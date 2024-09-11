@@ -125,7 +125,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         String query = "Software engineering";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(query, "default"), 0);
-        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software+engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
+        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
     }
 
     @Test
@@ -163,13 +163,13 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void performSearchByEmptyQuery() throws Exception {
+    void performSearchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
     @Test
     @Disabled("We seem to be blocked")
-    public void findByEntry() throws Exception {
+    void findByEntry() throws Exception {
         BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
                 .withField(StandardField.AUTHOR, "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi")

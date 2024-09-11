@@ -38,7 +38,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
@@ -146,11 +146,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             sslCertificatesChanged.set(true);
             while (c.next()) {
                 if (c.wasAdded()) {
-                    CustomCertificateViewModel certificate = c.getAddedSubList().get(0);
+                    CustomCertificateViewModel certificate = c.getAddedSubList().getFirst();
                     certificate.getPath().ifPresent(path -> trustStoreManager
                             .addCertificate(formatCustomAlias(certificate.getThumbprint()), Path.of(path)));
                 } else if (c.wasRemoved()) {
-                    CustomCertificateViewModel certificate = c.getRemoved().get(0);
+                    CustomCertificateViewModel certificate = c.getRemoved().getFirst();
                     trustStoreManager.deleteCertificate(formatCustomAlias(certificate.getThumbprint()));
                 }
             }
@@ -159,6 +159,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
         proxyPreferences.setUseProxy(proxyUseProperty.getValue());
         proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
         proxyPreferences.setPort(proxyPortProperty.getValue().trim());

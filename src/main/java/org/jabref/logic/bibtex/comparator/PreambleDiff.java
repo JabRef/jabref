@@ -50,4 +50,12 @@ public class PreambleDiff {
     public int hashCode() {
         return Objects.hash(originalPreamble, newPreamble);
     }
+
+    @Override
+    public String toString() {
+        return "PreambleDiff{" +
+                "originalPreamble='" + originalPreamble + '\'' +
+                ", newPreamble='" + newPreamble + '\'' +
+                '}';
+    }
 }

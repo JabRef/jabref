@@ -62,9 +62,6 @@ public class CleanupAction extends SimpleCommand {
             return;
         }
 
-        dialogService.notify(Localization.lang("Doing a cleanup for %0 entries...",
-                Integer.toString(stateManager.getSelectedEntries().size())));
-
         isCanceled = false;
         modifiedEntriesCount = 0;
 

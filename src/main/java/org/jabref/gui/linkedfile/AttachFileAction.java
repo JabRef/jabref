@@ -51,7 +51,7 @@ public class AttachFileAction extends SimpleCommand {
 
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
-        BibEntry entry = stateManager.getSelectedEntries().get(0);
+        BibEntry entry = stateManager.getSelectedEntries().getFirst();
 
         Path workingDirectory = databaseContext.getFirstExistingFileDir(filePreferences)
                                                .orElse(filePreferences.getWorkingDirectory());
@@ -66,7 +66,7 @@ public class AttachFileAction extends SimpleCommand {
                     databaseContext.getFileDirectories(filePreferences),
                     filePreferences);
 
-            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
+            LinkedFileEditDialog dialog = new LinkedFileEditDialog(linkedFile);
 
             dialogService.showCustomDialogAndWait(dialog)
                   .ifPresent(editedLinkedFile -> {

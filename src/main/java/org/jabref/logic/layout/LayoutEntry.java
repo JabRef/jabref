@@ -236,9 +236,7 @@ class LayoutEntry {
         if (InternalField.TYPE_HEADER.getName().equals(text)) {
             fieldEntry = bibtex.getType().getDisplayName();
         } else if (InternalField.OBSOLETE_TYPE_HEADER.getName().equals(text)) {
-            LOGGER.warn("'" + InternalField.OBSOLETE_TYPE_HEADER
-                    + "' is an obsolete name for the entry type. Please update your layout to use '"
-                    + InternalField.TYPE_HEADER + "' instead.");
+            LOGGER.warn("'{}' is an obsolete name for the entry type. Please update your layout to use '{}' instead.", InternalField.OBSOLETE_TYPE_HEADER, InternalField.TYPE_HEADER);
             fieldEntry = bibtex.getType().getDisplayName();
         } else {
             // changed section begin - arudert

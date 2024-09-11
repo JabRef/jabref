@@ -11,7 +11,7 @@ import javafx.util.Pair;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldFactory;
 
 import com.google.common.base.CharMatcher;
 
@@ -28,7 +28,7 @@ public class AmpersandChecker implements EntryChecker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         return entry.getFieldMap().entrySet().stream()
-                    .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
+                    .filter(field -> FieldFactory.isLatexField(field.getKey()))
                     // We use "flatMap" instead of filtering later, because we assume there won't be that much error messages - and construction of Stream.empty() is faster than construction of a new Tuple2 (including lifting long to Long)
                     .flatMap(AmpersandChecker::getUnescapedAmpersandsWithCount)
                     .map(pair -> new IntegrityMessage(Localization.lang("Found %0 unescaped '&'", pair.getValue()), entry, pair.getKey()))

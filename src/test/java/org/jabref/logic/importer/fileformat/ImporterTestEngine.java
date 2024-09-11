@@ -17,9 +17,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.Assertions;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImporterTestEngine {
 
@@ -40,11 +40,11 @@ public class ImporterTestEngine {
     }
 
     public static void testIsRecognizedFormat(Importer importer, String fileName) throws IOException {
-        Assertions.assertTrue(importer.isRecognizedFormat(getPath(fileName)));
+        assertTrue(importer.isRecognizedFormat(getPath(fileName)));
     }
 
     public static void testIsNotRecognizedFormat(Importer importer, String fileName) throws IOException {
-        Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName)));
+        assertFalse(importer.isRecognizedFormat(getPath(fileName)));
     }
 
     public static void testImportEntries(Importer importer, String fileName, String fileType) throws IOException, ImportException {
@@ -52,8 +52,7 @@ public class ImporterTestEngine {
         if (parserResult.isInvalid()) {
             throw new ImportException(parserResult.getErrorMessage());
         }
-        List<BibEntry> entries = parserResult.getDatabase()
-                                             .getEntries();
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
         BibEntryAssert.assertEquals(ImporterTestEngine.class, fileName.replaceAll(fileType, ".bib"), entries);
     }
 

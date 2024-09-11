@@ -1,11 +1,11 @@
 package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -17,71 +17,116 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.StandardFileType;
 
-import de.undercouch.citeproc.helper.CSLUtils;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself
  */
-public class CitationStyle {
+@AllowedToUseClassGetResource("org.jabref.logic.citationstyle.CitationStyle.discoverCitationStyles reads the whole path to discover all available styles. Should be converted to a build-time job.")
+public class CitationStyle implements OOStyle {
 
     public static final String DEFAULT = "/ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final List<CitationStyle> STYLES = new ArrayList<>();
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
     private final String filePath;
     private final String title;
+    private final boolean isNumericStyle;
     private final String source;
 
-    private CitationStyle(final String filename, final String title, final String source) {
+    private CitationStyle(final String filename, final String title, final boolean isNumericStyle, final String source) {
         this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
+        this.isNumericStyle = isNumericStyle;
         this.source = Objects.requireNonNull(source);
     }
 
     /**
      * Creates an CitationStyle instance out of the style string
      */
-    private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
-        if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
-            try {
-                InputSource inputSource = new InputSource();
-                inputSource.setCharacterStream(new StringReader(stripInvalidProlog(source)));
+    private static Optional<CitationStyle> createCitationStyleFromSource(final InputStream source, final String filename) {
+        try {
+            String content = new String(source.readAllBytes());
 
-                Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
-
-                // See CSL#canFormatBibliographies, checks if the tag exists
-                NodeList bibs = doc.getElementsByTagName("bibliography");
-                if (bibs.getLength() <= 0) {
-                    LOGGER.debug("no bibliography element for file {} ", filename);
-                    return Optional.empty();
-                }
-
-                NodeList nodes = doc.getElementsByTagName("info");
-                NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-                String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
-
-                return Optional.of(new CitationStyle(filename, title, source));
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                LOGGER.error("Error while parsing source", e);
+            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
+            if (styleInfo.isEmpty()) {
+                return Optional.empty();
             }
+
+            return Optional.of(new CitationStyle(filename, styleInfo.get().title(), styleInfo.get().isNumericStyle(), content));
+        } catch (IOException e) {
+            LOGGER.error("Error while parsing source", e);
+            return Optional.empty();
         }
-        return Optional.empty();
+    }
+
+    public record StyleInfo(String title, boolean isNumericStyle) {
+    }
+
+    @VisibleForTesting
+    static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
+        FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
+
+        try {
+            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
+
+            boolean inInfo = false;
+            boolean hasBibliography = false;
+            String title = "";
+            boolean isNumericStyle = false;
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    switch (elementName) {
+                        case "bibliography" -> hasBibliography = true;
+                        case "info" -> inInfo = true;
+                        case "title" -> {
+                            if (inInfo) {
+                                title = reader.getElementText();
+                            }
+                        }
+                        case "category" -> {
+                            String citationFormat = reader.getAttributeValue(null, "citation-format");
+                            if (citationFormat != null) {
+                                isNumericStyle = "numeric".equals(citationFormat);
+                            }
+                        }
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
+                    if ("info".equals(reader.getLocalName())) {
+                        inInfo = false;
+                    }
+                }
+            }
+
+            if (hasBibliography && title != null) {
+                return Optional.of(new StyleInfo(title, isNumericStyle));
+            } else {
+                LOGGER.debug("No valid title or bibliography found for file {}", filename);
+                return Optional.empty();
+            }
+        } catch (XMLStreamException e) {
+            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
+            return Optional.empty();
+        }
     }
 
     private static String stripInvalidProlog(String source) {
@@ -102,18 +147,15 @@ public class CitationStyle {
             return Optional.empty();
         }
 
-        try {
-            String text;
-            String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
-            URL url = CitationStyle.class.getResource(internalFile);
-
-            if (url != null) {
-                text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
-            } else {
-                // if the url is null then the style is located outside the classpath
-                text = Files.readString(Path.of(styleFile));
+        String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
+        Path internalFilePath = Path.of(internalFile);
+        boolean isExternalFile = Files.exists(internalFilePath);
+        try (InputStream inputStream = isExternalFile ? Files.newInputStream(internalFilePath) : CitationStyle.class.getResourceAsStream(internalFile)) {
+            if (inputStream == null) {
+                LOGGER.error("Could not find file: {}", styleFile);
+                return Optional.empty();
             }
-            return createCitationStyleFromSource(text, styleFile);
+            return createCitationStyleFromSource(inputStream, styleFile);
         } catch (NoSuchFileException e) {
             LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
@@ -128,7 +170,7 @@ public class CitationStyle {
      * @return default citation style
      */
     public static CitationStyle getDefault() {
-        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", ""));
+        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", false, ""));
     }
 
     /**
@@ -140,6 +182,8 @@ public class CitationStyle {
         if (!STYLES.isEmpty()) {
             return STYLES;
         }
+
+        // TODO: The list of files should be determined at build time (instead of the dynamic method in discoverCitationStylesInPath(path))
 
         URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
         if (url == null) {
@@ -153,7 +197,8 @@ public class CitationStyle {
             STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
-        } catch (URISyntaxException | IOException e) {
+        } catch (URISyntaxException
+                 | IOException e) {
             LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
@@ -179,6 +224,10 @@ public class CitationStyle {
 
     public String getTitle() {
         return title;
+    }
+
+    public boolean isNumericStyle() {
+        return isNumericStyle;
     }
 
     public String getSource() {
@@ -210,5 +259,20 @@ public class CitationStyle {
     @Override
     public int hashCode() {
         return Objects.hash(source);
+    }
+
+    @Override
+    public String getName() {
+        return getTitle();
+    }
+
+    @Override
+    public boolean isInternalStyle() {
+        return true;
+    }
+
+    @Override
+    public String getPath() {
+        return getFilePath();
     }
 }

@@ -12,7 +12,6 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -34,12 +33,12 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.ai.AiPreferences;
 
 import org.jvnet.hk2.annotations.Contract;
 
 @Contract
 public interface PreferencesService {
-
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;
@@ -55,8 +54,6 @@ public interface PreferencesService {
     BibEntryPreferences getBibEntryPreferences();
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
-
-    void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
     KeyBindingRepository getKeyBindingRepository();
 
@@ -88,8 +85,6 @@ public interface PreferencesService {
     CleanupPreferences getDefaultCleanupPreset();
 
     LibraryPreferences getLibraryPreferences();
-
-    TelemetryPreferences getTelemetryPreferences();
 
     DOIPreferences getDOIPreferences();
 
@@ -152,4 +147,8 @@ public interface PreferencesService {
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
+
+    UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
+
+    AiPreferences getAiPreferences();
 }

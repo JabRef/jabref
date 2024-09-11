@@ -15,8 +15,7 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -70,45 +69,35 @@ public class ExternalFilesEntryLinker {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
                 ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
                                                          .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectories(filePreferences));
+                Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
                 LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
                 entry.addFile(linkedfile);
             });
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, LuceneManager luceneManager) {
+        try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
             renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
-            LOGGER.error("Could not block IndexingTaskManager", e);
+            LOGGER.error("Could not block LinkedFilesIndexer", e);
         }
-
-        try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
-        } catch (IOException e) {
-            LOGGER.error("Could not access Fulltext-Index", e);
-        }
+        luceneManager.updateAfterDropFiles(entry);
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, LuceneManager luceneManager) {
+        try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             for (Path file : files) {
                 copyFileToFileDir(file)
                         .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
             }
             renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
-            LOGGER.error("Could not block IndexingTaskManager", e);
+            LOGGER.error("Could not block LinkedFilesIndexer", e);
         }
-
-        try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
-        } catch (IOException e) {
-            LOGGER.error("Could not access fulltext index", e);
-        }
+        luceneManager.updateAfterDropFiles(entry);
     }
 
     private List<Path> getValidFileNames(List<Path> filesToAdd) {

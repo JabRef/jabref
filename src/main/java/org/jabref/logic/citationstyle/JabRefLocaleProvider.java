@@ -1,13 +1,15 @@
 package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.undercouch.citeproc.LocaleProvider;
-import de.undercouch.citeproc.helper.CSLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LocaleProvider} that loads locales from a directory in the current module.
@@ -16,6 +18,8 @@ import de.undercouch.citeproc.helper.CSLUtils;
  */
 public class JabRefLocaleProvider implements LocaleProvider {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefLocaleProvider.class);
+
     private static final String LOCALES_ROOT = "/csl-locales";
 
     private final Map<String, String> locales = new HashMap<>();
@@ -23,13 +27,13 @@ public class JabRefLocaleProvider implements LocaleProvider {
     @Override
     public String retrieveLocale(String lang) {
         return locales.computeIfAbsent(lang, locale -> {
-            try {
-                URL url = getClass().getResource(LOCALES_ROOT + "/locales-" + locale + ".xml");
-                if (url == null) {
+            try (InputStream inputStream = getClass().getResourceAsStream(LOCALES_ROOT + "/locales-" + locale + ".xml")) {
+                if (inputStream == null) {
                     throw new IllegalArgumentException("Unable to load locale " + locale);
                 }
-                return CSLUtils.readURLToString(url, "UTF-8");
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             } catch (IOException e) {
+                LOGGER.error("failed to read locale {}", locale, e);
                 throw new UncheckedIOException("failed to read locale " + locale, e);
             }
         });

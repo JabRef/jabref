@@ -39,13 +39,14 @@ import org.jabref.logic.util.OS;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
+    private final BooleanProperty shouldkeepDownloadUrl = new SimpleBooleanProperty();
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
@@ -83,7 +84,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
-
+        shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
@@ -110,7 +111,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
-
+        filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
@@ -170,6 +171,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty shouldDownloadLinkedOnlineFiles() {
         return shouldDownloadLinkedOnlineFiles;
+    }
+
+    public BooleanProperty shouldKeepDownloadUrl() {
+        return shouldkeepDownloadUrl;
     }
 
     public ReadOnlyBooleanProperty apiKeyPersistAvailable() {

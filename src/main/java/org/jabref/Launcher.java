@@ -13,10 +13,12 @@ import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -25,13 +27,17 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,45 +53,42 @@ import org.tinylog.configuration.Configuration;
  */
 public class Launcher {
     private static Logger LOGGER;
-    private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
-        routeLoggingToSlf4J();
+        initLogging(args);
 
-        // We must configure logging as soon as possible, which is why we cannot wait for the usual
-        // argument parsing workflow to parse logging options .e.g. --debug
-        JabRefCLI jabRefCLI;
         try {
-            jabRefCLI = new JabRefCLI(args);
-            isDebugEnabled = jabRefCLI.isDebugLogging();
-        } catch (ParseException e) {
-            isDebugEnabled = false;
-        }
-
-        addLogToDisk();
-        try {
-            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-            Globals.entryTypesManager = entryTypesManager;
+            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Injector.setModelOrService(PreferencesService.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
                 return;
             }
 
-            Globals.prefs = preferences;
+            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+            Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
+
             PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
-            // Initialize rest of preferences
+            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+            Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
+
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
-            initGlobals(preferences);
+
             clearOldSearchIndices();
 
             try {
-                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+                DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+                Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+                HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+
+                DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+                Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
@@ -114,25 +117,35 @@ public class Launcher {
         }
     }
 
-    private static void routeLoggingToSlf4J() {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
     /**
      * This needs to be called as early as possible. After the first log write, it
-     * is not possible to alter
-     * the log configuration programmatically anymore.
+     * is not possible to alter the log configuration programmatically anymore.
      */
-    private static void addLogToDisk() {
+    private static void initLogging(String[] args) {
+        // routeLoggingToSlf4J
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+        // argument parsing workflow to parse logging options .e.g. --debug
+        boolean isDebugEnabled;
+        try {
+            JabRefCLI jabRefCLI = new JabRefCLI(args);
+            isDebugEnabled = jabRefCLI.isDebugLogging();
+        } catch (ParseException e) {
+            isDebugEnabled = false;
+        }
+
+        // addLogToDisk
         Path directory = OS.getNativeDesktop().getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            initializeLogger();
+            LOGGER = LoggerFactory.getLogger(Launcher.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
+
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
@@ -144,12 +157,8 @@ public class Launcher {
                 "writerFile.charset", "UTF-8",
                 "writerFile.policies", "startup",
                 "writerFile.backups", "30");
-
         configuration.forEach(Configuration::set);
-        initializeLogger();
-    }
 
-    private static void initializeLogger() {
         LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
 
@@ -181,14 +190,6 @@ public class Launcher {
             }
         }
         return true;
-    }
-
-    private static void initGlobals(PreferencesService preferences) {
-        // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader
-                .loadRepository(preferences.getJournalAbbreviationPreferences());
-        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
-        Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

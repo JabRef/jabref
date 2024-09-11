@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,9 +21,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
-public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     public static final String NAME = "IACR eprints";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprintFetcher.class);
 
     private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile("[^0-9/]");
 
@@ -55,7 +61,13 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     }
 
     private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
-        String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
+        URL url;
+        try {
+            url = URI.create(CITATION_URL_PREFIX + validIdentifier).toURL();
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Invalid URL", e);
+        }
+        String bibtexCitationHtml = getHtml(url);
         if (bibtexCitationHtml.contains("No such report found")) {
             throw new FetcherException(Localization.lang("No results found."));
         }
@@ -69,7 +81,13 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     }
 
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
-        String entryUrl = DESCRIPTION_URL_PREFIX + identifier;
+        URL entryUrl;
+        try {
+            entryUrl = URI.create(DESCRIPTION_URL_PREFIX + identifier).toURL();
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Invalid URL", e);
+        }
+
         String descriptiveHtml = getHtml(entryUrl);
 
         entry.setField(StandardField.ABSTRACT, getAbstract(descriptiveHtml));
@@ -77,8 +95,12 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
 
         // Version information for entries after year 2000
         if (isFromOrAfterYear2000(entry)) {
-            String entryVersion = VERSION_URL_PREFIX + identifier;
-            String versionHtml = getHtml(entryVersion);
+            try {
+                entryUrl = URI.create(VERSION_URL_PREFIX + identifier).toURL();
+            } catch (MalformedURLException e) {
+                throw new FetcherException("Invalid URL", e);
+            }
+            String versionHtml = getHtml(entryUrl);
             String version = getVersion(identifier, versionHtml);
             entry.setField(StandardField.VERSION, version);
             entry.setField(StandardField.URL, entryUrl + "/" + version);
@@ -103,13 +125,9 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         return dateStringAsInHtml;
     }
 
-    private String getHtml(String url) throws FetcherException {
-        try {
-            URLDownload download = new URLDownload(url);
-            return download.asString();
-        } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Could not retrieve entry data from '%0'.", url), e);
-        }
+    private String getHtml(URL url) throws FetcherException {
+        URLDownload download = new URLDownload(url);
+        return download.asString();
     }
 
     private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
@@ -140,7 +158,15 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
 
         Optional<String> urlField = entry.getField(StandardField.URL);
         if (urlField.isPresent()) {
-            String descriptiveHtml = getHtml(urlField.get());
+            URL url;
+            try {
+                url = URI.create(urlField.get()).toURL();
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Invalid URL {}", urlField.get(), e);
+                return Optional.empty();
+            }
+
+            String descriptiveHtml = getHtml(url);
             String startOfFulltextLink = "<a class=\"btn btn-sm btn-outline-dark\"";
             String fulltextLinkAsInHtml = getRequiredValueBetween(startOfFulltextLink, ".pdf", descriptiveHtml);
             // There is an additional "\n           href=\"/archive/" we have to remove - and for some reason,

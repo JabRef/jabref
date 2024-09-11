@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InspecImporterTest {
+class InspecImporterTest {
 
     private static final String FILE_ENDING = ".txt";
     private InspecImporter importer;
@@ -40,24 +40,24 @@ public class InspecImporterTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         this.importer = new InspecImporter();
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormatAccept(String fileName) throws IOException {
+    void isRecognizedFormatAccept(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonInspecfileNames")
-    public void isRecognizedFormatReject(String fileName) throws IOException {
+    void isRecognizedFormatReject(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void completeBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
+    void completeBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         expectedEntry.setField(StandardField.TITLE, "The SIS project : software reuse with a natural language approach");
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
@@ -73,7 +73,7 @@ public class InspecImporterTest {
     }
 
     @Test
-    public void importConferencePaperGivesInproceedings() throws IOException {
+    void importConferencePaperGivesInproceedings() throws IOException {
         String testInput = "Record.*INSPEC.*\n" +
                 "\n" +
                 "RT ~ Conference-Paper\n" +
@@ -88,7 +88,7 @@ public class InspecImporterTest {
     }
 
     @Test
-    public void importMiscGivesMisc() throws IOException {
+    void importMiscGivesMisc() throws IOException {
         String testInput = "Record.*INSPEC.*\n" +
                 "\n" +
                 "AU ~ Prechelt, Lutz \n" +
@@ -105,22 +105,17 @@ public class InspecImporterTest {
     }
 
     @Test
-    public void getFormatName() {
+    void getFormatName() {
         assertEquals("INSPEC", importer.getName());
     }
 
     @Test
-    public void getCLIId() {
+    void getCLIId() {
         assertEquals("inspec", importer.getId());
     }
 
     @Test
-    public void sGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
-    }
-
-    @Test
-    public void getDescription() {
-        assertEquals("INSPEC format importer.", importer.getDescription());
     }
 }

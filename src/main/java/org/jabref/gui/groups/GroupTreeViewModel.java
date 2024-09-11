@@ -26,6 +26,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,6 +43,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import dev.langchain4j.data.message.ChatMessage;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -49,6 +51,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final AiService aiService;
     private final PreferencesService preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
@@ -72,9 +75,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, AiService aiService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.aiService = Objects.requireNonNull(aiService);
         this.preferences = Objects.requireNonNull(preferencesService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
@@ -85,9 +89,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
-
-        // Init
-        refresh();
     }
 
     private void refresh() {
@@ -178,7 +179,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     groupDialogHeader));
 
             newGroup.ifPresent(group -> {
-                parent.addSubgroup(group);
+                GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -186,7 +188,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
-
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
             });
@@ -261,8 +262,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
-            newGroup.ifPresent(group -> {
 
+            newGroup.ifPresent(group -> {
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
                 String oldGroupName = oldGroupDef.getName();
 
@@ -278,11 +279,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
-                    boolean removePreviousAssignments = true;
                     // We found more than 2 groups, so we cannot simply remove old assignment
-                    if (groupsWithSameName >= 2) {
-                        removePreviousAssignments = false;
-                    }
+                    boolean removePreviousAssignments = groupsWithSameName < 2;
 
                     oldGroup.getGroupNode().setGroup(
                             group,
@@ -292,7 +290,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
-                    // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                    // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                     refresh();
                     return;
                 }
@@ -378,10 +376,30 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
-                // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                 refresh();
             });
         });
+    }
+
+    public void chatWithGroup(GroupNodeViewModel group) {
+        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
+        if (currentDatabase.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
+            return;
+        }
+
+        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
+
+        // We localize the name here, because it is used as the title of the window.
+        // See documentation for {@link AiChatGuardedComponent#name}.
+        StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
+        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
+
+        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode());
+        ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
+
+        aiService.openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

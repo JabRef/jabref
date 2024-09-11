@@ -29,7 +29,7 @@ The [MariaDB Connector](https://mariadb.com/kb/en/library/about-mariadb-connecto
 
 ### Use MySQL Connector
 
-The [MySQL Connector](https://www.mysql.com/de/products/connector/) is distributed by Oracle and licensed under GPL-2. Source: [https://downloads.mysql.com/docs/licenses/connector-j-8.0-gpl-en.pdf](https://downloads.mysql.com/docs/licenses/connector-j-8.0-gpl-en.pdf). Oracle added the [Universal FOSS Exception, Version 1.0](https://oss.oracle.com/licenses/universal-foss-exception/) to it, which seems to limit the effects of GPL. More information on the FOSS Exception are available at [https://www.mysql.com/de/about/legal/licensing/foss-exception/](https://www.mysql.com/de/about/legal/licensing/foss-exception/).
+The [MySQL Connector](https://www.mysql.com/de/products/connector/) is distributed by Oracle and licensed under GPL-2. Source: [https://github.com/mysql/mysql-connector-j/blob/release/9.x/LICENSE](https://github.com/mysql/mysql-connector-j/blob/release/9.x/LICENSE). Oracle added the [Universal FOSS Exception, Version 1.0](https://oss.oracle.com/licenses/universal-foss-exception/) to it, which seems to limit the effects of GPL. More information on the FOSS Exception are available at [https://www.mysql.com/de/about/legal/licensing/foss-exception/](https://www.mysql.com/de/about/legal/licensing/foss-exception/).
 
 * Good, because it stems from the same development team than MySQL
 * Bad, because the "Universal FOSS Exception" makes licensing more complicated.

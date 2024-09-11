@@ -45,7 +45,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
      */
     public void newFile(Path file) {
         removeItem(file);
-        this.add(0, file);
+        this.addFirst(file);
         while (size() > HISTORY_SIZE) {
             history.remove(HISTORY_SIZE);
         }

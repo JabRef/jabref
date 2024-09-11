@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -15,7 +14,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
@@ -64,7 +62,7 @@ public class WebSearchPaneViewModel {
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
         int defaultFetcherIndex = sidePanePreferences.getWebSearchFetcherSelected();
         if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
-            selectedFetcherProperty().setValue(fetchers.get(0));
+            selectedFetcherProperty().setValue(fetchers.getFirst());
         } else {
             selectedFetcherProperty().setValue(fetchers.get(defaultFetcherIndex));
         }
@@ -146,25 +144,26 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
+
+        Callable<ParserResult> parserResultCallable;
+
         String fetcherName = activeFetcher.getName();
 
         if (CompositeIdFetcher.containsValidId(query)) {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
+        } else {
+            // Exceptions are handled below at "task.onFailure(dialogService::showErrorDialogAndWait)"
+            parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         }
 
-        final String finalFetcherName = fetcherName;
-        Telemetry.getTelemetryClient().ifPresent(client ->
-                client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
-
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
-                             .withInitialMessage(Localization.lang("Processing %0", query));
+                                                          .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-        dialog.setTitle(finalFetcherName);
+        dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 

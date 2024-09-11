@@ -12,44 +12,37 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class SearchPreferences {
 
-    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
+    private final DoubleProperty searchWindowHeight;
+    private final DoubleProperty searchWindowWidth;
+    private final DoubleProperty searchWindowDividerPosition;
+    private final BooleanProperty keepSearchSting;
+    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
-    private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
-    private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
-
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
-
-        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
-        if (isCaseSensitive) {
-            searchFlags.add(SearchFlags.CASE_SENSITIVE);
-        }
-        if (isRegularExpression) {
-            searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
-        }
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isFulltext, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
         if (isFulltext) {
             searchFlags.add(SearchFlags.FULLTEXT);
         }
-        if (isKeepSearchString) {
-            searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
-        }
-
-        this.setSearchWindowHeight(searchWindowHeight);
-        this.setSearchWindowWidth(searchWindowWidth);
     }
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
+    @VisibleForTesting
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
-
         this.searchFlags = FXCollections.observableSet(searchFlags);
+
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
+        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
+        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
+        this.keepSearchSting = new SimpleBooleanProperty(keepSearchString);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -60,24 +53,8 @@ public class SearchPreferences {
         return EnumSet.copyOf(searchFlags);
     }
 
-    protected ObservableSet<SearchFlags> getObservableSearchFlags() {
+    public ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
-    }
-
-    public SearchDisplayMode getSearchDisplayMode() {
-        return searchDisplayMode.get();
-    }
-
-    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
-        return searchDisplayMode;
-    }
-
-    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
-        this.searchDisplayMode.set(searchDisplayMode);
-    }
-
-    public boolean isCaseSensitive() {
-        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {
@@ -88,16 +65,12 @@ public class SearchPreferences {
         }
     }
 
-    public boolean isRegularExpression() {
-        return searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);
-    }
-
     public boolean isFulltext() {
         return searchFlags.contains(SearchFlags.FULLTEXT);
     }
 
     public boolean shouldKeepSearchString() {
-        return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+        return keepSearchSting.get();
     }
 
     public boolean shouldKeepWindowOnTop() {
@@ -120,6 +93,10 @@ public class SearchPreferences {
         return this.searchWindowWidth.get();
     }
 
+    public Double getSearchWindowDividerPosition() {
+        return this.searchWindowDividerPosition.get();
+    }
+
     public DoubleProperty getSearchWindowHeightProperty() {
         return this.searchWindowHeight;
     }
@@ -128,11 +105,39 @@ public class SearchPreferences {
         return this.searchWindowWidth;
     }
 
+    public SearchDisplayMode getSearchDisplayMode() {
+        return searchDisplayMode.get();
+    }
+
+    public DoubleProperty getSearchWindowDividerPositionProperty() {
+        return this.searchWindowDividerPosition;
+    }
+
+    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
+        return this.searchDisplayMode;
+    }
+
+    public BooleanProperty keepSearchStingProperty() {
+        return keepSearchSting;
+    }
+
     public void setSearchWindowHeight(double height) {
         this.searchWindowHeight.set(height);
     }
 
     public void setSearchWindowWidth(double width) {
         this.searchWindowWidth.set(width);
+    }
+
+    public void setSearchWindowDividerPosition(double position) {
+        this.searchWindowDividerPosition.set(position);
+    }
+
+    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
+        this.searchDisplayMode.set(searchDisplayMode);
+    }
+
+    public void setKeepSearchString(boolean keepSearchString) {
+        this.keepSearchSting.set(keepSearchString);
     }
 }

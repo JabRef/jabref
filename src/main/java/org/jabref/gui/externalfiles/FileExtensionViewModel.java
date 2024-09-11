@@ -15,14 +15,20 @@ import org.jabref.preferences.FilePreferences;
 
 public class FileExtensionViewModel {
 
+    private final String name;
     private final String description;
     private final List<String> extensions;
     private final FilePreferences filePreferences;
 
     FileExtensionViewModel(FileType fileType, FilePreferences filePreferences) {
+        this.name = fileType.getName();
         this.description = Localization.lang("%0 file", fileType.getName());
         this.extensions = fileType.getExtensionsWithAsteriskAndDot();
         this.filePreferences = filePreferences;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public String getDescription() {

@@ -39,7 +39,7 @@ public class RelativePathsCleanup implements CleanupJob {
             } else {
                 // only try to transform local file path to relative one
                 newFileName = FileUtil
-                        .relativize(Path.of(oldFileName), databaseContext.getFileDirectories(filePreferences))
+                        .relativize(Path.of(oldFileName), databaseContext, filePreferences)
                         .toString();
             }
             LinkedFile newFileEntry = fileEntry;

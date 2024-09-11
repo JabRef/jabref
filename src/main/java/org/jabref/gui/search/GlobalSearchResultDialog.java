@@ -14,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
@@ -24,6 +25,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
@@ -35,13 +37,14 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
+    // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
+    @SuppressWarnings("FieldCanBeLocal") private Subscription keepOnTopSubscription;
+
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
-
-    private GlobalSearchResultDialogViewModel viewModel;
 
     public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
         this.undoManager = undoManager;
@@ -56,16 +59,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
+        GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferencesService.getSearchPreferences());
 
         GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
-        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager, taskExecutor);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
@@ -82,13 +85,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                var selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                if (selectedEntry == null) {
+                    return;
+                }
                 libraryTabContainer.getLibraryTabs().stream()
                                    .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
 
-                stateManager.clearSearchQuery();
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
                 stage.close();
             }
@@ -98,7 +104,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
 
-        EasyBind.subscribe(viewModel.keepOnTop(), value -> {
+        keepOnTopSubscription = EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             stage.setAlwaysOnTop(value);
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
@@ -108,11 +114,14 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         stage.setOnShown(event -> {
             stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+            container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
+            searchBar.requestFocus();
         });
 
         stage.setOnHidden(event -> {
             preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
+            preferencesService.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
         });
     }
 }

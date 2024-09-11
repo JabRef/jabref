@@ -1,10 +1,12 @@
 package org.jabref.logic.importer;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -46,6 +48,16 @@ class AuthorListParserTest {
         assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
     }
 
+    @Test
+    void dashedNamesWithoutSpaceNormalized() {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and W-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W-P. Chen, and H. Sun"));
+    }
+
+    @Test
+    void dashedNamesWithSpaceNormalized() {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and W.-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
+    }
+
     private static Stream<Arguments> parseMultipleCorrectly() {
         return Stream.of(
                 Arguments.of(
@@ -61,7 +73,13 @@ class AuthorListParserTest {
                                 new Author("A.", "A.", null, "Ibarra", null),
                                 new Author("J.", "J.", null, "Molla", null)
                         ),
-                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla")
+                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"),
+                Arguments.of(AuthorList.of(
+                                new Author("Vivian", "V.", null, "U", null),
+                                new Author("Thomas", "T.", null, "Lai", null)
+                        ),
+                        "U, Vivian and Lai, Thomas"
+                )
         );
     }
 

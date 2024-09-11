@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -42,10 +43,15 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
+import org.jabref.http.dto.SimpleHttpResponse;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -86,6 +92,7 @@ public class JabRefDialogService implements DialogService {
         alert.setResizable(true);
 
         TextArea area = new TextArea(content);
+        area.setWrapText(true);
 
         alert.getDialogPane().setContent(area);
         alert.initOwner(mainWindow);
@@ -204,6 +211,42 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
+    public void showErrorDialogAndWait(Exception exception) {
+        if (exception instanceof FetcherException fetcherException) {
+            // Somehow, Java does not route correctly to the other method
+            showErrorDialogAndWait(fetcherException);
+        } else {
+            showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
+        }
+    }
+
+    @Override
+    public void showErrorDialogAndWait(FetcherException fetcherException) {
+        String failedTitle = Localization.lang("Failed to download from URL");
+        String localizedMessage = fetcherException.getLocalizedMessage();
+        Optional<SimpleHttpResponse> httpResponse = fetcherException.getHttpResponse();
+        if (httpResponse.isPresent()) {
+            int statusCode = httpResponse.get().statusCode();
+            if (statusCode == 401) {
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\n\n" + localizedMessage);
+            } else if (statusCode == 403) {
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\n\n" + localizedMessage);
+            } else if (statusCode == 404) {
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\n\n" + localizedMessage);
+            } else {
+                this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
+            }
+        } else if (fetcherException instanceof FetcherClientException) {
+            this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
+        } else if (fetcherException instanceof FetcherServerException) {
+            this.showInformationDialogAndWait(failedTitle,
+                    Localization.lang("Error downloading from URL. Cause is likely the server side.\nPlease try again later or contact the server administrator.") + "\n\n" + localizedMessage);
+        } else {
+            this.showErrorDialogAndWait(failedTitle, localizedMessage);
+        }
+    }
+
+    @Override
     public void showErrorDialogAndWait(String title, String content, Throwable exception) {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setHeaderText(title);
@@ -282,7 +325,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog) {
+    public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
         if (dialog.getOwner() == null) {
             dialog.initOwner(mainWindow);
         }
@@ -291,7 +334,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
-        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<String> dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(header);
 
@@ -347,7 +390,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-        EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+        EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
         taskProgressView.setRetainTasks(false);
         taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
@@ -377,9 +420,11 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
+        // TODO: Change to a notification overview instead of event log when that is available.
+        //       The event log is not that user friendly (different purpose).
         LOGGER.info(message);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
                          .text(message)
                          .position(Pos.BOTTOM_CENTER)
@@ -388,7 +433,6 @@ public class JabRefDialogService implements DialogService {
                          .threshold(5,
                                  Notifications.create()
                                               .title(Localization.lang("Last notification"))
-                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)
@@ -466,5 +510,14 @@ public class JabRefDialogService implements DialogService {
             aboutDialogView.initOwner(mainWindow);
         }
         aboutDialogView.show();
+    }
+
+    @Override
+    public void showCustomWindow(BaseWindow window) {
+        if (window.getOwner() == null) {
+            window.initOwner(mainWindow);
+        }
+        window.applyStylesheets(mainWindow.getScene().getStylesheets());
+        window.show();
     }
 }

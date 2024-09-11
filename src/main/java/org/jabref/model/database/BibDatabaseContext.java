@@ -3,14 +3,13 @@ package org.jabref.model.database;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseContext.class);
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -154,40 +153,43 @@ public class BibDatabaseContext {
      *     <li>user-specific metadata directory</li>
      *     <li>general metadata directory</li>
      *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
-     *     <li>preferences directory (if .bib file directory should not be used according to the preferences)</li>
+     *     <li>preferences directory (if .bib file directory should not be used according to the (global) preferences)</li>
      * </ol>
      *
      * @param preferences The fileDirectory preferences
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        List<Path> fileDirs = new ArrayList<>();
+        // Paths are a) ordered and b) should be contained only once in the result
+        LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
 
-        // 1. Metadata user-specific directory
-        metaData.getUserFileDirectory(preferences.getUserAndHost())
-                .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
+        userFileDirectory.ifPresent(fileDirs::add);
 
-        // 2. Metadata general directory
-        metaData.getDefaultFileDirectory()
-                .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
+        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        generalFileDirectory.ifPresent(fileDirs::add);
 
-        // 3. BIB file directory or main file directory
-        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
-        // (in the metadata of the bib file)
-        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
+        // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
+        //   1) no user-specific file directory set (in the metadata of the bib file) and
+        //   2) no general file directory is set (in the metadata of the bib file)
+
+        // BIB file directory or main file directory (according to (global) preferences)
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
+                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(parentPath);
+                fileDirs.add(parentPath.toAbsolutePath());
             });
         } else {
-            // Main file directory
-            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
+            preferences.getMainFileDirectory()
+                       .filter(path -> !fileDirs.contains(path))
+                       .ifPresent(fileDirs::add);
         }
 
-        return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
+        return new ArrayList<>(fileDirs);
     }
 
     /**
@@ -201,15 +203,19 @@ public class BibDatabaseContext {
                                               .findFirst();
     }
 
-    private Path getFileDirectoryPath(String directoryName) {
-        Path directory = Path.of(directoryName);
-        // If this directory is relative, we try to interpret it as relative to
-        // the file path of this BIB file:
-        Optional<Path> databaseFile = getDatabasePath();
-        if (!directory.isAbsolute() && databaseFile.isPresent()) {
-            return databaseFile.get().getParent().resolve(directory).normalize();
+    /**
+     * @return The absolute path for the given directory
+     */
+    private Path getFileDirectoryPath(String directory) {
+        Path path = Path.of(directory);
+        if (path.isAbsolute()) {
+            return path;
         }
-        return directory;
+
+        // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
+        return getDatabasePath()
+                .map(databaseFile -> databaseFile.getParent().resolve(path).normalize().toAbsolutePath())
+                .orElse(path);
     }
 
     public DatabaseSynchronizer getDBMSSynchronizer() {
@@ -255,8 +261,9 @@ public class BibDatabaseContext {
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            Path databaseFileName = getDatabasePath().get().getFileName();
-            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            Path databasePath = getDatabasePath().get();
+            // Eventually, this leads to filenames as "40daf3b0--fuu.bib--2022-09-04--01.36.25.bib" --> "--" is used as separator between "groups"
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
@@ -274,6 +281,7 @@ public class BibDatabaseContext {
                 ", mode=" + getMode() +
                 ", databasePath=" + getDatabasePath() +
                 ", biblatexMode=" + isBiblatexMode() +
+                ", uid= " + getUid() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
     }
@@ -289,6 +297,9 @@ public class BibDatabaseContext {
         return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
     }
 
+    /**
+     * @implNote This implementation needs to be consistent with equals. That means, as soon as a new entry is added to the database, two different instances of BibDatabaseContext are not equal - and thus, the hashCode also needs to change. This has the drawback, that one cannot create HashMaps from the BiDatabaseContext anymore, as the hashCode changes as soon as a new entry is added.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(database, metaData, path, location);
@@ -296,6 +307,8 @@ public class BibDatabaseContext {
 
     /**
      * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
+     * <p>
+     * This is required, because of {@link #hashCode()} implementation.
      *
      * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
      */

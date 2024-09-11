@@ -26,6 +26,10 @@ public class MergeReviewIntoCommentMigration {
          */
         List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
+        if (!entries.isEmpty()) {
+            parserResult.setChangedOnMigration(true);
+        }
+
         entries.stream()
                .filter(MergeReviewIntoCommentMigration::hasReviewField)
                .filter(entry -> !MergeReviewIntoCommentMigration.hasCommentField(entry))
@@ -64,7 +68,7 @@ public class MergeReviewIntoCommentMigration {
     private void migrate(BibEntry entry, ParserResult parserResult) {
         if (hasReviewField(entry)) {
             updateFields(entry, mergeCommentFieldIfPresent(entry, entry.getField(StandardField.REVIEW).get()));
-            parserResult.wasChangedOnMigration();
+            parserResult.setChangedOnMigration(true);
         }
     }
 

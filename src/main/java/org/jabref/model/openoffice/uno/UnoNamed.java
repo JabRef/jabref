@@ -5,6 +5,7 @@ import org.jabref.model.openoffice.DocumentAnnotation;
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
+import com.sun.star.uno.Exception;
 
 public class UnoNamed {
 
@@ -28,7 +29,7 @@ public class UnoNamed {
         Object xObject;
         try {
             xObject = msf.createInstance(service);
-        } catch (com.sun.star.uno.Exception e) {
+        } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
 

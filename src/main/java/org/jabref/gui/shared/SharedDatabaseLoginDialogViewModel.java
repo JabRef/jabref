@@ -22,8 +22,8 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -32,6 +32,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -48,6 +49,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -76,15 +78,19 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
+    private final BooleanProperty expertMode = new SimpleBooleanProperty();
+    private final StringProperty jdbcUrl = new SimpleStringProperty("");
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     private final Validator databaseValidator;
@@ -98,18 +104,22 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
+                                              AiService aiService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               UndoManager undoManager,
+                                              ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
@@ -144,6 +154,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setAllowPublicKeyRetrieval(true)
                 .setKeyStore(keystore.getValue())
                 .setServerTimezone(serverTimezone.getValue())
+                .setExpertMode(expertMode.getValue())
+                .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
         setupKeyStore();
@@ -184,17 +196,24 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     tabContainer,
                     dialogService,
                     preferencesService,
+                    aiService,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(
+                            libraryTab,
+                            dialogService,
+                            preferencesService,
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                    ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
@@ -402,5 +421,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public StringProperty serverTimezoneProperty() {
         return serverTimezone;
+    }
+
+    public BooleanProperty expertModeProperty() {
+        return expertMode;
+    }
+
+    public StringProperty jdbcUrlProperty() {
+        return jdbcUrl;
     }
 }

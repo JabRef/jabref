@@ -242,18 +242,14 @@ public class PreferencesMigrations {
                 oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-            LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                    " value \"" + oldStylePattern + "\" to new value \"" +
-                    newStylePattern + "\" in the preference file");
+            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
 
             if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
                 // Update also the key in the current application settings, if necessary:
                 String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
                 if (oldStylePattern.equals(fileNamePattern)) {
                     prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                    LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                            " value \"" + oldStylePattern + "\" to new value \"" +
-                            newStylePattern + "\" in the running application");
+                    LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
                 }
             }
         }
@@ -292,7 +288,7 @@ public class PreferencesMigrations {
             return result;
         };
 
-        List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
+        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
     }
@@ -436,7 +432,8 @@ public class PreferencesMigrations {
      * they can deal with.
      */
     static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
-        List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        // 5.0 preference name "columnNames". The new one is {@link JabRefPreferences#COLUMN_NAMES}
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {

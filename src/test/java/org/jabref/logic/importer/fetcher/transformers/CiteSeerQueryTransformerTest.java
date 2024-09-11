@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
@@ -28,6 +28,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Override
+    @Test
     public void convertYearField() throws Exception {
         String queryString = "year:2023";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -41,6 +42,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Override
+    @Test
     public void convertYearRangeField() throws Exception {
         String queryString = "year-range:2019-2023";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -54,7 +56,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    public void convertPageField() throws Exception {
+    void convertPageField() throws Exception {
         String queryString = "page:2";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -65,7 +67,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    public void convertPageSizeField() throws Exception {
+    void convertPageSizeField() throws Exception {
         String queryString = "pageSize:20";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -76,7 +78,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    public void convertSortByField() throws Exception {
+    void convertSortByField() throws Exception {
         String queryString = "sortBy:relevance";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -87,7 +89,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    public void convertMultipleAuthors() throws Exception {
+    void convertMultipleAuthors() throws Exception {
         String queryString = "author:\"Wang Wei\" author:\"Zhang Pingwen\" author:\"Zhang Zhifei\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -134,7 +136,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @ParameterizedTest
     @MethodSource("getJSONWithYearVariations")
-    public void compareJSONRequestsWithYearVariations(JSONObject expected, Integer yearStart, Integer yearEnd, JSONObject actual) throws Exception {
+    void compareJSONRequestsWithYearVariations(JSONObject expected, Integer yearStart, Integer yearEnd, JSONObject actual) throws Exception {
         expected.put("yearStart", yearStart);
         expected.put("yearEnd", yearEnd);
         assertEquals(expected, actual);

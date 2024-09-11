@@ -26,8 +26,10 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String user;
     private String password;
     private boolean allowPublicKeyRetrieval;
-    private boolean useSSL;
+    private final boolean useSSL;
     private String serverTimezone = "";
+    private String jdbcUrl = "";
+    private final boolean expertMode;
 
     // Not needed for connection, but stored for future login
     private String keyStore;
@@ -38,9 +40,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
         if (prefs.getType().isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(prefs.getType().get());
-            if (dbmsType.isPresent()) {
-                this.type = dbmsType.get();
-            }
+            dbmsType.ifPresent(value -> this.type = value);
         }
 
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
@@ -48,6 +48,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
         prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
         prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
+        prefs.getJdbcUrl().ifPresent(theJdbcUrl -> this.jdbcUrl = theJdbcUrl);
+
+        this.expertMode = prefs.isUseExpertMode();
         this.useSSL = prefs.isUseSSL();
 
         if (prefs.getUser().isPresent()) {
@@ -61,14 +64,15 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             }
         }
 
-        if (!prefs.getPassword().isPresent()) {
+        if (prefs.getPassword().isEmpty()) {
             // Some DBMS require a non-null value as a password (in case of using an empty string).
             this.password = "";
         }
     }
 
     DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
-                             String password, boolean useSSL, boolean allowPublicKeyRetrieval, String serverTimezone, String keyStore) {
+                             String password, boolean useSSL, boolean allowPublicKeyRetrieval,
+                             String serverTimezone, String keyStore, String jdbcUrl, boolean expertMode) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -79,6 +83,8 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;
         this.serverTimezone = serverTimezone;
         this.keyStore = keyStore;
+        this.jdbcUrl = jdbcUrl;
+        this.expertMode = expertMode;
     }
 
     @Override
@@ -126,9 +132,18 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return serverTimezone;
     }
 
+    @Override
+    public String getJdbcUrl() {
+        return jdbcUrl;
+    }
+
+    @Override
+    public boolean isUseExpertMode() {
+        return expertMode;
+    }
+
     public String getUrl() {
-        String url = type.getUrl(host, port, database);
-        return url;
+        return type.getUrl(host, port, database);
     }
 
     /**
@@ -142,11 +157,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         props.setProperty("password", password);
         props.setProperty("serverTimezone", serverTimezone);
         if (useSSL) {
-            props.setProperty("ssl", Boolean.toString(useSSL));
-            props.setProperty("useSSL", Boolean.toString(useSSL));
+            props.setProperty("ssl", Boolean.toString(true));
+            props.setProperty("useSSL", Boolean.toString(true));
         }
         if (allowPublicKeyRetrieval) {
-            props.setProperty("allowPublicKeyRetrieval", Boolean.toString(allowPublicKeyRetrieval));
+            props.setProperty("allowPublicKeyRetrieval", Boolean.toString(true));
         }
         return props;
     }
@@ -165,10 +180,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             return true;
         }
 
-        if (!(obj instanceof DBMSConnectionProperties)) {
+        if (!(obj instanceof DBMSConnectionProperties properties)) {
             return false;
         }
-        DBMSConnectionProperties properties = (DBMSConnectionProperties) obj;
         return Objects.equals(type, properties.getType())
                 && this.host.equalsIgnoreCase(properties.getHost())
                 && Objects.equals(port, properties.getPort())
@@ -176,12 +190,15 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
                 && Objects.equals(user, properties.getUser())
                 && Objects.equals(useSSL, properties.isUseSSL())
                 && Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())
-                && Objects.equals(serverTimezone, properties.getServerTimezone());
+                && Objects.equals(serverTimezone, properties.getServerTimezone())
+                && Objects.equals(keyStore, properties.getKeyStore())
+                && Objects.equals(jdbcUrl, properties.getJdbcUrl())
+                && Objects.equals(expertMode, properties.isUseExpertMode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL);
+        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore, jdbcUrl, expertMode);
     }
 
     @Override

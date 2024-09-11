@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -27,10 +26,11 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -88,9 +88,9 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        duplicateCountObservable.addListener((obj, oldValue, newValue) -> DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
+        duplicateCountObservable.addListener((obj, oldValue, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
 
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
+        HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(taskExecutor);
@@ -148,7 +148,7 @@ public class DuplicateSearch extends SimpleCommand {
 
                 DuplicateResolverType resolverType = askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH;
 
-                DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> askResolveStrategy(result, first, second, resolverType));
+                UiTaskExecutor.runAndWaitInJavaFXThread(() -> askResolveStrategy(result, first, second, resolverType));
             }
         }
 
@@ -219,7 +219,7 @@ public class DuplicateSearch extends SimpleCommand {
      */
     static class DuplicateSearchResult {
 
-        private final Map<Integer, BibEntry> toRemove = new HashMap<>();
+        private final Map<String, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
 
         private int duplicates = 0;
@@ -233,7 +233,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized void remove(BibEntry entry) {
-            toRemove.put(System.identityHashCode(entry), entry);
+            // ADR-0038
+            toRemove.put(entry.getId(), entry);
             duplicates++;
         }
 
@@ -250,7 +251,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized boolean isToRemove(BibEntry entry) {
-            return toRemove.containsKey(System.identityHashCode(entry));
+            // ADR-0038
+            return toRemove.containsKey(entry.getId());
         }
 
         public synchronized int getDuplicateCount() {

@@ -1,7 +1,6 @@
 package org.jabref.http.server;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -32,7 +31,7 @@ public class Server {
      * Starts an http server serving the last files opened in JabRef<br>
      * More files can be provided as args.
      */
-    public static void main(final String[] args) throws InterruptedException, URISyntaxException {
+    public static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
@@ -86,12 +85,12 @@ public class Server {
         SeBootstrap.start(Application.class, configuration).thenAccept(instance -> {
             LOGGER.debug("Server started.");
             instance.stopOnShutdown(stopResult ->
-                    System.out.printf("Stop result: %s [Native stop result: %s].%n", stopResult,
+                    LOGGER.debug("Stop result: {} [Native stop result: {}].", stopResult,
                             stopResult.unwrap(Object.class)));
             final URI uri = instance.configuration().baseUri();
-            System.out.printf("Instance %s running at %s [Native handle: %s].%n", instance, uri,
+            LOGGER.debug("Instance {} running at {} [Native handle: {}].%n", instance, uri,
                     instance.unwrap(Object.class));
-            System.out.println("Send SIGKILL to shutdown.");
+            LOGGER.debug("Send SIGKILL to shutdown.");
             serverInstance = instance;
         });
     }
@@ -111,7 +110,7 @@ public class Server {
             LOGGER.error("Could not find server key store {}.", serverKeyStore);
             LOGGER.error("One create one by following the steps described in [http-server.md](/docs/code-howtos/http-server.md), which is rendered at <https://devdocs.jabref.org/code-howtos/http-server.html>");
         }
-        return sslContextConfig.createSSLContext();
+        return sslContextConfig.createSSLContext(false);
     }
 
     static void stopServer() {

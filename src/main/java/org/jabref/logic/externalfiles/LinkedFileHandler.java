@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -72,7 +71,7 @@ public class LinkedFileHandler {
         Files.move(oldFile.get(), targetPath);
 
         // Update path
-        fileEntry.setLink(relativize(targetPath));
+        fileEntry.setLink(FileUtil.relativize(targetPath, databaseContext, filePreferences).toString());
         return true;
     }
 
@@ -110,14 +109,9 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        fileEntry.setLink(relativize(newPath));
+        fileEntry.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
 
         return true;
-    }
-
-    private String relativize(Path path) {
-        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
-        return FileUtil.relativize(path, fileDirectories).toString();
     }
 
     public String getSuggestedFileName() {

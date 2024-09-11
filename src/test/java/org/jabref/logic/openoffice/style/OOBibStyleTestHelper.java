@@ -89,7 +89,7 @@ class OOBibStyleTestHelper {
      *
      * @param inList true means label for the bibliography
      */
-    static String runGetNumCitationMarker2a(OOBibStyle style,
+    static String runGetNumCitationMarker2a(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {
         if (inList) {
             if (num.size() != 1) {
@@ -120,7 +120,7 @@ class OOBibStyleTestHelper {
         return new CitationMarkerNumericEntryImpl(key, num, pageInfo);
     }
 
-    static String runGetNumCitationMarker2b(OOBibStyle style,
+    static String runGetNumCitationMarker2b(JStyle style,
                                             int minGroupingCount,
                                             CitationMarkerNumericEntry... s) {
         List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
@@ -157,7 +157,7 @@ class OOBibStyleTestHelper {
      * @implNote Similar to old API. pageInfo is new, and unlimAuthors is
      * replaced with isFirstAppearanceOfSource
      */
-    static String getCitationMarker2ab(OOBibStyle style,
+    static String getCitationMarker2ab(JStyle style,
                                        List<BibEntry> entries,
                                        Map<BibEntry, BibDatabase> entryDBMap,
                                        boolean inParenthesis,
@@ -192,7 +192,7 @@ class OOBibStyleTestHelper {
                 nonunique).toString();
     }
 
-    static String getCitationMarker2(OOBibStyle style,
+    static String getCitationMarker2(JStyle style,
                                      List<BibEntry> entries,
                                      Map<BibEntry, BibDatabase> entryDBMap,
                                      boolean inParenthesis,
@@ -209,7 +209,7 @@ class OOBibStyleTestHelper {
                 NonUniqueCitationMarker.THROWS);
     }
 
-    static String getCitationMarker2b(OOBibStyle style,
+    static String getCitationMarker2b(JStyle style,
                                       List<BibEntry> entries,
                                       Map<BibEntry, BibDatabase> entryDBMap,
                                       boolean inParenthesis,
@@ -230,7 +230,7 @@ class OOBibStyleTestHelper {
      * end helper
      */
 
-    static void testGetNumCitationMarkerExtra(OOBibStyle style) {
+    static void testGetNumCitationMarkerExtra(JStyle style) {
         // Identical numeric entries are joined.
         assertEquals("[1; 2]", runGetNumCitationMarker2b(style, 3,
                 numEntry("x1", 1, null),

@@ -35,6 +35,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * <p>
  * Currently, Springer, and IEEE formats are supported.
  * <p>
+ * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
+ * please see {@link BibliographyFromPdfImporter}.
  */
 public class PdfContentImporter extends Importer {
 
@@ -590,6 +592,6 @@ public class PdfContentImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.";
+        return Localization.lang("This importer parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.");
     }
 }

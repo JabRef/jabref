@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.jabref.gui.icon.JabRefIconView?>
+
+<?import org.jabref.gui.ai.components.util.Loadable?>
+<?import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent?>
+<?import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent?>
+
+<fx:root
+        type="javafx.scene.layout.VBox"
+        spacing="10"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fillWidth="true"
+        fx:controller="org.jabref.gui.ai.components.aichat.AiChatComponent">
+    <padding>
+        <Insets bottom="10.0"
+                left="10.0"
+                right="10.0"
+                top="10.0"/>
+    </padding>
+    <children>
+        <Loadable fx:id="uiLoadableChatHistory" VBox.vgrow="ALWAYS">
+            <ChatHistoryComponent fx:id="uiChatHistory" VBox.vgrow="ALWAYS" fitToWidth="true" />
+        </Loadable>
+
+            <HBox spacing="10">
+                <Button alignment="CENTER"
+                        fx:id="notificationsButton"
+                        styleClass="icon-button,narrow"
+                        textAlignment="CENTER">
+                    <tooltip>
+                        <Tooltip
+                                text="%Notifications"/>
+                    </tooltip>
+                </Button>
+                <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox alignment="CENTER"
+                  spacing="50">
+                <Label fx:id="noticeText"
+                       text="%Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided."
+                       BorderPane.alignment="CENTER"/>
+
+                <Button alignment="CENTER"
+                        onAction="#onClearChatHistory"
+                        styleClass="icon-button,narrow"
+                        textAlignment="CENTER">
+                    <graphic>
+                        <JabRefIconView
+                                glyph="DELETE_ENTRY"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip
+                                text="%Clear chat history"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+    </children>
+</fx:root>

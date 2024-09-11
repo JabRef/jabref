@@ -5,7 +5,7 @@ name: Deployment (JDK early access builds)
 
 on:
   schedule:
-    - cron: "0 5 * * 2"
+    - cron: "0 18 * * 1"
   pull_request:
     paths:
       - .github/workflows/deployment-jdk-ea.yml
@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, buildjet-4vcpu-ubuntu-2204-arm]
+        os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
         jdk: [22]
         javafx: [23]
         include:
@@ -45,7 +45,7 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: buildjet-4vcpu-ubuntu-2204-arm
+          - os: buildjet-8vcpu-ubuntu-2204-arm
             displayName: "linux-arm"
             archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
           - os: macos-latest
@@ -78,18 +78,18 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
         uses: awalsh128/cache-apt-pkgs-action@master
         with:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v1.1.1
+        uses: gittools/actions/gitversion/setup@v3.0.0
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v1.1.1
+        uses: gittools/actions/gitversion/execute@v3.0.0
 
       # JDK
       - name: 'Set up JDK ${{ matrix.jdk }}'
@@ -115,7 +115,7 @@ jobs:
 
       # JavaFX
       - name: Download and extract JavaFX ${{ matrix.javafx }}
-        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         shell: bash
         run: |
           cd javafx
@@ -127,7 +127,7 @@ jobs:
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               ;;
-            "buildjet-4vcpu-ubuntu-2204-arm")
+            "buildjet-8vcpu-ubuntu-2204-arm")
               OS="linux"
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
@@ -163,19 +163,19 @@ jobs:
           $EXTRACT
           rm *.$EXT
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
-        if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         run: |
           sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
           sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
           cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
-        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         run: |
           sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
           sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
           cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
-        if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
         # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
         run: |
           curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
@@ -191,7 +191,7 @@ jobs:
           java-version: 21
           distribution: 'temurin'
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir

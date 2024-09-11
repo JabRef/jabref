@@ -20,7 +20,6 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -30,8 +29,7 @@ import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.importer.FetcherClientException;
-import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
@@ -43,12 +41,13 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DownloadLinkedFileAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadLinkedFileAction.class);
 
     private final DialogService dialogService;
     private final BibEntry entry;
@@ -170,9 +169,9 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
             newLinkedFile.setDescription((linkedFile.getDescription()));
         }
-        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink()) && filePreferences.shouldKeepDownloadUrl()) {
             newLinkedFile.setSourceURL(linkedFile.getLink());
-        } else {
+        } else if (filePreferences.shouldKeepDownloadUrl()) {
             newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
         }
 
@@ -198,31 +197,19 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
     private void onFailure(URLDownload urlDownload, Exception ex) {
         LOGGER.error("Error downloading from URL: {}", urlDownload, ex);
-        String fetcherExceptionMessage = ex.getMessage();
-        String failedTitle = Localization.lang("Failed to download from URL");
-        int statusCode;
-        if (ex instanceof FetcherClientException clientException) {
-            statusCode = clientException.getStatusCode();
-            if (statusCode == 401) {
-                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
-            } else if (statusCode == 403) {
-                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
-            } else if (statusCode == 404) {
-                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
-            }
-        } else if (ex instanceof FetcherServerException serverException) {
-            statusCode = serverException.getStatusCode();
-            dialogService.showInformationDialogAndWait(failedTitle,
-                    Localization.lang("Error downloading from URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
+        if (ex instanceof FetcherException fetcherException) {
+            dialogService.showErrorDialogAndWait(fetcherException);
         } else {
-            dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
+            String fetcherExceptionMessage = ex.getLocalizedMessage();
+            String failedTitle = Localization.lang("Failed to download from URL");
+            dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Please check the URL and try again.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
         }
     }
 
     private boolean checkSSLHandshake(URLDownload urlDownload) {
         try {
             urlDownload.canBeReached();
-        } catch (kong.unirest.UnirestException ex) {
+        } catch (UnirestException ex) {
             if (ex.getCause() instanceof SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",

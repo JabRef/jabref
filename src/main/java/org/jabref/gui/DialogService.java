@@ -12,14 +12,16 @@ import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.FetcherException;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
@@ -96,9 +98,9 @@ public interface DialogService {
      *
      * @param exception the exception causing the error
      */
-    default void showErrorDialogAndWait(Exception exception) {
-        showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
-    }
+    void showErrorDialogAndWait(Exception exception);
+
+    void showErrorDialogAndWait(FetcherException fetcherException);
 
     /**
      * Create and display error dialog displaying the given exception.
@@ -185,6 +187,13 @@ public interface DialogService {
     void showCustomDialog(BaseDialog<?> dialog);
 
     /**
+     * Shows a custom window.
+     *
+     * @param window window to show
+     */
+    void showCustomWindow(BaseWindow window);
+
+    /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
      * {@link ButtonType}s.
@@ -208,7 +217,7 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
     /**
      * Constructs and shows a cancelable {@link ProgressDialog}.

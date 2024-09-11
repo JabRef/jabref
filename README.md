@@ -83,19 +83,17 @@ Check out the ways you can contribute, below:
 - You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
 
+Please follow our [step-by-step guide on how to set-up your workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+
+We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit.
+For developing, it is sufficient to locally only run the associated test for the classes you changed.
+GitHub will report any other failure.
+
 We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
-We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve. Please also remember to discuss bigger changes early with the core developers to avoid a waste of time and work. Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
-
-If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
-
-To compile JabRef from source, you need a Java Development Kit 20 and `JAVA_HOME` pointing to this JDK.
-To run it, just execute `gradlew run`.
-When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
-and then generate the Eclipse `gradlew eclipse`.
-For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
-
-`gradlew test` executes all tests. We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
+Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
+Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
 
 ## Sponsoring
 

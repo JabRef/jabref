@@ -9,6 +9,7 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
+import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -19,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.ExportPreferences;
@@ -48,9 +49,14 @@ class ArgumentProcessorTest {
 
         when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getSearchPreferences()).thenReturn(
-                new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
-        );
+        when(preferencesService.getSearchPreferences()).thenReturn(new SearchPreferences(
+                SearchDisplayMode.FILTER,
+                EnumSet.noneOf(SearchFlags.class),
+                false,
+                false,
+                0,
+                0,
+                0));
     }
 
     @Test
@@ -90,7 +96,7 @@ class ArgumentProcessorTest {
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "Author=Einstein," + outputBibFile, originBibFile);
+        List<String> args = List.of("-n", "--debug", "--exportMatches", "author:Einstein," + outputBibFile, originBibFile);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),

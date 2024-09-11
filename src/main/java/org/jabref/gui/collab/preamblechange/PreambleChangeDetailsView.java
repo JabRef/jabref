@@ -27,11 +27,7 @@ public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
         } else {
             container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
         }
-        setLeftAnchor(container, 8d);
-        setTopAnchor(container, 8d);
-        setRightAnchor(container, 8d);
-        setBottomAnchor(container, 8d);
 
-        getChildren().setAll(container);
+        this.setAllAnchorsAndAttachChild(container);
     }
 }

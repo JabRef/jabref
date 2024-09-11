@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -36,7 +36,7 @@ public class UpdateCitationMarkers {
      *
      * @param style    Bibliography style to use.
      */
-    public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
+    public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
             NoDocumentException,
             CreationException,
@@ -66,7 +66,7 @@ public class UpdateCitationMarkers {
                                                 XTextCursor cursor,
                                                 OOText citationText,
                                                 boolean withText,
-                                                OOBibStyle style)
+                                                JStyle style)
             throws
             WrappedTargetException,
             CreationException,
@@ -105,7 +105,7 @@ public class UpdateCitationMarkers {
                                                   CitationType citationType,
                                                   OOText citationText,
                                                   XTextCursor position,
-                                                  OOBibStyle style,
+                                                  JStyle style,
                                                   boolean insertSpaceAfter)
             throws
             NotRemoveableException,

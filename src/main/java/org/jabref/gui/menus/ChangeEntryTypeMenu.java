@@ -14,7 +14,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -35,13 +34,12 @@ public class ChangeEntryTypeMenu {
     public ChangeEntryTypeMenu(List<BibEntry> entries,
                                BibDatabaseContext bibDatabaseContext,
                                UndoManager undoManager,
-                               KeyBindingRepository keyBindingRepository,
                                BibEntryTypesManager entryTypesManager) {
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
-        this.factory = new ActionFactory(keyBindingRepository);
+        this.factory = new ActionFactory();
     }
 
     public ContextMenu asContextMenu() {

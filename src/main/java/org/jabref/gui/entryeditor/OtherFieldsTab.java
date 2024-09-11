@@ -13,14 +13,16 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -30,6 +32,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
@@ -41,25 +44,29 @@ public class OtherFieldsTab extends FieldsEditorTab {
     public OtherFieldsTab(BibDatabaseContext databaseContext,
                           SuggestionProviders suggestionProviders,
                           UndoManager undoManager,
+                          UndoAction undoAction,
+                          RedoAction redoAction,
                           DialogService dialogService,
                           PreferencesService preferences,
-                          StateManager stateManager,
                           ThemeManager themeManager,
-                          IndexingTaskManager indexingTaskManager,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,
-                          JournalAbbreviationRepository journalAbbreviationRepository) {
+                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          LuceneManager luceneManager,
+                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(false,
                 databaseContext,
                 suggestionProviders,
                 undoManager,
+                undoAction,
+                redoAction,
                 dialogService,
                 preferences,
-                stateManager,
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager);
+                luceneManager,
+                searchQueryProperty);
 
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();

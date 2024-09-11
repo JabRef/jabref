@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME = "jabref-ubuntu-24.04"
+
+Vagrant.configure("2") do |config|
+
+  # config.vm.box = "ubuntu/trusty64"
+  # config.vm.box = "ubuntu/jammy64"
+  # config.vm.box = "alvistack/ubuntu-24.04"
+
+  # https://app.vagrantup.com/caspermeijn/boxes/ubuntu-desktop-24.04
+  # GitHub: https://github.com/caspermeijn/vagrant-ubuntu-desktop/tree/main/ubuntu-desktop-24.04
+  # Here, the ubuntu-desktop works without usses
+  config.vm.box = "caspermeijn/ubuntu-desktop-24.04"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "C:/TEMP/JabRef", "/tmp/jabref"
+
+  config.vm.define NAME
+  config.vm.hostname = NAME
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = NAME
+    v.gui = true
+    v.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    # Update package index
+    sudo apt-get update
+    sudo apt-get upgrade -y
+
+    # Install latest development build of JabRef
+    sudo snap install --edge jabref
+
+    sudo apt-get install -y libreoffice-java-common
+    sudo mkdir -p /usr/lib/mozilla/native-messaging-hosts
+    snap connect jabref:hostfs-mozilla-native-messaging-jabref
+  SHELL
+
+  config.ssh.forward_x11 = true
+end

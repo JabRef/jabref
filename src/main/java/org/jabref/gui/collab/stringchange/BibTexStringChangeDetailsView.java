@@ -19,11 +19,7 @@ public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsVi
         );
 
         container.getChildren().add(new Label(Localization.lang("Current content: %0", stringChange.getOldString().getContent())));
-        setLeftAnchor(container, 8d);
-        setTopAnchor(container, 8d);
-        setRightAnchor(container, 8d);
-        setBottomAnchor(container, 8d);
 
-        getChildren().setAll(container);
+        this.setAllAnchorsAndAttachChild(container);
     }
 }

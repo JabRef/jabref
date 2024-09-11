@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-public class ScholarArchiveFetcherTest {
+class ScholarArchiveFetcherTest {
     private ScholarArchiveFetcher fetcher;
     private BibEntry bibEntry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new ScholarArchiveFetcher();
         bibEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.TITLE, "BPELscript: A Simplified Script Syntax for WS-BPEL 2.0")
@@ -30,13 +30,13 @@ public class ScholarArchiveFetcherTest {
     }
 
     @Test
-    public void getNameReturnsCorrectName() {
+    void getNameReturnsCorrectName() {
         assertEquals("ScholarArchive", fetcher.getName());
     }
 
     @Test
     @Disabled("We seem to be blocked")
-    public void performSearchReturnsExpectedResults() throws FetcherException {
+    void performSearchReturnsExpectedResults() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("bpelscript");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertTrue(fetchedEntries.contains(bibEntry), "Found the following entries " + fetchedEntries);

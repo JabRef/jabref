@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class IsiImporterTest {
+class IsiImporterTest {
 
     private static final String FILE_ENDING = ".isi";
     private final IsiImporter importer = new IsiImporter();
@@ -41,45 +41,39 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void parseMonthException() {
+    void parseMonthException() {
         IsiImporter.parseMonth("20l06 06-07");
     }
 
     @Test
-    public void getFormatName() {
+    void getFormatName() {
         assertEquals("ISI", importer.getName());
     }
 
     @Test
-    public void getCLIId() {
+    void getCLIId() {
         assertEquals("isi", importer.getId());
     }
 
     @Test
-    public void sGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.ISI, importer.getFileType());
-    }
-
-    @Test
-    public void getDescription() {
-        assertEquals("Importer for the ISI Web of Science, INSPEC and Medline format.",
-                importer.getDescription());
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormatAccepted(String fileName) throws IOException {
+    void isRecognizedFormatAccepted(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isRecognizedFormatRejected(String fileName) throws IOException {
+    void isRecognizedFormatRejected(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void processSubSup() {
+    void processSubSup() {
         HashMap<Field, String> subs = new HashMap<>();
 
         subs.put(StandardField.TITLE, "/sub 3/");
@@ -124,7 +118,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntries1() throws IOException, URISyntaxException {
+    void importEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.getFirst();
@@ -145,7 +139,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntries2() throws IOException, URISyntaxException {
+    void importEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.getFirst();
@@ -162,7 +156,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntriesINSPEC() throws IOException, URISyntaxException {
+    void importEntriesINSPEC() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -199,7 +193,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntriesWOS() throws IOException, URISyntaxException {
+    void importEntriesWOS() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -217,7 +211,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void isiAuthorsConvert() {
+    void isiAuthorsConvert() {
         assertEquals(
                 "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
                 IsiImporter.isiAuthorsConvert(
@@ -230,7 +224,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void monthConvert() {
+    void monthConvert() {
         assertEquals("#jun#", IsiImporter.parseMonth("06"));
         assertEquals("#jun#", IsiImporter.parseMonth("JUN"));
         assertEquals("#jun#", IsiImporter.parseMonth("jUn"));
@@ -242,7 +236,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void isiAuthorConvert() {
+    void isiAuthorConvert() {
         assertEquals("James Brown", IsiImporter.isiAuthorConvert("James Brown"));
         assertEquals("James Marc Brown", IsiImporter.isiAuthorConvert("James Marc Brown"));
         assertEquals("Brown, J. M.", IsiImporter.isiAuthorConvert("Brown, J.M."));
@@ -255,7 +249,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importIEEEExport() throws IOException, URISyntaxException {
+    void importIEEEExport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.getFirst();
@@ -278,7 +272,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void iEEEImport() throws IOException, URISyntaxException {
+    void iEEEImport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.getFirst();
@@ -302,7 +296,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntriesMedline() throws IOException, URISyntaxException {
+    void importEntriesMedline() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -338,7 +332,7 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void importEntriesEmpty() throws IOException, URISyntaxException {
+    void importEntriesEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();

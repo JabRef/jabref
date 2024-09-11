@@ -32,7 +32,7 @@ public class UnknownField implements Field {
     }
 
     public static UnknownField fromDisplayName(String displayName) {
-        return new UnknownField(displayName.toLowerCase(Locale.ROOT), displayName, FieldProperty.CUSTOM_FIELD);
+        return new UnknownField(displayName.toLowerCase(Locale.ROOT), displayName);
     }
 
     @Override

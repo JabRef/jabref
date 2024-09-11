@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -53,8 +53,8 @@ public class PushToTexShop extends AbstractPushToApplication {
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
 
-            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;

@@ -48,7 +48,7 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
                     Localization.lang("This operation requires exactly one item to be selected."));
         }
 
-        BibEntry originalEntry = stateManager.getSelectedEntries().get(0);
+        BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
         new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(originalEntry);
     }
 }

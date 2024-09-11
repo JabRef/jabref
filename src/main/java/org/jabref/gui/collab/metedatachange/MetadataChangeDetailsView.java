@@ -25,13 +25,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         }
 
         ScrollPane scrollPane = new ScrollPane(container);
-        scrollPane.setFitToWidth(true);
-        getChildren().setAll(scrollPane);
 
-        setLeftAnchor(scrollPane, 8d);
-        setTopAnchor(scrollPane, 8d);
-        setRightAnchor(scrollPane, 8d);
-        setBottomAnchor(scrollPane, 8d);
+        this.setAllAnchorsAndAttachChild(scrollPane);
     }
 
     private String getDifferenceString(MetaDataDiff.DifferenceType changeType) {

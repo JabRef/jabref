@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.Field;
  * Matches entries if the content of a given field is matched by a regular expression.
  */
 public class RegexKeywordGroup extends KeywordGroup {
-    private Pattern pattern;
+    private final Pattern pattern;
 
     public RegexKeywordGroup(String name, GroupHierarchyType context, Field searchField,
                              String searchExpression, boolean caseSensitive) {
@@ -35,10 +35,9 @@ public class RegexKeywordGroup extends KeywordGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof RegexKeywordGroup)) {
+        if (!(o instanceof RegexKeywordGroup other)) {
             return false;
         }
-        RegexKeywordGroup other = (RegexKeywordGroup) o;
         return getName().equals(other.getName())
                 && (getHierarchicalContext() == other.getHierarchicalContext())
                 && searchField.equals(other.searchField)

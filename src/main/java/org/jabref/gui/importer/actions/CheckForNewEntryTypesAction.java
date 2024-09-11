@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.LibraryPreferences;
+import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -17,26 +21,28 @@ import org.jabref.model.entry.BibEntryType;
 public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult) {
-        return !getListOfUnknownAndUnequalCustomizations(parserResult).isEmpty();
+    public boolean isActionNecessary(ParserResult parserResult, PreferencesService preferencesService) {
+        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferencesService.getLibraryPreferences()).isEmpty();
     }
 
     @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService) {
-        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
-        dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult)));
+    public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
+        LibraryPreferences preferences = preferencesService.getLibraryPreferences();
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);
+        dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult, preferences)));
     }
 
-    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
-        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
+    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult, LibraryPreferences preferences) {
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);
+        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
         return parserResult.getEntryTypes()
                            .stream()
-                           .filter(type -> Globals.entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
+                           .filter(type -> entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
                            .collect(Collectors.toList());
     }
 
-    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult) {
-        return parserResult.getMetaData().getMode().orElse(Globals.prefs.getLibraryPreferences().getDefaultBibDatabaseMode());
+    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult, LibraryPreferences preferences) {
+        return parserResult.getMetaData().getMode().orElse(preferences.getDefaultBibDatabaseMode());
     }
 }

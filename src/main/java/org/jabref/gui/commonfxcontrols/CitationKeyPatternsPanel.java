@@ -73,7 +73,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
         new ValueTableCellFactory<CitationKeyPatternsPanelItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
-                        String.format(Localization.lang("Reset %s to default value"), entryType.getDisplayName()))
+                        Localization.lang("Reset %s to default value").formatted(entryType.getDisplayName()))
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.setItemToDefaultPattern(this.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);

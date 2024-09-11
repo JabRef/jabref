@@ -10,11 +10,13 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -31,24 +33,28 @@ public class SidePane extends VBox {
 
     public SidePane(LibraryTabContainer tabContainer,
                     PreferencesService preferencesService,
+                    AiService aiService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
+                    ClipBoardManager clipBoardManager,
                     UndoManager undoManager) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.viewModel = new SidePaneViewModel(
                 tabContainer,
                 preferencesService,
+                aiService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
                 dialogService,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());

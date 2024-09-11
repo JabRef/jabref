@@ -63,7 +63,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
-
+            // TODO: Add support for PMID
             case null, default -> {
                 assert field != null;
                 throw new IllegalStateException("Unable to instantiate a view model for identifier field editor '%s'".formatted(field.getDisplayName()));
@@ -82,9 +82,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(DOI)) {
-            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService, preferencesService));
+            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService), preferencesService.getKeyBindingRepository());
         } else {
-            textArea.initContextMenu(new DefaultMenu(textArea));
+            textArea.initContextMenu(new DefaultMenu(textArea), preferencesService.getKeyBindingRepository());
         }
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);

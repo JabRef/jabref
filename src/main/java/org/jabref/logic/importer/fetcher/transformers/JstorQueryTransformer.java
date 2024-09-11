@@ -33,7 +33,7 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        return "sd:" + year + getLogicalAndOperator() + "ed: " + year;
+        return "sd:" + year + getLogicalAndOperator() + "ed:" + year;
     }
 
     @Override

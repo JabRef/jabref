@@ -63,7 +63,7 @@ public class LatexParserResult {
 
     @Override
     public String toString() {
-        return String.format("TexParserResult{path=%s, citations=%s, nestedFiles=%s, bibFiles=%s}",
+        return "TexParserResult{path=%s, citations=%s, nestedFiles=%s, bibFiles=%s}".formatted(
                 this.path,
                 this.citations,
                 this.nestedFiles,

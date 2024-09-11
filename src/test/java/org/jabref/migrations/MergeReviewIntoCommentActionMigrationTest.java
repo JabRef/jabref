@@ -20,14 +20,14 @@ class MergeReviewIntoCommentActionMigrationTest {
     private BibEntry expectedEntry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         action = new MergeReviewIntoCommentMigration();
         entry = createMinimalBibEntry();
         expectedEntry = createMinimalBibEntry();
     }
 
     @Test
-    public void noFields() {
+    void noFields() {
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         action.performMigration(actualParserResult);
@@ -36,7 +36,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     }
 
     @Test
-    public void reviewField() {
+    void reviewField() {
         entry.setField(StandardField.REVIEW, "My Review");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
@@ -48,7 +48,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     }
 
     @Test
-    public void commentField() {
+    void commentField() {
         entry.setField(StandardField.COMMENT, "My Comment");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
@@ -58,7 +58,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     }
 
     @Test
-    public void multiLineReviewField() {
+    void multiLineReviewField() {
         String commentString = "My Review\n\nSecond Paragraph\n\nThird Paragraph";
 
         entry.setField(StandardField.REVIEW, commentString);
@@ -73,7 +73,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
     @Test
     @Disabled("Re-enable if the MergeReviewIntoCommentMigration.mergeCommentFieldIfPresent() does not block and wait for user input.")
-    public void reviewAndCommentField() {
+    void reviewAndCommentField() {
         entry.setField(StandardField.REVIEW, "My Review");
         entry.setField(StandardField.COMMENT, "My Comment");
 

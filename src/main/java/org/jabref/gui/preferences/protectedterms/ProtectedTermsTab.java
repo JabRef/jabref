@@ -11,7 +11,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.BindingsHelper;
@@ -36,7 +35,6 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableDeleteColumn;
 
     @Inject private ProtectedTermsLoader termsLoader;
-    @Inject private KeyBindingRepository keyBindingRepository;
 
     public ProtectedTermsTab() {
         ViewLoader.view(this)
@@ -88,7 +86,7 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     }
 
     private ContextMenu createContextMenu(ProtectedTermsListItemModel file) {
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.EDIT_LIST, new ProtectedTermsTab.ContextAction(StandardActions.EDIT_LIST, file)),

@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import de.undercouch.citeproc.output.Citation;
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,30 +27,34 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
+     * Generates a Citation based on a given list of entries and a style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, CitationStyle style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(entry, style.getSource(), entryTypesManager);
+    protected static String generateBibliography(List<BibEntry> bibEntries, CitationStyle style, BibEntryTypesManager entryTypesManager) {
+        return generateBibliography(bibEntries, style.getSource(), entryTypesManager);
     }
 
     /**
-     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
+     * Generates a Citation based on a given list of entries and a style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, String style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager);
+    protected static String generateBibliography(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
+        return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager).getFirst();
     }
 
     /**
-     * Generates a Citation based on the given entry, style, and output format
+     * Generates a Citation based on a given list of entries, style, and output format
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
+    public static List<String> generateBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+        return generateBibliographies(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+    }
+
+    public static Citation generateCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+        return CSL_ADAPTER.makeCitation(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
     /**
@@ -57,7 +62,7 @@ public class CitationStyleGenerator {
      *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
-    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+    public static List<String> generateBibliographies(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {
             return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
         } catch (IllegalArgumentException e) {

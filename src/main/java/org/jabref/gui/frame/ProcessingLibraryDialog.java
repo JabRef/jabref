@@ -6,7 +6,7 @@ import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 
 /**
@@ -36,7 +36,7 @@ public class ProcessingLibraryDialog {
                 }
             };
 
-            DefaultTaskExecutor.runInJavaFXThread(waitForSaveFinished);
+            UiTaskExecutor.runInJavaFXThread(waitForSaveFinished);
             dialogService.showProgressDialogAndWait(
                     Localization.lang("Please wait..."),
                     Localization.lang("Waiting for save operation to finish..."),

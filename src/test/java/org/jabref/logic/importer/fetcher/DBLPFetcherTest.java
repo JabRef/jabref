@@ -19,21 +19,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class DBLPFetcherTest {
+class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         dblpFetcher = new DBLPFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         entry = new BibEntry();
 
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(StandardField.TITLE,
-                "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
-        entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
+        entry.setField(StandardField.TITLE, """
+                Process Engine Benchmarking with Betsy in the Context of {ISO/IEC}
+                                  Quality Standards""");
+        entry.setField(StandardField.AUTHOR, """
+                Matthias Geiger and
+                                  Simon Harrer and
+                                  J{\\\"{o}}rg Lenhard""");
         entry.setField(StandardField.JOURNAL, "Softwaretechnik-Trends");
         entry.setField(StandardField.VOLUME, "36");
         entry.setField(StandardField.NUMBER, "2");
@@ -45,7 +49,7 @@ public class DBLPFetcherTest {
     }
 
     @Test
-    public void findSingleEntry() throws FetcherException {
+    void findSingleEntry() throws FetcherException {
         // In Lucene curly brackets are used for range queries, therefore they have to be escaped using "". See https://lucene.apache.org/core/5_4_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html
         String query = "Process Engine Benchmarking with Betsy in the Context of \"{ISO/IEC}\" Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
@@ -54,7 +58,7 @@ public class DBLPFetcherTest {
     }
 
     @Test
-    public void findSingleEntryUsingComplexOperators() throws FetcherException {
+    void findSingleEntryUsingComplexOperators() throws FetcherException {
         String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
@@ -62,7 +66,7 @@ public class DBLPFetcherTest {
     }
 
     @Test
-    public void findNothing() throws Exception {
+    void findNothing() throws Exception {
         assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
     }
 }

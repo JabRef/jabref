@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class UpperCaseFormatterTest {
+class UpperCaseFormatterTest {
 
     private UpperCaseFormatter formatter = new UpperCaseFormatter();
 
     @ParameterizedTest
     @MethodSource("upperCaseTests")
-    public void upperCaseTest(String expectedFormat, String inputFormat) {
+    void upperCaseTest(String expectedFormat, String inputFormat) {
         assertEquals(expectedFormat, formatter.format(inputFormat));
     }
 
@@ -35,7 +35,7 @@ public class UpperCaseFormatterTest {
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
     }
 }

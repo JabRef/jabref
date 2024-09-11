@@ -30,7 +30,21 @@ import org.slf4j.LoggerFactory;
  * We cannot use {@link Task} directly since it runs certain update notifications on the JavaFX thread,
  * and so makes testing harder.
  * We take the opportunity and implement a fluid interface.
- *
+ * <p>
+ * A task created here is to be submitted to {@link org.jabref.gui.Globals#TASK_EXECUTOR}: Use {@link TaskExecutor#execute(BackgroundTask)} to submit.
+ * <p>
+ * Example (for using the fluent interface)
+ * <pre>{@code
+ * BackgroundTask
+ *     .wrap(() -> ...)
+ *     .showToUser(true)
+ *     .onRunning(() -> ...)
+ *     .onSuccess(() -> ...)
+ *     .onFailure(() -> ...)
+ *     .executeWith(taskExecutor);
+ * }</pre>
+ * Background: The task executor one takes care to show it in the UI. See {@link org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)} for details.
+ * <p>
  * TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
  *       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
  *       If this is not possible, add an @implNote why.
@@ -116,6 +130,11 @@ public abstract class BackgroundTask<V> {
         return title;
     }
 
+    public BackgroundTask<V> setTitle(String title) {
+        this.title.set(title);
+        return this;
+    }
+
     public double getWorkDonePercentage() {
         return workDonePercentage.get();
     }
@@ -136,16 +155,18 @@ public abstract class BackgroundTask<V> {
         return showToUser.get();
     }
 
-    public void showToUser(boolean show) {
+    public BackgroundTask<V> showToUser(boolean show) {
         showToUser.set(show);
+        return this;
     }
 
     public boolean willBeRecoveredAutomatically() {
         return willBeRecoveredAutomatically.get();
     }
 
-    public void willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
+    public BackgroundTask<V> willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
         this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);
+        return this;
     }
 
     /**
@@ -188,7 +209,7 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public Future<?> executeWith(TaskExecutor taskExecutor) {
+    public Future<V> executeWith(TaskExecutor taskExecutor) {
         return taskExecutor.execute(this);
     }
 
@@ -262,7 +283,7 @@ public abstract class BackgroundTask<V> {
         progress.setValue(newProgress);
     }
 
-    protected void updateProgress(double workDone, double max) {
+    public void updateProgress(double workDone, double max) {
         updateProgress(new BackgroundProgress(workDone, max));
     }
 

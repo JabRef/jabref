@@ -1,5 +1,7 @@
 package org.jabref.logic.citationstyle;
 
+import java.util.List;
+
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -16,7 +18,7 @@ public final class CitationStylePreviewLayout implements PreviewLayout {
 
     @Override
     public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
-        return CitationStyleGenerator.generateCitation(entry, citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager);
+        return CitationStyleGenerator.generateBibliography(List.of(entry), citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager).getFirst();
     }
 
     @Override
@@ -36,5 +38,9 @@ public final class CitationStylePreviewLayout implements PreviewLayout {
     @Override
     public String getName() {
         return citationStyle.getTitle();
+    }
+
+    public CitationStyle getCitationStyle() {
+        return citationStyle;
     }
 }

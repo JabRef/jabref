@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -17,7 +16,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class InfoButton extends Button {
     private final StringProperty infoMessage = new SimpleStringProperty();
-    private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+    private final ActionFactory actionFactory = new ActionFactory();
 
     private final Action mergeAction = new Action() {
         @Override

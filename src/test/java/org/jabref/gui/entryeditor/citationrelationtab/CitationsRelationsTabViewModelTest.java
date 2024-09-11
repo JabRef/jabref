@@ -5,11 +5,14 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
@@ -61,6 +64,10 @@ class CitationsRelationsTabViewModelTest {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.isGenerateNewKeyOnImport()).thenReturn(false);
         when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
+
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        when(preferencesService.getFieldPreferences()).thenReturn(fieldPreferences);
 
         when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferencesService.getOwnerPreferences()).thenReturn(mock(OwnerPreferences.class, Answers.RETURNS_DEEP_STUBS));

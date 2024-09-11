@@ -5,15 +5,17 @@ import java.util.Objects;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -31,7 +33,6 @@ public class JabRefCLI {
 
     public JabRefCLI(String[] args) throws ParseException {
         Options options = getOptions();
-
         this.cl = new DefaultParser().parse(options, args, true);
         this.leftOver = cl.getArgList();
     }
@@ -151,21 +152,21 @@ public class JabRefCLI {
         return cl.hasOption("automaticallySetFileLinks");
     }
 
-    public boolean isWriteXMPtoPdf() {
-        return cl.hasOption("writeXMPtoPdf");
+    public boolean isWriteXmpToPdf() {
+        return cl.hasOption("writeXmpToPdf");
     }
 
-    public boolean isEmbeddBibfileInPdf() {
-        return cl.hasOption("embeddBibfileInPdf");
+    public boolean isEmbedBibFileInPdf() {
+        return cl.hasOption("embedBibFileInPdf");
     }
 
-    public boolean isWriteMetadatatoPdf() {
-        return cl.hasOption("writeMetadatatoPdf");
+    public boolean isWriteMetadataToPdf() {
+        return cl.hasOption("writeMetadataToPdf");
     }
 
-    public String getWriteMetadatatoPdf() {
-        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
-                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
+    public String getWriteMetadataToPdf() {
+        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadataToPdf") :
+                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXmpToPdf") :
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
@@ -271,15 +272,15 @@ public class JabRefCLI {
 
         options.addOption(Option
                 .builder()
-                .longOpt("writeXMPtoPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .longOpt("writeXmpToPdf")
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeX as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
 
         options.addOption(Option
                 .builder()
-                .longOpt("embeddBibfileInPdf")
+                .longOpt("embedBibFileInPdf")
                 .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
@@ -287,8 +288,8 @@ public class JabRefCLI {
 
         options.addOption(Option
                 .builder("w")
-                .longOpt("writeMetadatatoPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .longOpt("writeMetadataToPdf")
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeX to PDF (XMP and embedded)"), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -322,17 +323,17 @@ public class JabRefCLI {
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String importFormatsIntro = Localization.lang("Available import formats");
-        String importFormatsList = String.format("%s:%n%s%n", importFormatsIntro, alignStringTable(importFormats));
+        String importFormatsList = "%s:%n%s%n".formatted(importFormatsIntro, alignStringTable(importFormats));
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                Globals.entryTypesManager);
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
         List<Pair<String, String>> exportFormats = exporterFactory
                 .getExporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, alignStringTable(exportFormats));
+        String outFormatsList = "%s:%n%s%n".formatted(outFormatsIntro, alignStringTable(exportFormats));
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -341,7 +342,8 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return "JabRef %s".formatted(Globals.BUILD_INFO.version);
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        return "JabRef %s".formatted(buildInfo.version);
     }
 
     public List<String> getLeftOver() {

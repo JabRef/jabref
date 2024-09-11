@@ -273,8 +273,8 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 }
             } catch (BstVMException e) {
                 bstVMContext.path().ifPresentOrElse(
-                        path -> LOGGER.error("{} ({})", e.getMessage(), path),
-                        () -> LOGGER.error(e.getMessage()));
+                        path -> LOGGER.error("{} ({})", e.getMessage(), path, e),
+                        () -> LOGGER.error("", e));
                 throw e;
             }
         }

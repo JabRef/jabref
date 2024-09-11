@@ -49,7 +49,7 @@ public class CitationsDisplay extends ListView<Citation> {
         HBox contextBox = new HBox(8, citationIcon, contextText);
         contextBox.getStyleClass().add("contextBox");
 
-        Label fileNameLabel = new Label(String.format("%s", basePath.get().relativize(item.path())));
+        Label fileNameLabel = new Label("%s".formatted(basePath.get().relativize(item.path())));
         fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
         Label positionLabel = new Label("(%s:%s-%s)".formatted(item.line(), item.colStart(), item.colEnd()));
         positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());

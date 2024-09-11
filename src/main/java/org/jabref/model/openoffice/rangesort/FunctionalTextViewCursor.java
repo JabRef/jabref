@@ -11,6 +11,7 @@ import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
+import com.sun.star.uno.RuntimeException;
 
 /*
  * A problem with XTextViewCursor: if it is not in text, then we get a crippled version that does
@@ -79,7 +80,7 @@ public class FunctionalTextViewCursor {
                 initialPosition = UnoCursor.createTextCursorByRange(viewCursor);
                 viewCursor.getStart();
                 return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));
-            } catch (com.sun.star.uno.RuntimeException ex) {
+            } catch (RuntimeException ex) {
                 // bad cursor
                 viewCursor = null;
                 initialPosition = null;
@@ -106,7 +107,7 @@ public class FunctionalTextViewCursor {
 
         try {
             viewCursor.getStart();
-        } catch (com.sun.star.uno.RuntimeException ex) {
+        } catch (RuntimeException ex) {
             restore(doc, initialPosition, initialSelection);
             String errorMessage = "The view cursor failed the functionality test";
             return OOResult.error(errorMessage);

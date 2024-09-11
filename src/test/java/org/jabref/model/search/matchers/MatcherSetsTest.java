@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MatcherSetsTest {
+class MatcherSetsTest {
 
     @Test
-    public void buildAnd() {
+    void buildAnd() {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.AND);
         assertTrue(matcherSet.isMatch(new BibEntry()));
 
@@ -23,7 +23,7 @@ public class MatcherSetsTest {
     }
 
     @Test
-    public void buildOr() {
+    void buildOr() {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.OR);
         assertFalse(matcherSet.isMatch(new BibEntry()));
 
@@ -35,13 +35,13 @@ public class MatcherSetsTest {
     }
 
     @Test
-    public void buildNotWithTrue() {
+    void buildNotWithTrue() {
         NotMatcher matcher = new NotMatcher(new MockSearchMatcher(true));
         assertFalse(matcher.isMatch(new BibEntry()));
     }
 
     @Test
-    public void buildNotWithFalse() {
+    void buildNotWithFalse() {
         NotMatcher matcher = new NotMatcher(new MockSearchMatcher(false));
         assertTrue(matcher.isMatch(new BibEntry()));
     }

@@ -13,13 +13,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTMLCharsTest {
+class HTMLCharsTest {
 
     private LayoutFormatter layout;
     private ParamLayoutFormatter layoutKeep;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         layout = new HTMLChars();
         layoutKeep = new HTMLChars();
         layoutKeep.setArgument("keepCurlyBraces");

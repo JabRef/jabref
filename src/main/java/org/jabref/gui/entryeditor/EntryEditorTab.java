@@ -43,18 +43,4 @@ public abstract class EntryEditorTab extends Tab {
         }
         handleFocus();
     }
-
-    /**
-     * Switch to next Preview style - should be overriden if a EntryEditorTab is actually showing a preview
-     */
-    protected void nextPreviewStyle() {
-        // do nothing by default
-    }
-
-    /**
-     * Switch to previous Preview style - should be overriden if a EntryEditorTab is actually showing a preview
-     */
-    protected void previousPreviewStyle() {
-        // do nothing by default
-    }
 }

@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 
 public class UserSpecificCommentField implements Field {
-    private static final EnumSet<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN);
+    private static final EnumSet<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN);
     private final String name;
 
     public UserSpecificCommentField(String username) {

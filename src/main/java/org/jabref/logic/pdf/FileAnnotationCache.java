@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileAnnotationCache {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationCache.class);
     // cache size in entries
     private final static int CACHE_SIZE = 10;
 

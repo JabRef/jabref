@@ -5,26 +5,23 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RepecNepImporterTest {
+class RepecNepImporterTest {
 
     private static final String FILE_ENDING = ".txt";
 
     private RepecNepImporter testImporter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -44,40 +41,19 @@ public class RepecNepImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
-    }
-
-    @Test
-    public final void getFormatName() {
-        assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
-    }
-
-    @Test
-    public final void getCliId() {
-        assertEquals("repecnep", testImporter.getId());
-    }
-
-    @Test
-    public void getExtension() {
-        assertEquals(StandardFileType.TXT, testImporter.getFileType());
-    }
-
-    @Test
-    public final void getDescription() {
-        assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
-                testImporter.getDescription());
     }
 }

@@ -7,13 +7,12 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 
 /*
  * https://datatracker.ietf.org
@@ -46,7 +45,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
      * @return the URL of the RFC resource
      */
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String prefixedIdentifier = identifier.toLowerCase(Locale.ENGLISH);
         // if not a "draft" version
         if ((!prefixedIdentifier.startsWith(DRAFT_PREFIX)) && (!prefixedIdentifier.startsWith("rfc"))) {

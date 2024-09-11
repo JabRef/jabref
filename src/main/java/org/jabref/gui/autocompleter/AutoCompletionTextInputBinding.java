@@ -33,7 +33,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
@@ -133,7 +133,7 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
             newText = "";
         }
         AutoCompletionInput input = inputAnalyzer.analyze(newText);
-        DefaultTaskExecutor.runInJavaFXThread(() -> setUserInput(input.getUnfinishedPart()));
+        UiTaskExecutor.runInJavaFXThread(() -> setUserInput(input.getUnfinishedPart()));
     }
 
     @Override

@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -24,6 +22,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
@@ -70,7 +69,7 @@ public class AbbreviateAction extends SimpleCommand {
             case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
             case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
             case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
-            default -> LOGGER.debug("Unknown action: " + action.name());
+            default -> LOGGER.debug("Unknown action: {}", action.name());
         }
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -93,7 +92,7 @@ public class AbbreviateAction extends SimpleCommand {
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
         } else {
-            LOGGER.debug("Unknown action: " + action.name());
+            LOGGER.debug("Unknown action: {}", action.name());
         }
     }
 
@@ -112,7 +111,7 @@ public class AbbreviateAction extends SimpleCommand {
                 .collect(Collectors.toSet());
 
         // Execute the callables and wait for the results.
-        List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
+        List<Future<Boolean>> futures = HeadlessExecutorService.INSTANCE.executeAll(tasks);
 
         // Evaluate the results of the callables.
         long count = futures.stream().filter(future -> {
@@ -135,7 +134,7 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationRepository);
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationRepository);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = entries.stream().mapToInt(entry ->

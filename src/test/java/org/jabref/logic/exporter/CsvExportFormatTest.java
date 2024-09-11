@@ -27,7 +27,7 @@ public class CsvExportFormatTest {
     private Exporter exportFormat;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         exportFormat = new TemplateExporter(
                 "OpenOffice/LibreOffice CSV",
                 "oocsv",
@@ -41,12 +41,12 @@ public class CsvExportFormatTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         exportFormat = null;
     }
 
     @Test
-    public void performExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
+    void performExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Someone, Van Something");
@@ -62,7 +62,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void performExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
+    void performExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
@@ -78,7 +78,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void performExportForSingleEditor(@TempDir Path testFolder) throws Exception {
+    void performExportForSingleEditor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "Someone, Van Something");
@@ -94,7 +94,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void performExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
+    void performExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry()

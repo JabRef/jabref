@@ -4,16 +4,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
 
-    public static void call(Scene scene, KeyEvent event) {
-        if (scene.focusOwnerProperty().get() instanceof TextInputControl) {
-            KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-            TextInputControl focusedTextField = (TextInputControl) scene.focusOwnerProperty().get();
+    public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
+        if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
                 switch (binding) {
                     case EDITOR_DELETE -> {

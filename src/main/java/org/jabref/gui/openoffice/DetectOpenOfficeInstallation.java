@@ -49,7 +49,7 @@ public class DetectOpenOfficeInstallation {
         if (OS.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
             executablePath = OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
         }
-        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Path.of(executablePath));
+        return !StringUtil.isNullOrEmpty(executablePath) && Files.isRegularFile(Path.of(executablePath));
     }
 
     public boolean setOpenOfficePreferences(Path installDir) {

@@ -3,6 +3,8 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -17,11 +19,13 @@ public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final UndoManager undoManager;
     private final PreferencesService preferencesService;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.undoManager = undoManager;
         this.preferencesService = preferencesService;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
@@ -64,7 +68,7 @@ public class MergeEntriesAction extends SimpleCommand {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, stateManager).execute();
+            new MergeTwoEntriesAction(entriesMergeResult, stateManager, undoManager).execute();
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

@@ -14,11 +14,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -40,12 +42,14 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
                              PreferencesService preferencesService,
+                             AiService aiService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              DialogService dialogService,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
+                             ClipBoardManager clipBoardManager,
                              UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
@@ -53,21 +57,23 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
                 preferencesService,
+                aiService,
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().getFirst());
                 } else if (change.wasRemoved()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().getFirst());
                 }
             }
         });

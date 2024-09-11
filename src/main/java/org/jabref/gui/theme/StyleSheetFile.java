@@ -87,7 +87,7 @@ final class StyleSheetFile extends StyleSheet {
      * This method allows callers to obtain the theme's additional stylesheet.
      *
      * @return the stylesheet location if there is an additional stylesheet present and available. The
-     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
+     * location will be a local URL. Typically, it will be a {@code 'data:'} URL where the CSS is embedded. However, for
      * large themes it can be {@code 'file:'}.
      */
     @Override
@@ -113,10 +113,10 @@ final class StyleSheetFile extends StyleSheet {
                 byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
                     String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
-                    LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
+                    LOGGER.trace("Embedded css in data URL of length {}", embeddedDataUrl.length());
                     return Optional.of(embeddedDataUrl);
                 } else {
-                    LOGGER.debug("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
+                    LOGGER.trace("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
                 }
             }
         } catch (IOException e) {

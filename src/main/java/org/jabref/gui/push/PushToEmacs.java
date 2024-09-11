@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -100,7 +100,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
             final Process p = Runtime.getRuntime().exec(com);
 
-            JabRefExecutorService.INSTANCE.executeAndWait(() -> {
+            HeadlessExecutorService.INSTANCE.executeAndWait(() -> {
                 try (InputStream out = p.getErrorStream()) {
                     int c;
                     StringBuilder sb = new StringBuilder();

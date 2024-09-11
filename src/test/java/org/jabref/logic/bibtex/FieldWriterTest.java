@@ -22,7 +22,7 @@ class FieldWriterTest {
 
     private FieldWriter writer;
 
-    public static Stream<Arguments> getMarkdowns() {
+    static Stream<Arguments> keepHashSignInComment() {
         return Stream.of(Arguments.of("""
                         # Changelog
 
@@ -42,8 +42,7 @@ class FieldWriterTest {
                                 #### Achievement\s
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                                 #### Method
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                """
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,"""
                 ),
                 // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
                 Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
@@ -54,6 +53,14 @@ class FieldWriterTest {
     void setUp() {
         FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList());
         writer = new FieldWriter(fieldPreferences);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void keepHashSignInComment(String text) throws Exception {
+        String writeResult = writer.write(StandardField.COMMENT, text);
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
+        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 
     @Test
@@ -96,9 +103,14 @@ class FieldWriterTest {
     }
 
     @Test
-    void removeWhitespaceFromNonMultiLineFields() throws Exception {
+    void whitespaceFromNonMultiLineFieldsKept() throws Exception {
+        // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
+        // We want to have a clean architecture for reading and writing
+        // Normalizing is done during write (and not during read)
+        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the fielld writer
+
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
-        String expected = "{I should not include additional whitespaces or tabs.}";
+        String expected = "{" + original + "}";
 
         String title = writer.write(StandardField.TITLE, original);
         String any = writer.write(new UnknownField("anyotherfield"), original);
@@ -141,11 +153,53 @@ class FieldWriterTest {
         assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
 
-    @ParameterizedTest
-    @MethodSource("getMarkdowns")
-    void keepHashSignInComment(String text) throws Exception {
-        String writeResult = writer.write(StandardField.COMMENT, text);
-        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
-        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
+    @Test
+    void hashWorksSimple() throws Exception {
+        String text = "#text";
+        assertEquals("{#text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void escapedHashWorksSimple() throws Exception {
+        String text = "\\#text";
+        assertEquals("{\\#text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void doubleHashesRemoved() throws Exception {
+        String text = "te##xt";
+        assertEquals("{text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void multipleSpacesNotShrunkOnSingleLineField() throws Exception {
+        String text = "t  w  o";
+        assertEquals("{t  w  o}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void doubleSpacesAreKept() throws Exception {
+        String text = "  text      ";
+        assertEquals("{  text      }", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void spacesAreNotTrimmedAtMultilineField() throws Exception {
+        String text = "  text      ";
+        assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
+    }
+
+    @Test
+    void multipleSpacesKeptOnMultiLineField() throws Exception {
+        String text = "t  w  o";
+        assertEquals("{t  w  o}", writer.write(StandardField.COMMENT, text));
+    }
+
+    @Test
+    void finalNewLineIsKeptAtMultilineField() throws Exception {
+        String text = "  text      " + OS.NEWLINE;
+        assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
     }
 }

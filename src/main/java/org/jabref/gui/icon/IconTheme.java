@@ -22,6 +22,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.EnumSet.allOf;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
@@ -104,8 +107,7 @@ public class IconTheme {
     public static URL getIconUrl(String name) {
         String key = Objects.requireNonNull(name, "icon name");
         if (!KEY_TO_ICON.containsKey(key)) {
-            LOGGER.warn("Could not find icon url by name " + name + ", so falling back on default icon "
-                        + DEFAULT_ICON_PATH);
+            LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
         String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
@@ -287,9 +289,10 @@ public class IconTheme {
         CHECK(MaterialDesignC.CHECK),
         WARNING(MaterialDesignA.ALERT),
         ERROR(MaterialDesignA.ALERT_CIRCLE),
-        CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
+        FILTER(MaterialDesignF.FILTER),
+        INVERT(MaterialDesignI.INVERT_COLORS),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
@@ -349,12 +352,14 @@ public class IconTheme {
         SELECT_ICONS(MaterialDesignA.APPS),
         KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
         KEEP_ON_TOP(MaterialDesignP.PIN),
-        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF),
         OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW),
         REMOVE_TAGS(MaterialDesignC.CLOSE),
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
-        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
+        ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY);
+
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {

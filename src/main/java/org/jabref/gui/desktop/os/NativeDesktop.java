@@ -11,9 +11,10 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
-import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 
@@ -103,6 +104,13 @@ public abstract class NativeDesktop {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
+    public Path getAiFilesDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                .getUserDataDir(OS.APP_DIR_APP_NAME,
+                        "ai" + File.separator + AiService.VERSION,
+                        OS.APP_DIR_APP_AUTHOR));
+    }
+
     public Path getSslDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(OS.APP_DIR_APP_NAME,
@@ -122,7 +130,7 @@ public abstract class NativeDesktop {
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException e) {
-                LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
+                LoggerFactory.getLogger(NativeDesktop.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
         }

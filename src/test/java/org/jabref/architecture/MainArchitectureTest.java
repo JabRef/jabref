@@ -2,6 +2,8 @@ package org.jabref.architecture;
 
 import java.nio.file.Paths;
 
+import org.jabref.logic.importer.fileformat.ImporterTestEngine;
+
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchIgnore;
@@ -26,14 +28,14 @@ class MainArchitectureTest {
     private static final String PACKAGE_ORG_JABREF_CLI = "org.jabref.cli..";
 
     @ArchTest
-    public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
-        noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
+    public void doNotUseApacheCommonsLang3(JavaClasses classes) {
+        noClasses().that().areNotAnnotatedWith(AllowedToUseApacheCommonsLang3.class)
                    .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
                    .check(classes);
     }
 
     @ArchTest
-    public static void doNotUseSwing(JavaClasses classes) {
+    public void doNotUseSwing(JavaClasses classes) {
         // This checks for all Swing packages, but not the UndoManager
         noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .should().accessClassesThat()
@@ -50,20 +52,20 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void doNotUseAssertJ(JavaClasses classes) {
+    public void doNotUseAssertJ(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("org.assertj..")
                    .check(classes);
     }
 
     @ArchTest
-    public static void doNotUseJavaAWT(JavaClasses classes) {
+    public void doNotUseJavaAWT(JavaClasses classes) {
         noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
                    .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                    .check(classes);
     }
 
     @ArchTest
-    public static void doNotUsePaths(JavaClasses classes) {
+    public void doNotUsePaths(JavaClasses classes) {
         noClasses().should()
                    .accessClassesThat()
                    .belongToAnyOf(Paths.class)
@@ -72,9 +74,21 @@ class MainArchitectureTest {
     }
 
     @ArchTest
+    public void useStreamsOfResources(JavaClasses classes) {
+        // Reason: https://github.com/oracle/graal/issues/7682#issuecomment-1786704111
+        noClasses().that().haveNameNotMatching(".*Test")
+                   .and().areNotAnnotatedWith(AllowedToUseClassGetResource.class)
+                   .and().areNotAssignableFrom(ImporterTestEngine.class)
+                   .should()
+                   .callMethod(Class.class, "getResource", String.class)
+                   .because("getResourceAsStream(...) should be used instead")
+                   .check(classes);
+    }
+
+    @ArchTest
     @ArchIgnore
     // Fails currently
-    public static void respectLayeredArchitecture(JavaClasses classes) {
+    public void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture().consideringOnlyDependenciesInLayers()
                              .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                              .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
@@ -95,7 +109,7 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void doNotUseLogicInModel(JavaClasses classes) {
+    public void doNotUseLogicInModel(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
@@ -103,7 +117,7 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void restrictUsagesInModel(JavaClasses classes) {
+    public void restrictUsagesInModel(JavaClasses classes) {
         // Until we switch to Lucene, we need to access Globals.stateManager().getActiveDatabase() from the search classes,
         // because the PDFSearch needs to access the index of the corresponding database
         noClasses().that().areNotAssignableFrom("org.jabref.model.search.rules.ContainBasedSearchRule")
@@ -116,7 +130,7 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void restrictUsagesInLogic(JavaClasses classes) {
+    public void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .and().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
@@ -126,7 +140,7 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void restrictStandardStreams(JavaClasses classes) {
+    public void restrictStandardStreams(JavaClasses classes) {
         noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
                    .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
                    .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
@@ -136,7 +150,7 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    public static void nativeDesktopIsRestricted(JavaClasses classes) {
+    public void nativeDesktopIsRestricted(JavaClasses classes) {
         noClasses().that().doNotHaveSimpleName("JabRefDesktop")
                    .and().doNotHaveSimpleName("Launcher")
                    .and().doNotHaveSimpleName("DefaultDesktop")

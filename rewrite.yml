@@ -169,7 +169,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
 #  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
 #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
-  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
+  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrToString
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
   - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
   - org.openrewrite.staticanalysis.ReplaceWeekYearWithYear
@@ -196,6 +196,16 @@ recipeList:
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
+  # - org.openrewrite.java.testing.junit5.JUnit5BestPractices -- cannot be used directly, because one recipe is not working (see below)
+  - org.openrewrite.java.testing.cleanup.AssertLiteralBooleanToFailRecipe
   - org.openrewrite.java.testing.cleanup.RemoveTestPrefix
+  # - org.openrewrite.java.testing.cleanup.TestsShouldNotBePublic -- does not work due to https://github.com/openrewrite/rewrite-testing-frameworks/issues/458
   - org.openrewrite.java.testing.junit5.CleanupAssertions
-#  - org.openrewrite.java.testing.junit5.JUnit5BestPractices
+  - org.openrewrite.java.testing.junit5.AddParameterizedTestAnnotation
+  - org.openrewrite.java.testing.junit5.RemoveDuplicateTestTemplates
+  - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
+  - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
+  - org.openrewrite.java.testing.junit5.StaticImports
+
+  # Logging
+  - org.openrewrite.java.logging.slf4j.Slf4jBestPractices

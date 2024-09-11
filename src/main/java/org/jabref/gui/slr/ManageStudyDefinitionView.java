@@ -96,7 +96,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      */
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
-        this.setTitle("Define study parameters");
+        this.setTitle(Localization.lang("Define study parameters"));
         this.study = Optional.empty();
 
         ViewLoader.view(this)
@@ -111,7 +111,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /**
      * This is used to edit an existing study.
      *
-     * @param study          the study to edit
+     * @param study the study to edit
      * @param studyDirectory the directory of the study
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
@@ -145,6 +145,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
+                viewModel.updateSelectedCatalogs();
                 return viewModel.saveStudy();
             }
             // Cancel button will return null
@@ -158,6 +159,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             viewModel = new ManageStudyDefinitionViewModel(
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
+                    prefs.getWorkspacePreferences(),
                     dialogService);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
@@ -165,6 +167,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     pathToStudyDataDirectory,
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
+                    prefs.getWorkspacePreferences(),
                     dialogService);
 
             // The directory of the study cannot be changed
@@ -236,6 +239,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 })
                 .install(catalogTable);
+
+        if (study.isEmpty()) {
+            viewModel.initializeSelectedCatalogs();
+        }
 
         catalogColumn.setReorderable(false);
         catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());

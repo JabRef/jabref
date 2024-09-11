@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BstNameFormatterTest {
+class BstNameFormatterTest {
 
     @Test
-    public void umlautsFullNames() {
+    void umlautsFullNames() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph",
@@ -17,7 +17,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void umlautsAbbreviations() {
+    void umlautsAbbreviations() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.",
@@ -25,7 +25,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void umlautsAbbreviationsWithQuestionMark() {
+    void umlautsAbbreviationsWithQuestionMark() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?",
@@ -33,7 +33,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void formatName() {
+    void formatName() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("dlVP", BstNameFormatter.formatName(list.getAuthor(0), "{v{}}{l{}}"));
@@ -70,28 +70,28 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void matchingBraceConsumedForCompleteWords() {
+    void matchingBraceConsumedForCompleteWords() {
         StringBuilder sb = new StringBuilder();
         assertEquals(6, BstNameFormatter.consumeToMatchingBrace(sb, "{HELLO} {WORLD}".toCharArray(), 0));
         assertEquals("{HELLO}", sb.toString());
     }
 
     @Test
-    public void matchingBraceConsumedForBracesInWords() {
+    void matchingBraceConsumedForBracesInWords() {
         StringBuilder sb = new StringBuilder();
         assertEquals(18, BstNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}".toCharArray(), 12));
         assertEquals("{WORLD}", sb.toString());
     }
 
     @Test
-    public void consumeToMatchingBrace() {
+    void consumeToMatchingBrace() {
         StringBuilder sb = new StringBuilder();
         assertEquals(10, BstNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}".toCharArray(), 0));
         assertEquals("{HE{L{}L}O}", sb.toString());
     }
 
     @Test
-    public void getFirstCharOfString() {
+    void getFirstCharOfString() {
         assertEquals("C", BstNameFormatter.getFirstCharOfString("Charles"));
         assertEquals("V", BstNameFormatter.getFirstCharOfString("Vall{\\'e}e"));
         assertEquals("{\\'e}", BstNameFormatter.getFirstCharOfString("{\\'e}"));
@@ -100,7 +100,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void numberOfChars() {
+    void numberOfChars() {
         assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e}e", -1));
         assertEquals(2, BstNameFormatter.numberOfChars("Vall{\\'e}e", 2));
         assertEquals(1, BstNameFormatter.numberOfChars("Vall{\\'e}e", 1));

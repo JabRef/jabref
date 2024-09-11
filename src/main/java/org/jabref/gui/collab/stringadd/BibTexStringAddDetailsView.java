@@ -17,11 +17,7 @@ public final class BibTexStringAddDetailsView extends DatabaseChangeDetailsView 
                 new Label(Localization.lang("Label: %0", stringAdd.getAddedString().getName())),
                 new Label(Localization.lang("Content: %0", stringAdd.getAddedString().getContent()))
         );
-        setLeftAnchor(container, 8d);
-        setTopAnchor(container, 8d);
-        setRightAnchor(container, 8d);
-        setBottomAnchor(container, 8d);
 
-        getChildren().setAll(container);
+        this.setAllAnchorsAndAttachChild(container);
     }
 }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.database.BibDatabase;
@@ -83,6 +84,8 @@ public class BracketedPattern {
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
+
+    private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private enum Institution {
         SCHOOL,
@@ -844,51 +847,44 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    static String authorsAlpha(AuthorList authorList) {
+    public static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors;
-        final boolean maxAuthorsExceeded;
-        if (authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS) {
-            maxAuthors = authorList.getNumberOfAuthors();
-            maxAuthorsExceeded = false;
-        } else {
-            maxAuthors = MAX_ALPHA_AUTHORS - 1;
-            maxAuthorsExceeded = true;
-        }
+        int numberOfAuthors = authorList.getNumberOfAuthors();
+        boolean andOthersPresent = numberOfAuthors > 1 &&
+                authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);
 
-        if (authorList.getNumberOfAuthors() == 1) {
-            String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()
-                                             .replaceAll("\\s+", " ").trim().split(" ");
-            // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
-            for (int j = 0; j < (firstAuthor.length - 1); j++) {
-                alphaStyle.append(firstAuthor[j], 0, 1);
+        if (numberOfAuthors == 1 || andOthersPresent) {
+            // Single author or "and others" case
+            String lastName = authorList.getAuthor(0).getFamilyName().orElse("");
+            String formattedName = ENCLOSING_BRACES_FORMATTER.format(lastName);
+            if (!formattedName.equals(lastName)) {
+                // Inequality => braces were removed, indicating an organization
+                alphaStyle.append(getOrganizationInitials(formattedName));
+            } else {
+                alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
             }
-            // append last part of last name completely
-            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
-                    Math.min(3, firstAuthor[firstAuthor.length - 1].length()));
         } else {
-            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
-            if (andOthersPresent) {
-                maxAuthors--;
-            }
-            List<String> vonAndLastNames = authorList.getAuthors().stream()
-                                                     .limit(maxAuthors)
-                                                     .map(Author::getNamePrefixAndFamilyName)
-                                                     .collect(Collectors.toList());
-            for (String vonAndLast : vonAndLastNames) {
-                // replace all whitespaces by " "
-                // split the lastname at " "
-                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
-                for (String part : nameParts) {
-                    // use first character of each part of lastname
-                    alphaStyle.append(part, 0, 1);
+            int maxAuthors = Math.min(numberOfAuthors, MAX_ALPHA_AUTHORS);
+            for (int i = 0; i < maxAuthors; i++) {
+                String lastName = authorList.getAuthor(i).getFamilyName().orElse("");
+                alphaStyle.append(lastName, 0, 1);
+                if (alphaStyle.length() >= 4) {
+                    // Stop after 4 authors
+                    break;
                 }
-            }
-            if (andOthersPresent || maxAuthorsExceeded) {
-                alphaStyle.append("+");
             }
         }
         return alphaStyle.toString();
+    }
+
+    private static String getOrganizationInitials(String orgName) {
+        StringBuilder initials = new StringBuilder();
+        for (String part : orgName.split("\\s+")) {
+            if (!part.isEmpty() && Character.isUpperCase(part.charAt(0))) {
+                initials.append(part.charAt(0));
+            }
+        }
+        return initials.toString();
     }
 
     /**
@@ -902,7 +898,7 @@ public class BracketedPattern {
      * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
      * `maxAuthors` replaced with `suffix`
      */
-    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
+    public static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
         final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
         return authorList.getAuthors().stream()
                          .map(author -> {

@@ -1,3 +1,2 @@
 #! /bin/sh
-DIR="$SNAP/lib/runtime/bin"
-"$DIR/java"  -p "$DIR/../app" -m org.jabref/org.jabref.Launcher  "$@"
+"$SNAP/lib/runtime/bin/JabRef" "$@"

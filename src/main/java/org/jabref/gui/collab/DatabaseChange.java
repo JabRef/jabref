@@ -50,7 +50,7 @@ public sealed abstract class DatabaseChange permits EntryAdd, EntryChange, Entry
 
     /**
      * Convenience method for accepting changes
-     * */
+     */
     public void accept() {
         setAccepted(true);
     }

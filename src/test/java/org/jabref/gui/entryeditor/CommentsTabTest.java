@@ -10,10 +10,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -70,8 +73,6 @@ class CommentsTabTest {
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
-    private IndexingTaskManager indexingTaskManager;
-    @Mock
     private OwnerPreferences ownerPreferences;
 
     @Mock
@@ -79,7 +80,7 @@ class CommentsTabTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
@@ -94,12 +95,14 @@ class CommentsTabTest {
                 databaseContext,
                 suggestionProviders,
                 undoManager,
+                mock(UndoAction.class),
+                mock(RedoAction.class),
                 dialogService,
-                stateManager,
                 themeManager,
-                indexingTaskManager,
                 taskExecutor,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                mock(LuceneManager.class),
+                OptionalObjectProperty.empty()
         );
     }
 
@@ -159,7 +162,7 @@ class CommentsTabTest {
     }
 
     @Test
-    public void differentiateCaseInUserName() {
+    void differentiateCaseInUserName() {
         UserSpecificCommentField field1 = new UserSpecificCommentField("USER");
         UserSpecificCommentField field2 = new UserSpecificCommentField("user");
         assertNotEquals(field1, field2, "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");

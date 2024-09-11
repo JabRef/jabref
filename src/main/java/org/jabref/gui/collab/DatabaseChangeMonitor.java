@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
@@ -23,8 +25,6 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.Globals.undoManager;
-
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
@@ -35,6 +35,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final LibraryTab.DatabaseNotification notificationPane;
+    private final UndoManager undoManager;
+    private final StateManager stateManager;
     private LibraryTab saveState;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
@@ -43,12 +46,16 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
                                  LibraryTab.DatabaseNotification notificationPane,
+                                 UndoManager undoManager,
                                  StateManager stateManager) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.notificationPane = notificationPane;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
 
         this.listeners = new ArrayList<>();
 
@@ -60,7 +67,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             }
         });
 
-        addListener(changes -> notificationPane.notify(
+        addListener(this::notifyOnChange);
+    }
+
+    private void notifyOnChange(List<DatabaseChange> changes) {
+        // The changes come from {@link org.jabref.gui.collab.DatabaseChangeList.compareAndGetChanges}
+        notificationPane.notify(
                 IconTheme.JabRefIcons.SAVE.getGraphicNode(),
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
@@ -82,7 +94,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                             }
                             notificationPane.hide();
                         })),
-                Duration.ZERO));
+                Duration.ZERO);
     }
 
     @Override

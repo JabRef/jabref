@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOProcess;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -17,6 +17,7 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
@@ -30,7 +31,7 @@ public class EditSeparate {
     public static boolean separateCitations(XTextDocument doc,
                                             OOFrontend frontend,
                                             List<BibDatabase> databases,
-                                            OOBibStyle style)
+                                            JStyle style)
             throws
             CreationException,
             IllegalTypeException,
@@ -38,7 +39,7 @@ public class EditSeparate {
             NotRemoveableException,
             PropertyVetoException,
             WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
+            IllegalArgumentException {
 
         boolean madeModifications = false;
 

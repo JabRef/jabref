@@ -67,8 +67,9 @@ public class PersistenceVisualStateTable {
 
     private List<MainTableColumnModel> toList(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
         return columns.stream()
-                .filter(col -> col instanceof MainTableColumn<?>)
-                .map(column -> ((MainTableColumn<?>) column).getModel())
-                .collect(Collectors.toList());
+                      .filter(col -> col instanceof MainTableColumn<?>)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .filter(model -> model.getType() != MainTableColumnModel.Type.MATCH_CATEGORY)
+                      .collect(Collectors.toList());
     }
 }

@@ -24,7 +24,7 @@ class SuggestionProvidersTest {
     private SuggestionProviders suggestionProviders;
 
     @BeforeEach
-    public void initializeSuggestionProviders() {
+    void initializeSuggestionProviders() {
         BibDatabase database = new BibDatabase();
         JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
         Set<Field> completeFields = Set.of(StandardField.AUTHOR, StandardField.XREF, StandardField.XDATA, StandardField.JOURNAL, StandardField.PUBLISHER, SpecialField.PRINTED);
@@ -57,7 +57,7 @@ class SuggestionProvidersTest {
 
     @ParameterizedTest
     @MethodSource("getTestPairs")
-    public void appropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
+    void appropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
         assertEquals(expected, suggestionProviders.getForField(field).getClass());
     }
 

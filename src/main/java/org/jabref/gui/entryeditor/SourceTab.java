@@ -21,7 +21,6 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -32,7 +31,8 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -42,7 +42,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -50,6 +49,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -71,12 +71,10 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
-
     private BibEntry previousEntry;
 
     private class EditAction extends SimpleCommand {
@@ -105,9 +103,9 @@ public class SourceTab extends EntryEditorTab {
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
-                     StateManager stateManager,
                      BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository) {
+                     KeyBindingRepository keyBindingRepository,
+                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -117,28 +115,24 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            highlightSearchPattern();
-        });
-
-        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });
     }
 
     private void highlightSearchPattern() {
-        if (searchHighlightPattern.isPresent() && (codeArea != null)) {
+        if (codeArea != null) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
-            while (matcher.find()) {
-                for (int i = 0; i <= matcher.groupCount(); i++) {
-                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+            if (searchHighlightPattern.isPresent()) {
+                Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
+                while (matcher.find()) {
+                    for (int i = 0; i <= matcher.groupCount(); i++) {
+                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                    }
                 }
             }
         }
@@ -192,7 +186,7 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
@@ -233,7 +227,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void updateCodeArea() {
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
             if (codeArea == null) {
                 setupSourceEditor();
             }
@@ -294,7 +288,7 @@ public class SourceTab extends EntryEditorTab {
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntries().get(0);
+            BibEntry newEntry = database.getEntries().getFirst();
             String newKey = newEntry.getCitationKey().orElse(null);
 
             if (newKey != null) {

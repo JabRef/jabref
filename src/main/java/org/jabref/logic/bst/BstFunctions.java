@@ -711,12 +711,9 @@ public class BstFunctions {
             length = Integer.MAX_VALUE / 2;
         }
 
-        if (start > (Integer.MAX_VALUE / 2)) {
-            start = Integer.MAX_VALUE / 2;
-        }
-
-        if (start < (Integer.MIN_VALUE / 2)) {
-            start = -Integer.MIN_VALUE / 2;
+        if ((start > string.length()) || (start < -string.length())) {
+            stack.push("");
+            return;
         }
 
         if (start < 0) {
@@ -726,7 +723,12 @@ public class BstFunctions {
         }
 
         int zeroBasedStart = start - 1;
-        String result = string.substring(zeroBasedStart, Math.min(zeroBasedStart + length, string.length()));
+        int zeroBasedEnd = Math.min(zeroBasedStart + length, string.length());
+
+        // Sanitize too large start values
+        zeroBasedStart = Math.min(zeroBasedStart, zeroBasedEnd);
+
+        String result = string.substring(zeroBasedStart, zeroBasedEnd);
 
         LOGGER.trace("substring$(s, start, len): ({}, {}, {})={}", string, start, length, result);
         stack.push(result);

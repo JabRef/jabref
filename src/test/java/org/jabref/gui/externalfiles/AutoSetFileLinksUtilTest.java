@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AutoSetFileLinksUtilTest {
+class AutoSetFileLinksUtilTest {
 
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(
@@ -38,7 +38,7 @@ public class AutoSetFileLinksUtilTest {
     private Path path = null;
 
     @BeforeEach
-    public void setUp(@TempDir Path folder) throws Exception {
+    void setUp(@TempDir Path folder) throws Exception {
         path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCitationKey("CiteKey");
@@ -47,7 +47,7 @@ public class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    public void findAssociatedNotLinkedFilesSuccess() throws Exception {
+    void findAssociatedNotLinkedFilesSuccess() throws Exception {
         when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(path.getParent()));
         List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
@@ -56,7 +56,7 @@ public class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    public void findAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
+    void findAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);

@@ -9,7 +9,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -102,7 +101,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
             }
         });
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER, dialogService, preferencesService.getFilePreferences()), formatterHelp);
     }
 

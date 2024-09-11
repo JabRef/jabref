@@ -3,7 +3,6 @@ package org.jabref.logic.database;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -21,11 +20,9 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
@@ -76,12 +73,9 @@ public class DuplicateCheck {
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
-        for (final Field name : FieldFactory.getIdentifierFieldNames()) {
-            if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
-                return true;
-            }
-        }
-        return false;
+        return one.getFields().stream()
+                .filter(field -> field.getProperties().contains(FieldProperty.IDENTIFIER))
+                .anyMatch(field -> two.getField(field).map(content -> one.getField(field).orElseThrow().equals(content)).orElse(false));
     }
 
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
@@ -323,15 +317,9 @@ public class DuplicateCheck {
      * Checks if the two entries represent the same publication.
      */
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
+        // Checks DOI and other identifiers
         if (haveSameIdentifier(one, two)) {
             return true;
-        }
-
-        // check DOI
-        Optional<DOI> oneDOI = one.getDOI();
-        Optional<DOI> twoDOI = two.getDOI();
-        if (oneDOI.isPresent() && twoDOI.isPresent()) {
-            return Objects.equals(oneDOI, twoDOI);
         }
 
         if (haveDifferentEntryType(one, two) ||
@@ -341,12 +329,12 @@ public class DuplicateCheck {
         }
 
         // In case an ISBN is present, it is a strong indicator that the entries are equal.
-        // Only in InBook, InCollection, or Article the ISBN may be equal and the puplication on different pages (and thus not equal)
+        // Only in InBook, InCollection, or Article the ISBN may be equal and the publication on different pages (and thus not equal)
         Optional<ISBN> oneISBN = one.getISBN();
         Optional<ISBN> twoISBN = two.getISBN();
         if (oneISBN.isPresent() && twoISBN.isPresent()
                 && Objects.equals(oneISBN, twoISBN)
-                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())) {
+                && !Set.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())) {
             return true;
         }
 

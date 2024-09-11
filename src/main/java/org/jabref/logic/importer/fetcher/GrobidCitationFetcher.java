@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -43,23 +44,20 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * server has to look up the entry.
      *
      * @return A BibTeX string if extraction is successful
-     * @throws FetcherException
      */
     private Optional<BibEntry> parseUsingGrobid(String plainText) throws FetcherException {
         try {
             return grobidService.processCitation(plainText, importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         } catch (HttpStatusException e) {
-            String msg = "Connection failure.";
-            LOGGER.debug(msg, e);
-            throw new FetcherException(msg, e.getCause());
+            LOGGER.debug("Could not connect to Grobid", e);
+            throw new FetcherException("{grobid}", new SimpleHttpResponse(e));
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
             LOGGER.debug(msg, e);
             throw new FetcherException(msg, e.getCause());
         } catch (IOException | ParseException e) {
-            String msg = "Could not process citation. " + e.getMessage();
-            LOGGER.debug(msg, e);
-            return Optional.empty();
+            LOGGER.debug("Could not process citation", e);
+            throw new FetcherException("Could not process citation", e);
         }
     }
 
@@ -70,9 +68,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
-        List<BibEntry> collect;
+        List<BibEntry> result;
         try {
-            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+            result = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                             .map(String::trim)
                             .filter(str -> !str.isBlank())
                             .map(Unchecked.function(this::parseUsingGrobid))
@@ -82,7 +80,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
             // This "undoes" Unchecked.function(this::parseUsingGrobid))
             throw (FetcherException) e.getCause();
         }
-        return collect;
+        return result;
     }
 
     /**

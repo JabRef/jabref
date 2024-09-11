@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
@@ -11,14 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
-public class ACMPortalParserTest {
+class ACMPortalParserTest {
 
     ACMPortalParser parser;
     List<BibEntry> searchEntryList;
@@ -69,7 +67,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void parseEntries() throws IOException, ParseException {
+    void parseEntries() throws Exception {
         CookieHandler.setDefault(new CookieManager());
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(searchUrl).asInputStream());
         for (BibEntry bibEntry : bibEntries) {
@@ -79,7 +77,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void parseDoiSearchPage() throws ParseException, IOException {
+    void parseDoiSearchPage() throws Exception {
         String testDoi = "10.1145/3129790.3129810";
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
@@ -139,7 +137,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void noEntryFound() throws URISyntaxException, IOException, ParseException {
+    void noEntryFound() throws Exception {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298").build().toURL();
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());

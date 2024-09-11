@@ -32,8 +32,10 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
@@ -67,7 +69,7 @@ public class BackupManager {
     private final LibraryTab libraryTab;
 
     // Contains a list of all backup paths
-    // During a write, the less recent backup file is deleted
+    // During writing, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
@@ -259,10 +261,19 @@ public class BackupManager {
                 .withSaveOrder(saveOrder)
                 .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
+        // "Clone" the database context
+        // We "know" that "only" the BibEntries might be changed during writing (see [org.jabref.logic.exporter.BibDatabaseWriter.savePartOfDatabase])
+        List<BibEntry> list = bibDatabaseContext.getDatabase().getEntries().stream()
+                                                .map(BibEntry::clone)
+                                                .map(BibEntry.class::cast)
+                                                .toList();
+        BibDatabase bibDatabaseClone = new BibDatabase(list);
+        BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
+
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
-        // Example: What happens if one hard powers off the machine (or kills the jabref process) during the write of the backup?
+        // Example: What happens if one hard powers off the machine (or kills the jabref process) during writing of the backup?
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
         try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
@@ -272,7 +283,8 @@ public class BackupManager {
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     entryTypesManager)
-                    .saveDatabase(bibDatabaseContext);
+                    // we save the clone to prevent the original database (and thus the UI) from being changed
+                    .saveDatabase(bibDatabaseContextClone);
             backupFilesQueue.add(backupPath);
 
             // We wrote the file successfully
