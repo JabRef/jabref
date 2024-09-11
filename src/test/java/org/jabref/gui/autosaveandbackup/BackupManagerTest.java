@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -19,7 +20,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

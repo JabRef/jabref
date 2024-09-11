@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -14,7 +15,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.LuceneIndexer;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.apache.lucene.index.IndexReader;
 import org.junit.jupiter.api.BeforeEach;
