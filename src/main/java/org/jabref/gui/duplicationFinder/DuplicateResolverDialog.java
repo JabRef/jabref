@@ -13,13 +13,12 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
@@ -61,15 +60,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     private ThreeWayMergeView threeWayMerge;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     public DuplicateResolverDialog(BibEntry one,
                                    BibEntry two,
                                    DuplicateResolverType type,
-                                   BibDatabaseContext database,
                                    StateManager stateManager,
                                    DialogService dialogService,
-                                   CliPreferences preferences) {
+                                   GuiPreferences preferences) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.stateManager = stateManager;
         this.dialogService = dialogService;

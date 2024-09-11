@@ -20,6 +20,7 @@ import javafx.scene.web.WebView;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
@@ -31,7 +32,6 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -130,9 +130,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         highlightSearchPattern();
     };
 
-    /**
-     * The entry currently shown
-     */
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private PreviewLayout layout;
@@ -143,7 +140,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         CliPreferences preferences,
+                         GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
@@ -198,7 +195,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         CliPreferences preferences,
+                         GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
         this(database, dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());

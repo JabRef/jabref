@@ -10,23 +10,23 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
 public class UrlEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
     public UrlEditorViewModel(Field field,
                               SuggestionProvider<?> suggestionProvider,
                               DialogService dialogService,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;

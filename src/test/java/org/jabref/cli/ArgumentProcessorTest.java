@@ -9,6 +9,7 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -25,7 +26,6 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 class ArgumentProcessorTest {
 
-    private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -73,6 +73,7 @@ class ArgumentProcessorTest {
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
                 preferences,
+                preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
         processor.processArguments();
@@ -101,6 +102,7 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
+                preferences,
                 preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
@@ -133,6 +135,7 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
+                preferences,
                 preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);

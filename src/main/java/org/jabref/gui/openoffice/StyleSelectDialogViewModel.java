@@ -24,6 +24,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -38,7 +39,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class StyleSelectDialogViewModel {
 
@@ -56,7 +56,7 @@ public class StyleSelectDialogViewModel {
 
     public StyleSelectDialogViewModel(DialogService dialogService,
                                       StyleLoader styleLoader,
-                                      CliPreferences preferences,
+                                      GuiPreferences preferences,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;

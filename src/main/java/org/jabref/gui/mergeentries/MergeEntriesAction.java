@@ -9,20 +9,20 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, CliPreferences preferences) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;

@@ -7,6 +7,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -15,7 +16,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
                                         FieldCheckers fieldCheckers,
                                         DialogService dialogService,
                                         TaskExecutor taskExecutor,
-                                        CliPreferences preferences,
+                                        GuiPreferences preferences,
                                         UndoManager undoManager,
                                         StateManager stateManager) {
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);

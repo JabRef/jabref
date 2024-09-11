@@ -31,7 +31,6 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -107,7 +106,7 @@ public class RightClickMenu {
     private static Menu createCopySubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
-                                          CliPreferences preferences,
+                                          GuiPreferences preferences,
                                           ClipBoardManager clipBoardManager,
                                           JournalAbbreviationRepository abbreviationRepository,
                                           TaskExecutor taskExecutor) {
@@ -144,7 +143,7 @@ public class RightClickMenu {
     private static Menu createSendSubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
-                                          CliPreferences preferences,
+                                          GuiPreferences preferences,
                                           BibEntryTypesManager entryTypesManager,
                                           TaskExecutor taskExecutor) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);

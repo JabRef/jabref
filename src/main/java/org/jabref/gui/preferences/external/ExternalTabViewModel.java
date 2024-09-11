@@ -16,6 +16,7 @@ import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationPreferences;
@@ -26,7 +27,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -51,7 +51,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final Validator fileBrowserCommandValidator;
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
@@ -59,7 +59,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final PushToApplicationPreferences initialPushToApplicationPreferences;
     private final PushToApplicationPreferences workingPushToApplicationPreferences;
 
-    public ExternalTabViewModel(DialogService dialogService, CliPreferences preferences) {
+    public ExternalTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialExternalApplicationPreferences = this.preferences.getExternalApplicationsPreferences();

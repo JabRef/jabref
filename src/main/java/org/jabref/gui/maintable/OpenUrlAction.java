@@ -11,19 +11,19 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class OpenUrlAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
-    public OpenUrlAction(DialogService dialogService, StateManager stateManager, CliPreferences preferences) {
+    public OpenUrlAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

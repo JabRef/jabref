@@ -18,6 +18,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.exporter.Exporter;
@@ -30,7 +31,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ExportCommand extends SimpleCommand {
     private final ExportMethod exportMethod;
     private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -58,7 +58,7 @@ public class ExportCommand extends SimpleCommand {
                          Supplier<LibraryTab> tabSupplier,
                          StateManager stateManager,
                          DialogService dialogService,
-                         CliPreferences preferences,
+                         GuiPreferences preferences,
                          BibEntryTypesManager entryTypesManager,
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {

@@ -7,6 +7,7 @@ import javafx.collections.WeakMapChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -15,7 +16,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ARK;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.EprintIdentifier;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,7 +35,7 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
                                            FieldCheckers fieldCheckers,
                                            DialogService dialogService,
                                            TaskExecutor taskExecutor,
-                                           CliPreferences preferences,
+                                           GuiPreferences preferences,
                                            UndoManager undoManager) {
         super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(false, false);

@@ -13,6 +13,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
@@ -22,7 +23,6 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +34,14 @@ public class CopyMoreAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public CopyMoreAction(StandardActions action,
                           DialogService dialogService,
                           StateManager stateManager,
                           ClipBoardManager clipBoardManager,
-                          CliPreferences preferences,
+                          GuiPreferences preferences,
                           JournalAbbreviationRepository abbreviationRepository) {
         this.action = action;
         this.dialogService = dialogService;

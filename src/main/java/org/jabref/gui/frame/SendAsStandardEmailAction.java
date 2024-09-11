@@ -7,6 +7,7 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -15,7 +16,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  */
 public class SendAsStandardEmailAction extends SendAsEMailAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsStandardEmailAction.class);
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
 
     public SendAsStandardEmailAction(DialogService dialogService,
-                                     CliPreferences preferences,
+                                     GuiPreferences preferences,
                                      StateManager stateManager,
                                      BibEntryTypesManager entryTypesManager,
                                      TaskExecutor taskExecutor) {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 
 public class PushToApplications {
 
@@ -24,7 +24,7 @@ public class PushToApplications {
     private PushToApplications() {
     }
 
-    public static List<PushToApplication> getAllApplications(DialogService dialogService, CliPreferences preferences) {
+    public static List<PushToApplication> getAllApplications(DialogService dialogService, GuiPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return APPLICATIONS;
         }
@@ -43,7 +43,7 @@ public class PushToApplications {
         return APPLICATIONS;
     }
 
-    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, CliPreferences preferences) {
+    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, GuiPreferences preferences) {
         return getAllApplications(dialogService, preferences).stream()
                                                              .filter(application -> application.getDisplayName().equals(applicationName))
                                                              .findAny();

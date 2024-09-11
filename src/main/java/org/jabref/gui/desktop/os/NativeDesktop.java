@@ -19,6 +19,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
@@ -31,7 +32,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public abstract class NativeDesktop {
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
-                                          CliPreferences preferences,
+                                          GuiPreferences preferences,
                                           String initialLink,
                                           Field initialField,
                                           DialogService dialogService,
@@ -145,12 +145,12 @@ public abstract class NativeDesktop {
         }
     }
 
-    private static void openDoi(String doi, CliPreferences preferences) throws IOException {
+    private static void openDoi(String doi, GuiPreferences preferences) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
         openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
-    public static void openCustomDoi(String link, CliPreferences preferences, DialogService dialogService) {
+    public static void openCustomDoi(String link, GuiPreferences preferences, DialogService dialogService) {
         DOI.parse(link)
            .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
            .ifPresent(uri -> {
@@ -162,7 +162,7 @@ public abstract class NativeDesktop {
            });
     }
 
-    private static void openIsbn(String isbn, CliPreferences preferences) throws IOException {
+    private static void openIsbn(String isbn, GuiPreferences preferences) throws IOException {
         String link = "https://openlibrary.org/isbn/" + isbn;
         openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
@@ -249,7 +249,7 @@ public abstract class NativeDesktop {
      *
      * @param file Location the console should be opened at.
      */
-    public static void openConsole(Path file, CliPreferences preferences, DialogService dialogService) throws IOException {
+    public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }

@@ -20,18 +20,18 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final ThemeManager themeManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
     private final TaskExecutor taskExecutor;
@@ -39,7 +39,7 @@ public class DatabaseChangeDetailsViewFactory {
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
                                             ThemeManager themeManager,
-                                            CliPreferences preferences,
+                                            GuiPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
                                             TaskExecutor taskExecutor) {
@@ -60,7 +60,7 @@ public class DatabaseChangeDetailsViewFactory {
                 databaseContext,
                 dialogService,
                 themeManager,
-                    preferences,
+                preferences,
                 entryTypesManager,
                 previewViewer,
                 taskExecutor
@@ -68,14 +68,14 @@ public class DatabaseChangeDetailsViewFactory {
             case EntryAdd entryAdd -> new EntryWithPreviewAndSourceDetailsView(
                 entryAdd.getAddedEntry(),
                 databaseContext,
-                    preferences,
+                preferences,
                 entryTypesManager,
                 previewViewer
             );
             case EntryDelete entryDelete -> new EntryWithPreviewAndSourceDetailsView(
                 entryDelete.getDeletedEntry(),
                 databaseContext,
-                    preferences,
+                preferences,
                 entryTypesManager,
                 previewViewer
             );

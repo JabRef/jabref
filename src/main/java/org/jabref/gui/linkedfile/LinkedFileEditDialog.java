@@ -9,12 +9,12 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
 
     private LinkedFileEditDialogViewModel viewModel;
     private final LinkedFile linkedFile;

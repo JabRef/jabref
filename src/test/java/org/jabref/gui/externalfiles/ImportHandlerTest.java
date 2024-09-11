@@ -145,7 +145,7 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
         BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -177,7 +177,7 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
         BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -212,7 +212,7 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
         // create and return a default BibEntry or do other computations

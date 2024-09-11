@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -30,7 +31,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +47,11 @@ public class FetchAndMergeEntry {
     private final UndoManager undoManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
                               TaskExecutor taskExecutor,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               DialogService dialogService,
                               UndoManager undoManager) {
         this.bibDatabaseContext = bibDatabaseContext;

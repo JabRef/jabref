@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -40,7 +41,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -67,7 +67,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
 
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;

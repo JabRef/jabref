@@ -9,12 +9,12 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -33,9 +33,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
 
     protected final DialogService dialogService;
-    protected final CliPreferences preferences;
+    protected final GuiPreferences preferences;
 
-    public AbstractPushToApplication(DialogService dialogService, CliPreferences preferences) {
+    public AbstractPushToApplication(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
     }

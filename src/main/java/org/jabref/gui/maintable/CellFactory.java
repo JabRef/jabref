@@ -10,18 +10,18 @@ import javafx.scene.Node;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CellFactory {
 
     private final Map<Field, JabRefIcon> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(CliPreferences preferences, UndoManager undoManager) {
+    public CellFactory(GuiPreferences preferences, UndoManager undoManager) {
         JabRefIcon icon;
         icon = IconTheme.JabRefIcons.PDF_FILE;
         // icon.setToo(Localization.lang("Open") + " PDF");

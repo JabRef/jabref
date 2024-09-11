@@ -35,7 +35,6 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -88,7 +87,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final WorkspacePreferences workspacePreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;

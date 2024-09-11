@@ -13,6 +13,7 @@ import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
@@ -21,7 +22,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class CopyMoreActionTest {
 
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
-    private final CliPreferences preferences = mock(CliPreferences.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final List<String> titles = new ArrayList<>();

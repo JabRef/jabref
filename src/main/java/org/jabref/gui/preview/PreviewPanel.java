@@ -21,6 +21,7 @@ import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
@@ -30,7 +31,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class PreviewPanel extends VBox {
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
-                        CliPreferences preferences,
+                        GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
                         LuceneManager luceneManager,

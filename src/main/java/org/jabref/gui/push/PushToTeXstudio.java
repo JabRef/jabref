@@ -3,13 +3,13 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 
 public class PushToTeXstudio extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.TEXSTUDIO;
 
-    public PushToTeXstudio(DialogService dialogService, CliPreferences preferences) {
+    public PushToTeXstudio(DialogService dialogService, GuiPreferences preferences) {
         super(dialogService, preferences);
     }
 

@@ -8,20 +8,20 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class ISSNEditorViewModel extends AbstractEditorViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     public ISSNEditorViewModel(
             Field field,
@@ -31,7 +31,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
             DialogService dialogService,
             UndoManager undoManager,
             StateManager stateManager,
-            CliPreferences preferences) {
+            GuiPreferences preferences) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

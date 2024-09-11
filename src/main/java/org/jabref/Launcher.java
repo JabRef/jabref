@@ -96,6 +96,7 @@ public class Launcher {
                         args,
                         ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
+                        preferences,
                         fileUpdateMonitor,
                         entryTypesManager);
                 argumentProcessor.processArguments();

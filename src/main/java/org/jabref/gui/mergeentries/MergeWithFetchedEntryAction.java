@@ -6,25 +6,25 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class MergeWithFetchedEntryAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
     public MergeWithFetchedEntryAction(DialogService dialogService,
                                        StateManager stateManager,
                                        TaskExecutor taskExecutor,
-                                       CliPreferences preferences,
+                                       GuiPreferences preferences,
                                        UndoManager undoManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;

@@ -15,13 +15,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -57,7 +57,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
     @Inject private DialogService dialogService;
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private ThemeManager themeManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;

@@ -11,6 +11,7 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
@@ -18,7 +19,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -30,7 +30,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   ThemeManager themeManager,
-                                  CliPreferences preferences,
+                                  GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor) {

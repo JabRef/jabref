@@ -14,12 +14,12 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;
@@ -31,12 +31,12 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ErrorConsoleViewModel(DialogService dialogService, CliPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public ErrorConsoleViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);

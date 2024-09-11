@@ -14,9 +14,9 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -40,11 +40,11 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
-    public AboutDialogViewModel(DialogService dialogService, CliPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public AboutDialogViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);

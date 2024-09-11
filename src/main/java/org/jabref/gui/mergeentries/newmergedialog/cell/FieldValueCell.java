@@ -22,10 +22,10 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -46,7 +46,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     private final ActionFactory factory;
 
@@ -58,7 +58,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(String text, int rowIndex, CliPreferences preferences) {
+    public FieldValueCell(String text, int rowIndex, GuiPreferences preferences) {
         super(text, rowIndex);
 
         this.preferences = preferences;

@@ -22,6 +22,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -35,7 +36,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -53,20 +53,20 @@ public class DuplicateSearch extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    private final CliPreferences prefs;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
-                           CliPreferences prefs,
+                           GuiPreferences preferences,
                            BibEntryTypesManager entryTypesManager,
                            TaskExecutor taskExecutor) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.prefs = prefs;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
 
@@ -156,7 +156,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, tabSupplier.get().getBibDatabaseContext(), stateManager, dialogService, prefs);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 
