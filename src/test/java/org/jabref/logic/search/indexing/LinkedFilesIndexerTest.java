@@ -42,7 +42,7 @@ public class LinkedFilesIndexerTest {
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
 
-        this.indexer = new DefaultLinkedFilesIndexer(context, filePreferences);
+        this.indexer = new DefaultLinkedFilesIndexer(context, filePreferences, true);
     }
 
     @Test
