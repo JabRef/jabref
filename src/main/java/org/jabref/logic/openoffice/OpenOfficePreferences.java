@@ -38,7 +38,8 @@ public class OpenOfficePreferences {
                                  boolean syncWhenCiting,
                                  List<String> externalStyles,
                                  String currentJStyle,
-                                 OOStyle currentStyle, boolean alwaysAddCitedOnPages) {
+                                 OOStyle currentStyle,
+                                 boolean alwaysAddCitedOnPages) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);

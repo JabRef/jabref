@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
@@ -30,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a switch not to store the linked file URL, because it caused troubles at other apps. [#11735](https://github.com/JabRef/jabref/pull/11735)
 - When starting a new SLR, the selected catalogs now persist within and across JabRef sessions. [koppor#614](https://github.com/koppor/jabref/issues/614)
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
+- We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 
 ### Changed
 

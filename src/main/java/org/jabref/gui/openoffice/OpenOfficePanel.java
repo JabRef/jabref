@@ -630,7 +630,7 @@ public class OpenOfficePanel {
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
-        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at beginning of bibliographic entries"));
+        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
 
