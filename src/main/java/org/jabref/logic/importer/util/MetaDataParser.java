@@ -13,13 +13,20 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
@@ -36,10 +43,19 @@ import org.slf4j.LoggerFactory;
  */
 public class MetaDataParser {
 
+    public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
-
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+
+    static {
+        DEFAULT_SAVE_ACTIONS = List.of(
+                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
+                        new ReplaceUnicodeLigaturesFormatter()));
+    }
 
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
@@ -115,7 +131,7 @@ public class MetaDataParser {
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 metaData.setLatexFileDirectory(user, path);
             } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(FieldFormatterCleanups.parse(values));
+                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
@@ -236,5 +252,17 @@ public class MetaDataParser {
             return Optional.of(res.toString());
         }
         return Optional.empty();
+    }
+
+    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List<String> formatterMetaList) {
+        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
+            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
+            String formatterString = formatterMetaList.get(1);
+
+            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));
+        } else {
+            // return default actions
+            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+        }
     }
 }
