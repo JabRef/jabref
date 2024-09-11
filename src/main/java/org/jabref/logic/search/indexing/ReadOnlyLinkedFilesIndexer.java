@@ -17,10 +17,12 @@ import org.slf4j.LoggerFactory;
 
 public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyLinkedFilesIndexer.class);
+    private final boolean waitOnClose;
     private Directory indexDirectory;
     private SearcherManager searcherManager;
 
-    public ReadOnlyLinkedFilesIndexer(BibDatabaseContext databaseContext) {
+    public ReadOnlyLinkedFilesIndexer(BibDatabaseContext databaseContext, boolean waitOnClose) {
+        this.waitOnClose = waitOnClose;
         try {
             indexDirectory = FSDirectory.open(databaseContext.getFulltextIndexPath());
             searcherManager = new SearcherManager(indexDirectory, null);
@@ -60,12 +62,11 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
-    }
-
-    @Override
-    public void closeAndWait() {
-        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+        if (waitOnClose) {
+            HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+        } else {
+            HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+        }
     }
 
     private void closeIndex() {

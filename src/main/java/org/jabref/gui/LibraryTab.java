@@ -316,7 +316,7 @@ public class LibraryTab extends Tab {
     }
 
     public void createLuceneManager() {
-        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService.getFilePreferences());
+        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService.getFilePreferences(), false);
         stateManager.setLuceneManager(bibDatabaseContext, luceneManager);
     }
 

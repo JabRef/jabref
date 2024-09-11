@@ -23,6 +23,4 @@ public interface LuceneIndexer {
     SearcherManager getSearcherManager();
 
     void close();
-
-    void closeAndWait();
 }
