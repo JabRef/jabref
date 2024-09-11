@@ -14,8 +14,8 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;

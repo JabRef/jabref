@@ -11,11 +11,11 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CellFactory {
 

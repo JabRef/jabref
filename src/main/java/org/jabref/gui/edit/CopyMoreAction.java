@@ -18,11 +18,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

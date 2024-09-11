@@ -7,8 +7,8 @@ import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.BibEntry;
 
 public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final ThreeWayMergeView threeWayMergeView;

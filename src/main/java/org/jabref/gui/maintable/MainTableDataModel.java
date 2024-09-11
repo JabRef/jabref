@@ -19,6 +19,7 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
@@ -34,7 +35,6 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;

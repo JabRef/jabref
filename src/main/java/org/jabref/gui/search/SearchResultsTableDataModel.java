@@ -16,13 +16,13 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.util.FilteredListProxy;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

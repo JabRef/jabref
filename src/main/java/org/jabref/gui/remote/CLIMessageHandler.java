@@ -6,10 +6,10 @@ import javafx.application.Platform;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.frame.UiMessageHandler;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;

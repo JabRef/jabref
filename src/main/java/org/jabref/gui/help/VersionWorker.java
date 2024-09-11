@@ -10,10 +10,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -7,11 +7,11 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
 

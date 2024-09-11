@@ -21,10 +21,10 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.Loader;

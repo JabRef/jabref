@@ -9,8 +9,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

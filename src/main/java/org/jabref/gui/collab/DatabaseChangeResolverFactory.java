@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrychange.EntryChangeResolver;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 public class DatabaseChangeResolverFactory {
     private final DialogService dialogService;

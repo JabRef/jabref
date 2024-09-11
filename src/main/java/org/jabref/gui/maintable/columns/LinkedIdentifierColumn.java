@@ -22,9 +22,9 @@ import org.jabref.gui.maintable.OpenUrlAction;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.CliPreferences;
 
 /**
  * A clickable icons column for DOIs, URLs, URIs and EPrints.

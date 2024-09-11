@@ -13,10 +13,10 @@ import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;

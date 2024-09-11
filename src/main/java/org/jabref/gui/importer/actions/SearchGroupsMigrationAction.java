@@ -6,12 +6,12 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.migrations.SearchToLuceneMigration;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.logic.preferences.CliPreferences;
 
 /**
  * This action checks whether the syntax for SearchGroups is the new one.

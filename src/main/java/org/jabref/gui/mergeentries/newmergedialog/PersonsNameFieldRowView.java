@@ -4,11 +4,11 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.InfoButton;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class PersonsNameFieldRowView extends FieldRowView {
     private final AuthorList leftEntryNames;

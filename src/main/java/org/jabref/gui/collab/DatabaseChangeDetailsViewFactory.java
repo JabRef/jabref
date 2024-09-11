@@ -22,10 +22,10 @@ import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;

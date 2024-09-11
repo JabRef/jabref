@@ -8,8 +8,8 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.TaskExecutor;
 
 public class NewLibraryFromPdfActionOffline extends NewLibraryFromPdfAction {
 

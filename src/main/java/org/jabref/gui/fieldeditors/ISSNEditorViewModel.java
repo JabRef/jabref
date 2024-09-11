@@ -10,11 +10,11 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class ISSNEditorViewModel extends AbstractEditorViewModel {
     private final TaskExecutor taskExecutor;

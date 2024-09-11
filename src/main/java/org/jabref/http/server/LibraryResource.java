@@ -10,10 +10,9 @@ import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;

@@ -18,8 +18,8 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BuildInfo;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;

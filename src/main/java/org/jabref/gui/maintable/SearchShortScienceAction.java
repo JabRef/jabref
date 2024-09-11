@@ -10,10 +10,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
