@@ -8,7 +8,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
-import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -101,8 +100,6 @@ public interface CliPreferences {
     SSLPreferences getSSLPreferences();
 
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    PushToApplicationPreferences getPushToApplicationPreferences();
 
     ColumnPreferences getMainTableColumnPreferences();
 

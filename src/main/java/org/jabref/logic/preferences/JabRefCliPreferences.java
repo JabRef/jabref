@@ -39,8 +39,6 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
-import org.jabref.gui.push.PushToApplicationPreferences;
-import org.jabref.gui.push.PushToApplications;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -138,18 +136,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Service
 public class JabRefCliPreferences implements CliPreferences {
-
-    // Push to application preferences
-    public static final String PUSH_EMACS_PATH = "emacsPath";
-    public static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    public static final String PUSH_LYXPIPE = "lyxpipe";
-    public static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
-    public static final String PUSH_TEXWORKS_PATH = "TeXworksPath";
-    public static final String PUSH_WINEDT_PATH = "winEdtPath";
-    public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
-    public static final String PUSH_VIM_SERVER = "vimServer";
-    public static final String PUSH_VIM = "vim";
-    public static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
 
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -293,7 +279,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-    public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String SHOW_AI_SUMMARY = "showAiSummary";
     public static final String SHOW_AI_CHAT = "showAiChat";
@@ -331,6 +316,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // TODO: USed by both importer preferences and workspace preferences
     protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
+
+    // Helper string
+    protected static final String USER_HOME = System.getProperty("user.home");
 
     // UI
     private static final String FONT_FAMILY = "fontFamily";
@@ -371,9 +359,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
     private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
-
-    // Helper string
-    private static final String USER_HOME = System.getProperty("user.home");
 
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -440,7 +425,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private InternalPreferences internalPreferences;
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
-    private PushToApplicationPreferences pushToApplicationPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private NameDisplayPreferences nameDisplayPreferences;
     private MainTablePreferences mainTablePreferences;
@@ -494,16 +478,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
 
-        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath("texworks", "TeXworks"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath("subl", "Sublime"));
-        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(PUSH_VIM, "vim");
-        defaults.put(PUSH_VIM_SERVER, "vim");
-        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
@@ -511,16 +485,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (OS.WINDOWS) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
         }
-
-        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
@@ -1483,65 +1451,6 @@ public class JabRefCliPreferences implements CliPreferences {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         }
         return keySuffix;
-    }
-
-    //*************************************************************************************************************
-    // ExternalApplicationsPreferences
-    //*************************************************************************************************************
-
-    @Override
-    public PushToApplicationPreferences getPushToApplicationPreferences() {
-        if (pushToApplicationPreferences != null) {
-            return pushToApplicationPreferences;
-        }
-
-        Map<String, String> applicationCommands = new HashMap<>();
-        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
-        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
-        applicationCommands.put(PushToApplications.EMACS, getEmptyIsDefault(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToApplications.LYX, getEmptyIsDefault(PUSH_LYXPIPE));
-        applicationCommands.put(PushToApplications.TEXMAKER, getEmptyIsDefault(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToApplications.TEXSTUDIO, getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToApplications.TEXWORKS, getEmptyIsDefault(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
-        applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
-
-        pushToApplicationPreferences = new PushToApplicationPreferences(
-                get(PUSH_TO_APPLICATION),
-                applicationCommands,
-                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER)
-        );
-
-        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
-        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
-        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
-        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
-        return pushToApplicationPreferences;
-    }
-
-    private void storePushToApplicationPath(Map<String, String> commandPair) {
-        commandPair.forEach((key, value) -> {
-            switch (key) {
-                case PushToApplications.EMACS ->
-                        put(PUSH_EMACS_PATH, value);
-                case PushToApplications.LYX ->
-                        put(PUSH_LYXPIPE, value);
-                case PushToApplications.TEXMAKER ->
-                        put(PUSH_TEXMAKER_PATH, value);
-                case PushToApplications.TEXSTUDIO ->
-                        put(PUSH_TEXSTUDIO_PATH, value);
-                case PushToApplications.TEXWORKS ->
-                        put(PUSH_TEXWORKS_PATH, value);
-                case PushToApplications.VIM ->
-                        put(PUSH_VIM, value);
-                case PushToApplications.WIN_EDT ->
-                        put(PUSH_WINEDT_PATH, value);
-                case PushToApplications.SUBLIME_TEXT ->
-                        put(PUSH_SUBLIME_TEXT_PATH, value);
-            }
-        });
     }
 
     //*************************************************************************************************************

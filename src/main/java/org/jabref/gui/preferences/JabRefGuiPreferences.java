@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.gui.push.PushToApplicationPreferences;
+import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
@@ -77,6 +80,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
+
+    // region Push to application preferences
+    private static final String PUSH_TO_APPLICATION = "pushToApplication";
+    private static final String PUSH_EMACS_PATH = "emacsPath";
+    private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    private static final String PUSH_LYXPIPE = "lyxpipe";
+    private static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
+    private static final String PUSH_TEXWORKS_PATH = "TeXworksPath";
+    private static final String PUSH_WINEDT_PATH = "winEdtPath";
+    private static final String PUSH_TEXMAKER_PATH = "texmakerPath";
+    private static final String PUSH_VIM_SERVER = "vimServer";
+    private static final String PUSH_VIM = "vim";
+    private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
+    // endregion
 
     // region ExternalApplicationsPreferences
     private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
@@ -157,6 +174,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private GroupsPreferences groupsPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
     private PreviewPreferences previewPreferences;
+    private PushToApplicationPreferences pushToApplicationPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -272,6 +290,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
                         "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
                         "</font>__NEWLINE__");
+        // endregion
+
+        // region PushToApplicatoinPreferences
+        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
+        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath("texworks", "TeXworks"));
+        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath("subl", "Sublime"));
+        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
+        defaults.put(PUSH_VIM, "vim");
+        defaults.put(PUSH_VIM_SERVER, "vim");
+        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+
+        if (OS.OS_X) {
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
+        } else if (OS.WINDOWS) {
+            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
+        } else {
+            // Linux
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
+        }
         // endregion
     }
 
@@ -828,5 +868,63 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return 0; // fallback if stored position is no longer valid
         }
     }
+    // endregion
+
+    // region PushToApplicationPreferences
+
+    public PushToApplicationPreferences getPushToApplicationPreferences() {
+        if (pushToApplicationPreferences != null) {
+            return pushToApplicationPreferences;
+        }
+
+        Map<String, String> applicationCommands = new HashMap<>();
+        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
+        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
+        applicationCommands.put(PushToApplications.EMACS, getEmptyIsDefault(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToApplications.LYX, getEmptyIsDefault(PUSH_LYXPIPE));
+        applicationCommands.put(PushToApplications.TEXMAKER, getEmptyIsDefault(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToApplications.TEXSTUDIO, getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplications.TEXWORKS, getEmptyIsDefault(PUSH_TEXWORKS_PATH));
+        applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
+        applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
+
+        pushToApplicationPreferences = new PushToApplicationPreferences(
+                get(PUSH_TO_APPLICATION),
+                applicationCommands,
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
+                get(PUSH_VIM_SERVER)
+        );
+
+        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
+        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
+        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
+        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
+        return pushToApplicationPreferences;
+    }
+
+    private void storePushToApplicationPath(Map<String, String> commandPair) {
+        commandPair.forEach((key, value) -> {
+            switch (key) {
+                case PushToApplications.EMACS ->
+                        put(PUSH_EMACS_PATH, value);
+                case PushToApplications.LYX ->
+                        put(PUSH_LYXPIPE, value);
+                case PushToApplications.TEXMAKER ->
+                        put(PUSH_TEXMAKER_PATH, value);
+                case PushToApplications.TEXSTUDIO ->
+                        put(PUSH_TEXSTUDIO_PATH, value);
+                case PushToApplications.TEXWORKS ->
+                        put(PUSH_TEXWORKS_PATH, value);
+                case PushToApplications.VIM ->
+                        put(PUSH_VIM, value);
+                case PushToApplications.WIN_EDT ->
+                        put(PUSH_WINEDT_PATH, value);
+                case PushToApplications.SUBLIME_TEXT ->
+                        put(PUSH_SUBLIME_TEXT_PATH, value);
+            }
+        });
+    }
+
     // endregion
 }
