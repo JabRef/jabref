@@ -15,8 +15,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
 import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +35,7 @@ public class SearchResultsTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final TaskExecutor taskExecutor;
 
-    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, CliPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
+    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         NameDisplayPreferences nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
