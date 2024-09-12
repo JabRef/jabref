@@ -36,9 +36,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.maintable.NameDisplayPreferences;
-import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
-import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -138,12 +135,8 @@ import org.slf4j.LoggerFactory;
 public class JabRefCliPreferences implements CliPreferences {
 
     public static final String LANGUAGE = "language";
-    public static final String NAMES_LAST_ONLY = "namesLastOnly";
-    public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
-    public static final String NAMES_NATBIB = "namesNatbib";
-    public static final String NAMES_FIRST_LAST = "namesFf";
+
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
-    public static final String NAMES_AS_IS = "namesAsIs";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
 
@@ -426,7 +419,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private NameDisplayPreferences nameDisplayPreferences;
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
@@ -517,11 +509,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
 
-        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
-        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
-        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
-        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -1586,55 +1573,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return columnPreferences.getColumnSortOrder().stream()
                                 .map(MainTableColumnModel::getName)
                                 .collect(Collectors.toList());
-    }
-
-    //*************************************************************************************************************
-    // NameDisplayPreferences
-    //*************************************************************************************************************
-
-    @Override
-    public NameDisplayPreferences getNameDisplayPreferences() {
-        if (nameDisplayPreferences != null) {
-            return nameDisplayPreferences;
-        }
-
-        nameDisplayPreferences = new NameDisplayPreferences(
-                getNameDisplayStyle(),
-                getNameAbbreviationStyle());
-
-        EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
-            putBoolean(NAMES_NATBIB, newValue == DisplayStyle.NATBIB);
-            putBoolean(NAMES_AS_IS, newValue == DisplayStyle.AS_IS);
-            putBoolean(NAMES_FIRST_LAST, newValue == DisplayStyle.FIRSTNAME_LASTNAME);
-        });
-        EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
-            putBoolean(ABBR_AUTHOR_NAMES, newValue == AbbreviationStyle.FULL);
-            putBoolean(NAMES_LAST_ONLY, newValue == AbbreviationStyle.LASTNAME_ONLY);
-        });
-
-        return nameDisplayPreferences;
-    }
-
-    private AbbreviationStyle getNameAbbreviationStyle() {
-        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
-        }
-        return abbreviationStyle;
-    }
-
-    private DisplayStyle getNameDisplayStyle() {
-        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
-        }
-        return displayStyle;
     }
 
     //*************************************************************************************************************

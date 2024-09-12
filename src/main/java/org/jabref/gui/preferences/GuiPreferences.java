@@ -8,6 +8,7 @@ import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
@@ -38,4 +39,6 @@ public interface GuiPreferences extends CliPreferences {
     PreviewPreferences getPreviewPreferences();
 
     PushToApplicationPreferences getPushToApplicationPreferences();
+
+    NameDisplayPreferences getNameDisplayPreferences();
 }

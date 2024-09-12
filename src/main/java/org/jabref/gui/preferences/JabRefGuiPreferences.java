@@ -29,6 +29,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -93,6 +94,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String PUSH_VIM_SERVER = "vimServer";
     private static final String PUSH_VIM = "vim";
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
+    // endregion
+
+    // region NameDisplayPreferences
+    private static final String NAMES_LAST_ONLY = "namesLastOnly";
+    private static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
+    private static final String NAMES_NATBIB = "namesNatbib";
+    private static final String NAMES_FIRST_LAST = "namesFf";
+    private static final String NAMES_AS_IS = "namesAsIs";
     // endregion
 
     // region ExternalApplicationsPreferences
@@ -175,6 +184,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private SpecialFieldsPreferences specialFieldsPreferences;
     private PreviewPreferences previewPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
+    private NameDisplayPreferences nameDisplayPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -292,7 +302,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         "</font>__NEWLINE__");
         // endregion
 
-        // region PushToApplicatoinPreferences
+        // region NameDisplayPreferences
+        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
+        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
+        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
+        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
+        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
+        // endregion
+
+        // region PushToApplicationPreferences
         defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
@@ -924,6 +942,55 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         put(PUSH_SUBLIME_TEXT_PATH, value);
             }
         });
+    }
+
+    // endregion
+
+    // region NameDisplayPreferences
+
+    @Override
+    public NameDisplayPreferences getNameDisplayPreferences() {
+        if (nameDisplayPreferences != null) {
+            return nameDisplayPreferences;
+        }
+
+        nameDisplayPreferences = new NameDisplayPreferences(
+                getNameDisplayStyle(),
+                getNameAbbreviationStyle());
+
+        EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
+            putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
+            putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
+        });
+        EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
+            putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
+        });
+
+        return nameDisplayPreferences;
+    }
+
+    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
+        NameDisplayPreferences.AbbreviationStyle abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE; // default
+        if (getBoolean(ABBR_AUTHOR_NAMES)) {
+            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
+        } else if (getBoolean(NAMES_LAST_ONLY)) {
+            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+        }
+        return abbreviationStyle;
+    }
+
+    private NameDisplayPreferences.DisplayStyle getNameDisplayStyle() {
+        NameDisplayPreferences.DisplayStyle displayStyle = NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME; // default
+        if (getBoolean(NAMES_NATBIB)) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
+        } else if (getBoolean(NAMES_AS_IS)) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
+        } else if (getBoolean(NAMES_FIRST_LAST)) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+        return displayStyle;
     }
 
     // endregion
