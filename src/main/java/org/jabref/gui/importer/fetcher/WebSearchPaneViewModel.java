@@ -15,12 +15,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -43,13 +43,13 @@ public class WebSearchPaneViewModel {
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
     private final SyntaxParser parser = new StandardSyntaxParser();
 
-    public WebSearchPaneViewModel(CliPreferences preferences, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneViewModel(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

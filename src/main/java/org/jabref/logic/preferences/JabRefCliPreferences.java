@@ -293,6 +293,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
+
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
     public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     public static final String CUSTOM_TAB_NAME = "customTabName_";

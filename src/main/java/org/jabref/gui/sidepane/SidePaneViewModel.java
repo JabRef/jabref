@@ -23,7 +23,6 @@ import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -36,7 +35,7 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final SidePaneContentFactory sidePaneContentFactory;
     private final DialogService dialogService;
