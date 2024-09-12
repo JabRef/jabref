@@ -15,11 +15,11 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
@@ -64,7 +64,7 @@ public class MainTableDataModel {
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               TaskExecutor taskExecutor,
                               StateManager stateManager,
                               @Nullable LuceneManager luceneManager,

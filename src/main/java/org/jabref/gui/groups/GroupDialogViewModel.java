@@ -26,11 +26,11 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -107,7 +107,7 @@ public class GroupDialogViewModel {
     private CompositeValidator validator;
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
@@ -116,7 +116,7 @@ public class GroupDialogViewModel {
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
-                                CliPreferences preferences,
+                                GuiPreferences preferences,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
                                 FileUpdateMonitor fileUpdateMonitor,

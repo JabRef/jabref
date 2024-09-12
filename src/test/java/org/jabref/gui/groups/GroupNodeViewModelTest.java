@@ -7,9 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -36,7 +36,7 @@ class GroupNodeViewModelTest {
     private BibDatabaseContext databaseContext;
     private GroupNodeViewModel viewModel;
     private TaskExecutor taskExecutor;
-    private CliPreferences preferences;
+    private GuiPreferences preferences;
 
     @BeforeEach
     void setUp() {
@@ -44,7 +44,7 @@ class GroupNodeViewModelTest {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
-        preferences = mock(CliPreferences.class);
+        preferences = mock(GuiPreferences.class);
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
                 true,

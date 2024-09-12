@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.groups.AbstractGroup;
@@ -36,7 +36,7 @@ class GroupDialogViewModelTest {
     private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
     private final AbstractGroup group = mock(AbstractGroup.class);
-    private final CliPreferences preferences = mock(CliPreferences.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {

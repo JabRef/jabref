@@ -22,12 +22,12 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -73,13 +73,13 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     @SuppressWarnings("FieldCanBeLocal")
     private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, CliPreferences preferences) {
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -130,11 +130,11 @@ public class GroupNodeViewModel {
         this.databaseContext.getDatabase().registerListener(new LuceneIndexListener());
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, CliPreferences preferences) {
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
         this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferences);
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, CliPreferences preferences) {
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
         return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferences);
     }
 
