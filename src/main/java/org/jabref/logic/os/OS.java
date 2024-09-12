@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jabref.gui.desktop.os.Windows;
 import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.BackendNotSupportedException;
@@ -95,7 +94,7 @@ public class OS {
                         IOException |
                         ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
-                    Logger logger = Logger.getLogger(Windows.class.getName());
+                    Logger logger = Logger.getLogger(OS.class.getName());
                     logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);
                 }
             }
