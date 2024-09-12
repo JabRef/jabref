@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -52,8 +51,6 @@ public interface CliPreferences {
     BibEntryPreferences getBibEntryPreferences();
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
-
-    KeyBindingRepository getKeyBindingRepository();
 
     FilePreferences getFilePreferences();
 

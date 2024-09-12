@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -24,7 +25,7 @@ class KeyBindingViewModelTest {
     void resetToDefault() {
         // Set new key binding
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
-        CliPreferences preferences = mock(CliPreferences.class);
+        GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         Injector.setModelOrService(CliPreferences.class, preferences);
 

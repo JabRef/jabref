@@ -8,6 +8,7 @@ import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
@@ -49,4 +50,6 @@ public interface GuiPreferences extends CliPreferences {
     ColumnPreferences getMainTableColumnPreferences();
 
     ColumnPreferences getSearchDialogColumnPreferences();
+
+    KeyBindingRepository getKeyBindingRepository();
 }

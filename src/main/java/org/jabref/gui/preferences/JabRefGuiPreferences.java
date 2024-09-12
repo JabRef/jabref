@@ -31,6 +31,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
@@ -97,6 +98,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
     public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
     public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+    // endregion
+
+    // region keybindings - public because needed for pref migration
+    public static final String BIND_NAMES = "bindNames";
+    public static final String BINDINGS = "bindings";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
@@ -228,6 +234,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
+    private KeyBindingRepository keyBindingRepository;
 
     private JabRefGuiPreferences() {
         super();
@@ -1215,5 +1222,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new SelfContainedSaveConfiguration(
                 saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getLibraryPreferences()
                 .shouldAlwaysReformatOnSave());
+    }
+
+    @Override
+    public KeyBindingRepository getKeyBindingRepository() {
+        if (keyBindingRepository != null) {
+            return keyBindingRepository;
+        }
+
+        keyBindingRepository = new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
+
+        EasyBind.listen(keyBindingRepository.getBindingsProperty(), (obs, oldValue, newValue) -> {
+            putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
+            putStringList(BINDINGS, keyBindingRepository.getBindings());
+        });
+
+        return keyBindingRepository;
     }
 }

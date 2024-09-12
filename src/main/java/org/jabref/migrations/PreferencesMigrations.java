@@ -289,9 +289,9 @@ public class PreferencesMigrations {
             return result;
         };
 
-        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefCliPreferences.BINDINGS));
+        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefGuiPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
-        prefs.putStringList(JabRefCliPreferences.BINDINGS, keys);
+        prefs.putStringList(JabRefGuiPreferences.BINDINGS, keys);
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {

@@ -31,7 +31,6 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -274,8 +273,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
     public static final String VERSION_CHECK_ENABLED = "versionCheck";
-    // KeyBindings - keys - public because needed for pref migration
-    public static final String BINDINGS = "bindings";
 
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
@@ -306,7 +303,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
 
-    private static final String BIND_NAMES = "bindNames";
     // User
     private static final String USER_ID = "userId";
 
@@ -395,8 +391,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
-
-    private KeyBindingRepository keyBindingRepository;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -953,22 +947,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getNameFormatterPreferences(),
                 getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
-    }
-
-    @Override
-    public KeyBindingRepository getKeyBindingRepository() {
-        if (keyBindingRepository != null) {
-            return keyBindingRepository;
-        }
-
-        keyBindingRepository = new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
-
-        EasyBind.listen(keyBindingRepository.getBindingsProperty(), (obs, oldValue, newValue) -> {
-            putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
-            putStringList(BINDINGS, keyBindingRepository.getBindings());
-        });
-
-        return keyBindingRepository;
     }
 
     @Override
