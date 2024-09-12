@@ -24,6 +24,8 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
+import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -40,6 +42,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -100,6 +103,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     // endregion
 
+    // region GroupsPreferences
+    private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
+    private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
+    private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
+    private static final String GROUP_VIEW_FILTER = "groupFilter";
+    private static final String GROUP_VIEW_INVERT = "groupInvert";
+    private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
+    // endregion
+
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
@@ -117,6 +129,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private SidePanePreferences sidePanePreferences;
+    private GroupsPreferences groupsPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -195,6 +208,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
+        // endregion
+
+        // region GroupsPreferences
+        defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
+        defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_FILTER, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_INVERT, Boolean.FALSE);
+        defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
         // endregion
     }
 
@@ -622,5 +644,31 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
 
         return externalApplicationsPreferences;
+    }
+
+    public GroupsPreferences getGroupsPreferences() {
+        if (groupsPreferences != null) {
+            return groupsPreferences;
+        }
+
+        groupsPreferences = new GroupsPreferences(
+                getBoolean(GROUP_VIEW_INTERSECTION),
+                getBoolean(GROUP_VIEW_FILTER),
+                getBoolean(GROUP_VIEW_INVERT),
+                getBoolean(AUTO_ASSIGN_GROUP),
+                getBoolean(DISPLAY_GROUP_COUNT),
+                GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
+        );
+
+        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
+            putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
+            putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
+            putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
+        });
+        EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
+        EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
+        EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
+
+        return groupsPreferences;
     }
 }

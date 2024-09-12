@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
@@ -96,8 +95,6 @@ public interface CliPreferences {
     OwnerPreferences getOwnerPreferences();
 
     TimestampPreferences getTimestampPreferences();
-
-    GroupsPreferences getGroupsPreferences();
 
     RemotePreferences getRemotePreferences();
 

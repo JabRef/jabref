@@ -33,8 +33,6 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.groups.GroupViewMode;
-import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -115,7 +113,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchFlags;
@@ -215,8 +212,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CREATE_BACKUP = "createBackup";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
-    public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
-    public static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -389,12 +384,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
-    // GroupViewMode
-    private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
-    private static final String GROUP_VIEW_FILTER = "groupFilter";
-    private static final String GROUP_VIEW_INVERT = "groupInvert";
-    private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
-
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
@@ -469,7 +458,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private BibEntryPreferences bibEntryPreferences;
     private InternalPreferences internalPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
-    private GroupsPreferences groupsPreferences;
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
@@ -637,12 +625,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
-        defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
-        defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_FILTER, Boolean.TRUE);
-        defaults.put(GROUP_VIEW_INVERT, Boolean.FALSE);
-        defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
@@ -1344,33 +1326,6 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(timestampPreferences.addModificationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
 
         return timestampPreferences;
-    }
-
-    @Override
-    public GroupsPreferences getGroupsPreferences() {
-        if (groupsPreferences != null) {
-            return groupsPreferences;
-        }
-
-        groupsPreferences = new GroupsPreferences(
-                getBoolean(GROUP_VIEW_INTERSECTION),
-                getBoolean(GROUP_VIEW_FILTER),
-                getBoolean(GROUP_VIEW_INVERT),
-                getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT),
-                GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
-        );
-
-        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
-            putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
-            putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
-            putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
-        });
-        EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
-        EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
-        EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
-
-        return groupsPreferences;
     }
 
     //*************************************************************************************************************
