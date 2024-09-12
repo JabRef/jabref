@@ -22,6 +22,7 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
@@ -1238,5 +1239,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         });
 
         return keyBindingRepository;
+    }
+
+    /**
+     * In GUI mode, we can lookup the directory better
+     */
+    @Override
+    protected Path getDefaultPath() {
+        return NativeDesktop.get().getDefaultFileChooserDirectory();
     }
 }

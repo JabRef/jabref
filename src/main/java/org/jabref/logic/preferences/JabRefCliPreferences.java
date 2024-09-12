@@ -1391,6 +1391,10 @@ public class JabRefCliPreferences implements CliPreferences {
     // InternalPreferences
     //*************************************************************************************************************
 
+    protected Path getDefaultPath() {
+        return Path.of("/");
+    }
+
     @Override
     public InternalPreferences getInternalPreferences() {
         if (internalPreferences != null) {
@@ -1400,7 +1404,7 @@ public class JabRefCliPreferences implements CliPreferences {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
-                getPath(PREFS_EXPORT_PATH, NativeDesktop.get().getDefaultFileChooserDirectory()),
+                getPath(PREFS_EXPORT_PATH, getDefaultPath()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
@@ -1476,7 +1480,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUserAndHost(),
-                getPath(MAIN_FILE_DIRECTORY, NativeDesktop.get().getDefaultFileChooserDirectory()).toString(),
+                getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
