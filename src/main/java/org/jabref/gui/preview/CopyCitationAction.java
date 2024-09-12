@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -22,7 +23,6 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -47,7 +47,7 @@ public class CopyCitationAction extends SimpleCommand {
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public CopyCitationAction(CitationStyleOutputFormat outputFormat,
@@ -55,7 +55,7 @@ public class CopyCitationAction extends SimpleCommand {
                               StateManager stateManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               JournalAbbreviationRepository abbreviationRepository) {
         this.outputFormat = outputFormat;
         this.dialogService = dialogService;

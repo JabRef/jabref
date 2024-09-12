@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 class GuiPreferencesMigrationsTest {
 
-    private JabRefCliPreferences prefs;
+    private JabRefGuiPreferences preferences;
     private Preferences mainPrefsNode;
 
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
@@ -36,32 +36,32 @@ class GuiPreferencesMigrationsTest {
 
     @BeforeEach
     void setUp() {
-        prefs = mock(JabRefCliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        Injector.setModelOrService(CliPreferences.class, prefs);
+        preferences = mock(JabRefGuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Injector.setModelOrService(CliPreferences.class, preferences);
         mainPrefsNode = mock(Preferences.class);
     }
 
     @Test
     void oldStyleBibtexkeyPattern0() {
-        when(prefs.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
+        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
         when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[0]);
-        when(prefs.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
+        when(preferences.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
 
-        verify(prefs).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
+        verify(preferences).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
         verify(mainPrefsNode).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
     }
 
     @Test
     void oldStyleBibtexkeyPattern1() {
-        when(prefs.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[1]);
+        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[1]);
         when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[1]);
-        when(prefs.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
+        when(preferences.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
 
-        verify(prefs).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[1]);
+        verify(preferences).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[1]);
         verify(mainPrefsNode).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[1]);
     }
 
@@ -69,12 +69,12 @@ class GuiPreferencesMigrationsTest {
     void arbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
-        when(prefs.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(arbitraryPattern);
+        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(arbitraryPattern);
         when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(arbitraryPattern);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
 
-        verify(prefs, never()).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
+        verify(preferences, never()).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
         verify(mainPrefsNode, never()).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
     }
 
@@ -92,11 +92,11 @@ class GuiPreferencesMigrationsTest {
                 + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
                 + "</font>__NEWLINE__";
 
-        when(prefs.get(JabRefCliPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
+        when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
 
-        PreferencesMigrations.upgradePreviewStyle(prefs);
+        PreferencesMigrations.upgradePreviewStyle(preferences);
 
-        verify(prefs).put(JabRefCliPreferences.PREVIEW_STYLE, newPreviewStyle);
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, newPreviewStyle);
     }
 
     @Test
@@ -104,13 +104,13 @@ class GuiPreferencesMigrationsTest {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
-        PreferencesMigrations.upgradeColumnPreferences(prefs);
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
 
-        verify(prefs, never()).put(JabRefCliPreferences.COLUMN_NAMES, "anyString");
-        verify(prefs, never()).put(JabRefCliPreferences.COLUMN_WIDTHS, "anyString");
+        verify(preferences, never()).put(JabRefCliPreferences.COLUMN_NAMES, "anyString");
+        verify(preferences, never()).put(JabRefCliPreferences.COLUMN_WIDTHS, "anyString");
     }
 
     @Test
@@ -121,14 +121,14 @@ class GuiPreferencesMigrationsTest {
         List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
         List<String> newSortTypes = Arrays.asList("ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING");
 
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
-        PreferencesMigrations.upgradeColumnPreferences(prefs);
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
 
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_NAMES, updatedNames);
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, updatedWidths);
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_SORT_TYPES, newSortTypes);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, updatedNames);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_SORT_TYPES, newSortTypes);
     }
 
     @Test
@@ -137,22 +137,22 @@ class GuiPreferencesMigrationsTest {
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
-        when(prefs.getStringList("columnNames")).thenReturn(columnNames);
-        when(prefs.getStringList("columnWidths")).thenReturn(columnWidths);
-        when(prefs.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
-        when(prefs.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
+        when(preferences.getStringList("columnNames")).thenReturn(columnNames);
+        when(preferences.getStringList("columnWidths")).thenReturn(columnWidths);
+        when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
+        when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
 
-        PreferencesMigrations.changeColumnVariableNamesFor51(prefs);
+        PreferencesMigrations.changeColumnVariableNamesFor51(preferences);
 
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
-        verify(prefs).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
     }
 
     @Test
@@ -161,22 +161,22 @@ class GuiPreferencesMigrationsTest {
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
-        when(prefs.getStringList("columnNames")).thenReturn(columnNames);
-        when(prefs.getStringList("columnWidths")).thenReturn(columnWidths);
-        when(prefs.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
-        when(prefs.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
+        when(preferences.getStringList("columnNames")).thenReturn(columnNames);
+        when(preferences.getStringList("columnWidths")).thenReturn(columnWidths);
+        when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
+        when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(prefs.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
 
-        PreferencesMigrations.upgradeColumnPreferences(prefs);
+        PreferencesMigrations.upgradeColumnPreferences(preferences);
 
-        verify(prefs, never()).put("columnNames", "anyString");
-        verify(prefs, never()).put("columnWidths", "anyString");
-        verify(prefs, never()).put("mainTableColumnSortTypes", "anyString");
-        verify(prefs, never()).put("mainTableColumnSortOrder", "anyString");
+        verify(preferences, never()).put("columnNames", "anyString");
+        verify(preferences, never()).put("columnWidths", "anyString");
+        verify(preferences, never()).put("mainTableColumnSortTypes", "anyString");
+        verify(preferences, never()).put("mainTableColumnSortOrder", "anyString");
     }
 
     @Test
@@ -185,18 +185,18 @@ class GuiPreferencesMigrationsTest {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
 
-        when(prefs.getStringList("columnNames")).thenReturn(updatedNames);
+        when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
 
-        when(prefs.get(JabRefGuiPreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
+        when(preferences.get(JabRefGuiPreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
 
-        PreferencesMigrations.restoreVariablesForBackwardCompatibility(prefs);
+        PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
 
-        verify(prefs).putStringList("columnNames", columnNames);
-        verify(prefs).putStringList("columnWidths", columnWidths);
-        verify(prefs).put("columnSortTypes", "");
-        verify(prefs).put("columnSortOrder", "");
+        verify(preferences).putStringList("columnNames", columnNames);
+        verify(preferences).putStringList("columnWidths", columnWidths);
+        verify(preferences).put("columnSortTypes", "");
+        verify(preferences).put("columnSortOrder", "");
 
-        verify(prefs).putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, 11);
+        verify(preferences).putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, 11);
     }
 
     @Test
@@ -205,19 +205,19 @@ class GuiPreferencesMigrationsTest {
         final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);
 
-        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
-        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
-        when(prefs.getInternalPreferences().getUserAndHost()).thenReturn("user-host");
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+        when(preferences.getInternalPreferences().getUserAndHost()).thenReturn("user-host");
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
 
-            PreferencesMigrations.moveApiKeysToKeyring(prefs);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
 
             verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
             verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
             verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
-            verify(prefs).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
         }
     }
 }

@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.entryeditor.CommentsTab;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -325,14 +324,14 @@ public class PreferencesMigrations {
      *     <li> Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).</li>
      * </ul>
      */
-    protected static void upgradePreviewStyle(JabRefCliPreferences prefs) {
-        String currentPreviewStyle = prefs.get(JabRefCliPreferences.PREVIEW_STYLE);
+    protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
+        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
-        prefs.put(JabRefCliPreferences.PREVIEW_STYLE, migratedStyle);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE, migratedStyle);
     }
 
     /**
@@ -550,7 +549,7 @@ public class PreferencesMigrations {
     }
 
     /**
-     * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
+     * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
