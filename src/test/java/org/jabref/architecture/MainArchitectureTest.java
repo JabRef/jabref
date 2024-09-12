@@ -89,20 +89,26 @@ class MainArchitectureTest {
 
     @ArchTest
     public void respectLayeredArchitecture(JavaClasses classes) {
+        String Logic = "Logic";
+        String Model = "Model";
+        String Preferences = "Preferences";
+        String Migrations = "Migrations";
+        String CLI = "Cli";
+        String GUI = "Gui";
         layeredArchitecture().consideringOnlyDependenciesInLayers()
-                             .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
-                             .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
-                             .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
-                             .layer("Cli").definedBy(PACKAGE_ORG_JABREF_CLI)
-                             .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
-                             .layer("Preferences").definedBy("org.jabref.preferences..")
+                             .layer(GUI).definedBy(PACKAGE_ORG_JABREF_GUI)
+                             .layer(Logic).definedBy(PACKAGE_ORG_JABREF_LOGIC)
+                             .layer(Model).definedBy(PACKAGE_ORG_JABREF_MODEL)
+                             .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
+                             .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
+                             .layer(Preferences).definedBy("org.jabref.preferences..")
 
-                             .whereLayer("Gui").mayOnlyBeAccessedByLayers("Cli")
-                             .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
-                             .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
-                             .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
-                             .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
-                             .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli")
+                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI)
+                             .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations, Preferences)
+                             .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI, Preferences)
+                             .whereLayer(CLI).mayNotBeAccessedByAnyLayer()
+                             .whereLayer(Migrations).mayOnlyBeAccessedByLayers(GUI, Logic)
+                             .whereLayer(Preferences).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
 
                              .check(classes);
     }
