@@ -103,7 +103,7 @@ class MainArchitectureTest {
                              .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
                              .layer(Preferences).definedBy("org.jabref.preferences..")
 
-                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI)
+                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI, Migrations)
                              .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations, Preferences)
                              .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI, Preferences)
                              .whereLayer(CLI).mayNotBeAccessedByAnyLayer()
