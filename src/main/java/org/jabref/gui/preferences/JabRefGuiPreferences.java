@@ -97,6 +97,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     private static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     private static final String OO_SHOW_PANEL = "showOOPanel";
+    private static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     // endregion
 
     private static final String LAST_FOCUSED = "lastFocused";

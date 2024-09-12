@@ -295,7 +295,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
 
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
-    public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
