@@ -26,7 +26,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;

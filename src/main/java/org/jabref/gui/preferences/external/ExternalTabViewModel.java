@@ -25,7 +25,6 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.strings.StringUtil;
 

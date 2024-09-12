@@ -19,7 +19,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;

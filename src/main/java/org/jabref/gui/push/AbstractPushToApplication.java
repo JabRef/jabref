@@ -12,7 +12,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;

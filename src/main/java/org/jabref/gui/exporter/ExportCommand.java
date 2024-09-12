@@ -25,7 +25,6 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;

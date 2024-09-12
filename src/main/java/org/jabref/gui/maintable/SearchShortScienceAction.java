@@ -11,7 +11,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

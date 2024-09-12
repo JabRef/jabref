@@ -35,7 +35,6 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;

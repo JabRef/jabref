@@ -24,7 +24,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;

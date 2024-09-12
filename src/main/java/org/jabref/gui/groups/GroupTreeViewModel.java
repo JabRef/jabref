@@ -30,7 +30,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

@@ -13,7 +13,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.LinkedFile;
 

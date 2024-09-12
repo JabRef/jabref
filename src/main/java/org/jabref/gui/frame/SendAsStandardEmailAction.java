@@ -12,7 +12,6 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

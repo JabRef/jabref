@@ -11,7 +11,6 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
