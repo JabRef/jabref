@@ -377,7 +377,10 @@ public abstract class NativeDesktop {
      * @see Desktop#moveToTrash(File)
      */
     public void moveToTrash(Path path) {
-        Desktop.getDesktop().moveToTrash(path.toFile());
+        boolean success = Desktop.getDesktop().moveToTrash(path.toFile());
+        if (!success) {
+            LoggerFactory.getLogger(NativeDesktop.class).warn("Could not move to trash. File {} is kept.", path);
+        }
     }
 
     public boolean moveToTrashSupported() {
