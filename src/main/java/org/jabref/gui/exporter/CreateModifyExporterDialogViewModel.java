@@ -10,8 +10,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.StandardFileType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

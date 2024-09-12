@@ -2,8 +2,8 @@ package org.jabref.gui.importer;
 
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 /**
  * Create a new, empty, database.

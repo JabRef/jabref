@@ -25,6 +25,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.TaskExecutor;

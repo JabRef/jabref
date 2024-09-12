@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 class GuiPreferencesMigrationsTest {
 
     private JabRefCliPreferences prefs;
-    private java.util.prefs.Preferences mainPrefsNode;
+    private Preferences mainPrefsNode;
 
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -37,7 +38,7 @@ class GuiPreferencesMigrationsTest {
     void setUp() {
         prefs = mock(JabRefCliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         Injector.setModelOrService(CliPreferences.class, prefs);
-        mainPrefsNode = mock(java.util.prefs.Preferences.class);
+        mainPrefsNode = mock(Preferences.class);
     }
 
     @Test

@@ -124,7 +124,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 preferences);
     }
 
-
     public BooleanProperty isOfflinePdfProperty() {
         return isOfflinePdf;
     }

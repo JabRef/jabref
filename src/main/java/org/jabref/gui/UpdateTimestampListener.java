@@ -1,9 +1,9 @@
 package org.jabref.gui;
 
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 

@@ -26,6 +26,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -62,7 +63,7 @@ public class Launcher {
 
             // Initialize preferences
             final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
-            Injector.setModelOrService(org.jabref.logic.preferences.CliPreferences.class, preferences);
+            Injector.setModelOrService(CliPreferences.class, preferences);
             Injector.setModelOrService(GuiPreferences.class, preferences);
 
             // Early exit in case another instance is already running

@@ -4,8 +4,8 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.model.entry.field.Field;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.field.Field;
 
 public class OwnerEditorViewModel extends AbstractEditorViewModel {
     private final CliPreferences preferences;
