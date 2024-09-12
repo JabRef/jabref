@@ -8,7 +8,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
-import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
@@ -120,8 +119,6 @@ public interface CliPreferences {
     ImporterPreferences getImporterPreferences();
 
     GrobidPreferences getGrobidPreferences();
-
-    PreviewPreferences getPreviewPreferences();
 
     XmpPreferences getXmpPreferences();
 

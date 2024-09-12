@@ -9,6 +9,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -32,4 +33,6 @@ public interface GuiPreferences extends CliPreferences {
     GroupsPreferences getGroupsPreferences();
 
     SpecialFieldsPreferences getSpecialFieldsPreferences();
+
+    PreviewPreferences getPreviewPreferences();
 }
