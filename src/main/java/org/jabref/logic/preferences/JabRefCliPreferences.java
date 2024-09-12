@@ -43,7 +43,6 @@ import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
-import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -322,9 +321,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
 
-    // Special field preferences
-    public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
-
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -457,7 +453,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private NameFormatterPreferences nameFormatterPreferences;
     private BibEntryPreferences bibEntryPreferences;
     private InternalPreferences internalPreferences;
-    private SpecialFieldsPreferences specialFieldsPreferences;
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
@@ -651,8 +646,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
         defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
-
-        defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -2348,19 +2341,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
 
         return nameFormatterPreferences;
-    }
-
-    @Override
-    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        if (specialFieldsPreferences != null) {
-            return specialFieldsPreferences;
-        }
-
-        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
-
-        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
-
-        return specialFieldsPreferences;
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
@@ -112,6 +113,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
     // endregion
 
+    // region specialFieldsPreferences
+    public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    // endregion
+
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
@@ -130,6 +135,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private SidePanePreferences sidePanePreferences;
     private GroupsPreferences groupsPreferences;
+    private SpecialFieldsPreferences specialFieldsPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -218,6 +224,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(GROUP_VIEW_INVERT, Boolean.FALSE);
         defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
         // endregion
+
+        defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
     }
 
     @Deprecated
@@ -670,5 +678,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
+    }
+
+    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
+        if (specialFieldsPreferences != null) {
+            return specialFieldsPreferences;
+        }
+
+        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
+
+        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
+
+        return specialFieldsPreferences;
     }
 }

@@ -10,7 +10,6 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
-import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -127,8 +126,6 @@ public interface CliPreferences {
     XmpPreferences getXmpPreferences();
 
     NameFormatterPreferences getNameFormatterPreferences();
-
-    SpecialFieldsPreferences getSpecialFieldsPreferences();
 
     SearchPreferences getSearchPreferences();
 
