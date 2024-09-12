@@ -1248,4 +1248,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     protected Path getDefaultPath() {
         return NativeDesktop.get().getDefaultFileChooserDirectory();
     }
+
+    @Override
+    protected boolean moveToTrashSupported() {
+        return NativeDesktop.get().moveToTrashSupported();
+    }
 }

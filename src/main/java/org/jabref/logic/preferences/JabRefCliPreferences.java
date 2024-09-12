@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -1472,6 +1471,10 @@ public class JabRefCliPreferences implements CliPreferences {
     // Linked files preferences
     //*************************************************************************************************************
 
+    protected boolean moveToTrashSupported() {
+        return false;
+    }
+
     @Override
     public FilePreferences getFilePreferences() {
         if (filePreferences != null) {
@@ -1492,7 +1495,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getPath(BACKUP_DIRECTORY, Directories.getBackupDirectory()),
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
-                getBoolean(TRASH_INSTEAD_OF_DELETE, NativeDesktop.get().moveToTrashSupported()),
+                getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
