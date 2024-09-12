@@ -29,13 +29,9 @@ import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
-import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -137,8 +133,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String LANGUAGE = "language";
 
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
-    public static final String AUTO_RESIZE_MODE = "autoResizeMode";
-    public static final String WINDOW_MAXIMISED = "windowMaximised";
 
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
@@ -152,29 +146,10 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
     public static final String NEWLINE = "newline";
 
-    // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
-    // Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
-    public static final String COLUMN_NAMES = "mainTableColumnNames";
-    public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
-    public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
-    public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
-
-    public static final String SEARCH_DIALOG_COLUMN_WIDTHS = "searchTableColumnWidths";
-    public static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
-    public static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
-
-    public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
-    public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
 
-    public static final String MAIN_WINDOW_POS_X = "mainWindowPosX";
-    public static final String MAIN_WINDOW_POS_Y = "mainWindowPosY";
-    public static final String MAIN_WINDOW_WIDTH = "mainWindowSizeX";
-    public static final String MAIN_WINDOW_HEIGHT = "mainWindowSizeY";
-
-    public static final String LAST_EDITED = "lastEdited";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
@@ -184,7 +159,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CREATE_BACKUP = "createBackup";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
-    public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
@@ -250,7 +224,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
-    public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
 
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
@@ -419,9 +392,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private MainTablePreferences mainTablePreferences;
-    private ColumnPreferences mainTableColumnPreferences;
-    private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
@@ -499,16 +469,6 @@ public class JabRefCliPreferences implements CliPreferences {
                                         .getSslDirectory()
                                         .resolve("truststore.jks").toString());
 
-        defaults.put(MAIN_WINDOW_POS_X, 0);
-        defaults.put(MAIN_WINDOW_POS_Y, 0);
-        defaults.put(MAIN_WINDOW_WIDTH, 1024);
-        defaults.put(MAIN_WINDOW_HEIGHT, 768);
-
-        defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
-
-        // By default disable "Fit table horizontally on the screen"
-        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
-
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -528,12 +488,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
-        defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
-
-        defaults.put(COLUMN_NAMES, "search_score;groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "50;28;40;28;28;75;300;470;60;130;50;50;50");
-
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
@@ -545,7 +499,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(LAST_EDITED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
@@ -564,8 +517,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
-
-        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
@@ -619,7 +570,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
-        defaults.put(SIDE_PANE_WIDTH, 0.15);
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
@@ -1441,141 +1391,6 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     //*************************************************************************************************************
-    // Main table and search dialog preferences
-    //*************************************************************************************************************
-
-    @Override
-    public MainTablePreferences getMainTablePreferences() {
-        if (mainTablePreferences != null) {
-            return mainTablePreferences;
-        }
-
-        mainTablePreferences = new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
-
-        EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
-                (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
-        EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
-                (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
-
-        return mainTablePreferences;
-    }
-
-    @Override
-    public ColumnPreferences getMainTableColumnPreferences() {
-        if (mainTableColumnPreferences != null) {
-            return mainTableColumnPreferences;
-        }
-
-        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
-        mainTableColumnPreferences = new ColumnPreferences(columns, columnSortOrder);
-
-        mainTableColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
-            putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
-        });
-        mainTableColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) change ->
-                putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)));
-
-        return mainTableColumnPreferences;
-    }
-
-    @Override
-    public ColumnPreferences getSearchDialogColumnPreferences() {
-        if (searchDialogColumnPreferences != null) {
-            return searchDialogColumnPreferences;
-        }
-
-        List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, columns);
-        searchDialogColumnPreferences = new ColumnPreferences(columns, columnSortOrder);
-
-        searchDialogColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
-            // MainTable and SearchResultTable use the same set of columnNames
-            // putStringList(SEARCH_DIALOG_COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
-        });
-        searchDialogColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) change ->
-                putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)));
-
-        return searchDialogColumnPreferences;
-    }
-
-    // --- Generic column handling ---
-    @SuppressWarnings("SameParameterValue")
-    private List<MainTableColumnModel> getColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
-        List<String> columnNames = getStringList(columnNamesList);
-        List<Double> columnWidths = getStringList(columnWidthList)
-                .stream()
-                .map(string -> {
-                    try {
-                        return Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
-                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return defaultWidth;
-                    }
-                }).toList();
-
-        List<SortType> columnSortTypes = getStringList(sortTypeList)
-                .stream()
-                .map(SortType::valueOf).toList();
-
-        List<MainTableColumnModel> columns = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
-
-            if (i < columnWidths.size()) {
-                columnModel.widthProperty().setValue(columnWidths.get(i));
-            }
-
-            if (i < columnSortTypes.size()) {
-                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
-            }
-
-            columns.add(columnModel);
-        }
-        return columns;
-    }
-
-    private List<MainTableColumnModel> getColumnSortOrder(String sortOrderList, List<MainTableColumnModel> tableColumns) {
-        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(sortOrderList).forEach(columnName -> tableColumns.stream().filter(column -> column.getName().equals(columnName))
-                                                                       .findFirst()
-                                                                       .ifPresent(columnsOrdered::add));
-
-        return columnsOrdered;
-    }
-
-    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(MainTableColumnModel::getName)
-                                .toList();
-    }
-
-    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.widthProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.sortTypeProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumnSortOrder().stream()
-                                .map(MainTableColumnModel::getName)
-                                .collect(Collectors.toList());
-    }
-
-    //*************************************************************************************************************
     // BibEntryPreferences
     //*************************************************************************************************************
 
@@ -1775,7 +1590,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return exportPreferences;
     }
 
-    private SaveOrder getExportSaveOrder() {
+    protected SaveOrder getExportSaveOrder() {
         List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
 
         if (!"".equals(get(EXPORT_PRIMARY_SORT_FIELD))) {
@@ -1822,22 +1637,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    /**
-     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
-     */
-    public SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
-        List<MainTableColumnModel> sortOrder = getMainTableColumnPreferences().getColumnSortOrder();
-        return new SelfContainedSaveOrder(
-                SaveOrder.OrderType.SPECIFIED,
-                sortOrder.stream().flatMap(model -> model.getSortCriteria().stream()).toList());
-    }
-
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
-            case TABLE ->
-                    this.getSelfContainedTableSaveOrder();
+            case TABLE -> {
+                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
+                yield SaveOrder.getDefaultSaveOrder();
+            }
             case SPECIFIED ->
                     SelfContainedSaveOrder.of(exportSaveOrder);
             case ORIGINAL ->

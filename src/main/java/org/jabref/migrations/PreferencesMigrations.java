@@ -348,8 +348,8 @@ public class PreferencesMigrations {
      * Since 5.1: mainTableColumnNames, mainTableColumnWidths, mainTableColumnSortTypes, mainTableColumnSortOrder
      */
     static void upgradeColumnPreferences(JabRefCliPreferences preferences) {
-        List<String> columnNames = preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES);
-        List<Double> columnWidths = preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)
+        List<String> columnNames = preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES);
+        List<Double> columnWidths = preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)
                                                .stream()
                                                .map(string -> {
                                                    try {
@@ -383,12 +383,12 @@ public class PreferencesMigrations {
                 columns.add(new MainTableColumnModel(type, name, columnWidth));
             }
 
-            preferences.putStringList(JabRefCliPreferences.COLUMN_NAMES,
+            preferences.putStringList(JabRefGuiPreferences.COLUMN_NAMES,
                     columns.stream()
                            .map(MainTableColumnModel::getName)
                            .collect(Collectors.toList()));
 
-            preferences.putStringList(JabRefCliPreferences.COLUMN_WIDTHS,
+            preferences.putStringList(JabRefGuiPreferences.COLUMN_WIDTHS,
                     columns.stream()
                            .map(MainTableColumnModel::getWidth)
                            .map(Double::intValue)
@@ -396,7 +396,7 @@ public class PreferencesMigrations {
                            .collect(Collectors.toList()));
 
             // ASCENDING by default
-            preferences.putStringList(JabRefCliPreferences.COLUMN_SORT_TYPES,
+            preferences.putStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES,
                     columns.stream()
                            .map(MainTableColumnModel::getSortType)
                            .map(TableColumn.SortType::toString)

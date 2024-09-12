@@ -8,6 +8,8 @@ import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -41,4 +43,10 @@ public interface GuiPreferences extends CliPreferences {
     PushToApplicationPreferences getPushToApplicationPreferences();
 
     NameDisplayPreferences getNameDisplayPreferences();
+
+    MainTablePreferences getMainTablePreferences();
+
+    ColumnPreferences getMainTableColumnPreferences();
+
+    ColumnPreferences getSearchDialogColumnPreferences();
 }

@@ -104,13 +104,13 @@ class GuiPreferencesMigrationsTest {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
         PreferencesMigrations.upgradeColumnPreferences(preferences);
 
-        verify(preferences, never()).put(JabRefCliPreferences.COLUMN_NAMES, "anyString");
-        verify(preferences, never()).put(JabRefCliPreferences.COLUMN_WIDTHS, "anyString");
+        verify(preferences, never()).put(JabRefGuiPreferences.COLUMN_NAMES, "anyString");
+        verify(preferences, never()).put(JabRefGuiPreferences.COLUMN_WIDTHS, "anyString");
     }
 
     @Test
@@ -121,14 +121,14 @@ class GuiPreferencesMigrationsTest {
         List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
         List<String> newSortTypes = Arrays.asList("ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING");
 
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
         PreferencesMigrations.upgradeColumnPreferences(preferences);
 
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, updatedNames);
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, updatedWidths);
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_SORT_TYPES, newSortTypes);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, updatedNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES, newSortTypes);
     }
 
     @Test
@@ -142,17 +142,17 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
         when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
 
         PreferencesMigrations.changeColumnVariableNamesFor51(preferences);
 
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_NAMES, columnNames);
-        verify(preferences).putStringList(JabRefCliPreferences.COLUMN_WIDTHS, columnWidths);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, columnWidths);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_NAMES, columnNames);
+        verify(preferences).putStringList(JabRefGuiPreferences.COLUMN_WIDTHS, columnWidths);
     }
 
     @Test
@@ -166,10 +166,10 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
         when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefCliPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
 
         PreferencesMigrations.upgradeColumnPreferences(preferences);
 
