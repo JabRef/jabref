@@ -6,6 +6,7 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -23,4 +24,6 @@ public interface GuiPreferences extends CliPreferences {
     UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
 
     ExternalApplicationsPreferences getExternalApplicationsPreferences();
+
+    SidePanePreferences getSidePanePreferences();
 }

@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -127,8 +126,6 @@ public interface CliPreferences {
     GrobidPreferences getGrobidPreferences();
 
     PreviewPreferences getPreviewPreferences();
-
-    SidePanePreferences getSidePanePreferences();
 
     XmpPreferences getXmpPreferences();
 

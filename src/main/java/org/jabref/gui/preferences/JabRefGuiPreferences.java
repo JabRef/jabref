@@ -1,6 +1,8 @@
 package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +23,10 @@ import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
@@ -39,12 +43,16 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
     // Public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
 
     // region ExternalApplicationsPreferences
     private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
@@ -85,6 +93,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
     // endregion
 
+    // region SidePanePreferences
+    private static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
+    private static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
+    private static final String OO_SHOW_PANEL = "showOOPanel";
+    // endregion
+
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
@@ -101,6 +115,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private WorkspacePreferences workspacePreferences;
     private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
+    private SidePanePreferences sidePanePreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -172,6 +187,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             defaults.put(CONSOLE_COMMAND, "");
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
+        // endregion
+
+        // region SidePanePreferences
+        defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
+        defaults.put(SELECTED_FETCHER_INDEX, 0);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
+        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         // endregion
     }
 
@@ -483,6 +505,83 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return unlinkedFilesDialogPreferences;
     }
+
+    // region SidePanePreferences
+    @Override
+    public SidePanePreferences getSidePanePreferences() {
+        if (sidePanePreferences != null) {
+            return sidePanePreferences;
+        }
+
+        sidePanePreferences = new SidePanePreferences(
+                getVisibleSidePanes(),
+                getSidePanePreferredPositions(),
+                getInt(SELECTED_FETCHER_INDEX));
+
+        sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
+                storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
+        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
+                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
+        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
+
+        return sidePanePreferences;
+    }
+
+    private Set<SidePaneType> getVisibleSidePanes() {
+        Set<SidePaneType> visiblePanes = new HashSet<>();
+        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+            visiblePanes.add(SidePaneType.WEB_SEARCH);
+        }
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+            visiblePanes.add(SidePaneType.GROUPS);
+        }
+        if (getBoolean(OO_SHOW_PANEL)) {
+            visiblePanes.add(SidePaneType.OPEN_OFFICE);
+        }
+        return visiblePanes;
+    }
+
+    private void storeVisibleSidePanes(Set<SidePaneType> visiblePanes) {
+        putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
+        putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
+        putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
+    }
+
+    private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+
+        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+
+        for (int i = 0; i < componentNames.size(); ++i) {
+            String name = componentNames.get(i);
+            try {
+                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
+                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid number format for side pane component '{}'", name, e);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Following component is not a side pane: '{}'", name, e);
+            }
+        }
+
+        return preferredPositions;
+    }
+
+    private void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> names = preferredPositions.keySet().stream()
+                                               .map(Enum::toString)
+                                               .collect(Collectors.toList());
+
+        List<String> positions = preferredPositions.values().stream()
+                                                   .map(integer -> Integer.toString(integer))
+                                                   .collect(Collectors.toList());
+
+        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
+        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
+    }
+    // endregion
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {

@@ -33,7 +33,6 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -46,7 +45,6 @@ import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
-import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
@@ -296,8 +294,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
-    public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
-    public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
@@ -325,7 +321,6 @@ public class JabRefCliPreferences implements CliPreferences {
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
-    public static final String OO_SHOW_PANEL = "showOOPanel";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
@@ -459,7 +454,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private TimestampPreferences timestampPreferences;
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
-    private SidePanePreferences sidePanePreferences;
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
@@ -671,7 +665,6 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
-        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
@@ -713,6 +706,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
+        defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
+
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
@@ -721,11 +716,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Currently, JabRef does not escape them
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        defaults.put(SELECTED_FETCHER_INDEX, 0);
-        defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
@@ -2231,85 +2221,6 @@ public class JabRefCliPreferences implements CliPreferences {
         } else {
             return 0; // fallback if stored position is no longer valid
         }
-    }
-
-    //*************************************************************************************************************
-    // SidePanePreferences
-    //*************************************************************************************************************
-
-    @Override
-    public SidePanePreferences getSidePanePreferences() {
-        if (sidePanePreferences != null) {
-            return sidePanePreferences;
-        }
-
-        sidePanePreferences = new SidePanePreferences(
-                getVisibleSidePanes(),
-                getSidePanePreferredPositions(),
-                getInt(SELECTED_FETCHER_INDEX));
-
-        sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
-                storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
-        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
-                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
-        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
-
-        return sidePanePreferences;
-    }
-
-    private Set<SidePaneType> getVisibleSidePanes() {
-        HashSet<SidePaneType> visiblePanes = new HashSet<>();
-        if (getBoolean(WEB_SEARCH_VISIBLE)) {
-            visiblePanes.add(SidePaneType.WEB_SEARCH);
-        }
-        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
-            visiblePanes.add(SidePaneType.GROUPS);
-        }
-        if (getBoolean(OO_SHOW_PANEL)) {
-            visiblePanes.add(SidePaneType.OPEN_OFFICE);
-        }
-        return visiblePanes;
-    }
-
-    private void storeVisibleSidePanes(Set<SidePaneType> visiblePanes) {
-        putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
-        putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
-        putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
-    }
-
-    private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
-
-        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
-        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
-
-        for (int i = 0; i < componentNames.size(); ++i) {
-            String name = componentNames.get(i);
-            try {
-                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
-                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
-            } catch (NumberFormatException e) {
-                LOGGER.debug("Invalid number format for side pane component '{}'", name, e);
-            } catch (IllegalArgumentException e) {
-                LOGGER.debug("Following component is not a side pane: '{}'", name, e);
-            }
-        }
-
-        return preferredPositions;
-    }
-
-    private void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
-        // Split the map into a pair of parallel String lists suitable for storage
-        List<String> names = preferredPositions.keySet().stream()
-                                               .map(Enum::toString)
-                                               .collect(Collectors.toList());
-
-        List<String> positions = preferredPositions.values().stream()
-                                                   .map(integer -> Integer.toString(integer))
-                                                   .collect(Collectors.toList());
-
-        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
-        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
     //*************************************************************************************************************
