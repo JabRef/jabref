@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import javax.swing.undo.UndoManager;
 
@@ -10,11 +11,15 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -47,16 +52,26 @@ public class AutoLinkFilesAction extends SimpleCommand {
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         final List<BibEntry> entries = stateManager.getSelectedEntries();
-        final AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
+            final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> {
+                // lambda for gui actions that are relevant when setting the linked file entry when ui is opened
+                String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
+                String oldVal = entry.getField(StandardField.FILE).orElse(null);
+                UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
+                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+                entry.addFile(linkedFile);
+            };
+
             @Override
             protected AutoSetFileLinksUtil.LinkFilesResult call() {
-                return util.linkAssociatedFiles(entries, nc);
+                return util.linkAssociatedFiles(entries, onLinkedFile);
             }
 
             @Override

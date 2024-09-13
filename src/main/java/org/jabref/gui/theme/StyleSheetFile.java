@@ -113,10 +113,10 @@ final class StyleSheetFile extends StyleSheet {
                 byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
                     String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
-                    LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
+                    LOGGER.trace("Embedded css in data URL of length {}", embeddedDataUrl.length());
                     return Optional.of(embeddedDataUrl);
                 } else {
-                    LOGGER.debug("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
+                    LOGGER.trace("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
                 }
             }
         } catch (IOException e) {

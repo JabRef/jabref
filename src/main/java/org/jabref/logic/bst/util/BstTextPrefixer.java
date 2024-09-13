@@ -23,49 +23,65 @@ public class BstTextPrefixer {
     private BstTextPrefixer() {
     }
 
-    public static String textPrefix(int inNumOfChars, String toPrefix) {
-        int numOfChars = inNumOfChars;
+    public static String textPrefix(int numOfChars, String toPrefix) {
         StringBuilder sb = new StringBuilder();
-
+        PrefixState prefixState = new PrefixState(0, 0, numOfChars);
         char[] cs = toPrefix.toCharArray();
-        int n = cs.length;
-        int i = 0;
-
-        int braceLevel = 0;
-
-        while ((i < n) && (numOfChars > 0)) {
-            char c = cs[i];
-            i++;
-            if (c == '{') {
-                braceLevel++;
-                if ((braceLevel == 1) && (i < n) && (cs[i] == '\\')) {
-                    i++; // skip backslash
-                    while ((i < n) && (braceLevel > 0)) {
-                        if (cs[i] == '}') {
-                            braceLevel--;
-                        } else if (cs[i] == '{') {
-                            braceLevel++;
-                        }
-                        i++;
-                    }
-                    numOfChars--;
-                }
-            } else if (c == '}') {
-                if (braceLevel > 0) {
-                    braceLevel--;
-                } else {
-                    LOGGER.warn("Unbalanced brace in string for purify$: {}", toPrefix);
-                }
-            } else {
-                numOfChars--;
+        while (prefixState.index < cs.length && prefixState.numOfChars > 0) {
+            char c = cs[prefixState.index++];
+            handleOpeningBrace(cs, prefixState, c);
+            handleClosingBrace(prefixState, toPrefix, c);
+            boolean isNormalCharacter = c != '{' && c != '}';
+            if (isNormalCharacter) {
+                prefixState.numOfChars--;
             }
         }
-        sb.append(toPrefix, 0, i);
-        while (braceLevel > 0) {
+        sb.append(toPrefix, 0, prefixState.index);
+        // Append any remaining closing braces if unbalanced
+        while (prefixState.braceLevel-- > 0) {
             sb.append('}');
-            braceLevel--;
         }
-
         return sb.toString();
+    }
+
+    private static void handleOpeningBrace(char[] cs, PrefixState prefixState, char c) {
+        if (c != '{') {
+            return;
+        }
+        prefixState.braceLevel++;
+        if ((prefixState.braceLevel == 1) && (prefixState.index < cs.length) && (cs[prefixState.index] == '\\')) {
+            prefixState.index++; // skip backslash
+            while ((prefixState.index < cs.length) && (prefixState.braceLevel > 0)) {
+                if (cs[prefixState.index] == '}') {
+                    prefixState.braceLevel--;
+                } else if (cs[prefixState.index] == '{') {
+                    prefixState.braceLevel++;
+                }
+                prefixState.index++;
+            }
+            prefixState.numOfChars--;
+        }
+    }
+
+    private static void handleClosingBrace(PrefixState prefixState, String toPrefix, char c) {
+        if (c != '}') {
+            return;
+        }
+        if (prefixState.braceLevel > 0) {
+            prefixState.braceLevel--;
+        } else {
+            LOGGER.warn("Unbalanced brace in string for purify$: {}", toPrefix);
+        }
+    }
+
+    private static class PrefixState {
+        public int index;
+        public int braceLevel;
+        public int numOfChars;
+        public PrefixState(int index, int braceLevel, int numOfChars) {
+            this.index = index;
+            this.braceLevel = braceLevel;
+            this.numOfChars = numOfChars;
+        }
     }
 }

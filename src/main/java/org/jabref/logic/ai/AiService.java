@@ -28,7 +28,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -79,7 +78,6 @@ public class AiService implements AutoCloseable {
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
                      CitationKeyPatternPreferences citationKeyPatternPreferences,
-                     AiApiKeyProvider aiApiKeyProvider,
                      DialogService dialogService,
                      TaskExecutor taskExecutor
     ) {
@@ -88,7 +86,7 @@ public class AiService implements AutoCloseable {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences, aiApiKeyProvider);
+        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
 
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), dialogService);
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(JabRefDesktop.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), dialogService);
