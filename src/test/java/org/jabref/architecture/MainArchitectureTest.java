@@ -21,7 +21,6 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.DoNotIncludeTests.class)
 class MainArchitectureTest {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
@@ -91,7 +90,6 @@ class MainArchitectureTest {
     public void respectLayeredArchitecture(JavaClasses classes) {
         String Logic = "Logic";
         String Model = "Model";
-        String Preferences = "Preferences";
         String Migrations = "Migrations";
         String CLI = "Cli";
         String GUI = "Gui";
@@ -101,15 +99,12 @@ class MainArchitectureTest {
                              .layer(Model).definedBy(PACKAGE_ORG_JABREF_MODEL)
                              .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
                              .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
-                             .layer(Preferences).definedBy("org.jabref.preferences..")
 
                              .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI, Migrations)
-                             .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations, Preferences)
-                             .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI, Preferences)
+                             .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations)
+                             .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
                              .whereLayer(CLI).mayNotBeAccessedByAnyLayer()
                              .whereLayer(Migrations).mayOnlyBeAccessedByLayers(GUI, Logic)
-                             .whereLayer(Preferences).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
-
                              .check(classes);
     }
 
@@ -130,7 +125,6 @@ class MainArchitectureTest {
                    .and().areNotAssignableFrom("org.jabref.model.search.rules.GrammarBasedSearchRule")
                    .and().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
 
@@ -140,7 +134,6 @@ class MainArchitectureTest {
                    .and().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
 

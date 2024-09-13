@@ -7,7 +7,6 @@ import com.tngtech.archunit.junit.ArchTest;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOBALS;
 
 /**
  * This class checks JabRef's test classes for architecture quality
@@ -15,7 +14,7 @@ import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOB
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
 public class ArchitectureTest {
 
-    private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.logic.preferences.JabRefPreferences";
+    private static final String CLASS_ORG_JABREF_LOGIC_PREFERENCES = "org.jabref.logic.preferences.CliPreferences";
 
     @ArchTest
     public void testsAreIndependent(JavaClasses classes) {
@@ -28,8 +27,7 @@ public class ArchitectureTest {
                    .and().doNotHaveSimpleName("DatabaseSearcherWithBibFilesTest")
                    .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                    .and().doNotHaveFullyQualifiedName("org.jabref.testutils.interactive.styletester.StyleTesterMain")
-                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_PREFERENCES)
+                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_LOGIC_PREFERENCES)
                    .check(classes);
     }
 
