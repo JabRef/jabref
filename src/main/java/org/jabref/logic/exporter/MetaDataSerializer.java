@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -46,7 +45,7 @@ public class MetaDataSerializer {
         metaData.getSaveOrder().ifPresent(
                 saveOrderConfig -> stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));
         metaData.getSaveActions().ifPresent(
-                saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(OS.NEWLINE)));
+                saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, getAsStringList(saveActions, OS.NEWLINE)));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
@@ -158,18 +157,31 @@ public class MetaDataSerializer {
     }
 
     public static String serializeCustomEntryTypes(BibEntryType entryType) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MetaData.ENTRYTYPE_FLAG);
-        builder.append(entryType.getType().getName());
-        builder.append(": req[");
-        builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
-        builder.append("] opt[");
-        builder.append(FieldFactory.serializeFieldsList(
-                entryType.getOptionalFields()
-                         .stream()
-                         .map(BibField::field)
-                         .collect(Collectors.toList())));
-        builder.append("]");
-        return builder.toString();
+        return MetaData.ENTRYTYPE_FLAG +
+                entryType.getType().getName() +
+                ": req[" +
+                FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()) +
+                "] opt[" +
+                FieldFactory.serializeFieldsList(
+                        entryType.getOptionalFields()
+                                 .stream()
+                                 .map(BibField::field)
+                                 .toList()) +
+                "]";
+    }
+
+    public static List<String> getAsStringList(FieldFormatterCleanups fieldFormatterCleanups, String delimiter) {
+        List<String> stringRepresentation = new ArrayList<>();
+
+        if (fieldFormatterCleanups.isEnabled()) {
+            stringRepresentation.add(FieldFormatterCleanups.ENABLED);
+        } else {
+            stringRepresentation.add(FieldFormatterCleanups.DISABLED);
+        }
+
+        String formatterString = FieldFormatterCleanups.getMetaDataString(
+                fieldFormatterCleanups.getConfiguredActions(), delimiter);
+        stringRepresentation.add(formatterString);
+        return stringRepresentation;
     }
 }
