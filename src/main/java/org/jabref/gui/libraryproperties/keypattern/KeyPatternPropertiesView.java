@@ -12,7 +12,6 @@ import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
