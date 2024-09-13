@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enabled creating a new file link manually. [#11017](https://github.com/JabRef/jabref/issues/11017)
 - We added a toggle button to invert the selected groups. [#9073](https://github.com/JabRef/jabref/issues/9073)
 - We reintroduced the floating search in the main table. [#4237](https://github.com/JabRef/jabref/issues/4237)
+- We improved [cleanup](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) of `arXiv` IDs in distributed in the fields `note`, `version`, `institution`, and `eid` fields. [#11306](https://github.com/JabRef/jabref/issues/11306)
 - We added a switch not to store the linked file URL, because it caused troubles at other apps. [#11735](https://github.com/JabRef/jabref/pull/11735)
 - When starting a new SLR, the selected catalogs now persist within and across JabRef sessions. [koppor#614](https://github.com/koppor/jabref/issues/614)
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)

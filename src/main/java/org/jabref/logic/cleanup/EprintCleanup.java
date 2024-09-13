@@ -13,6 +13,8 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+ *
+ * Background information on <a href="https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex">tex.stackexchange</a>.
  */
 public class EprintCleanup implements CleanupJob {
 
@@ -20,11 +22,25 @@ public class EprintCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE)) {
+        Optional<String> version = entry.getField(StandardField.VERSION);
+        Optional<String> institution = entry.getField(StandardField.INSTITUTION);
+
+        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
-                entry.setField(StandardField.EPRINT, arXivIdentifier.get().getNormalized())
+                String normalizedEprint = arXivIdentifier.get().getNormalized();
+
+                if (version.isPresent() && !normalizedEprint.contains("v" + version.get())) {
+                    normalizedEprint += "v" + version.get();
+                }
+
+                if (institution.isPresent() && "arxiv".equalsIgnoreCase(institution.get())) {
+                    entry.clearField(StandardField.INSTITUTION)
+                         .ifPresent(changes::add);
+                }
+
+                entry.setField(StandardField.EPRINT, normalizedEprint)
                      .ifPresent(changes::add);
 
                 entry.setField(StandardField.EPRINTTYPE, "arxiv")
@@ -45,6 +61,7 @@ public class EprintCleanup implements CleanupJob {
                 }
             }
         }
+        entry.clearField(StandardField.VERSION).ifPresent(changes::add);
 
         return changes;
     }
