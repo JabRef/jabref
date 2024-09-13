@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.gui.preferences;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,7 @@ public class PreferencesFilter {
 
     private final CliPreferences preferences;
 
-    public PreferencesFilter(CliPreferences preferences) {
+    public PreferencesFilter(GuiPreferences preferences) {
         this.preferences = preferences;
     }
 
