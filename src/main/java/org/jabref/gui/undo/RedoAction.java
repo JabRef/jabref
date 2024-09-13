@@ -7,7 +7,6 @@ import javax.swing.undo.CannotRedoException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
@@ -22,9 +21,10 @@ public class RedoAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
-        // TODO: Rework the UndoManager to something like the following, if it had a property.
-        //  this.executable.bind(frame.getCurrentBasePanel().getUndoManager().canUndo())
-        this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        stateManager.activeTabProperty().addListener((observable, oldValue, activeLibraryTab) -> {
+            activeLibraryTab.ifPresent(libraryTab ->
+                    this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
+        });
     }
 
     @Override
