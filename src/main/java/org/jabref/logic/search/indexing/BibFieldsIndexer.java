@@ -29,15 +29,13 @@ import org.slf4j.LoggerFactory;
 public class BibFieldsIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private final BibDatabaseContext databaseContext;
-    private final boolean waitOnClose;
     private final String libraryName;
     private final Directory indexDirectory;
     private IndexWriter indexWriter;
     private SearcherManager searcherManager;
 
-    public BibFieldsIndexer(BibDatabaseContext databaseContext, boolean waitOnClose) {
+    public BibFieldsIndexer(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
-        this.waitOnClose = waitOnClose;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
 
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LATEX_AWARE_NGRAM_ANALYZER);
@@ -155,11 +153,12 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        if (waitOnClose) {
-            HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
-        } else {
-            HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
-        }
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
     }
 
     private void closeIndex() {

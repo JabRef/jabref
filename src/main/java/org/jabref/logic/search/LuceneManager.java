@@ -39,21 +39,21 @@ public class LuceneManager {
     private final LuceneIndexer linkedFilesIndexer;
     private final LuceneSearcher luceneSearcher;
 
-    public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences, boolean waitOnClose) {
+    public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
-        this.bibFieldsIndexer = new BibFieldsIndexer(databaseContext, waitOnClose);
+        this.bibFieldsIndexer = new BibFieldsIndexer(databaseContext);
 
         LuceneIndexer indexer;
         try {
-            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences, waitOnClose);
+            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences);
         } catch (IOException e) {
             LOGGER.debug("Error initializing linked files index - using read only index");
-            indexer = new ReadOnlyLinkedFilesIndexer(databaseContext, waitOnClose);
+            indexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
         }
         linkedFilesIndexer = indexer;
 
@@ -207,6 +207,13 @@ public class LuceneManager {
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
+        databaseContext.getDatabase().postEvent(new IndexClosedEvent());
+    }
+
+    public void closeAndWait() {
+        bibFieldsIndexer.closeAndWait();
+        shouldIndexLinkedFiles.removeListener(preferencesListener);
+        linkedFilesIndexer.closeAndWait();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 

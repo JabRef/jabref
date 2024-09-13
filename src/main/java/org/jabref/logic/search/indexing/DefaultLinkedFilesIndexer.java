@@ -51,7 +51,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
-    private final boolean waitOnClose;
     private final String libraryName;
     private final Directory indexDirectory;
     private final IndexWriter indexWriter;
@@ -59,10 +58,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private Path indexDirectoryPath;
     private Map<String, Long> indexedFiles;
 
-    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences, boolean waitOnClose) throws IOException {
+    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
-        this.waitOnClose = waitOnClose;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.indexedFiles = new ConcurrentHashMap<>();
 
@@ -314,11 +312,12 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        if (waitOnClose) {
-            HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
-        } else {
-            HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
-        }
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
     }
 
     private void closeIndex() {

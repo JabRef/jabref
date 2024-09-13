@@ -26,7 +26,7 @@ public class DatabaseSearcher {
     public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);
-        this.luceneManager = new LuceneManager(databaseContext, taskExecutor, filePreferences, true);
+        this.luceneManager = new LuceneManager(databaseContext, taskExecutor, filePreferences);
     }
 
     /**
@@ -37,7 +37,7 @@ public class DatabaseSearcher {
 
         if (!query.isValid()) {
             LOGGER.warn("Search failed: invalid search expression");
-            luceneManager.close();
+            luceneManager.closeAndWait();
             return Collections.emptyList();
         }
         List<BibEntry> matchEntries = luceneManager.search(query)
@@ -45,7 +45,7 @@ public class DatabaseSearcher {
                                                    .stream()
                                                    .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
                                                    .toList();
-        luceneManager.close();
+        luceneManager.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }
