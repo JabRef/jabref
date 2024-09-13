@@ -16,6 +16,7 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
@@ -76,8 +77,20 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 );
             }
 
+            case GEMINI -> {
+                // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
+                langchainChatModel = Optional.of(GoogleAiGeminiChatModel
+                        .builder()
+                        .apiKey(apiKey)
+                        .modelName(aiPreferences.getSelectedChatModel())
+                        .temperature(aiPreferences.getTemperature())
+                        .logRequestsAndResponses(true)
+                        .build()
+                );
+            }
+
             case HUGGING_FACE -> {
-                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
+                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
                         .accessToken(apiKey)

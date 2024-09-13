@@ -63,6 +63,11 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
         HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
     }
 
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+    }
+
     private void closeIndex() {
         try {
             searcherManager.close();

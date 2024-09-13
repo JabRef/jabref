@@ -33,6 +33,7 @@ import org.mockito.Answers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class DatabaseSearcherWithBibFilesTest {
@@ -77,7 +78,8 @@ class DatabaseSearcherWithBibFilesTest {
 
     private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws Exception {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
-        BibDatabaseContext databaseContext = result.getDatabaseContext();
+        BibDatabaseContext databaseContext = spy(result.getDatabaseContext());
+        when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));

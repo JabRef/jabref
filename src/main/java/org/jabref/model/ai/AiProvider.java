@@ -5,6 +5,7 @@ import java.io.Serializable;
 public enum AiProvider implements Serializable {
     OPEN_AI("OpenAI"),
     MISTRAL_AI("Mistral AI"),
+    GEMINI("Gemini"),
     HUGGING_FACE("Hugging Face");
 
     private final String label;

@@ -36,12 +36,14 @@ public class AiPreferences {
 
     private final StringProperty openAiChatModel;
     private final StringProperty mistralAiChatModel;
+    private final StringProperty geminiChatModel;
     private final StringProperty huggingFaceChatModel;
 
     private final BooleanProperty customizeExpertSettings;
 
     private final StringProperty openAiApiBaseUrl;
     private final StringProperty mistralAiApiBaseUrl;
+    private final StringProperty geminiApiBaseUrl;
     private final StringProperty huggingFaceApiBaseUrl;
 
     private final ObjectProperty<EmbeddingModel> embeddingModel;
@@ -59,10 +61,12 @@ public class AiPreferences {
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
+                         String geminiChatModel,
                          String huggingFaceChatModel,
                          boolean customizeExpertSettings,
                          String openAiApiBaseUrl,
                          String mistralAiApiBaseUrl,
+                         String geminiApiBaseUrl,
                          String huggingFaceApiBaseUrl,
                          EmbeddingModel embeddingModel,
                          String instruction,
@@ -79,12 +83,14 @@ public class AiPreferences {
 
         this.openAiChatModel = new SimpleStringProperty(openAiChatModel);
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
+        this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
         this.openAiApiBaseUrl = new SimpleStringProperty(openAiApiBaseUrl);
         this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
+        this.geminiApiBaseUrl = new SimpleStringProperty(geminiApiBaseUrl);
         this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
 
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
@@ -100,8 +106,7 @@ public class AiPreferences {
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-        } catch (
-                PasswordAccessException e) {
+        } catch (PasswordAccessException e) {
             LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getLabel());
             return "";
         } catch (Exception e) {
@@ -174,6 +179,18 @@ public class AiPreferences {
         this.mistralAiChatModel.set(mistralAiChatModel);
     }
 
+    public StringProperty geminiChatModelProperty() {
+        return geminiChatModel;
+    }
+
+    public String getGeminiChatModel() {
+        return geminiChatModel.get();
+    }
+
+    public void setGeminiChatModel(String geminiChatModel) {
+        this.geminiChatModel.set(geminiChatModel);
+    }
+
     public StringProperty huggingFaceChatModelProperty() {
         return huggingFaceChatModel;
     }
@@ -238,6 +255,18 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl.set(mistralAiApiBaseUrl);
     }
 
+    public StringProperty geminiApiBaseUrlProperty() {
+        return geminiApiBaseUrl;
+    }
+
+    public String getGeminiApiBaseUrl() {
+        return geminiApiBaseUrl.get();
+    }
+
+    public void setGeminiApiBaseUrl(String geminiApiBaseUrl) {
+        this.geminiApiBaseUrl.set(geminiApiBaseUrl);
+    }
+
     public StringProperty huggingFaceApiBaseUrlProperty() {
         return huggingFaceApiBaseUrl;
     }
@@ -294,6 +323,7 @@ public class AiPreferences {
                 case OPEN_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
                 case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
                 case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+                case GEMINI -> AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
             };
         }
     }
@@ -419,6 +449,8 @@ public class AiPreferences {
                     mistralAiChatModel.get();
             case HUGGING_FACE ->
                     huggingFaceChatModel.get();
+            case GEMINI ->
+                    geminiChatModel.get();
         };
     }
 
@@ -431,6 +463,8 @@ public class AiPreferences {
                         mistralAiApiBaseUrl.get();
                 case HUGGING_FACE ->
                         huggingFaceApiBaseUrl.get();
+                case GEMINI ->
+                        geminiApiBaseUrl.get();
             };
         } else {
             return AiDefaultPreferences.PROVIDERS_API_URLS.get(aiProvider.get());
