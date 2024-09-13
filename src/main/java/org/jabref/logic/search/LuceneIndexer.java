@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.logic.search;
 
 import java.util.Collection;
 

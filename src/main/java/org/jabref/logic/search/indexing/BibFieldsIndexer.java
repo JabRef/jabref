@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
