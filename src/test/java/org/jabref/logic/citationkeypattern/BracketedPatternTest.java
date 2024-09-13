@@ -738,7 +738,6 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @CsvSource({
-        "null, null",
         "'', ''",
         "The Attributed Graph Grammar System ({AGG}),AGG",
         "'The University of Science',UniScience",
@@ -756,10 +755,11 @@ class BracketedPatternTest {
         "'{Example with Several Tokens, Some Address}',EST"})
 
     void generateInstitutionKeyTest(String input, String expected) {
-        if ("null".equals(input)) {
-            assertNull(BracketedPattern.generateInstitutionKey(null));
-        } else {
-            assertEquals(expected, BracketedPattern.generateInstitutionKey(input));
-        }
+        assertEquals(expected, BracketedPattern.generateInstitutionKey(input));
+    }
+
+    @Test
+    void generateInstitutionKeyNullTest() {
+        assertNull(BracketedPattern.generateInstitutionKey(null));
     }
 }
