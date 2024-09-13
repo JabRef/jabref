@@ -28,7 +28,7 @@
             </Label>
             <TextFlow fx:id="openAiPrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -37,7 +37,7 @@
             </TextFlow>
             <TextFlow fx:id="mistralAiPrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -46,7 +46,7 @@
             </TextFlow>
              <TextFlow fx:id="geminiPrivacyTextFlow">
                  <children>
-                     <Text text="%If you have chosen the Google Gemini as AI provider, the privacy policy of Google Gemini applies. You find it at %0.">
+                     <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                          <font>
                              <Font size="14.0" />
                          </font>
@@ -55,7 +55,7 @@
              </TextFlow>
             <TextFlow fx:id="huggingFacePrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>

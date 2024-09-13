@@ -15,6 +15,13 @@ public class AiDefaultPreferences {
             AiProvider.HUGGING_FACE, List.of()
     );
 
+    public static final Map<AiProvider, String> PROVIDERS_PRIVACY_POLICIES = Map.of(
+            AiProvider.OPEN_AI, "https://openai.com/policies/privacy-policy/",
+            AiProvider.MISTRAL_AI, "https://mistral.ai/terms/#privacy-policy",
+            AiProvider.GEMINI, "https://ai.google.dev/gemini-api/terms",
+            AiProvider.HUGGING_FACE, "https://huggingface.co/privacy"
+    );
+
     public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
             AiProvider.OPEN_AI, "https://api.openai.com/v1",
             AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
