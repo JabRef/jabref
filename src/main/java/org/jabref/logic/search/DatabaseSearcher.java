@@ -37,6 +37,7 @@ public class DatabaseSearcher {
 
         if (!query.isValid()) {
             LOGGER.warn("Search failed: invalid search expression");
+            luceneManager.closeAndWait();
             return Collections.emptyList();
         }
         List<BibEntry> matchEntries = luceneManager.search(query)
@@ -44,7 +45,7 @@ public class DatabaseSearcher {
                                                    .stream()
                                                    .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
                                                    .toList();
-        luceneManager.close();
+        luceneManager.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }

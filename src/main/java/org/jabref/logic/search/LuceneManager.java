@@ -210,6 +210,13 @@ public class LuceneManager {
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
+    public void closeAndWait() {
+        bibFieldsIndexer.closeAndWait();
+        shouldIndexLinkedFiles.removeListener(preferencesListener);
+        linkedFilesIndexer.closeAndWait();
+        databaseContext.getDatabase().postEvent(new IndexClosedEvent());
+    }
+
     public AutoCloseable blockLinkedFileIndexer() {
         LOGGER.debug("Blocking linked files indexer");
         isLinkedFilesIndexerBlocked.set(true);
