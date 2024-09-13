@@ -36,6 +36,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1218,14 +1219,14 @@ public class BracketedPattern {
      *         <li>null if content is null</li>
      *         </ul>
      */
-    private static String generateInstitutionKey(String content) {
+     @VisibleForTesting
+     static String generateInstitutionKey(String content) {
         if (content == null) {
             return null;
         }
         if (content.isBlank()) {
             return "";
         }
-
         Matcher matcher = INLINE_ABBREVIATION.matcher(content);
         if (matcher.find()) {
             return LatexToUnicodeAdapter.format(matcher.group());
@@ -1309,8 +1310,7 @@ public class BracketedPattern {
         // Putting parts together.
         return (university == null ? Objects.toString(rest, "") : university)
                 + (school == null ? "" : school)
-                + ((department == null)
-                || ((school != null) && department.equals(school)) ? "" : department);
+                + ((department == null) || (department.equals(school)) ? "" : department);
     }
 
     /**
