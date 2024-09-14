@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<office:document-content
-        xmlns:office="http://openoffice.org/2000/office"
-        xmlns:fo="http://www.w3.org/1999/XSL/Format"
-        xmlns:style="http://openoffice.org/2000/style"
-        xmlns:table="http://openoffice.org/2000/table"
-        xmlns:text="http://openoffice.org/2000/text">
+<office:document-content xmlns:office="http://openoffice.org/2000/office"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:class="spreadsheet" xmlns:version="1.0"
+    xmlns:style="http://openoffice.org/2000/style" xmlns:table="http://openoffice.org/2000/table"
+    xmlns:text="http://openoffice.org/2000/text">
     <office:script />
     <office:automatic-styles>
         <style:style style:family="table-row" style:name="ro1">
