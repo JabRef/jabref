@@ -263,6 +263,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
+    public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -528,6 +529,8 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
+        defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
+        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
@@ -1075,10 +1078,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                currentStyle);
+                currentStyle,
+                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES));
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
+        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
 
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
