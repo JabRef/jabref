@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -733,5 +734,32 @@ class BracketedPatternTest {
         BibEntry bibEntry = new BibEntry().withField(StandardField.EDITOR, editor);
         BracketedPattern bracketedPattern = new BracketedPattern(pattern);
         assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "'', ''",
+        "The Attributed Graph Grammar System ({AGG}),AGG",
+        "'The University of Science',UniScience",
+        "'School of Business, Department of Management',BM",
+        "'Graph Systems Research Group',GSRG",
+        "'The Great Institute, 123 Main Street, Springfield',GreatInstitute",
+        "'Invalid {\\Unicode}',Invalid",
+        "'School of Electrical Engineering ({SEE}), Department of Computer Science',SEE",
+        "'{The Attributed Graph Grammar System ({AGG})}',AGG",
+        "'{The Attributed Graph Grammar System}',AGGS",
+        "'{University of Example, Department of Computer Science, Some Address}',UniExampleCS",
+        "'{Example School of Engineering, Department of Computer Science, Some Address}',SomeAddressEECS",
+        "'{Example Institute, Computer Science Department, Some Address}',ExampleInstituteCS",
+        "'{Short Part, Some Address}',ShortPart",
+        "'{Example with Several Tokens, Some Address}',EST"})
+
+    void generateInstitutionKeyTest(String input, String expected) {
+        assertEquals(expected, BracketedPattern.generateInstitutionKey(input));
+    }
+
+    @Test
+    void generateInstitutionKeyNullTest() {
+        assertNull(BracketedPattern.generateInstitutionKey(null));
     }
 }
