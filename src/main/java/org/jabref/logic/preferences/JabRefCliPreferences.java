@@ -530,7 +530,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
         defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
-        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
