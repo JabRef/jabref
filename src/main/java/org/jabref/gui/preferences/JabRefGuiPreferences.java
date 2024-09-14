@@ -106,7 +106,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BINDINGS = "bindings";
     // endregion
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
 
     // region core GUI preferences
     private static final String MAIN_WINDOW_POS_X = "mainWindowPosX";
