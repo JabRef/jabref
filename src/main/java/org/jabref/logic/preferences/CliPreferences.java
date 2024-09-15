@@ -114,4 +114,6 @@ public interface CliPreferences {
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
     AiPreferences getAiPreferences();
+
+    LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 }

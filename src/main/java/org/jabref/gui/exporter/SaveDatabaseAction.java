@@ -120,7 +120,7 @@ public class SaveDatabaseAction {
         askForSavePath().ifPresent(path -> {
             try {
                 saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
-                preferences.getGuiPreferences().getFileHistory().newFile(path);
+                preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
@@ -165,7 +165,7 @@ public class SaveDatabaseAction {
             libraryTab.installAutosaveManagerAndBackupManager();
             libraryTab.createLuceneManager();
 
-            preferences.getGuiPreferences().getFileHistory().newFile(file);
+            preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }
         return saveResult;
     }

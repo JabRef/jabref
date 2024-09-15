@@ -86,10 +86,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                preferences.getGuiPreferences().getLastFilesOpened().clear();
+                preferences.getLastFilesOpenedPreferences().getLastFilesOpened().clear();
             } else {
-                preferences.getGuiPreferences().setLastFilesOpened(filenames);
-                preferences.getGuiPreferences().setLastFocusedFile(focusedDatabase);
+                preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
+                preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
     }
@@ -194,7 +194,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         Path focusedFile = parserResults.stream()
                                         .findFirst()
                                         .flatMap(ParserResult::getPath)
-                                        .orElse(preferences.getGuiPreferences()
+                                        .orElse(preferences.getLastFilesOpenedPreferences()
                                                            .getLastFocusedFile())
                                         .toAbsolutePath();
 

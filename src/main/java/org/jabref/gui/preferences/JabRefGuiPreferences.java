@@ -62,7 +62,6 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -114,7 +113,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String MAIN_WINDOW_WIDTH = "mainWindowSizeX";
     private static final String MAIN_WINDOW_HEIGHT = "mainWindowSizeY";
     private static final String WINDOW_MAXIMISED = "windowMaximised";
-    private static final String LAST_EDITED = "lastEdited";
     private static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     private static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     private static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
@@ -172,8 +170,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CONFIRM_DELETE = "confirmDelete";
     // endregion
 
-    private static final String RECENT_DATABASES = "recentDatabases";
-
     private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
 
     /**
@@ -210,7 +206,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // endregion
 
-    private static final String LAST_FOCUSED = "lastFocused";
     private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
     private static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
@@ -261,13 +256,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        // endregion
-
-        // region coreGuiPreferences
-        // Set DOI to be the default ID entry generator
-        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
-        defaults.put(RECENT_DATABASES, "");
-        defaults.put(LAST_FOCUSED, "");
         // endregion
 
         // region workspace
@@ -394,7 +382,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region core GUI preferences
-        defaults.put(LAST_EDITED, "");
+        // Set DOI to be the default ID entry generator
+        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
         defaults.put(MAIN_WINDOW_POS_X, 0);
         defaults.put(MAIN_WINDOW_POS_Y, 0);
         defaults.put(MAIN_WINDOW_WIDTH, 1024);
@@ -603,11 +592,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getDouble(MAIN_WINDOW_WIDTH),
                 getDouble(MAIN_WINDOW_HEIGHT),
                 getBoolean(WINDOW_MAXIMISED),
-                getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .collect(Collectors.toList()),
-                Path.of(get(LAST_FOCUSED)),
-                getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH));
 
@@ -618,41 +602,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
         EasyBind.listen(coreGuiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
-        coreGuiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
-            if (change.getList().isEmpty()) {
-                remove(LAST_EDITED);
-            } else {
-                putStringList(LAST_EDITED, coreGuiPreferences.getLastFilesOpened().stream()
-                                                             .map(Path::toAbsolutePath)
-                                                             .map(Path::toString)
-                                                             .collect(Collectors.toList()));
-            }
-        });
-        EasyBind.listen(coreGuiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
-            if (newValue != null) {
-                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
-            } else {
-                remove(LAST_FOCUSED);
-            }
-        });
-        coreGuiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(coreGuiPreferences.getFileHistory()));
         EasyBind.listen(coreGuiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
 
         return coreGuiPreferences;
     }
 
-    private FileHistory getFileHistory() {
-        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
-    }
-
-    private void storeFileHistory(FileHistory history) {
-        putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
-                                               .map(Path::toString)
-                                               .toList());
-    }
     // endregion
 
     @Override

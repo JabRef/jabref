@@ -174,7 +174,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor);
 
         this.fileHistory = new FileHistoryMenu(
-                this.preferences.getGuiPreferences().getFileHistory(),
+                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
                 dialogService,
                 getOpenDatabaseAction());
         this.setOnKeyTyped(key -> {
@@ -533,7 +533,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void openLastEditedDatabases() {
-        List<Path> lastFiles = preferences.getGuiPreferences().getLastFilesOpened();
+        List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }

@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
@@ -82,6 +83,7 @@ import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
@@ -286,6 +288,12 @@ public class JabRefCliPreferences implements CliPreferences {
     // UI
     private static final String FONT_FAMILY = "fontFamily";
 
+    // region last files opened
+    private static final String LAST_EDITED = "lastEdited";
+    private static final String LAST_FOCUSED = "lastFocused";
+    private static final String RECENT_DATABASES = "recentDatabases";
+    // endregion
+
     // Proxy
     private static final String PROXY_PORT = "proxyPort";
     private static final String PROXY_HOSTNAME = "proxyHostname";
@@ -393,6 +401,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
+    private LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -602,6 +611,12 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
         setLanguageDependentDefaultValues();
+
+        // region last files opened
+        defaults.put(RECENT_DATABASES, "");
+        defaults.put(LAST_FOCUSED, "");
+        defaults.put(LAST_EDITED, "");
+        // endregion
 
         // region:AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
@@ -1684,9 +1699,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    //*************************************************************************************************************
-    // Cleanup preferences
-    //*************************************************************************************************************
+    // region Cleanup preferences
 
     @Override
     public CleanupPreferences getCleanupPreferences() {
@@ -1731,6 +1744,62 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
         return activeJobs;
     }
+
+    // endregion
+
+    // region last files opened
+
+    @Override
+    public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
+        if (lastFilesOpenedPreferences != null) {
+            return lastFilesOpenedPreferences;
+        }
+
+        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
+                getStringList(LAST_EDITED).stream()
+                                          .map(Path::of)
+                                          .toList(),
+                Path.of(get(LAST_FOCUSED)),
+                getFileHistory());
+
+        lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
+            if (change.getList().isEmpty()) {
+                remove(LAST_EDITED);
+            } else {
+                putStringList(LAST_EDITED, lastFilesOpenedPreferences.getLastFilesOpened().stream()
+                                                                     .map(Path::toAbsolutePath)
+                                                                     .map(Path::toString)
+                                                                     .toList());
+            }
+        });
+        EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
+            } else {
+                remove(LAST_FOCUSED);
+            }
+        });
+        lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));
+
+        return lastFilesOpenedPreferences;
+    }
+
+    private FileHistory getFileHistory() {
+        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
+                                                             .map(Path::of)
+                                                             .toList());
+    }
+
+    private void storeFileHistory(FileHistory history) {
+        putStringList(RECENT_DATABASES, history.stream()
+                                               .map(Path::toAbsolutePath)
+                                               .map(Path::toString)
+                                               .toList());
+    }
+
+    // endregion
+
+    // region other preferences
 
     @Override
     public AiPreferences getAiPreferences() {
@@ -1788,10 +1857,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return aiPreferences;
     }
-
-    //*************************************************************************************************************
-    // Misc preferences
-    //*************************************************************************************************************
 
     @Override
     public SearchPreferences getSearchPreferences() {
@@ -2091,4 +2156,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDOIPreferences(),
                 getGrobidPreferences());
     }
+
+    // endregion
 }

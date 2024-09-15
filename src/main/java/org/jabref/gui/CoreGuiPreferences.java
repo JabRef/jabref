@@ -1,20 +1,11 @@
 package org.jabref.gui;
 
-import java.nio.file.Path;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import org.jabref.logic.util.io.FileHistory;
 
 public class CoreGuiPreferences {
     private final DoubleProperty positionX;
@@ -26,14 +17,6 @@ public class CoreGuiPreferences {
 
     private final DoubleProperty sidePaneWidth;
 
-    // the last libraries that were open when jabref closes and should be reopened on startup
-    private final ObservableList<Path> lastFilesOpened;
-
-    private final ObjectProperty<Path> lastFocusedFile;
-
-    // observable list last files opened in the file menu
-    private final FileHistory fileHistory;
-
     private final StringProperty lastSelectedIdBasedFetcher;
 
     public CoreGuiPreferences(double positionX,
@@ -41,9 +24,6 @@ public class CoreGuiPreferences {
                               double sizeX,
                               double sizeY,
                               boolean windowMaximised,
-                              List<Path> lastFilesOpened,
-                              Path lastFocusedFile,
-                              FileHistory fileHistory,
                               String lastSelectedIdBasedFetcher,
                               double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
@@ -51,11 +31,8 @@ public class CoreGuiPreferences {
         this.sizeX = new SimpleDoubleProperty(sizeX);
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
-        this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
-        this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
-        this.fileHistory = fileHistory;
     }
 
     public double getPositionX() {
@@ -116,30 +93,6 @@ public class CoreGuiPreferences {
 
     public void setWindowMaximised(boolean windowMaximised) {
         this.windowMaximised.set(windowMaximised);
-    }
-
-    public ObservableList<Path> getLastFilesOpened() {
-        return lastFilesOpened;
-    }
-
-    public void setLastFilesOpened(List<Path> files) {
-        lastFilesOpened.setAll(files);
-    }
-
-    public Path getLastFocusedFile() {
-        return lastFocusedFile.get();
-    }
-
-    public ObjectProperty<Path> lastFocusedFileProperty() {
-        return lastFocusedFile;
-    }
-
-    public void setLastFocusedFile(Path lastFocusedFile) {
-        this.lastFocusedFile.set(lastFocusedFile);
-    }
-
-    public FileHistory getFileHistory() {
-        return fileHistory;
     }
 
     public String getLastSelectedIdBasedFetcher() {
