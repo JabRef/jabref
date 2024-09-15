@@ -779,6 +779,7 @@ jlink {
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'kong.unirest.core.json.JsonEngine';
+        uses 'ai.djl.repository.zoo.ZooProvider';
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
@@ -795,7 +796,10 @@ jlink {
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';
-
+        provides 'ai.djl.repository.zoo.ZooProvider' with 'ai.djl.engine.rust.zoo.RsZooProvider',
+                'ai.djl.huggingface.zoo.HfZooProvider',
+                'ai.djl.pytorch.zoo.PtZooProvider',
+                'ai.djl.repository.zoo.DefaultZooProvider';
     }
 
     jpackage {
