@@ -161,7 +161,8 @@ public class ImportHandler {
 
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
-                    undoManager.addEdit(ce);
+                    // prevent fx thread exception in undo manager
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
 
                     counter++;
                 }
