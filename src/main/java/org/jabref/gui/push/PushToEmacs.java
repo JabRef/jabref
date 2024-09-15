@@ -8,13 +8,12 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +25,10 @@ public class PushToEmacs extends AbstractPushToApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
     /**
-     * @param preferencesService getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
+     * @param preferences getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
-    public PushToEmacs(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToEmacs(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class PushToEmacs extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        PushToApplicationPreferences pushToApplicationPreferences = preferencesService.getPushToApplicationPreferences();
+        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
 
         commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
 
@@ -146,6 +145,6 @@ public class PushToEmacs extends AbstractPushToApplication {
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToEmacsSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
+        return new PushToEmacsSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 }

@@ -24,10 +24,13 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -40,8 +43,8 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 
@@ -51,8 +54,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final AiService aiService;
-    private final PreferencesService preferences;
+    private final ChatHistoryService chatHistoryService;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -75,11 +78,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, AiService aiService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, GuiPreferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.aiService = Objects.requireNonNull(aiService);
-        this.preferences = Objects.requireNonNull(preferencesService);
+        this.chatHistoryService = Objects.requireNonNull(chatHistoryService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
@@ -396,10 +399,35 @@ public class GroupTreeViewModel extends AbstractViewModel {
         StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
         groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
 
-        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode());
+        ObservableList<ChatMessage> chatHistory = chatHistoryService.getChatHistoryForGroup(group.getGroupNode());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
 
-        aiService.openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
+        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
+    }
+
+    private void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
+        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+
+        if (existingWindow.isPresent()) {
+            existingWindow.get().requestFocus();
+        } else {
+            AiChatWindow aiChatWindow = new AiChatWindow(
+                    Injector.instantiateModelOrService(AiService.class),
+                    dialogService,
+                    preferences.getAiPreferences(),
+                    preferences.getExternalApplicationsPreferences(),
+                    taskExecutor
+            );
+
+            aiChatWindow.setOnCloseRequest(event ->
+                    stateManager.getAiChatWindows().remove(aiChatWindow)
+            );
+
+            stateManager.getAiChatWindows().add(aiChatWindow);
+            dialogService.showCustomWindow(aiChatWindow);
+            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
+            aiChatWindow.requestFocus();
+        }
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

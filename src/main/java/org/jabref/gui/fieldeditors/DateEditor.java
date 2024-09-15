@@ -10,13 +10,13 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -27,7 +27,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private TemporalAccessorPicker datePicker;
 
     @Inject private UndoManager undoManager;
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
 
     public DateEditor(Field field,
@@ -43,7 +43,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
         establishBinding(datePicker.getEditor(), viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), datePicker.getEditor());
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), datePicker.getEditor());
     }
 
     public DateEditorViewModel getViewModel() {

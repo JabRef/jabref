@@ -50,18 +50,18 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -82,9 +82,9 @@ public class GroupTreeView extends BorderPane {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -106,15 +106,15 @@ public class GroupTreeView extends BorderPane {
      */
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
-                         PreferencesService preferencesService,
+                         GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService
+                         ChatHistoryService chatHistoryService
     ) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
-        this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
 
         createNodes();
         this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
@@ -122,7 +122,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(preferencesService.getKeyBindingRepository());
+        searchField = SearchTextField.create(preferences.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
         this.setTop(searchField);
 
@@ -164,7 +164,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferencesService, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, chatHistoryService, preferences, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -280,7 +280,7 @@ public class GroupTreeView extends BorderPane {
                     group.allSelectedEntriesMatchedProperty());
         }
         Text text = new Text();
-        EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
+        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(),
                 shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
@@ -298,7 +298,7 @@ public class GroupTreeView extends BorderPane {
 
         text.styleProperty().bind(Bindings.createStringBinding(() -> {
             double reducedFontSize;
-            double font_size = preferencesService.getWorkspacePreferences().getMainFontSize();
+            double font_size = preferences.getWorkspacePreferences().getMainFontSize();
             // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
             if (font_size > 26.0) {
                 reducedFontSize = 0.25;
@@ -310,7 +310,7 @@ public class GroupTreeView extends BorderPane {
                 reducedFontSize = 0.75;
             }
             return "-fx-font-size: %fem;".formatted(reducedFontSize);
-        }, preferencesService.getWorkspacePreferences().mainFontSizeProperty()));
+        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));
 
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -549,7 +549,7 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
-        if (preferencesService.getAiPreferences().getEnableAi()) {
+        if (preferences.getAiPreferences().getEnableAi()) {
             contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
         }
 

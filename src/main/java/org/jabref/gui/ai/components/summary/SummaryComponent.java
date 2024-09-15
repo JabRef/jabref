@@ -7,6 +7,8 @@ import javafx.scene.Node;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.summarization.Summary;
@@ -18,8 +20,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +37,11 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                             BibEntry entry,
                             AiService aiService,
                             AiPreferences aiPreferences,
-                            FilePreferences filePreferences,
+                            ExternalApplicationsPreferences externalApplicationsPreferences,
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
                             DialogService dialogService
     ) {
-        super(aiPreferences, filePreferences, dialogService);
+        super(aiPreferences, externalApplicationsPreferences, dialogService);
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;

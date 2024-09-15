@@ -21,17 +21,16 @@ import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,18 +49,18 @@ public class PreviewPanel extends VBox {
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
-                        PreferencesService preferencesService,
+                        GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
                         LuceneManager luceneManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        this.previewPreferences = preferencesService.getPreviewPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
+        this.previewPreferences = preferences.getPreviewPreferences();
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
 
-        PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, preferencesService, themeManager, taskExecutor, searchQueryProperty);
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        previewView = new PreviewViewer(database, dialogService, preferences, themeManager, taskExecutor, searchQueryProperty);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(event -> {

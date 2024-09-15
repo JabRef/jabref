@@ -7,22 +7,21 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class LuceneManager {
         if (newValue) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
@@ -78,7 +77,7 @@ public class LuceneManager {
     private void updateOnStart() {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
@@ -90,7 +89,7 @@ public class LuceneManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
@@ -101,7 +100,7 @@ public class LuceneManager {
     public void addToIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
@@ -111,7 +110,7 @@ public class LuceneManager {
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.addToIndex(entries, this);
                     return null;
                 }
@@ -122,7 +121,7 @@ public class LuceneManager {
     public void removeFromIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
@@ -132,7 +131,7 @@ public class LuceneManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.removeFromIndex(entries, this);
                     return null;
                 }
@@ -143,7 +142,7 @@ public class LuceneManager {
     public void updateEntry(BibEntry entry, String oldValue, String newValue, boolean isLinkedFile) {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
                 return null;
             }
@@ -153,7 +152,7 @@ public class LuceneManager {
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.updateEntry(entry, oldValue, newValue, this);
                     return null;
                 }
@@ -164,7 +163,7 @@ public class LuceneManager {
     public void updateAfterDropFiles(BibEntry entry) {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.updateEntry(entry, "", "", this);
                 return null;
             }
@@ -174,7 +173,7 @@ public class LuceneManager {
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.addToIndex(List.of(entry), this);
                     return null;
                 }
@@ -185,7 +184,7 @@ public class LuceneManager {
     public void rebuildIndex() {
         new BackgroundTask<>() {
             @Override
-            protected Object call() {
+            public Object call() {
                 bibFieldsIndexer.rebuildIndex(this);
                 return null;
             }
@@ -195,7 +194,7 @@ public class LuceneManager {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
-                protected Object call() {
+                public Object call() {
                     linkedFilesIndexer.rebuildIndex(this);
                     return null;
                 }

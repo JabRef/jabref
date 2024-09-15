@@ -15,13 +15,13 @@ import java.util.function.BiFunction;
 import javafx.concurrent.Task;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private static final String LOGFILE_PREFIX = "copyFileslog_";
     private static final String LOGFILE_EXT = ".log";
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final Path exportPath;
     private final String localizedSuccessMessage = Localization.lang("Copied file successfully");
     private final String localizedErrorMessage = Localization.lang("Could not copy file") + ": " + Localization.lang("File exists");
@@ -45,9 +45,9 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
 
-    public CopyFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path, PreferencesService preferencesService) {
+    public CopyFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path, CliPreferences preferences) {
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entries = entries;
         this.exportPath = path;
         totalFilesCount = entries.stream().mapToLong(entry -> entry.getFiles().size()).sum();
@@ -79,7 +79,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
                     LinkedFile fileName = files.get(j);
 
-                    Optional<Path> fileToExport = fileName.findIn(databaseContext, preferencesService.getFilePreferences());
+                    Optional<Path> fileToExport = fileName.findIn(databaseContext, preferences.getFilePreferences());
 
                     newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 

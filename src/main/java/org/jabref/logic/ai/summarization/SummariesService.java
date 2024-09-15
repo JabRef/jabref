@@ -7,14 +7,14 @@ import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.ai.util.CitationKeyCheck;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.slf4j.Logger;

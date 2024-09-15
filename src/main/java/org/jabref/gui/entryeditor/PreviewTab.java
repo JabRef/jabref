@@ -2,22 +2,22 @@ package org.jabref.gui.entryeditor;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
@@ -26,7 +26,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
 
     public PreviewTab(BibDatabaseContext databaseContext,
                       DialogService dialogService,
-                      PreferencesService preferences,
+                      GuiPreferences preferences,
                       ThemeManager themeManager,
                       TaskExecutor taskExecutor,
                       LuceneManager luceneManager,

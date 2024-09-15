@@ -5,10 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
@@ -60,18 +60,17 @@ public class FileNameUniqueness {
      *
      * @param directory The directory which saves the files (.pdf, for example)
      * @param fileName Suggest name for the newly downloaded file
-     * @param dialogService To display the error and success message
+     * @param messageOnDeletion To display the error and success message
      * @return true when the content of the newly downloaded file is same as the file with "similar" name,
      *         false when there is no "similar" file name or the content is different from that of files with "similar" name
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
-    public static boolean isDuplicatedFile(Path directory, Path fileName, DialogService dialogService) throws IOException {
+    public static boolean isDuplicatedFile(Path directory, Path fileName, Consumer<String> messageOnDeletion) throws IOException {
         Objects.requireNonNull(directory);
         Objects.requireNonNull(fileName);
-        Objects.requireNonNull(dialogService);
 
         String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
-        extensionSuffix = "".equals(extensionSuffix) ? extensionSuffix : "." + extensionSuffix;
+        extensionSuffix = extensionSuffix.isEmpty() ? extensionSuffix : "." + extensionSuffix;
         String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;
 
         String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));
@@ -89,7 +88,7 @@ public class FileNameUniqueness {
             if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
                 try {
                     Files.delete(duplicateFile);
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
+                    messageOnDeletion.accept(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
                 } catch (IOException e) {
                     LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }

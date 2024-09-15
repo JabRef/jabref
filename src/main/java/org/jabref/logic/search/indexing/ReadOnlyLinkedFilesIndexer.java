@@ -3,11 +3,11 @@ package org.jabref.logic.search.indexing;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.LuceneIndexer;
 
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;

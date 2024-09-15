@@ -10,8 +10,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
 
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty layoutFile = new SimpleStringProperty("");
@@ -36,7 +36,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
                                                DialogService dialogService,
-                                               PreferencesService preferences) {
+                                               CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
 

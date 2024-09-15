@@ -3,7 +3,7 @@ package org.jabref.logic.ai.chatting.model;
 import java.net.http.HttpClient;
 import java.util.List;
 
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;

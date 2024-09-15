@@ -7,11 +7,12 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
@@ -31,10 +33,12 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
 
     public RedownloadMissingFilesAction(StateManager stateManager,
                                         DialogService dialogService,
+                                        ExternalApplicationsPreferences externalApplicationsPreferences,
                                         FilePreferences filePreferences,
                                         TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
 
@@ -72,8 +76,17 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
                 }
                 String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-                DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(this.databaseContext, entry,
-                        linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor, fileName, true);
+                DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(
+                        this.databaseContext,
+                        entry,
+                        linkedFile,
+                        linkedFile.getSourceUrl(),
+                        dialogService,
+                        externalApplicationsPreferences,
+                        filePreferences,
+                        taskExecutor,
+                        fileName,
+                        true);
                 downloadAction.execute();
             });
         });

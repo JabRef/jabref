@@ -18,12 +18,12 @@ import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -42,7 +42,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
@@ -58,11 +58,11 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         switch (field) {
             case DOI ->
-                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
+                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case ISBN ->
-                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
+                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
-                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
+                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
             // TODO: Add support for PMID
             case null, default -> {
                 assert field != null;
@@ -82,12 +82,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(DOI)) {
-            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService), preferencesService.getKeyBindingRepository());
+            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService), preferences.getKeyBindingRepository());
         } else {
-            textArea.initContextMenu(new DefaultMenu(textArea), preferencesService.getKeyBindingRepository());
+            textArea.initContextMenu(new DefaultMenu(textArea), preferences.getKeyBindingRepository());
         }
 
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {

@@ -24,7 +24,7 @@ public class ExportTab extends AbstractPreferenceTabView<ExportTabViewModel> imp
     }
 
     public void initialize() {
-        this.viewModel = new ExportTabViewModel(preferencesService.getExportPreferences());
+        this.viewModel = new ExportTabViewModel(preferences.getExportPreferences());
 
         exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());

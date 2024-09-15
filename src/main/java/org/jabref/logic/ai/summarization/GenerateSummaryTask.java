@@ -10,14 +10,14 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileToDocument;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
@@ -105,7 +105,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
     }
 
     @Override
-    protected String call() throws Exception {
+    public String call() throws Exception {
         LOGGER.debug("Starting summarization task for entry {}", citationKey);
 
         String result = null;

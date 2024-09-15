@@ -13,16 +13,16 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.push.CitationCommandString;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,20 +34,20 @@ public class CopyMoreAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public CopyMoreAction(StandardActions action,
                           DialogService dialogService,
                           StateManager stateManager,
                           ClipBoardManager clipBoardManager,
-                          PreferencesService preferencesService,
+                          GuiPreferences preferences,
                           JournalAbbreviationRepository abbreviationRepository) {
         this.action = action;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -169,13 +169,13 @@ public class CopyMoreAction extends SimpleCommand {
 
     private void copyCiteKey() {
         doCopyKey(keys -> {
-            CitationCommandString citeCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+            CitationCommandString citeCommand = preferences.getExternalApplicationsPreferences().getCiteCommand();
             return citeCommand.prefix() + String.join(citeCommand.delimiter(), keys) + citeCommand.suffix();
         });
     }
 
     private void copyKey() {
-        doCopyKey(keys -> String.join(preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter(), keys));
+        doCopyKey(keys -> String.join(preferences.getExternalApplicationsPreferences().getCiteCommand().delimiter(), keys));
     }
 
     private void copyKeyAndTitle() {
@@ -185,7 +185,7 @@ public class CopyMoreAction extends SimpleCommand {
         StringReader layoutString = new StringReader("\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
         Layout layout;
         try {
-            layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(), abbreviationRepository).getLayoutFromText();
+            layout = new LayoutHelper(layoutString, preferences.getLayoutFormatterPreferences(), abbreviationRepository).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Could not get layout.", e);
             return;

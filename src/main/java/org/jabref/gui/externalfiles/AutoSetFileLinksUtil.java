@@ -11,6 +11,8 @@ import java.util.function.BiConsumer;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -18,7 +20,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,15 +51,20 @@ public class AutoSetFileLinksUtil {
 
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
 
-    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
-        this(databaseContext.getFileDirectories(filePreferences), filePreferences, autoLinkPreferences);
+    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext,
+                                ExternalApplicationsPreferences externalApplicationsPreferences,
+                                FilePreferences filePreferences,
+                                AutoLinkPreferences autoLinkPreferences) {
+        this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, filePreferences, autoLinkPreferences);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
+    private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
     }
 
@@ -88,7 +94,7 @@ public class AutoSetFileLinksUtil {
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();
+        List<String> extensions = externalApplicationsPreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();
 
         LOGGER.debug("Searching for extensions {} in directories {}", extensions, directories);
 
@@ -111,7 +117,7 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
+                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";

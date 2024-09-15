@@ -18,7 +18,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
 /**
  * Handles keyboard shortcuts. Including checking whether a keybinding matches.

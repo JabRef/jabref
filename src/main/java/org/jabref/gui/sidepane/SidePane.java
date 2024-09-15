@@ -15,16 +15,16 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiService;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 public class SidePane extends VBox {
     private final SidePaneViewModel viewModel;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
 
     // These bindings need to be stored, otherwise they are garbage collected
@@ -32,8 +32,8 @@ public class SidePane extends VBox {
     private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(LibraryTabContainer tabContainer,
-                    PreferencesService preferencesService,
-                    AiService aiService,
+                    GuiPreferences preferences,
+                    ChatHistoryService chatHistoryService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
@@ -43,11 +43,11 @@ public class SidePane extends VBox {
                     ClipBoardManager clipBoardManager,
                     UndoManager undoManager) {
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.viewModel = new SidePaneViewModel(
                 tabContainer,
-                preferencesService,
-                aiService,
+                preferences,
+                chatHistoryService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
@@ -78,7 +78,7 @@ public class SidePane extends VBox {
     }
 
     public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
-        return new TogglePaneAction(stateManager, sidePane, preferencesService.getSidePanePreferences());
+        return new TogglePaneAction(stateManager, sidePane, preferences.getSidePanePreferences());
     }
 
     public SidePaneComponent getSidePaneComponent(SidePaneType type) {

@@ -115,7 +115,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> {
@@ -124,7 +124,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferencesService.getPreviewPreferences(), taskExecutor, stateManager);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferences.getPreviewPreferences(), taskExecutor, stateManager);
         lastKeyPressTime = System.currentTimeMillis();
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
@@ -177,7 +177,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, themeManager, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferences, themeManager, taskExecutor);
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()

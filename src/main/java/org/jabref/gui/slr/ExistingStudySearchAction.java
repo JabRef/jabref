@@ -10,16 +10,16 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     protected final DialogService dialogService;
 
     protected Path studyDirectory;
-    protected final PreferencesService preferencesService;
+    protected final CliPreferences preferences;
     protected final StateManager stateManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -49,14 +49,14 @@ public class ExistingStudySearchAction extends SimpleCommand {
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
-            PreferencesService preferencesService,
+            CliPreferences preferences,
             StateManager stateManager) {
         this(tabContainer,
                 openDatabaseActionSupplier,
                 dialogService,
                 fileUpdateMonitor,
                 taskExecutor,
-                preferencesService,
+                preferences,
                 stateManager,
                 false);
     }
@@ -67,7 +67,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
-            PreferencesService preferencesService,
+            CliPreferences preferences,
             StateManager stateManager,
             boolean isNew) {
         this.tabContainer = tabContainer;
@@ -75,7 +75,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
 
         if (!isNew) {
@@ -113,7 +113,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             crawler = new Crawler(
                     this.studyDirectory,
                     new SlrGitHandler(this.studyDirectory),
-                    preferencesService,
+                    preferences,
                     new BibEntryTypesManager(),
                     fileUpdateMonitor);
         } catch (IOException | ParseException e) {

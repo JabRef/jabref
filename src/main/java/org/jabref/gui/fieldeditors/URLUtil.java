@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 public class URLUtil {
     private static final String URL_EXP = "^(https?|ftp)://.+";
@@ -91,7 +91,7 @@ public class URLUtil {
      * @param link The link
      * @return The suffix, excluding the dot (e.g. "pdf")
      */
-    public static Optional<String> getSuffix(final String link, FilePreferences filePreferences) {
+    public static Optional<String> getSuffix(final String link, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
@@ -111,7 +111,7 @@ public class URLUtil {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, filePreferences)) {
+        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, externalApplicationsPreferences)) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');

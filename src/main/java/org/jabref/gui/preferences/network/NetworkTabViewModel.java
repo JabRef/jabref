@@ -21,17 +21,17 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.InternalPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -58,7 +58,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
 
 
     private final ProxyPreferences proxyPreferences;
@@ -70,7 +70,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService,
-                               PreferencesService preferences) {
+                               CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.proxyPreferences = preferences.getProxyPreferences();

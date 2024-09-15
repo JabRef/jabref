@@ -18,7 +18,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -39,7 +38,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ToggleButton memoryStickMode;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private ThemeManager themeManager;
 
     private PreferencesDialogViewModel viewModel;
@@ -71,13 +70,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferences);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
         // The list view does not respect the listener for the dialog and needs its own
         preferenceTabList.setOnKeyReleased(key -> {
-            if (preferencesService.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
+            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
                 this.closeDialog();
             }
         });

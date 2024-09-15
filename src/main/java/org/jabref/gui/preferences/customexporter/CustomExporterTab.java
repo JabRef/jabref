@@ -33,7 +33,7 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
 
     @FXML
     private void initialize() {
-        viewModel = new CustomExporterTabViewModel(preferencesService, dialogService);
+        viewModel = new CustomExporterTabViewModel(preferences, dialogService);
 
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());

@@ -20,13 +20,13 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
+import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.EmbeddingModel;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.ai.AiPreferences;
-import org.jabref.preferences.ai.AiProvider;
-import org.jabref.preferences.ai.EmbeddingModel;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -100,10 +100,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(PreferencesService preferencesService) {
+    public AiTabViewModel(CliPreferences preferences) {
         this.oldLocale = Locale.getDefault();
 
-        this.aiPreferences = preferencesService.getAiPreferences();
+        this.aiPreferences = preferences.getAiPreferences();
 
         this.enableAi.addListener((observable, oldValue, newValue) -> {
             disableBasicSettings.set(!newValue);

@@ -13,10 +13,10 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.preferences.PreferencesService;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -40,13 +40,13 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
-    public AboutDialogViewModel(DialogService dialogService, PreferencesService preferencesService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public AboutDialogViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         String[] version = buildInfo.version.getFullVersion().split("--");
         heading.set("JabRef " + version[0]);
@@ -152,7 +152,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);

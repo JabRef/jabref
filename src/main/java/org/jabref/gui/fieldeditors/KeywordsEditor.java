@@ -24,10 +24,10 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
@@ -40,7 +40,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
 
     @FXML private TagsField<Keyword> keywordTagsField;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
@@ -59,7 +59,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                preferencesService,
+                preferences,
                 undoManager);
 
         keywordTagsField.setCellFactory(new ViewModelListCellFactory<Keyword>().withText(Keyword::get));

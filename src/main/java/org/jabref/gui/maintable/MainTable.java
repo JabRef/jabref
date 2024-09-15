@@ -38,19 +38,19 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -82,7 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
                      BibDatabaseContext database,
-                     PreferencesService preferencesService,
+                     GuiPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
@@ -98,10 +98,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.model = model;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
 
-        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
+        MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -110,8 +110,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
                 database,
-                preferencesService,
-                preferencesService.getMainTableColumnPreferences(),
+                preferences,
+                preferences.getMainTableColumnPreferences(),
                 undoManager,
                 dialogService,
                 stateManager,
@@ -131,7 +131,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab,
                         dialogService,
                         stateManager,
-                        preferencesService,
+                        preferences,
                         undoManager,
                         clipBoardManager,
                         taskExecutor,

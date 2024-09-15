@@ -25,8 +25,8 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
@@ -35,11 +35,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -58,7 +59,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrameViewModel(PreferencesService preferencesService,
+    public JabRefFrameViewModel(GuiPreferences preferences,
                                 AiService aiService,
                                 StateManager stateManager,
                                 DialogService dialogService,
@@ -68,7 +69,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 UndoManager undoManager,
                                 ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
-        this.preferences = preferencesService;
+        this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
@@ -85,10 +86,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                preferences.getGuiPreferences().getLastFilesOpened().clear();
+                preferences.getLastFilesOpenedPreferences().getLastFilesOpened().clear();
             } else {
-                preferences.getGuiPreferences().setLastFilesOpened(filenames);
-                preferences.getGuiPreferences().setLastFocusedFile(focusedDatabase);
+                preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
+                preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
     }
@@ -193,7 +194,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         Path focusedFile = parserResults.stream()
                                         .findFirst()
                                         .flatMap(ParserResult::getPath)
-                                        .orElse(preferences.getGuiPreferences()
+                                        .orElse(preferences.getLastFilesOpenedPreferences()
                                                            .getLastFocusedFile())
                                         .toAbsolutePath();
 
@@ -407,7 +408,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     void autoSetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
-            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, taskExecutor).execute();
+            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor).execute();
         }
     }
 }

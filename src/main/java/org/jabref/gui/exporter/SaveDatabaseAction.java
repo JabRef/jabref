@@ -24,7 +24,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -36,13 +36,13 @@ import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class SaveDatabaseAction {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
 
     public enum SaveDatabaseMode {
@@ -68,7 +68,7 @@ public class SaveDatabaseAction {
 
     public SaveDatabaseAction(LibraryTab libraryTab,
                               DialogService dialogService,
-                              PreferencesService preferences,
+                              GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
@@ -120,7 +120,7 @@ public class SaveDatabaseAction {
         askForSavePath().ifPresent(path -> {
             try {
                 saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
-                preferences.getGuiPreferences().getFileHistory().newFile(path);
+                preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
@@ -165,7 +165,7 @@ public class SaveDatabaseAction {
             libraryTab.installAutosaveManagerAndBackupManager();
             libraryTab.createLuceneManager();
 
-            preferences.getGuiPreferences().getFileHistory().newFile(file);
+            preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }
         return saveResult;
     }

@@ -34,21 +34,22 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.UnlinkedFilesDialogPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -79,7 +80,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private TitledPane filePane;
     @FXML private TitledPane resultPane;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private UndoManager undoManager;
@@ -118,7 +119,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 dialogService,
                 undoManager,
                 fileUpdateMonitor,
-                preferencesService,
+                preferences,
                 stateManager,
                 taskExecutor);
 
@@ -175,7 +176,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
 
-        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
+        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(Path::toString).orElse(""));
         loadSavedConfiguration();
     }
 
@@ -232,22 +233,22 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     private void loadSavedConfiguration() {
-        UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferencesService.getUnlinkedFilesDialogPreferences();
+        UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferences.getUnlinkedFilesDialogPreferences();
 
         FileExtensionViewModel selectedExtension = fileTypeCombo.getItems()
                                                                 .stream()
                                                                 .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
                                                                 .findFirst()
-                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferencesService.getFilePreferences()));
+                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()));
         fileTypeCombo.getSelectionModel().select(selectedExtension);
         fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());
         fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());
     }
 
     public void saveConfiguration() {
-        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
-        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
-        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
     }
 
     @FXML

@@ -12,13 +12,13 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class BackupManagerDiscardedTest {
     private BackupManager backupManager;
     private Path testBib;
     private SelfContainedSaveConfiguration saveConfiguration;
-    private PreferencesService preferencesService;
+    private CliPreferences preferences;
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
 
@@ -54,11 +54,11 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         saveDatabase();
 
-        backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferencesService);
+        backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferences);
 
         makeBackup();
     }
@@ -69,8 +69,8 @@ class BackupManagerDiscardedTest {
             new BibtexDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    preferencesService.getFieldPreferences(),
-                    preferencesService.getCitationKeyPatternPreferences(),
+                    preferences.getFieldPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         }

@@ -4,9 +4,9 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.DynamicallyChangeableNode;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 /**
  * A class that guards a component, before AI privacy policy is accepted.
@@ -14,12 +14,12 @@ import org.jabref.preferences.ai.AiPreferences;
  */
 public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangeableNode {
     private final AiPreferences aiPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final DialogService dialogService;
 
-    public AiPrivacyNoticeGuardedComponent(AiPreferences aiPreferences, FilePreferences filePreferences, DialogService dialogService) {
+    public AiPrivacyNoticeGuardedComponent(AiPreferences aiPreferences, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-        this.filePreferences = filePreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.dialogService = dialogService;
 
         aiPreferences.enableAiProperty().addListener(observable -> rebuildUi());
@@ -33,7 +33,7 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
                     new PrivacyNoticeComponent(
                             aiPreferences,
                             this::rebuildUi,
-                            filePreferences,
+                            externalApplicationsPreferences,
                             dialogService
                     )
             );

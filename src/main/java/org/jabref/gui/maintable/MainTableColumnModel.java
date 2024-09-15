@@ -17,9 +17,9 @@ import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -87,7 +87,7 @@ public class MainTableColumnModel {
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
 
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
     /**
@@ -103,7 +103,7 @@ public class MainTableColumnModel {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
-        this.preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
+        this.preferences = Injector.instantiateModelOrService(CliPreferences.class);
         this.undoManager = Injector.instantiateModelOrService(UndoManager.class);
 
         if (Type.ICON_COLUMNS.contains(type)) {
@@ -159,7 +159,7 @@ public class MainTableColumnModel {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
             // "author/editor(Custom)" instead of "author/editor" in the output
 
-            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferencesService, undoManager);
+            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferences, undoManager);
         }
     }
 
