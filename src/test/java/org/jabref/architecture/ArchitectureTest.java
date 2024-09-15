@@ -14,10 +14,10 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
 public class ArchitectureTest {
 
-    private static final String CLASS_ORG_JABREF_LOGIC_PREFERENCES = "org.jabref.logic.preferences.CliPreferences";
+    private static final String CLASS_ORG_JABREF_GUI_PREFERENCES = "org.jabref.logic.preferences.GuiPreferences";
 
     @ArchTest
-    public void testsAreIndependent(JavaClasses classes) {
+    public void testsAreIndependentOfGuiPreferences(JavaClasses classes) {
         noClasses().that().doNotHaveSimpleName("EntryEditorTest")
                    .and().doNotHaveSimpleName("LinkedFileViewModelTest")
                    .and().doNotHaveSimpleName("JabRefPreferencesTest")
@@ -27,7 +27,7 @@ public class ArchitectureTest {
                    .and().doNotHaveSimpleName("DatabaseSearcherWithBibFilesTest")
                    .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                    .and().doNotHaveFullyQualifiedName("org.jabref.testutils.interactive.styletester.StyleTesterMain")
-                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_LOGIC_PREFERENCES)
+                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GUI_PREFERENCES)
                    .check(classes);
     }
 
