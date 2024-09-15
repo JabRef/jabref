@@ -11,6 +11,7 @@ import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -88,11 +89,10 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-//        return preferences.getGuiPreferences().getLastFilesOpened()
-//                          .stream()
-//                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-//                          .findAny()
-//                          .orElseThrow(NotFoundException::new);
-        throw new NotFoundException();
+        return preferences.getLastFilesOpenedPreferences().getLastFilesOpened()
+                          .stream()
+                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                          .findAny()
+                          .orElseThrow(NotFoundException::new);
     }
 }

@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 
 import com.google.gson.Gson;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
-    private static CoreGuiPreferences coreGuiPreferences;
+    private static LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -64,7 +64,7 @@ abstract class ServerTest extends JerseyTest {
     }
 
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        when(coreGuiPreferences.getLastFilesOpened()).thenReturn(
+        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(
                 FXCollections.observableArrayList(
                         files.stream()
                              .map(file -> file.path)
@@ -90,11 +90,9 @@ abstract class ServerTest extends JerseyTest {
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
-/*
-        coreGuiPreferences = mock(CoreGuiPreferences.class);
-        when(preferences.getGuiPreferences()).thenReturn(coreGuiPreferences);
+        lastFilesOpenedPreferences = mock(LastFilesOpenedPreferences.class);
+        when(preferences.getLastFilesOpenedPreferences()).thenReturn(lastFilesOpenedPreferences);
 
-        when(coreGuiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
-*/
+        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 }
