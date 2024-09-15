@@ -142,8 +142,9 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
-    // region: AI
+    // region AI
     requires ai.djl.api;
+    uses ai.djl.repository.zoo.ZooProvider;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;
