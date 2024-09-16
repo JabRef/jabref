@@ -116,7 +116,7 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
 ```BASH
-$ cd src/main/resources/csl-styles
+cd src/main/resources/csl-styles
 ```
 
 3. Find the latest submodule commit id from remote (github):
