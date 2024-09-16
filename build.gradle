@@ -270,9 +270,9 @@ dependencies {
     implementation 'org.tinylog:tinylog-impl:2.7.0'
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.13'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.16'
     // route all requests to log4j to SLF4J
-    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.0'
 
     implementation('de.undercouch:citeproc-java:3.1.0') {
         exclude group: 'org.antlr'
@@ -337,7 +337,7 @@ dependencies {
     implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.34.0')
     implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0')
     implementation 'ai.djl:api:0.29.0'
-    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.30.0'
     implementation 'ai.djl.huggingface:tokenizers:0.29.0'
     implementation 'io.github.stefanbratanov:jvm-openai:0.11.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
@@ -370,7 +370,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.18.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.19.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
