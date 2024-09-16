@@ -442,14 +442,14 @@ public class OpenOfficePanel {
             Throwable ex = connectTask.getException();
             LOGGER.error("autodetect failed", ex);
             switch (ex) {
-                case UnsatisfiedLinkError ignored -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                case UnsatisfiedLinkError unsatisfiedLinkError -> {
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", unsatisfiedLinkError);
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
                 }
                 case IOException ioException -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ioException);
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
                             Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
