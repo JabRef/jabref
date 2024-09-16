@@ -21,6 +21,7 @@ public class RedoAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
+        // TODO: The old listener should be removed. Otherwise, memory consumption will increase.
         stateManager.activeTabProperty().addListener((observable, oldValue, activeLibraryTab) -> {
             activeLibraryTab.ifPresent(libraryTab ->
                     this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
