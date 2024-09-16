@@ -126,7 +126,7 @@ Here, in the case of `csl-styles`, it is `4e0902d`.
 4. Checkout the commit:
 
 ```BASH
-$ git checkout 4e0902d
+git checkout 4e0902d
 ```
 
 Now, the IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
