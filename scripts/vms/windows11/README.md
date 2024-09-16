@@ -1,4 +1,4 @@
-# Windows VM
+# Windows 11 VM
 
 A Windows-based VM to test JabRef.
 As user, you need to ensure to have the proper Windows license to use this VM.

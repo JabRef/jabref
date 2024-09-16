@@ -55,7 +55,8 @@ Then, everything is removed.
 | [`fedora`](fedora/)                             | source  | --      | --          | --        |
 | [`Linux Mint (Cinnamon)`](linux-mint-cinnamon/) | source  | Firefox | yes         | --        |
 | [`ubuntu`](ubuntu/)                             | snap    | Firefox | yes         | --        |
-| [`windows`](windows/)                           | source  | Edge    | --          | --        |
+| [`windows 10`](windows10/)                      | source  | Edge    | --          | --        |
+| [`windows 11`](windows11/)                      | source  | Edge    | --          | --        |
 
 ## Troubleshooting
 

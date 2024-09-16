@@ -13,6 +13,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
 /**
  * This action checks whether the syntax for SearchGroups is the new one.
  * If not we ask the user whether to migrate.
@@ -54,18 +56,26 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
             return;
         }
 
-        parserResult.getMetaData().getGroups().ifPresent(this::migrateGroups);
+        parserResult.getMetaData().getGroups().ifPresent(groupTreeNode -> migrateGroups(groupTreeNode, dialogService));
         parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA);
         parserResult.setChangedOnMigration(true);
     }
 
-    private void migrateGroups(GroupTreeNode node) {
+    private void migrateGroups(GroupTreeNode node, DialogService dialogService) {
         if (node.getGroup() instanceof SearchGroup searchGroup) {
-            String luceneSearchExpression = SearchToLuceneMigration.migrateToLuceneSyntax(searchGroup.getSearchExpression(), searchGroup.getSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
-            searchGroup.setSearchExpression(luceneSearchExpression);
+            try {
+                String luceneSearchExpression = SearchToLuceneMigration.migrateToLuceneSyntax(searchGroup.getSearchExpression(), searchGroup.getSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
+                searchGroup.setSearchExpression(luceneSearchExpression);
+            } catch (ParseCancellationException e) {
+                Optional<String> luceneSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
+                        Localization.lang("Search group migration failed"),
+                        Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.", searchGroup.getName()),
+                        searchGroup.getSearchExpression());
+                luceneSearchExpression.ifPresent(searchGroup::setSearchExpression);
+            }
         }
         for (GroupTreeNode child : node.getChildren()) {
-            migrateGroups(child);
+            migrateGroups(child, dialogService);
         }
     }
 }

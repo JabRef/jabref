@@ -1,11 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-NAME = "jabref-windows-sandbox"
+NAME = "jabref-windows-11-sandbox"
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "gusztavvargadr/windows-10"
-  config.vm.box_url = "https://app.vagrantup.com/gusztavvargadr/boxes/windows-10"
+  # config.vm.box = "Caden/windows-11-pro-jp-22h2-22621.1992"
+  config.vm.box = "stromweld/windows-11"
 
   config.vm.define NAME
   config.vm.hostname = NAME
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", privileged: "false", inline: <<-SHELL
     cd \\users\\vagrant
-    git clone --recurse-submodules https://github.com/JabRef/jabref.git
+    git clone --depth=1 --recurse-submodules https://github.com/JabRef/jabref.git
     # cd jabref
     # .\\gradlew jar
   SHELL

@@ -20,8 +20,7 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);
 
-    private static final int MAX_TAG_LENGTH = 100;
-
+    private static final Pattern REMOVE_TAGS_PATTERN = Pattern.compile("<[^>]{1,100}>");
     private static final Pattern ESCAPED_PATTERN = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN2 = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN3 = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
@@ -35,29 +34,12 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
             return result;
         }
 
-        StringBuilder sb = new StringBuilder();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
         result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
-
-        // TODO: maybe rewrite this based on regular expressions instead
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
         // remove tags for its image alt-tag to equation converter
-        for (int i = 0; i < result.length(); i++) {
-            int c = result.charAt(i);
-
-            if (c == '<') {
-                int oldI = i;
-                i = readTag(result, i);
-                if (oldI == i) {
-                    // just a single <, which needs to be kept
-                    sb.append('<');
-                }
-            } else {
-                sb.append((char) c);
-            }
-        }
-        result = sb.toString();
+        result = REMOVE_TAGS_PATTERN.matcher(result).replaceAll("");
 
         // Handle text based HTML entities
         Set<String> patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
@@ -120,16 +102,6 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
     @Override
     public String getExampleInput() {
         return "<strong>JabRef</strong>";
-    }
-
-    private int readTag(String text, int position) {
-        // Have just read the < character that starts the tag.
-        int index = text.indexOf('>', position);
-        if ((index > position) && ((index - position) < MAX_TAG_LENGTH)) {
-            return index; // Just skip the tag.
-        } else {
-            return position; // Don't do anything.
-        }
     }
 
     @Override
