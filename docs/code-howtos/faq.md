@@ -93,18 +93,20 @@ JabRef needs external submodules (such as CSL style files) for some of its respe
 What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes should ideally not be noticed on staging, as per the `.gitmodules` configuration. However, that is somehow overruled when using IntelliJ's CLI.
   
 ### Fix
+
 For `csl-styles`:
 
 ```
-$ git merge origin/main
-$ git checkout main -- src/main/resources/csl-styles
-$ ... git commit ... 
-$ git push
+git merge origin/main
+git checkout main -- src/main/resources/csl-styles
+... git commit ... 
+git push
 ```
 
 And similarly for `csl-locales` or `abbrv.jabref.org`.
 
-#### Alternative method (if the above doesn't work):
+#### Alternative method (if the above doesn't work)
+
 1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
 
 ```
