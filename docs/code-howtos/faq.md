@@ -109,7 +109,7 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
 
-```JAVA
+```gitignore
 # ignore = all
 ```
 
@@ -130,9 +130,7 @@ git checkout 4e0902d
 ```
 
 Now, the IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
-
 5. Use IntelliJ's git manager (commit tab) or `git gui` to commit submodule changes only. Repeat steps 2-5 for other submodules that are shown as modified in the PR. Then, push these changes.
-
 6. Revert the changes in `.gitmodules` (that you made in step 1).
 
 ### Prevention
