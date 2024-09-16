@@ -78,7 +78,9 @@ Execute gradle task `clean` from the `build` group of the Gradle Tool Window in 
 
 ### `No test candidates found`
 
-You probably chose the wrong gradle task.
+You probably chose the wrong gradle task:
+
+![Gradle tests](../images/gradle-tests.png)<br>
 
 ## Submodules
 
