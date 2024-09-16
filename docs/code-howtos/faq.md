@@ -123,8 +123,10 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
     ```
 
 3. Find the latest submodule commit id from remote (github):
-![Submodule commits](../images/submodule-commit.png)
-Here, in the case of `csl-styles`, it is `4e0902d`.
+
+    ![Submodule commits](../images/submodule-commit.png)
+
+    Here, in the case of `csl-styles`, it is `4e0902d`.
 
 4. Checkout the commit:
 
