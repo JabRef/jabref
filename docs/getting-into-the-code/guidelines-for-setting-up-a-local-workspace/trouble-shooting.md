@@ -83,3 +83,9 @@ Another indication is following output
 ```text
 java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 ```
+
+## Attempts to open preferences panel freezes application
+
+This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program. 
+
+For reference, see issue [#11766](https://github.com/JabRef/jabref/issues/11766).
