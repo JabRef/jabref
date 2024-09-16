@@ -86,6 +86,6 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 ## Attempts to open preferences panel freezes application
 
-This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program. 
+This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program.
 
 For reference, see issue [#11766](https://github.com/JabRef/jabref/issues/11766).
