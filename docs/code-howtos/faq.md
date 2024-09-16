@@ -85,6 +85,7 @@ You probably chose the wrong gradle task.
 ### The problem
 
 Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org` or `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+
 ![Changed submodules](../images/submodules.png)
 
 ### Context
@@ -96,7 +97,7 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
 
 For `csl-styles`:
 
-```BASH
+```bash
 git merge origin/main
 git checkout main -- src/main/resources/csl-styles
 ... git commit ... 
@@ -109,15 +110,15 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
 
-```gitignore
-# ignore = all
-```
+    ```gitignore
+    # ignore = all
+    ```
 
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
-```BASH
-cd src/main/resources/csl-styles
-```
+    ```bash
+    cd src/main/resources/csl-styles
+    ```
 
 3. Find the latest submodule commit id from remote (github):
 ![Submodule commits](../images/submodule-commit.png)
@@ -125,13 +126,15 @@ Here, in the case of `csl-styles`, it is `4e0902d`.
 
 4. Checkout the commit:
 
-```BASH
-git checkout 4e0902d
-```
+    ```bash
+    git checkout 4e0902d
+    ```
 
-Now, the IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
-5. Use IntelliJ's git manager (commit tab) or `git gui` to commit submodule changes only. Repeat steps 2-5 for other submodules that are shown as modified in the PR. Then, push these changes.
-6. Revert the changes in `.gitmodules` (that you made in step 1).
+5. Now, IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
+
+6. Use IntelliJ's git manager (commit tab) or `git gui` to commit submodule changes only. Repeat steps 2-5 for other submodules that are shown as modified in the PR. Then, push these changes.
+
+7. Revert the changes in `.gitmodules` (that you made in step 1).
 
 ### Prevention
 
