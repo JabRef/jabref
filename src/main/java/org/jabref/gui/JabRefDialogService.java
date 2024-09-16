@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
@@ -227,14 +226,15 @@ public class JabRefDialogService implements DialogService {
         Optional<SimpleHttpResponse> httpResponse = fetcherException.getHttpResponse();
         if (httpResponse.isPresent()) {
             int statusCode = httpResponse.get().statusCode();
-            if (statusCode == 401) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\n\n" + localizedMessage);
-            } else if (statusCode == 403) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\n\n" + localizedMessage);
-            } else if (statusCode == 404) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\n\n" + localizedMessage);
-            } else {
-                this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
+            switch (statusCode) {
+                case 401 ->
+                    this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\n\n" + localizedMessage);
+                case 403 ->
+                    this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\n\n" + localizedMessage);
+                case 404 ->
+                    this.showInformationDialogAndWait(failedTitle, Localization.lang("The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\n\n" + localizedMessage);
+                default ->
+                    this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
             }
         } else if (fetcherException instanceof FetcherClientException) {
             this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
@@ -388,7 +388,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
+    public Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
         EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
         taskProgressView.setRetainTasks(false);
@@ -424,25 +424,23 @@ public class JabRefDialogService implements DialogService {
         //       The event log is not that user friendly (different purpose).
         LOGGER.info(message);
 
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            Notifications.create()
-                         .text(message)
-                         .position(Pos.BOTTOM_CENTER)
-                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                         .owner(mainWindow)
-                         .threshold(5,
-                                 Notifications.create()
-                                              .title(Localization.lang("Last notification"))
-                                              .text(
-                                                    "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                                     + "\n\n" + message)
-                                              .onAction(e -> {
-                                                     ErrorConsoleAction ec = new ErrorConsoleAction();
-                                                     ec.execute();
-                                                 }))
-                         .hideCloseButton()
-                         .show();
-        });
+        UiTaskExecutor.runInJavaFXThread(() -> Notifications.create()
+                                                        .text(message)
+                                                        .position(Pos.BOTTOM_CENTER)
+                                                        .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                                                        .owner(mainWindow)
+                                                        .threshold(5,
+                             Notifications.create()
+                                          .title(Localization.lang("Last notification"))
+                                          .text(
+                                                "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                 + "\n\n" + message)
+                                          .onAction(e -> {
+                                                 ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                 ec.execute();
+                                             }))
+                                                        .hideCloseButton()
+                                                        .show());
     }
 
     @Override
@@ -472,7 +470,7 @@ public class JabRefDialogService implements DialogService {
     public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         List<File> files = chooser.showOpenMultipleDialog(mainWindow);
-        return files != null ? files.stream().map(File::toPath).collect(Collectors.toList()) : Collections.emptyList();
+        return files != null ? files.stream().map(File::toPath).toList() : Collections.emptyList();
     }
 
     private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {
