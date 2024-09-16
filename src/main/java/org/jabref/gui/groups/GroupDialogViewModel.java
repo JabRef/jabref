@@ -26,6 +26,7 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -318,6 +319,17 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
                         searchFlagsProperty.getValue());
+
+                if (currentDatabase.getMetaData().getGroupSearchSyntaxVersion().isEmpty()) {
+                    // If the syntax version for search groups is not present, it indicates that the groups
+                    // have not been migrated to the new syntax, or this is the first search group in the library.
+                    // If this is the first search group, set the syntax version to the new version.
+                    // Otherwise, it means that the user did not accept the migration to the new version.
+                    Optional<GroupTreeNode> groups = currentDatabase.getMetaData().getGroups();
+                    if (groups.filter(this::groupOrSubgroupIsSearchGroup).isEmpty()) {
+                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA);
+                    }
+                }
 
                 Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
                 if (luceneManager.isPresent()) {
@@ -619,5 +631,17 @@ public class GroupDialogViewModel {
 
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
+    }
+
+    private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {
+        if (groupTreeNode.getGroup() instanceof SearchGroup) {
+            return true;
+        }
+        for (GroupTreeNode child : groupTreeNode.getChildren()) {
+            if (groupOrSubgroupIsSearchGroup(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
