@@ -96,7 +96,7 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
 
 For `csl-styles`:
 
-```
+```BASH
 git merge origin/main
 git checkout main -- src/main/resources/csl-styles
 ... git commit ... 
@@ -109,13 +109,13 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
 
-```
+```JAVA
 # ignore = all
 ```
 
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
-```
+```BASH
 $ cd src/main/resources/csl-styles
 ```
 
@@ -125,7 +125,7 @@ Here, in the case of `csl-styles`, it is `4e0902d`.
 
 4. Checkout the commit:
 
-```
+```BASH
 $ git checkout 4e0902d
 ```
 
