@@ -94,21 +94,25 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 For `csl-styles`:
+
 ```
 $ git merge origin/main
 $ git checkout main -- src/main/resources/csl-styles
 $ ... git commit ... 
 $ git push
 ```
+
 And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 #### Alternative method (if the above doesn't work):
 1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
+
 ```
 # ignore = all
 ```
 
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
+
 ```
 $ cd src/main/resources/csl-styles
 ```
@@ -118,9 +122,11 @@ $ cd src/main/resources/csl-styles
 Here, in the case of `csl-styles`, it is `4e0902d`.
 
 4. Checkout the commit:
+
 ```
 $ git checkout 4e0902d
 ```
+
 Now, the IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
 
 5. Use IntelliJ's git manager (commit tab) or `git gui` to commit submodule changes only. Repeat steps 2-5 for other submodules that are shown as modified in the PR. Then, push these changes.
