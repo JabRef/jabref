@@ -99,6 +99,12 @@ class PdfContentImporterTest {
 
     @Test
     void extractDOIFromPage1() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.DOI, "10.1017/S0007114507795296")
+                .withField(StandardField.AUTHOR, "Review Article")
+                .withField(StandardField.TITLE, "British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 q The Authors")
+                .withField(StandardField.YEAR, "2008");
+
         String firstPageContent = """
                 British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296
                 q The Authors 2008
@@ -121,12 +127,6 @@ class PdfContentImporterTest {
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press
                 """;
-
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
-        entry.setField(StandardField.DOI, "10.1017/S0007114507795296");
-        entry.setField(StandardField.AUTHOR, "Review Article");
-        entry.setField(StandardField.TITLE, "British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 q The Authors");
-        entry.setField(StandardField.YEAR, "2008");
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
     }
