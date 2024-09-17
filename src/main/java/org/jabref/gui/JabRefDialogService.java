@@ -224,7 +224,7 @@ public class JabRefDialogService implements DialogService {
         String localizedMessage = fetcherException.getLocalizedMessage();
         Optional<SimpleHttpResponse> httpResponse = fetcherException.getHttpResponse();
         if (httpResponse.isPresent()) {
-            this.showInformationDialogAndWait(failedTitle, Localization.lang(getContentByCode(httpResponse.get().statusCode())));
+            this.showInformationDialogAndWait(failedTitle, Localization.lang(getContentByCode(httpResponse.get().statusCode())) + "\n\n" + localizedMessage);
         } else if (fetcherException instanceof FetcherClientException) {
             this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
         } else if (fetcherException instanceof FetcherServerException) {
