@@ -48,7 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
 - We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 - We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
-- We improved the DOI detection in PDF imports []()
+- We improved the DOI detection in PDF imports [#11782](https://github.com/JabRef/jabref/pull/11782)
 
 ### Fixed
 
