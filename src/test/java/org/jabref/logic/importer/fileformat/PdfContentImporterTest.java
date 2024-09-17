@@ -55,20 +55,20 @@ class PdfContentImporterTest {
         entry.setField(StandardField.TITLE, "Corpus Linguistics – An International Handbook – Lüdeling, Anke, Kytö, Merja (Eds.)");
 
         String firstPageContents = "Corpus Linguistics – An International Handbook – Lüdeling, Anke,\n" +
-                                   "Kytö, Merja (Eds.)\n" +
-                                   "\n" +
-                                   "Anke Lüdeling, Merja Kytö (Eds.)\n" +
-                                   "\n" +
-                                   "VOLUME 2\n" +
-                                   "\n" +
-                                   "This handbook provides an up-to-date survey of the field of corpus linguistics, a Handbücher zur Sprach- und\n" +
-                                   "field whose methodology has revolutionized much of the empirical work done in Kommunikationswissenschaft / Handbooks\n" +
-                                   "\n" +
-                                   "of Linguistics and Communication Science\n" +
-                                   "most fields of linguistic study over the past decade. (HSK) 29/2\n" +
-                                   "\n" +
-                                   "vii, 578 pages\n" +
-                                   "Corpus linguistics investigates human language by starting out from large\n";
+                "Kytö, Merja (Eds.)\n" +
+                "\n" +
+                "Anke Lüdeling, Merja Kytö (Eds.)\n" +
+                "\n" +
+                "VOLUME 2\n" +
+                "\n" +
+                "This handbook provides an up-to-date survey of the field of corpus linguistics, a Handbücher zur Sprach- und\n" +
+                "field whose methodology has revolutionized much of the empirical work done in Kommunikationswissenschaft / Handbooks\n" +
+                "\n" +
+                "of Linguistics and Communication Science\n" +
+                "most fields of linguistic study over the past decade. (HSK) 29/2\n" +
+                "\n" +
+                "vii, 578 pages\n" +
+                "Corpus linguistics investigates human language by starting out from large\n";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
     }
@@ -80,17 +80,54 @@ class PdfContentImporterTest {
              .withField(StandardField.TITLE, "Kent Academic Repository Full text document (pdf) Citation for published version Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock Losses and Stakeholder Opinions. DOI")
              .withField(StandardField.YEAR, "5104");
 
-        String firstPageContents = "Kent Academic Repository Full text document (pdf)\n"
-                                   + "Citation for published version\n"
-                                   + "Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock\n"
-                                   + "Losses and Stakeholder Opinions.\n"
-                                   + "DOI\n\n\n"
-                                   + "Link to record in KAR\n"
-                                   + "http://kar.kent.ac.uk/51043/\n"
-                                   + "Document Version\n"
-                                   + "UNSPECIFIED\n"
-                                   + "Master of Research (MRes) thesis, University of Kent,.";
+        String firstPageContents = """
+                Kent Academic Repository Full text document (pdf)
+                Citation for published version
+                Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock
+                Losses and Stakeholder Opinions.
+                DOI
+
+
+                Link to record in KAR
+                http://kar.kent.ac.uk/51043/
+                Document Version
+                UNSPECIFIED
+                Master of Research (MRes) thesis, University of Kent,.""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
+    }
+
+    @Test
+    void extractDOIFromPage1() {
+        String firstPageContent = """
+                British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296
+                q The Authors 2008
+ 
+                Review Article
+ 
+                Cocoa and health: a decade of research
+ 
+                Karen A. Cooper1, Jennifer L. Donovan2, Andrew L. Waterhouse3 and Gary Williamson1*
+                1Nestlé Research Center, Vers-Chez-les-Blanc, PO Box 44, CH-1000 Lausanne 26, Switzerland
+                2Department of Psychiatry and Behavioural Sciences, Medical University of South Carolina, Charleston, SC 29425, USA
+                3Department of Viticulture & Enology, University of California, Davis, CA 95616, USA
+
+                (Received 5 December 2006 – Revised 29 May 2007 – Accepted 31 May 2007)
+ 
+                 Abbreviations: FMD, flow-mediated dilation; NO, nitirc oxide.
+ 
+                *Corresponding author: Dr Gary Williamson, fax þ41 21 785 8544, email gary.williamson@rdls.nestle.com
+ 
+                British Journal of Nutrition
+                https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press
+                """;
+
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
+        entry.setField(StandardField.DOI, "10.1017/S0007114507795296");
+        entry.setField(StandardField.AUTHOR, "Review Article");
+        entry.setField(StandardField.TITLE, "British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 q The Authors");
+        entry.setField(StandardField.YEAR, "2008");
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
     }
 }

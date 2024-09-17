@@ -22,6 +22,7 @@ import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
@@ -241,7 +242,7 @@ public class PdfContentImporter extends Importer {
         String keywords = null;
         String title;
         String conference = null;
-        String DOI = null;
+        String doi = null;
         String series = null;
         String volume = null;
         String number = null;
@@ -253,6 +254,7 @@ public class PdfContentImporter extends Importer {
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
             extractYear();
+            doi = getDoi(null);
             if (curString.contains("Conference")) {
                 fillCurStringWithNonEmptyLines();
                 conference = curString;
@@ -384,27 +386,7 @@ public class PdfContentImporter extends Importer {
                     }
                 }
             } else {
-                if (DOI == null) {
-                    pos = curString.indexOf("DOI");
-                    if (pos < 0) {
-                        pos = curString.indexOf(StandardField.DOI.getName());
-                    }
-                    if (pos >= 0) {
-                        pos += 3;
-                        if (curString.length() > pos) {
-                            char delimiter = curString.charAt(pos);
-                            if ((delimiter == ':') || (delimiter == ' ')) {
-                                pos++;
-                            }
-                            int nextSpace = curString.indexOf(' ', pos);
-                            if (nextSpace > 0) {
-                                DOI = curString.substring(pos, nextSpace);
-                            } else {
-                                DOI = curString.substring(pos);
-                            }
-                        }
-                    }
-                }
+                doi = getDoi(doi);
 
                 if ((publisher == null) && curString.contains("IEEE")) {
                     // IEEE has the conference things at the end
@@ -459,8 +441,8 @@ public class PdfContentImporter extends Importer {
         if (conference != null) {
             entry.setField(StandardField.BOOKTITLE, conference);
         }
-        if (DOI != null) {
-            entry.setField(StandardField.DOI, DOI);
+        if (doi != null) {
+            entry.setField(StandardField.DOI, doi);
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
@@ -481,6 +463,20 @@ public class PdfContentImporter extends Importer {
             entry.setField(StandardField.PUBLISHER, publisher);
         }
         return Optional.of(entry);
+    }
+
+    private String getDoi(String doi) {
+        int pos;
+        if (doi == null) {
+            pos = curString.indexOf("DOI");
+            if (pos < 0) {
+                pos = curString.indexOf(StandardField.DOI.getName());
+            }
+            if (pos >= 0) {
+                return DOI.findInText(curString).map(DOI::getDOI).orElse(null);
+            }
+        }
+        return doi;
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {
