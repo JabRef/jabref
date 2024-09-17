@@ -125,8 +125,7 @@ class PdfContentImporterTest {
                 *Corresponding author: Dr Gary Williamson, fax þ41 21 785 8544, email gary.williamson@rdls.nestle.com
                 
                 British Journal of Nutrition
-                https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press
-                """;
+                https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
     }
