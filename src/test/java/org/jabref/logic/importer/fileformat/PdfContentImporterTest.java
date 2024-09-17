@@ -86,8 +86,8 @@ class PdfContentImporterTest {
                 Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock
                 Losses and Stakeholder Opinions.
                 DOI
-
-
+                
+                
                 Link to record in KAR
                 http://kar.kent.ac.uk/51043/
                 Document Version
@@ -102,22 +102,22 @@ class PdfContentImporterTest {
         String firstPageContent = """
                 British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296
                 q The Authors 2008
- 
+                
                 Review Article
- 
+                
                 Cocoa and health: a decade of research
- 
+                
                 Karen A. Cooper1, Jennifer L. Donovan2, Andrew L. Waterhouse3 and Gary Williamson1*
                 1Nestlé Research Center, Vers-Chez-les-Blanc, PO Box 44, CH-1000 Lausanne 26, Switzerland
                 2Department of Psychiatry and Behavioural Sciences, Medical University of South Carolina, Charleston, SC 29425, USA
                 3Department of Viticulture & Enology, University of California, Davis, CA 95616, USA
-
+                
                 (Received 5 December 2006 – Revised 29 May 2007 – Accepted 31 May 2007)
- 
-                 Abbreviations: FMD, flow-mediated dilation; NO, nitirc oxide.
- 
+                
+                Abbreviations: FMD, flow-mediated dilation; NO, nitirc oxide.
+                
                 *Corresponding author: Dr Gary Williamson, fax þ41 21 785 8544, email gary.williamson@rdls.nestle.com
- 
+                
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press
                 """;
