@@ -4,16 +4,16 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 
 public class MVStoreSummariesStorage extends MVStoreBase implements SummariesStorage {
     private static final String SUMMARIES_MAP_PREFIX = "summaries";
 
-    public MVStoreSummariesStorage(Path path, DialogService dialogService) {
+    public MVStoreSummariesStorage(Path path, NotificationService dialogService) {
         super(path, dialogService);
     }
 

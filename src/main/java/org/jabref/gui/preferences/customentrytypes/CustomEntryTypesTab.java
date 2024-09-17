@@ -75,10 +75,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     public void initialize() {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                           .orElse(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
-        BibEntryTypesManager entryTypesRepository = preferencesService.getCustomEntryTypesRepository();
+                                           .orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
+        BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository();
 
-        this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferencesService);
+        this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferences);
 
         // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();

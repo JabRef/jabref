@@ -2,10 +2,10 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
 
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 class SciteTabViewModelTest {
 
     @Mock
-    private PreferencesService preferencesService;
+    private GuiPreferences preferences;
     @Mock
     private TaskExecutor taskExecutor;
 
@@ -30,7 +30,7 @@ class SciteTabViewModelTest {
         MockitoAnnotations.openMocks(this);
         EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
-        when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
     }
 
     @Test
@@ -57,7 +57,7 @@ class SciteTabViewModelTest {
 
     @Test
     void fetchTallies() throws FetcherException {
-        var viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
+        var viewModel = new SciteTabViewModel(preferences, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
         var actual = DOI.parse(viewModel.fetchTallies(doi).doi());
         assertEquals(Optional.of(doi), actual);

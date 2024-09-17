@@ -41,7 +41,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -392,7 +392,7 @@ public class JabRefDialogService implements DialogService {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
         EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
         taskProgressView.setRetainTasks(false);
-        taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+        taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
 
         Label message = new Label(content);
 

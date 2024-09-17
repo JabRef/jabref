@@ -3,7 +3,7 @@ package org.jabref.logic.ai.util;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jabref.gui.DialogService;
+import org.jabref.logic.util.NotificationService;
 
 import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
@@ -15,7 +15,7 @@ public abstract class MVStoreBase implements AutoCloseable {
 
     protected final MVStore mvStore;
 
-    public MVStoreBase(Path path, DialogService dialogService) {
+    public MVStoreBase(Path path, NotificationService dialogService) {
         @Nullable Path mvStorePath = path;
 
         try {

@@ -12,13 +12,13 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -37,7 +37,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @Inject protected FileUpdateMonitor fileUpdateMonitor;
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected UndoManager undoManager;
-    @Inject protected PreferencesService preferencesService;
+    @Inject protected GuiPreferences preferences;
 
     @FXML protected TextArea input;
     private final boolean onlineMode;
@@ -63,7 +63,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
                 onlineMode,
                 database,
                 dialogService,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 taskExecutor,
                 undoManager,

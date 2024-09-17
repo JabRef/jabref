@@ -10,17 +10,17 @@ import javafx.concurrent.Task;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -32,12 +32,12 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class AutoLinkFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -55,6 +55,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));

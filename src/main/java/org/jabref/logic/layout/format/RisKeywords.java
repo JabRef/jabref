@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 

@@ -13,20 +13,20 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
 
     private final Supplier<LibraryTab> tabSupplier;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
@@ -36,7 +36,7 @@ public class CleanupAction extends SimpleCommand {
     private int modifiedEntriesCount;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
-                         PreferencesService preferences,
+                         CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,

@@ -20,6 +20,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -28,7 +29,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -72,14 +72,14 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final Validator columnsNotEmptyValidator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
 
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final MainTablePreferences mainTablePreferences;
 
-    public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public TableTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
@@ -183,7 +183,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        preferences.getFilePreferences().getExternalFileTypes().stream()
+        preferences.getExternalApplicationsPreferences().getExternalFileTypes().stream()
                    .map(ExternalFileType::getName)
                    .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
                    .forEach(item -> availableColumnsProperty.getValue().add(item));

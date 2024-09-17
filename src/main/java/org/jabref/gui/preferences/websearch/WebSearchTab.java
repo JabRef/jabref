@@ -61,7 +61,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     public void initialize() {
-        this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
+        this.viewModel = new WebSearchTabViewModel(preferences, dialogService);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());

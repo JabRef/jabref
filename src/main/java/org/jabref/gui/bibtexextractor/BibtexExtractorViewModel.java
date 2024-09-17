@@ -10,15 +10,16 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,27 +36,27 @@ public class BibtexExtractorViewModel {
 
     private final boolean onlineMode;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final ImportHandler importHandler;
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
 
     public BibtexExtractorViewModel(boolean onlineMode,
-                                          BibDatabaseContext bibdatabaseContext,
-                                          DialogService dialogService,
-                                          PreferencesService preferencesService,
-                                          FileUpdateMonitor fileUpdateMonitor,
-                                          TaskExecutor taskExecutor,
-                                          UndoManager undoManager,
-                                          StateManager stateManager) {
+                                    BibDatabaseContext bibdatabaseContext,
+                                    DialogService dialogService,
+                                    GuiPreferences preferences,
+                                    FileUpdateMonitor fileUpdateMonitor,
+                                    TaskExecutor taskExecutor,
+                                    UndoManager undoManager,
+                                    StateManager stateManager) {
         this.onlineMode = onlineMode;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
@@ -77,7 +78,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void startParsingOnline() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure(e -> {

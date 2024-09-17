@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.field.Field;
 
 public class AutoCompletePreferences {

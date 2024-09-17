@@ -4,11 +4,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
-import org.jabref.preferences.WorkspacePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

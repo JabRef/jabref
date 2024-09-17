@@ -47,22 +47,23 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
-import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
+import org.jabref.logic.search.SearchDisplayMode;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SearchPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -88,7 +89,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton filterModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
     private final SearchPreferences searchPreferences;
@@ -100,20 +101,20 @@ public class GlobalSearchBar extends HBox {
 
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
-                           PreferencesService preferencesService,
+                           GuiPreferences preferences,
                            UndoManager undoManager,
                            DialogService dialogService,
                            SearchType searchType) {
         super();
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
-        this.searchPreferences = preferencesService.getSearchPreferences();
+        this.preferences = preferences;
+        this.searchPreferences = preferences.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
         this.searchType = searchType;
 
-        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
+        KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
@@ -327,7 +328,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
-        if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
+        if (preferences.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
                     new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
@@ -354,7 +355,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void updateHintVisibility() {
-        if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
+        if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith AND title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 

@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
@@ -29,7 +30,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

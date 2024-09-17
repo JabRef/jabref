@@ -14,6 +14,8 @@ import java.util.Map;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
@@ -24,18 +26,17 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;
@@ -61,8 +62,9 @@ public class Launcher {
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             // Initialize preferences
-            final JabRefPreferences preferences = JabRefPreferences.getInstance();
-            Injector.setModelOrService(PreferencesService.class, preferences);
+            final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
+            Injector.setModelOrService(CliPreferences.class, preferences);
+            Injector.setModelOrService(GuiPreferences.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
@@ -94,6 +96,7 @@ public class Launcher {
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                         args,
                         ArgumentProcessor.Mode.INITIAL_START,
+                        preferences,
                         preferences,
                         fileUpdateMonitor,
                         entryTypesManager);
@@ -137,7 +140,7 @@ public class Launcher {
         }
 
         // addLogToDisk
-        Path directory = OS.getNativeDesktop().getLogDirectory();
+        Path directory = Directories.getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -204,7 +207,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path currentIndexPath = Directories.getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {

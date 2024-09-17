@@ -22,7 +22,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -31,8 +31,9 @@ import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -42,14 +43,13 @@ import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfVerbatimBibTextImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -71,7 +71,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final LinkedFileHandler linkedFileHandler;
 
     private ObjectBinding<Node> linkedFileIconBinding;
@@ -83,10 +83,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               PreferencesService preferencesService) {
+                               GuiPreferences preferences) {
         this.linkedFile = linkedFile;
-        this.preferencesService = preferencesService;
-        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferencesService.getFilePreferences());
+        this.preferences = preferences;
+        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.dialogService = dialogService;
@@ -98,7 +98,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
+                        Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
@@ -106,6 +106,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
+    }
+
+    public static LinkedFileViewModel fromLinkedFile(
+            LinkedFile linkedFile,
+            BibEntry entry,
+            BibDatabaseContext databaseContext,
+            TaskExecutor taskExecutor,
+            DialogService dialogService,
+            GuiPreferences preferences) {
+        return new LinkedFileViewModel(
+                linkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences);
     }
 
     public BooleanProperty isOfflinePdfProperty() {
@@ -165,7 +181,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public JabRefIcon getTypeIcon() {
-        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferencesService.getFilePreferences())
+        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferences.getExternalApplicationsPreferences())
                                 .map(ExternalFileType::getIcon)
                                 .orElse(IconTheme.JabRefIcons.FILE);
     }
@@ -196,8 +212,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void open() {
         try {
-            Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferencesService.getFilePreferences());
-            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, preferencesService.getFilePreferences(), linkedFile.getLink(), type);
+            Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
+            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -212,9 +228,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 Optional<Path> resolvedPath = FileUtil.find(
                         databaseContext,
                         linkedFile.getLink(),
-                        preferencesService.getFilePreferences());
+                        preferences.getFilePreferences());
                 if (resolvedPath.isPresent()) {
-                    JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferencesService.getExternalApplicationsPreferences(), dialogService);
+                    NativeDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences.getExternalApplicationsPreferences(), dialogService);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }
@@ -246,7 +262,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences());
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (file.isPresent()) {
             performRenameWithConflictCheck(targetFileName);
         } else {
@@ -283,13 +299,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences());
+        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         if (fileDir.isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences());
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (file.isPresent()) {
             // Found the linked file, so move it
             try {
@@ -325,7 +341,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
-        FilePreferences filePreferences = preferencesService.getFilePreferences();
+        FilePreferences filePreferences = preferences.getFilePreferences();
         Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (baseDir.isEmpty()) {
             // could not find default path
@@ -340,7 +356,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         Optional<Path> targetDir = baseDir.map(dir -> dir.resolve(targetDirectoryName));
 
-        Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences()).map(Path::getParent);
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
         if (currentDir.isEmpty()) {
             // Could not find file
             return false;
@@ -369,7 +385,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * successfully, does not exist in the first place, or the user choose to remove it)
      */
     public boolean delete() {
-        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), databaseContext, null, List.of(this));
+        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));
         deleteFileAction.execute();
         return deleteFileAction.isSuccess();
     }
@@ -401,7 +417,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 linkedFile,
                 linkedFile.getSourceUrl(),
                 dialogService,
-                preferencesService.getFilePreferences(),
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getFilePreferences(),
                 taskExecutor,
                 fileName,
                 true);
@@ -421,7 +438,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
-                preferencesService.getFilePreferences(),
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getFilePreferences(),
                 taskExecutor,
                 "",
                 keepHtmlLink);
@@ -438,16 +456,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void parsePdfMetadataAndShowMergeDialog() {
-        linkedFile.findIn(databaseContext, preferencesService.getFilePreferences()).ifPresent(filePath -> {
-            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferencesService, taskExecutor);
+        linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
+            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.setTitle(Localization.lang("Merge PDF metadata"));
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferencesService.getImportFormatPreferences()), filePath));
-            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferencesService.getImportFormatPreferences()), filePath));
-            if (preferencesService.getGrobidPreferences().isGrobidEnabled()) {
-                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferencesService.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            if (preferences.getGrobidPreferences().isGrobidEnabled()) {
+                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
             }
-            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferencesService.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
             dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
             dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);

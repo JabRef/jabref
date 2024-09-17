@@ -31,20 +31,20 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class MainTableColumnFactory {
     public static final String STYLE_ICON_COLUMN = "column-icon";
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final ColumnPreferences columnPreferences;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
@@ -66,22 +66,22 @@ public class MainTableColumnFactory {
     private final MainTableTooltip tooltip;
 
     public MainTableColumnFactory(BibDatabaseContext database,
-                                  PreferencesService preferencesService,
+                                  GuiPreferences preferences,
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.cellFactory = new CellFactory(preferencesService, undoManager);
+        this.cellFactory = new CellFactory(preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -308,14 +308,14 @@ public class MainTableColumnFactory {
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
     /**
      * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
+        return new SpecialFieldColumn(columnModel, preferences, undoManager);
     }
 
     /**
@@ -326,7 +326,7 @@ public class MainTableColumnFactory {
         return new FileColumn(columnModel,
                 database,
                 dialogService,
-                preferencesService,
+                preferences,
                 taskExecutor);
     }
 
@@ -337,7 +337,7 @@ public class MainTableColumnFactory {
         return new FileColumn(columnModel,
                 database,
                 dialogService,
-                preferencesService,
+                preferences,
                 columnModel.getQualifier(),
                 taskExecutor);
     }

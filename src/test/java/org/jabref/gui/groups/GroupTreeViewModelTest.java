@@ -5,10 +5,11 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -17,7 +18,6 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class GroupTreeViewModelTest {
     private GroupTreeViewModel groupTree;
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
-    private PreferencesService preferencesService;
+    private GuiPreferences preferences;
     private DialogService dialogService;
 
     @BeforeEach
@@ -44,21 +44,21 @@ class GroupTreeViewModelTest {
         stateManager = new StateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
-        preferencesService = mock(PreferencesService.class);
+        preferences = mock(GuiPreferences.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
-        when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
+        when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT));
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(AiService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(ChatHistoryService.class), preferences, taskExecutor, new CustomLocalDragboard());
     }
 
     @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService), groupTree.rootGroupProperty().getValue());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
     }
 
     @Test
@@ -72,7 +72,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
@@ -86,7 +86,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
@@ -100,7 +100,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(ChatHistoryService.class), preferences, taskExecutor, new CustomLocalDragboard());
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -112,7 +112,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(ChatHistoryService.class), preferences, taskExecutor, new CustomLocalDragboard());
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -124,7 +124,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(ChatHistoryService.class), preferences, taskExecutor, new CustomLocalDragboard());
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
@@ -136,7 +136,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(ChatHistoryService.class), preferences, taskExecutor, new CustomLocalDragboard());
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 }

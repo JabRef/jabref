@@ -4,17 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jabref.gui.DialogService;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 class FileNameUniquenessTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNameUniquenessTest.class);
 
     @TempDir
     protected Path tempDir;
@@ -51,18 +52,16 @@ class FileNameUniquenessTest {
 
     @Test
     void isDuplicatedFileWithNoSimilarNames() throws IOException {
-        DialogService dialogService = mock(DialogService.class);
         String filename1 = "file1.txt";
         Path filePath1 = tempDir.resolve(filename1);
         Files.createFile(filePath1);
 
-        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath1, dialogService);
+        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath1, LOGGER::info);
         assertFalse(isDuplicate);
     }
 
     @Test
     void isDuplicatedFileWithOneSimilarNames() throws IOException {
-        DialogService dialogService = mock(DialogService.class);
         String filename1 = "file.txt";
         String filename2 = "file (1).txt";
         Path filePath1 = tempDir.resolve(filename1);
@@ -70,7 +69,7 @@ class FileNameUniquenessTest {
         Files.createFile(filePath1);
         Files.createFile(filePath2);
 
-        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath2, dialogService);
+        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath2, LOGGER::info);
         assertTrue(isDuplicate);
     }
 
@@ -82,21 +81,21 @@ class FileNameUniquenessTest {
     }
 
     @Test
-    void taseDuplicateMarksReturnsOrignalFileName2() throws IOException {
+    void taseDuplicateMarksReturnsOrignalFileName2() {
         String fileName1 = "abc (def) gh (1)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc (def) gh", fileName2);
     }
 
     @Test
-    void taseDuplicateMarksReturnsSameName1() throws IOException {
+    void taseDuplicateMarksReturnsSameName1() {
         String fileName1 = "abc def (g)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc def (g)", fileName2);
     }
 
     @Test
-    void taseDuplicateMarksReturnsSameName2() throws IOException {
+    void taseDuplicateMarksReturnsSameName2() {
         String fileName1 = "abc def";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc def", fileName2);

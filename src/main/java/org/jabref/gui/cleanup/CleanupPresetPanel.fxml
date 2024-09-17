@@ -3,11 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.control.RadioButton?>
-
 <fx:root xmlns:fx="http://javafx.com/fxml/1" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.121"
          fx:controller="org.jabref.gui.cleanup.CleanupPresetPanel">
     <fx:define>

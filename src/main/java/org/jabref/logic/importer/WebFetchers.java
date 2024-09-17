@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
@@ -53,7 +54,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;

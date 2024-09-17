@@ -1,8 +1,8 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.BibEntryPreferences;
 
 public class FieldMergerFactory {
     private final BibEntryPreferences bibEntryPreferences;

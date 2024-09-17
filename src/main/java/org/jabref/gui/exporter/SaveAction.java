@@ -7,8 +7,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -23,17 +23,17 @@ public class SaveAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     public SaveAction(SaveMethod saveMethod,
                       Supplier<LibraryTab> tabSupplier,
                       DialogService dialogService,
-                      PreferencesService preferencesService,
+                      GuiPreferences preferences,
                       StateManager stateManager) {
         this.saveMethod = saveMethod;
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
             this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -47,7 +47,7 @@ public class SaveAction extends SimpleCommand {
         SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
                 tabSupplier.get(),
                 dialogService,
-                preferencesService,
+                preferences,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
         switch (saveMethod) {

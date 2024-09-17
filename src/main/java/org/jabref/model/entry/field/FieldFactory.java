@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -210,7 +211,7 @@ public class FieldFactory {
     }
 
     /**
-     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     * These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
      * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object

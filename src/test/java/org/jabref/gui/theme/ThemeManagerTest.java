@@ -13,9 +13,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.WorkspacePreferences;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;

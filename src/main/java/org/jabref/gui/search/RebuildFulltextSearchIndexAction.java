@@ -7,7 +7,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -21,7 +21,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     public RebuildFulltextSearchIndexAction(StateManager stateManager,
                                             Supplier<LibraryTab> tabSupplier,
                                             DialogService dialogService,
-                                            PreferencesService preferences) {
+                                            CliPreferences preferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabSupplier = tabSupplier;

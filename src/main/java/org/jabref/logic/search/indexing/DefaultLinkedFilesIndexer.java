@@ -16,17 +16,17 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -137,7 +137,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
         for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Adding files to index canceled");
                 return;
             }

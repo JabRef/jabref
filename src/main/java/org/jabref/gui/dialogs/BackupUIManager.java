@@ -18,6 +18,8 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -29,8 +31,6 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.ExternalApplicationsPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +46,21 @@ public class BackupUIManager {
 
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  Path originalPath,
-                                                                 PreferencesService preferencesService,
+                                                                 GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  UndoManager undoManager,
                                                                  StateManager stateManager) {
         var actionOpt = showBackupResolverDialog(
                 dialogService,
-                preferencesService.getExternalApplicationsPreferences(),
+                preferences.getExternalApplicationsPreferences(),
                 originalPath,
-                preferencesService.getFilePreferences().getBackupDirectory());
+                preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
+                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             }
             return Optional.empty();
         });
@@ -77,22 +77,22 @@ public class BackupUIManager {
     private static Optional<ParserResult> showReviewBackupDialog(
             DialogService dialogService,
             Path originalPath,
-            PreferencesService preferencesService,
+            GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
             UndoManager undoManager,
             StateManager stateManager) {
         try {
-            ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
+            ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
             // The database of the originalParserResult will be modified
             ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, fileUpdateMonitor);
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferencesService.getFilePreferences().getBackupDirectory()).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences);
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
@@ -119,7 +119,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

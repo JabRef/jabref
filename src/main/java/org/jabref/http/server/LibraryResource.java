@@ -10,10 +10,10 @@ import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
@@ -34,7 +34,7 @@ public class LibraryResource {
     public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
-    PreferencesService preferences;
+    CliPreferences preferences;
 
     @Inject
     Gson gson;
@@ -89,7 +89,7 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-        return preferences.getGuiPreferences().getLastFilesOpened()
+        return preferences.getLastFilesOpenedPreferences().getLastFilesOpened()
                           .stream()
                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
                           .findAny()

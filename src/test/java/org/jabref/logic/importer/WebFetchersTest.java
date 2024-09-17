@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
@@ -18,7 +19,6 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsb
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;

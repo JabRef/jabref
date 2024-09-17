@@ -19,19 +19,19 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -130,9 +130,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         highlightSearchPattern();
     };
 
-    /**
-     * The entry currently shown
-     */
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private PreviewLayout layout;
@@ -143,7 +140,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
+                         GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
@@ -181,7 +178,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            JabRefDesktop.openBrowser(href, preferencesService.getFilePreferences());
+                            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {
@@ -198,10 +195,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
+                         GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(database, dialogService, preferencesService, themeManager, taskExecutor, OptionalObjectProperty.empty());
+        this(database, dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
     }
 
     private void highlightSearchPattern() {

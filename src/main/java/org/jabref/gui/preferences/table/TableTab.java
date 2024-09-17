@@ -60,13 +60,13 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new TableTabViewModel(dialogService, preferencesService);
+        this.viewModel = new TableTabViewModel(dialogService, preferences);
 
         setupTable();
         setupBindings();
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS, dialogService, preferencesService.getFilePreferences()), specialFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), specialFieldsHelp);
     }
 
     private void setupTable() {

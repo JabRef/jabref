@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
 import org.junit.jupiter.api.Test;
 

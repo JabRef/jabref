@@ -18,10 +18,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
@@ -36,6 +36,8 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -53,8 +55,6 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
@@ -67,7 +67,7 @@ public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibDatabaseContext;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker linker;
     private final ExternalFilesContentImporter contentImporter;
@@ -77,7 +77,7 @@ public class ImportHandler {
     private final TaskExecutor taskExecutor;
 
     public ImportHandler(BibDatabaseContext database,
-                         PreferencesService preferences,
+                         GuiPreferences preferences,
                          FileUpdateMonitor fileupdateMonitor,
                          UndoManager undoManager,
                          StateManager stateManager,
@@ -91,7 +91,7 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.linker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database, dialogService);
+        this.linker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
@@ -106,13 +106,13 @@ public class ImportHandler {
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
-            protected List<ImportFilesResultItemViewModel> call() {
+            public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
-                    if (isCanceled()) {
+                    if (isCancelled()) {
                         break;
                     }
 
@@ -161,7 +161,8 @@ public class ImportHandler {
 
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
-                    undoManager.addEdit(ce);
+                    // prevent fx thread exception in undo manager
+                    UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
 
                     counter++;
                 }
@@ -229,7 +230,7 @@ public class ImportHandler {
     }
 
     public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext, decision);
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, decision);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
@@ -248,8 +249,8 @@ public class ImportHandler {
         return Optional.of(originalEntry);
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferences);
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, stateManager, dialogService, preferences);
         if (decision == BREAK) {
             decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
         }

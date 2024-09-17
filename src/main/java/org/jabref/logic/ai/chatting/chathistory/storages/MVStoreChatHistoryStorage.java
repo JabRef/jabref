@@ -6,11 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -65,7 +65,7 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
         }
     }
 
-    public MVStoreChatHistoryStorage(Path path, DialogService dialogService) {
+    public MVStoreChatHistoryStorage(Path path, NotificationService dialogService) {
         super(path, dialogService);
     }
 

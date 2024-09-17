@@ -17,8 +17,10 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -96,6 +98,15 @@ public class UiTaskExecutor implements TaskExecutor {
         Platform.runLater(runnable);
     }
 
+    /**
+     * This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
+     * The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
+     *
+     * @param task the BackgroundTask to run
+     * @param <V> The background task type
+     *
+     * @return Future of a JavaFX Task which will execute the call method a background thread
+     */
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
@@ -110,7 +121,13 @@ public class UiTaskExecutor implements TaskExecutor {
         return execute(javafxTask);
     }
 
-    @Override
+    /**
+     * Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
+     * #execute(BackgroundTask)}.
+     *
+     * @param <V>  type of return value of the task
+     * @param task the task to run
+     */
     public <V> Future<V> execute(Task<V> task) {
         executor.submit(task);
         return task;
@@ -128,7 +145,7 @@ public class UiTaskExecutor implements TaskExecutor {
     public void shutdown() {
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
         if (stateManager != null) {
-            stateManager.getRunningBackgroundTasks().stream().forEach(Task::cancel);
+            stateManager.getRunningBackgroundTasks().forEach(Task::cancel);
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
@@ -143,13 +160,13 @@ public class UiTaskExecutor implements TaskExecutor {
     }
 
     /**
-     * Generates a wrapper JavaFX {@link Task} monitoring the progress based on the data given from the task.
+     * Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
      * <code>call</code> is routed to the given task object.
      *
      * @param task the BackgroundTask to wrap
-     * @return a new Task object
+     * @return a new Javafx Task object
      */
-    private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
+    public static <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {
             {
                 this.updateMessage(task.messageProperty().get());
@@ -157,7 +174,7 @@ public class UiTaskExecutor implements TaskExecutor {
                 BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
-                BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {
+                BindingsHelper.subscribeFuture(task.isCancelledProperty(), cancelled -> {
                     if (cancelled) {
                         cancel();
                     }
@@ -166,7 +183,8 @@ public class UiTaskExecutor implements TaskExecutor {
             }
 
             @Override
-            public V call() throws Exception {
+            protected V call() throws Exception {
+                // this requires that background task call is public as it's in another package
                 return task.call();
             }
         };
@@ -190,7 +208,7 @@ public class UiTaskExecutor implements TaskExecutor {
         return javaTask;
     }
 
-    private Exception convertToException(Throwable throwable) {
+    private static Exception convertToException(Throwable throwable) {
         if (throwable instanceof Exception exception) {
             return exception;
         } else {

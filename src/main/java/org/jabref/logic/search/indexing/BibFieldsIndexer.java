@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
@@ -36,7 +36,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     public BibFieldsIndexer(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
-        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
+        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
 
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LATEX_AWARE_NGRAM_ANALYZER);
 
@@ -61,7 +61,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         long startTime = System.currentTimeMillis();
         LOGGER.debug("Adding {} entries to index", entries.size());
         for (BibEntry entry : entries) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Indexing canceled");
                 return;
             }
@@ -102,7 +102,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         task.setTitle(Localization.lang("Removing entries from index for %0", libraryName));
         int i = 1;
         for (BibEntry entry : entries) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Removing entries canceled");
                 return;
             }

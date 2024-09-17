@@ -10,6 +10,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
