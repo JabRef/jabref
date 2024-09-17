@@ -224,7 +224,7 @@ public class JabRefDialogService implements DialogService {
         String localizedMessage = fetcherException.getLocalizedMessage();
         Optional<SimpleHttpResponse> httpResponse = fetcherException.getHttpResponse();
         if (httpResponse.isPresent()) {
-            this.showInformationDialogAndWait(failedTitle, Localization.lang(getContentByCode(httpResponse.get().statusCode())) + "\n\n" + localizedMessage);
+            this.showInformationDialogAndWait(failedTitle, getContentByCode(httpResponse.get().statusCode()) + "\n\n" + localizedMessage);
         } else if (fetcherException instanceof FetcherClientException) {
             this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
         } else if (fetcherException instanceof FetcherServerException) {
@@ -233,19 +233,6 @@ public class JabRefDialogService implements DialogService {
         } else {
             this.showErrorDialogAndWait(failedTitle, localizedMessage);
         }
-    }
-
-    private String getContentByCode(int statusCode) {
-        return switch (statusCode) {
-            case 401 ->
-                "Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.";
-            case 403 ->
-                "Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.";
-            case 404 ->
-                "The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.";
-            default ->
-                "Something is wrong on JabRef side. Please check the URL and try again.";
-        };
     }
 
     @Override
@@ -520,5 +507,18 @@ public class JabRefDialogService implements DialogService {
         }
         window.applyStylesheets(mainWindow.getScene().getStylesheets());
         window.show();
+    }
+
+    private String getContentByCode(int statusCode) {
+        return switch (statusCode) {
+            case 401 ->
+                    Localization.lang("Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.");
+            case 403 ->
+                    Localization.lang("Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.");
+            case 404 ->
+                    Localization.lang("The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.");
+            default ->
+                    Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.");
+        };
     }
 }
