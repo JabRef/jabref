@@ -21,10 +21,10 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.events.XMLEvent;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -40,7 +40,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,7 +189,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseData(XMLStreamReader reader) {
-
         if (reader.getEventType() == XMLStreamReader.START_ELEMENT && reader.hasText()) {
             String elementName = reader.getName().getLocalPart();
             if ("Person".equals(elementName)) {
