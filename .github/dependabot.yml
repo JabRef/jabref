@@ -13,6 +13,15 @@ updates:
       - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
         versions:
           - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+      - dependency-name: ai.djl:api
+        versions:
+          - ">= 0.30.0" # Blocked by https://github.com/deepjavalibrary/djl/issues/3473
+      - dependency-name: ai.djl:pytorch:pytorch-model-zoo
+        versions:
+          - ">= 0.30.0"
+      - dependency-name: ai.djl:huggingface:tokenizers
+        versions:
+          - ">= 0.30.0"
   - package-ecosystem: gradle
     directory: "buildSrc/"
     schedule:
