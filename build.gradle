@@ -336,8 +336,8 @@ dependencies {
     implementation('dev.langchain4j:langchain4j-mistral-ai:0.34.0')
     implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.34.0')
     implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0')
-    implementation 'ai.djl:api:0.30.0'
-    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.30.0'
+    implementation 'ai.djl:api:0.29.0'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
     implementation 'ai.djl.huggingface:tokenizers:0.29.0'
     implementation 'io.github.stefanbratanov:jvm-openai:0.11.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
