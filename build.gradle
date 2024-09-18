@@ -327,7 +327,7 @@ dependencies {
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.3'
 
-    // AI
+    // region AI
     implementation 'dev.langchain4j:langchain4j:0.34.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
     implementation('dev.langchain4j:langchain4j-open-ai:0.34.0') {
@@ -336,9 +336,12 @@ dependencies {
     implementation('dev.langchain4j:langchain4j-mistral-ai:0.34.0')
     implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.34.0')
     implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0')
-    implementation 'ai.djl:api:0.30.0'
-    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.30.0'
-    implementation 'ai.djl.huggingface:tokenizers:0.29.0'
+
+    implementation platform('ai.djl:bom:0.29.0')
+    implementation 'ai.djl:api'
+    implementation 'ai.djl.huggingface:tokenizers'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo'
+
     implementation 'io.github.stefanbratanov:jvm-openai:0.11.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
     implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
@@ -346,6 +349,7 @@ dependencies {
     }
     // GemxFX also (transitively) depends on kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20'
+    // endregion
 
     implementation 'commons-io:commons-io:2.16.1'
 

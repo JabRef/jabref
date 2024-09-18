@@ -13,6 +13,9 @@ updates:
       - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
         versions:
           - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+      - dependency-name: ai.djl:bom
+        versions:
+          - ">= 0.30.0" # Blocked by https://github.com/deepjavalibrary/djl/issues/3473
   - package-ecosystem: gradle
     directory: "buildSrc/"
     schedule:
