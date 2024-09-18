@@ -144,6 +144,7 @@ open module org.jabref {
 
     // region AI
     requires ai.djl.api;
+    requires ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;
