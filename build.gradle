@@ -771,15 +771,20 @@ jlink {
         requires 'jakarta.xml.bind'
         requires 'org.apache.commons.lang3'
         requires 'org.apache.commons.text'
-        requires 'org.apache.commons.logging';
+        requires 'org.apache.commons.logging'
+
+        uses 'ai.djl.engine.EngineProvider'
+        uses 'ai.djl.repository.RepositoryFactory'
+        uses 'ai.djl.repository.zoo.ZooProvider'
+        uses 'dev.langchain4j.spi.prompt.PromptTemplateFactory'
+        uses 'kong.unirest.core.json.JsonEngine'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        uses 'kong.unirest.core.json.JsonEngine';
-        uses 'ai.djl.repository.zoo.ZooProvider';
+
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',

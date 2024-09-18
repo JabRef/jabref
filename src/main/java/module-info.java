@@ -144,7 +144,6 @@ open module org.jabref {
 
     // region AI
     requires ai.djl.api;
-    uses ai.djl.repository.zoo.ZooProvider;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;
@@ -152,6 +151,10 @@ open module org.jabref {
     requires langchain4j.hugging.face;
     requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
+    uses ai.djl.engine.EngineProvider;
+    uses ai.djl.repository.RepositoryFactory;
+    uses ai.djl.repository.zoo.ZooProvider;
+    uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
     // endregion
 
     // region: Lucene
