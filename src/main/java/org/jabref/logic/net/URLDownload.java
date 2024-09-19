@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -104,7 +105,7 @@ public class URLDownload {
         return source;
     }
 
-    public String getMimeType() {
+    public Optional<String> getMimeType() {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         String contentType;
@@ -119,7 +120,7 @@ public class URLDownload {
             }
             contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+                return Optional.of(contentType);
             }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via HEAD request", e);
@@ -129,7 +130,7 @@ public class URLDownload {
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
             if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+                return Optional.of(contentType);
             }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via GET request", e);
@@ -141,13 +142,13 @@ public class URLDownload {
 
             contentType = connection.getContentType();
             if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+                return Optional.of(contentType);
             }
         } catch (IOException e) {
             LOGGER.debug("Error trying to get MIME type of local URI", e);
         }
 
-        return "";
+        return Optional.empty();
     }
 
     /**
@@ -168,13 +169,7 @@ public class URLDownload {
     }
 
     public boolean isMimeType(String type) {
-        String mime = getMimeType();
-
-        if (mime.isEmpty()) {
-            return false;
-        }
-
-        return mime.startsWith(type);
+        return getMimeType().map(mimeType -> mimeType.startsWith(type)).orElse(false);
     }
 
     public boolean isPdf() {
