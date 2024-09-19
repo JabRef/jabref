@@ -40,6 +40,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
+import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
@@ -94,7 +95,8 @@ public class URLDownload {
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
             HttpsURLConnection.setDefaultHostnameVerifier(verifier);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
@@ -109,7 +111,14 @@ public class URLDownload {
         String contentType;
         // Try to use HEAD request to avoid downloading the whole file
         try {
-            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
+            String urlToCheck = source.toString();
+            HttpResponse<String> response = Unirest.head(urlToCheck).asString();
+            // check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
+            String locationHeader = response.getHeaders().getFirst("location");
+            if (locationHeader != null && !locationHeader.isEmpty()) {
+                urlToCheck = locationHeader;
+            }
+            contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
@@ -224,7 +233,8 @@ public class URLDownload {
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             throw new FetcherException("Error downloading", e);
         }
     }
@@ -341,7 +351,8 @@ public class URLDownload {
         URLConnection connection;
         try {
             connection = getUrlConnection();
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             throw new FetcherException("Error opening connection", e);
         }
 
@@ -350,29 +361,31 @@ public class URLDownload {
             try {
                 // this does network i/o: GET + read returned headers
                 status = httpURLConnection.getResponseCode();
-            } catch (IOException e) {
+            } catch (
+                    IOException e) {
                 LOGGER.error("Error getting response code", e);
                 throw new FetcherException("Error getting response code", e);
             }
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
                 try {
                     connection = new URLDownload(newUrl).openConnection();
-                } catch (MalformedURLException e) {
+                } catch (
+                        MalformedURLException e) {
                     throw new FetcherException("Could not open URL Download", e);
                 }
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
                 LOGGER.info("{}", httpResponse);
-                if ((status >= 400) && (status < 500)) {
+                if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
-                } else if (status >= 500) {
+                } else {
                     throw new FetcherServerException(this.source, httpResponse);
                 }
             }
