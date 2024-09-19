@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.Pair;
 
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
@@ -79,7 +80,8 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
         linkedFiles
                 .stream()
                 .map(processingInfo -> {
-                    processingInfo.setState(ProcessingState.PROCESSING);
+                    UiTaskExecutor.runInJavaFXThread(() -> processingInfo.setState(ProcessingState.PROCESSING));
+
                     return new Pair<>(
                             new GenerateEmbeddingsTask(
                                     processingInfo.getObject(),

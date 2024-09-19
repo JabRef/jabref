@@ -55,7 +55,6 @@ public class AiService implements AutoCloseable {
 
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
-                     CitationKeyPatternPreferences citationKeyPatternPreferences,
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
     ) {
