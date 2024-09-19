@@ -772,6 +772,7 @@ jlink {
         requires 'org.apache.commons.lang3'
         requires 'org.apache.commons.logging'
         requires 'org.apache.commons.text'
+        requires 'org.freedesktop.dbus'
         requires 'org.jsoup'
         requires 'org.slf4j'
         uses 'ai.djl.engine.EngineProvider'
