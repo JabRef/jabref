@@ -95,8 +95,7 @@ public class URLDownload {
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
             HttpsURLConnection.setDefaultHostnameVerifier(verifier);
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
@@ -233,8 +232,7 @@ public class URLDownload {
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             throw new FetcherException("Error downloading", e);
         }
     }
@@ -351,8 +349,7 @@ public class URLDownload {
         URLConnection connection;
         try {
             connection = getUrlConnection();
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             throw new FetcherException("Error opening connection", e);
         }
 
@@ -361,8 +358,7 @@ public class URLDownload {
             try {
                 // this does network i/o: GET + read returned headers
                 status = httpURLConnection.getResponseCode();
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 LOGGER.error("Error getting response code", e);
                 throw new FetcherException("Error getting response code", e);
             }
@@ -375,8 +371,7 @@ public class URLDownload {
                 // open the new connection again
                 try {
                     connection = new URLDownload(newUrl).openConnection();
-                } catch (
-                        MalformedURLException e) {
+                } catch (MalformedURLException e) {
                     throw new FetcherException("Could not open URL Download", e);
                 }
             } else if (status >= 400) {
