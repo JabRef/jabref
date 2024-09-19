@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.autocompletion;
 
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -18,6 +19,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 
 public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionTabViewModel> implements PreferencesTab {
+    private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
     @FXML private CheckBox enableAutoComplete;
     @FXML private TagsField<Field> autoCompleteFields;
@@ -58,8 +60,10 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
         autoCompleteFields.setConverter(viewModel.getFieldStringConverter());
         autoCompleteFields.setTagViewFactory(this::createTag);
         autoCompleteFields.setShowSearchIcon(false);
+        autoCompleteFields.setOnMouseClicked(event -> autoCompleteFields.getEditor().requestFocus());
         autoCompleteFields.getEditor().getStyleClass().clear();
         autoCompleteFields.getEditor().getStyleClass().add("tags-field-editor");
+        autoCompleteFields.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> autoCompleteFields.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
     private Node createTag(Field field) {
