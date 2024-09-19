@@ -41,7 +41,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
-import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
@@ -86,6 +85,10 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
+        Unirest.config().reset()
+               .followRedirects(true)
+               .enableCookieManagement(true)
+               .setDefaultHeader("User-Agent", USER_AGENT);
     }
 
     /**
@@ -106,18 +109,11 @@ public class URLDownload {
     }
 
     public Optional<String> getMimeType() {
-        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
-
         String contentType;
+
         // Try to use HEAD request to avoid downloading the whole file
         try {
             String urlToCheck = source.toString();
-            HttpResponse<String> response = Unirest.head(urlToCheck).asString();
-            // check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
-            String locationHeader = response.getHeaders().getFirst("location");
-            if (locationHeader != null && !locationHeader.isEmpty()) {
-                urlToCheck = locationHeader;
-            }
             contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
@@ -158,12 +154,6 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-        // new unirest version does not support apache http client any longer
-        Unirest.config().reset()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
-
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
     }
