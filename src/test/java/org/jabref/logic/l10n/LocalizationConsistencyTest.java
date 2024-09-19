@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -158,17 +159,17 @@ class LocalizationConsistencyTest {
     @Test
     void localizationParameterMustIncludeAString() throws IOException {
         // Must start or end with "
+        // No string concatenation, just literal string, please check https://devdocs.jabref.org/code-howtos/localization.html
         // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
-        // TODO: Localization.lang(var1 + "test" + var2) not covered
-        // Localization.lang("Problem downloading from %1", address)
+        // Localization.lang(var1 + "test" + var2), Localization.lang("Problem downloading from %1", address)
         Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\"") || StringUtils.countMatches(e.getKey(), "\"") == 2, "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
 
         keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\"") || StringUtils.countMatches(e.getKey(), "\"") == 2, "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
     }
 
