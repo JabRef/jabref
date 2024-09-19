@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.model.citation.semanticscholar;
 
 import java.util.List;
 import java.util.Map;

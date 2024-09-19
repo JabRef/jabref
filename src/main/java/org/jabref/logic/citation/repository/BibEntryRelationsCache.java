@@ -1,13 +1,11 @@
-package org.jabref.gui.entryeditor.citationrelationtab;
+package org.jabref.logic.citation.repository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
+import org.eclipse.jgit.util.LRUMap;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-
-import org.eclipse.jgit.util.LRUMap;
 
 public class BibEntryRelationsCache {
     private static final Integer MAX_CACHED_ENTRIES = 100;

@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -7,21 +7,22 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
+import org.jabref.model.citation.semanticscholar.CitationsResponse;
+import org.jabref.model.citation.semanticscholar.ReferencesResponse;
 
-public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyFetcher {
+public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     private static final String API_KEY = new BuildInfo().semanticScholarApiKey;
 
     private final ImporterPreferences importerPreferences;
 
-    public SemanticScholarFetcher(ImporterPreferences importerPreferences) {
+    public SemanticScholarCitationFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
 

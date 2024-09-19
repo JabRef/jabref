@@ -30,8 +30,10 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
+import org.jabref.logic.citation.repository.BibEntryRelationsCache;
+import org.jabref.logic.citation.repository.BibEntryRelationsRepository;
+import org.jabref.logic.importer.fetcher.CitationFetcher;
+import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -92,8 +94,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
         this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferences.getImporterPreferences()),
-                new BibEntryRelationsCache());
+        this.bibEntryRelationsRepository = new BibEntryRelationsRepository(
+            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()),
+            new BibEntryRelationsCache()
+        );
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
@@ -394,7 +398,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
                 .orElseGet(() -> new CitationRelationItem(entr, false)))
             .toList()
-    );
+        );
 
         if (!observableList.isEmpty()) {
             listView.refresh();
