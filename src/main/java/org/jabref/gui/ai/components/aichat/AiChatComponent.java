@@ -28,7 +28,6 @@ import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.Default;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
