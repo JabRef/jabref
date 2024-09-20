@@ -40,7 +40,9 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
@@ -114,6 +116,17 @@ public class URLDownload {
         // Try to use HEAD request to avoid downloading the whole file
         try {
             String urlToCheck = source.toString();
+            String locationHeader;
+            do {
+                HttpResponse<String> response = Unirest.head(urlToCheck).asString();
+                // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
+                // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
+                locationHeader = response.getHeaders().getFirst("location");
+                if (StringUtil.isNullOrEmpty(locationHeader)) {
+                    urlToCheck = locationHeader;
+                }
+                // while loop, because there could be multiple redirects
+            } while (StringUtil.isNullOrEmpty(locationHeader));
             contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
@@ -125,7 +138,7 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
-            if ((contentType != null) && !contentType.isEmpty()) {
+            if (StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
             }
         } catch (Exception e) {
@@ -135,9 +148,8 @@ public class URLDownload {
         // Try to resolve local URIs
         try {
             URLConnection connection = new URL(source.toString()).openConnection();
-
             contentType = connection.getContentType();
-            if ((contentType != null) && !contentType.isEmpty()) {
+            if (StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
             }
         } catch (IOException e) {
@@ -326,7 +338,7 @@ public class URLDownload {
     /**
      * Open a connection to this object's URL (with specified settings).
      * <p>
-     * If accessing an HTTP URL, remeber to close the resulting connection after usage.
+     * If accessing an HTTP URL, remember to close the resulting connection after usage.
      *
      * @return an open connection
      */
@@ -355,6 +367,8 @@ public class URLDownload {
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
                 try {
+                    httpURLConnection.disconnect();
+                    // multiple redirects are implemented by this recursion
                     connection = new URLDownload(newUrl).openConnection();
                 } catch (MalformedURLException e) {
                     throw new FetcherException("Could not open URL Download", e);
