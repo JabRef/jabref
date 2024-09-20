@@ -97,6 +97,8 @@ open module org.jabref {
     // endregion
 
     // region: SQL databases
+    requires embedded.postgres;
+    requires org.tukaani.xz;
     requires ojdbc10;
     requires org.postgresql.jdbc;
     requires org.mariadb.jdbc;
@@ -108,6 +110,8 @@ open module org.jabref {
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires org.apache.commons.cli;
+    requires org.apache.commons.codec;
+    requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
     requires org.apache.commons.lang3;
