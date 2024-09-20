@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.head;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -194,6 +195,12 @@ class DownloadLinkedFileActionTest {
     @Test
     void removesHtmlFileLink(@TempDir Path tempFolder) throws Exception {
         stubFor(get(urlEqualTo("/html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html; charset=utf-8")
+                        .withBody("<html><body><h1>Hi</h1></body></html>")));
+
+        stubFor(head(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")
