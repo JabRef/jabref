@@ -161,7 +161,7 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
-    void keepsHtmlEntry(@TempDir Path tempFolder) throws Exception {
+    void keepsHtmlFileLink(@TempDir Path tempFolder) throws Exception {
         stubFor(get(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -192,7 +192,7 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
-    void removesHtmlEntry(@TempDir Path tempFolder) throws Exception {
+    void removesHtmlFileLink(@TempDir Path tempFolder) throws Exception {
         stubFor(get(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)
