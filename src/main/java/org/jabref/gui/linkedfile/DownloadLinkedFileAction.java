@@ -280,14 +280,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
-        String mimeType = urlDownload.getMimeType();
-
-        if (mimeType != null) {
-            LOGGER.debug("MIME Type suggested: {}", mimeType);
-            return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, externalApplicationsPreferences);
-        } else {
-            return Optional.empty();
-        }
+        return urlDownload.getMimeType()
+                          .flatMap(mimeType -> {
+                              LOGGER.debug("MIME Type suggested: {}", mimeType);
+                              return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, externalApplicationsPreferences);
+                          });
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
