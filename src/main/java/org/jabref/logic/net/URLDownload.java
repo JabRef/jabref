@@ -73,6 +73,13 @@ public class URLDownload {
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
+    static {
+        Unirest.config()
+               .followRedirects(true)
+               .enableCookieManagement(true)
+               .setDefaultHeader("User-Agent", USER_AGENT);
+    }
+
     /**
      * @param source the URL to download from
      * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
@@ -87,10 +94,6 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
-        Unirest.config().reset()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
     }
 
     /**
@@ -166,6 +169,7 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
+
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
     }
