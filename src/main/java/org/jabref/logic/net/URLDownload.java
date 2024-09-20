@@ -138,7 +138,7 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
-            if (StringUtil.isNullOrEmpty(contentType)) {
+            if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
             }
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public class URLDownload {
         try {
             URLConnection connection = new URL(source.toString()).openConnection();
             contentType = connection.getContentType();
-            if (StringUtil.isNullOrEmpty(contentType)) {
+            if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
             }
         } catch (IOException e) {
