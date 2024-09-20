@@ -171,8 +171,7 @@ class DownloadLinkedFileActionTest {
         stubFor(head(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "text/html; charset=utf-8")
-                        .withBody("<html><body><h1>Hi</h1></body></html>")));
+                        .withHeader("Content-Type", "text/html; charset=utf-8")));
 
         LinkedFile linkedFile = new LinkedFile(new URL("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
@@ -208,8 +207,7 @@ class DownloadLinkedFileActionTest {
         stubFor(head(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "text/html; charset=utf-8")
-                        .withBody("<html><body><h1>Hi</h1></body></html>")));
+                        .withHeader("Content-Type", "text/html; charset=utf-8")));
 
         LinkedFile linkedFile = new LinkedFile(new URL("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
