@@ -37,9 +37,8 @@ import static org.mockito.Mockito.when;
 
 class DownloadLinkedFileActionTest {
 
-    // Required for keepsHtmlEntry
     @TempDir
-    Path tempFolder;
+    private Path tempFolder;
 
     private BibEntry entry;
 
