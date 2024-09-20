@@ -11,6 +11,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.JabRefGUI;
@@ -21,6 +24,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -175,19 +179,22 @@ public class Launcher {
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
                 LOGGER.debug("Pinging other instance succeeded.");
-                // We are not alone, there is already a server out there, send command line
-                // arguments to other instance
-                LOGGER.debug("Passing arguments passed on to running JabRef...");
-                if (remoteClient.sendCommandLineArguments(args)) {
-                    // So we assume it's all taken care of, and quit.
-                    // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
-                    LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
-                    return false;
+                // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
+                if (args.length == 0) {
+                    SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, Localization.lang("Another JabRef instance is already running. Please switch to that instance.")));
                 } else {
-                    LOGGER.warn("Could not communicate with other running JabRef instance.");
-                    // We do not launch a new instance in presence of an error
-                    return false;
+                    // We are not alone, there is already a server out there, send command line arguments to other instance
+                    LOGGER.debug("Passing arguments passed on to running JabRef...");
+                    if (remoteClient.sendCommandLineArguments(args)) {
+                        // So we assume it's all taken care of, and quit.
+                        // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
+                        LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
+                    } else {
+                        LOGGER.warn("Could not communicate with other running JabRef instance.");
+                    }
                 }
+                // We do not launch a new instance in presence of an error
+                return false;
             } else {
                 LOGGER.debug("Could not ping JabRef instance.");
             }
