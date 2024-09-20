@@ -67,6 +67,7 @@ public class URLDownload {
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+    private static final int MAX_RETRIES = 3;
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
@@ -116,11 +117,13 @@ public class URLDownload {
     public Optional<String> getMimeType() {
         String contentType;
 
+        int retries = 0;
         // Try to use HEAD request to avoid downloading the whole file
         try {
             String urlToCheck = source.toString();
             String locationHeader;
             do {
+                retries++;
                 HttpResponse<String> response = Unirest.head(urlToCheck).asString();
                 // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
                 // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
@@ -129,7 +132,7 @@ public class URLDownload {
                     urlToCheck = locationHeader;
                 }
                 // while loop, because there could be multiple redirects
-            } while (!StringUtil.isNullOrEmpty(locationHeader));
+            } while (!StringUtil.isNullOrEmpty(locationHeader) && retries <= MAX_RETRIES);
             contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
