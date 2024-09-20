@@ -1,6 +1,5 @@
 package org.jabref.gui.linkedfile;
 
-import java.io.File;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -140,10 +139,10 @@ class DownloadLinkedFileActionTest {
 
         linkedFile = entry.getFiles().getFirst();
 
-        File downloadedFile = new File(linkedFile.getLink());
+        Path downloadedFile = Path.of(linkedFile.getLink());
 
         // Verify that re-downloading the file after the first download doesn't modify the entry
-        downloadedFile.delete();
+        Files.delete(downloadedFile);
 
         DownloadLinkedFileAction downloadLinkedFileAction2 = new DownloadLinkedFileAction(
                 databaseContext,
