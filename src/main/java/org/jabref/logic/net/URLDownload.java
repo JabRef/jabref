@@ -126,7 +126,7 @@ public class URLDownload {
                     urlToCheck = locationHeader;
                 }
                 // while loop, because there could be multiple redirects
-            } while (StringUtil.isNullOrEmpty(locationHeader));
+            } while (!StringUtil.isNullOrEmpty(locationHeader));
             contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
