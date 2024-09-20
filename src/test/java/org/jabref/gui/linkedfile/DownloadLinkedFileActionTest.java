@@ -24,12 +24,19 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -47,6 +54,8 @@ class DownloadLinkedFileActionTest {
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
+
+    private WireMockServer wireMockServer;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
@@ -69,6 +78,15 @@ class DownloadLinkedFileActionTest {
             cookieManager = (CookieManager) CookieHandler.getDefault();
         }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+
+        wireMockServer = new WireMockServer(2331);
+        wireMockServer.start();
+        configureFor("localhost", 2331);
+    }
+
+    @AfterEach
+    void tearDown() {
+        wireMockServer.stop();
     }
 
     @Test
@@ -144,9 +162,13 @@ class DownloadLinkedFileActionTest {
 
     @Test
     void keepsHtmlEntry(@TempDir Path tempFolder) throws Exception {
-        String url = "https://blog.fefe.de/?ts=98e04151";
+        stubFor(get(urlEqualTo("/html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html; charset=utf-8")
+                        .withBody("<html><body><h1>Hi</h1></body></html>")));
 
-        LinkedFile linkedFile = new LinkedFile(new URL(url), "");
+        LinkedFile linkedFile = new LinkedFile(new URL("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -171,9 +193,13 @@ class DownloadLinkedFileActionTest {
 
     @Test
     void removesHtmlEntry(@TempDir Path tempFolder) throws Exception {
-        String url = "https://blog.fefe.de/?ts=98e04151";
+        stubFor(get(urlEqualTo("/html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html; charset=utf-8")
+                        .withBody("<html><body><h1>Hi</h1></body></html>")));
 
-        LinkedFile linkedFile = new LinkedFile(new URL(url), "");
+        LinkedFile linkedFile = new LinkedFile(new URL("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
