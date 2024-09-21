@@ -185,5 +185,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires langchain4j.google.ai.gemini;
+    requires javafx.swing;
     // endregion
 }
