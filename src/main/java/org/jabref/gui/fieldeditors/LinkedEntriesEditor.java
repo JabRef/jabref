@@ -5,6 +5,7 @@ import java.util.Comparator;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -39,17 +40,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedEntriesEditor.class);
+    private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
-    @FXML public TagsField<ParsedEntryLink> entryLinkField;
+    @FXML private LinkedEntriesEditorViewModel viewModel;
+    @FXML private TagsField<ParsedEntryLink> entryLinkField;
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
-
-    private final LinkedEntriesEditorViewModel viewModel;
 
     public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         ViewLoader.view(this)
@@ -66,9 +66,12 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         entryLinkField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
         entryLinkField.setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
         entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));
+
         entryLinkField.setShowSearchIcon(false);
+        entryLinkField.setOnMouseClicked(event -> entryLinkField.getEditor().requestFocus());
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
+        entryLinkField.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> entryLinkField.pseudoClassStateChanged(FOCUSED, newValue));
 
         String separator = EntryLinkList.SEPARATOR;
         entryLinkField.getEditor().setOnKeyReleased(event -> {
