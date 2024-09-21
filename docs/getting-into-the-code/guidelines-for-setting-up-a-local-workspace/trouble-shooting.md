@@ -88,4 +88,10 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program.
 
-For reference, see issue [#11766](https://github.com/JabRef/jabref/issues/11766).
+In an ideal scenario, a password prompt should appear when the program starts, provided the keyring your OS uses has not already been unlocked. However, the implementation details vary depending on the operating system, which makes troubleshooting more complex.
+
+For Windows and macOS users, specific configurations may differ based on the password management tools and settings used, so ensure your OS's password management system is properly set up and functioning.
+
+For Linux users, ensure that your [xdg-desktop-portal](https://wiki.archlinux.org/title/XDG_Desktop_Portal) settings refer to active and valid portal implementations installed on your system. However, there might be other factors involved, so additional research or guidance specific to your distribution may be necessary.
+
+For reference, see the discussion at issue [#11766](https://github.com/JabRef/jabref/issues/11766).

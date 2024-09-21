@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -39,7 +40,9 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
@@ -64,11 +67,19 @@ public class URLDownload {
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+    private static final int MAX_RETRIES = 3;
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+
+    static {
+        Unirest.config()
+               .followRedirects(true)
+               .enableCookieManagement(true)
+               .setDefaultHeader("User-Agent", USER_AGENT);
+    }
 
     /**
      * @param source the URL to download from
@@ -103,15 +114,28 @@ public class URLDownload {
         return source;
     }
 
-    public String getMimeType() {
-        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
-
+    public Optional<String> getMimeType() {
         String contentType;
+
+        int retries = 0;
         // Try to use HEAD request to avoid downloading the whole file
         try {
-            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
+            String urlToCheck = source.toString();
+            String locationHeader;
+            do {
+                retries++;
+                HttpResponse<String> response = Unirest.head(urlToCheck).asString();
+                // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
+                // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
+                locationHeader = response.getHeaders().getFirst("location");
+                if (!StringUtil.isNullOrEmpty(locationHeader)) {
+                    urlToCheck = locationHeader;
+                }
+                // while loop, because there could be multiple redirects
+            } while (!StringUtil.isNullOrEmpty(locationHeader) && retries <= MAX_RETRIES);
+            contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+                return Optional.of(contentType);
             }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via HEAD request", e);
@@ -120,8 +144,8 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
-            if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+            if (!StringUtil.isNullOrEmpty(contentType)) {
+                return Optional.of(contentType);
             }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via GET request", e);
@@ -130,16 +154,15 @@ public class URLDownload {
         // Try to resolve local URIs
         try {
             URLConnection connection = new URL(source.toString()).openConnection();
-
             contentType = connection.getContentType();
-            if ((contentType != null) && !contentType.isEmpty()) {
-                return contentType;
+            if (!StringUtil.isNullOrEmpty(contentType)) {
+                return Optional.of(contentType);
             }
         } catch (IOException e) {
             LOGGER.debug("Error trying to get MIME type of local URI", e);
         }
 
-        return "";
+        return Optional.empty();
     }
 
     /**
@@ -149,24 +172,13 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-        // new unirest version does not support apache http client any longer
-        Unirest.config().reset()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
     }
 
     public boolean isMimeType(String type) {
-        String mime = getMimeType();
-
-        if (mime.isEmpty()) {
-            return false;
-        }
-
-        return mime.startsWith(type);
+        return getMimeType().map(mimeType -> mimeType.startsWith(type)).orElse(false);
     }
 
     public boolean isPdf() {
@@ -333,7 +345,7 @@ public class URLDownload {
     /**
      * Open a connection to this object's URL (with specified settings).
      * <p>
-     * If accessing an HTTP URL, remeber to close the resulting connection after usage.
+     * If accessing an HTTP URL, remember to close the resulting connection after usage.
      *
      * @return an open connection
      */
@@ -356,12 +368,14 @@ public class URLDownload {
             }
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
                 try {
+                    httpURLConnection.disconnect();
+                    // multiple redirects are implemented by this recursion
                     connection = new URLDownload(newUrl).openConnection();
                 } catch (MalformedURLException e) {
                     throw new FetcherException("Could not open URL Download", e);
@@ -370,9 +384,9 @@ public class URLDownload {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
                 LOGGER.info("{}", httpResponse);
-                if ((status >= 400) && (status < 500)) {
+                if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
-                } else if (status >= 500) {
+                } else {
                     throw new FetcherServerException(this.source, httpResponse);
                 }
             }
