@@ -11,10 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.control.Alert;
-
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.JabRefGUI;
@@ -25,7 +21,6 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -170,14 +165,6 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
 
-    private static void showDialog() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Opening multiple JabRef instance");
-        alert.setHeaderText(null);
-        alert.setContentText(Localization.lang("Another JabRef instance is already running. Please switch to that instance."));
-        alert.showAndWait();
-    }
-
     /**
      * @return true if JabRef should continue starting up, false if it should quit.
      */
@@ -190,11 +177,8 @@ public class Launcher {
                 LOGGER.debug("Pinging other instance succeeded.");
                 // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
                 if (args.length == 0) {
-                    new JFXPanel();
-                    Platform.runLater(() -> {
-                        showDialog();
-                        Platform.exit();
-                    });
+                    remoteClient.sendCommandLineArguments(new String[] {"This JabRef instance has already running. Please don't open a new one."});
+                    LOGGER.debug("This JabRef instance is already running. Please switch to that instance.");
                 } else {
                     // We are not alone, there is already a server out there, send command line arguments to other instance
                     LOGGER.debug("Passing arguments passed on to running JabRef...");
