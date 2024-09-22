@@ -29,24 +29,27 @@ import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LuceneManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
+public class IndexManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexManager.class);
 
     private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
     private final BooleanProperty shouldIndexLinkedFiles;
     private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
+    private final PostgreIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
     private final LinkedFilesSearcher linkedFilesSearcher;
-    private final PostgreIndexer postgreIndexer;
 
-    public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
+    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
+
+        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+        bibFieldsIndexer = new PostgreIndexer(databaseContext, postgreServer.getConnection());
 
         LuceneIndexer indexer;
         try {
@@ -58,8 +61,6 @@ public class LuceneManager {
         linkedFilesIndexer = indexer;
 
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences);
-        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        postgreIndexer = new PostgreIndexer(databaseContext, postgreServer.getConnection());
         updateOnStart();
     }
 
@@ -81,7 +82,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                postgreIndexer.updateOnStart(this);
+                bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
         }.showToUser(true)
@@ -104,7 +105,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                postgreIndexer.addToIndex(entries, this);
+                bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
@@ -125,7 +126,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                postgreIndexer.removeFromIndex(entries, this);
+                bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
@@ -146,7 +147,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                postgreIndexer.updateEntry(event.getBibEntry(), event.getField());
+                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
@@ -167,7 +168,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                postgreIndexer.updateEntry(entry, StandardField.FILE);
+                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
@@ -197,14 +198,14 @@ public class LuceneManager {
     }
 
     public void close() {
-        postgreIndexer.close();
+        bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
     public void closeAndWait() {
-        postgreIndexer.closeAndWait();
+        bibFieldsIndexer.closeAndWait();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());

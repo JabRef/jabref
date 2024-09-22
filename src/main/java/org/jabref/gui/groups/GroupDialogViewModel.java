@@ -32,7 +32,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -331,10 +331,10 @@ public class GroupDialogViewModel {
                     }
                 }
 
-                Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
-                if (luceneManager.isPresent()) {
+                Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
+                if (indexManager.isPresent()) {
                     SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    searchGroup.setMatchedEntries(luceneManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                    searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getQuery()).getMatchedEntries());
                 }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {

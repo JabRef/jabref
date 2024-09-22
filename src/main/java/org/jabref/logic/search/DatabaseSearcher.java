@@ -20,13 +20,13 @@ public class DatabaseSearcher {
 
     private final BibDatabaseContext databaseContext;
     private final SearchQuery query;
-    private final LuceneManager luceneManager;
+    private final IndexManager indexManager;
 
-    // get rid of task executor here or add a constuctor overload?
+    // get rid of task executor here or add a constructor overload?
     public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);
-        this.luceneManager = new LuceneManager(databaseContext, taskExecutor, filePreferences);
+        this.indexManager = new IndexManager(databaseContext, taskExecutor, filePreferences);
     }
 
     /**
@@ -37,15 +37,15 @@ public class DatabaseSearcher {
 
         if (!query.isValid()) {
             LOGGER.warn("Search failed: invalid search expression");
-            luceneManager.closeAndWait();
+            indexManager.closeAndWait();
             return Collections.emptyList();
         }
-        List<BibEntry> matchEntries = luceneManager.search(query)
-                                                   .getMatchedEntries()
-                                                   .stream()
-                                                   .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
-                                                   .toList();
-        luceneManager.closeAndWait();
+        List<BibEntry> matchEntries = indexManager.search(query)
+                                                  .getMatchedEntries()
+                                                  .stream()
+                                                  .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
+                                                  .toList();
+        indexManager.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }

@@ -12,7 +12,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -20,7 +19,7 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -56,17 +55,16 @@ public class MainTableDataModel {
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
-    private final LuceneIndexListener indexUpdatedListener;
+    private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
-    @Nullable private final LuceneManager luceneManager;
+    @Nullable private final IndexManager indexManager;
 
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              StateManager stateManager,
-                              @Nullable LuceneManager luceneManager,
+                              @Nullable IndexManager indexManager,
                               ListProperty<GroupTreeNode> selectedGroupsProperty,
                               OptionalObjectProperty<SearchQuery> searchQueryProperty,
                               IntegerProperty resultSizeProperty) {
@@ -74,10 +72,10 @@ public class MainTableDataModel {
         this.searchPreferences = preferences.getSearchPreferences();
         this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
-        this.luceneManager = luceneManager;
+        this.indexManager = indexManager;
         this.bibDatabaseContext = context;
         this.searchQueryProperty = searchQueryProperty;
-        this.indexUpdatedListener = new LuceneIndexListener();
+        this.indexUpdatedListener = new SearchIndexListener();
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
 
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
@@ -100,7 +98,7 @@ public class MainTableDataModel {
     private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
             if (query.isPresent()) {
-                SearchResults results = luceneManager.search(query.get());
+                SearchResults results = indexManager.search(query.get());
                 setSearchMatches(results);
             } else {
                 clearSearchMatches();
@@ -202,7 +200,7 @@ public class MainTableDataModel {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 
-    class LuceneIndexListener {
+    class SearchIndexListener {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
@@ -216,7 +214,7 @@ public class MainTableDataModel {
                             SearchQuery searchQuery = searchQueryProperty.get().get();
                             String newSearchExpression = "+" + SearchFieldConstants.ENTRY_ID + ":" + entry.getId() + " +" + searchQuery.getSearchExpression();
                             SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
-                            SearchResults results = luceneManager.search(entryQuery);
+                            SearchResults results = indexManager.search(entryQuery);
 
                             viewModel.searchScoreProperty().set(results.getSearchScoreForEntry(entry));
                             viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));

@@ -28,7 +28,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -55,7 +55,7 @@ public class CommentsTab extends FieldsEditorTab {
                        ThemeManager themeManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       LuceneManager luceneManager,
+                       IndexManager indexManager,
                        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 false,
@@ -69,7 +69,7 @@ public class CommentsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                luceneManager,
+                indexManager,
                 searchQueryProperty
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
