@@ -24,7 +24,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private enum SearchTermFlag {
-        REGULAR_EXPRESSION, CASE_SENSITIVE, EXACT_MATCH
+        REGULAR_EXPRESSION,               // mutually exclusive to the others
+        NEGATION,
+        CASE_SENSITIVE, CASE_INSENSITIVE, // mutually exclusive
+        EXACT_MATCH, INEXACT_MATCH        // mutually exclusive
     }
 
     @Override
@@ -70,11 +73,33 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             // Direct comparison does not work
             // context.CONTAINS() and others are null if absent (thus, we cannot check for getText())
             EnumSet<SearchTermFlag> searchFlags = EnumSet.noneOf(SearchTermFlag.class);
-            if (context.MATCHES() != null || context.EEQUAL() != null) {
-                searchFlags.add(SearchTermFlag.EXACT_MATCH);
+            if (context.REQUAL() != null) {
+                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
+            } else {
+                if (context.CONTAINS() != null || context.EQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.INEXACT_MATCH);
+                    searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+                } else if (context.NEQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.INEXACT_MATCH);
+                    searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+                    searchFlags.add(SearchTermFlag.NEGATION);
+                } else if (context.CEQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.INEXACT_MATCH);
+                    searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+//                } else if (context.NCEQUAL() != null) {
+//                    searchFlags.add(SearchTermFlag.INEXACT_MATCH);
+//                    searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+//                    searchFlags.add(SearchTermFlag.NEGATION);
+                } else if (context.MATCHES() != null || context.EEQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                    searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+                } else if (context.CEEQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                    searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+                } else if (context.NEQUAL() != null) {
+                    searchFlags.add(SearchTermFlag.NEGATION);
+                }
             }
-            // TODO: Add check for regular expression
-            // TODO: Add check for case sensitivity
 
             // NEQUAL is treated at unaryExpression
             assert (context.NEQUAL() == null);
@@ -82,7 +107,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             return getFieldQueryNode(field, right, searchFlags);
         } else {
             // Query without any field name
-            return getFieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), right, EnumSet.noneOf(SearchTermFlag.class));
+            return getFieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), right, EnumSet.of(SearchTermFlag.INEXACT_MATCH, SearchTermFlag.CASE_INSENSITIVE));
         }
     }
 
@@ -103,13 +128,15 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
          */
         // TODO: Handle search flags
         String operator = "~*";
+        String prefixSuffix = "";
+        boolean negation = searchFlags.contains(SearchTermFlag.NEGATION);
         if (searchFlags.equals(EnumSet.of(SearchTermFlag.REGULAR_EXPRESSION))) {
             operator = "~*";
-        } else if (searchFlags.equals(EnumSet.of(SearchTermFlag.CASE_SENSITIVE, SearchTermFlag.EXACT_MATCH))) {
-            return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " ~ '\\y'" + term + "\\y')";
+        } else if (searchFlags.equals(EnumSet.of(SearchTermFlag.CASE_INSENSITIVE, SearchTermFlag.INEXACT_MATCH))) {
+            operator = "~*";
         } else if (searchFlags.equals(EnumSet.of(SearchTermFlag.CASE_SENSITIVE))) {
             return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " ~ '\\y'" + term + "\\y')";
         }
-        return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " " + operator + " '" + term + "')";
+        return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
     }
 }
