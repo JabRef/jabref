@@ -274,6 +274,14 @@ public class BibDatabaseContext {
         return indexPath;
     }
 
+    public String getPostgreTableName() {
+        if (getDatabasePath().isPresent()) {
+            Path databasePath = getDatabasePath().get();
+            return BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+        }
+        return "unsaved";
+    }
+
     @Override
     public String toString() {
         return "BibDatabaseContext{" +

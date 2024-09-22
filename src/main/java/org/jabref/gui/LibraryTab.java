@@ -92,7 +92,6 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.DirectoryMonitor;
@@ -1150,7 +1149,7 @@ public class LibraryTab extends Tab {
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            luceneManager.updateEntry(fieldChangedEvent.getBibEntry(), fieldChangedEvent.getOldValue(), fieldChangedEvent.getNewValue(), fieldChangedEvent.getField().equals(StandardField.FILE));
+            luceneManager.updateEntry(fieldChangedEvent);
         }
     }
 

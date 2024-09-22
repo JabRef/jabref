@@ -10,12 +10,15 @@ import javafx.beans.value.ChangeListener;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
+import org.jabref.logic.search.indexing.PostgreIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
@@ -23,6 +26,7 @@ import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +41,7 @@ public class LuceneManager {
     private final LuceneIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
     private final LuceneSearcher luceneSearcher;
+    private final PostgreIndexer postgreIndexer;
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
         this.taskExecutor = executor;
@@ -57,6 +62,8 @@ public class LuceneManager {
         linkedFilesIndexer = indexer;
 
         this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer, preferences);
+        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+        postgreIndexer = new PostgreIndexer(databaseContext, postgreServer.getConnection());
         updateOnStart();
     }
 
@@ -78,7 +85,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateOnStart(this);
+                postgreIndexer.updateOnStart(this);
                 return null;
             }
         }.showToUser(true)
@@ -101,7 +108,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.addToIndex(entries, this);
+                postgreIndexer.addToIndex(entries, this);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
@@ -122,7 +129,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.removeFromIndex(entries, this);
+                postgreIndexer.removeFromIndex(entries, this);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
@@ -139,21 +146,21 @@ public class LuceneManager {
         }
     }
 
-    public void updateEntry(BibEntry entry, String oldValue, String newValue, boolean isLinkedFile) {
+    public void updateEntry(FieldChangedEvent event) {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
+                postgreIndexer.updateEntry(event.getBibEntry(), event.getField());
                 return null;
             }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
          .executeWith(taskExecutor);
 
-        if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
+        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE) && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
-                    linkedFilesIndexer.updateEntry(entry, oldValue, newValue, this);
+                    linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
                     return null;
                 }
             }.executeWith(taskExecutor);
@@ -164,7 +171,7 @@ public class LuceneManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(entry, "", "", this);
+                postgreIndexer.updateEntry(entry, StandardField.FILE);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
@@ -206,6 +213,7 @@ public class LuceneManager {
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
+        postgreIndexer.close();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
