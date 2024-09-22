@@ -506,8 +506,7 @@ public class OpenOfficePanel {
 
         final Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
 
-        if (activeDatabase.isEmpty()
-                || (activeDatabase.get().getDatabase() == null)) {
+        if (activeDatabase.isEmpty() || (activeDatabase.get().getDatabase() == null)) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
