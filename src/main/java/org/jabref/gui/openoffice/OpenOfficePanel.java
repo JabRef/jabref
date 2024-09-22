@@ -402,23 +402,25 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnected = ooBase != null;
-        boolean isConnectedToDocument = isConnected && !ooBase.isDocumentConnectionMissing();
+        boolean isConnectedToDocument = (ooBase != null && !ooBase.isDocumentConnectionMissing());
+        boolean hasStyle = (currentStyle != null);
+        boolean hasDatabase = !getBaseList().isEmpty();
+        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
+        boolean canCite = isConnectedToDocument && hasStyle;
+        boolean cslStyleSelected = currentStyle instanceof CitationStyle;
 
-        selectDocument.setDisable(!isConnected);
-        pushEntries.setDisable(!isConnectedToDocument);
+        selectDocument.setDisable(!isConnectedToDocument);
 
-        boolean cslStyleSelected = openOfficePreferences.getCurrentStyle() instanceof CitationStyle;
-        pushEntriesInt.setDisable(!isConnectedToDocument);
-        pushEntriesEmpty.setDisable(!isConnectedToDocument);
-        pushEntriesAdvanced.setDisable(!isConnectedToDocument || cslStyleSelected);
+        pushEntries.setDisable(!(canCite && hasDatabase));
+        pushEntriesInt.setDisable(!(canCite && hasDatabase));
+        pushEntriesEmpty.setDisable(!(canCite && hasDatabase));
+        pushEntriesAdvanced.setDisable(!(canCite && hasDatabase) || cslStyleSelected);
 
-        update.setDisable(!isConnectedToDocument);
-        merge.setDisable(!isConnectedToDocument || cslStyleSelected);
-        unmerge.setDisable(!isConnectedToDocument || cslStyleSelected);
-        manageCitations.setDisable(!isConnectedToDocument || cslStyleSelected);
-
-        exportCitations.setDisable(!isConnectedToDocument || cslStyleSelected);
+        update.setDisable(!canRefreshDocument);
+        merge.setDisable(!canRefreshDocument || cslStyleSelected);
+        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
+        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
     }
 
     private void connect() {
@@ -502,23 +504,19 @@ public class OpenOfficePanel {
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
-        if (stateManager.getActiveDatabase().isEmpty()
-                || (stateManager.getActiveDatabase().get().getDatabase() == null)) {
+        final Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+
+        if (activeDatabase.isEmpty()
+                || (activeDatabase.get().getDatabase() == null)) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
             return;
         }
 
-        final BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
+        final BibDatabaseContext bibDatabaseContext = activeDatabase.get();
 
         List<BibEntry> entries = stateManager.getSelectedEntries();
-        if (entries.isEmpty()) {
-            OOError.noEntriesSelectedForCitation()
-                   .setTitle(errorDialogTitle)
-                   .showErrorDialog(dialogService);
-            return;
-        }
 
         if (getOrUpdateTheStyle(errorDialogTitle)) {
             return;
