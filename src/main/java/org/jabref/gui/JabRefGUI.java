@@ -168,7 +168,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
@@ -376,6 +375,8 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
+        LOGGER.trace("Closing chat history service");
+        chatHistoryService.close();
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
         LOGGER.trace("Stopping background tasks");
