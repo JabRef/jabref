@@ -406,15 +406,15 @@ public class OpenOfficePanel {
         boolean hasStyle = (currentStyle != null);
         boolean hasDatabase = !getBaseList().isEmpty();
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
-        boolean canCite = isConnectedToDocument && hasStyle;
+        boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
 
         selectDocument.setDisable(!isConnectedToDocument);
 
-        pushEntries.setDisable(!(canCite && hasDatabase));
-        pushEntriesInt.setDisable(!(canCite && hasDatabase));
-        pushEntriesEmpty.setDisable(!(canCite && hasDatabase));
-        pushEntriesAdvanced.setDisable(!(canCite && hasDatabase) || cslStyleSelected);
+        pushEntries.setDisable(!canCite);
+        pushEntriesInt.setDisable(!canCite);
+        pushEntriesEmpty.setDisable(!canCite);
+        pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
 
         update.setDisable(!canRefreshDocument);
         merge.setDisable(!canRefreshDocument || cslStyleSelected);
