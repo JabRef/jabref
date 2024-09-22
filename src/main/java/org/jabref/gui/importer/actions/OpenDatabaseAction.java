@@ -109,7 +109,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .build();
 
         List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        openFiles(filesToOpen);
+        openFiles(new ArrayList<>(filesToOpen));
     }
 
     /**
