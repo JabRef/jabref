@@ -8,11 +8,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.PostgreIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
-import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,9 +37,8 @@ public class LuceneManager {
     private final BooleanProperty shouldIndexLinkedFiles;
     private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
-    private final LuceneIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
-    private final LuceneSearcher luceneSearcher;
+    private final LinkedFilesSearcher linkedFilesSearcher;
     private final PostgreIndexer postgreIndexer;
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
@@ -49,8 +47,6 @@ public class LuceneManager {
         this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
-
-        this.bibFieldsIndexer = new BibFieldsIndexer(databaseContext);
 
         LuceneIndexer indexer;
         try {
@@ -61,7 +57,7 @@ public class LuceneManager {
         }
         linkedFilesIndexer = indexer;
 
-        this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer, preferences);
+        this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences);
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
         postgreIndexer = new PostgreIndexer(databaseContext, postgreServer.getConnection());
         updateOnStart();
@@ -188,16 +184,7 @@ public class LuceneManager {
         }
     }
 
-    public void rebuildIndex() {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.rebuildIndex(this);
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
-         .showToUser(true).executeWith(taskExecutor);
-
+    public void rebuildFullTextIndex() {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
@@ -210,15 +197,14 @@ public class LuceneManager {
     }
 
     public void close() {
-        bibFieldsIndexer.close();
+        postgreIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
-        postgreIndexer.close();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
     public void closeAndWait() {
-        bibFieldsIndexer.closeAndWait();
+        postgreIndexer.closeAndWait();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
@@ -232,7 +218,7 @@ public class LuceneManager {
 
     public SearchResults search(SearchQuery query) {
         if (query.isValid()) {
-            query.setSearchResults(luceneSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
+            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
         } else {
             query.setSearchResults(new SearchResults());
         }
@@ -240,6 +226,6 @@ public class LuceneManager {
     }
 
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
-        return luceneSearcher.isEntryMatched(entry, query);
+        return true;
     }
 }

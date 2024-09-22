@@ -51,7 +51,6 @@ public class MainTableDataModel {
     private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
-    private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
@@ -75,7 +74,6 @@ public class MainTableDataModel {
         this.searchPreferences = preferences.getSearchPreferences();
         this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
-        this.stateManager = stateManager;
         this.luceneManager = luceneManager;
         this.bibDatabaseContext = context;
         this.searchQueryProperty = searchQueryProperty;

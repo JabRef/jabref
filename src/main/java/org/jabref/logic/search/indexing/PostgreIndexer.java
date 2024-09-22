@@ -185,16 +185,22 @@ public class PostgreIndexer {
     }
 
     public void close() {
-        HeadlessExecutorService.INSTANCE.execute(() -> {
-            try {
-                LOGGER.debug("Closing connection to Postgres server for library: {}", libraryName);
-                connection.createStatement().executeUpdate("""
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+    }
+
+    private void closeIndex() {
+        try {
+            LOGGER.debug("Closing connection to Postgres server for library: {}", libraryName);
+            connection.createStatement().executeUpdate("""
                         DROP TABLE IF EXISTS "%s"
                         """.formatted(tableName));
-                connection.close();
-            } catch (SQLException e) {
-                LOGGER.error("Could not drop table for library: {}", libraryName, e);
-            }
-        });
+            connection.close();
+        } catch (SQLException e) {
+            LOGGER.error("Could not drop table for library: {}", libraryName, e);
+        }
     }
 }
