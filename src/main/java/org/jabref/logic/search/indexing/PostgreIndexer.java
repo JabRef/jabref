@@ -161,24 +161,27 @@ public class PostgreIndexer {
     public void updateEntry(BibEntry entry, Field field) {
         try {
             // Use upsert to add the field to the index if it doesn't exist, or update it if it does
-            connection.createStatement().executeUpdate("""
-                INSERT INTO "%s" ("%s", "%s", "%s")
-                VALUES ('%s', '%s', '%s')
-                ON CONFLICT ("%s", "%s") DO UPDATE
-                SET "%s" = EXCLUDED."%s"
-                """.formatted(tableName,
+            String updateQuery = """
+            INSERT INTO "%s" ("%s", "%s", "%s")
+            VALUES (?, ?, ?)
+            ON CONFLICT ("%s", "%s") DO UPDATE
+            SET "%s" = EXCLUDED."%s"
+            """.formatted(tableName,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
                     PostgreConstants.FIELD_VALUE,
-                    entry.getId(),
-                    field.getName(),
-                    entry.getField(field).orElse(""),
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
                     PostgreConstants.FIELD_VALUE,
-                    PostgreConstants.FIELD_VALUE));
+                    PostgreConstants.FIELD_VALUE);
 
-            LOGGER.debug("Updated entry {} in index", entry.getId());
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                preparedStatement.setString(1, entry.getId());
+                preparedStatement.setString(2, field.getName());
+                preparedStatement.setString(3, entry.getField(field).orElse(""));
+                preparedStatement.executeUpdate();
+                LOGGER.debug("Updated entry {} in index", entry.getId());
+            }
         } catch (SQLException e) {
             LOGGER.error("Error updating entry in index", e);
         }
