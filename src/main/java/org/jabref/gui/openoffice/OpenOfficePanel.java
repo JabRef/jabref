@@ -405,8 +405,8 @@ public class OpenOfficePanel {
         boolean isConnectedToDocument = (ooBase != null && !ooBase.isDocumentConnectionMissing());
         boolean hasStyle = (currentStyle != null);
         boolean hasDatabase = !getBaseList().isEmpty();
-        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
+        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
 
         selectDocument.setDisable(!isConnectedToDocument);
