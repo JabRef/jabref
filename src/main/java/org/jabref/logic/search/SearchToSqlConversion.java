@@ -1,4 +1,4 @@
-package org.jabref.migrations;
+package org.jabref.logic.search;
 
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
@@ -7,19 +7,13 @@ import org.jabref.search.SearchParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 
-/**
- * @deprecated This class is deprecated and will be removed in the future. We use Search.g4 as main search grammar
- */
-@Deprecated
-public class SearchToLuceneMigration {
-    public static String migrateToLuceneSyntax(String searchExpression, boolean isRegularExpression) {
+public class SearchToSqlConversion {
+
+    public static String searchToSql(String table, String searchExpression) {
         SearchParser.StartContext context = getStartContext(searchExpression);
-        SearchToLuceneVisitor searchToLuceneVisitor = new SearchToLuceneVisitor(isRegularExpression);
-        QueryNode luceneQueryNode = searchToLuceneVisitor.visit(context);
-        return luceneQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
+        SearchToSqlVisitor searchToSqlVisitor = new SearchToSqlVisitor(table);
+        return searchToSqlVisitor.visit(context);
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
