@@ -73,6 +73,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
 - We fixed an issue where two contradicting notifications were shown when cutting an entry in the main table. [#11724](https://github.com/JabRef/jabref/pull/11724)
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
+- We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
+- We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
 
 ### Removed
 
