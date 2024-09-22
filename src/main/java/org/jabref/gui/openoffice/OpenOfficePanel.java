@@ -518,6 +518,13 @@ public class OpenOfficePanel {
 
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
+        if (entries.isEmpty()) {
+            OOError.noEntriesSelectedForCitation()
+                   .setTitle(errorDialogTitle)
+                   .showErrorDialog(dialogService);
+            return;
+        }
+
         if (getOrUpdateTheStyle(errorDialogTitle)) {
             return;
         }
