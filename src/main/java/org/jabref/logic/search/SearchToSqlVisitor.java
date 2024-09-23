@@ -4,6 +4,8 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.logic.search.indexing.PostgreConstants;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -111,20 +113,13 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
-        /*
         field = switch (field) {
-            case "anyfield" -> field(PostgreConstants.FIELD_VALUE.toString()).eq;
+            case "anyfield" -> SearchFieldConstants.DEFAULT_FIELD.toString();
             case "anykeyword" -> StandardField.KEYWORDS.getName();
             case "key" -> InternalField.KEY_FIELD.getName();
             default -> field;
         };
 
-        if (isRegularExpression || forceRegex) {
-            // Lucene does a sanity check on the positions, thus we provide other fake positions
-            return new RegexpQueryNode(field, term, 0, term.length());
-        }
-        return new FieldQueryNode(field, term, startIndex, stopIndex);
-         */
         String operator = "";
         String prefixSuffix = "";
 
@@ -142,6 +137,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             operator += "~*";
         }
 
+        if (SearchFieldConstants.DEFAULT_FIELD.toString().equals(field)) {
+            return "(" + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        }
         return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
     }
 }

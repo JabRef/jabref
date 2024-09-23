@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SearchToSqlConversionTest {
     @ParameterizedTest
     @CsvSource({
+            // Default search, query without any field name (case insensitive contains)
+            "SELECT entry_id FROM tableName WHERE (field_value ~* 'compute'), compute",
             // case insensitive contains
             "SELECT entry_id FROM tableName WHERE (field_name = 'title' AND field_value ~* 'compute'), title=compute",
             // case sensitive contains
