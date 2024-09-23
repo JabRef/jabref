@@ -145,7 +145,7 @@ public class UiTaskExecutor implements TaskExecutor {
     public void shutdown() {
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
         if (stateManager != null) {
-            stateManager.getRunningBackgroundTasks().forEach(Task::cancel);
+            stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
@@ -193,14 +193,9 @@ public class UiTaskExecutor implements TaskExecutor {
             javaTask.setOnRunning(event -> onRunning.run());
         }
         Consumer<V> onSuccess = task.getOnSuccess();
-        javaTask.setOnSucceeded(event -> {
-            // Set to 100% completed on completion
-            task.updateProgress(1, 1);
-
-            if (onSuccess != null) {
-                onSuccess.accept(javaTask.getValue());
-            }
-        });
+        if (onSuccess != null) {
+            javaTask.setOnSucceeded(event -> onSuccess.accept(javaTask.getValue()));
+        }
         Consumer<Exception> onException = task.getOnException();
         if (onException != null) {
             javaTask.setOnFailed(event -> onException.accept(convertToException(javaTask.getException())));

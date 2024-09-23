@@ -46,7 +46,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
@@ -66,7 +65,6 @@ public class MainToolBar extends ToolBar {
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
-    private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
                        PushToApplicationCommand pushToApplicationCommand,
@@ -211,11 +209,15 @@ public class MainToolBar extends ToolBar {
             }
         });
 
-        // The label of the indicator cannot be removed with styling. Therefore,
-        // hide it and clip it to a square of (width x width) each time width is updated.
+        /*
+        The label of the indicator cannot be removed with styling. Therefore,
+        hide it and clip it to a square of (width x width) each time width is updated.
+         */
         indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            // The indeterminate spinner is wider than the determinate spinner.
-            // We must make sure they are the same width for the clipping to result in a square of the same size always.
+            /*
+            The indeterminate spinner is wider than the determinate spinner.
+            We must make sure they are the same width for the clipping to result in a square of the same size always.
+             */
             if (!indicator.isIndeterminate()) {
                 indicator.setPrefWidth(newValue.doubleValue());
             }
@@ -226,24 +228,23 @@ public class MainToolBar extends ToolBar {
         });
 
         indicator.setOnMouseClicked(event -> {
-            if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
-                progressViewPopOver.hide();
-                taskProgressSubscription.unsubscribe();
-            }
-
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
-            taskProgressView.setRetainTasks(false);
+            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);
                 progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
                 progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            } else if (progressViewPopOver.isShowing()) {
+                progressViewPopOver.hide();
+            } else {
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
             }
-
-            progressViewPopOver.setContentNode(taskProgressView);
-            progressViewPopOver.show(indicator);
         });
 
         return new Group(indicator);
