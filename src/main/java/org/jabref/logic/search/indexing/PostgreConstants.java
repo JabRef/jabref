@@ -12,7 +12,7 @@ public enum PostgreConstants {
     }
 
     public String getIndexName(String tableName) {
-        return String.format("%s_%s_index", tableName, this.columnName);
+        return "%s_%s_index".formatted(tableName, this.columnName);
     }
 
     @Override
