@@ -43,6 +43,13 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 (Sorted alphabetically by Id)
 
 ```yaml
+Id:      ai.djl.*:*
+Project: Deep Java Library
+URL:     https://djl.ai/
+License: Apache-2.0
+```
+
+```yaml
 Id:      at.favre.lib
 Project: HMAC-based Key Derivation Function (HKDF) RFC 5869
 URL:     https://github.com/patrickfav/hkdf
@@ -82,6 +89,13 @@ Id:      com.fasterxml.jackson
 Project: Jackson Project
 URL:     https://github.com/FasterXML/jackson
 License: Apache-2.0
+```
+
+```yaml
+Id:      com.knuddels:jtokkit
+Project: JTokkit - Java Tokenizer Kit
+URL:     https://github.com/knuddelsgmbh/jtokkit
+License: MIT
 ```
 
 ```yaml
@@ -209,13 +223,6 @@ Id:      com.sun.istack:istack-commons-runtime
 Project: iStack Common Utility Code
 URL:     https://github.com/eclipse-ee4j/jaxb-istack-commons
 License: BSD-3-Clause (with copyright as described in Eclipse Distribution License - v 1.0 - see https://wiki.spdx.org/view/Legal_Team/License_List/Licenses_Under_Consideration for details)
-```
-
-```yaml
-Id:      com.tobiasdiez:easybind
-Project: EasyBind
-URL:     https://github.com/tobiasdiez/EasyBind
-License: BSD-2-Clause
 ```
 
 ```yaml
@@ -542,6 +549,13 @@ SourcePath: lib/ic4j-src.jar
 ```
 
 ```yaml
+Id:      org.jabref:easybind
+Project: EasyBind
+URL:     https://github.com/JabRef/EasyBind
+License: BSD-2-Clause
+```
+
+```yaml
 Id:      org.jooq:jool
 Project: JOOλ
 URL:     https://github.com/jOOQ/jOOL
@@ -699,8 +713,13 @@ License: BSD-3-Clause
 3. (on WSL) `sed 's/[^a-z]*//' < build/reports/project/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
+ai.djl.huggingface:tokenizers:0.30.0
+ai.djl.pytorch:pytorch-engine:0.30.0
+ai.djl.pytorch:pytorch-model-zoo:0.30.0
+ai.djl:api:0.30.0
+ai.djl:bom:0.30.0
 at.favre.lib:hkdf:1.1.0
-com.dlsc.gemsfx:gemsfx:2.32.0
+com.dlsc.gemsfx:gemsfx:2.48.0
 com.dlsc.pickerfx:pickerfx:1.3.1
 com.dlsc.unitfx:unitfx:1.0.10
 com.fasterxml.jackson.core:jackson-annotations:2.17.2
@@ -717,21 +736,22 @@ com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9
 com.github.tomtung:latex2unicode_2.13:0.3.2
 com.github.vatbub:mslinks:1.0.6.2
 com.github.weisj:jsvg:1.2.0
-com.google.code.gson:gson:2.10.1
-com.google.errorprone:error_prone_annotations:2.26.1
+com.google.code.gson:gson:2.11.0
+com.google.errorprone:error_prone_annotations:2.27.0
 com.google.guava:failureaccess:1.0.2
 com.google.guava:guava:33.1.0-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:3.0.0
 com.googlecode.javaewah:JavaEWAH:1.2.3
 com.googlecode.plist:dd-plist:1.28
-com.h2database:h2-mvstore:2.2.224
-com.kohlschutter.junixsocket:junixsocket-common:2.9.1
-com.kohlschutter.junixsocket:junixsocket-core:2.9.1
-com.kohlschutter.junixsocket:junixsocket-mysql:2.9.1
-com.kohlschutter.junixsocket:junixsocket-native-common:2.9.1
-com.konghq:unirest-java-core:4.4.0
-com.konghq:unirest-modules-gson:4.4.0
+com.h2database:h2-mvstore:2.3.232
+com.knuddels:jtokkit:1.1.0
+com.kohlschutter.junixsocket:junixsocket-common:2.10.0
+com.kohlschutter.junixsocket:junixsocket-core:2.10.0
+com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0
+com.kohlschutter.junixsocket:junixsocket-native-common:2.10.0
+com.konghq:unirest-java-core:4.4.4
+com.konghq:unirest-modules-gson:4.4.4
 com.oracle.ojdbc:ojdbc10:19.3.0.0
 com.oracle.ojdbc:ons:19.3.0.0
 com.oracle.ojdbc:osdt_cert:19.3.0.0
@@ -739,7 +759,6 @@ com.oracle.ojdbc:osdt_core:19.3.0.0
 com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
 com.sun.istack:istack-commons-runtime:4.1.2
-com.tobiasdiez:easybind:2.2.1-SNAPSHOT
 com.vladsch.flexmark:flexmark-ext-emoji:0.64.8
 com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.8
 com.vladsch.flexmark:flexmark-ext-ins:0.64.8
@@ -762,12 +781,12 @@ com.vladsch.flexmark:flexmark-util-visitor:0.64.8
 com.vladsch.flexmark:flexmark-util:0.64.8
 com.vladsch.flexmark:flexmark:0.64.8
 commons-beanutils:commons-beanutils:1.9.4
-commons-cli:commons-cli:1.8.0
-commons-codec:commons-codec:1.17.0
+commons-cli:commons-cli:1.9.0
+commons-codec:commons-codec:1.17.1
 commons-collections:commons-collections:3.2.2
 commons-digester:commons-digester:2.1
 commons-io:commons-io:2.16.1
-commons-logging:commons-logging:1.3.2
+commons-logging:commons-logging:1.3.4
 commons-validator:commons-validator:1.8.0
 de.rototor.jeuclid:jeuclid-core:3.1.11
 de.rototor.snuggletex:snuggletex-core:1.3.0
@@ -788,30 +807,30 @@ jakarta.xml.bind:jakarta.xml.bind-api:4.0.2
 javax.measure:unit-api:2.2
 net.harawata:appdirs:1.2.2
 net.java.dev.jna:jna-platform:5.13.0
-net.java.dev.jna:jna:5.13.0
+net.java.dev.jna:jna:5.14.0
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
 net.synedra:validatorfx:0.5.0
 one.jpro.jproutils:tree-showing:0.2.2
-org.antlr:antlr4-runtime:4.13.1
+org.antlr:antlr4-runtime:4.13.2
 org.apache.commons:commons-csv:1.11.0
-org.apache.commons:commons-lang3:3.14.0
+org.apache.commons:commons-lang3:3.17.0
 org.apache.commons:commons-text:1.12.0
 org.apache.httpcomponents.client5:httpclient5:5.3.1
 org.apache.httpcomponents.core5:httpcore5-h2:5.2.4
 org.apache.httpcomponents.core5:httpcore5:5.2.4
-org.apache.logging.log4j:log4j-api:2.23.1
-org.apache.logging.log4j:log4j-to-slf4j:2.23.1
+org.apache.logging.log4j:log4j-api:2.24.0
+org.apache.logging.log4j:log4j-to-slf4j:2.24.0
 org.apache.lucene:lucene-analysis-common:9.11.1
 org.apache.lucene:lucene-core:9.11.1
 org.apache.lucene:lucene-highlighter:9.11.1
 org.apache.lucene:lucene-queries:9.11.1
 org.apache.lucene:lucene-queryparser:9.11.1
 org.apache.lucene:lucene-sandbox:9.11.1
-org.apache.pdfbox:fontbox:3.0.2
-org.apache.pdfbox:pdfbox-io:3.0.2
-org.apache.pdfbox:pdfbox:3.0.2
-org.apache.pdfbox:xmpbox:3.0.2
+org.apache.pdfbox:fontbox:3.0.3
+org.apache.pdfbox:pdfbox-io:3.0.3
+org.apache.pdfbox:pdfbox:3.0.3
+org.apache.pdfbox:xmpbox:3.0.3
 org.apiguardian:apiguardian-api:1.1.2
 org.bouncycastle:bcprov-jdk18on:1.78.1
 org.checkerframework:checker-qual:3.42.0
@@ -833,18 +852,19 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3
 org.glassfish.jaxb:jaxb-core:4.0.3
 org.glassfish.jaxb:jaxb-runtime:4.0.3
 org.glassfish.jaxb:txw2:4.0.3
-org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.7
-org.glassfish.jersey.core:jersey-client:3.1.7
-org.glassfish.jersey.core:jersey-common:3.1.7
-org.glassfish.jersey.core:jersey-server:3.1.7
-org.glassfish.jersey.inject:jersey-hk2:3.1.7
+org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.8
+org.glassfish.jersey.core:jersey-client:3.1.8
+org.glassfish.jersey.core:jersey-common:3.1.8
+org.glassfish.jersey.core:jersey-server:3.1.8
+org.glassfish.jersey.inject:jersey-hk2:3.1.8
 org.jabref:afterburner.fx:2.0.0
+org.jabref:easybind:2.2.1-SNAPSHOT
 org.javassist:javassist:3.30.2-GA
 org.jbibtex:jbibtex:1.0.20
 org.jetbrains:annotations:24.0.1
 org.jooq:jool:0.9.15
-org.jsoup:jsoup:1.17.2
-org.jspecify:jspecify:0.3.0
+org.jsoup:jsoup:1.18.1
+org.jspecify:jspecify:1.0.0
 org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.3.1
 org.kordamp.ikonli:ikonli-core:12.3.1
 org.kordamp.ikonli:ikonli-javafx:12.3.1
@@ -854,22 +874,22 @@ org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
 org.libreoffice:libreoffice:24.2.3
 org.libreoffice:unoloader:24.2.3
 org.mariadb.jdbc:mariadb-java-client:2.7.9
-org.openjfx:javafx-base:22.0.1
-org.openjfx:javafx-controls:22.0.1
-org.openjfx:javafx-fxml:22.0.1
-org.openjfx:javafx-graphics:22.0.1
-org.openjfx:javafx-media:22.0.1
-org.openjfx:javafx-swing:22.0.1
-org.openjfx:javafx-web:22.0.1
-org.postgresql:postgresql:42.7.3
+org.openjfx:javafx-base:23
+org.openjfx:javafx-controls:23
+org.openjfx:javafx-fxml:23
+org.openjfx:javafx-graphics:23
+org.openjfx:javafx-media:23
+org.openjfx:javafx-swing:23
+org.openjfx:javafx-web:23
+org.postgresql:postgresql:42.7.4
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
-org.slf4j:jul-to-slf4j:2.0.13
-org.slf4j:slf4j-api:2.0.13
+org.slf4j:jul-to-slf4j:2.0.16
+org.slf4j:slf4j-api:2.0.16
 org.tinylog:slf4j-tinylog:2.7.0
 org.tinylog:tinylog-api:2.7.0
 org.tinylog:tinylog-impl:2.7.0
-org.yaml:snakeyaml:2.2
+org.yaml:snakeyaml:2.3
 pt.davidafsilva.apple:jkeychain:1.1.0
 tech.units:indriya:2.2
 tech.uom.lib:uom-lib-common:2.2
