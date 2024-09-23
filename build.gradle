@@ -210,7 +210,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // Support unix socket connection types
-    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.0'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
     implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
