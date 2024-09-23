@@ -92,6 +92,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      com.knuddels:jtokkit
+Project: JTokkit - Java Tokenizer Kit
+URL:     https://github.com/knuddelsgmbh/jtokkit
+License: MIT
+```
+
+```yaml
 Id:      com.github.hypfvieh.dbus-java
 Project: dbus-java
 URL:     https://github.com/hypfvieh/dbus-java
@@ -738,6 +745,7 @@ com.google.j2objc:j2objc-annotations:3.0.0
 com.googlecode.javaewah:JavaEWAH:1.2.3
 com.googlecode.plist:dd-plist:1.28
 com.h2database:h2-mvstore:2.3.232
+com.knuddels:jtokkit:1.1.0
 com.kohlschutter.junixsocket:junixsocket-common:2.10.0
 com.kohlschutter.junixsocket:junixsocket-core:2.10.0
 com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0
