@@ -350,7 +350,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20'
     // endregion
 
-    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'commons-io:commons-io:2.17.0'
 
     // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
