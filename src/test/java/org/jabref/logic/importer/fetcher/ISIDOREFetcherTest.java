@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -60,18 +61,19 @@ class ISIDOREFetcherTest {
 
     @Test
     void checkThesis() throws FetcherException {
-        BibEntry expected = new BibEntry(StandardEntryType.Thesis)
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Thesis)
                 .withField(StandardField.TITLE, "Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system")
                 .withField(StandardField.AUTHOR, "Wensheng Xie")
                 .withField(StandardField.YEAR, "2024");
 
+        Optional<BibEntry> expected = Optional.of(expectedEntry);
+
         List<BibEntry> actual = fetcher.performSearch("Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system");
 
         // The results obtained by the fetcher contain three entries (as of 2024), and the first matches our expected entry. So, we can use actual.getFirst(), but shall still use findFirst() in case the order of returned items changes.
-        BibEntry matchingEntry = actual.stream()
-                                       .filter(entry -> entry.equals(expected))
-                                       .findFirst()
-                                       .orElse(null);
+        Optional<BibEntry> matchingEntry = actual.stream()
+                                                 .filter(entry -> entry.equals(expectedEntry))
+                                                 .findFirst();
 
         assertEquals(expected, matchingEntry);
     }
