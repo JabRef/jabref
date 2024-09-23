@@ -61,21 +61,19 @@ class ISIDOREFetcherTest {
 
     @Test
     void checkThesis() throws FetcherException {
-        BibEntry expectedEntry = new BibEntry(StandardEntryType.Thesis)
+        BibEntry expected = new BibEntry(StandardEntryType.Thesis)
                 .withField(StandardField.TITLE, "Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system")
                 .withField(StandardField.AUTHOR, "Wensheng Xie")
                 .withField(StandardField.YEAR, "2024");
-
-        Optional<BibEntry> expected = Optional.of(expectedEntry);
 
         List<BibEntry> actual = fetcher.performSearch("Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system");
 
         // The results obtained by the fetcher contain three entries (as of 2024), and the first matches our expected entry. So, we can use actual.getFirst(), but shall still use findFirst() in case the order of returned items changes.
         Optional<BibEntry> matchingEntry = actual.stream()
-                                                 .filter(entry -> entry.equals(expectedEntry))
+                                                 .filter(entry -> entry.equals(expected))
                                                  .findFirst();
 
-        assertEquals(expected, matchingEntry);
+        assertEquals(Optional.of(expected), matchingEntry);
     }
 
     @Test
