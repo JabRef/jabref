@@ -14,15 +14,15 @@ EQUAL:'='; // case insensitive contains, semantically the same as CONTAINS
 CEQUAL:'=!'; // case sensitive contains
 
 EEQUAL:'=='; // exact match case insensitive, semantically the same as MATCHES
-CEEQUAL:'==!'; // exact match case sensitive
 
 NEQUAL:'!='; //  negated case insensitive contains
 NCEQUAL:'!=!'; // negated case sensitive contains
 
-NEEQUAL:'!=='; // negated case insensitive exact match
-NCEEQUAL:'!==!'; // negated case sensitive exact match
+REQUAL:'=~'; // regex check case insensitive
+CREEQUAL:'=~!'; // regex check case sensitive
 
-REQUAL:'=~'; // regex check
+NREQUAL:'!=~'; // negated regex check case insensitive
+NCREEQUAL:'!=~!'; // negated regex check case sensitive
 
 AND:[aA][nN][dD]; // 'and' case insensitive
 OR:[oO][rR]; // 'or' case insensitive
@@ -52,7 +52,7 @@ expression:
     ;
 
 comparison:
-    left=name operator=(CONTAINS | EQUAL | CEQUAL | MATCHES | EEQUAL | CEEQUAL | NEQUAL | NCEQUAL | NEEQUAL | NCEEQUAL | REQUAL) right=name // example: author != miller
+    left=name operator=(CONTAINS | EQUAL | CEQUAL | MATCHES | EEQUAL | NEQUAL | NCEQUAL | REQUAL | CREEQUAL | NREQUAL | NCREEQUAL) right=name // example: author != miller
     | right=name                                                                 // example: miller (search all fields)
     ;
 
