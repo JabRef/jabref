@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -61,14 +62,18 @@ class ISIDOREFetcherTest {
     @Test
     void checkThesis() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Thesis)
-                .withField(StandardField.TITLE, "Mapping English L2 errors: an integrated system and textual approach")
-                .withField(StandardField.AUTHOR, "Clive E. Hamilton")
-                .withField(StandardField.YEAR, "2015");
+                .withField(StandardField.TITLE, "Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system")
+                .withField(StandardField.AUTHOR, "Wensheng Xie")
+                .withField(StandardField.YEAR, "2024");
 
-        List<BibEntry> actual = fetcher.performSearch("Mapping English L2 errors: an integrated system and textual approach");
+        List<BibEntry> actual = fetcher.performSearch("Phosphate homeostasis and transport in relation with the liver microsomal glucose-6-phosphatase system");
 
-        // Fetcher returns the same entry twice. Since 2024, it also returns an additional entry. We just ignore this for now.
-        assertEquals(expected, actual.getFirst());
+        // The results obtained by the fetcher contain three entries (as of 2024), and the first matches our expected entry. So, we can use actual.getFirst(), but shall still use findFirst() in case the order of returned items changes.
+        Optional<BibEntry> matchingEntry = actual.stream()
+                                                 .filter(entry -> entry.equals(expected))
+                                                 .findFirst();
+
+        assertEquals(Optional.of(expected), matchingEntry);
     }
 
     @Test
