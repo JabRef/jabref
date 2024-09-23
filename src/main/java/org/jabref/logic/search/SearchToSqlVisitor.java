@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.jabref.logic.search.indexing.PostgreConstants;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -113,13 +112,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
-        field = switch (field) {
-            case "anyfield" -> SearchFieldConstants.DEFAULT_FIELD.toString();
-            case "anykeyword" -> StandardField.KEYWORDS.getName();
-            case "key" -> InternalField.KEY_FIELD.getName();
-            default -> field;
-        };
-
         String operator = "";
         String prefixSuffix = "";
 
@@ -136,6 +128,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         } else {
             operator += "~*";
         }
+
+        if ("anyfield".equals(field) || "any".equals(field)) {
+            return "(" + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        }
+
+        if ("anykeyword".equals(field)) {
+            // TODO
+        }
+
+        field = switch (field) {
+            case "key" -> InternalField.KEY_FIELD.getName();
+            default -> field;
+        };
 
         if (SearchFieldConstants.DEFAULT_FIELD.toString().equals(field)) {
             return "(" + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
