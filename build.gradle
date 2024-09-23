@@ -251,6 +251,7 @@ dependencies {
     }
     // Required by gemsfx
     implementation 'tech.units:indriya:2.2'
+    // Required by gemsfx and langchain4j
     implementation ('com.squareup.retrofit2:retrofit:2.11.0') {
         exclude group: 'com.squareup.okhttp3'
     }
@@ -331,11 +332,25 @@ dependencies {
     implementation 'dev.langchain4j:langchain4j:0.34.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
     implementation('dev.langchain4j:langchain4j-open-ai:0.34.0') {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-mistral-ai:0.34.0')
-    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.34.0')
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0')
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.34.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.34.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+    }
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
 
     implementation platform('ai.djl:bom:0.30.0')
     implementation 'ai.djl:api'
