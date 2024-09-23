@@ -226,13 +226,6 @@ License: BSD-3-Clause (with copyright as described in Eclipse Distribution Licen
 ```
 
 ```yaml
-Id:      com.tobiasdiez:easybind
-Project: EasyBind
-URL:     https://github.com/tobiasdiez/EasyBind
-License: BSD-2-Clause
-```
-
-```yaml
 Id:      com.vladsch.flexmark:flexmark-all
 Project: flexmark-java
 URL:     https://github.com/vsch/flexmark-java
@@ -556,6 +549,13 @@ SourcePath: lib/ic4j-src.jar
 ```
 
 ```yaml
+Id:      org.jabref:easybind
+Project: EasyBind
+URL:     https://github.com/JabRef/EasyBind
+License: BSD-2-Clause
+```
+
+```yaml
 Id:      org.jooq:jool
 Project: JOOλ
 URL:     https://github.com/jOOQ/jOOL
@@ -759,7 +759,6 @@ com.oracle.ojdbc:osdt_core:19.3.0.0
 com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
 com.sun.istack:istack-commons-runtime:4.1.2
-com.tobiasdiez:easybind:2.2.1-SNAPSHOT
 com.vladsch.flexmark:flexmark-ext-emoji:0.64.8
 com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.8
 com.vladsch.flexmark:flexmark-ext-ins:0.64.8
@@ -859,6 +858,7 @@ org.glassfish.jersey.core:jersey-common:3.1.8
 org.glassfish.jersey.core:jersey-server:3.1.8
 org.glassfish.jersey.inject:jersey-hk2:3.1.8
 org.jabref:afterburner.fx:2.0.0
+org.jabref:easybind:2.2.1-SNAPSHOT
 org.javassist:javassist:3.30.2-GA
 org.jbibtex:jbibtex:1.0.20
 org.jetbrains:annotations:24.0.1
