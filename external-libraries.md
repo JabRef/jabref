@@ -43,6 +43,13 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 (Sorted alphabetically by Id)
 
 ```yaml
+Id:      ai.djl.*:*
+Project: Deep Java Library
+URL:     https://djl.ai/
+License: Apache-2.0
+```
+
+```yaml
 Id:      at.favre.lib
 Project: HMAC-based Key Derivation Function (HKDF) RFC 5869
 URL:     https://github.com/patrickfav/hkdf
@@ -699,8 +706,13 @@ License: BSD-3-Clause
 3. (on WSL) `sed 's/[^a-z]*//' < build/reports/project/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
+ai.djl.huggingface:tokenizers:0.30.0
+ai.djl.pytorch:pytorch-engine:0.30.0
+ai.djl.pytorch:pytorch-model-zoo:0.30.0
+ai.djl:api:0.30.0
+ai.djl:bom:0.30.0
 at.favre.lib:hkdf:1.1.0
-com.dlsc.gemsfx:gemsfx:2.32.0
+com.dlsc.gemsfx:gemsfx:2.48.0
 com.dlsc.pickerfx:pickerfx:1.3.1
 com.dlsc.unitfx:unitfx:1.0.10
 com.fasterxml.jackson.core:jackson-annotations:2.17.2
@@ -717,21 +729,21 @@ com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9
 com.github.tomtung:latex2unicode_2.13:0.3.2
 com.github.vatbub:mslinks:1.0.6.2
 com.github.weisj:jsvg:1.2.0
-com.google.code.gson:gson:2.10.1
-com.google.errorprone:error_prone_annotations:2.26.1
+com.google.code.gson:gson:2.11.0
+com.google.errorprone:error_prone_annotations:2.27.0
 com.google.guava:failureaccess:1.0.2
 com.google.guava:guava:33.1.0-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:3.0.0
 com.googlecode.javaewah:JavaEWAH:1.2.3
 com.googlecode.plist:dd-plist:1.28
-com.h2database:h2-mvstore:2.2.224
-com.kohlschutter.junixsocket:junixsocket-common:2.9.1
-com.kohlschutter.junixsocket:junixsocket-core:2.9.1
-com.kohlschutter.junixsocket:junixsocket-mysql:2.9.1
-com.kohlschutter.junixsocket:junixsocket-native-common:2.9.1
-com.konghq:unirest-java-core:4.4.0
-com.konghq:unirest-modules-gson:4.4.0
+com.h2database:h2-mvstore:2.3.232
+com.kohlschutter.junixsocket:junixsocket-common:2.10.0
+com.kohlschutter.junixsocket:junixsocket-core:2.10.0
+com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0
+com.kohlschutter.junixsocket:junixsocket-native-common:2.10.0
+com.konghq:unirest-java-core:4.4.4
+com.konghq:unirest-modules-gson:4.4.4
 com.oracle.ojdbc:ojdbc10:19.3.0.0
 com.oracle.ojdbc:ons:19.3.0.0
 com.oracle.ojdbc:osdt_cert:19.3.0.0
