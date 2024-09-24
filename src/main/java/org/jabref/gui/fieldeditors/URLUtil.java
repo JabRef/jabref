@@ -79,7 +79,7 @@ public class URLUtil {
         try {
             URI.create(url).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return false;
         }
     }
