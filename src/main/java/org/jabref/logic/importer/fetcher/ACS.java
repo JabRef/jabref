@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class ACS implements FulltextFetcher {
 
         if (link != null) {
             LOGGER.info("Fulltext PDF found @ ACS.");
-            return Optional.of(new URL(source.replaceFirst("/abs/", "/pdf/")));
+            return Optional.of(URI.create(source.replaceFirst("/abs/", "/pdf/")).toURL());
         }
         return Optional.empty();
     }

@@ -100,6 +100,8 @@ recipeList:
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
+  - org.openrewrite.java.migrate.net.JavaNetAPIs
+  - org.openrewrite.java.migrate.net.URLConstructorsToURIRecipes
   - org.openrewrite.java.migrate.util.SequencedCollection
   - org.openrewrite.java.migrate.lang.StringFormatted
 

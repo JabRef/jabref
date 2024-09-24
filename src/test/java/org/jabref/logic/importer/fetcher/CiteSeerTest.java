@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
@@ -100,7 +101,7 @@ class CiteSeerTest {
     void findByIdAsDOI() throws FetcherException, IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e");
-        Optional<URL> expected = Optional.of(new URL("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
+        Optional<URL> expected = Optional.of(URI.create("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e").toURL());
         assertEquals(expected, fetcher.findFullText(entry));
     }
 
@@ -109,7 +110,7 @@ class CiteSeerTest {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "")
                 .withField(StandardField.URL, "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf");
-        Optional<URL> expected = Optional.of(new URL("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"));
+        Optional<URL> expected = Optional.of(URI.create("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf").toURL());
         assertEquals(expected, fetcher.findFullText(entry));
     }
 

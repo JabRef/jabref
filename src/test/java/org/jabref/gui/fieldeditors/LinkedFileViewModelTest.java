@@ -5,6 +5,7 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,7 +198,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
-        URL url = new URL("https://www.google.com/");
+        URL url = URI.create("https://www.google.com/").toURL();
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
@@ -274,7 +275,7 @@ class LinkedFileViewModelTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
-        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+        linkedFile = new LinkedFile(URI.create("http://arxiv.org/pdf/1207.0408v1").toURL(), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");

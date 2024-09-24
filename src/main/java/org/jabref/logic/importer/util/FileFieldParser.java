@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.util;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -59,7 +60,7 @@ public class FileFieldParser {
         if (LinkedFile.isOnlineLink(value.trim())) {
             // needs to be modifiable
             try {
-                return List.of(new LinkedFile(new URL(value), ""));
+                return List.of(new LinkedFile(URI.create(value).toURL(), ""));
             } catch (MalformedURLException e) {
                 LOGGER.error("invalid url", e);
                 return files;
@@ -157,7 +158,7 @@ public class FileFieldParser {
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
-                field = new LinkedFile(entry.getFirst(), new URL(entry.get(1)), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), URI.create(entry.get(1)).toURL(), entry.get(2));
             } catch (MalformedURLException e) {
                 // in case the URL is malformed, store it nevertheless
                 field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
