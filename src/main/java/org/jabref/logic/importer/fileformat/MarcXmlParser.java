@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.time.DateTimeException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -383,7 +383,7 @@ public class MarcXmlParser implements Parser {
 
             if ("Volltext".equals(fulltext)) {
                 try {
-                    LinkedFile linkedFile = new LinkedFile(new URL(resource), "PDF");
+                    LinkedFile linkedFile = new LinkedFile(URI.create(resource).toURL(), "PDF");
                     bibEntry.setField(StandardField.FILE, linkedFile.toString());
                 } catch (MalformedURLException e) {
                     LOGGER.info("Malformed URL: {}", resource);
@@ -405,7 +405,7 @@ public class MarcXmlParser implements Parser {
 
             if ("Volltext".equals(fulltext) && StringUtil.isNotBlank(resource)) {
                 try {
-                    LinkedFile linkedFile = new LinkedFile(new URL(resource), "PDF");
+                    LinkedFile linkedFile = new LinkedFile(URI.create(resource).toURL(), "PDF");
                     bibEntry.setField(StandardField.FILE, linkedFile.toString());
                 } catch (MalformedURLException e) {
                     LOGGER.info("Malformed URL: {}", resource);

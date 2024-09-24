@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -65,10 +66,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
 
         if (identifier.contains("/")) {
             // if identifier links to a entry with a valid doi
-            return new URL(start + identifier);
+            return URI.create(start + identifier).toURL();
         }
         // else use default doi start.
-        return new URL(start + "10.2307/" + identifier);
+        return URI.create(start + "10.2307/" + identifier).toURL();
     }
 
     @Override
@@ -125,7 +126,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
 
         String url = elements.getFirst().attr("href");
-        return Optional.of(new URL(url));
+        return Optional.of(URI.create(url).toURL());
     }
 
     @Override

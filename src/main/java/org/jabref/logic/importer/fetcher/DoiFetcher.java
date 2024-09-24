@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -121,7 +122,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
         URL doiURL;
         try {
-            doiURL = new URL(doi.get().getURIAsASCIIString());
+            doiURL = URI.create(doi.get().getURIAsASCIIString()).toURL();
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -218,7 +219,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
-            URLDownload download = getUrlDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));
+            URLDownload download = getUrlDownload(URI.create(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()).toURL());
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));
