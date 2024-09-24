@@ -145,7 +145,7 @@ public class UiTaskExecutor implements TaskExecutor {
     public void shutdown() {
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
         if (stateManager != null) {
-            stateManager.getRunningBackgroundTasks().stream().forEach(Task::cancel);
+            stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
