@@ -198,7 +198,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.2'
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.10.0.202406032230-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.0.0.202409031743-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.2'
@@ -801,7 +801,7 @@ jlink {
         uses 'ai.djl.repository.zoo.ZooProvider'
         uses 'dev.langchain4j.spi.prompt.PromptTemplateFactory'
         uses 'kong.unirest.core.json.JsonEngine'
-        uses 'org.eclipse.jgit.lib.GpgSigner'
+        uses 'org.eclipse.jgit.lib.Signer'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
