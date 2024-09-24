@@ -68,7 +68,7 @@ public class LuceneManager {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         } else {
             linkedFilesIndexer.removeAllFromIndex();
         }
@@ -81,8 +81,7 @@ public class LuceneManager {
                 bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
-        }.showToUser(true)
-         .willBeRecoveredAutomatically(true)
+        }.willBeRecoveredAutomatically(true)
          .onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
          .executeWith(taskExecutor);
 
@@ -93,7 +92,7 @@ public class LuceneManager {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -105,7 +104,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
@@ -114,7 +113,7 @@ public class LuceneManager {
                     linkedFilesIndexer.addToIndex(entries, this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -126,7 +125,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
@@ -135,7 +134,7 @@ public class LuceneManager {
                     linkedFilesIndexer.removeFromIndex(entries, this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -177,7 +176,7 @@ public class LuceneManager {
                     linkedFilesIndexer.addToIndex(List.of(entry), this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -189,7 +188,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
@@ -198,7 +197,7 @@ public class LuceneManager {
                     linkedFilesIndexer.rebuildIndex(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 

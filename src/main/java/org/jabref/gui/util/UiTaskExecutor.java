@@ -110,14 +110,17 @@ public class UiTaskExecutor implements TaskExecutor {
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
-        if (task.showToUser()) {
-            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-            if (stateManager != null) {
-                stateManager.addBackgroundTask(task, javafxTask);
-            } else {
-                LOGGER.info("Background task visible without GUI");
+
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        task.showToUserProperty().subscribe(showToUser -> {
+            if (showToUser) {
+                if (stateManager != null) {
+                    runInJavaFXThread(() -> stateManager.addBackgroundTask(task, javafxTask));
+                } else {
+                    LOGGER.info("Background task visible without GUI");
+                }
             }
-        }
+        });
         return execute(javafxTask);
     }
 
