@@ -19,7 +19,6 @@ public class PostgreServer {
         EmbeddedPostgres embeddedPostgres;
         try {
             embeddedPostgres = EmbeddedPostgres.builder()
-                                               .setPort(5033)
                                                .start();
             LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
         } catch (IOException e) {

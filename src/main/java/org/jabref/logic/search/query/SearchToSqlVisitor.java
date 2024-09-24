@@ -34,7 +34,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
-        return "SELECT " + PostgreConstants.ENTRY_ID + " FROM " + tableName + " WHERE " + visit(ctx.expression());
+        return "SELECT " + PostgreConstants.ENTRY_ID + " FROM \"" + tableName + "\" WHERE " + visit(ctx.expression()) + " GROUP BY " + PostgreConstants.ENTRY_ID;
     }
 
     @Override

@@ -39,6 +39,10 @@ public class PostgreIndexer {
         setup();
     }
 
+    public String getTableName() {
+        return tableName;
+    }
+
     /**
      * Creates a table for the library in the database, and sets up indexes on the columns.
      */

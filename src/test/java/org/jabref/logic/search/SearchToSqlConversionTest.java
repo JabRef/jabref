@@ -56,6 +56,6 @@ class SearchToSqlConversionTest {
     })
 
     void conversion(String expected, String input) {
-        assertEquals(expected, SearchToSqlConversion.searchToSql("tableName", input));
+        assertEquals(expected + " GROUP BY entry_id", SearchToSqlConversion.searchToSql("tableName", input));
     }
 }

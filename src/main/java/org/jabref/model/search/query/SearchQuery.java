@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.search.query.SearchToSqlConversion;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchFlags;
 
@@ -98,6 +99,10 @@ public class SearchQuery {
             parsedQuery = null;
             parseError = e.getMessage();
         }
+    }
+
+    public SqlSearchQuery getSqlQuery(String tableName) {
+        return new SqlSearchQuery(SearchToSqlConversion.searchToSql(tableName, query));
     }
 
     public String getSearchExpression() {

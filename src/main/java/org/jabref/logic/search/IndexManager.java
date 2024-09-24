@@ -11,6 +11,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.PostgreIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
+import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -18,12 +19,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.search.query.SearchResults;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ public class IndexManager {
     private final ChangeListener<Boolean> preferencesListener;
     private final PostgreIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
+    private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
     public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
@@ -60,6 +63,7 @@ public class IndexManager {
         }
         linkedFilesIndexer = indexer;
 
+        this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences);
         updateOnStart();
     }
@@ -218,10 +222,15 @@ public class IndexManager {
     }
 
     public SearchResults search(SearchQuery query) {
-        if (query.isValid()) {
-            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
+//        if (query.isValid()) {
+//            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
+//        } else {
+//            query.setSearchResults(new SearchResults());
+//        }
+        if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
+            // TODO: merge results from lucene and postgres
         } else {
-            query.setSearchResults(new SearchResults());
+            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getTableName())));
         }
         return query.getSearchResults();
     }
