@@ -29,6 +29,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -39,7 +40,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public class BackupManager {
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
@@ -73,7 +73,7 @@ public class BackupManager {
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
-    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
@@ -106,7 +106,7 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManager);

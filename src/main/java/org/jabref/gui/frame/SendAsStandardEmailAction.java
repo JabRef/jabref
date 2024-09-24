@@ -7,15 +7,15 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +26,17 @@ import org.slf4j.LoggerFactory;
  */
 public class SendAsStandardEmailAction extends SendAsEMailAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsStandardEmailAction.class);
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
 
     public SendAsStandardEmailAction(DialogService dialogService,
-                                     PreferencesService preferencesService,
+                                     GuiPreferences preferences,
                                      StateManager stateManager,
                                      BibEntryTypesManager entryTypesManager,
                                      TaskExecutor taskExecutor) {
-        super(dialogService, preferencesService, stateManager, taskExecutor);
-        this.preferencesService = preferencesService;
+        super(dialogService, preferences, stateManager, taskExecutor);
+        this.preferences = preferences;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -49,7 +49,7 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
 
     @Override
     protected String getSubject() {
-        return preferencesService.getExternalApplicationsPreferences().getEmailSubject();
+        return preferences.getExternalApplicationsPreferences().getEmailSubject();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
         StringWriter rawEntries = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
 
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
 
         for (BibEntry entry : entries) {
             try {

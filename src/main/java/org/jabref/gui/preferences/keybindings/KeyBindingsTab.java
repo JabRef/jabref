@@ -46,7 +46,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferencesService);
+        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferences);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(

@@ -11,30 +11,76 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
 - We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- Added the functionality to invoke offline reference parsing explicitly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- The dialog for [adding an entry using reference text](https://docs.jabref.org/collect/newentryfromplaintext) is now filled with the clipboard contents as default. [#11565](https://github.com/JabRef/jabref/pull/11565)
 - Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in `.layout` files. [#11505](https://github.com/JabRef/jabref/issues/11505)
 - Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
+- We enabled creating a new file link manually. [#11017](https://github.com/JabRef/jabref/issues/11017)
+- We added a toggle button to invert the selected groups. [#9073](https://github.com/JabRef/jabref/issues/9073)
+- We reintroduced the floating search in the main table. [#4237](https://github.com/JabRef/jabref/issues/4237)
+- We improved [cleanup](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) of `arXiv` IDs in distributed in the fields `note`, `version`, `institution`, and `eid` fields. [#11306](https://github.com/JabRef/jabref/issues/11306)
+- We added a switch not to store the linked file URL, because it caused troubles at other apps. [#11735](https://github.com/JabRef/jabref/pull/11735)
+- When starting a new SLR, the selected catalogs now persist within and across JabRef sessions. [koppor#614](https://github.com/koppor/jabref/issues/614)
+- We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
+- We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 
 ### Changed
 
+- The search syntax is changed to [Apache Lucene syntax](https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Overview) (also to be similar to the [online search syntax](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax)). [#11542](https://github.com/JabRef/jabref/pull/11542/)
+- When searching using a regular expression, one needs to enclose the search string in `/`. [#11542](https://github.com/JabRef/jabref/pull/11542/)
+- A search in "any" fields ignores the [groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups). [#7996](https://github.com/JabRef/jabref/issues/7996)
+- When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
 - JabRef does not show finished background tasks in the status bar popup. [#11574](https://github.com/JabRef/jabref/pull/11574)
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
+- ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
+- The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
+- The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
+- We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
+- We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
+- We improved the DOI detection in PDF imports. [#11782](https://github.com/JabRef/jabref/pull/11782)
 
 ### Fixed
 
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
+- We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
+- We fixed an issue that online and offline mode for new library creation were handled incorrectly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
+- We fixed an issue with query transformers (JStor and others). [#11643](https://github.com/JabRef/jabref/pull/11643)
 - We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
 - We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
+- We fixed an issue where the entry preview highlight was not working when searching before opening the entry editor. [#11659](https://github.com/JabRef/jabref/pull/11659)
+- We fixed an issue where text in Dark mode inside "Citation information" was not readable. [#11512](https://github.com/JabRef/jabref/issues/11512)
+- We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
+- We fixed the non-functionality of the option "Automatically sync bibliography when inserting citations" in the OpenOffice panel, when enabled in case of JStyles. [#11684](https://github.com/JabRef/jabref/issues/11684)
+- We fixed an issue where the library was not marked changed after a migration. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We fixed an issue where rebuilding the full-text search index was not working. [#11374](https://github.com/JabRef/jabref/issues/11374)
+- We fixed an issue where the progress of indexing linked files showed an incorrect number of files. [#11378](https://github.com/JabRef/jabref/issues/11378)
+- We fixed an issue where the full-text search results were incomplete. [#8626](https://github.com/JabRef/jabref/issues/8626)
+- We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
+- We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
+- We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
+- We fixed an issue where two contradicting notifications were shown when cutting an entry in the main table. [#11724](https://github.com/JabRef/jabref/pull/11724)
+- We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
+- We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
+- We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
 
 ### Removed
 
-
+- We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 
 
 

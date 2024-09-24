@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -14,7 +15,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RemoveLinksToNotExistentFilesTest {
+class RemoveLinksToNotExistentFilesTest {
     private Path fileBefore;
     private BibEntry entry;
     private RemoveLinksToNotExistentFiles removeLinks;

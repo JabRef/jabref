@@ -8,7 +8,8 @@ nav_order: 12
 
 ## Ensure that JDK 21 is available to IntelliJ
 
-Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
+Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.<br>
+**Note:** In some MacBooks, `Project Structure` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 21 is missing." %}
 ![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
@@ -64,8 +65,10 @@ Copy following text into your clipboard:
 ```text
 --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
 --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
---add-reads org.jabref=org.fxmisc.flowless
 --add-reads org.jabref=org.apache.commons.csv
+--add-reads org.jabref=org.fxmisc.flowless
+--add-reads org.jabref=langchain4j.core
+--add-reads org.jabref=langchain4j.open.ai
 ```
 
 Then double click inside the cell "Compilation options".
@@ -193,3 +196,5 @@ A right-click on "BibEntryTests" enables the debugger to start.
 {% figure caption:"Run window for the BibEntry test case" %}
 ![Run window for the BibEntry test case](guidelines-intellij-tests-are-green.png)
 {% endfigure %}
+
+<!-- markdownlint-disable-file MD033 -->

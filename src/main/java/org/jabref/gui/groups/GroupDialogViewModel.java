@@ -24,11 +24,15 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -47,11 +51,9 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -101,30 +103,32 @@ public class GroupDialogViewModel {
     private Validator keywordRegexValidator;
     private Validator keywordFieldEmptyValidator;
     private Validator keywordSearchTermEmptyValidator;
-    private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
     private CompositeValidator validator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final StateManager stateManager;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
-                                PreferencesService preferencesService,
+                                GuiPreferences preferences,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
-                                FileUpdateMonitor fileUpdateMonitor) {
+                                FileUpdateMonitor fileUpdateMonitor,
+                                StateManager stateManager) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.stateManager = stateManager;
 
         setupValidation();
         setValues();
@@ -140,11 +144,11 @@ public class GroupDialogViewModel {
 
         nameContainsDelimiterValidator = new FunctionBasedValidator<>(
                 nameProperty,
-                name -> !name.contains(Character.toString(preferencesService.getBibEntryPreferences().getKeywordSeparator())),
+                name -> !name.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())),
                 ValidationMessage.warning(
                         Localization.lang(
                                 "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(preferencesService.getBibEntryPreferences().getKeywordSeparator())
+                                Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
                         )));
 
         sameNameValidator = new FunctionBasedValidator<>(
@@ -205,29 +209,6 @@ public class GroupDialogViewModel {
                         Localization.lang("Search term is empty.")
                 )));
 
-        searchRegexValidator = new FunctionBasedValidator<>(
-                searchGroupSearchTermProperty,
-                input -> {
-                    if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                        return true;
-                    }
-
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    }
-
-                    try {
-                        Pattern.compile(input);
-                        return true;
-                    } catch (PatternSyntaxException e) {
-                        // Ignored
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s > %n %s".formatted(
-                        Localization.lang("Free search expression"),
-                        Localization.lang("Invalid regular expression."))));
-
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
@@ -246,7 +227,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> "aux".equalsIgnoreCase(extension))
+                                .map("aux"::equalsIgnoreCase)
                                 .orElse(false);
                     }
                 },
@@ -254,9 +235,9 @@ public class GroupDialogViewModel {
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
-                validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.addValidators(searchSearchTermEmptyValidator);
             } else {
-                validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.removeValidators(searchSearchTermEmptyValidator);
             }
         });
 
@@ -288,7 +269,7 @@ public class GroupDialogViewModel {
      * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */
     private Path getAbsoluteTexGroupPath(String input) {
-        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
@@ -313,7 +294,7 @@ public class GroupDialogViewModel {
                 resultingGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getBibEntryPreferences().getKeywordSeparator());
+                        preferences.getBibEntryPreferences().getKeywordSeparator());
             } else if (typeKeywordsProperty.getValue()) {
                 if (keywordGroupRegexProperty.getValue()) {
                     resultingGroup = new RegexKeywordGroup(
@@ -329,7 +310,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
                             keywordGroupCaseSensitiveProperty.getValue(),
-                            preferencesService.getBibEntryPreferences().getKeywordSeparator(),
+                            preferences.getBibEntryPreferences().getKeywordSeparator(),
                             false);
                 }
             } else if (typeSearchProperty.getValue()) {
@@ -338,6 +319,23 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
                         searchFlagsProperty.getValue());
+
+                if (currentDatabase.getMetaData().getGroupSearchSyntaxVersion().isEmpty()) {
+                    // If the syntax version for search groups is not present, it indicates that the groups
+                    // have not been migrated to the new syntax, or this is the first search group in the library.
+                    // If this is the first search group, set the syntax version to the new version.
+                    // Otherwise, it means that the user did not accept the migration to the new version.
+                    Optional<GroupTreeNode> groups = currentDatabase.getMetaData().getGroups();
+                    if (groups.filter(this::groupOrSubgroupIsSearchGroup).isEmpty()) {
+                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA);
+                    }
+                }
+
+                Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
+                if (luceneManager.isPresent()) {
+                    SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                    searchGroup.setMatchedEntries(luceneManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
@@ -374,7 +372,7 @@ public class GroupDialogViewModel {
             }
 
             if (resultingGroup != null) {
-                preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
+                preferences.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
                 resultingGroup.setColor(colorUseProperty.getValue() ? colorProperty.getValue() : null);
                 resultingGroup.setDescription(descriptionProperty.getValue());
@@ -406,7 +404,7 @@ public class GroupDialogViewModel {
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
-            groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
+            groupHierarchySelectedProperty.setValue(preferences.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
@@ -483,8 +481,8 @@ public class GroupDialogViewModel {
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(currentDatabase.getMetaData()
-                                                     .getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferencesService.getFilePreferences().getWorkingDirectory()))).build();
+                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()))).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
@@ -494,7 +492,7 @@ public class GroupDialogViewModel {
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
         MetaData metaData = currentDatabase.getMetaData();
-        metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).ifPresent(fileDirs::add);
+        metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).ifPresent(fileDirs::add);
 
         return fileDirs;
     }
@@ -513,10 +511,6 @@ public class GroupDialogViewModel {
 
     public ValidationStatus sameNameValidationStatus() {
         return sameNameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus searchRegexValidationStatus() {
-        return searchRegexValidator.getValidationStatus();
     }
 
     public ValidationStatus searchSearchTermEmptyValidationStatus() {
@@ -637,5 +631,17 @@ public class GroupDialogViewModel {
 
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
+    }
+
+    private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {
+        if (groupTreeNode.getGroup() instanceof SearchGroup) {
+            return true;
+        }
+        for (GroupTreeNode child : groupTreeNode.getChildren()) {
+            if (groupOrSubgroupIsSearchGroup(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

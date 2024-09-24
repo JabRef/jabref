@@ -24,9 +24,13 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -39,9 +43,10 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import dev.langchain4j.data.message.ChatMessage;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -49,7 +54,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final ChatHistoryService chatHistoryService;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -72,10 +78,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, GuiPreferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferencesService);
+        this.chatHistoryService = Objects.requireNonNull(chatHistoryService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
@@ -85,9 +92,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
-
-        // Init
-        refresh();
     }
 
     private void refresh() {
@@ -261,8 +265,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
-            newGroup.ifPresent(group -> {
 
+            newGroup.ifPresent(group -> {
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
                 String oldGroupName = oldGroupDef.getName();
 
@@ -278,11 +282,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
-                    boolean removePreviousAssignments = true;
                     // We found more than 2 groups, so we cannot simply remove old assignment
-                    if (groupsWithSameName >= 2) {
-                        removePreviousAssignments = false;
-                    }
+                    boolean removePreviousAssignments = groupsWithSameName < 2;
 
                     oldGroup.getGroupNode().setGroup(
                             group,
@@ -292,7 +293,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
-                    // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                    // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                     refresh();
                     return;
                 }
@@ -378,10 +379,55 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
-                // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                 refresh();
             });
         });
+    }
+
+    public void chatWithGroup(GroupNodeViewModel group) {
+        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
+        if (currentDatabase.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
+            return;
+        }
+
+        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
+
+        // We localize the name here, because it is used as the title of the window.
+        // See documentation for {@link AiChatGuardedComponent#name}.
+        StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
+        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
+
+        ObservableList<ChatMessage> chatHistory = chatHistoryService.getChatHistoryForGroup(group.getGroupNode());
+        ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
+
+        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
+    }
+
+    private void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
+        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+
+        if (existingWindow.isPresent()) {
+            existingWindow.get().requestFocus();
+        } else {
+            AiChatWindow aiChatWindow = new AiChatWindow(
+                    Injector.instantiateModelOrService(AiService.class),
+                    dialogService,
+                    preferences.getAiPreferences(),
+                    preferences.getExternalApplicationsPreferences(),
+                    taskExecutor
+            );
+
+            aiChatWindow.setOnCloseRequest(event ->
+                    stateManager.getAiChatWindows().remove(aiChatWindow)
+            );
+
+            stateManager.getAiChatWindows().add(aiChatWindow);
+            dialogService.showCustomWindow(aiChatWindow);
+            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
+            aiChatWindow.requestFocus();
+        }
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

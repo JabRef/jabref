@@ -7,7 +7,6 @@ import com.tngtech.archunit.junit.ArchTest;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOBALS;
 
 /**
  * This class checks JabRef's test classes for architecture quality
@@ -15,10 +14,10 @@ import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOB
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
 public class ArchitectureTest {
 
-    private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
+    private static final String CLASS_ORG_JABREF_GUI_PREFERENCES = "org.jabref.logic.preferences.GuiPreferences";
 
     @ArchTest
-    public void testsAreIndependent(JavaClasses classes) {
+    public void testsAreIndependentOfGuiPreferences(JavaClasses classes) {
         noClasses().that().doNotHaveSimpleName("EntryEditorTest")
                    .and().doNotHaveSimpleName("LinkedFileViewModelTest")
                    .and().doNotHaveSimpleName("JabRefPreferencesTest")
@@ -28,8 +27,7 @@ public class ArchitectureTest {
                    .and().doNotHaveSimpleName("DatabaseSearcherWithBibFilesTest")
                    .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                    .and().doNotHaveFullyQualifiedName("org.jabref.testutils.interactive.styletester.StyleTesterMain")
-                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_PREFERENCES)
+                   .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GUI_PREFERENCES)
                    .check(classes);
     }
 
@@ -40,7 +38,7 @@ public class ArchitectureTest {
                  .and().doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
-                 .and().doNotHaveFullyQualifiedName("org.jabref.gui.util.CurrentThreadTaskExecutor")
+                 .and().doNotHaveFullyQualifiedName("org.jabref.logic.util.CurrentThreadTaskExecutor")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.importer.fileformat.ImporterTestEngine")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.l10n.JavaLocalizationEntryParser")

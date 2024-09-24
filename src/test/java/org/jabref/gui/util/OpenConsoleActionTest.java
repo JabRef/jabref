@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.OpenConsoleAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,21 +16,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class OpenConsoleActionTest {
+class OpenConsoleActionTest {
 
     private final StateManager stateManager = mock(StateManager.class);
-    private final PreferencesService preferences = mock(PreferencesService.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final BibDatabaseContext current = mock(BibDatabaseContext.class);
     private final BibDatabaseContext other = mock(BibDatabaseContext.class);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(current));
     }
 
     @Test
-    public void newActionGetsCurrentDatabase() {
+    void newActionGetsCurrentDatabase() {
         OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences, null);
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
@@ -38,7 +38,7 @@ public class OpenConsoleActionTest {
     }
 
     @Test
-    public void newActionGetsSuppliedDatabase() {
+    void newActionGetsSuppliedDatabase() {
         OpenConsoleAction action = new OpenConsoleAction(() -> other, stateManager, preferences, null);
         action.execute();
         verify(stateManager, never()).getActiveDatabase();
@@ -46,7 +46,7 @@ public class OpenConsoleActionTest {
     }
 
     @Test
-    public void actionDefaultsToCurrentDatabase() {
+    void actionDefaultsToCurrentDatabase() {
         OpenConsoleAction action = new OpenConsoleAction(() -> null, stateManager, preferences, null);
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();

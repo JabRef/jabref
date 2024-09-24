@@ -10,17 +10,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class CapitalizeFormatterTest {
+class CapitalizeFormatterTest {
 
     private CapitalizeFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new CapitalizeFormatter();
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("I Have {a} Dream", formatter.format(formatter.getExampleInput()));
     }
 
@@ -51,7 +51,7 @@ public class CapitalizeFormatterTest {
             "-upper, -Upper", // single word with -
             "-{u}pper, -{u}pper", // single word with {} and -
     })
-    public void inputs(String input, String expectedResult) {
+    void inputs(String input, String expectedResult) {
         String formattedStr = formatter.format(input);
         assertEquals(expectedResult, formattedStr);
     }

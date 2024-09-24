@@ -3,7 +3,7 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.gui.preferences.GuiPreferences;
 
 /**
  * Class for pushing entries into TexMaker.
@@ -12,8 +12,8 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     public static final String NAME = "Texmaker";
 
-    public PushToTexmaker(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToTexmaker(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override

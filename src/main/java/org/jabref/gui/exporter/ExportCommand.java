@@ -16,21 +16,21 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ExportCommand extends SimpleCommand {
     private final ExportMethod exportMethod;
     private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -58,7 +58,7 @@ public class ExportCommand extends SimpleCommand {
                          Supplier<LibraryTab> tabSupplier,
                          StateManager stateManager,
                          DialogService dialogService,
-                         PreferencesService preferences,
+                         GuiPreferences preferences,
                          BibEntryTypesManager entryTypesManager,
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {
@@ -141,7 +141,7 @@ public class ExportCommand extends SimpleCommand {
                             Localization.lang("Export operation finished successfully."),
                             List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                 try {
-                                    JabRefDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
+                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
                                 } catch (IOException e) {
                                     LOGGER.error("Could not open export folder.", e);
                                 }

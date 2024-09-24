@@ -2,6 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Collections;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PersonNameStringConverterTest {
+class PersonNameStringConverterTest {
 
     /** The author. **/
     private Author author;

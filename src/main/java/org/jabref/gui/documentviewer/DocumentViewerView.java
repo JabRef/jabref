@@ -18,11 +18,11 @@ import javafx.stage.Stage;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.OnlyIntegerFormatter;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -42,7 +42,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
 
     private DocumentViewerControl viewer;
     private DocumentViewerViewModel viewModel;
@@ -62,7 +62,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager, preferencesService);
+        viewModel = new DocumentViewerViewModel(stateManager, preferences);
 
         setupViewer();
         setupScrollbar();

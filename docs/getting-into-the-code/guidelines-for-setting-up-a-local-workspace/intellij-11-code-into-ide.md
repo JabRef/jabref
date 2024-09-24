@@ -43,7 +43,8 @@ Press <kbd>Alt</kbd>+<kbd>0</kbd> to open the commit dialog.
 Unfortunately, IntelliJ has no support for ignored sub modules [[IDEA-285237](https://youtrack.jetbrains.com/issue/IDEA-285237/ignored-changes-in-submodules-are-still-visible-in-the-commit-window)].
 Fortunately, there is a workaround:
 
-Go to **File > Settings... > Version Control > Directory Mappings**.
+Go to **File > Settings... > Version Control > Directory Mappings**.<br>
+**Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 Currently, it looks as follows:
 
@@ -60,3 +61,5 @@ This will make these directories "Unregistered roots:", which is fine.
 {% figure caption:"Directory Mappings having three unregistered roots" %}
 ![Directory Mappings having three repositories unregsitered](intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
+
+<!-- markdownlint-disable-file MD033 -->

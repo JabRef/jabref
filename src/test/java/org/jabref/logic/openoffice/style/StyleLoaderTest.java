@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class StyleLoaderTest {
+class StyleLoaderTest {
 
     private static final int NUMBER_OF_INTERNAL_STYLES = 2;
     private StyleLoader loader;
@@ -33,29 +33,29 @@ public class StyleLoaderTest {
     private JournalAbbreviationRepository abbreviationRepository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
     }
 
     @Test
-    public void throwNPEWithNullPreferences() {
+    void throwNPEWithNullPreferences() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, abbreviationRepository));
     }
 
     @Test
-    public void throwNPEWithNullLayoutPreferences() {
+    void throwNPEWithNullLayoutPreferences() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, abbreviationRepository));
     }
 
     @Test
-    public void throwNPEWithNullAbbreviationRepository() {
+    void throwNPEWithNullAbbreviationRepository() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
     }
 
     @Test
-    public void getStylesWithEmptyExternal() {
+    void getStylesWithEmptyExternal() {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
@@ -63,7 +63,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void addStyleLeadsToOneMoreStyle() throws URISyntaxException {
+    void addStyleLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
@@ -74,7 +74,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void addInvalidStyleLeadsToNoMoreStyle() {
+    void addInvalidStyleLeadsToNoMoreStyle() {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
@@ -83,7 +83,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void initalizeWithOneExternalFile() throws URISyntaxException {
+    void initalizeWithOneExternalFile() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -92,7 +92,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void initalizeWithIncorrectExternalFile() {
+    void initalizeWithIncorrectExternalFile() {
         preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -100,7 +100,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void initalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
+    void initalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -121,7 +121,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
+    void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -142,7 +142,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void addSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
+    void addSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
@@ -154,13 +154,13 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void addNullStyleThrowsNPE() {
+    void addNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
     }
 
     @Test
-    public void getDefaultUsedStyleWhenEmpty() {
+    void getDefaultUsedStyleWhenEmpty() {
         when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         preferences.clearCurrentJStyle();
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -171,7 +171,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void getStoredUsedStyle() {
+    void getStoredUsedStyle() {
         when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         JStyle style = loader.getUsedJstyle();
@@ -181,7 +181,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void getDefaultUsedStyleWhenIncorrect() {
+    void getDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentJStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         JStyle style = loader.getUsedJstyle();
@@ -190,7 +190,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void removeInternalStyleReturnsFalseAndDoNotRemove() {
+    void removeInternalStyleReturnsFalseAndDoNotRemove() {
         preferences.setExternalStyles(Collections.emptyList());
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);

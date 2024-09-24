@@ -37,23 +37,23 @@ import static org.mockito.Mockito.mock;
  * Tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}.
  * Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
  */
-public class BibtexImporterTest {
+class BibtexImporterTest {
 
     private BibtexImporter importer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
-    public void isRecognizedFormat() throws IOException, URISyntaxException {
+    void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void importEntries() throws IOException, URISyntaxException {
+    void importEntries() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -121,24 +121,17 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void getFormatName() {
+    void getFormatName() {
         assertEquals("BibTeX", importer.getName());
     }
 
     @Test
-    public void sGetExtensions() {
+    void getExtensions() {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
     }
 
     @Test
-    public void getDescription() {
-        assertEquals(
-                "This importer enables `--importToOpen someEntry.bib`",
-                importer.getDescription());
-    }
-
-    @Test
-    public void recognizesDatabaseID() throws Exception {
+    void recognizesDatabaseID() throws Exception {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
@@ -156,7 +149,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
+    void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
         assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
@@ -164,7 +157,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
-    public void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
+    void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -174,8 +167,8 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
-                "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
-    public void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
+            "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -194,14 +187,14 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
+    void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(encodingExplicitlySupplied, parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 
     @Test
-    public void wrongEncodingSupplied() throws Exception {
+    void wrongEncodingSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
 
@@ -212,7 +205,7 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void encodingNotSupplied() throws Exception {
+    void encodingNotSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
         assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());

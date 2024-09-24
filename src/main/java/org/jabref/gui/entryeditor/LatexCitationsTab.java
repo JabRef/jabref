@@ -16,31 +16,31 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DirectoryMonitorManager;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
-    public static final String NAME = "LaTeX Citations";
+    public static final String NAME = "LaTeX citations";
     private final LatexCitationsTabViewModel viewModel;
     private final GridPane searchPane;
     private final ProgressIndicator progressIndicator;
     private final CitationsDisplay citationsDisplay;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext,
-                             PreferencesService preferencesService,
+                             GuiPreferences preferences,
                              DialogService dialogService,
                              DirectoryMonitorManager directoryMonitorManager) {
 
         this.viewModel = new LatexCitationsTabViewModel(
                 databaseContext,
-                preferencesService,
+                preferences,
                 dialogService,
                 directoryMonitorManager);
 
@@ -48,7 +48,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         this.progressIndicator = new ProgressIndicator();
         this.citationsDisplay = new CitationsDisplay();
 
-        setText(Localization.lang("LaTeX Citations"));
+        setText(Localization.lang("LaTeX citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());
         setSearchPane();

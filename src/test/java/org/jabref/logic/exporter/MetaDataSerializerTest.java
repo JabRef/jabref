@@ -12,7 +12,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.BibField;
@@ -42,7 +42,7 @@ public class MetaDataSerializerTest {
     private BibEntryType newCustomType;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         metaData = new MetaData();
         pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         newCustomType = new BibEntryType(
@@ -52,12 +52,12 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeNewMetadataReturnsEmptyMap() {
+    void serializeNewMetadataReturnsEmptyMap() {
         assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
     @Test
-    public void serializeSingleSaveAction() {
+    void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
@@ -69,7 +69,7 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeSingleContentSelectors() {
+    void serializeSingleContentSelectors() {
         List<String> values = List.of(
                 "approved",
                 "captured",

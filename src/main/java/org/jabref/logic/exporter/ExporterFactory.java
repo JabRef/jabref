@@ -9,12 +9,12 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 public class ExporterFactory {
 
@@ -24,15 +24,15 @@ public class ExporterFactory {
         this.exporters = Objects.requireNonNull(exporters);
     }
 
-    public static ExporterFactory create(PreferencesService preferencesService,
+    public static ExporterFactory create(CliPreferences preferences,
                                          BibEntryTypesManager entryTypesManager) {
 
-        List<TemplateExporter> customFormats = preferencesService.getExportPreferences().getCustomExporters();
-        LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
-        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferencesService.getSelfContainedExportConfiguration().getSaveOrder());
-        XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
-        FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
-        BibDatabaseMode bibDatabaseMode = preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode();
+        List<TemplateExporter> customFormats = preferences.getExportPreferences().getCustomExporters();
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences();
+        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferences.getSelfContainedExportConfiguration().getSaveOrder());
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
+        FieldPreferences fieldPreferences = preferences.getFieldPreferences();
+        BibDatabaseMode bibDatabaseMode = preferences.getLibraryPreferences().getDefaultBibDatabaseMode();
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class ExporterFactory {
         exporters.add(new XmpPdfExporter(xmpPreferences));
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, entryTypesManager, fieldPreferences));
         exporters.add(new CffExporter());
-        exporters.add(new EndnoteXmlExporter(preferencesService.getBibEntryPreferences()));
+        exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
 
         // Now add custom export formats
         exporters.addAll(customFormats);

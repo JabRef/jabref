@@ -46,7 +46,20 @@ public enum HelpFile {
     DATABASE_PROPERTIES("setup/databaseproperties"),
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
     SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),
-    PUSH_TO_APPLICATION("cite/pushtoapplications");
+    PUSH_TO_APPLICATION("cite/pushtoapplications"),
+    AI_ENABLE("ai"),
+    AI_PROVIDER("ai/ai-providers-and-api-keys#what-is-an-ai-provider"),
+    AI_CHAT_MODEL("ai/preferences"),
+    AI_API_KEY("ai/ai-providers-and-api-keys#what-is-an-api-key"),
+    AI_API_BASE_URL("ai/preferences#api-base-url"),
+    AI_EMBEDDING_MODEL("ai/preferences#embedding-model"),
+    AI_INSTRUCTION("ai/preferences#instruction"),
+    AI_CONTEXT_WINDOW_SIZE("ai/preferences#context-window-size"),
+    AI_TEMPERATURE("ai/preferences#temperature"),
+    AI_DOCUMENT_SPLITTER_CHUNK_SIZE("ai/preferences#document-splitter-chunk-size"),
+    AI_DOCUMENT_SPLITTER_OVERLAP_SIZE("ai/preferences#document-splitter-chunk-overlap"),
+    AI_RAG_MAX_RESULTS_COUNT("ai/preferences#retrieval-augmented-generation-maximum-results-count"),
+    AI_RAG_MIN_SCORE("ai/preferences#retrieval-augmented-generation-minimum-score");
 
     private final String pageName;
 

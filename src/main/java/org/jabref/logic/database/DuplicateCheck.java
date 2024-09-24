@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;

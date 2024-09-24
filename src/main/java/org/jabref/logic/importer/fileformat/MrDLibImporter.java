@@ -66,7 +66,7 @@ public class MrDLibImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry";
+        return "Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry.";
     }
 
     /**
@@ -83,7 +83,7 @@ public class MrDLibImporter extends Importer {
                 stringBuilder.append(line);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("", e);
         }
         return stringBuilder.toString();
     }

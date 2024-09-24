@@ -21,7 +21,6 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -32,6 +31,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -42,14 +42,14 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -75,7 +75,6 @@ public class SourceTab extends EntryEditorTab {
     private final KeyBindingRepository keyBindingRepository;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
-
     private BibEntry previousEntry;
 
     private class EditAction extends SimpleCommand {
@@ -104,9 +103,9 @@ public class SourceTab extends EntryEditorTab {
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
-                     StateManager stateManager,
                      BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository) {
+                     KeyBindingRepository keyBindingRepository,
+                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -119,12 +118,7 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            highlightSearchPattern();
-        });
-
-        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });

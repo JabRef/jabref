@@ -7,16 +7,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,33 +26,27 @@ import org.slf4j.LoggerFactory;
  *   <li>Mode choice A: online or offline</li>
  *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
  * </ul>
- * <p>
- * The mode is selected by the preferences whether to use Grobid or not.
- * <p>
- * The different modes should be implemented as sub classes. Moreover, there are synergies with {@link ExtractReferencesAction}. However, this was too complicated.
  */
-public class NewLibraryFromPdfAction extends SimpleCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction .class);
+public abstract class NewLibraryFromPdfAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
+
+    protected final CliPreferences preferences;
 
     private final LibraryTabContainer libraryTabContainer;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
-    private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
     private final TaskExecutor taskExecutor;
 
     public NewLibraryFromPdfAction(
             LibraryTabContainer libraryTabContainer,
             StateManager stateManager,
             DialogService dialogService,
-            PreferencesService preferencesService,
+            CliPreferences preferences,
             TaskExecutor taskExecutor) {
         this.libraryTabContainer = libraryTabContainer;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
-        // Instruct the importer to keep the numbers (instead of generating keys)
-        this.bibliographyFromPdfImporter = new BibliographyFromPdfImporter();
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
     }
 
@@ -84,15 +76,5 @@ public class NewLibraryFromPdfAction extends SimpleCommand {
         });
     }
 
-    private Callable<ParserResult> getParserResultCallable(Path path) {
-        Callable<ParserResult> parserResultCallable;
-        boolean online = this.preferencesService.getGrobidPreferences().isGrobidEnabled();
-        if (online) {
-            parserResultCallable = () -> new ParserResult(
-                    new GrobidService(this.preferencesService.getGrobidPreferences()).processReferences(path, preferencesService.getImportFormatPreferences()));
-        } else {
-            parserResultCallable = () -> bibliographyFromPdfImporter.importDatabase(path);
-        }
-        return parserResultCallable;
-    }
+    protected abstract Callable<ParserResult> getParserResultCallable(Path path);
 }

@@ -18,7 +18,7 @@ class StaxParserTest {
     private static XMLInputFactory xmlInputFactory;
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
     }

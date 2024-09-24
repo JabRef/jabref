@@ -4,12 +4,14 @@ import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRangeByFilteringQueryTransformer> extends InfixTransformerTest<T> {
 
     @Override
+    @Test
     public void convertYearRangeField() throws Exception {
         YearRangeByFilteringQueryTransformer transformer = getTransformer();
 
@@ -20,11 +22,10 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
         // The API does not support querying for a year range
         // The implementation of the fetcher filters the results manually
 
-        // The implementations returns an empty query
-        assertEquals(Optional.of(""), result);
+        assertEquals(Optional.empty(), result);
 
         // The implementation sets the start year and end year values according to the query
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        assertEquals(Optional.of(2018), transformer.getStartYear());
+        assertEquals(Optional.of(2021), transformer.getEndYear());
     }
 }

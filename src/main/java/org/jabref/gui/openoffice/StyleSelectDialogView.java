@@ -20,12 +20,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -36,12 +35,12 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -68,9 +67,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
-    @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
@@ -78,7 +76,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    private PreviewViewer cslPreviewViewer;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
@@ -99,7 +96,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService, taskExecutor, bibEntryTypesManager);
+        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferences, taskExecutor, bibEntryTypesManager);
 
         availableListView.setItems(viewModel.getAvailableLayouts());
         new ViewModelListCellFactory<CitationStylePreviewLayout>()
@@ -117,7 +114,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.selectedLayoutProperty().set(newValue));
 
-        cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
@@ -191,6 +188,18 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             }
         });
 
+        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
+        if (currentStyle instanceof JStyle) {
+            tabPane.getSelectionModel().select(1);
+        } else {
+            tabPane.getSelectionModel().select(0);
+        }
+
+        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setSelectedTab(newValue);
+        });
+
         updateCurrentStyleLabel();
     }
 
@@ -206,7 +215,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferences, themeManager, taskExecutor);
         viewer.setEntry(entry);
         return viewer;
     }
@@ -231,7 +240,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             return; // Scroll has already been performed, exit early
         }
 
-        OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
             findIndexOfCurrentStyle(currentCitationStyle).ifPresent(index -> {
                 int itemsPerPage = calculateItemsPerPage();

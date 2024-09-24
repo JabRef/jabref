@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 class AbstractCitationKeyPatternsTest {
 
     @Test
-    void AbstractCitationKeyPatternParse() throws Exception {
+    void AbstractCitationKeyPatternParse() {
         AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1]spacer1[field2]spacer2[field3]");
@@ -21,7 +21,7 @@ class AbstractCitationKeyPatternsTest {
     }
 
     @Test
-    void AbstractCitationKeyPatternParseEmptySpacer() throws Exception {
+    void AbstractCitationKeyPatternParseEmptySpacer() {
         AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1][field2]spacer2[field3]");

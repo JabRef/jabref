@@ -19,8 +19,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.Cell;

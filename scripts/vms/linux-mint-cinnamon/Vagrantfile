@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME = "jabref-linux-mint-cinnamon"
+
+Vagrant.configure("2") do |config|
+
+  # https://portal.cloud.hashicorp.com/vagrant/discover/aaronvonawesome/linux-mint-21-cinnamon
+  config.vm.box = "aaronvonawesome/linux-mint-21-cinnamon"
+  # config.vm.box = "archman/linuxmint" # v22
+
+  config.vm.define NAME
+  config.vm.hostname = NAME
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = NAME
+    v.gui = true
+    v.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get -y upgrade
+
+    # enable building of the virtual box guest addons
+    # hint from https://forums.virtualbox.org/viewtopic.php?p=508680&sid=fe86fb0f6c03c7443f1fba9a5c29a861#p508680
+    sudo apt install -y build-essential dkms
+
+    # switch kernel - hint by https://askubuntu.com/a/1521872/196423
+    sudo apt install -y linux-oem-22.04 linux-tools-oem-22.04
+
+    sudo apt-get install -y git
+  SHELL
+
+  # Install JDK, clone JabRef's source code, and do an initial build
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    curl -s "https://get.sdkman.io" | bash
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    sdk install java 21.0.4-tem < /dev/null
+    git clone --recurse-submodules https://github.com/JabRef/jabref.git
+    cd jabref
+    sdk use java 21.0.4-tem
+    ./gradlew jar
+  SHELL
+
+  config.vm.provision "shell", inline: "sudo reboot"
+
+  config.ssh.forward_x11 = true
+end

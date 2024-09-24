@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PageTest {
+class PageTest {
     private Page<String> page1;
     private Page<String> page2;
     private final int testPageNumber = 3;
@@ -21,7 +21,7 @@ public class PageTest {
     private final String[] testStrings = {"str1", "str2", "str3"};
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testContent.addAll(Arrays.asList(testStrings));
         testContent = Collections.unmodifiableCollection(testContent);
         page1 = new Page<>(testQuery, testPageNumber, testContent);
@@ -29,7 +29,7 @@ public class PageTest {
     }
 
     @Test
-    public void getContentTest() {
+    void getContentTest() {
         // make sure the collections have the same elements
         List<String> differences = new ArrayList<>(testContent);
         differences.removeAll(page1.getContent());
@@ -43,17 +43,17 @@ public class PageTest {
     }
 
     @Test
-    public void getPageNumberTest() {
+    void getPageNumberTest() {
         assertEquals(testPageNumber, page1.getPageNumber());
     }
 
     @Test
-    public void getQueryTest() {
+    void getQueryTest() {
         assertEquals(testQuery, page1.getQuery());
     }
 
     @Test
-    public void getSizeTest() {
+    void getSizeTest() {
         assertEquals(testContent.size(), page1.getSize());
     }
 }

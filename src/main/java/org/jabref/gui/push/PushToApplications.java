@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.gui.preferences.GuiPreferences;
 
 public class PushToApplications {
 
@@ -24,28 +24,28 @@ public class PushToApplications {
     private PushToApplications() {
     }
 
-    public static List<PushToApplication> getAllApplications(DialogService dialogService, PreferencesService preferencesService) {
+    public static List<PushToApplication> getAllApplications(DialogService dialogService, GuiPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return APPLICATIONS;
         }
 
         APPLICATIONS.addAll(List.of(
-                new PushToEmacs(dialogService, preferencesService),
-                new PushToLyx(dialogService, preferencesService),
-                new PushToSublimeText(dialogService, preferencesService),
-                new PushToTexmaker(dialogService, preferencesService),
-                new PushToTeXstudio(dialogService, preferencesService),
-                new PushToTeXworks(dialogService, preferencesService),
-                new PushToVim(dialogService, preferencesService),
-                new PushToWinEdt(dialogService, preferencesService),
-                new PushToTexShop(dialogService, preferencesService)));
+                new PushToEmacs(dialogService, preferences),
+                new PushToLyx(dialogService, preferences),
+                new PushToSublimeText(dialogService, preferences),
+                new PushToTexmaker(dialogService, preferences),
+                new PushToTeXstudio(dialogService, preferences),
+                new PushToTeXworks(dialogService, preferences),
+                new PushToVim(dialogService, preferences),
+                new PushToWinEdt(dialogService, preferences),
+                new PushToTexShop(dialogService, preferences)));
 
         return APPLICATIONS;
     }
 
-    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, PreferencesService preferencesService) {
-        return getAllApplications(dialogService, preferencesService).stream()
-                                                                    .filter(application -> application.getDisplayName().equals(applicationName))
-                                                                    .findAny();
+    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, GuiPreferences preferences) {
+        return getAllApplications(dialogService, preferences).stream()
+                                                             .filter(application -> application.getDisplayName().equals(applicationName))
+                                                             .findAny();
     }
 }

@@ -25,7 +25,6 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -167,12 +166,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
             String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
 
             // The co-authors differ, thus we check for the author present at all papers
-            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+            getTestAuthors().forEach(expectedAuthor -> assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
         });
     }
 
     @Test
-    public void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
+    void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
         StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
@@ -413,7 +412,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    public void supportsPhraseSearch() throws Exception {
+    void supportsPhraseSearch() throws Exception {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
         List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
         // Phrase search result has to be subset of the default search result
@@ -425,7 +424,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    public void supportsPhraseSearchAndMatchesExact() throws Exception {
+    void supportsPhraseSearchAndMatchesExact() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Rafrastara, Fauzi Adi and Deyu, Qi")
                 .withField(StandardField.TITLE, "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review")
@@ -449,7 +448,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void supportsBooleanANDSearch() throws Exception {
+    void supportsBooleanANDSearch() throws Exception {
         // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
@@ -480,7 +479,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
+    void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -503,7 +502,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
+    void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -522,7 +521,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void retrievePartialResultWhenCannotGetInformationFromUserAssignedDOI() throws FetcherException {
+    void retrievePartialResultWhenCannotGetInformationFromUserAssignedDOI() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Zheng, Hai and Ho, Po-Yi and Jiang, Meiling and Tang, Bin and Liu, Weirong and Li, Dengjin and Yu, Xuefeng and Kleckner, Nancy E. and Amir, Ariel and Liu, Chenli")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -548,7 +547,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void retrievePartialResultWhenCannotGetInformationFromArXivAssignedDOI() throws FetcherException {
+    void retrievePartialResultWhenCannotGetInformationFromArXivAssignedDOI() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -575,5 +574,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
         assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    void abstractIsCleanedUp() throws Exception {
+        Optional<BibEntry> entry = fetcher.performSearchById("2407.02238");
+        String escaped = "{One of the primary areas of interest in High Performance Computing is the improvement of performance of parallel workloads. Nowadays, compilable source code-based optimization tasks that employ deep learning often exploit LLVM Intermediate Representations (IRs) for extracting features from source code. Most such works target specific tasks, or are designed with a pre-defined set of heuristics. So far, pre-trained models are rare in this domain, but the possibilities have been widely discussed. Especially approaches mimicking large-language models (LLMs) have been proposed. But these have prohibitively large training costs. In this paper, we propose MIREncoder, a M}ulti-modal IR-based Auto-Encoder that can be pre-trained to generate a learned embedding space to be used for downstream tasks by machine learning-based approaches. A multi-modal approach enables us to better extract features from compilable programs. It allows us to better model code syntax, semantics and structure. For code-based performance optimizations, these features are very important while making optimization decisions. A pre-trained model/embedding implicitly enables the usage of transfer learning, and helps move away from task-specific trained models. Additionally, a pre-trained model used for downstream performance optimization should itself have reduced overhead, and be easily usable. These considerations have led us to propose a modeling approach that i) understands code semantics and structure, ii) enables use of transfer learning, and iii) is small and simple enough to be easily re-purposed or reused even with low resource availability. Our evaluations will show that our proposed approach can outperform the state of the art while reducing overhead.";
+        assertEquals(Optional.of(escaped), entry.get().getField(StandardField.ABSTRACT));
     }
 }

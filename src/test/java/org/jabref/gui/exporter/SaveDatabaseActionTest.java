@@ -8,16 +8,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
@@ -27,10 +32,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.ExportPreferences;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,13 +52,13 @@ class SaveDatabaseActionTest {
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
     private final DialogService dialogService = mock(DialogService.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
@@ -66,7 +67,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAsShouldSetWorkingDirectory() {
+    void saveAsShouldSetWorkingDirectory() {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
@@ -76,7 +77,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
+    void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
@@ -86,10 +87,13 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveShouldShowSaveAsIfDatabaseNotSelected() {
+    void saveShouldShowSaveAsIfDatabaseNotSelected() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
-        when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(libraryPreferences.autoSaveProperty()).thenReturn(new SimpleBooleanProperty(false));
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
 
@@ -117,7 +121,9 @@ class SaveDatabaseActionTest {
         when(dbContext.getDatabase()).thenReturn(database);
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
-        when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(libraryPreferences.autoSaveProperty()).thenReturn(new SimpleBooleanProperty(false));
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
         when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(emptyGlobalCitationKeyPatterns);
@@ -131,7 +137,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveKeepsChangedFlag() throws Exception {
+    void saveKeepsChangedFlag() throws Exception {
         BibEntry firstEntry = new BibEntry().withField(StandardField.AUTHOR, "first");
         firstEntry.setChanged(true);
         BibEntry secondEntry = new BibEntry().withField(StandardField.AUTHOR, "second");
@@ -148,7 +154,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveShouldNotSaveDatabaseIfPathNotSet() {
+    void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         boolean result = saveDatabaseAction.save();
         assertFalse(result);

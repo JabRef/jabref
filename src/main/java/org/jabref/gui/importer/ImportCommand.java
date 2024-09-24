@@ -15,10 +15,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
@@ -28,11 +26,13 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,20 +51,20 @@ public class ImportCommand extends SimpleCommand {
     private final ImportMethod importMethod;
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
     public ImportCommand(LibraryTabContainer tabContainer,
                          ImportMethod importMethod,
-                         PreferencesService preferencesService,
+                         CliPreferences preferences,
                          StateManager stateManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor,
                          DialogService dialogService) {
         this.tabContainer = tabContainer;
         this.importMethod = importMethod;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
@@ -77,9 +77,9 @@ public class ImportCommand extends SimpleCommand {
     @Override
     public void execute() {
         ImportFormatReader importFormatReader = new ImportFormatReader(
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor
         );
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
@@ -88,7 +88,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)
                 .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
-                .withInitialDirectory(preferencesService.getImporterPreferences().getImportWorkingDirectory())
+                .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
@@ -123,7 +123,7 @@ public class ImportCommand extends SimpleCommand {
         }
 
         // Set last working dir for import
-        preferencesService.getImporterPreferences().setImportWorkingDirectory(file.getParent());
+        preferences.getImporterPreferences().setImportWorkingDirectory(file.getParent());
     }
 
     /**
@@ -134,9 +134,9 @@ public class ImportCommand extends SimpleCommand {
         // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
         ImportFormatReader importFormatReader = new ImportFormatReader(
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor
         );
         for (Path filename : files) {
@@ -144,7 +144,7 @@ public class ImportCommand extends SimpleCommand {
                 if (importer.isEmpty()) {
                     // Unknown format
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
+                        if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
@@ -155,7 +155,7 @@ public class ImportCommand extends SimpleCommand {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter)
                                 || (importer.get() instanceof PdfMergeMetadataImporter))
-                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
+                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
                         dialogService.notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
@@ -202,7 +202,7 @@ public class ImportCommand extends SimpleCommand {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())) {
                 // additional treatment of BibTeX
-                new DatabaseMerger(preferencesService.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+                new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult().getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
@@ -212,7 +212,7 @@ public class ImportCommand extends SimpleCommand {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferencesService.getOwnerPreferences(), preferencesService.getTimestampPreferences()); // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences()); // set timestamp and owner
 
         return result;
     }

@@ -1,8 +1,6 @@
 package org.jabref.gui.bibtexextractor;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
@@ -12,43 +10,53 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * View model for the feature "Extract BibTeX from plain text".
+ * Handles both online and offline case.
+ *
+ * @implNote Instead of using inheritance, we do if/else checks.
+ */
 public class BibtexExtractorViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
-    private final StringProperty inputTextProperty = new SimpleStringProperty("");
+    private final boolean onlineMode;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final ImportHandler importHandler;
 
-    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
+    private final ImportHandler importHandler;
+    private final StringProperty inputTextProperty = new SimpleStringProperty("");
+
+    public BibtexExtractorViewModel(boolean onlineMode,
+                                    BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
-                                    PreferencesService preferencesService,
+                                    GuiPreferences preferences,
                                     FileUpdateMonitor fileUpdateMonitor,
                                     TaskExecutor taskExecutor,
                                     UndoManager undoManager,
                                     StateManager stateManager) {
-
+        this.onlineMode = onlineMode;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
@@ -56,26 +64,21 @@ public class BibtexExtractorViewModel {
                 taskExecutor);
     }
 
-    public StringProperty inputTextProperty() {
-        return this.inputTextProperty;
-    }
-
     public void startParsing() {
-        if (preferencesService.getGrobidPreferences().isGrobidEnabled()) {
-            parseUsingGrobid();
+        if (onlineMode) {
+            startParsingOnline();
         } else {
-            parseUsingBibtexExtractor();
+            startParsingOffline();
         }
     }
 
-    private void parseUsingBibtexExtractor() {
+    private void startParsingOffline() {
         BibEntry parsedEntry = new BibtexExtractor().extract(inputTextProperty.getValue());
         importHandler.importEntries(List.of(parsedEntry));
-        trackNewEntry(parsedEntry, "ParseWithBibTeXExtractor");
     }
 
-    private void parseUsingGrobid() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
+    private void startParsingOnline() {
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure(e -> {
@@ -90,14 +93,10 @@ public class BibtexExtractorViewModel {
                       .onSuccess(parsedEntries -> {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
                           importHandler.importEntries(parsedEntries);
-                          for (BibEntry bibEntry : parsedEntries) {
-                              trackNewEntry(bibEntry, "ParseWithGrobid");
-                          }
                       }).executeWith(taskExecutor);
     }
 
-    private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
+    public StringProperty inputTextProperty() {
+        return this.inputTextProperty;
     }
 }

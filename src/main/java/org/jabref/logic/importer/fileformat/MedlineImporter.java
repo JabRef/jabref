@@ -29,6 +29,7 @@ import org.jabref.logic.importer.fileformat.medline.MeshHeading;
 import org.jabref.logic.importer.fileformat.medline.OtherId;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
 import org.jabref.logic.importer.util.MathMLParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -85,7 +86,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     @Override
     public String getDescription() {
-        return "Importer for the Medline format.";
+        return Localization.lang("Importer for the Medline format.");
     }
 
     @Override

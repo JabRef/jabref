@@ -17,17 +17,17 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -51,18 +51,18 @@ public class ExportToClipboardAction extends SimpleCommand {
     private final List<BibEntry> entries = new ArrayList<>();
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
 
     public ExportToClipboardAction(DialogService dialogService,
                                    StateManager stateManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor,
-                                   PreferencesService preferencesService) {
+                                   CliPreferences preferences) {
         this.dialogService = dialogService;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.preferences = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));

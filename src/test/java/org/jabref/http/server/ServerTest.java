@@ -9,9 +9,9 @@ import javafx.collections.FXCollections;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.preferences.BibEntryPreferences;
-import org.jabref.preferences.GuiPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.LastFilesOpenedPreferences;
+import org.jabref.model.entry.BibEntryPreferences;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -33,8 +33,8 @@ import static org.mockito.Mockito.when;
  */
 abstract class ServerTest extends JerseyTest {
 
-    private static PreferencesService preferencesService;
-    private static GuiPreferences guiPreferences;
+    private static CliPreferences preferences;
+    private static LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -58,13 +58,13 @@ abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(preferencesService).to(PreferencesService.class).ranked(2);
+                bind(preferences).to(CliPreferences.class).ranked(2);
             }
         });
     }
 
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        when(guiPreferences.getLastFilesOpened()).thenReturn(
+        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(
                 FXCollections.observableArrayList(
                         files.stream()
                              .map(file -> file.path)
@@ -72,27 +72,27 @@ abstract class ServerTest extends JerseyTest {
     }
 
     private static void initializePreferencesService() {
-        preferencesService = mock(PreferencesService.class);
+        preferences = mock(CliPreferences.class);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
 
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
         FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldWriterPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldWriterPreferences);
         when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
-        // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
+        // defaults are in {@link org.jabref.logic.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
         FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
-        guiPreferences = mock(GuiPreferences.class);
-        when(preferencesService.getGuiPreferences()).thenReturn(guiPreferences);
+        lastFilesOpenedPreferences = mock(LastFilesOpenedPreferences.class);
+        when(preferences.getLastFilesOpenedPreferences()).thenReturn(lastFilesOpenedPreferences);
 
-        when(guiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
+        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 }

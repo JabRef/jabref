@@ -5,10 +5,9 @@ on:
     branches:
       - main
       - main-release
+  pull_request:
   merge_group:
   workflow_dispatch:
-  # The checkers should write comments on the PR if something fails. For this, we need to have a proper GITHUB_TOKEN. This is enabled by ..._target.
-  pull_request_target:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -47,25 +46,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-              We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-              The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
-              Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-              Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
 
-
-              You can check review dog's comments at the tab "Files changed" of your pull request.
-          comment_tag: automated-test-feedback
 
   openrewrite:
     name: OpenRewrite
@@ -82,25 +68,12 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet JabRef's code guidelines.
-              We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
-              The issues found can be **automatically fixed**.
-              Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-              You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
-          comment_tag: automated-test-feedback
 
   modernizer:
     name: Modernizer
@@ -117,7 +90,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run modernizer
@@ -125,18 +98,6 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet JabRef's code guidelines.
-              We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
-              Please fix the detected errors, commit, and push.
-
-
-              You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-          comment_tag: automated-test-feedback
 
   markdown:
     name: Markdown
@@ -148,23 +109,11 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v16
+        uses: DavidAnson/markdownlint-cli2-action@v17
         with:
           globs: |
             *.md
             docs/**/*.md
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
-              To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
-              [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
-
-
-              You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
-          comment_tag: automated-test-feedback
 
   changelog:
     name: CHANGELOG.md
@@ -213,14 +162,6 @@ jobs:
           diff \
             <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              While the PR was in progress, JabRef released a new version.
-              You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
-          comment_tag: automated-test-feedback
 
   tests:
     name: Unit tests
@@ -237,7 +178,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
@@ -280,7 +221,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests on PostgreSQL
@@ -321,7 +262,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run GUI tests
@@ -371,7 +312,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
@@ -391,6 +332,22 @@ jobs:
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
+  requirements_coverage:
+    name: "Validate requiremenet coverage"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.2
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew traceRequirements
+
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
   # It ensures that the jar file is from gradle and not by a strange third party.
   gradlevalidation:
@@ -400,7 +357,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@v3
+      - uses: gradle/actions/wrapper-validation@v4
 
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
@@ -422,3 +379,13 @@ jobs:
         with:
           script: |
               core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read https://devdocs.jabref.org/contributing again carefully. 👈')
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt

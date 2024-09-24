@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -33,18 +33,18 @@ public class ExporterTest {
     public List<BibEntry> entries;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         databaseContext = new BibDatabaseContext();
         entries = Collections.emptyList();
     }
 
     private static Stream<Object[]> exportFormats() {
-        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 
         ExporterFactory exporterFactory = ExporterFactory.create(
-                preferencesService,
+                preferences,
                 mock(BibEntryTypesManager.class));
 
         Collection<Object[]> result = new ArrayList<>();
@@ -56,7 +56,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
+    void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
         exportFormat.export(databaseContext, tmpFile, entries);
@@ -65,7 +65,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
+    void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);

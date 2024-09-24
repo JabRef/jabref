@@ -12,14 +12,14 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +39,16 @@ public abstract class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
 
     public SendAsEMailAction(DialogService dialogService,
-                             PreferencesService preferencesService,
+                             GuiPreferences preferences,
                              StateManager stateManager,
                              TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
     }
@@ -102,17 +102,17 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     private List<String> getAttachments(List<BibEntry> entries) {
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
-        boolean openFolders = preferencesService.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
+        boolean openFolders = preferences.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
 
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferences.getFilePreferences()));
 
         List<String> attachments = new ArrayList<>();
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService.getExternalApplicationsPreferences(), dialogService);
+                    NativeDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferences.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }

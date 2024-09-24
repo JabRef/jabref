@@ -11,23 +11,34 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
+
+    @TempDir
+    static Path bibTempDir;
+
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
@@ -334,7 +345,6 @@ class FileUtilTest {
     @Test
     void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
-
         assertTrue(FileUtil.isBibFile(bibFile));
     }
 
@@ -345,7 +355,7 @@ class FileUtilTest {
     }
 
     @Test
-    void findinPath() {
+    void findInPath() {
         Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
     }
@@ -360,32 +370,32 @@ class FileUtilTest {
     }
 
     @Test
-    public void extractFileExtension() {
+    void extractFileExtension() {
         final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void fileExtensionFromUrl() {
+    void fileExtensionFromUrl() {
         final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void fileNameEmpty() {
+    void fileNameEmpty() {
         Path path = Path.of("/");
         assertEquals(Optional.of(path), FileUtil.find("", path));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"*", "?", ">", "\""})
-    public void fileNameIllegal(String fileName) {
+    void fileNameIllegal(String fileName) {
         Path path = Path.of("/");
         assertEquals(Optional.empty(), FileUtil.find(fileName, path));
     }
 
     @Test
-    public void findsFileInDirectory(@TempDir Path temp) throws Exception {
+    void findsFileInDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -394,7 +404,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+    void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -403,7 +413,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+    void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
         Path firstFilesPath = temp.resolve("files");
         Path secondFilesPath = firstFilesPath.resolve("files");
         Files.createDirectories(secondFilesPath);
@@ -421,15 +431,50 @@ class FileUtilTest {
         }
     }
 
+    /**
+     * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
+     */
+    public static Stream<Arguments> relativize() {
+        Path bibPath = bibTempDir.resolve("bibliography.bib");
+        Path filesPath = bibTempDir.resolve("files").resolve("pdfs");
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(bibPath);
+        database.getMetaData().setDefaultFileDirectory(filesPath.toString());
+
+        FilePreferences fileDirPrefs = mock(FilePreferences.class);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        Path testPdf = filesPath.resolve("test.pdf");
+        BibEntry source1 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target1 = new BibEntry().withFiles(List.of(new LinkedFile(filesPath.relativize(testPdf))));
+
+        testPdf = bibPath.resolve("test.pdf");
+        BibEntry source2 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target2 = new BibEntry().withFiles(List.of(new LinkedFile(bibTempDir.relativize(testPdf))));
+
+        return Stream.of(
+                Arguments.of(List.of(target1), List.of(source1), database, fileDirPrefs),
+                Arguments.of(List.of(target2), List.of(source2), database, fileDirPrefs)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void relativize(List<BibEntry> expected, List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<BibEntry> actual = FileUtil.relativize(entries, databaseContext, filePreferences);
+        assertEquals(expected, actual);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"/mnt/tmp/test.pdf"})
-    public void legalPaths(String fileName) {
+    void legalPaths(String fileName) {
         assertFalse(FileUtil.detectBadFileName(fileName));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"te{}mp.pdf"})
-    public void illegalPaths(String fileName) {
+    void illegalPaths(String fileName) {
         assertTrue(FileUtil.detectBadFileName(fileName));
     }
 }

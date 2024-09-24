@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -45,7 +46,7 @@ public class RisImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Imports a Biblioscape Tag File.";
+        return Localization.lang("Imports a Biblioscape tag file.");
     }
 
     @Override

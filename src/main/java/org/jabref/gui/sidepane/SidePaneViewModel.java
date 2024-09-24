@@ -19,12 +19,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.frame.SidePanePreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SidePanePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,14 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
 
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final SidePaneContentFactory sidePaneContentFactory;
     private final DialogService dialogService;
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
-                             PreferencesService preferencesService,
+                             GuiPreferences preferences,
+                             ChatHistoryService chatHistoryService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
@@ -49,12 +51,13 @@ public class SidePaneViewModel extends AbstractViewModel {
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
                              UndoManager undoManager) {
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
-                preferencesService,
+                preferences,
+                chatHistoryService,
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,
@@ -64,13 +67,13 @@ public class SidePaneViewModel extends AbstractViewModel {
                 clipBoardManager,
                 undoManager);
 
-        preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
+        preferences.getSidePanePreferences().visiblePanes().forEach(this::show);
         getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().getFirst());
+                    preferences.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().getFirst());
                 } else if (change.wasRemoved()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().getFirst());
+                    preferences.getSidePanePreferences().visiblePanes().remove(change.getRemoved().getFirst());
                 }
             }
         });
@@ -85,7 +88,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                         new MoveUpAction(pane),
                         new MoveDownAction(pane),
                         sidePaneContentFactory,
-                        preferencesService.getGroupsPreferences(),
+                        preferences.getGroupsPreferences(),
                         dialogService);
                 case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane,
                         new ClosePaneAction(pane),
@@ -103,10 +106,10 @@ public class SidePaneViewModel extends AbstractViewModel {
      * position next time.
      */
     private void updatePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences()
-                                                                                        .getPreferredPositions());
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferences.getSidePanePreferences()
+                                                                                 .getPreferredPositions());
         IntStream.range(0, getPanes().size()).forEach(i -> preferredPositions.put(getPanes().get(i), i));
-        preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
+        preferences.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
 
     public void moveUp(SidePaneType pane) {
@@ -142,7 +145,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     private void show(SidePaneType pane) {
         if (!getPanes().contains(pane)) {
             getPanes().add(pane);
-            getPanes().sort(new PreferredIndexSort(preferencesService.getSidePanePreferences()));
+            getPanes().sort(new PreferredIndexSort(preferences.getSidePanePreferences()));
         } else {
             LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
         }

@@ -7,9 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ManageKeywordsViewModelTest {
+class ManageKeywordsViewModelTest {
 
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     private ManageKeywordsViewModel keywordsViewModel;

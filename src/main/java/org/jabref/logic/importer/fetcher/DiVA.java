@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
@@ -37,7 +36,7 @@ public class DiVA implements IdBasedParserFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("http://www.diva-portal.org/smash/getreferences");
 
         uriBuilder.addParameter("referenceFormat", "BibTex");

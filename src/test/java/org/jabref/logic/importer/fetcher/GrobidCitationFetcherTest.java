@@ -102,32 +102,32 @@ public class GrobidCitationFetcherTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideExamplesForCorrectResultTest")
-    public void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) throws FetcherException {
+    void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
         assertEquals(List.of(expectedBibEntry), entries);
     }
 
     @Test
-    public void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
+    void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
         assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
     }
 
     @Test
-    public void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
+    void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
         assertEquals(Collections.emptyList(), entries);
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidInput")
-    public void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
-        assertEquals(Collections.emptyList(), entries);
+    void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
+        assertThrows(FetcherException.class, () ->
+                grobidCitationFetcher.performSearch("invalidInput"), "performSearch should throw an FetcherException.");
     }
 
     @Test
-    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
+    void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
         when(grobidServiceMock.processCitation(anyString(), any(), any())).thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);

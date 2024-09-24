@@ -31,18 +31,20 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -51,42 +53,43 @@ import org.slf4j.LoggerFactory;
 public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final ColumnPreferences columnPreferences;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
     public MainTableColumnFactory(BibDatabaseContext database,
-                                  PreferencesService preferencesService,
+                                  GuiPreferences preferences,
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.cellFactory = new CellFactory(preferencesService, undoManager);
+        this.cellFactory = new CellFactory(preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
+            case MATCH_SCORE:
+                returnColumn = createScoreColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -134,10 +137,8 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columnPreferences.getColumns().forEach(column -> {
-            columns.add(createColumn(column));
-        });
-
+        columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
@@ -148,7 +149,37 @@ public class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column with a continous number
+     * Creates a column for the match category.
+     * <p>This column is always hidden but is used for sorting the table
+     * in the floating mode. The order of the {@link MatchCategory} enum constants
+     * determines the sorting order.</p>
+     */
+    private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
+        column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
+        column.setSortable(true);
+        column.setSortType(TableColumn.SortType.ASCENDING);
+        column.setVisible(false);
+        return column;
+    }
+
+    private TableColumn<BibEntryTableViewModel, Number> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Score"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_SCORE.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty());
+        new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setReorderable(false);
+        column.visibleProperty().bind(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).isPresent());
+        return column;
+    }
+
+    /**
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
@@ -192,7 +223,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group icons")));
+        Tooltip.install(headerGraphic, new Tooltip(MainTableColumnModel.Type.GROUP_ICONS.getDisplayName()));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         column.setResizable(true);
@@ -277,14 +308,14 @@ public class MainTableColumnFactory {
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
     /**
      * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
+        return new SpecialFieldColumn(columnModel, preferences, undoManager);
     }
 
     /**
@@ -295,7 +326,7 @@ public class MainTableColumnFactory {
         return new FileColumn(columnModel,
                 database,
                 dialogService,
-                preferencesService,
+                preferences,
                 taskExecutor);
     }
 
@@ -306,7 +337,7 @@ public class MainTableColumnFactory {
         return new FileColumn(columnModel,
                 database,
                 dialogService,
-                preferencesService,
+                preferences,
                 columnModel.getQualifier(),
                 taskExecutor);
     }

@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EntryTypeFormatterTest {
+class EntryTypeFormatterTest {
 
     private EntryTypeFormatter formatter = new EntryTypeFormatter();
 

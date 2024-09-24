@@ -10,28 +10,28 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 public class CitationsRelationsTabViewModel {
 
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
@@ -44,7 +44,7 @@ public class CitationsRelationsTabViewModel {
 
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
@@ -58,9 +58,9 @@ public class CitationsRelationsTabViewModel {
     }
 
     private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-        boolean generateNewKeyOnImport = preferencesService.getImporterPreferences().generateNewKeyOnImportProperty().get();
+        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
         citeKeys.removeIf(String::isEmpty);
@@ -78,9 +78,9 @@ public class CitationsRelationsTabViewModel {
     }
 
     private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-        boolean generateNewKeyOnImport = preferencesService.getImporterPreferences().generateNewKeyOnImportProperty().get();
+        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         for (BibEntry entryThatCitesOurExistingEntry : entries) {
             List<String> existingCites = getExistingEntriesFromCiteField(entryThatCitesOurExistingEntry);

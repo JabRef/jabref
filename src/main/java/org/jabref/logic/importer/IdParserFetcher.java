@@ -52,7 +52,13 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
     default Optional<T> findIdentifier(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
+        URL urlForEntry;
+        try {
+            urlForEntry = getURLForEntry(entry);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URL is malformed", e);
+        }
+        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {
@@ -63,8 +69,6 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
             fetchedEntries.forEach(this::doPostCleanup);
 
             return extractIdentifier(entry, fetchedEntries);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (FileNotFoundException e) {
             LOGGER.debug("Id not found");
             return Optional.empty();
@@ -73,9 +77,9 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
             if (e.getCause() instanceof FetcherException fe) {
                 throw fe;
             }
-            throw new FetcherException("An I/O exception occurred", e);
+            throw new FetcherException(urlForEntry, "An I/O exception occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urlForEntry, "An internal parser error occurred", e);
         }
     }
 }

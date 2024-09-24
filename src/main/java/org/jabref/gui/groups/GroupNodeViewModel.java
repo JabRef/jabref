@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
@@ -21,13 +22,14 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -44,11 +46,16 @@ import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.event.IndexClosedEvent;
+import org.jabref.model.search.event.IndexRemovedEvent;
+import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
+import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
+import io.github.adr.linked.ADR;
 
 public class GroupNodeViewModel {
 
@@ -58,24 +65,27 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableList<BibEntry> matchedEntries = FXCollections.observableArrayList();
+    @ADR(38)
+    private final ObservableSet<String> matchedEntries = FXCollections.observableSet();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
+    private final GuiPreferences preferences;
+    @SuppressWarnings("FieldCanBeLocal")
     private final ObservableList<BibEntry> entriesList;
-    private final PreferencesService preferencesService;
+    @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
@@ -90,10 +100,20 @@ public class GroupNodeViewModel {
         }
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
+        } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+            stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                BackgroundTask.wrap(() -> {
+                    searchGroup.setMatchedEntries(luceneManager.search(searchGroup.getQuery()).getMatchedEntries());
+                }).onSuccess(success -> {
+                    refreshGroup();
+                    databaseContext.getMetaData().groupsBinding().invalidate();
+                }).executeWith(taskExecutor);
+            });
         }
+
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -106,18 +126,20 @@ public class GroupNodeViewModel {
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
+
+        this.databaseContext.getDatabase().registerListener(new LuceneIndexListener());
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
-        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferencesService);
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
+        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferences);
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferencesService);
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferences);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferencesService);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferences);
     }
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
@@ -228,30 +250,35 @@ public class GroupNodeViewModel {
 
     /**
      * Gets invoked if an entry in the current database changes.
+     *
+     * @implNote Search groups are updated in {@link LuceneIndexListener}.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
+        if (groupNode.getGroup() instanceof SearchGroup) {
+            return;
+        }
         while (change.next()) {
             if (change.wasPermutated()) {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
-                        if (!matchedEntries.contains(changedEntry)) {
-                            matchedEntries.add(changedEntry);
-                        }
+                        // ADR-0038
+                        matchedEntries.add(changedEntry.getId());
                     } else {
-                        matchedEntries.remove(changedEntry);
+                        // ADR-0038
+                        matchedEntries.remove(changedEntry.getId());
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
-                    matchedEntries.remove(removedEntry);
+                    // ADR-0038
+                    matchedEntries.remove(removedEntry.getId());
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (groupNode.matches(addedEntry)) {
-                        if (!matchedEntries.contains(addedEntry)) {
-                            matchedEntries.add(addedEntry);
-                        }
+                        // ADR-0038
+                        matchedEntries.add(addedEntry.getId());
                     }
                 }
             }
@@ -273,12 +300,13 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        if (preferencesService.getGroupsPreferences().shouldDisplayGroupCount()) {
+        if (preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
             BackgroundTask
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
                         matchedEntries.clear();
-                        matchedEntries.addAll(entries);
+                        // ADR-0038
+                        entries.forEach(entry -> matchedEntries.add(entry.getId()));
                     })
                     .executeWith(taskExecutor);
         }
@@ -389,7 +417,7 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
                             .orElse(false);
         } else if (group instanceof KeywordGroup) {
@@ -417,7 +445,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -442,7 +470,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -467,7 +495,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -492,7 +520,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -505,6 +533,60 @@ public class GroupNodeViewModel {
             return true;
         } else {
             throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    class LuceneIndexListener {
+        @Subscribe
+        public void listen(IndexStartedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+                stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                    BackgroundTask.wrap(() -> {
+                        searchGroup.setMatchedEntries(luceneManager.search(searchGroup.getQuery()).getMatchedEntries());
+                    }).onSuccess(success -> {
+                        refreshGroup();
+                        databaseContext.getMetaData().groupsBinding().invalidate();
+                    }).executeWith(taskExecutor);
+                });
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexAddedOrUpdatedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+                stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                    BackgroundTask.wrap(() -> {
+                        for (BibEntry entry : event.entries()) {
+                            searchGroup.updateMatches(entry, luceneManager.isEntryMatched(entry, searchGroup.getQuery()));
+                        }
+                    }).onFinished(() -> {
+                        for (BibEntry entry : event.entries()) {
+                            if (groupNode.matches(entry)) {
+                                matchedEntries.add(entry.getId());
+                            } else {
+                                matchedEntries.remove(entry.getId());
+                            }
+                        }
+                    }).executeWith(taskExecutor);
+                });
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexRemovedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+                for (BibEntry entry : event.entries()) {
+                    searchGroup.updateMatches(entry, false);
+                    matchedEntries.remove(entry.getId());
+                }
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexClosedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup group) {
+                databaseContext.getDatabase().unregisterListener(this);
+            }
         }
     }
 }

@@ -722,13 +722,23 @@ public class BibEntry implements Cloneable {
      * to a) enable debugging the internal representation and b) save time at this method.
      * <p>
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
+     * <p>
+     * Alternative for some more readable output: {@link #getAuthorTitleYear(int)}
      */
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
+    public String getAuthorTitleYear() {
+        return getAuthorTitleYear(0);
+    }
+
     /**
+     * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
+     *
+     * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
+     *
      * @param maxCharacters The maximum number of characters (additional
      *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:

@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME = "jabref-debian-12"
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "alvistack/debian-12"
+
+  config.vm.define NAME
+  config.vm.hostname = NAME
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = NAME
+    v.gui = true
+    v.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get -y upgrade
+
+    # enable building of the virtual box guest addons
+    # hint from https://forums.virtualbox.org/viewtopic.php?p=508680&sid=fe86fb0f6c03c7443f1fba9a5c29a861#p508680
+    # sudo apt install -y build-essential dkms
+
+    sudo apt-get install -y git
+
+    # sudo apt-get install -y task-cinnamon-desktop
+
+    # install IntelliJ Community Edition - source: https://snapcraft.io/install/intellij-idea-community/debian
+    sudo rm /etc/apt/preferences.d/nosnap.pref # source: https://stackoverflow.com/a/77235743/873282
+    sudo apt-get install -y snapd
+    sudo snap install snapd
+    sudo snap install intellij-idea-community --classic
+  SHELL
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    # Install "Just Perfection GNOME Shell Extension"
+    cd /tmp
+    wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v26.shell-extension.zip -O shell-extension.zip
+    gnome-extensions install --force shell-extension.zip
+
+    # Install JDK, clone JabRef's source code, and do an initial build
+    curl -s "https://get.sdkman.io" | bash
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    sdk install java 21.0.4-tem < /dev/null
+
+    cd ~
+    git clone --recurse-submodules https://github.com/JabRef/jabref.git
+    cd jabref
+    sdk use java 21.0.4-tem
+    ./gradlew jar
+  SHELL
+
+  config.vm.provision "shell", inline: "sudo reboot"
+
+  config.ssh.forward_x11 = true
+end

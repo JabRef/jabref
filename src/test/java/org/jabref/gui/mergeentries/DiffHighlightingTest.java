@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 class DiffHighlightingTest {
@@ -29,12 +31,12 @@ class DiffHighlightingTest {
 
     @Test
     void generateDiffHighlightingBothNullThrowsNPE() {
-        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
+        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
     }
 
     @Test
     void nullSeparatorThrowsNPE() {
-        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
+        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
     }
 
     @Test

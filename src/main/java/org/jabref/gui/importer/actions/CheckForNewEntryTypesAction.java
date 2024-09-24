@@ -5,12 +5,12 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.LibraryPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -21,12 +21,12 @@ import com.airhacks.afterburner.injection.Injector;
 public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, PreferencesService preferencesService) {
-        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferencesService.getLibraryPreferences()).isEmpty();
+    public boolean isActionNecessary(ParserResult parserResult, CliPreferences preferences) {
+        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferences.getLibraryPreferences()).isEmpty();
     }
 
     @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
+    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
         LibraryPreferences preferences = preferencesService.getLibraryPreferences();
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);
         dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult, preferences)));

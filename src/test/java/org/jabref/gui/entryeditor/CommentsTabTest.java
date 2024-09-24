@@ -7,15 +7,16 @@ import java.util.Set;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -25,7 +26,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -62,17 +62,13 @@ class CommentsTabTest {
     @Mock
     private DialogService dialogService;
     @Mock
-    private PreferencesService preferences;
-    @Mock
-    private StateManager stateManager;
+    private GuiPreferences preferences;
     @Mock
     private ThemeManager themeManager;
     @Mock
     private TaskExecutor taskExecutor;
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
-    @Mock
-    private IndexingTaskManager indexingTaskManager;
     @Mock
     private OwnerPreferences ownerPreferences;
 
@@ -81,7 +77,7 @@ class CommentsTabTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
@@ -99,11 +95,11 @@ class CommentsTabTest {
                 mock(UndoAction.class),
                 mock(RedoAction.class),
                 dialogService,
-                stateManager,
                 themeManager,
-                indexingTaskManager,
                 taskExecutor,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                mock(LuceneManager.class),
+                OptionalObjectProperty.empty()
         );
     }
 
@@ -163,7 +159,7 @@ class CommentsTabTest {
     }
 
     @Test
-    public void differentiateCaseInUserName() {
+    void differentiateCaseInUserName() {
         UserSpecificCommentField field1 = new UserSpecificCommentField("USER");
         UserSpecificCommentField field2 = new UserSpecificCommentField("user");
         assertNotEquals(field1, field2, "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");

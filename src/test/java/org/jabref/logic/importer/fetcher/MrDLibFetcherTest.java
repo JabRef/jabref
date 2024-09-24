@@ -6,7 +6,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.MrDlibPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
-public class MrDLibFetcherTest {
+class MrDLibFetcherTest {
 
     private MrDLibFetcher fetcher;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MrDlibPreferences mrDlibPreferences = new MrDlibPreferences(
                 true,
                 false,
@@ -31,7 +30,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void performSearch() throws FetcherException {
+    void performSearch() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.TITLE, "lernen");
         List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
@@ -39,7 +38,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void performSearchForHornecker2006() throws FetcherException {
+    void performSearchForHornecker2006() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setCitationKey("Hornecker:2006:GGT:1124772.1124838");
         bibEntry.setField(StandardField.ADDRESS, "New York, NY, USA");
@@ -60,7 +59,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("MDL_FETCHER", fetcher.getName());
     }
 }

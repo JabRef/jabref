@@ -83,6 +83,6 @@ public class PdfXmpImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Wraps the XMPUtility function to be used as an Importer.";
+        return Localization.lang("Imports BibTeX data using XMP data of a PDF.");
     }
 }

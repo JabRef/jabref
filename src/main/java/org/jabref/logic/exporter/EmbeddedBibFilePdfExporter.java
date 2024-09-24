@@ -16,7 +16,7 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilWriter;

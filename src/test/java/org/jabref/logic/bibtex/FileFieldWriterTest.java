@@ -13,25 +13,25 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class FileFieldWriterTest {
+class FileFieldWriterTest {
 
     @Test
-    public void quoteStandard() {
+    void quoteStandard() {
         assertEquals("a", FileFieldWriter.quote("a"));
     }
 
     @Test
-    public void quoteAllCharacters() {
+    void quoteAllCharacters() {
         assertEquals("a\\:\\;\\\\", FileFieldWriter.quote("a:;\\"));
     }
 
     @Test
-    public void quoteEmpty() {
+    void quoteEmpty() {
         assertEquals("", FileFieldWriter.quote(""));
     }
 
     @Test
-    public void quoteNull() {
+    void quoteNull() {
         assertNull(FileFieldWriter.quote(null));
     }
 
@@ -46,12 +46,12 @@ public class FileFieldWriterTest {
 
     @ParameterizedTest
     @MethodSource("getEncodingTestData")
-    public void encodeStringArray(String expected, String[][] values) {
+    void encodeStringArray(String expected, String[][] values) {
         assertEquals(expected, FileFieldWriter.encodeStringArray(values));
     }
 
     @Test
-    public void fileFieldWriterGetStringRepresentation() {
+    void fileFieldWriterGetStringRepresentation() {
         LinkedFile file = new LinkedFile("test", Path.of("X:\\Users\\abc.pdf"), "PDF");
         assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }

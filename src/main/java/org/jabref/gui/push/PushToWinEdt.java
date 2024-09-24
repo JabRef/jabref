@@ -3,14 +3,14 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.gui.preferences.GuiPreferences;
 
 public class PushToWinEdt extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.WIN_EDT;
 
-    public PushToWinEdt(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToWinEdt(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override

@@ -20,6 +20,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox openOnNewEntry;
     @FXML private CheckBox defaultSource;
     @FXML private CheckBox enableRelatedArticlesTab;
+    @FXML private CheckBox enableAiSummaryTab;
+    @FXML private CheckBox enableAiChatTab;
     @FXML private CheckBox acceptRecommendations;
     @FXML private CheckBox enableLatexCitationsTab;
     @FXML private CheckBox enableValidation;
@@ -44,11 +46,13 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferencesService);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
         enableRelatedArticlesTab.selectedProperty().bindBidirectional(viewModel.enableRelatedArticlesTabProperty());
+        enableAiSummaryTab.selectedProperty().bindBidirectional(viewModel.enableAiSummaryTabProperty());
+        enableAiChatTab.selectedProperty().bindBidirectional(viewModel.enableAiChatTabProperty());
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
         enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
@@ -61,7 +65,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferencesService.getFilePreferences()), generalFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), generalFieldsHelp);
     }
 
     @FXML

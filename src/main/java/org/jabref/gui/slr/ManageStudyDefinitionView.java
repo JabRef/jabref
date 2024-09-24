@@ -26,6 +26,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -33,7 +34,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -76,7 +76,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private Label directoryWarning;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService prefs;
+    @Inject private GuiPreferences preferences;
     @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;
@@ -96,7 +96,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      */
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
-        this.setTitle("Define study parameters");
+        this.setTitle(Localization.lang("Define study parameters"));
         this.study = Optional.empty();
 
         ViewLoader.view(this)
@@ -111,7 +111,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /**
      * This is used to edit an existing study.
      *
-     * @param study          the study to edit
+     * @param study the study to edit
      * @param studyDirectory the directory of the study
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
@@ -145,6 +145,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
+                viewModel.updateSelectedCatalogs();
                 return viewModel.saveStudy();
             }
             // Cancel button will return null
@@ -156,15 +157,17 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     private void initialize() {
         if (study.isEmpty()) {
             viewModel = new ManageStudyDefinitionViewModel(
-                    prefs.getImportFormatPreferences(),
-                    prefs.getImporterPreferences(),
+                    preferences.getImportFormatPreferences(),
+                    preferences.getImporterPreferences(),
+                    preferences.getWorkspacePreferences(),
                     dialogService);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
                     study.get(),
                     pathToStudyDataDirectory,
-                    prefs.getImportFormatPreferences(),
-                    prefs.getImporterPreferences(),
+                    preferences.getImportFormatPreferences(),
+                    preferences.getImporterPreferences(),
+                    preferences.getWorkspacePreferences(),
                     dialogService);
 
             // The directory of the study cannot be changed
@@ -236,6 +239,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 })
                 .install(catalogTable);
+
+        if (study.isEmpty()) {
+            viewModel.initializeSelectedCatalogs();
+        }
 
         catalogColumn.setReorderable(false);
         catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());

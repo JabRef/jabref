@@ -15,11 +15,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -27,8 +30,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +39,19 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     private final ProtectedTermsLoader termsLoader;
     private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final FilePreferences filePreferences;
     private final DialogService dialogService;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final FilePreferences filePreferences;
     private final ProtectedTermsPreferences protectedTermsPreferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
-                                      PreferencesService preferencesService) {
+                                      GuiPreferences preferences) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
-        this.filePreferences = preferencesService.getFilePreferences();
-        this.protectedTermsPreferences = preferencesService.getProtectedTermsPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.filePreferences = preferences.getFilePreferences();
+        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
     }
 
     @Override
@@ -122,13 +125,13 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public void edit(ProtectedTermsListItemModel file) {
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
-                ExternalFileTypes.getExternalFileTypeByExt("terms", filePreferences),
-                ExternalFileTypes.getExternalFileTypeByExt("txt", filePreferences)
+                ExternalFileTypes.getExternalFileTypeByExt("terms", externalApplicationsPreferences),
+                ExternalFileTypes.getExternalFileTypeByExt("txt", externalApplicationsPreferences)
         );
 
         String fileName = file.getTermsList().getLocation();
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, fileName, termsFileType);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

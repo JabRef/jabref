@@ -10,20 +10,20 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 public class OpenUrlAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
 
-    public OpenUrlAction(DialogService dialogService, StateManager stateManager, PreferencesService preferences) {
+    public OpenUrlAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -70,9 +70,9 @@ public class OpenUrlAction extends SimpleCommand {
             if (link.isPresent()) {
                 try {
                     if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
-                        JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
+                        NativeDesktop.openCustomDoi(link.get(), preferences, dialogService);
                     } else {
-                        JabRefDesktop.openExternalViewer(databaseContext, preferences, link.get(), field, dialogService, entry);
+                        NativeDesktop.openExternalViewer(databaseContext, preferences, link.get(), field, dialogService, entry);
                     }
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);

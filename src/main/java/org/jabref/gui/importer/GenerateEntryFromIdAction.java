@@ -7,17 +7,17 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
@@ -37,7 +37,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab,
                                      DialogService dialogService,
-                                     PreferencesService preferencesService,
+                                     GuiPreferences preferences,
                                      TaskExecutor taskExecutor,
                                      PopOver entryFromIdPopOver,
                                      String identifier,
@@ -45,7 +45,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                                      FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
@@ -79,7 +79,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             if (dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), msg, Localization.lang("Add entry manually"))) {
                 // add entry manually
                 new NewEntryAction(() -> libraryTab, StandardEntryType.Article, dialogService,
-                                   preferencesService, stateManager).execute();
+                        preferences, stateManager).execute();
             }
         });
         backgroundTask.onSuccess(result -> {
@@ -87,7 +87,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                 final BibEntry entry = result.get();
                 ImportHandler handler = new ImportHandler(
                         libraryTab.getBibDatabaseContext(),
-                        preferencesService,
+                        preferences,
                         fileUpdateMonitor,
                         libraryTab.getUndoManager(),
                         stateManager,
@@ -104,12 +104,12 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
             @Override
-            protected Optional<BibEntry> call() throws FetcherException {
-                if (isCanceled()) {
+            public Optional<BibEntry> call() throws FetcherException {
+                if (isCancelled()) {
                     return Optional.empty();
                 }
                 updateMessage(Localization.lang("Searching..."));
-                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
+                return new CompositeIdFetcher(preferences.getImportFormatPreferences()).performSearchById(identifier);
             }
         };
     }

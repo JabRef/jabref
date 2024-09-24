@@ -20,11 +20,12 @@ import org.jabref.gui.fieldeditors.optioneditors.mapbased.PaginationEditorViewMo
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.PatentTypeEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.TypeEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.YesNoEditorViewModel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -34,7 +35,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class FieldEditors {
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
-                                            final PreferencesService preferences,
+                                            final GuiPreferences preferences,
                                             final BibDatabaseContext databaseContext,
                                             final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,

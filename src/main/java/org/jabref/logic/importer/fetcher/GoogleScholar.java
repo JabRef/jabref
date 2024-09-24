@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpCookie;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                 if (!target.isEmpty() && new URLDownload(target).isPdf()) {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
-                    LOGGER.info("Fulltext PDF found @ Google: " + target);
+                    LOGGER.info("Fulltext PDF found @ Google: {}", target);
                     pdfLink = Optional.of(new URL(target));
                     break;
                 }
@@ -132,7 +133,8 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         String content = new URLDownload(queryURL).asString();
 
         if (needsCaptcha(content)) {
-            throw new FetcherException("Fetching from Google Scholar failed: Captacha hit at " + queryURL + ".",
+            // TODO: Remove "null"
+            throw new FetcherException(queryURL, "Fetching from Google Scholar failed: Captacha hit." +
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 
@@ -153,7 +155,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         } else {
             Collection<BibEntry> entries = result.getDatabase().getEntries();
             if (entries.size() != 1) {
-                LOGGER.debug(entries.size() + " entries found! (" + link + ")");
+                LOGGER.debug("{} entries found! ({})", entries.size(), link);
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
             } else {
                 BibEntry entry = entries.iterator().next();
@@ -179,40 +181,49 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
         ScholarQueryTransformer queryTransformer = new ScholarQueryTransformer();
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
+
+        obtainAndModifyCookie();
+
+        URIBuilder uriBuilder;
         try {
-            obtainAndModifyCookie();
-            List<BibEntry> foundEntries = new ArrayList<>(10);
-            URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-            uriBuilder.addParameter("hl", "en");
-            uriBuilder.addParameter("btnG", "Search");
-            uriBuilder.addParameter("q", transformedQuery);
-            uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
-            uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            uriBuilder.addParameter("as_ylo", String.valueOf(queryTransformer.getStartYear()));
-            uriBuilder.addParameter("as_yhi", String.valueOf(queryTransformer.getEndYear()));
-
-            try {
-                addHitsFromQuery(foundEntries, uriBuilder.toString());
-
-                if (foundEntries.size() == 10) {
-                    uriBuilder.addParameter("start", "10");
-                    addHitsFromQuery(foundEntries, uriBuilder.toString());
-                }
-            } catch (IOException e) {
-                LOGGER.info("IOException for URL {}", uriBuilder.toString());
-                // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
-                // The caught IOException looks for example like this:
-                // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-                if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
-                    throw new FetcherException("Fetching from Google Scholar failed.",
-                            Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-                } else {
-                    throw new FetcherException("Error while fetching from " + getName(), e);
-                }
-            }
-            return new Page<>(transformedQuery, pageNumber, foundEntries);
+            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
         } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from " + getName(), e);
+            throw new FetcherException("Building URI failed.", e);
         }
+        uriBuilder.addParameter("hl", "en");
+        uriBuilder.addParameter("btnG", "Search");
+        uriBuilder.addParameter("q", transformedQuery);
+        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("num", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("as_ylo", String.valueOf(queryTransformer.getStartYear()));
+        uriBuilder.addParameter("as_yhi", String.valueOf(queryTransformer.getEndYear()));
+
+        List<BibEntry> foundEntries = new ArrayList<>(10);
+
+        try {
+            addHitsFromQuery(foundEntries, uriBuilder.toString());
+            if (foundEntries.size() == 10) {
+                uriBuilder.addParameter("start", "10");
+                addHitsFromQuery(foundEntries, uriBuilder.toString());
+            }
+        } catch (IOException e) {
+            LOGGER.info("IOException for URL {}", uriBuilder);
+            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                throw new FetcherException("Fetching from Google Scholar failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                URL url;
+                try {
+                    url = uriBuilder.build().toURL();
+                } catch (URISyntaxException | MalformedURLException ex) {
+                    throw new FetcherException("Wrong URL syntax", e);
+                }
+                throw new FetcherException(url, "Error while fetching from " + getName(), e);
+            }
+        }
+        return new Page<>(transformedQuery, pageNumber, foundEntries);
     }
 }

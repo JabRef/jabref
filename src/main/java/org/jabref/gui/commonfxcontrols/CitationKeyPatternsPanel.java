@@ -15,9 +15,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -28,7 +28,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
 
-    @Inject private PreferencesService preferences;
+    @Inject private CliPreferences preferences;
 
     private CitationKeyPatternsPanelViewModel viewModel;
 

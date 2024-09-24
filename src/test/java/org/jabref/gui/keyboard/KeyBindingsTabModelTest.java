@@ -7,10 +7,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
-import org.jabref.logic.util.OS;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.os.OS;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +35,10 @@ class KeyBindingsTabModelTest {
     @BeforeEach
     void setUp() {
         keyBindingRepository = new KeyBindingRepository();
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         Injector.setModelOrService(KeyBindingRepository.class, keyBindingRepository);
-        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferencesService);
+        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
     }
 
     @Test

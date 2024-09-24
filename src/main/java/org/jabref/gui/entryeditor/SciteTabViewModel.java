@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,23 +13,23 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
-import org.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
-    /**
-     * Status enum for Scite tab
-     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SciteTabViewModel.class);
+
     public enum SciteStatus {
         IN_PROGRESS,
         FOUND,
@@ -38,7 +37,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     private static final String BASE_URL = "https://api.scite.ai/";
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
@@ -46,15 +45,15 @@ public class SciteTabViewModel extends AbstractViewModel {
 
     private Future<?> searchTask;
 
-    public SciteTabViewModel(PreferencesService preferencesService, TaskExecutor taskExecutor) {
-        this.preferencesService = preferencesService;
+    public SciteTabViewModel(GuiPreferences preferences, TaskExecutor taskExecutor) {
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
     }
 
     public boolean shouldShow() {
-        return preferencesService.getEntryEditorPreferences().shouldShowSciteTab();
+        return preferences.getEntryEditorPreferences().shouldShowSciteTab();
     }
 
     public void bindToEntry(BibEntry entry) {
@@ -97,24 +96,24 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
+        URL url;
         try {
-            URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
-            URLDownload download = new URLDownload(url);
-            String response = download.asString();
-            Logger.debug("Response {}", response);
-            JSONObject tallies = new JSONObject(response);
-            if (tallies.has("detail")) {
-                String message = tallies.getString("detail");
-                throw new FetcherException(message);
-            } else if (!tallies.has("total")) {
-                throw new FetcherException("Unexpected result data!");
-            }
-            return SciteTallyModel.fromJSONObject(tallies);
+            url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
         } catch (MalformedURLException | URISyntaxException ex) {
-            throw new FetcherException("Malformed url for DOs", ex);
-        } catch (IOException ioex) {
-            throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
+            throw new FetcherException("Malformed URL for DOI", ex);
         }
+        LOGGER.debug("Fetching tallies from {}", url);
+        URLDownload download = new URLDownload(url);
+        String response = download.asString();
+        LOGGER.debug("Response {}", response);
+        JSONObject tallies = new JSONObject(response);
+        if (tallies.has("detail")) {
+            String message = tallies.getString("detail");
+            throw new FetcherException(message);
+        } else if (!tallies.has("total")) {
+            throw new FetcherException("Unexpected result data.");
+        }
+        return SciteTallyModel.fromJSONObject(tallies);
     }
 
     public ObjectProperty<SciteStatus> statusProperty() {
