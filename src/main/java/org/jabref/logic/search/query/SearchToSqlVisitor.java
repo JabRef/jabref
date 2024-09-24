@@ -26,10 +26,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private enum SearchTermFlag {
-        REGULAR_EXPRESSION,               // mutually exclusive to the others
+        REGULAR_EXPRESSION,               // mutually exclusive to exact/inexact match
         NEGATION,
         CASE_SENSITIVE, CASE_INSENSITIVE, // mutually exclusive
-        INEXACT_MATCH        // mutually exclusive
+        EXACT_MATCH, INEXACT_MATCH        // mutually exclusive
     }
 
     @Override
@@ -73,25 +73,23 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             // Direct comparison does not work
             // context.CONTAINS() and others are null if absent (thus, we cannot check for getText())
             EnumSet<SearchTermFlag> searchFlags = EnumSet.noneOf(SearchTermFlag.class);
-            if (context.REQUAL() != null) {
-                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
-                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
-            } else if (context.CREEQUAL() != null) {
-                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
-                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
-            } else if (context.NREQUAL() != null) {
-                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
-                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
-                searchFlags.add(SearchTermFlag.NEGATION);
-            } else if (context.NCREEQUAL() != null) {
-                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
-                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
-                searchFlags.add(SearchTermFlag.NEGATION);
-            } else if (context.CONTAINS() != null || context.EQUAL() != null) {
+            if (context.EQUAL() != null || context.CONTAINS() != null) {
                 searchFlags.add(SearchTermFlag.INEXACT_MATCH);
                 searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
             } else if (context.CEQUAL() != null) {
                 searchFlags.add(SearchTermFlag.INEXACT_MATCH);
+                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+            } else if (context.EEQUAL() != null || context.MATCHES() != null) {
+                searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+            } else if (context.CEEQUAL() != null) {
+                searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+            } else if (context.REQUAL() != null) {
+                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
+                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+            } else if (context.CREEQUAL() != null) {
+                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
                 searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
             } else if (context.NEQUAL() != null) {
                 searchFlags.add(SearchTermFlag.INEXACT_MATCH);
@@ -101,7 +99,24 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 searchFlags.add(SearchTermFlag.INEXACT_MATCH);
                 searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
                 searchFlags.add(SearchTermFlag.NEGATION);
+            } else if (context.NEEQUAL() != null) {
+                searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+                searchFlags.add(SearchTermFlag.NEGATION);
+            } else if (context.NCEEQUAL() != null) {
+                searchFlags.add(SearchTermFlag.EXACT_MATCH);
+                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+                searchFlags.add(SearchTermFlag.NEGATION);
+            } else if (context.NREQUAL() != null) {
+                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
+                searchFlags.add(SearchTermFlag.CASE_INSENSITIVE);
+                searchFlags.add(SearchTermFlag.NEGATION);
+            } else if (context.NCREEQUAL() != null) {
+                searchFlags.add(SearchTermFlag.REGULAR_EXPRESSION);
+                searchFlags.add(SearchTermFlag.CASE_SENSITIVE);
+                searchFlags.add(SearchTermFlag.NEGATION);
             }
+
             return getFieldQueryNode(field, right, searchFlags);
         } else {
             // Query without any field name
@@ -124,7 +139,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 operator += "~*";
             }
         } else {
-            prefixSuffix = "%";
+            if (searchFlags.contains(SearchTermFlag.INEXACT_MATCH)) {
+                prefixSuffix = "%";
+            }
+
             if (searchFlags.contains(SearchTermFlag.NEGATION)) {
                 operator = "NOT ";
             }
@@ -142,9 +160,12 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         }
 
         field = switch (field) {
-            case "key" -> InternalField.KEY_FIELD.getName();
-            case "keywords" -> StandardField.KEYWORDS.getName();
-            default -> field;
+            case "key" ->
+                    InternalField.KEY_FIELD.getName();
+            case "anykeyword" ->
+                    StandardField.KEYWORDS.getName();
+            default ->
+                    field;
         };
 
         return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
