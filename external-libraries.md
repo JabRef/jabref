@@ -350,10 +350,10 @@ License: MIT
 ```
 
 ```yaml
-Id:io.github.adr:e-adr
-Project:EmbeddedArchitecturalDecisionRecords
-URL:https://github.com/adr/e-adr/
-License:EPL-2.0
+Id:      io.github.adr:e-adr
+Project: EmbeddedArchitecturalDecisionRecords
+URL:     https://github.com/adr/e-adr/
+License: EPL-2.0
 ```
 
 ```yaml
@@ -821,6 +821,7 @@ net.jodah:typetools:0.6.1
 net.synedra:validatorfx:0.5.0
 one.jpro.jproutils:tree-showing:0.2.2
 org.antlr:antlr4-runtime:4.13.2
+org.apache.commons:commons-compress:1.27.1
 org.apache.commons:commons-csv:1.11.0
 org.apache.commons:commons-lang3:3.17.0
 org.apache.commons:commons-text:1.12.0
@@ -897,6 +898,7 @@ org.slf4j:slf4j-api:2.0.16
 org.tinylog:slf4j-tinylog:2.7.0
 org.tinylog:tinylog-api:2.7.0
 org.tinylog:tinylog-impl:2.7.0
+org.tukaani:xz:1.9
 org.yaml:snakeyaml:2.3
 pt.davidafsilva.apple:jkeychain:1.1.0
 tech.units:indriya:2.2

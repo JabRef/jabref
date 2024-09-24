@@ -110,7 +110,6 @@ open module org.jabref {
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires org.apache.commons.cli;
-    requires org.apache.commons.codec;
     requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
