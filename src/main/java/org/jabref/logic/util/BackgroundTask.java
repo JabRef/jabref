@@ -146,6 +146,10 @@ public abstract class BackgroundTask<V> {
         return showToUser.get();
     }
 
+    public BooleanProperty showToUserProperty() {
+        return showToUser;
+    }
+
     public BackgroundTask<V> showToUser(boolean show) {
         showToUser.set(show);
         return this;

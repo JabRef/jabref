@@ -56,7 +56,10 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
+        if (entries.size() > 1) {
+            task.showToUser(true);
+            task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
+        }
         int i = 1;
         long startTime = System.currentTimeMillis();
         LOGGER.debug("Adding {} entries to index", entries.size());
@@ -99,7 +102,10 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        task.setTitle(Localization.lang("Removing entries from index for %0", libraryName));
+        if (entries.size() > 1) {
+            task.showToUser(true);
+            task.setTitle(Localization.lang("Removing entries from index for %0", libraryName));
+        }
         int i = 1;
         for (BibEntry entry : entries) {
             if (task.isCancelled()) {
