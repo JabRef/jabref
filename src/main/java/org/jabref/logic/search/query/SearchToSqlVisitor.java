@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Similar class: {@link org.jabref.migrations.SearchToLuceneMigration}
+ * Converts to a query processable by the scheme created by {@link org.jabref.logic.search.indexing.PostgreIndexer}.
+ *
+ * @implNote Similar class: {@link org.jabref.migrations.SearchToLuceneMigration}
  */
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
