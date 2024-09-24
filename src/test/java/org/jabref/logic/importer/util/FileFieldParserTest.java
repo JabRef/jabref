@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.util;
 
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;

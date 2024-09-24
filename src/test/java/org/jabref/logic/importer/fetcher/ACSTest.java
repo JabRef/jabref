@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;

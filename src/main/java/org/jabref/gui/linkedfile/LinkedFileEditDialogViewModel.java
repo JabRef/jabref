@@ -2,7 +2,6 @@ package org.jabref.gui.linkedfile;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
