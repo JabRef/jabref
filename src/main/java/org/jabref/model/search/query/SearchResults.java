@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.model.search.query;
 
 import java.util.ArrayList;
 import java.util.Collection;

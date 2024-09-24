@@ -1,11 +1,11 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.query;
 
 import java.util.EnumSet;
 import java.util.Optional;
 
-import org.jabref.logic.search.indexing.PostgreConstants;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;

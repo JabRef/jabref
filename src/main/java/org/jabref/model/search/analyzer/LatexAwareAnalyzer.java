@@ -1,4 +1,4 @@
-package org.jabref.model.search.Analyzer;
+package org.jabref.model.search.analyzer;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;

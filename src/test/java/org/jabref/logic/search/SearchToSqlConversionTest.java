@@ -1,5 +1,7 @@
 package org.jabref.logic.search;
 
+import org.jabref.logic.search.query.SearchToSqlConversion;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

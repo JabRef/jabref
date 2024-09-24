@@ -17,7 +17,7 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.search.SearchDisplayMode;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;

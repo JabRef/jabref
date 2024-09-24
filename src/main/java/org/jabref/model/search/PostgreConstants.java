@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.model.search;
 
 public enum PostgreConstants {
     ENTRY_ID("entry_id"),

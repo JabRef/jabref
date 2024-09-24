@@ -2,7 +2,7 @@ package org.jabref.model.search;
 
 import java.util.List;
 
-import org.jabref.model.search.Analyzer.LatexAwareAnalyzer;
+import org.jabref.model.search.analyzer.LatexAwareAnalyzer;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;

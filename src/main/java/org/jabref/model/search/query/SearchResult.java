@@ -1,8 +1,10 @@
-package org.jabref.model.search;
+package org.jabref.model.search.query;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import org.jabref.model.search.SearchFieldConstants;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.highlight.Highlighter;

@@ -12,6 +12,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.SearchFieldConstants;
 
 import org.slf4j.Logger;

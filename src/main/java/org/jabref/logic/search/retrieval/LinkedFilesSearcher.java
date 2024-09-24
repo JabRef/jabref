@@ -15,8 +15,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchResult;
-import org.jabref.model.search.SearchResults;
+import org.jabref.model.search.query.SearchResult;
+import org.jabref.model.search.query.SearchResults;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.StoredFields;

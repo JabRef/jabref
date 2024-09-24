@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.model.search.query;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,6 +11,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.SearchFlags;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;

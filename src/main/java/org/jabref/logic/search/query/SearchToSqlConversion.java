@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.query;
 
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
