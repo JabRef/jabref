@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,7 +72,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
         if (!metaLinks.isEmpty()) {
             String link = metaLinks.first().attr("content");
-            return Optional.of(new URL(link));
+            return Optional.of(URI.create(link).toURL());
         }
 
         // We use the ScienceDirect web page which contains the article (presented using HTML).
@@ -102,7 +103,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         String fullLinkToPdf;
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
-            URL url = new URL(urlFromDoi);
+            URL url = URI.create(urlFromDoi).toURL();
             fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
@@ -122,7 +123,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
         LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
         try {
-            return Optional.of(new URL(fullLinkToPdf));
+            return Optional.of(URI.create(fullLinkToPdf).toURL());
         } catch (MalformedURLException e) {
             LOGGER.error("malformed URL", e);
             return Optional.empty();

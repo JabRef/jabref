@@ -15,6 +15,7 @@ import java.net.CookiePolicy;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -86,7 +87,7 @@ public class URLDownload {
      * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
      */
     public URLDownload(String source) throws MalformedURLException {
-        this(new URL(source));
+        this(URI.create(source).toURL());
     }
 
     /**
@@ -153,7 +154,7 @@ public class URLDownload {
 
         // Try to resolve local URIs
         try {
-            URLConnection connection = new URL(source.toString()).openConnection();
+            URLConnection connection = URI.create(source.toString()).toURL().openConnection();
             contentType = connection.getContentType();
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);

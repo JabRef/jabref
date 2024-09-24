@@ -1,6 +1,7 @@
 package org.jabref.gui.linkedfile;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
         }
 
         try {
-            URL url = new URL(urlforDownload.get());
+            URL url = URI.create(urlforDownload.get()).toURL();
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                              new LinkedFile(url, ""),
                              entry,

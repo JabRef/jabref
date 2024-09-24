@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -49,7 +49,7 @@ class SpringerLinkTest {
     void findByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1186/s13677-015-0042-8");
         assertEquals(
-                Optional.of(new URL("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf")),
+                Optional.of(URI.create("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf").toURL()),
                 finder.findFullText(entry));
     }
 

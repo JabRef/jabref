@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
                     LOGGER.info("Fulltext PDF found @ Google: {}", target);
-                    pdfLink = Optional.of(new URL(target));
+                    pdfLink = Optional.of(URI.create(target).toURL());
                     break;
                 }
             }

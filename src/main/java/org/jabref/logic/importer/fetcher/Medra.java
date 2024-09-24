@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -103,7 +104,7 @@ public class Medra implements IdBasedParserFetcher {
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        return new URL(API_URL + "/" + identifier);
+        return URI.create(API_URL + "/" + identifier).toURL();
     }
 
     @Override
