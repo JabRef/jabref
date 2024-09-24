@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -13,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
@@ -64,10 +67,12 @@ public class StateManager {
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
-    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
-    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
+    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(() -> !runningBackgroundTasks.isEmpty(), runningBackgroundTasks);
+    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
@@ -153,14 +158,18 @@ public class StateManager {
     }
 
     public ObservableList<Task<?>> getBackgroundTasks() {
-        return EasyBind.map(backgroundTasks, Pair::getValue);
+        return backgroundTasks;
+    }
+
+    public ObservableList<Task<?>> getRunningBackgroundTasks() {
+        return runningBackgroundTasks;
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.addFirst(new Pair<>(backgroundTask, task));
+        this.backgroundTasksPairs.addFirst(new Pair<>(backgroundTask, task));
     }
 
-    public EasyBinding<Boolean> getAnyTaskRunning() {
+    public BooleanBinding getAnyTaskRunning() {
         return anyTaskRunning;
     }
 
