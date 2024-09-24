@@ -158,7 +158,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
         // Pseudo-fields
         if ("anyfield".equals(field) || "any".equals(field)) {
-            return "(" + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+            return "(" + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
         }
 
         field = switch (field) {
@@ -170,6 +170,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                     field;
         };
 
-        return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
     }
 }

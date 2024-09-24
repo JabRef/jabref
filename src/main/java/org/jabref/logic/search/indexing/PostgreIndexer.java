@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class PostgreIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreIndexer.class);
-    private static final String TABLE_STRING_NAME_SPLIT_VALUES_PREFIX = "_split_values";
+    private static final String SPLIT_VALUES_PREFIX = "_split_values";
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
     private final BibDatabaseContext databaseContext;
@@ -83,6 +84,7 @@ public class PostgreIndexer {
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableName), tableName, PostgreConstants.ENTRY_ID));
+
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues), tableName, PostgreConstants.ENTRY_ID));
@@ -91,9 +93,15 @@ public class PostgreIndexer {
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableName), tableName, PostgreConstants.FIELD_NAME));
+
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_NAME));
+
+            // btree index on spilt values column
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.FIELD_SPLIT_VALUE.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_SPLIT_VALUE));
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
@@ -104,11 +112,6 @@ public class PostgreIndexer {
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
                     """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
-
-            // btree index on spilt values column
-            connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_SPLIT_VALUE.getIndexName(tableName), tableName, PostgreConstants.FIELD_SPLIT_VALUE));
 
             LOGGER.debug("Created indexes for library: {}", libraryName);
         } catch (SQLException e) {
@@ -140,8 +143,8 @@ public class PostgreIndexer {
 
     private void addToIndex(BibEntry bibEntry) {
         String insertFieldQuery = """
-                                                                                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
-                                                                                VALUES (?, ?, ?, ?)
+            INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+            VALUES (?, ?, ?, ?)
             """.formatted(tableName,
                 PostgreConstants.ENTRY_ID,
                 PostgreConstants.FIELD_NAME,
@@ -159,8 +162,9 @@ public class PostgreIndexer {
                 // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
-                assert bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase()).isPresent();
-                preparedStatement.setString(4, bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase()).orElse(""));
+                Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase());
+                assert resolvedFieldLatexFree.isPresent();
+                preparedStatement.setString(4, resolvedFieldLatexFree.orElse(""));
 
                 preparedStatement.addBatch();
             }
@@ -209,18 +213,19 @@ public class PostgreIndexer {
         try {
             // Use upsert to add the field to the index if it doesn't exist, or update it if it does
             String updateQuery = """
-            INSERT INTO "%s" ("%s", "%s", "%s")
-            VALUES (?, ?, ?)
+            INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+            VALUES (?, ?, ?, ?)
             ON CONFLICT ("%s", "%s") DO UPDATE
             SET "%s" = EXCLUDED."%s"
             """.formatted(tableName,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE,
+                    PostgreConstants.FIELD_VALUE_LITERAL,
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE,
-                    PostgreConstants.FIELD_VALUE);
+                    PostgreConstants.FIELD_VALUE_LITERAL,
+                    PostgreConstants.FIELD_VALUE_LITERAL);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                 preparedStatement.setString(1, entry.getId());
