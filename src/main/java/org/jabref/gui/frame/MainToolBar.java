@@ -229,6 +229,7 @@ public class MainToolBar extends ToolBar {
             if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
                 progressViewPopOver.hide();
                 taskProgressSubscription.unsubscribe();
+                return;
             }
 
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
