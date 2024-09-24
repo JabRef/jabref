@@ -88,13 +88,13 @@ class BibEntryRelationsRepositoryTest {
             null,
             null
         );
-        var bibEntryRelationsCache = new BibEntryRelationsCache();
-        var bibEntryRelationsRepository = new BibEntryRelationsRepository(
+        var bibEntryRelationsCache = new LRUBibEntryRelationsCache();
+        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
             citationFetcherMock, bibEntryRelationsCache
         );
 
         // WHEN
-        var citations = bibEntryRelationsRepository.getCitations(bibEntry);
+        var citations = bibEntryRelationsRepository.readCitations(bibEntry);
 
         // THEN
         Assertions.assertFalse(citations.isEmpty());
@@ -110,15 +110,15 @@ class BibEntryRelationsRepositoryTest {
         var citationFetcherMock = new CitationFetcherMock(
             BibEntryRelationsRepositoryTest::getCitedBy, null, null
         );
-        var bibEntryRelationsCache = new BibEntryRelationsCache();
-        var bibEntryRelationsRepository = new BibEntryRelationsRepository(
+        var bibEntryRelationsCache = new LRUBibEntryRelationsCache();
+        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
             citationFetcherMock, bibEntryRelationsCache
         );
         var bibEntry = BibEntryRelationsRepositoryTest.createBibEntry(1);
 
         // WHEN
         Assertions.assertEquals(List.of(), bibEntryRelationsCache.getCitations(bibEntry));
-        var citations = bibEntryRelationsRepository.getCitations(bibEntry);
+        var citations = bibEntryRelationsRepository.readCitations(bibEntry);
         var fromCacheCitations = bibEntryRelationsCache.getCitations(bibEntry);
 
         // THEN

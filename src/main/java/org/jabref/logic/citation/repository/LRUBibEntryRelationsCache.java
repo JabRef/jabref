@@ -7,7 +7,7 @@ import org.eclipse.jgit.util.LRUMap;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
-public class BibEntryRelationsCache {
+public class LRUBibEntryRelationsCache {
     private static final Integer MAX_CACHED_ENTRIES = 100;
     private static final Map<String, List<BibEntry>> CITATIONS_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
     private static final Map<String, List<BibEntry>> REFERENCES_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
