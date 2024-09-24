@@ -786,7 +786,7 @@ jlink {
         uses 'ai.djl.repository.zoo.ZooProvider'
         uses 'dev.langchain4j.spi.prompt.PromptTemplateFactory'
         uses 'kong.unirest.core.json.JsonEngine'
-        uses 'org.eclipse.jgit.lib.GpgSigner'
+        uses 'org.eclipse.jgit.lib.Signer'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
