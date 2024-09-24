@@ -379,7 +379,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-        EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
+        EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
         taskProgressView.setRetainTasks(false);
         taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
 

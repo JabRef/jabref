@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
@@ -153,9 +152,8 @@ public class StateManager {
         return focusOwner.get();
     }
 
-    public ObservableList<Task<?>> getRunningBackgroundTasks() {
-        FilteredList<Pair<BackgroundTask<?>, Task<?>>> pairs = new FilteredList<>(backgroundTasks, task -> task.getValue().isRunning());
-        return EasyBind.map(pairs, Pair::getValue);
+    public ObservableList<Task<?>> getBackgroundTasks() {
+        return EasyBind.map(backgroundTasks, Pair::getValue);
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
