@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class PostgreIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreIndexer.class);
+    private static final String TABLE_STRING_NAME_SPLIT_VALUES_PREFIX = "_split_values";
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
     private final BibDatabaseContext databaseContext;
@@ -53,30 +54,61 @@ public class PostgreIndexer {
                         %s TEXT NOT NULL,
                         %s TEXT NOT NULL,
                         %s TEXT,
+                        %s TEXT,
                         PRIMARY KEY (%s, %s)
                     )
                     """.formatted(tableName,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE,
+                    PostgreConstants.FIELD_VALUE_LITERAL,
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME));
-            LOGGER.debug("Created table for library: {}", libraryName);
+
+            String tableNameSplitValues = tableName + "_split_values";
+            connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS "%s" (
+                        %s TEXT NOT NULL,
+                        %s TEXT NOT NULL,
+                        %s TEXT
+                    )
+                    """.formatted(tableNameSplitValues,
+                    PostgreConstants.ENTRY_ID,
+                    PostgreConstants.FIELD_NAME,
+                    PostgreConstants.FIELD_SPLIT_VALUE));
+
+            LOGGER.debug("Created tables for library: {}", libraryName);
 
             // btree index on id column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableName), tableName, PostgreConstants.ENTRY_ID));
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues), tableName, PostgreConstants.ENTRY_ID));
 
             // btree index on field name column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableName), tableName, PostgreConstants.FIELD_NAME));
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_NAME));
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
-                    """.formatted(PostgreConstants.FIELD_VALUE.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE));
+                    """.formatted(PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_LITERAL));
+
+            // trigram index on field value column
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
+                    """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
+
+            // btree index on spilt values column
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.FIELD_SPLIT_VALUE.getIndexName(tableName), tableName, PostgreConstants.FIELD_SPLIT_VALUE));
 
             LOGGER.debug("Created indexes for library: {}", libraryName);
         } catch (SQLException e) {
@@ -108,12 +140,13 @@ public class PostgreIndexer {
 
     private void addToIndex(BibEntry bibEntry) {
         String insertFieldQuery = """
-            INSERT INTO "%s" ("%s", "%s", "%s")
-            VALUES (?, ?, ?)
+                                                                                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+                                                                                VALUES (?, ?, ?, ?)
             """.formatted(tableName,
                 PostgreConstants.ENTRY_ID,
                 PostgreConstants.FIELD_NAME,
-                PostgreConstants.FIELD_VALUE);
+                PostgreConstants.FIELD_VALUE_LITERAL,
+                PostgreConstants.FIELD_VALUE_TRANSFORMED);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
             String entryId = bibEntry.getId();
@@ -121,6 +154,14 @@ public class PostgreIndexer {
                 preparedStatement.setString(1, entryId);
                 preparedStatement.setString(2, field.getKey().getName());
                 preparedStatement.setString(3, field.getValue());
+
+                // If a field exists, there also exists a resolved field latex free.
+                // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
+                // To uncover these flaws, we add the "assert" statement.
+                // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
+                assert bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase()).isPresent();
+                preparedStatement.setString(4, bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase()).orElse(""));
+
                 preparedStatement.addBatch();
             }
 
@@ -128,6 +169,7 @@ public class PostgreIndexer {
             preparedStatement.setString(1, entryId);
             preparedStatement.setString(2, SearchFieldConstants.ENTRY_TYPE.toString());
             preparedStatement.setString(3, bibEntry.getType().getName());
+            preparedStatement.setString(4, bibEntry.getType().getName());
             preparedStatement.addBatch();
 
             preparedStatement.executeBatch();
