@@ -25,7 +25,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class ChatHistoryService implements AutoCloseable {
 
     private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
 
-    private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+    private final StateManager stateManager;
 
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
@@ -79,31 +78,25 @@ public class ChatHistoryService implements AutoCloseable {
         return o1 == o2 ? 0 : o1.getGroup().getName().compareTo(o2.getGroup().getName());
     });
 
-    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
+    public ChatHistoryService(StateManager stateManager, CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
+        this.stateManager = stateManager;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.implementation = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
-        configureHistoryTransfer();
+
+        configureDatabaseListeners();
     }
 
-    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
-                              ChatHistoryStorage implementation) {
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
-        this.implementation = implementation;
-
-        configureHistoryTransfer();
-    }
-
-    private void configureHistoryTransfer() {
+    private void configureDatabaseListeners() {
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::configureHistoryTransfer);
+                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
                 }
             }
         });
     }
 
-    private void configureHistoryTransfer(BibDatabaseContext bibDatabaseContext) {
+    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
         bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> {
             rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
                 groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
@@ -264,6 +257,7 @@ public class ChatHistoryService implements AutoCloseable {
         new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
 
         implementation.commit();
+        implementation.close();
     }
 
     private void transferGroupHistory(BibDatabaseContext bibDatabaseContext, GroupTreeNode groupTreeNode, String oldName, String newName) {

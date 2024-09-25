@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
@@ -52,7 +53,8 @@ public class AiService implements AutoCloseable {
     private final IngestionService ingestionService;
     private final SummariesService summariesService;
 
-    public AiService(AiPreferences aiPreferences,
+    public AiService(StateManager stateManager,
+                     AiPreferences aiPreferences,
                      FilePreferences filePreferences,
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
@@ -64,8 +66,11 @@ public class AiService implements AutoCloseable {
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
 
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
+
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
+
         this.ingestionService = new IngestionService(
+                stateManager,
                 aiPreferences,
                 shutdownSignal,
                 jabRefEmbeddingModel,
@@ -74,7 +79,16 @@ public class AiService implements AutoCloseable {
                 filePreferences,
                 taskExecutor
         );
-        this.summariesService = new SummariesService(aiPreferences, mvStoreSummariesStorage, jabRefChatLanguageModel, shutdownSignal, filePreferences, taskExecutor);
+
+        this.summariesService = new SummariesService(
+                stateManager,
+                aiPreferences,
+                mvStoreSummariesStorage,
+                jabRefChatLanguageModel,
+                shutdownSignal,
+                filePreferences,
+                taskExecutor
+        );
     }
 
     public JabRefChatLanguageModel getChatLanguageModel() {

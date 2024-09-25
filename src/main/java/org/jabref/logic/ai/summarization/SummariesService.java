@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.collections.ListChangeListener;
 
+import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
@@ -34,6 +36,7 @@ public class SummariesService {
 
     private final Map<BibEntry, ProcessingInfo<BibEntry, Summary>> summariesStatusMap = new HashMap<>();
 
+    private final StateManager stateManager;
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
     private final ChatLanguageModel chatLanguageModel;
@@ -41,19 +44,45 @@ public class SummariesService {
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
-    public SummariesService(AiPreferences aiPreferences,
+    public SummariesService(StateManager stateManager,
+                            AiPreferences aiPreferences,
                             SummariesStorage summariesStorage,
                             ChatLanguageModel chatLanguageModel,
                             BooleanProperty shutdownSignal,
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
     ) {
+        this.stateManager = stateManager;
         this.aiPreferences = aiPreferences;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+    }
+
+    private void configureDatabaseListeners(StateManager stateManager) {
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
+                }
+            }
+        });
+    }
+
+    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(entry -> {
+                        if (aiPreferences.getAutoGenerateEmbeddings()) {
+                            summarize(entry, bibDatabaseContext);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     /**

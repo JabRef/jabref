@@ -7,13 +7,16 @@ import java.util.Map;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 
+import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import dev.langchain4j.data.segment.TextSegment;
@@ -29,6 +32,7 @@ public class IngestionService {
 
     private final List<List<LinkedFile>> listsUnderIngestion = new ArrayList<>();
 
+    private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
@@ -36,7 +40,8 @@ public class IngestionService {
 
     private final ReadOnlyBooleanProperty shutdownSignal;
 
-    public IngestionService(AiPreferences aiPreferences,
+    public IngestionService(StateManager stateManager,
+                            AiPreferences aiPreferences,
                             ReadOnlyBooleanProperty shutdownSignal,
                             EmbeddingModel embeddingModel,
                             EmbeddingStore<TextSegment> embeddingStore,
@@ -44,6 +49,7 @@ public class IngestionService {
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
     ) {
+        this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
 
@@ -56,6 +62,32 @@ public class IngestionService {
         );
 
         this.shutdownSignal = shutdownSignal;
+
+        configureDatabaseListeners(stateManager);
+    }
+
+    private void configureDatabaseListeners(StateManager stateManager) {
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
+                }
+            }
+        });
+    }
+
+    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(entry -> {
+                        if (aiPreferences.getAutoGenerateEmbeddings()) {
+                            entry.getFiles().forEach(linkedFile -> ingest(linkedFile, bibDatabaseContext));
+                        }
+                    });
+                }
+            }
+        });
     }
 
     /**
