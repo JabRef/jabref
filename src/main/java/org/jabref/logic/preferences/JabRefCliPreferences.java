@@ -56,6 +56,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.util.MetaDataParser;
@@ -210,6 +211,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
+    public static final String DEFAULT_ONLINE_PLAIN_CITATION_PARSER = "defaultOnlinePlainCitationParser";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -436,6 +438,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 SpringerFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
+        defaults.put(DEFAULT_ONLINE_PLAIN_CITATION_PARSER, OnlinePlainCitationParser.GROBID.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
@@ -1988,7 +1991,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getCustomImportFormats(),
                 getFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
-                getStringList(SEARCH_CATALOGS));
+                getStringList(SEARCH_CATALOGS),
+                OnlinePlainCitationParser.valueOf(get(DEFAULT_ONLINE_PLAIN_CITATION_PARSER))
+        );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
@@ -1998,6 +2003,7 @@ public class JabRefCliPreferences implements CliPreferences {
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
         importerPreferences.getCatalogs().addListener((InvalidationListener) c -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
+        EasyBind.listen(importerPreferences.defaultOnlinePlainCitationParserProperty(), (obs, oldValue, newValue) -> put(DEFAULT_ONLINE_PLAIN_CITATION_PARSER, newValue.name()));
 
         return importerPreferences;
     }

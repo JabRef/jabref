@@ -4,6 +4,7 @@ import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -16,7 +17,9 @@ import javafx.scene.input.MouseButton;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.slr.StudyCatalogItem;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
 
@@ -30,6 +33,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
+    @FXML private ComboBox<OnlinePlainCitationParser> defaultOnlinePlainCitationParser;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -68,6 +72,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
         keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
+
+        new ViewModelListCellFactory<OnlinePlainCitationParser>()
+                .withText(OnlinePlainCitationParser::getLocalizedName)
+                .install(defaultOnlinePlainCitationParser);
+        defaultOnlinePlainCitationParser.itemsProperty().bind(viewModel.onlinePlainCitationParsers());
+        defaultOnlinePlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultOnlinePlainCitationParserProperty());
 
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());

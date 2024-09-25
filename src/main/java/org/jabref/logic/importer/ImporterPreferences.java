@@ -13,11 +13,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.preferences.FetcherApiKey;
 
 public class ImporterPreferences {
-
     private final BooleanProperty importerEnabled;
     private final BooleanProperty generateNewKeyOnImport;
     private final BooleanProperty warnAboutDuplicatesOnImport;
@@ -26,6 +26,8 @@ public class ImporterPreferences {
     private final ObservableSet<CustomImporter> customImporters;
     private final BooleanProperty persistCustomKeys;
     private final ObservableList<String> catalogs;
+    private final ObjectProperty<OnlinePlainCitationParser> defaultOnlinePlainCitationParser;
+
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
@@ -33,7 +35,9 @@ public class ImporterPreferences {
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
                                boolean persistCustomKeys,
-                               List<String> catalogs) {
+                               List<String> catalogs,
+                               OnlinePlainCitationParser defaultOnlinePlainCitationParser
+    ) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
@@ -42,6 +46,7 @@ public class ImporterPreferences {
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
         this.catalogs = FXCollections.observableArrayList(catalogs);
+        this.defaultOnlinePlainCitationParser = new SimpleObjectProperty<>(defaultOnlinePlainCitationParser);
     }
 
     public boolean areImporterEnabled() {
@@ -132,5 +137,17 @@ public class ImporterPreferences {
 
     public ObservableList<String> getCatalogs() {
           return catalogs;
+    }
+
+    public OnlinePlainCitationParser getDefaultOnlinePlainCitationParser() {
+        return defaultOnlinePlainCitationParser.get();
+    }
+
+    public ObjectProperty<OnlinePlainCitationParser> defaultOnlinePlainCitationParserProperty() {
+        return defaultOnlinePlainCitationParser;
+    }
+
+    public void setDefaultOnlinePlainCitationParser(OnlinePlainCitationParser defaultOnlinePlainCitationParser) {
+        this.defaultOnlinePlainCitationParser.set(defaultOnlinePlainCitationParser);
     }
 }

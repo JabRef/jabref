@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
@@ -14,6 +15,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,21 +38,25 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
     @Inject protected StateManager stateManager;
     @Inject protected DialogService dialogService;
+    @Inject protected AiService aiService;
     @Inject protected FileUpdateMonitor fileUpdateMonitor;
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected UndoManager undoManager;
     @Inject protected GuiPreferences preferences;
 
     @FXML protected TextArea input;
-    private final boolean onlineMode;
+    @FXML protected ButtonType parseButtonType;
+    @FXML protected ComboBox<OnlinePlainCitationParser> parserChoice;
 
-    @FXML private ButtonType parseButtonType;
+    private final boolean onlineMode;
 
     public ExtractBibtexDialog(boolean onlineMode) {
         this.onlineMode = onlineMode;
+
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
         if (onlineMode) {
             this.setTitle(Localization.lang("Plain References Parser (online)"));
         } else {
@@ -59,15 +67,24 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+
         BibtexExtractorViewModel viewModel = new BibtexExtractorViewModel(
                 onlineMode,
                 database,
                 dialogService,
+                aiService,
                 preferences,
                 fileUpdateMonitor,
                 taskExecutor,
                 undoManager,
                 stateManager);
+
+        new ViewModelListCellFactory<OnlinePlainCitationParser>()
+                .withText(OnlinePlainCitationParser::getLocalizedName)
+                .install(parserChoice);
+        parserChoice.getItems().setAll(viewModel.onlinePlainCitationParsers());
+        parserChoice.valueProperty().bindBidirectional(viewModel.parserChoice());
+        parserChoice.setDisable(!onlineMode);
 
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
         String clipText = ClipBoardManager.getContents();
