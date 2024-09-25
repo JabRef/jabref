@@ -16,6 +16,7 @@ import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
+import org.jabref.logic.importer.fetcher.LlmCitationFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
@@ -136,8 +137,9 @@ class WebFetchersTest {
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
 
-            // Remove GROBID, because we don't want to show this to the user
+            // Remove GROBID and LLM, because we don't want to show this to the user (since they convert text to BibTeX)
             expected.remove(GrobidCitationFetcher.class);
+            expected.remove(LlmCitationFetcher.class);
 
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
