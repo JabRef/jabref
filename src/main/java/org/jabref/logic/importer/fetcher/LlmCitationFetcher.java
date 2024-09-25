@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +34,19 @@ public class LlmCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
-        return parseBibtexUsingLlm(searchQuery).map(List::of).orElse(List.of());
+        List<BibEntry> entries = new ArrayList<>();
+
+        for (String citation : searchQuery.split("\n\n")) {
+            Optional<BibEntry> entry = parseCitationUsingLlm(citation);
+            entry.ifPresent(entries::add);
+        }
+
+        return entries;
     }
 
-    private Optional<BibEntry> parseBibtexUsingLlm(String searchQuery) throws FetcherException {
+    private Optional<BibEntry> parseCitationUsingLlm(String citation) throws FetcherException {
         try {
-            return BibtexParser.singleFromString(getBibtexStringFromLlm(searchQuery), importFormatPreferences);
+            return BibtexParser.singleFromString(getBibtexStringFromLlm(citation), importFormatPreferences);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX returned from LLM", e);
         }
