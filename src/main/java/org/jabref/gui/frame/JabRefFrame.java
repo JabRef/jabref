@@ -161,6 +161,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

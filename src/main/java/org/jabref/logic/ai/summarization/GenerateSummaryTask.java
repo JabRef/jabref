@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,15 +9,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileToDocument;
+import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import dev.langchain4j.data.document.Document;
@@ -31,12 +34,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This task generates a new summary for an entry.
- * It will not check if summary was already generated.
- * And it also does not store the summary.
+ * It will check if summary was already generated.
+ * And it also will store the summary.
  * <p>
  * This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
  */
-public class GenerateSummaryTask extends BackgroundTask<String> {
+public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);
 
     // Be careful when constructing prompt.
@@ -69,57 +72,89 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
     private static final int CHAR_TOKEN_FACTOR = 4; // Means, every token is roughly 4 characters.
 
     private final BibDatabaseContext bibDatabaseContext;
+    private final BibEntry entry;
     private final String citationKey;
-    private final List<LinkedFile> linkedFiles;
     private final ChatLanguageModel chatLanguageModel;
-    private final BooleanProperty shutdownSignal;
+    private final SummariesStorage summariesStorage;
+    private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
-    public GenerateSummaryTask(BibDatabaseContext bibDatabaseContext,
-                               String citationKey,
-                               List<LinkedFile> linkedFiles,
+    public GenerateSummaryTask(BibEntry entry,
+                               BibDatabaseContext bibDatabaseContext,
+                               SummariesStorage summariesStorage,
                                ChatLanguageModel chatLanguageModel,
-                               BooleanProperty shutdownSignal,
+                               ReadOnlyBooleanProperty shutdownSignal,
                                AiPreferences aiPreferences,
                                FilePreferences filePreferences
     ) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.citationKey = citationKey;
-        this.linkedFiles = linkedFiles;
+        this.entry = entry;
+        this.citationKey = entry.getCitationKey().orElse("<no citation key>");
         this.chatLanguageModel = chatLanguageModel;
+        this.summariesStorage = summariesStorage;
         this.shutdownSignal = shutdownSignal;
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
 
-        configure(citationKey);
+        configure();
     }
 
-    private void configure(String citationKey) {
-        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
+    private void configure() {
         showToUser(true);
+        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }
 
     @Override
-    public String call() throws Exception {
+    public Summary call() throws Exception {
         LOGGER.debug("Starting summarization task for entry {}", citationKey);
 
-        String result = null;
+        Optional<Summary> savedSummary = Optional.empty();
 
-        try {
-            result = summarizeAll();
-        } catch (InterruptedException e) {
-            LOGGER.debug("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            LOGGER.info("No database path is present. Summary will not be stored in the next sessions");
+        } else if (entry.getCitationKey().isEmpty()) {
+            LOGGER.info("No citation key is present. Summary will not be stored in the next sessions");
+        } else {
+            savedSummary = summariesStorage.get(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
         }
 
-        showToUser(false);
+        Summary summary;
+
+        if (savedSummary.isPresent()) {
+            summary = savedSummary.get();
+        } else {
+            try {
+                String result = summarizeAll();
+
+                summary = new Summary(
+                        LocalDateTime.now(),
+                        aiPreferences.getAiProvider(),
+                        aiPreferences.getSelectedChatModel(),
+                        result
+                );
+            } catch (InterruptedException e) {
+                LOGGER.debug("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
+                return null;
+            }
+        }
+
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            LOGGER.info("No database path is present. Summary will not be stored in the next sessions");
+        } else if (CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
+            LOGGER.info("No valid citation key is present. Summary will not be stored in the next sessions");
+        } else {
+            summariesStorage.set(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get(), summary);
+        }
+
         LOGGER.debug("Finished summarization task for entry {}", citationKey);
         progressCounter.stop();
-        return result;
+
+        return summary;
     }
 
     private String summarizeAll() throws InterruptedException {
@@ -129,7 +164,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
         // Stream API would look better here, but we need to catch InterruptedException.
         List<String> linkedFilesSummary = new ArrayList<>();
-        for (LinkedFile linkedFile : linkedFiles) {
+        for (LinkedFile linkedFile : entry.getFiles()) {
             Optional<String> s = generateSummary(linkedFile);
             if (s.isPresent()) {
                 String string = s.get();

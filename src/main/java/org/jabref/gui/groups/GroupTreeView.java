@@ -59,6 +59,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -82,6 +83,7 @@ public class GroupTreeView extends BorderPane {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final AiService aiService;
     private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
@@ -108,12 +110,14 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
+                         AiService aiService,
                          ChatHistoryService chatHistoryService
     ) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.aiService = aiService;
         this.chatHistoryService = chatHistoryService;
 
         createNodes();
@@ -164,7 +168,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, chatHistoryService, preferences, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, chatHistoryService, preferences, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -555,6 +559,8 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
@@ -668,6 +674,10 @@ public class GroupTreeView extends BorderPane {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
+                case GROUP_GENERATE_EMBEDDINGS ->
+                        viewModel.generateEmbeddings(group);
+                case GROUP_GENERATE_SUMMARIES ->
+                        viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
                     viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->

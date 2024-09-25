@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.ingestion;
+package org.jabref.logic.ai.summarization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.util.Pair;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.l10n.Localization;
@@ -16,90 +17,99 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.BibEntry;
 
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This task generates embeddings for several {@link LinkedFile} (typically used for groups).
- * It will check if embeddings were already generated.
- * And it also will store the embeddings.
+ * This task generates summaries for several {@link BibEntry}ies (typically used for groups).
+ * It will check if summaries were already generated.
+ * And it also will store the summaries.
  */
-public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsForSeveralTask.class);
+public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.ai.ingestion.GenerateEmbeddingsForSeveralTask.class);
 
     private final StringProperty groupName;
-    private final List<ProcessingInfo<LinkedFile, Void>> linkedFiles;
-    private final FileEmbeddingsManager fileEmbeddingsManager;
+    private final List<ProcessingInfo<BibEntry, Summary>> entries;
     private final BibDatabaseContext bibDatabaseContext;
+    private final SummariesStorage summariesStorage;
+    private final ChatLanguageModel chatLanguageModel;
+    private final ReadOnlyBooleanProperty shutdownSignal;
+    private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
-    private final ReadOnlyBooleanProperty shutdownSignal;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
     private String currentFile = "";
 
-    public GenerateEmbeddingsForSeveralTask(
+    public GenerateSummaryForSeveralTask(
             StringProperty groupName,
-            List<ProcessingInfo<LinkedFile, Void>> linkedFiles,
-            FileEmbeddingsManager fileEmbeddingsManager,
+            List<ProcessingInfo<BibEntry, Summary>> entries,
             BibDatabaseContext bibDatabaseContext,
+            SummariesStorage summariesStorage,
+            ChatLanguageModel chatLanguageModel,
+            ReadOnlyBooleanProperty shutdownSignal,
+            AiPreferences aiPreferences,
             FilePreferences filePreferences,
-            TaskExecutor taskExecutor,
-            ReadOnlyBooleanProperty shutdownSignal
+            TaskExecutor taskExecutor
     ) {
         this.groupName = groupName;
-        this.linkedFiles = linkedFiles;
-        this.fileEmbeddingsManager = fileEmbeddingsManager;
+        this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
+        this.summariesStorage = summariesStorage;
+        this.chatLanguageModel = chatLanguageModel;
+        this.shutdownSignal = shutdownSignal;
+        this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
-        this.shutdownSignal = shutdownSignal;
 
-        configure(groupName);
+        configure();
     }
 
-    private void configure(StringProperty name) {
+    private void configure() {
         showToUser(true);
-        titleProperty().set(Localization.lang("Generating embeddings for %0", name.get()));
-        name.addListener((o, oldValue, newValue) -> titleProperty().set(Localization.lang("Generating embeddings for %0", newValue)));
+        titleProperty().set(Localization.lang("Generating summaries for %0", groupName.get()));
+        groupName.addListener((o, oldValue, newValue) -> titleProperty().set(Localization.lang("Generating summaries for %0", newValue)));
 
-        progressCounter.increaseWorkMax(linkedFiles.size());
+        progressCounter.increaseWorkMax(entries.size());
         progressCounter.listenToAllProperties(this::updateProgress);
         updateProgress();
     }
 
     @Override
     public Void call() throws Exception {
-        LOGGER.debug("Starting embeddings generation of several files for {}", groupName.get());
+        LOGGER.debug("Starting summaries generation of several files for {}", groupName.get());
 
-        List<Pair<? extends Future<?>, String>> futures = new ArrayList<>();
+        List<Pair<? extends Future<?>, BibEntry>> futures = new ArrayList<>();
 
-        linkedFiles
+        entries
                 .stream()
                 .map(processingInfo -> {
                     processingInfo.setState(ProcessingState.PROCESSING);
                     return new Pair<>(
-                            new GenerateEmbeddingsTask(
+                            new GenerateSummaryTask(
                                     processingInfo.getObject(),
-                                    fileEmbeddingsManager,
                                     bibDatabaseContext,
-                                    filePreferences,
-                                    shutdownSignal
+                                    summariesStorage,
+                                    chatLanguageModel,
+                                    shutdownSignal,
+                                    aiPreferences,
+                                    filePreferences
                             )
                                     .showToUser(false)
-                                    .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
+                                    .onSuccess(processingInfo::setSuccess)
                                     .onFailure(processingInfo::setException)
                                     .onFinished(() -> progressCounter.increaseWorkDone(1))
                                     .executeWith(taskExecutor),
-                            processingInfo.getObject().getLink());
+                            processingInfo.getObject());
                 })
                 .forEach(futures::add);
 
-        for (Pair<? extends Future<?>, String> pair : futures) {
-            currentFile = pair.getValue();
+        for (Pair<? extends Future<?>, BibEntry> pair : futures) {
+            currentFile = pair.getValue().getCitationKey().orElse("<no citation key>");
             pair.getKey().get();
         }
 

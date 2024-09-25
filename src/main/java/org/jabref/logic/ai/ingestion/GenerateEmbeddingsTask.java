@@ -48,10 +48,11 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         this.filePreferences = filePreferences;
         this.shutdownSignal = shutdownSignal;
 
-        configure(linkedFile);
+        configure();
     }
 
-    private void configure(LinkedFile linkedFile) {
+    private void configure() {
+        showToUser(true);
         titleProperty().set(Localization.lang("Generating embeddings for file '%0'", linkedFile.getLink()));
 
         progressCounter.listenToAllProperties(this::updateProgress);

@@ -33,6 +33,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -54,6 +55,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final AiService aiService;
     private final ChatHistoryService chatHistoryService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
@@ -78,9 +80,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, GuiPreferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager,
+                              DialogService dialogService,
+                              AiService aiService,
+                              ChatHistoryService chatHistoryService,
+                              GuiPreferences preferences,
+                              TaskExecutor taskExecutor,
+                              CustomLocalDragboard localDragboard
+    ) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.aiService = aiService;
         this.chatHistoryService = Objects.requireNonNull(chatHistoryService);
         this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
@@ -386,7 +396,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void chatWithGroup(GroupNodeViewModel group) {
-        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
         if (currentDatabase.isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
             return;
@@ -428,6 +437,57 @@ public class GroupTreeViewModel extends AbstractViewModel {
             aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
             aiChatWindow.requestFocus();
         }
+    }
+
+    public void generateEmbeddings(GroupNodeViewModel groupNode) {
+        if (currentDatabase.isEmpty()) {
+            dialogService.notify(Localization.lang("Unable to generate embeddings. No library is selected."));
+            return;
+        }
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<LinkedFile> linkedFiles = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .flatMap(entry -> entry.getFiles().stream())
+                .toList();
+
+        aiService.getIngestionService().ingest(
+                group.nameProperty(),
+                linkedFiles,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
+    }
+
+    public void generateSummaries(GroupNodeViewModel groupNode) {
+        if (currentDatabase.isEmpty()) {
+            dialogService.notify(Localization.lang("Unable to generate summaries. No library is selected."));
+            return;
+        }
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<BibEntry> entries = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .toList();
+
+        aiService.getSummariesService().summarize(
+                group.nameProperty(),
+                entries,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

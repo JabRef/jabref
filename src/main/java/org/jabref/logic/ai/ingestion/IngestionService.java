@@ -86,28 +86,34 @@ public class IngestionService {
         return linkedFiles.stream().map(this::getProcessingInfo).toList();
     }
 
-    public List<ProcessingInfo<LinkedFile, Void>> ingest(StringProperty name, List<LinkedFile> linkedFiles, BibDatabaseContext bibDatabaseContext) {
+    public List<ProcessingInfo<LinkedFile, Void>> ingest(StringProperty groupName, List<LinkedFile> linkedFiles, BibDatabaseContext bibDatabaseContext) {
         List<ProcessingInfo<LinkedFile, Void>> result = getProcessingInfo(linkedFiles);
 
         if (listsUnderIngestion.contains(linkedFiles)) {
             return result;
         }
 
+        listsUnderIngestion.add(linkedFiles);
+
         List<ProcessingInfo<LinkedFile, Void>> needToProcess = result.stream().filter(processingInfo -> processingInfo.getState() == ProcessingState.STOPPED).toList();
-        startEmbeddingsGenerationTask(name, needToProcess, bibDatabaseContext);
+        startEmbeddingsGenerationTask(groupName, needToProcess, bibDatabaseContext);
 
         return result;
     }
 
     private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo<LinkedFile, Void> processingInfo) {
+        processingInfo.setState(ProcessingState.PROCESSING);
+
         new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences, shutdownSignal)
                 .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
     }
 
-    private void startEmbeddingsGenerationTask(StringProperty name, List<ProcessingInfo<LinkedFile, Void>> linkedFiles, BibDatabaseContext bibDatabaseContext) {
-        new GenerateEmbeddingsForSeveralTask(name, linkedFiles, fileEmbeddingsManager, bibDatabaseContext, filePreferences, taskExecutor, shutdownSignal)
+    private void startEmbeddingsGenerationTask(StringProperty groupName, List<ProcessingInfo<LinkedFile, Void>> linkedFiles, BibDatabaseContext bibDatabaseContext) {
+        linkedFiles.forEach(processingInfo -> processingInfo.setState(ProcessingState.PROCESSING));
+
+        new GenerateEmbeddingsForSeveralTask(groupName, linkedFiles, fileEmbeddingsManager, bibDatabaseContext, filePreferences, taskExecutor, shutdownSignal)
                 .executeWith(taskExecutor);
     }
 

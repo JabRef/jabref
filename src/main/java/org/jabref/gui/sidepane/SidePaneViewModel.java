@@ -22,6 +22,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -47,6 +48,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              DialogService dialogService,
+                             AiService aiService,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
@@ -61,6 +63,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
