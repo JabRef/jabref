@@ -1,9 +1,11 @@
 package org.jabref.logic.importer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
@@ -116,7 +118,9 @@ class WebFetchersTest {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            Set<Class<?>> expected = new TreeSet<>(Comparator.comparing(Class::getName));
+            expected.addAll(controlClasses.loadClasses());
 
             // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -178,6 +182,8 @@ class WebFetchersTest {
     }
 
     private Set<? extends Class<?>> getClasses(Collection<?> objects) {
-        return objects.stream().map(Object::getClass).collect(Collectors.toSet());
+        return objects.stream()
+                      .map(Object::getClass)
+                      .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Class::getName))));
     }
 }
