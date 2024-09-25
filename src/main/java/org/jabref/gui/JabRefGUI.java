@@ -93,7 +93,14 @@ public class JabRefGUI extends Application {
                 dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
             });
         });
-
+        if (uiCommands.stream().anyMatch(UiCommand.InstanceAlreadyRunning.class::isInstance)) {
+//            UiTaskExecutor.runInJavaFXThread(() -> {
+//                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+//                dialogService.showInformationDialogAndWait(null, "Uncaught exception occurred in ");
+//            });
+            Platform.exit();
+            return;
+        }
         initialize();
 
         JabRefGUI.mainFrame = new JabRefFrame(

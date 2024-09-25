@@ -5,22 +5,18 @@ import java.util.Arrays;
 import javafx.application.Platform;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CLIMessageHandler implements RemoteMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CLIMessageHandler.class);
-    private static String MULTIPLE_INSTANCE_MESSAGE = "This JabRef instance has already running. Please don't open a new one.";
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -40,12 +36,6 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     public void handleCommandLineArguments(String[] message) {
         try {
             LOGGER.info("Processing message {}", Arrays.stream(message).toList());
-            if (message[0].equals(MULTIPLE_INSTANCE_MESSAGE)) {
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                    DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-                    dialogService.showInformationDialogAndWait(null, message[0]);
-                });
-            }
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                 message,
                 ArgumentProcessor.Mode.REMOTE_START,

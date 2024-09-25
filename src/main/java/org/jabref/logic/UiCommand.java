@@ -12,4 +12,6 @@ public sealed interface UiCommand {
     record OpenDatabases(List<ParserResult> parserResults) implements UiCommand { }
 
     record AutoSetFileLinks(List<ParserResult> parserResults) implements UiCommand { }
+
+    record InstanceAlreadyRunning() implements UiCommand { }
 }

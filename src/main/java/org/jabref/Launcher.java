@@ -109,6 +109,7 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
+                uiCommands.add(new UiCommand.InstanceAlreadyRunning());
                 JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
                 JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {
@@ -177,7 +178,6 @@ public class Launcher {
                 LOGGER.debug("Pinging other instance succeeded.");
                 // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
                 if (args.length == 0) {
-                    remoteClient.sendCommandLineArguments(new String[] {"This JabRef instance has already running. Please don't open a new one."});
                     LOGGER.debug("This JabRef instance is already running. Please switch to that instance.");
                 } else {
                     // We are not alone, there is already a server out there, send command line arguments to other instance
