@@ -42,6 +42,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
+    @FXML private CheckBox useLessSpacingInToolbar;
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
@@ -99,6 +100,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
+
+        useLessSpacingInToolbar.selectedProperty().bindBidirectional(viewModel.useLessSpacingInToolbarProperty());
 
         new ViewModelListCellFactory<ThemeTypes>()
                 .withText(ThemeTypes::getDisplayName)

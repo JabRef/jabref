@@ -7,9 +7,6 @@ open module org.jabref {
     requires java.sql.rowset;
 
     // region JavaFX
-    requires javafx.base;
-    requires javafx.graphics;
-    requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
 
@@ -189,5 +186,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires langchain4j.google.ai.gemini;
+    requires net.synedra.validatorfx;
     // endregion
 }

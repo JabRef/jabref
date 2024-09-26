@@ -72,6 +72,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
 
+    private final BooleanProperty useLessSpacingInToolbar = new SimpleBooleanProperty();
+
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
@@ -179,6 +181,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));
 
+        useLessSpacingInToolbar.setValue(workspacePreferences.getUseLessSpacingInToolbar());
+
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
@@ -219,6 +223,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                     workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
         workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());
+
+        if (workspacePreferences.getUseLessSpacingInToolbar() != useLessSpacingInToolbar.getValue()) {
+            restartWarning.add(Localization.lang("Changed toolbar spacing"));
+        }
+
+        workspacePreferences.setUseLessSpacingInToolbar(useLessSpacingInToolbar.getValue());
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
@@ -353,6 +363,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fontSizeProperty() {
         return fontSizeProperty;
+    }
+
+    public BooleanProperty useLessSpacingInToolbarProperty() {
+        return useLessSpacingInToolbar;
     }
 
     public BooleanProperty openLastStartupProperty() {

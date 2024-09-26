@@ -116,6 +116,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     private static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     private static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
+    private static final String USE_LESS_SPACING_IN_TOOLBAR = "useLessSpacingInToolbar";
     // endregion
 
     // region main table, main table columns, save columns
@@ -260,6 +261,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region workspace
         defaults.put(MAIN_FONT_SIZE, 9);
+        defaults.put(USE_LESS_SPACING_IN_TOOLBAR, Boolean.FALSE);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(THEME, Theme.BASE_CSS);
@@ -620,6 +622,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
+                getBoolean(USE_LESS_SPACING_IN_TOOLBAR),
                 new Theme(get(THEME)),
                 getBoolean(THEME_SYNC_OS),
                 getBoolean(OPEN_LAST_EDITED),
@@ -638,6 +641,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.useLessSpacingInToolbarProperty(), (obs, oldValue, newValue) -> putBoolean(USE_LESS_SPACING_IN_TOOLBAR, newValue));
         EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(THEME, newValue.getName()));
         EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (obs, oldValue, newValue) -> putBoolean(THEME_SYNC_OS, newValue));
         EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));

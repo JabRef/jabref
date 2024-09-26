@@ -111,18 +111,23 @@ public class MainToolBar extends ToolBar {
         // Therefore, the condition of enablement is "only" if a library is opened. (Parameter "false")
         Button newEntryFromPlainTextOnlineButton = factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexActionOnline(dialogService, preferences, stateManager, false));
 
-        getItems().addAll(
+        getItems().add(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))));
 
-                leftSpacer,
+        if (!preferences.getWorkspacePreferences().getUseLessSpacingInToolbar()) {
+            getItems().add(leftSpacer);
+        }
 
-                globalSearchBar,
+        getItems().add(globalSearchBar);
 
-                rightSpacer,
+        if (!preferences.getWorkspacePreferences().getUseLessSpacingInToolbar()) {
+            getItems().add(rightSpacer);
+        }
 
+        getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
@@ -163,6 +168,13 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
         getStyleClass().add("mainToolbar");
+
+        if (preferences.getWorkspacePreferences().getUseLessSpacingInToolbar()) {
+            getItems().stream().filter(node -> node instanceof Separator).map(node -> (Separator) node).forEach(separator -> {
+                separator.setMinWidth(5);
+                separator.setPrefWidth(5);
+            });
+        }
     }
 
     Button createNewEntryFromIdButton() {

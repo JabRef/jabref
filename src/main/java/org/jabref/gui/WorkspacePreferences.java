@@ -19,6 +19,7 @@ public class WorkspacePreferences {
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
     private final IntegerProperty defaultFontSize;
+    private final BooleanProperty useLessSpacingInToolbar;
     private final ObjectProperty<Theme> theme;
     private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
@@ -31,6 +32,7 @@ public class WorkspacePreferences {
                                 boolean shouldOverrideDefaultFontSize,
                                 int mainFontSize,
                                 int defaultFontSize,
+                                boolean useLessSpacingInToolbar,
                                 Theme theme,
                                 boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
@@ -42,6 +44,7 @@ public class WorkspacePreferences {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
+        this.useLessSpacingInToolbar = new SimpleBooleanProperty(useLessSpacingInToolbar);
         this.theme = new SimpleObjectProperty<>(theme);
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
@@ -89,6 +92,18 @@ public class WorkspacePreferences {
 
     public IntegerProperty mainFontSizeProperty() {
         return mainFontSize;
+    }
+
+    public void setUseLessSpacingInToolbar(boolean useLessSpacingInToolbar) {
+        this.useLessSpacingInToolbar.set(useLessSpacingInToolbar);
+    }
+
+    public BooleanProperty useLessSpacingInToolbarProperty() {
+        return useLessSpacingInToolbar;
+    }
+
+    public boolean getUseLessSpacingInToolbar() {
+        return useLessSpacingInToolbar.get();
     }
 
     public Theme getTheme() {

@@ -60,6 +60,9 @@
             <Label text="%Size"/>
             <Spinner fx:id="fontSize" styleClass="fontsizeSpinner" editable="true"/>
         </HBox>
+
+        <CheckBox fx:id="useLessSpacingInToolbar" text="%Use less spacing in toolbar"
+                  GridPane.rowIndex="5" GridPane.columnIndex="0"/>
     </GridPane>
 
     <Hyperlink fx:id="moreThemes" text = "%Get more themes..." onAction="#openBrowser"/>
