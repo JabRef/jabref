@@ -3,9 +3,11 @@ package org.jabref.gui.undo;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.swing.undo.CannotRedoException;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
-import javax.swing.undo.CannotRedoException;
+
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
