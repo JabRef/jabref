@@ -9,6 +9,7 @@ import org.jabref.model.search.PostgreConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +20,9 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
+    public static final String MAIN_TABLE = "main_table";
+    public static final String SPLIT_TABLE = "split_table";
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
-    private static final String MAIN_TABLE = "main_table";
-    private static final String SPLIT_TABLE = "split_table";
 
     private final String mainTableName;
     private final String splitTableName;
@@ -40,7 +41,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
-        String whereClause = visit(ctx.expression());
+        String whereClause = getWhereClause(ctx);
         String result = """
                 SELECT %s.%s
                 FROM "%s" AS %s
@@ -60,6 +61,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, PostgreConstants.ENTRY_ID);
         LOGGER.trace("Converted search query to SQL: {}", result);
         return result;
+    }
+
+    @VisibleForTesting
+    public String getWhereClause(SearchParser.StartContext ctx) {
+        return visit(ctx.expression());
     }
 
     @Override
