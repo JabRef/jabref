@@ -110,14 +110,17 @@ public class UiTaskExecutor implements TaskExecutor {
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
-        if (task.showToUser()) {
-            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-            if (stateManager != null) {
-                stateManager.addBackgroundTask(task, javafxTask);
-            } else {
-                LOGGER.info("Background task visible without GUI");
+
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        task.showToUserProperty().subscribe(showToUser -> {
+            if (showToUser) {
+                if (stateManager != null) {
+                    runInJavaFXThread(() -> stateManager.addBackgroundTask(task, javafxTask));
+                } else {
+                    LOGGER.info("Background task visible without GUI");
+                }
             }
-        }
+        });
         return execute(javafxTask);
     }
 
@@ -193,9 +196,14 @@ public class UiTaskExecutor implements TaskExecutor {
             javaTask.setOnRunning(event -> onRunning.run());
         }
         Consumer<V> onSuccess = task.getOnSuccess();
-        if (onSuccess != null) {
-            javaTask.setOnSucceeded(event -> onSuccess.accept(javaTask.getValue()));
-        }
+        javaTask.setOnSucceeded(event -> {
+            // Set to 100% completed on completion
+            task.updateProgress(1, 1);
+
+            if (onSuccess != null) {
+                onSuccess.accept(javaTask.getValue());
+            }
+        });
         Consumer<Exception> onException = task.getOnException();
         if (onException != null) {
             javaTask.setOnFailed(event -> onException.accept(convertToException(javaTask.getException())));

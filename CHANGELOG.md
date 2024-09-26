@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
+- JabRef does not show finished background tasks in the status bar popup. [#11821](https://github.com/JabRef/jabref/pull/11821)
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
@@ -74,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
 - We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
 - We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
+- We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 
 ### Removed
 

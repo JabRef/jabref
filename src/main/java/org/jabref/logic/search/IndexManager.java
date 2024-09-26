@@ -76,7 +76,7 @@ public class IndexManager {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         } else {
             linkedFilesIndexer.removeAllFromIndex();
         }
@@ -89,8 +89,7 @@ public class IndexManager {
                 bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
-        }.showToUser(true)
-         .willBeRecoveredAutomatically(true)
+        }.willBeRecoveredAutomatically(true)
          .onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
          .executeWith(taskExecutor);
 
@@ -101,7 +100,7 @@ public class IndexManager {
                     linkedFilesIndexer.updateOnStart(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -113,7 +112,7 @@ public class IndexManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
@@ -122,7 +121,7 @@ public class IndexManager {
                     linkedFilesIndexer.addToIndex(entries, this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -134,7 +133,7 @@ public class IndexManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
@@ -143,7 +142,7 @@ public class IndexManager {
                     linkedFilesIndexer.removeFromIndex(entries, this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -185,7 +184,7 @@ public class IndexManager {
                     linkedFilesIndexer.addToIndex(List.of(entry), this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -197,7 +196,7 @@ public class IndexManager {
                     linkedFilesIndexer.rebuildIndex(this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
