@@ -12,6 +12,8 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.SearchFieldConstants;
@@ -19,17 +21,25 @@ import org.jabref.model.search.SearchFieldConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.model.entry.field.StandardField.AUTHOR;
+import static org.jabref.model.entry.field.StandardField.CROSSREF;
+import static org.jabref.model.entry.field.StandardField.EDITOR;
+import static org.jabref.model.entry.field.StandardField.FILE;
+import static org.jabref.model.entry.field.StandardField.GROUPS;
+import static org.jabref.model.entry.field.StandardField.KEYWORDS;
+
 public class PostgreIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreIndexer.class);
-    private static final String SPLIT_VALUES_PREFIX = "_split_values";
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
+    private final BibEntryPreferences bibEntryPreferences;
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
     private final String libraryName;
     private final String tableName;
 
-    public PostgreIndexer(BibDatabaseContext databaseContext, Connection connection) {
+    public PostgreIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
+        this.bibEntryPreferences = bibEntryPreferences;
         this.databaseContext = databaseContext;
         this.connection = connection;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
@@ -108,7 +118,7 @@ public class PostgreIndexer {
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
                     """.formatted(PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_LITERAL));
 
-            // trigram index on field value column
+            // trigram index on field value transformed column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
                     """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
@@ -170,6 +180,28 @@ public class PostgreIndexer {
                 preparedStatement.setString(4, resolvedFieldLatexFree.orElse(""));
 
                 preparedStatement.addBatch();
+
+                if ()
+
+                if (PostgreConstants.MULTI_VALUE_FIELDS.contains(field.getKey())) {
+                    switch (field.getKey()) {
+                        case AUTHOR -> {
+                        }
+                        case EDITOR -> {
+                        }
+                        case CROSSREF -> {
+                        }
+                        case KEYWORDS -> {
+                            KeywordList keywordList = KeywordList.parse(field.getValue(), bibEntryPreferences.getKeywordSeparator());
+                        }
+                        case GROUPS -> {
+                        }
+                        case FILE -> {
+                        }
+                        default -> {
+                        }
+                    }
+                }
             }
 
             // add entry type
@@ -215,23 +247,16 @@ public class PostgreIndexer {
         }
     }
 
-    public void updateEntry(BibEntry entry, Field field) {
+    public void updateEntry(BibEntry entry, Field field, String oldValue, String newValue) {
         try {
-            // Use upsert to add the field to the index if it doesn't exist, or update it if it does
             String updateQuery = """
             INSERT INTO "%s" ("%s", "%s", "%s", "%s")
             VALUES (?, ?, ?, ?)
-            ON CONFLICT ("%s", "%s") DO UPDATE
-            SET "%s" = EXCLUDED."%s"
             """.formatted(tableName,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
                     PostgreConstants.FIELD_VALUE_LITERAL,
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED,
-                    PostgreConstants.ENTRY_ID,
-                    PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE_LITERAL,
-                    PostgreConstants.FIELD_VALUE_LITERAL);
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                 preparedStatement.setString(1, entry.getId());

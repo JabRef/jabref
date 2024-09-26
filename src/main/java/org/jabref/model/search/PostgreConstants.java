@@ -1,5 +1,10 @@
 package org.jabref.model.search;
 
+import java.util.Set;
+
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+
 public enum PostgreConstants {
     ENTRY_ID("entry_id"),
     FIELD_NAME("field_name"),
@@ -7,6 +12,13 @@ public enum PostgreConstants {
     FIELD_VALUE_TRANSFORMED("field_value_transforemd"), // contains the value transformed for better querying
     FIELD_SPLIT_VALUE("field_split_value");
 
+    public static final Set<Field> MULTI_VALUE_FIELDS = Set.of(
+            StandardField.AUTHOR,
+            StandardField.EDITOR,
+            StandardField.CROSSREF,
+            StandardField.KEYWORDS,
+            StandardField.GROUPS,
+            StandardField.FILE);
     private final String columnName;
 
     PostgreConstants(String columnName) {

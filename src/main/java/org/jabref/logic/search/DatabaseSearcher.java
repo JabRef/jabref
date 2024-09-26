@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
@@ -23,10 +23,10 @@ public class DatabaseSearcher {
     private final IndexManager indexManager;
 
     // get rid of task executor here or add a constructor overload?
-    public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
+    public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, CliPreferences preferences) throws IOException {
         this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);
-        this.indexManager = new IndexManager(databaseContext, taskExecutor, filePreferences);
+        this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences);
     }
 
     /**

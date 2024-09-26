@@ -315,7 +315,7 @@ public class LibraryTab extends Tab {
     }
 
     public void createIndexManager() {
-        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences.getFilePreferences());
+        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences);
         stateManager.setIndexManager(bibDatabaseContext, indexManager);
     }
 

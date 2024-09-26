@@ -7,7 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.PostgreIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
@@ -44,19 +44,19 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
-    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
+    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
-        this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
+        this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        bibFieldsIndexer = new PostgreIndexer(databaseContext, postgreServer.getConnection());
+        bibFieldsIndexer = new PostgreIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
 
         LuceneIndexer indexer;
         try {
-            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences);
+            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences.getFilePreferences());
         } catch (IOException e) {
             LOGGER.debug("Error initializing linked files index - using read only index");
             indexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
@@ -64,7 +64,7 @@ public class IndexManager {
         linkedFilesIndexer = indexer;
 
         this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection());
-        this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences);
+        this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
         updateOnStart();
     }
 
@@ -150,7 +150,7 @@ public class IndexManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
+                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField(), event.getOldValue(), event.getNewValue());
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
@@ -171,7 +171,7 @@ public class IndexManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
+//                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
