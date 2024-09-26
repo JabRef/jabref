@@ -1,7 +1,10 @@
 package org.jabref.gui.undo;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javax.swing.undo.CannotRedoException;
 
 import org.jabref.gui.DialogService;
@@ -21,11 +24,15 @@ public class RedoAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
-        // TODO: The old listener should be removed. Otherwise, memory consumption will increase.
-        stateManager.activeTabProperty().addListener((observable, oldValue, activeLibraryTab) -> {
+        ChangeListener<Optional<LibraryTab>> listener = (observable, oldValue, activeLibraryTab) -> {
             activeLibraryTab.ifPresent(libraryTab ->
-                    this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
-        });
+                this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
+
+            oldValue.ifPresent(libraryTab -> this.executable.unbind());
+        };
+
+        WeakChangeListener<Optional<LibraryTab>> weakListener = new WeakChangeListener<>(listener);
+        stateManager.activeTabProperty().addListener(weakListener);
     }
 
     @Override
