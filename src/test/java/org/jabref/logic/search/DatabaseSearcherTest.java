@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.when;
 public class DatabaseSearcherTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private BibDatabaseContext databaseContext;
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     @TempDir
     private Path indexDir;
@@ -50,7 +52,7 @@ public class DatabaseSearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, filePreferences).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences).getMatches();
         assertEquals(expectedMatches, matches);
     }
 

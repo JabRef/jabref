@@ -12,6 +12,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -67,6 +68,7 @@ class DatabaseSearcherWithBibFilesTest {
             .withCitationKey("minimal-note-mixed-case")
             .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     @TempDir
@@ -134,7 +136,7 @@ class DatabaseSearcherWithBibFilesTest {
     @MethodSource
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, filePreferences).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, preferences).getMatches();
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
