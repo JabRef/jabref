@@ -66,11 +66,6 @@ public class Launcher {
             Injector.setModelOrService(CliPreferences.class, preferences);
             Injector.setModelOrService(GuiPreferences.class, preferences);
 
-            // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
-                return;
-            }
-
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
@@ -109,7 +104,10 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                uiCommands.add(new UiCommand.InstanceAlreadyRunning());
+                // Early exit in case another instance is already running
+                if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
+                    uiCommands.add(new UiCommand.InstanceAlreadyRunning());
+                }
                 JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
                 JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {

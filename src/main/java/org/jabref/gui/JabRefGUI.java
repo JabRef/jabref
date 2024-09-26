@@ -93,14 +93,6 @@ public class JabRefGUI extends Application {
                 dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
             });
         });
-        if (uiCommands.stream().anyMatch(UiCommand.InstanceAlreadyRunning.class::isInstance)) {
-//            UiTaskExecutor.runInJavaFXThread(() -> {
-//                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-//                dialogService.showInformationDialogAndWait(null, "Uncaught exception occurred in ");
-//            });
-            Platform.exit();
-            return;
-        }
         initialize();
 
         JabRefGUI.mainFrame = new JabRefFrame(
@@ -117,7 +109,9 @@ public class JabRefGUI extends Application {
                 taskExecutor);
 
         openWindow();
-
+        if (earlyExitWhenMultipleInstancesOpened()) {
+            return;
+        }
         startBackgroundTasks();
 
         if (!fileUpdateMonitor.isActive()) {
@@ -273,6 +267,15 @@ public class JabRefGUI extends Application {
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
     }
 
+    private boolean earlyExitWhenMultipleInstancesOpened() {
+        if (uiCommands.stream().anyMatch(UiCommand.InstanceAlreadyRunning.class::isInstance)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Another JabRef instance is already running. Please switch to that instance."));
+            Platform.exit();
+            return true;
+        }
+        return false;
+    }
+
     public void onShowing(WindowEvent event) {
         Platform.runLater(() -> mainFrame.updateDividerPosition());
 
@@ -398,7 +401,9 @@ public class JabRefGUI extends Application {
 
     public static void shutdownThreadPools() {
         LOGGER.trace("Shutting down taskExecutor");
-        taskExecutor.shutdown();
+        if (taskExecutor != null) {
+            taskExecutor.shutdown();
+        }
         LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
         LOGGER.trace("Shutting down directoryMonitor");
