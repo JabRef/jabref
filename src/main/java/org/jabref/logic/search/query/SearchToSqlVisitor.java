@@ -38,14 +38,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
         String whereClause = visit(ctx.expression());
-        return """
-                SELECT %s
+        String result = """
+                SELECT main_table.%s
                 FROM "%s" AS main_table
                 LEFT JOIN "%s_split_values" AS split_table
                 ON main_table.%s = split_table.%s
                 AND main_table.%s = split_table.%s
                 WHERE %s
-                GROUP BY %s
+                GROUP BY main_table.%s
                 """.formatted(PostgreConstants.ENTRY_ID,
                 tableName,
                 tableName,
@@ -55,6 +55,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 PostgreConstants.FIELD_NAME,
                 whereClause,
                 PostgreConstants.ENTRY_ID);
+        LOGGER.trace("Converted search query to SQL: {}", result);
+        return result;
     }
 
     @Override
@@ -159,7 +161,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             } else {
                 operator += "ILIKE";
             }
-            additionalCondition = "(split_table.field_name = '\" + field + \"' AND split_table.field_value " + operator + " '" + term + "')";
+            additionalCondition = "(split_table." + PostgreConstants.FIELD_NAME + "='\" + field + \"' AND (" +
+                    "(split_table." + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + term + "')" +
+                    " OR " +
+                    "(split_table." + PostgreConstants.FIELD_VALUE_TRANSFORMED + " " + operator + " '" + term + "')" +
+                    "))";
         }
 
         String operator = "";
@@ -193,7 +199,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
         // Pseudo-fields
         if ("anyfield".equals(field) || "any".equals(field)) {
-            return "(" + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+            // TODO: also query _TRANSFORMED
+            return "(main_table." + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
         }
 
         field = switch (field) {
@@ -205,7 +212,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                     field;
         };
 
-        String resultMainTable = "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        // TODO: also query _TRANSFORMED
+        String resultMainTable = "(main_table." + PostgreConstants.FIELD_NAME + " = '" + field + "' AND main_table." + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
         if (additionalCondition != null) {
             return "(" + resultMainTable + " OR " + additionalCondition + ")";
         } else {

@@ -82,37 +82,37 @@ public class PostgreIndexer {
                     CREATE TABLE IF NOT EXISTS "%s" (
                         %s TEXT NOT NULL,
                         %s TEXT NOT NULL,
+                        %s TEXT,
                         %s TEXT
-                    )
+                        )
                     """.formatted(tableNameSplitValues,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_SPLIT_VALUE));
+                    PostgreConstants.FIELD_VALUE_LITERAL,
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
 
             LOGGER.debug("Created tables for library: {}", libraryName);
-
-            // btree index on id column
+        } catch (SQLException e) {
+            LOGGER.error("Could not create tables for library: {}", libraryName, e);
+        }
+        try {
+            // region btree index on id column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableName), tableName, PostgreConstants.ENTRY_ID));
-
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues), tableName, PostgreConstants.ENTRY_ID));
+            // endregion
 
-            // btree index on field name column
+            // region btree index on field name column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableName), tableName, PostgreConstants.FIELD_NAME));
-
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
                     """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_NAME));
-
-            // btree index on spilt values column
-            connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_SPLIT_VALUE.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_SPLIT_VALUE));
+            // endregion
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
@@ -124,9 +124,18 @@ public class PostgreIndexer {
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
                     """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
 
+            // region btree index on spilt values column
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_VALUE_LITERAL));
+            connection.createStatement().executeUpdate("""
+                    CREATE INDEX "%s" ON "%s" ("%s")
+                    """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
+            // endregion
+
             LOGGER.debug("Created indexes for library: {}", libraryName);
         } catch (SQLException e) {
-            LOGGER.error("Could not create table for library: {}", libraryName, e);
+            LOGGER.error("Could not create indexes for library: {}", libraryName, e);
         }
     }
 
