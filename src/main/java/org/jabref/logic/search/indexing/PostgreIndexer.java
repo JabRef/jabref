@@ -50,7 +50,7 @@ public class PostgreIndexer {
         } else {
             this.tableName = databaseContext.getPostgreTableName();
         }
-        tableNameSplitValues = tableName + "_split_values";
+        tableNameSplitValues = tableName + PostgreConstants.TABLE_NAME_SUFFIX;
         setup();
     }
 
@@ -262,8 +262,8 @@ public class PostgreIndexer {
         AuthorList.parse(value).getAuthors().forEach(author -> {
             // Author object does not support literal values
             // We use the method giving us the most complete information for the literal value;
-            String literal = author.getFamilyGiven(false);
-            String transformed = author.latexFree().getFamilyGiven(false);
+            String literal = author.getGivenFamily(false);
+            String transformed = author.latexFree().getGivenFamily(false);
             prepareStatement(preparedStatementSplitValues, entryId, field, literal, transformed);
         });
     }
