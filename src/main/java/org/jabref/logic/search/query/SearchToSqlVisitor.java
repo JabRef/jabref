@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
+
     private final String tableName;
 
     public SearchToSqlVisitor(String tableName) {
@@ -36,7 +37,24 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
-        return "SELECT " + PostgreConstants.ENTRY_ID + " FROM \"" + tableName + "\" WHERE " + visit(ctx.expression()) + " GROUP BY " + PostgreConstants.ENTRY_ID;
+        String whereClause = visit(ctx.expression());
+        return """
+                SELECT %s
+                FROM "%s" AS main_table
+                LEFT JOIN "%s_split_values" AS split_table
+                ON main_table.%s = split_table.%s
+                AND main_table.%s = split_table.%s
+                WHERE %s
+                GROUP BY %s
+                """.formatted(PostgreConstants.ENTRY_ID,
+                tableName,
+                tableName,
+                PostgreConstants.ENTRY_ID,
+                PostgreConstants.ENTRY_ID,
+                PostgreConstants.FIELD_NAME,
+                PostgreConstants.FIELD_NAME,
+                whereClause,
+                PostgreConstants.ENTRY_ID);
     }
 
     @Override
@@ -127,6 +145,23 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
+        String additionalCondition = null;
+        if (searchFlags.contains((SearchTermFlag.EXACT_MATCH))) {
+            // additionally search in second table
+
+            String operator = "";
+            if (searchFlags.contains(SearchTermFlag.NEGATION)) {
+                operator = "NOT ";
+            }
+
+            if (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE)) {
+                operator += "LIKE";
+            } else {
+                operator += "ILIKE";
+            }
+            additionalCondition = "(split_table.field_name = '\" + field + \"' AND split_table.field_value " + operator + " '" + term + "')";
+        }
+
         String operator = "";
         String prefixSuffix = "";
 
@@ -170,6 +205,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                     field;
         };
 
-        return "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        String resultMainTable = "(" + PostgreConstants.FIELD_NAME + " = '" + field + "' AND " + PostgreConstants.FIELD_VALUE_LITERAL + " " + operator + " '" + prefixSuffix + term + prefixSuffix + "')";
+        if (additionalCondition != null) {
+            return "(" + resultMainTable + " OR " + additionalCondition + ")";
+        } else {
+            return resultMainTable;
+        }
     }
 }

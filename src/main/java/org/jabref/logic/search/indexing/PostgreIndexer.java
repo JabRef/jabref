@@ -37,6 +37,7 @@ public class PostgreIndexer {
     private final Connection connection;
     private final String libraryName;
     private final String tableName;
+    private final String tableNameSplitValues;
 
     public PostgreIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.bibEntryPreferences = bibEntryPreferences;
@@ -48,6 +49,7 @@ public class PostgreIndexer {
         } else {
             this.tableName = databaseContext.getPostgreTableName();
         }
+        tableNameSplitValues = tableName + "_split_values";
         setup();
     }
 
@@ -76,7 +78,6 @@ public class PostgreIndexer {
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME));
 
-            String tableNameSplitValues = tableName + "_split_values";
             connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS "%s" (
                         %s TEXT NOT NULL,
@@ -166,25 +167,37 @@ public class PostgreIndexer {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
             String entryId = bibEntry.getId();
-            for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
+            for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
+                Field field = fieldPair.getKey();
+                String value = fieldPair.getValue();
+
                 preparedStatement.setString(1, entryId);
-                preparedStatement.setString(2, field.getKey().getName());
-                preparedStatement.setString(3, field.getValue());
+                preparedStatement.setString(2, field.getName());
+                preparedStatement.setString(3, value);
 
                 // If a field exists, there also exists a resolved field latex free.
                 // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
-                Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field.getKey(), this.databaseContext.getDatabase());
+                Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
                 assert resolvedFieldLatexFree.isPresent();
                 preparedStatement.setString(4, resolvedFieldLatexFree.orElse(""));
 
                 preparedStatement.addBatch();
 
-                if ()
+                // region Handling of known multi-value fields
+                // split and convert to unicode
+                /*
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES) {
+                    authorList = AuthorListParser.parse(value);
+                } else {
 
-                if (PostgreConstants.MULTI_VALUE_FIELDS.contains(field.getKey())) {
-                    switch (field.getKey()) {
+                }
+                */
+                // endregion
+
+                if (PostgreConstants.MULTI_VALUE_FIELDS.contains(field)) {
+                    switch (field) {
                         case AUTHOR -> {
                         }
                         case EDITOR -> {
@@ -192,7 +205,7 @@ public class PostgreIndexer {
                         case CROSSREF -> {
                         }
                         case KEYWORDS -> {
-                            KeywordList keywordList = KeywordList.parse(field.getValue(), bibEntryPreferences.getKeywordSeparator());
+                            KeywordList keywordList = KeywordList.parse(value, bibEntryPreferences.getKeywordSeparator());
                         }
                         case GROUPS -> {
                         }
