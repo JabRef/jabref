@@ -2,8 +2,6 @@ package org.jabref.logic.ai.summarization;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -13,7 +11,6 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.ai.util.CitationKeyCheck;

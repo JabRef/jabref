@@ -1,9 +1,7 @@
 package org.jabref.logic.ai.ingestion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -18,11 +16,8 @@ import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
