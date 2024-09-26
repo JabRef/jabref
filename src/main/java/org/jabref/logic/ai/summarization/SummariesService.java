@@ -1,9 +1,11 @@
 package org.jabref.logic.ai.summarization;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
@@ -11,13 +13,18 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +41,8 @@ import org.slf4j.LoggerFactory;
 public class SummariesService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummariesService.class);
 
-    private final Map<BibEntry, ProcessingInfo<BibEntry, Summary>> summariesStatusMap = new HashMap<>();
+    private final TreeMap<BibEntry, ProcessingInfo<BibEntry, Summary>> summariesStatusMap = new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
-    private final StateManager stateManager;
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
     private final ChatLanguageModel chatLanguageModel;
@@ -52,13 +58,14 @@ public class SummariesService {
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
     ) {
-        this.stateManager = stateManager;
         this.aiPreferences = aiPreferences;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+
+        configureDatabaseListeners(stateManager);
     }
 
     private void configureDatabaseListeners(StateManager stateManager) {
@@ -72,17 +79,32 @@ public class SummariesService {
     }
 
     private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
-        bibDatabaseContext.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(entry -> {
-                        if (aiPreferences.getAutoGenerateEmbeddings()) {
-                            summarize(entry, bibDatabaseContext);
-                        }
-                    });
+        // GC was eating the listeners, so we have to fall back to the event bus.
+        bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));
+    }
+
+    private class EntriesChangedListener {
+        private final BibDatabaseContext bibDatabaseContext;
+
+        public EntriesChangedListener(BibDatabaseContext bibDatabaseContext) {
+            this.bibDatabaseContext = bibDatabaseContext;
+        }
+
+        @Subscribe
+        public void listen(EntriesAddedEvent e) {
+            e.getBibEntries().forEach(entry -> {
+                if (aiPreferences.getAutoGenerateSummaries()) {
+                    summarize(entry, bibDatabaseContext);
                 }
+            });
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent e) {
+            if (e.getField() == StandardField.FILE && aiPreferences.getAutoGenerateSummaries()) {
+                summarize(e.getBibEntry(), bibDatabaseContext);
             }
-        });
+        }
     }
 
     /**
