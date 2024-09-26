@@ -3,33 +3,34 @@ package org.jabref.logic.search.indexing;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.SearchFieldConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.entry.field.StandardField.AUTHOR;
-import static org.jabref.model.entry.field.StandardField.CROSSREF;
-import static org.jabref.model.entry.field.StandardField.EDITOR;
-import static org.jabref.model.entry.field.StandardField.FILE;
-import static org.jabref.model.entry.field.StandardField.GROUPS;
-import static org.jabref.model.entry.field.StandardField.KEYWORDS;
-
 public class PostgreIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreIndexer.class);
+    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
+    private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
     private final BibEntryPreferences bibEntryPreferences;
@@ -174,15 +175,21 @@ public class PostgreIndexer {
                 PostgreConstants.FIELD_VALUE_LITERAL,
                 PostgreConstants.FIELD_VALUE_TRANSFORMED);
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
+        String insertIntoSplitTable = """
+                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                """.formatted(tableNameSplitValues,
+                PostgreConstants.ENTRY_ID,
+                PostgreConstants.FIELD_NAME,
+                PostgreConstants.FIELD_VALUE_LITERAL,
+                PostgreConstants.FIELD_VALUE_TRANSFORMED);
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
+             PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
             String entryId = bibEntry.getId();
             for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
                 Field field = fieldPair.getKey();
                 String value = fieldPair.getValue();
-
-                preparedStatement.setString(1, entryId);
-                preparedStatement.setString(2, field.getName());
-                preparedStatement.setString(3, value);
 
                 // If a field exists, there also exists a resolved field latex free.
                 // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
@@ -190,43 +197,31 @@ public class PostgreIndexer {
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
                 assert resolvedFieldLatexFree.isPresent();
-                preparedStatement.setString(4, resolvedFieldLatexFree.orElse(""));
-
-                preparedStatement.addBatch();
+                prepareStatement(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
 
                 // region Handling of known multi-value fields
                 // split and convert to unicode
-                /*
-                if (field.getProperties().contains(FieldProperty.PERSON_NAMES) {
-                    authorList = AuthorListParser.parse(value);
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    addAuthors(value, preparedStatementSplitValues, entryId, field);
+                } else if (field == StandardField.KEYWORDS) {
+                    addKeywords(value, preparedStatementSplitValues, entryId, field);
+                } else if (field == StandardField.GROUPS) {
+                    addGroups(value, preparedStatementSplitValues, entryId, field);
+                } else if (field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+                    addEntryLinks(bibEntry, field, preparedStatementSplitValues, entryId);
+                } else if (field == StandardField.FILE) {
+                    // No handling of File, because due to relative paths, we think, there won't be any exact match operation
+                    // We could add the filename itself (with and without extension). However, the user can also use regular expressions to achieve the same.
+                    // The use case to search for file names seems pretty seldom, therefore we omit it.
                 } else {
-
+                    // No other multi-value fields are known
+                    // No action needed -> main table has the value
                 }
-                */
                 // endregion
-
-                if (PostgreConstants.MULTI_VALUE_FIELDS.contains(field)) {
-                    switch (field) {
-                        case AUTHOR -> {
-                        }
-                        case EDITOR -> {
-                        }
-                        case CROSSREF -> {
-                        }
-                        case KEYWORDS -> {
-                            KeywordList keywordList = KeywordList.parse(value, bibEntryPreferences.getKeywordSeparator());
-                        }
-                        case GROUPS -> {
-                        }
-                        case FILE -> {
-                        }
-                        default -> {
-                        }
-                    }
-                }
             }
 
             // add entry type
+            // Separate code, because ENTRY_TYPE is not a Field
             preparedStatement.setString(1, entryId);
             preparedStatement.setString(2, SearchFieldConstants.ENTRY_TYPE.toString());
             preparedStatement.setString(3, bibEntry.getType().getName());
@@ -234,8 +229,61 @@ public class PostgreIndexer {
             preparedStatement.addBatch();
 
             preparedStatement.executeBatch();
+            preparedStatementSplitValues.executeBatch();
         } catch (SQLException e) {
             LOGGER.error("Could not add an entry to the index.", e);
+        }
+    }
+
+    private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
+        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> {
+            doInsert(preparedStatementSplitValues, entryId, field, link.getKey());
+        });
+    }
+
+    private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+        // We could use KeywordList, but we are afraid that group names could have ">" in their name and then they would not be handled correctly
+        Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))
+              .distinct()
+              .forEach(group -> {
+                  doInsert(preparedStatementSplitValues, entryId, field, group);
+              });
+    }
+
+    private void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+        KeywordList keywordList = KeywordList.parse(keywordsString, bibEntryPreferences.getKeywordSeparator());
+        keywordList.stream().flatMap(keyword -> keyword.flatten().stream()).forEach(keyword -> {
+            String value = keyword.toString();
+            doInsert(preparedStatementSplitValues, entryId, field, value);
+        });
+    }
+
+    private static void addAuthors(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+        AuthorList.parse(value).getAuthors().forEach(author -> {
+            // Author object does not support literal values
+            // We use the method giving us the most complete information for the literal value;
+            String literal = author.getFamilyGiven(false);
+            String transformed = author.latexFree().getFamilyGiven(false);
+            prepareStatement(preparedStatementSplitValues, entryId, field, literal, transformed);
+        });
+    }
+
+    private static void doInsert(PreparedStatement preparedStatement, String entryId, Field field, String value) {
+        prepareStatement(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
+    }
+
+    /**
+     * The values are passed as they should be inserted into the database table
+     */
+    private static void prepareStatement(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
+        try {
+            preparedStatement.setString(1, entryId);
+            preparedStatement.setString(2, field.getName());
+            preparedStatement.setString(3, value);
+            preparedStatement.setString(4, normalized);
+            preparedStatement.addBatch();
+        } catch (SQLException e) {
+            LOGGER.error("Could not add field {} having value {} of entry {} to the index.", field.getName(), value, entryId, e);
         }
     }
 
