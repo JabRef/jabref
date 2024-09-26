@@ -94,8 +94,8 @@ public class EditMerge {
     }
 
     /**
-     * group : A list of consecutive citation groups only separated by spaces.
-     * groupCursor : A cursor covering the XTextRange of each entry in group (and the spaces between them)
+     * @param group : A list of consecutive citation groups only separated by spaces.
+     * @param groupCursor : A cursor covering the XTextRange of each entry in group (and the spaces between them)
      */
     private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
     }
