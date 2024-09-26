@@ -8,7 +8,6 @@ import javax.swing.undo.CannotRedoException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -16,7 +15,11 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * @implNote See also {@link UndoAction}
+ * @implNote
+ * See
+ * also
+ * {@link
+ * UndoAction}
  */
 public class RedoAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
@@ -28,7 +31,7 @@ public class RedoAction extends SimpleCommand {
 
         ChangeListener<Optional<LibraryTab>> listener = (observable, oldValue, activeLibraryTab) -> {
             activeLibraryTab.ifPresent(libraryTab ->
-                this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
+                    this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
 
             oldValue.ifPresent(libraryTab -> this.executable.unbind());
         };
@@ -43,7 +46,8 @@ public class RedoAction extends SimpleCommand {
         try {
             libraryTab.getUndoManager().redo();
             dialogService.notify(Localization.lang("Redo"));
-        } catch (CannotRedoException ex) {
+        } catch (
+                CannotRedoException ex) {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
