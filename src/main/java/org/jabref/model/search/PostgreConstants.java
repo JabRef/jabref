@@ -7,6 +7,7 @@ public enum PostgreConstants {
     FIELD_VALUE_TRANSFORMED("field_value_transformed"); // contains the value transformed for better querying
 
     public static final String TABLE_NAME_SUFFIX = "_split_values";
+
     private final String columnName;
 
     PostgreConstants(String columnName) {

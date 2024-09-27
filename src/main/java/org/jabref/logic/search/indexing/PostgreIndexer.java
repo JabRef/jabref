@@ -33,17 +33,17 @@ public class PostgreIndexer {
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
-    private final BibEntryPreferences bibEntryPreferences;
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
     private final String libraryName;
     private final String tableName;
     private final String tableNameSplitValues;
+    private final Character keywordSeparator;
 
     public PostgreIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
-        this.bibEntryPreferences = bibEntryPreferences;
         this.databaseContext = databaseContext;
         this.connection = connection;
+        this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
         if ("unsaved".equals(databaseContext.getPostgreTableName())) {
             this.tableName = "unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++;
@@ -71,7 +71,8 @@ public class PostgreIndexer {
                         %s TEXT,
                         PRIMARY KEY (%s, %s)
                     )
-                    """.formatted(tableName,
+                    """.formatted(
+                    tableName,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
                     PostgreConstants.FIELD_VALUE_LITERAL,
@@ -86,7 +87,8 @@ public class PostgreIndexer {
                         %s TEXT,
                         %s TEXT
                         )
-                    """.formatted(tableNameSplitValues,
+                    """.formatted(
+                    tableNameSplitValues,
                     PostgreConstants.ENTRY_ID,
                     PostgreConstants.FIELD_NAME,
                     PostgreConstants.FIELD_VALUE_LITERAL,
@@ -100,38 +102,65 @@ public class PostgreIndexer {
             // region btree index on id column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableName), tableName, PostgreConstants.ENTRY_ID));
+                    """.formatted(
+                    PostgreConstants.ENTRY_ID.getIndexName(tableName),
+                    tableName,
+                    PostgreConstants.ENTRY_ID));
+
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues), tableName, PostgreConstants.ENTRY_ID));
+                    """.formatted(
+                    PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues),
+                    tableName,
+                    PostgreConstants.ENTRY_ID));
             // endregion
 
             // region btree index on field name column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableName), tableName, PostgreConstants.FIELD_NAME));
+                    """.formatted(
+                    PostgreConstants.FIELD_NAME.getIndexName(tableName),
+                    tableName,
+                    PostgreConstants.FIELD_NAME));
+
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_NAME));
+                    """.formatted(
+                    PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues),
+                    tableName,
+                    PostgreConstants.FIELD_NAME));
             // endregion
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
-                    """.formatted(PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_LITERAL));
+                    """.formatted(
+                    PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableName),
+                    tableName,
+                    PostgreConstants.FIELD_VALUE_LITERAL));
 
             // trigram index on field value transformed column
             connection.createStatement().executeUpdate("""
                     CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
-                    """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
+                    """.formatted(
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName),
+                    tableName,
+                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
 
             // region btree index on spilt values column
-            connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_VALUE_LITERAL));
-            connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
-                    """.formatted(PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues), tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED));
+//            connection.createStatement().executeUpdate("""
+//                    CREATE INDEX "%s" ON "%s" ("%s")
+//                    """.formatted(
+//                    PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues),
+//                    tableName,
+//                    PostgreConstants.FIELD_VALUE_LITERAL));
+//
+//            connection.createStatement().executeUpdate("""
+//                    CREATE INDEX "%s" ON "%s" ("%s")
+//                    """.formatted(
+//                    PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues),
+//                    tableName,
+//                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
             // endregion
 
             LOGGER.debug("Created indexes for library: {}", libraryName);
@@ -167,9 +196,10 @@ public class PostgreIndexer {
 
     private void addToIndex(BibEntry bibEntry) {
         String insertFieldQuery = """
-            INSERT INTO "%s" ("%s", "%s", "%s", "%s")
-            VALUES (?, ?, ?, ?)
-            """.formatted(tableName,
+                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                """.formatted(
+                tableName,
                 PostgreConstants.ENTRY_ID,
                 PostgreConstants.FIELD_NAME,
                 PostgreConstants.FIELD_VALUE_LITERAL,
@@ -178,7 +208,8 @@ public class PostgreIndexer {
         String insertIntoSplitTable = """
                 INSERT INTO "%s" ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
-                """.formatted(tableNameSplitValues,
+                """.formatted(
+                tableNameSplitValues,
                 PostgreConstants.ENTRY_ID,
                 PostgreConstants.FIELD_NAME,
                 PostgreConstants.FIELD_VALUE_LITERAL,
@@ -197,14 +228,14 @@ public class PostgreIndexer {
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
                 assert resolvedFieldLatexFree.isPresent();
-                prepareStatement(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
 
                 // region Handling of known multi-value fields
-                // split and convert to unicode
+                // split and convert to Unicode
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     addAuthors(value, preparedStatementSplitValues, entryId, field);
                 } else if (field == StandardField.KEYWORDS) {
-                    addKeywords(value, preparedStatementSplitValues, entryId, field);
+                    addKeywords(value, preparedStatementSplitValues, entryId, field, keywordSeparator);
                 } else if (field == StandardField.GROUPS) {
                     addGroups(value, preparedStatementSplitValues, entryId, field);
                 } else if (field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
@@ -237,24 +268,24 @@ public class PostgreIndexer {
 
     private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
         bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> {
-            doInsert(preparedStatementSplitValues, entryId, field, link.getKey());
+            addBatch(preparedStatementSplitValues, entryId, field, link.getKey());
         });
     }
 
     private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
-        // We could use KeywordList, but we are afraid that group names could have ">" in their name and then they would not be handled correctly
+        // We could use KeywordList, but we are afraid that group names could have ">" in their name, and then they would not be handled correctly
         Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))
               .distinct()
               .forEach(group -> {
-                  doInsert(preparedStatementSplitValues, entryId, field, group);
+                  addBatch(preparedStatementSplitValues, entryId, field, group);
               });
     }
 
-    private void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
-        KeywordList keywordList = KeywordList.parse(keywordsString, bibEntryPreferences.getKeywordSeparator());
+    private static void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field, Character keywordSeparator) {
+        KeywordList keywordList = KeywordList.parse(keywordsString, keywordSeparator);
         keywordList.stream().flatMap(keyword -> keyword.flatten().stream()).forEach(keyword -> {
             String value = keyword.toString();
-            doInsert(preparedStatementSplitValues, entryId, field, value);
+            addBatch(preparedStatementSplitValues, entryId, field, value);
         });
     }
 
@@ -264,18 +295,18 @@ public class PostgreIndexer {
             // We use the method giving us the most complete information for the literal value;
             String literal = author.getGivenFamily(false);
             String transformed = author.latexFree().getGivenFamily(false);
-            prepareStatement(preparedStatementSplitValues, entryId, field, literal, transformed);
+            addBatch(preparedStatementSplitValues, entryId, field, literal, transformed);
         });
     }
 
-    private static void doInsert(PreparedStatement preparedStatement, String entryId, Field field, String value) {
-        prepareStatement(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
+    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
+        addBatch(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
     }
 
     /**
      * The values are passed as they should be inserted into the database table
      */
-    private static void prepareStatement(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
+    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
         try {
             preparedStatement.setString(1, entryId);
             preparedStatement.setString(2, field.getName());

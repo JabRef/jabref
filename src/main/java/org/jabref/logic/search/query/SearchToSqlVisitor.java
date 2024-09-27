@@ -20,12 +20,13 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
-    public static final String MAIN_TABLE = "main_table";
-    public static final String SPLIT_TABLE = "split_table";
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
+    private static final String MAIN_TABLE = "main_table";
+    private static final String SPLIT_TABLE = "split_table";
 
     private final String mainTableName;
     private final String splitTableName;
+    private boolean isExactMatch = false;
 
     public SearchToSqlVisitor(String mainTableName) {
         this.mainTableName = mainTableName;
@@ -42,23 +43,36 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
         String whereClause = getWhereClause(ctx);
-        String result = """
-                SELECT %s.%s
-                FROM "%s" AS %s
-                LEFT JOIN "%s" AS %s
-                ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                WHERE (%s)
-                GROUP BY %s.%s
-                """.formatted(
-                PostgreConstants.ENTRY_ID, MAIN_TABLE,
-                mainTableName, MAIN_TABLE,
-                splitTableName, SPLIT_TABLE,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                SPLIT_TABLE, PostgreConstants.ENTRY_ID,
-                MAIN_TABLE, PostgreConstants.FIELD_NAME,
-                SPLIT_TABLE, PostgreConstants.FIELD_NAME,
-                whereClause,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID);
+        String result;
+
+        if (isExactMatch) {
+            result = """
+                    SELECT %s.%s FROM "%s" AS %s
+                    LEFT JOIN "%s" AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (%s)
+                    GROUP BY %s.%s
+                    """.formatted(
+                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                    mainTableName, MAIN_TABLE,
+                    splitTableName, SPLIT_TABLE,
+                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                    SPLIT_TABLE, PostgreConstants.ENTRY_ID,
+                    MAIN_TABLE, PostgreConstants.FIELD_NAME,
+                    SPLIT_TABLE, PostgreConstants.FIELD_NAME,
+                    whereClause,
+                    MAIN_TABLE, PostgreConstants.ENTRY_ID);
+        } else {
+            result = """
+                    SELECT %s.%s FROM "%s" AS %s
+                    WHERE (%s)
+                    GROUP BY %s.%s
+                    """.formatted(
+                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                    mainTableName, MAIN_TABLE,
+                    whereClause,
+                    MAIN_TABLE, PostgreConstants.ENTRY_ID);
+        }
         LOGGER.trace("Converted search query to SQL: {}", result);
         return result;
     }
@@ -137,7 +151,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         }
     }
 
-    private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
+    private void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
+        isExactMatch |= matchType.equals(SearchTermFlag.EXACT_MATCH);
+        flags.add(matchType);
+
+        flags.add(caseSensitive ? SearchTermFlag.CASE_SENSITIVE : SearchTermFlag.CASE_INSENSITIVE);
+        if (negation) {
+            flags.add(SearchTermFlag.NEGATION);
+        }
+    }
+
+    private static String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
         StringBuilder whereClause = new StringBuilder();
         String operator = getOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(SearchTermFlag.INEXACT_MATCH) ? "%" : "";
@@ -164,38 +188,27 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return whereClause.toString();
     }
 
-    private String getOperator(EnumSet<SearchTermFlag> searchFlags) {
-        if (searchFlags.contains(SearchTermFlag.REGULAR_EXPRESSION)) {
-            return (searchFlags.contains(SearchTermFlag.NEGATION) ? "!" : "") +
-                    (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "~" : "~*");
-        } else {
-            return (searchFlags.contains(SearchTermFlag.NEGATION) ? "NOT " : "") +
-                    (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "LIKE" : "ILIKE");
-        }
+    private static String getOperator(EnumSet<SearchTermFlag> searchFlags) {
+        return searchFlags.contains(SearchTermFlag.REGULAR_EXPRESSION)
+                ? (searchFlags.contains(SearchTermFlag.NEGATION) ? "!" : "") + (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "~" : "~*")
+                : (searchFlags.contains(SearchTermFlag.NEGATION) ? "NOT " : "") + (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "LIKE" : "ILIKE");
     }
 
-    private String buildTableQuery(String tableName, String operator, String prefixSuffix, String term) {
+    private static String buildTableQuery(String tableName, String operator, String prefixSuffix, String term) {
         return """
                 (%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s')""".formatted(
                 tableName, PostgreConstants.FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
                 tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED,
-                operator, prefixSuffix, term, prefixSuffix);
+                operator,
+                prefixSuffix, term, prefixSuffix);
     }
 
-    private String buildFieldQuery(String tableName, String field, String operator, String prefixSuffix, String term) {
+    private static String buildFieldQuery(String tableName, String field, String operator, String prefixSuffix, String term) {
         return """
                 ((%s.%s = '%s') AND (%s))""".formatted(
                 tableName, PostgreConstants.FIELD_NAME, field,
                 buildTableQuery(tableName, operator, prefixSuffix, term));
-    }
-
-    private static void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
-        flags.add(matchType);
-        flags.add(caseSensitive ? SearchTermFlag.CASE_SENSITIVE : SearchTermFlag.CASE_INSENSITIVE);
-        if (negation) {
-            flags.add(SearchTermFlag.NEGATION);
-        }
     }
 }
