@@ -8,6 +8,7 @@ import org.jabref.logic.l10n.Localization;
 public enum KeyBinding {
     EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
+    GET_BIBLIOGRAPHIC_DATA("Get bibliographic data", Localization.lang("Get bibliographic data"), "ctrl+shift+alt+B", KeyBindingCategory.EDITOR),
     EDITOR_BACKWARD("Move caret left", Localization.lang("Move caret left"), "", KeyBindingCategory.EDITOR),
     EDITOR_FORWARD("Move caret right", Localization.lang("Move caret right"), "", KeyBindingCategory.EDITOR),
     EDITOR_WORD_BACKWARD("Move caret to previous word", Localization.lang("Move caret to previous word"), "", KeyBindingCategory.EDITOR),
