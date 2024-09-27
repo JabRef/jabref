@@ -109,9 +109,7 @@ public class JabRefGUI extends Application {
                 taskExecutor);
 
         openWindow();
-        if (earlyExitWhenMultipleInstancesOpened()) {
-            return;
-        }
+
         startBackgroundTasks();
 
         if (!fileUpdateMonitor.isActive()) {
@@ -265,15 +263,6 @@ public class JabRefGUI extends Application {
         LOGGER.debug("frame initialized");
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
-    }
-
-    private boolean earlyExitWhenMultipleInstancesOpened() {
-        if (uiCommands.stream().anyMatch(UiCommand.InstanceAlreadyRunning.class::isInstance)) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Another JabRef instance is already running. Please switch to that instance."));
-            Platform.exit();
-            return true;
-        }
-        return false;
     }
 
     public void onShowing(WindowEvent event) {

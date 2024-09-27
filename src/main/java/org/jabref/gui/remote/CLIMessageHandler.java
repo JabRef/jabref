@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class CLIMessageHandler implements RemoteMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CLIMessageHandler.class);
+
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -37,12 +38,12 @@ public class CLIMessageHandler implements RemoteMessageHandler {
         try {
             LOGGER.info("Processing message {}", Arrays.stream(message).toList());
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                message,
-                ArgumentProcessor.Mode.REMOTE_START,
-                preferences,
-                preferences,
-                fileUpdateMonitor,
-                entryTypesManager);
+                    message,
+                    ArgumentProcessor.Mode.REMOTE_START,
+                    preferences,
+                    preferences,
+                    fileUpdateMonitor,
+                    entryTypesManager);
             argumentProcessor.processArguments();
             Platform.runLater(() -> uiMessageHandler.handleUiCommands(argumentProcessor.getUiCommands()));
         } catch (ParseException e) {
