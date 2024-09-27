@@ -175,9 +175,9 @@ public class Launcher {
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
                 LOGGER.debug("Pinging other instance succeeded.");
-                // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
                 if (args.length == 0) {
-                    LOGGER.debug("This JabRef instance is already running. Please switch to that instance.");
+                    // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
+                    LOGGER.warn("This JabRef instance is already running. Please switch to that instance.");
                 } else {
                     // We are not alone, there is already a server out there, send command line arguments to other instance
                     LOGGER.debug("Passing arguments passed on to running JabRef...");
