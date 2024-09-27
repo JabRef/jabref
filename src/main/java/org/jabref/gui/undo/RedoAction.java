@@ -15,11 +15,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * @implNote
- * See
- * also
- * {@link
- * UndoAction}
+ * @implNote See also {@link UndoAction}
  */
 public class RedoAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
@@ -46,8 +42,7 @@ public class RedoAction extends SimpleCommand {
         try {
             libraryTab.getUndoManager().redo();
             dialogService.notify(Localization.lang("Redo"));
-        } catch (
-                CannotRedoException ex) {
+        } catch (CannotRedoException ex) {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
