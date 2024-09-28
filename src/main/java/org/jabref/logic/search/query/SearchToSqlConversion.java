@@ -4,8 +4,8 @@ import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 public class SearchToSqlConversion {
@@ -17,7 +17,7 @@ public class SearchToSqlConversion {
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
-        SearchLexer lexer = new SearchLexer(new ANTLRInputStream(searchExpression));
+        SearchLexer lexer = new SearchLexer(CharStreams.fromString(searchExpression));
         lexer.removeErrorListeners(); // no infos on file system
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
