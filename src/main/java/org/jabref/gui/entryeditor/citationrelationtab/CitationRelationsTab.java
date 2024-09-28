@@ -30,15 +30,16 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.logic.citation.repository.BibEntryRelationsCache;
-import org.jabref.logic.citation.repository.BibEntryRelationsRepository;
-import org.jabref.logic.importer.fetcher.CitationFetcher;
-import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.citation.repository.LRUBibEntryRelationsCache;
+import org.jabref.logic.citation.repository.LRUBibEntryRelationsRepository;
+import org.jabref.logic.citation.service.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.importer.fetcher.CitationFetcher;
+import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -73,7 +74,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
-    private final BibEntryRelationsRepository bibEntryRelationsRepository;
+    private final SearchCitationsRelationsService searchCitationsRelationsService;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
 
@@ -94,11 +95,22 @@ public class CitationRelationsTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
         this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        this.bibEntryRelationsRepository = new BibEntryRelationsRepository(
-            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()),
-            new BibEntryRelationsCache()
+        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
+            new LRUBibEntryRelationsCache()
         );
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
+        this.searchCitationsRelationsService = new SearchCitationsRelationsService(
+            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()),
+            bibEntryRelationsRepository
+        );
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
+            databaseContext,
+            preferences,
+            undoManager,
+            stateManager,
+            dialogService,
+            fileUpdateMonitor,
+            taskExecutor
+        );
     }
 
     /**
@@ -347,39 +359,52 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask.cancel();
         }
 
-        BackgroundTask<List<BibEntry>> task;
-
-        if (searchType == CitationFetcher.SearchType.CITES) {
-            task = BackgroundTask.wrap(() -> {
-                if (shouldRefresh) {
-                    bibEntryRelationsRepository.forceRefreshReferences(entry);
-                }
-                return bibEntryRelationsRepository.getReferences(entry);
-            });
-            citingTask = task;
-        } else {
-            task = BackgroundTask.wrap(() -> {
-                if (shouldRefresh) {
-                    bibEntryRelationsRepository.forceRefreshCitations(entry);
-                }
-                return bibEntryRelationsRepository.getCitations(entry);
-            });
-            citedByTask = task;
-        }
-
-        task.onRunning(() -> prepareToSearchForRelations(abortButton, refreshButton, importButton, progress, task))
-            .onSuccess(fetchedList -> onSearchForRelationsSucceed(entry, listView, abortButton, refreshButton,
-                    searchType, importButton, progress, fetchedList, observableList))
+        this.createBackGroundTask(entry, searchType, shouldRefresh)
+            .consumeOnRunning(task -> prepareToSearchForRelations(
+                abortButton, refreshButton, importButton, progress, task
+            ))
+            .onSuccess(fetchedList -> onSearchForRelationsSucceed(
+                entry,
+                listView,
+                abortButton,
+                refreshButton,
+                searchType,
+                importButton,
+                progress,
+                fetchedList,
+                observableList
+            ))
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching citing Articles", exception);
                 hideNodes(abortButton, progress, importButton);
-                listView.setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
-                        exception.getMessage())));
-
+                listView.setPlaceholder(
+                    new Label(Localization.lang(
+                        "Error while fetching citing entries: %0", exception.getMessage())
+                    )
+                );
                 refreshButton.setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
             .executeWith(taskExecutor);
+    }
+
+    private BackgroundTask<List<BibEntry>> createBackGroundTask(
+        BibEntry entry, CitationFetcher.SearchType searchType, boolean shouldRefresh
+    ) {
+        return switch (searchType) {
+            case CitationFetcher.SearchType.CITES -> {
+                citingTask = BackgroundTask.wrap(
+                    () -> this.searchCitationsRelationsService.searchReferences(entry, shouldRefresh)
+                );
+                yield citingTask;
+            }
+            case CitationFetcher.SearchType.CITED_BY -> {
+                citedByTask = BackgroundTask.wrap(
+                    () -> this.searchCitationsRelationsService.searchCitations(entry, shouldRefresh)
+                );
+                yield citedByTask;
+            }
+        };
     }
 
     private void onSearchForRelationsSucceed(BibEntry entry, CheckListView<CitationRelationItem> listView,

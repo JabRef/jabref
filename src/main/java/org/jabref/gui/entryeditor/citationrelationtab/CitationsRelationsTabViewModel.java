@@ -8,11 +8,11 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.importer.fetcher.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.fetcher.CitationFetcher;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
