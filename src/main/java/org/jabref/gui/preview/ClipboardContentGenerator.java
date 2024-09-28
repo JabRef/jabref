@@ -38,7 +38,7 @@ public class ClipboardContentGenerator {
         this.abbreviationRepository = abbreviationRepository;
     }
 
-    public ClipboardContent generateCitation(List<BibEntry> selectedEntries, CitationStyleOutputFormat outputFormat, BibDatabaseContext bibDatabaseContext) throws IOException {
+    public ClipboardContent generate(List<BibEntry> selectedEntries, CitationStyleOutputFormat outputFormat, BibDatabaseContext bibDatabaseContext) throws IOException {
         List<String> citations = generateCitations(selectedEntries, outputFormat, bibDatabaseContext);
         PreviewLayout previewLayout = previewPreferences.getSelectedPreviewLayout();
 

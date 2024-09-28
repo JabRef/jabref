@@ -64,7 +64,7 @@ public class CopyCitationAction extends SimpleCommand {
     }
 
     private ClipboardContent generateCitations() throws IOException {
-        return clipboardContentGenerator.generateCitation(selectedEntries, outputFormat, stateManager.getActiveDatabase().get());
+        return clipboardContentGenerator.generate(selectedEntries, outputFormat, stateManager.getActiveDatabase().get());
     }
 
     private void setClipBoardContent(ClipboardContent clipBoardContent) {
