@@ -10,6 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SearchToSqlConversionTest {
     @ParameterizedTest
     @CsvSource({
+            "(), alex",
+            "(), author=alex",
+            "(), title=dino AND author=alex",
+            "(), author=computer AND editor=science OR title=math",
+            "(), (author=computer AND editor=science) OR title=math",
+            "(), author=computer AND (editor=science OR title=math)",
+            "(), (author=computer AND editor=science) OR (title=math AND year=2021)",
             // case insensitive contains
             "((main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE '%compute%') OR (main_table.field_value_transformed ILIKE '%compute%'))), title=compute",
 
@@ -79,6 +86,6 @@ class SearchToSqlConversionTest {
     })
 
     void conversion(String expectedWhereClause, String input) {
-        assertEquals(expectedWhereClause, SearchToSqlConversion.getWhereClause("tableName", input));
+        assertEquals(expectedWhereClause, SearchToSqlConversion.searchToSql("tableName", input));
     }
 }

@@ -22,15 +22,13 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
     private static final String MAIN_TABLE = "main_table";
-    private static final String SPLIT_TABLE = "split_table";
 
     private final String mainTableName;
-    private final String splitTableName;
-    private boolean isExactMatch = false;
+
+    private int cteCount = 0;
 
     public SearchToSqlVisitor(String mainTableName) {
         this.mainTableName = mainTableName;
-        this.splitTableName = mainTableName + PostgreConstants.TABLE_NAME_SUFFIX;
     }
 
     private enum SearchTermFlag {
@@ -44,35 +42,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     public String visitStart(SearchParser.StartContext ctx) {
         String whereClause = getWhereClause(ctx);
         String result;
+        result = """
+                WITH %s
+                SELECT * FROM cte%s
+                """.formatted(whereClause, cteCount - 1);
 
-        if (isExactMatch) {
-            result = """
-                    SELECT %s.%s FROM "%s" AS %s
-                    LEFT JOIN "%s" AS %s
-                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                    WHERE (%s)
-                    GROUP BY %s.%s
-                    """.formatted(
-                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                    mainTableName, MAIN_TABLE,
-                    splitTableName, SPLIT_TABLE,
-                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                    SPLIT_TABLE, PostgreConstants.ENTRY_ID,
-                    MAIN_TABLE, PostgreConstants.FIELD_NAME,
-                    SPLIT_TABLE, PostgreConstants.FIELD_NAME,
-                    whereClause,
-                    MAIN_TABLE, PostgreConstants.ENTRY_ID);
-        } else {
-            result = """
-                    SELECT %s.%s FROM "%s" AS %s
-                    WHERE (%s)
-                    GROUP BY %s.%s
-                    """.formatted(
-                    MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                    mainTableName, MAIN_TABLE,
-                    whereClause,
-                    MAIN_TABLE, PostgreConstants.ENTRY_ID);
-        }
         LOGGER.trace("Converted search query to SQL: {}", result);
         return result;
     }
@@ -89,16 +63,32 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return "(" + visit(ctx.expression()) + ")";
+        return visit(ctx.expression());
     }
 
     @Override
     public String visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-        if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
-            return visit(ctx.left) + " AND " + visit(ctx.right);
-        } else {
-            return visit(ctx.left) + " OR " + visit(ctx.right);
-        }
+        String left = visit(ctx.left);
+        String right = visit(ctx.right);
+        return """
+                %s,
+                %s,
+                cte%s AS (
+                 SELECT %s
+                 FROM cte%s
+                 %s
+                 SELECT %s
+                 FROM cte%s
+                )
+                """.formatted(
+                left,
+                right,
+                cteCount++,
+                PostgreConstants.ENTRY_ID,
+                cteCount - 3,
+                "AND".equalsIgnoreCase(ctx.operator.getText()) ? "INTERSECT" : "UNION",
+                PostgreConstants.ENTRY_ID,
+                cteCount - 2);
     }
 
     @Override
@@ -152,7 +142,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     private void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
-        isExactMatch |= matchType.equals(SearchTermFlag.EXACT_MATCH);
         flags.add(matchType);
 
         flags.add(caseSensitive ? SearchTermFlag.CASE_SENSITIVE : SearchTermFlag.CASE_INSENSITIVE);
@@ -161,7 +150,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         }
     }
 
-    private static String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
+    private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
         StringBuilder whereClause = new StringBuilder();
         String operator = getOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(SearchTermFlag.INEXACT_MATCH) ? "%" : "";
@@ -174,15 +163,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         };
 
         if ("anyfield".equals(field) || "any".equals(field)) {
-            whereClause.append(buildTableQuery(MAIN_TABLE, operator, prefixSuffix, term));
-            if (searchFlags.contains(SearchTermFlag.EXACT_MATCH)) {
-                whereClause.append(" OR ").append(buildTableQuery(SPLIT_TABLE, operator, prefixSuffix, term));
-            }
+            whereClause.append(buildAnyFieldQuery(operator, prefixSuffix, term));
         } else {
-            whereClause.append(buildFieldQuery(MAIN_TABLE, field, operator, prefixSuffix, term));
-            if (searchFlags.contains(SearchTermFlag.EXACT_MATCH)) {
-                whereClause.append(" OR ").append(buildFieldQuery(SPLIT_TABLE, field, operator, prefixSuffix, term));
-            }
+            whereClause.append(buildFieldQuery(field, operator, prefixSuffix, term));
         }
 
         return whereClause.toString();
@@ -194,21 +177,43 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 : (searchFlags.contains(SearchTermFlag.NEGATION) ? "NOT " : "") + (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "LIKE" : "ILIKE");
     }
 
-    private static String buildTableQuery(String tableName, String operator, String prefixSuffix, String term) {
+    private String buildFieldQuery(String field, String operator, String prefixSuffix, String term) {
         return """
-                (%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s')""".formatted(
-                tableName, PostgreConstants.FIELD_VALUE_LITERAL,
+                cte%s AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                )
+                """.formatted(
+                cteCount++,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, PostgreConstants.FIELD_NAME,
+                field,
+                MAIN_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
-                tableName, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                MAIN_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
     }
 
-    private static String buildFieldQuery(String tableName, String field, String operator, String prefixSuffix, String term) {
+    private String buildAnyFieldQuery(String operator, String prefixSuffix, String term) {
         return """
-                ((%s.%s = '%s') AND (%s))""".formatted(
-                tableName, PostgreConstants.FIELD_NAME, field,
-                buildTableQuery(tableName, operator, prefixSuffix, term));
+                cte%s AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                )
+                """.formatted(
+                cteCount++,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                operator,
+                prefixSuffix, term, prefixSuffix,
+                MAIN_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                operator,
+                prefixSuffix, term, prefixSuffix);
     }
 }
