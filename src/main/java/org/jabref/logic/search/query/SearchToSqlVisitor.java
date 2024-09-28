@@ -53,7 +53,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             sql.setLength(sql.length() - 2);
         }
 
-        sql.append("SELECT * FROM ").append(query);
+        sql.append("SELECT * FROM ").append(query).append(" GROUP BY ").append(PostgreConstants.ENTRY_ID);
         LOGGER.trace("Converted search query to SQL: {}", sql);
         return sql.toString();
     }
