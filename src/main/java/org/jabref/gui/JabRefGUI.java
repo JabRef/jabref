@@ -93,6 +93,7 @@ public class JabRefGUI extends Application {
                 dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
             });
         });
+
         initialize();
 
         JabRefGUI.mainFrame = new JabRefFrame(
