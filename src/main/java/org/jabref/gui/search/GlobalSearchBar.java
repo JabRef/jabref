@@ -253,7 +253,7 @@ public class GlobalSearchBar extends HBox {
                     fulltextButton.setSelected(false);
                 }
             }
-            searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, true);
+            searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, newVal);
             updateSearchQuery();
         });
 
