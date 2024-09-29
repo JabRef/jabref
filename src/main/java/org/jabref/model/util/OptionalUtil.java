@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 public class OptionalUtil {
 
     public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
-        if (!left.isPresent()) {
-            return !right.isPresent();
+        if (left.isEmpty()) {
+            return right.isEmpty();
         } else {
             if (right.isPresent()) {
                 return equality.test(left.get(), right.get());
