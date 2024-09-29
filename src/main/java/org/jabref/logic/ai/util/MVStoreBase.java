@@ -7,29 +7,39 @@ import org.jabref.logic.util.NotificationService;
 
 import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
+import org.h2.mvstore.MVStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class MVStoreBase implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBase.class);
 
-    protected final MVStore mvStore;
+    protected MVStore mvStore;
 
     public MVStoreBase(Path path, NotificationService dialogService) {
         @Nullable Path mvStorePath = path;
 
         try {
             Files.createDirectories(path.getParent());
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             LOGGER.error(errorMessageForOpening(), e);
             dialogService.notify(errorMessageForOpeningLocalized());
             mvStorePath = null;
         }
 
-        this.mvStore = new MVStore.Builder()
-                .autoCommitDisabled()
-                .fileName(mvStorePath == null ? null : mvStorePath.toString())
-                .open();
+        try {
+            this.mvStore = new MVStore.Builder()
+                    .autoCommitDisabled()
+                    .fileName(mvStorePath == null ? null : mvStorePath.toString())
+                    .open();
+        } catch (MVStoreException e) {
+            this.mvStore = new MVStore.Builder()
+                    .autoCommitDisabled()
+                    .fileName(null) // creates an in memory store
+                    .open();
+            LOGGER.error(errorMessageForOpening(), e);
+        }
     }
 
     public void commit() {
