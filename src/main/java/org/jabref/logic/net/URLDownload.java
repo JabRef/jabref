@@ -382,6 +382,10 @@ public class URLDownload {
 
     private URLConnection getUrlConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
+
+        if (connection instanceof HttpURLConnection httpConnection) {
+            httpConnection.setInstanceFollowRedirects(true);
+        }
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
