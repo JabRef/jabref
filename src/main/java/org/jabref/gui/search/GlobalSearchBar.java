@@ -241,7 +241,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
 
-        EasyBind.subscribe(filePreferences.fulltextIndexLinkedFilesProperty(), (enabled) -> {
+        EasyBind.subscribe(filePreferences.fulltextIndexLinkedFilesProperty(), enabled -> {
             if (!enabled) {
                 fulltextButton.setSelected(false);
             } else if (searchPreferences.isFulltext()) {
