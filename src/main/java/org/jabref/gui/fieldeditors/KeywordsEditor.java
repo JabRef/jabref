@@ -11,6 +11,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.ClipBoardManager;
@@ -46,6 +53,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private ClipBoardManager clipBoardManager;
 
     private final KeywordsEditorViewModel viewModel;
+    private Keyword draggedKeyword;
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
@@ -69,7 +77,6 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         keywordTagsField.setConverter(viewModel.getStringConverter());
         keywordTagsField.setMatcher((keyword, searchText) -> keyword.get().toLowerCase().startsWith(searchText.toLowerCase()));
         keywordTagsField.setComparator(Comparator.comparing(Keyword::get));
-
         keywordTagsField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
 
         keywordTagsField.setShowSearchIcon(false);
@@ -83,8 +90,42 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 event.consume();
             }
         });
-
+        keywordTagsField.getEditor().setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePasteAction();  // Call paste handler
+            }
+        });
+        keywordTagsField.getEditor().setOnContextMenuRequested(event -> {
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem pasteItem = new MenuItem("Paste");
+            pasteItem.setOnAction(e -> handlePasteAction());
+            contextMenu.getItems().add(pasteItem);
+            contextMenu.show(keywordTagsField.getEditor(), event.getScreenX(), event.getScreenY());
+        });
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
+    }
+
+    private void handlePasteAction() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard.hasString()) {
+            String pastedText = clipboard.getString().trim();
+
+            if (!pastedText.isEmpty()) {
+                // Split keywords by the separator and add them
+                String[] keywords = pastedText.split(String.valueOf(viewModel.getKeywordSeparator()));
+
+                for (String keywordText : keywords) {
+                    Keyword keyword = viewModel.getStringConverter().fromString(keywordText.trim());
+
+                    // Add keyword if it's valid and not already present
+                    if (keyword != null && !keywordTagsField.getTags().contains(keyword)) {
+                        keywordTagsField.getTags().add(keyword);
+                    }
+                }
+                // Clear the editor after pasting
+                keywordTagsField.getEditor().clear();
+            }
+        }
     }
 
     private Node createTag(Keyword keyword) {
@@ -93,6 +134,45 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
         tagLabel.getGraphic().setOnMouseClicked(event -> keywordTagsField.removeTags(keyword));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
+        tagLabel.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {  // Detect double-click
+                keywordTagsField.removeTags(keyword);  // Remove the keyword
+                keywordTagsField.getEditor().setText(keyword.get());  // Enter edit mode with the keyword text
+                keywordTagsField.getEditor().requestFocus();  // Set focus to the editor
+            }
+        });
+        tagLabel.setOnDragDetected(event -> {
+            Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString(keyword.get());
+            db.setContent(content);
+            draggedKeyword = keyword;  // Store the dragged keyword
+            event.consume();
+        });
+
+        tagLabel.setOnDragOver(event -> {
+            if (event.getGestureSource() != tagLabel && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+
+        tagLabel.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasString() && draggedKeyword != null) {
+                int dropIndex = keywordTagsField.getTags().indexOf(keyword);
+                keywordTagsField.removeTags(draggedKeyword);
+                keywordTagsField.getTags().add(dropIndex, draggedKeyword);
+                event.setDropCompleted(true);
+            } else {
+                event.setDropCompleted(false);
+            }
+            draggedKeyword = null;  // Clear dragged keyword
+            event.consume();
+        });
+
+        tagLabel.setOnDragDone(DragEvent::consume);
+
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
         contextMenu.getItems().addAll(
