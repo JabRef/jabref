@@ -256,12 +256,15 @@ public class GlobalSearchBar extends HBox {
                 LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
                 if (libraryTab != null && enableFulltextSearch) {
                     filePreferences.setFulltextIndexLinkedFiles(true);
+                    searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, true);
                 }
                 if (!enableFulltextSearch) {
                     fulltextButton.setSelected(false);
+                    searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, false);
                 }
+            } else {
+                searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, newVal);
             }
-            searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, newVal);
             updateSearchQuery();
         });
 
