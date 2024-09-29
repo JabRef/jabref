@@ -26,23 +26,15 @@ public class ACS implements FulltextFetcher {
     private static final String SOURCE = "https://pubs.acs.org/doi/abs/%s";
 
     /**
-     * Tries to find a fulltext URL for a given BibTex entry.
-     * <p>
-     * Currently only uses the DOI if found.
-     *
-     * @param entry The Bibtex entry
-     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws NullPointerException if no BibTex entry is given
-     * @throws java.io.IOException
+     * Tries to find a fulltext URL for a given BibTeX entry.
+     * Requires the entry to have a DOI field.
+     * In case no DOI is present, an empty Optional is returned.
      */
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-
-        // DOI search
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
