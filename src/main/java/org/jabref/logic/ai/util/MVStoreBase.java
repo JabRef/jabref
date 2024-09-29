@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.util;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -21,8 +22,7 @@ public abstract class MVStoreBase implements AutoCloseable {
 
         try {
             Files.createDirectories(path.getParent());
-        } catch (
-                Exception e) {
+        } catch (IOException e) {
             LOGGER.error(errorMessageForOpening(), e);
             dialogService.notify(errorMessageForOpeningLocalized());
             mvStorePath = null;
