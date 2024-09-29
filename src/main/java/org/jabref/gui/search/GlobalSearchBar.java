@@ -248,7 +248,6 @@ public class GlobalSearchBar extends HBox {
                 LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
                 if (libraryTab != null && enableFulltextSearch) {
                     filePreferences.setFulltextIndexLinkedFiles(true);
-                    libraryTab.getLuceneManager().rebuildIndex();
                 }
                 if (!enableFulltextSearch) {
                     fulltextButton.setSelected(false);
