@@ -34,7 +34,7 @@ public class ACS implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 

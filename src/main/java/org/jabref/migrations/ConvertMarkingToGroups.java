@@ -49,7 +49,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
                 markingGroup.addEntriesToGroup(markingMatchedEntries);
             }
 
-            if (!parserResult.getMetaData().getGroups().isPresent()) {
+            if (parserResult.getMetaData().getGroups().isEmpty()) {
                 parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
@@ -68,7 +68,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
 
         for (BibEntry entry : entries) {
             Optional<String> marking = entry.getField(InternalField.MARKED_INTERNAL);
-            if (!marking.isPresent()) {
+            if (marking.isEmpty()) {
                 continue;
             }
 

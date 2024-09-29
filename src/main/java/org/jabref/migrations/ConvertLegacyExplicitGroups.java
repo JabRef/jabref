@@ -18,7 +18,7 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
     @Override
     public void performMigration(ParserResult parserResult) {
         Objects.requireNonNull(parserResult);
-        if (!parserResult.getMetaData().getGroups().isPresent()) {
+        if (parserResult.getMetaData().getGroups().isEmpty()) {
             return;
         }
 
