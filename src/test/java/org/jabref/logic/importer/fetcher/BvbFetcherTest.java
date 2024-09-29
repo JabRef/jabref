@@ -80,7 +80,7 @@ class BvbFetcherTest {
     @Test
     void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertEquals(List.of(bibEntryISBN9783960886402, bibEntryISBN0134685997), searchResult.subList(0, 1));
+        assertEquals(List.of(bibEntryISBN9783960886402, bibEntryISBN0134685997), searchResult.subList(0, 2));
     }
 
     @Test

@@ -23,6 +23,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
@@ -381,17 +382,7 @@ public class MarcXmlParser implements Parser {
 
         if ("e".equals(ind1) && StringUtil.isNotBlank("u") && StringUtil.isNotBlank(resource)) { // DOI
             String fulltext = getSubfield("3", datafield);
-
-            if ("Volltext".equals(fulltext)) {
-                try {
-                    LinkedFile linkedFile = new LinkedFile(URI.create(resource).toURL(), "PDF");
-                    bibEntry.setField(StandardField.FILE, linkedFile.toString());
-                } catch (MalformedURLException e) {
-                    LOGGER.info("Malformed URL: {}", resource);
-                }
-            } else {
-                bibEntry.setField(StandardField.DOI, resource);
-            }
+            handleVolltext(bibEntry, fulltext, resource, StandardField.DOI);
         }
     }
 
@@ -403,17 +394,20 @@ public class MarcXmlParser implements Parser {
         if ("4".equals(ind1) && "0".equals(ind2)) {
             String fulltext = getSubfield("3", datafield);
             String resource = getSubfield("u", datafield);
+            handleVolltext(bibEntry, fulltext, resource, StandardField.URL);
+        }
+    }
 
-            if ("Volltext".equals(fulltext) && StringUtil.isNotBlank(resource)) {
-                try {
-                    LinkedFile linkedFile = new LinkedFile("", URI.create(resource).toURL(), StandardFileType.PDF.getName());
-                    bibEntry.setFiles(List.of(linkedFile));
-                } catch (MalformedURLException | IllegalArgumentException e) {
-                    LOGGER.info("Malformed URL: {}", resource);
-                }
-            } else {
-                bibEntry.setField(StandardField.URL, resource);
+    private static void handleVolltext(BibEntry bibEntry, String fieldName, String resource, Field fallBackField) {
+        if ("Volltext".equals(fieldName) && StringUtil.isNotBlank(resource)) {
+            try {
+                LinkedFile linkedFile = new LinkedFile("", URI.create(resource).toURL(), StandardFileType.PDF.getName());
+                bibEntry.setFiles(List.of(linkedFile));
+            } catch (MalformedURLException | IllegalArgumentException e) {
+                LOGGER.info("Malformed URL: {}", resource);
             }
+        } else {
+            bibEntry.setField(fallBackField, resource);
         }
     }
 
