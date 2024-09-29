@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -405,8 +406,8 @@ public class MarcXmlParser implements Parser {
 
             if ("Volltext".equals(fulltext) && StringUtil.isNotBlank(resource)) {
                 try {
-                    LinkedFile linkedFile = new LinkedFile(URI.create(resource).toURL(), "PDF");
-                    bibEntry.setField(StandardField.FILE, linkedFile.toString());
+                    LinkedFile linkedFile = new LinkedFile("", URI.create(resource).toURL(), StandardFileType.PDF.getName());
+                    bibEntry.setFiles(List.of(linkedFile));
                 } catch (MalformedURLException | IllegalArgumentException e) {
                     LOGGER.info("Malformed URL: {}", resource);
                 }

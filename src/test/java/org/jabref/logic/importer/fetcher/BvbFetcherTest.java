@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
@@ -29,7 +31,7 @@ class BvbFetcherTest {
             .withField(StandardField.AUTHOR, "Bloch, Joshua")
             .withField(StandardField.TITLEADDON, "Joshua Bloch")
             .withField(StandardField.EDITION, "3. Auflage, Übersetzung der englischsprachigen 3. Originalausgabe 2018")
-            .withField(StandardField.FILE, "ParsedFileField{description='', link='http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353', fileType='PDF'}")
+            .withFiles(List.of(new LinkedFile("", "http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353", StandardFileType.PDF)))
             .withField(StandardField.ISBN, "9783960886402")
             .withField(StandardField.KEYWORDS, "Klassen, Interfaces, Generics, Enums, Annotationen, Lambdas, Streams, Module, parallel, Parallele Programmierung, Serialisierung, funktional, funktionale Programmierung, Java EE, Jakarta EE")
             .withField(StandardField.ADDRESS, "Heidelberg")
@@ -78,8 +80,7 @@ class BvbFetcherTest {
     @Test
     void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertEquals(bibEntryISBN9783960886402, searchResult.getFirst());
-        assertEquals(bibEntryISBN0134685997, searchResult.get(1));
+        assertEquals(List.of(bibEntryISBN9783960886402, bibEntryISBN0134685997), searchResult.subList(0, 1));
     }
 
     @Test

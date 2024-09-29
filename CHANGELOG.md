@@ -74,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
 - We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
 - We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
+- We fixed an issue with the link to the full text at the BVB fetcher. [#11852](https://github.com/JabRef/jabref/pull/11852)
 - We fixed an issue where two contradicting notifications were shown when cutting an entry in the main table. [#11724](https://github.com/JabRef/jabref/pull/11724)
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
 - We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
