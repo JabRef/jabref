@@ -238,7 +238,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void initSearchModifierButtons() {
-        fulltextButton.setSelected(searchPreferences.isFulltext());
+        fulltextButton.setSelected(searchPreferences.isFulltext() && filePreferences.shouldFulltextIndexLinkedFiles());
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
         fulltextButton.selectedProperty().addListener((obs, oldVal, newVal) -> {
