@@ -69,7 +69,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             html = getHTML(entry);
         } catch (FetcherException | NullPointerException e) {
-            LOGGER.debug("ResearchGate server is not available");
+            LOGGER.debug("ResearchGate server is not available", e);
             return Optional.empty();
         }
         Elements eLink = html.getElementsByTag("section");
