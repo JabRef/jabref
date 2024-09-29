@@ -238,9 +238,17 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void initSearchModifierButtons() {
-        fulltextButton.setSelected(searchPreferences.isFulltext() && filePreferences.shouldFulltextIndexLinkedFiles());
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
+
+        EasyBind.subscribe(filePreferences.fulltextIndexLinkedFilesProperty(), (enabled) -> {
+            if (!enabled) {
+                fulltextButton.setSelected(false);
+            } else if (searchPreferences.isFulltext()) {
+                fulltextButton.setSelected(true);
+            }
+        });
+
         fulltextButton.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (!filePreferences.shouldFulltextIndexLinkedFiles() && newVal) {
                 boolean enableFulltextSearch = dialogService.showConfirmationDialogAndWait(Localization.lang("Fulltext search"), Localization.lang("Fulltext search requires the setting 'Automatically index all linked files for fulltext search' to be enabled. Do you want to enable indexing now?"), Localization.lang("Enable indexing"), Localization.lang("Keep disabled"));
