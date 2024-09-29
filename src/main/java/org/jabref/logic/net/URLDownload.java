@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_RETRIES = 3;
@@ -384,7 +384,7 @@ public class URLDownload {
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("{}", httpResponse);
+                LOGGER.info("{}: {}", this.source, httpResponse);
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
                 } else {
