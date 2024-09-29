@@ -230,6 +230,16 @@ class LayoutEntry {
         }
     }
 
+    private String resolveFieldEntry(BibEntry bibtex, BibDatabase database) {
+        if (text.startsWith("\\")) {
+            return bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database).orElse("");
+        }
+        if (database == null) {
+            return text;
+        }
+        return database.resolveForStrings(text);
+    }
+
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
@@ -241,9 +251,7 @@ class LayoutEntry {
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            fieldEntry = text.startsWith("\\") ? bibtex
-                    .getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database)
-                    .orElse("") : database.resolveForStrings(text);
+            fieldEntry = resolveFieldEntry(bibtex, database);
             // changed section end - arudert
         }
 
@@ -360,7 +368,10 @@ class LayoutEntry {
                 throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
 
             case LayoutHelper.IS_OPTION_FIELD:
-                String field = databaseContext.getDatabase().resolveForStrings(text);
+                String field = Optional.ofNullable(databaseContext)
+                                       .map(BibDatabaseContext::getDatabase)
+                                       .map(db -> db.resolveForStrings(text))
+                                       .orElse(text);
                 if (option != null) {
                     for (LayoutFormatter anOption : option) {
                         field = anOption.format(field);
