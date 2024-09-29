@@ -89,6 +89,10 @@ public class FetcherException extends JabRefException {
         return API_KEY_PATTERN.matcher(url).replaceAll(REDACTED_STRING);
     }
 
+    public static Object getRedactedUrl(URL source) {
+        return API_KEY_PATTERN.matcher(source.toString()).replaceAll(REDACTED_STRING);
+    }
+
     private String getPrefix() {
         String superLocalizedMessage = super.getLocalizedMessage();
         if (!StringUtil.isBlank(superLocalizedMessage)) {
