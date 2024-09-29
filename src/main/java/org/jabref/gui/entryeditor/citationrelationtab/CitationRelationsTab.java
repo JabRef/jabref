@@ -1,10 +1,10 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
@@ -40,15 +40,18 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFe
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.RedoAction;
-import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -269,10 +272,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                     }
 
                     Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
-                    showEntrySource.setTooltip(new Tooltip(Localization.lang("Show %0 source", databaseContext.getMode().getFormattedName())));
+                    showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", databaseContext.getMode().getFormattedName())));
                     showEntrySource.setOnMouseClicked(event -> {
-                        this.entryEditor = createEntryEditor();
-                        showEntrySourceDialog(this.entryEditor.getEntrySource(entry.entry()));
+                        showEntrySourceDialog(entry.entry());
                     });
 
                     vContainer.getChildren().addLast(showEntrySource);
@@ -293,35 +295,38 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setSelectionModel(new NoSelectionModel<>());
     }
 
-    private EntryEditor createEntryEditor() {
-        Supplier<LibraryTab> tabSupplier = () -> this.libraryTab;
-        return new EntryEditor(this.libraryTab,
-                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(tabSupplier, dialogService, stateManager),
-                new RedoAction(tabSupplier, dialogService, stateManager));
+    private String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(this.preferences.getFieldPreferences());
+        new BibEntryWriter(fieldWriter, new BibEntryTypesManager()).write(entry, bibWriter, type);
+        return writer.toString();
     }
 
-    private void showEntrySourceDialog(CodeArea codeArea) {
-        if (codeArea == null) {
-            dialogService.showWarningDialogAndWait(Localization.lang("BibTeX source", databaseContext.getMode().getFormattedName()), Localization.lang("Could not load %0 source", databaseContext.getMode().getFormattedName()));
-        } else {
-            String title = Localization.lang("BibTeX of that entry");
-
-            codeArea.setWrapText(true);
-            codeArea.setPadding(new Insets(0, 10, 0, 10));
-            codeArea.showParagraphAtTop(0);
-
-            ScrollPane scrollPane = new ScrollPane();
-            scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true);
-            scrollPane.setContent(new VirtualizedScrollPane<>(codeArea));
-
-            DialogPane dialogPane = new DialogPane();
-            dialogPane.setPrefSize(800, 400);
-            dialogPane.setContent(scrollPane);
-
-            dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
+    private void showEntrySourceDialog(BibEntry entry) {
+        CodeArea ca = new CodeArea();
+        try {
+            ca.appendText(getSourceString(entry, databaseContext.getMode()));
+        } catch (IOException e) {
+            LOGGER.warn("Incorrect entry, could not load source:", e);
+            return;
         }
+
+        ca.setWrapText(true);
+        ca.setPadding(new Insets(0, 10, 0, 10));
+        ca.showParagraphAtTop(0);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setContent(new VirtualizedScrollPane<>(ca));
+
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setPrefSize(800, 400);
+        dialogPane.setContent(scrollPane);
+        String title = Localization.lang("%0 source", "Show BibTeX");
+
+        dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
     }
 
     /**

@@ -347,16 +347,4 @@ public class SourceTab extends EntryEditorTab {
             }
         });
     }
-
-    public CodeArea getEntryCodeArea(BibEntry entry) {
-        CodeArea ca = new CodeArea();
-        try {
-            ca.appendText(getSourceString(entry, mode, fieldPreferences));
-        } catch (
-                IOException ex) {
-            ca = null;
-            LOGGER.debug("Incorrect entry", ex);
-        }
-        return ca;
-    }
 }
