@@ -407,7 +407,7 @@ public class MarcXmlParser implements Parser {
                 try {
                     LinkedFile linkedFile = new LinkedFile(URI.create(resource).toURL(), "PDF");
                     bibEntry.setField(StandardField.FILE, linkedFile.toString());
-                } catch (MalformedURLException e) {
+                } catch (MalformedURLException | IllegalArgumentException e) {
                     LOGGER.info("Malformed URL: {}", resource);
                 }
             } else {
