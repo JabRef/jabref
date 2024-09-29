@@ -97,7 +97,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 LibraryTab libraryTab,
-                                TaskExecutor taskExecutor) {
+                                TaskExecutor taskExecutor,
+                                BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
@@ -106,7 +107,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
-        this.entryTypesManager = new BibEntryTypesManager();
+        this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferences.getImporterPreferences()),
                 new BibEntryRelationsCache());
