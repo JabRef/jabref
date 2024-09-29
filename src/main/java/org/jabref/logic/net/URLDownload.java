@@ -24,6 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +36,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
@@ -72,6 +76,7 @@ public class URLDownload {
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    private SSLContext sslContext;
 
     static {
         Unirest.config()
@@ -94,6 +99,14 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
+
+        try {
+            sslContext = SSLContext.getInstance("TLSv1.2");
+            sslContext.init(null, null, new SecureRandom());
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            LOGGER.error("Could not initialize SSL context", e);
+            sslContext = null;
+        }
     }
 
     public URL getSource() {
@@ -386,6 +399,11 @@ public class URLDownload {
         if (connection instanceof HttpURLConnection httpConnection) {
             httpConnection.setInstanceFollowRedirects(true);
         }
+
+        if ((sslContext != null) && (connection instanceof HttpsURLConnection httpsConnection)) {
+            httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+        }
+
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
