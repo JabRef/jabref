@@ -69,6 +69,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -473,5 +474,9 @@ public class EntryEditor extends BorderPane {
 
     public void previousPreviewStyle() {
         this.previewTabs.forEach(OffersPreview::previousPreviewStyle);
+    }
+
+    public CodeArea getEntrySource(BibEntry entry) {
+        return sourceTab.getEntryCodeArea(entry);
     }
 }

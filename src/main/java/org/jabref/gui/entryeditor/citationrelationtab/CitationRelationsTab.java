@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
@@ -12,11 +13,15 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -29,11 +34,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.database.DuplicateCheck;
@@ -51,6 +59,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +84,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
+    private EntryEditor entryEditor;
+
+    private StateManager stateManager;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -87,6 +100,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.libraryTab = libraryTab;
+        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -254,6 +268,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
+                    Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
+                    showEntrySource.setTooltip(new Tooltip(Localization.lang("Show %0 source", databaseContext.getMode().getFormattedName())));
+                    showEntrySource.setOnMouseClicked(event -> {
+                        this.entryEditor = createEntryEditor();
+                        showEntrySourceDialog(this.entryEditor.getEntrySource(entry.entry()));
+                    });
+
+                    vContainer.getChildren().addLast(showEntrySource);
+
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
@@ -268,6 +291,37 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private EntryEditor createEntryEditor() {
+        Supplier<LibraryTab> tabSupplier = () -> this.libraryTab;
+        return new EntryEditor(this.libraryTab,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(tabSupplier, dialogService, stateManager),
+                new RedoAction(tabSupplier, dialogService, stateManager));
+    }
+
+    private void showEntrySourceDialog(CodeArea codeArea) {
+        if (codeArea == null) {
+            dialogService.showWarningDialogAndWait(Localization.lang("BibTeX source", databaseContext.getMode().getFormattedName()), Localization.lang("Could not load %0 source", databaseContext.getMode().getFormattedName()));
+        } else {
+            String title = Localization.lang("BibTeX of that entry");
+
+            codeArea.setWrapText(true);
+            codeArea.setPadding(new Insets(0, 10, 0, 10));
+            codeArea.showParagraphAtTop(0);
+
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+            scrollPane.setContent(new VirtualizedScrollPane<>(codeArea));
+
+            DialogPane dialogPane = new DialogPane();
+            dialogPane.setPrefSize(800, 400);
+            dialogPane.setContent(scrollPane);
+
+            dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
+        }
     }
 
     /**
