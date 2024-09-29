@@ -189,7 +189,7 @@ public class Launcher {
                         LOGGER.warn("Could not communicate with other running JabRef instance.");
                     }
                 }
-                // We do not launch a new instance in presence of an error
+                // We do not launch a new instance in presence if there is another instance running
                 return false;
             } else {
                 LOGGER.debug("Could not ping JabRef instance.");
