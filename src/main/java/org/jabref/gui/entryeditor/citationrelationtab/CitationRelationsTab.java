@@ -33,8 +33,8 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
@@ -43,6 +43,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
@@ -87,9 +88,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
-    private EntryEditor entryEditor;
-
-    private StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -103,12 +102,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.libraryTab = libraryTab;
-        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
-        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        this.entryTypesManager = new BibEntryTypesManager();
+        this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferences.getImporterPreferences()),
                 new BibEntryRelationsCache());
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
@@ -272,7 +271,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     }
 
                     Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
-                    showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", databaseContext.getMode().getFormattedName())));
+                    showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(event -> {
                         showEntrySourceDialog(entry.entry());
                     });
@@ -295,18 +294,21 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setSelectionModel(new NoSelectionModel<>());
     }
 
-    private String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+    /**
+     * @implNote This code is similar to {@link PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)}.
+     */
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(this.preferences.getFieldPreferences());
-        new BibEntryWriter(fieldWriter, new BibEntryTypesManager()).write(entry, bibWriter, type);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
 
     private void showEntrySourceDialog(BibEntry entry) {
         CodeArea ca = new CodeArea();
         try {
-            ca.appendText(getSourceString(entry, databaseContext.getMode()));
+            ca.appendText(getSourceString(entry, databaseContext.getMode(), preferences.getFieldPreferences(), this.entryTypesManager));
         } catch (IOException e) {
             LOGGER.warn("Incorrect entry, could not load source:", e);
             return;
@@ -324,7 +326,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         DialogPane dialogPane = new DialogPane();
         dialogPane.setPrefSize(800, 400);
         dialogPane.setContent(scrollPane);
-        String title = Localization.lang("%0 source", "Show BibTeX");
+        String title = Localization.lang("Show BibTeX source");
 
         dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
     }
