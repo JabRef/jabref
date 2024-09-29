@@ -103,6 +103,7 @@ public class URLDownload {
         try {
             sslContext = SSLContext.getInstance("TLSv1.2");
             sslContext.init(null, null, new SecureRandom());
+            // Note: SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             LOGGER.error("Could not initialize SSL context", e);
             sslContext = null;

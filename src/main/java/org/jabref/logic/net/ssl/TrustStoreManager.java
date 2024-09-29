@@ -27,6 +27,9 @@ import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @implNote SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+ */
 public class TrustStoreManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);
@@ -163,7 +166,9 @@ public class TrustStoreManager {
         }
     }
 
-    // based on https://stackoverflow.com/a/62586564/3450689
+    /**
+     * @implNote based on https://stackoverflow.com/a/62586564/3450689
+     */
     private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
         CertificateException, IOException {
         X509TrustManager jreTrustManager = getJreTrustManager();
