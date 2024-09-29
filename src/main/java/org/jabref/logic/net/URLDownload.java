@@ -32,9 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
@@ -96,19 +94,6 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
-    }
-
-    /**
-     * @param socketFactory trust manager
-     * @param verifier      host verifier
-     */
-    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
-        try {
-            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
-            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
-        } catch (Exception e) {
-            LOGGER.error("A problem occurred when reset SSL verification", e);
-        }
     }
 
     public URL getSource() {
