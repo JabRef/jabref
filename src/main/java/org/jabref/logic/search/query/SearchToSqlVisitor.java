@@ -7,12 +7,16 @@ import java.util.Optional;
 
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.PostgreConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
+import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
+import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
 
 /**
  * Converts to a query processable by the scheme created by {@link org.jabref.logic.search.indexing.PostgreIndexer}.
@@ -52,7 +56,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             sql.setLength(sql.length() - 2);
         }
 
-        sql.append("SELECT * FROM ").append(query).append(" GROUP BY ").append(PostgreConstants.ENTRY_ID);
+        sql.append("SELECT * FROM ").append(query).append(" GROUP BY ").append(ENTRY_ID);
         LOGGER.trace("Converted search query to SQL: {}", sql);
         return sql.toString();
     }
@@ -62,18 +66,20 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         String subQuery = visit(ctx.expression());
         String cte = """
                 cte%d AS (
-                 SELECT %s
-                 FROM %s
-                 EXCEPT
-                 SELECT %s
-                 FROM "%s"
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE %s.%s NOT IN (
+                    SELECT %s
+                    FROM %s
+                 )
                 )
                 """.formatted(
                 cteCounter,
-                PostgreConstants.ENTRY_ID,
-                subQuery,
-                PostgreConstants.ENTRY_ID,
-                mainTableName);
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, ENTRY_ID,
+                ENTRY_ID,
+                subQuery);
         ctes.add(cte);
         return "cte" + cteCounter++;
     }
@@ -94,10 +100,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 )
                 """.formatted(
                 cteCounter,
-                PostgreConstants.ENTRY_ID,
+                ENTRY_ID,
                 left,
                 operator,
-                PostgreConstants.ENTRY_ID,
+                ENTRY_ID,
                 right);
         ctes.add(cte);
         return "cte" + cteCounter++;
@@ -208,14 +214,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 )
                 """.formatted(
                 cteCounter,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
-                MAIN_TABLE, PostgreConstants.FIELD_NAME,
+                MAIN_TABLE, FIELD_NAME,
                 field,
-                MAIN_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                MAIN_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
-                MAIN_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
     }
@@ -233,17 +239,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 )
                 """.formatted(
                 cteCounter,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                INNER_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
                 mainTableName, INNER_TABLE,
-                INNER_TABLE, PostgreConstants.FIELD_NAME,
+                INNER_TABLE, FIELD_NAME,
                 field,
-                INNER_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                INNER_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
-                INNER_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
     }
@@ -257,12 +263,12 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 )
                 """.formatted(
                 cteCounter,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
-                MAIN_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                MAIN_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
-                MAIN_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
     }
@@ -280,15 +286,15 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 )
                 """.formatted(
                 cteCounter,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
-                MAIN_TABLE, PostgreConstants.ENTRY_ID,
-                INNER_TABLE, PostgreConstants.ENTRY_ID,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
                 mainTableName, INNER_TABLE,
-                INNER_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                INNER_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
-                INNER_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
     }
