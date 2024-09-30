@@ -17,6 +17,7 @@ import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+import static org.jabref.model.search.PostgreConstants.TABLE_NAME_SUFFIX;
 
 /**
  * Converts to a query processable by the scheme created by {@link org.jabref.logic.search.indexing.PostgreIndexer}.
@@ -27,14 +28,18 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
     private static final String MAIN_TABLE = "main_table";
+    private static final String SPLIT_TABLE = "split_table";
     private static final String INNER_TABLE = "inner_table";
 
     private final String mainTableName;
+    private final String splitValuesTableName;
+
     private final List<String> ctes = new ArrayList<>();
     private int cteCounter = 0;
 
     public SearchToSqlVisitor(String mainTableName) {
         this.mainTableName = mainTableName;
+        this.splitValuesTableName = mainTableName + TABLE_NAME_SUFFIX;
     }
 
     private enum SearchTermFlag {
@@ -190,22 +195,30 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         };
 
         if ("anyfield".equals(field) || "any".equals(field)) {
-            if (!searchFlags.contains(SearchTermFlag.NEGATION)) {
-                cte = buildAllFieldsQuery(operator, prefixSuffix, term);
+            if (searchFlags.contains(SearchTermFlag.EXACT_MATCH)) {
+                cte = searchFlags.contains(SearchTermFlag.NEGATION)
+                        ? buildExactNegationAnyFieldQuery(operator, term)
+                        : buildExactAnyFieldQuery(operator, term);
             } else {
-                cte = buildNegationAllFieldsQuery(operator, prefixSuffix, term);
+                cte = searchFlags.contains(SearchTermFlag.NEGATION)
+                        ? buildContainsNegationAnyFieldQuery(operator, prefixSuffix, term)
+                        : buildContainsAnyFieldQuery(operator, prefixSuffix, term);
             }
         } else {
-            if (!searchFlags.contains(SearchTermFlag.NEGATION)) {
-                cte = buildFieldQuery(field, operator, prefixSuffix, term);
+            if (searchFlags.contains(SearchTermFlag.EXACT_MATCH)) {
+                cte = searchFlags.contains(SearchTermFlag.NEGATION)
+                        ? buildExactNegationFieldQuery(field, operator, term)
+                        : buildExactFieldQuery(field, operator, term);
             } else {
-                cte = buildNegationFieldQuery(field, operator, prefixSuffix, term);
+                cte = searchFlags.contains(SearchTermFlag.NEGATION)
+                        ? buildContainsNegationFieldQuery(field, operator, prefixSuffix, term)
+                        : buildContainsFieldQuery(field, operator, prefixSuffix, term);
             }
         }
         return cte;
     }
 
-    private String buildFieldQuery(String field, String operator, String prefixSuffix, String term) {
+    private String buildContainsFieldQuery(String field, String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
                  SELECT %s.%s
@@ -226,7 +239,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 prefixSuffix, term, prefixSuffix);
     }
 
-    private String buildNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
+    private String buildContainsNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
                  SELECT %s.%s
@@ -254,7 +267,70 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 prefixSuffix, term, prefixSuffix);
     }
 
-    private String buildAllFieldsQuery(String operator, String prefixSuffix, String term) {
+    private String buildExactFieldQuery(String field, String operator, String term) {
+        return """
+                cte%d AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 LEFT JOIN "%s" AS %s
+                 ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                 WHERE (
+                    (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                    OR
+                    (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                 )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                MAIN_TABLE, FIELD_NAME, field,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                SPLIT_TABLE, FIELD_NAME, field,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+    }
+
+    private String buildExactNegationFieldQuery(String field, String operator, String term) {
+        return """
+                cte%d AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE %s.%s NOT IN (
+                    SELECT %s.%s
+                    FROM "%s" AS %s
+                    LEFT JOIN "%s" AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (
+                      (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                      OR
+                      (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                    )
+                 )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                INNER_TABLE, FIELD_NAME, field,
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                SPLIT_TABLE, FIELD_NAME, field,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+    }
+
+    private String buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
                  SELECT %s.%s
@@ -273,7 +349,66 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 prefixSuffix, term, prefixSuffix);
     }
 
-    private String buildNegationAllFieldsQuery(String operator, String prefixSuffix, String term) {
+    private String buildExactAnyFieldQuery(String operator, String term) {
+        return """
+                cte%d AS (
+                  SELECT %s.%s
+                  FROM "%s" AS %s
+                  LEFT JOIN "%s" AS %s
+                  ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                  WHERE (
+                    (%s.%s %s '%s') OR (%s.%s %s '%s')
+                    OR
+                    (%s.%s %s '%s') OR (%s.%s %s '%s')
+                  )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+    }
+
+    private String buildExactNegationAnyFieldQuery(String operator, String term) {
+        return """
+                cte%d AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE %s.%s NOT IN (
+                    SELECT %s.%s
+                    FROM "%s" AS %s
+                    LEFT JOIN "%s" AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (
+                      (%s.%s %s '%s') OR (%s.%s %s '%s')
+                      OR
+                      (%s.%s %s '%s') OR (%s.%s %s '%s')
+                    )
+                 )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+    }
+
+    private String buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
                  SELECT %s.%s
