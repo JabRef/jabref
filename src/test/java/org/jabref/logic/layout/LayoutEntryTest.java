@@ -2,17 +2,23 @@ package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -94,5 +100,35 @@ public class LayoutEntryTest {
         assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).getFirst());
         assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst()).get(1));
         assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1));
+    }
+
+    private void assertUnsupportedOperation(int type, List<StringInt> parsedEntries, BibDatabaseContext context) {
+        LayoutEntry layoutEntry = new LayoutEntry(parsedEntries, type, null, null, null);
+        assertThrows(UnsupportedOperationException.class, () -> layoutEntry.doLayout(context, StandardCharsets.UTF_8));
+    }
+
+    private void assertLayoutResult(int type, String expected, List<StringInt> parsedEntries, BibDatabaseContext context) {
+        LayoutEntry layoutEntry = new LayoutEntry(parsedEntries, type, null, null, null);
+        assertEquals(expected, layoutEntry.doLayout(context, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void doLayoutTest() {
+        List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
+                new StringInt("testString", 0));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), null);
+
+        List<Integer> unsupportedOperationTypes = List.of(2, 3, 4, 6, 7);
+        unsupportedOperationTypes.forEach(type -> assertUnsupportedOperation(type, parsedEntries, bibDatabaseContext));
+
+        // test IS_LAYOUT_TEXT
+        assertLayoutResult(1, "testString", parsedEntries, bibDatabaseContext);
+        // test IS_OPTION_FIELD with empty dataBase in BibDatabaseContext
+        assertLayoutResult(5, "testString", parsedEntries, bibDatabaseContext);
+        // test IS_ENCODING_NAME
+        assertLayoutResult(8, StandardCharsets.UTF_8.toString(), parsedEntries, bibDatabaseContext);
+        // test IS_FILENAME and IS_FILEPATH with empty path
+        assertLayoutResult(9, "", parsedEntries, bibDatabaseContext);
+        assertLayoutResult(10, "", parsedEntries, bibDatabaseContext);
     }
 }
