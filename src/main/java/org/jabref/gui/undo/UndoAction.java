@@ -1,8 +1,12 @@
 package org.jabref.gui.undo;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.undo.CannotUndoException;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -21,10 +25,15 @@ public class UndoAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
-        stateManager.activeTabProperty().addListener((observable, oldValue, activeLibraryTab) -> {
+        ChangeListener<Optional<LibraryTab>> listener = (observable, oldValue, activeLibraryTab) -> {
             activeLibraryTab.ifPresent(libraryTab ->
-                    this.executable.bind(libraryTab.getUndoManager().getUndoableProperty()));
-        });
+                    this.executable.bind(libraryTab.getUndoManager().getRedoableProperty()));
+
+            oldValue.ifPresent(libraryTab -> this.executable.unbind());
+        };
+
+        WeakChangeListener<Optional<LibraryTab>> weakListener = new WeakChangeListener<>(listener);
+        stateManager.activeTabProperty().addListener(weakListener);
     }
 
     @Override
