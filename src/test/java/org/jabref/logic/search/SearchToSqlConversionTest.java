@@ -16,6 +16,7 @@ class SearchToSqlConversionTest {
             "(), author=computer AND editor=science OR title=math",
             "(), (author=computer AND editor=science) OR title=math",
             "(), author=computer AND (editor=science OR title=math)",
+            "(), (title = computer OR comment = science) AND (title = math OR comment = physics)",
             "(), (author=computer AND editor=science) OR (title=math AND year=2021)",
             // case insensitive contains
             "((main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE '%compute%') OR (main_table.field_value_transformed ILIKE '%compute%'))), title=compute",

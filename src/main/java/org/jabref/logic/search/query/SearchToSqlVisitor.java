@@ -23,6 +23,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
     private static final String MAIN_TABLE = "main_table";
+    private static final String INNER_TABLE = "inner_table";
 
     private final String mainTableName;
     private final List<String> ctes = new ArrayList<>();
@@ -44,9 +45,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         String query = visit(ctx.expression());
 
         StringBuilder sql = new StringBuilder("WITH\n");
-        for (String cte : ctes) {
-            sql.append(cte).append(",\n");
-        }
+        ctes.forEach(cte -> sql.append(cte).append(",\n"));
 
         // Remove the last comma and newline
         if (!ctes.isEmpty()) {
@@ -172,17 +171,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return "cte" + cteCounter++;
     }
 
-    private void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
-        flags.add(matchType);
-
-        flags.add(caseSensitive ? SearchTermFlag.CASE_SENSITIVE : SearchTermFlag.CASE_INSENSITIVE);
-        if (negation) {
-            flags.add(SearchTermFlag.NEGATION);
-        }
-    }
-
     private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
-        StringBuilder whereClause = new StringBuilder();
+        String cte;
         String operator = getOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(SearchTermFlag.INEXACT_MATCH) ? "%" : "";
 
@@ -194,18 +184,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         };
 
         if ("anyfield".equals(field) || "any".equals(field)) {
-            whereClause.append(buildAllFieldsQuery(operator, prefixSuffix, term));
+            if (!searchFlags.contains(SearchTermFlag.NEGATION)) {
+                cte = buildAllFieldsQuery(operator, prefixSuffix, term);
+            } else {
+                cte = buildNegationAllFieldsQuery(operator, prefixSuffix, term);
+            }
         } else {
-            whereClause.append(buildFieldQuery(field, operator, prefixSuffix, term));
+            if (!searchFlags.contains(SearchTermFlag.NEGATION)) {
+                cte = buildFieldQuery(field, operator, prefixSuffix, term);
+            } else {
+                cte = buildNegationFieldQuery(field, operator, prefixSuffix, term);
+            }
         }
-
-        return whereClause.toString();
-    }
-
-    private static String getOperator(EnumSet<SearchTermFlag> searchFlags) {
-        return searchFlags.contains(SearchTermFlag.REGULAR_EXPRESSION)
-                ? (searchFlags.contains(SearchTermFlag.NEGATION) ? "!" : "") + (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "~" : "~*")
-                : (searchFlags.contains(SearchTermFlag.NEGATION) ? "NOT " : "") + (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "LIKE" : "ILIKE");
+        return cte;
     }
 
     private String buildFieldQuery(String field, String operator, String prefixSuffix, String term) {
@@ -229,6 +220,34 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 prefixSuffix, term, prefixSuffix);
     }
 
+    private String buildNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
+        return """
+                cte%d AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE %s.%s NOT IN (
+                    SELECT %s.%s
+                    FROM "%s" AS %s
+                    WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                INNER_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                INNER_TABLE, PostgreConstants.FIELD_NAME,
+                field,
+                INNER_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                operator,
+                prefixSuffix, term, prefixSuffix,
+                INNER_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                operator,
+                prefixSuffix, term, prefixSuffix);
+    }
+
     private String buildAllFieldsQuery(String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
@@ -246,5 +265,46 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
                 operator,
                 prefixSuffix, term, prefixSuffix);
+    }
+
+    private String buildNegationAllFieldsQuery(String operator, String prefixSuffix, String term) {
+        return """
+                cte%d AS (
+                 SELECT %s.%s
+                 FROM "%s" AS %s
+                 WHERE %s.%s NOT IN (
+                    SELECT %s.%s
+                    FROM "%s" AS %s
+                    WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, PostgreConstants.ENTRY_ID,
+                INNER_TABLE, PostgreConstants.ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                INNER_TABLE, PostgreConstants.FIELD_VALUE_LITERAL,
+                operator,
+                prefixSuffix, term, prefixSuffix,
+                INNER_TABLE, PostgreConstants.FIELD_VALUE_TRANSFORMED,
+                operator,
+                prefixSuffix, term, prefixSuffix);
+    }
+
+    private static void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
+        flags.add(matchType);
+
+        flags.add(caseSensitive ? SearchTermFlag.CASE_SENSITIVE : SearchTermFlag.CASE_INSENSITIVE);
+        if (negation) {
+            flags.add(SearchTermFlag.NEGATION);
+        }
+    }
+
+    private static String getOperator(EnumSet<SearchTermFlag> searchFlags) {
+        return searchFlags.contains(SearchTermFlag.REGULAR_EXPRESSION)
+                ? (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "~" : "~*")
+                : (searchFlags.contains(SearchTermFlag.CASE_SENSITIVE) ? "LIKE" : "ILIKE");
     }
 }
