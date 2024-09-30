@@ -14,10 +14,8 @@ import org.slf4j.LoggerFactory;
 
 public class FetcherException extends JabRefException {
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherException.class);
-
-    Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api|key|api[-_]?key)=[^&]*");
-
-    String REDACTED_STRING = "[REDACTED]";
+    private static final Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api|key|api[-_]?key)=[^&]*");
+    private static String REDACTED_STRING = "[REDACTED]";
 
     private final String url;
     private final SimpleHttpResponse httpResponse;
@@ -89,6 +87,10 @@ public class FetcherException extends JabRefException {
 
     private String getRedactedUrl() {
         return API_KEY_PATTERN.matcher(url).replaceAll(REDACTED_STRING);
+    }
+
+    public static Object getRedactedUrl(URL source) {
+        return API_KEY_PATTERN.matcher(source.toString()).replaceAll(REDACTED_STRING);
     }
 
     private String getPrefix() {
