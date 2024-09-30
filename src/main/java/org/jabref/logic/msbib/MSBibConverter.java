@@ -67,7 +67,7 @@ public class MSBibConverter {
         result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
         result.month = entry.getMonth().map(Month::getFullName).orElse(null);
 
-        if (!entry.getFieldLatexFree(StandardField.YEAR).isPresent()) {
+        if (entry.getFieldLatexFree(StandardField.YEAR).isEmpty()) {
             result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
         }
         result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);

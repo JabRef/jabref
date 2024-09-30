@@ -54,7 +54,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
-        if (!title.isPresent()) {
+        if (title.isEmpty()) {
             // without a title there is no reason to ask MrDLib
             return List.of();
         }

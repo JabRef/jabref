@@ -68,7 +68,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new));
+            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> entry.getField(field).isPresent()).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
             // Entry type unknown -> treat all fields as required (thus no optional fields)
             return new LinkedHashSet<>();

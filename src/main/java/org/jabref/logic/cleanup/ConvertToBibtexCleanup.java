@@ -40,7 +40,7 @@ public class ConvertToBibtexCleanup implements CleanupJob {
             Field oldField = alias.getValue();
             Field newField = alias.getKey();
             entry.getField(oldField).ifPresent(oldValue -> {
-                if (!oldValue.isEmpty() && (!entry.getField(newField).isPresent())) {
+                if (!oldValue.isEmpty() && (entry.getField(newField).isEmpty())) {
                     // There is content in the old field and no value in the new, so just copy
                     entry.setField(newField, oldValue).ifPresent(changes::add);
                     entry.clearField(oldField).ifPresent(changes::add);

@@ -15,7 +15,7 @@ public class DateChecker implements ValueChecker {
         }
 
         Optional<Date> parsedDate = Date.parse(value);
-        if (!parsedDate.isPresent()) {
+        if (parsedDate.isEmpty()) {
             return Optional.of(Localization.lang("incorrect format"));
         }
 
