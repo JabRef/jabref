@@ -1,15 +1,14 @@
 package org.jabref.gui.fieldeditors.identifier;
 
-import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
-
+import com.airhacks.afterburner.injection.Injector;
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -18,6 +17,7 @@ import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -25,26 +25,32 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-import com.airhacks.afterburner.injection.Injector;
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
+import javax.swing.undo.UndoManager;
+import java.util.Optional;
 
-import static org.jabref.model.entry.field.StandardField.DOI;
-import static org.jabref.model.entry.field.StandardField.EPRINT;
-import static org.jabref.model.entry.field.StandardField.ISBN;
+import static org.jabref.model.entry.field.StandardField.*;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
-    @FXML private BaseIdentifierEditorViewModel<?> viewModel;
-    @FXML private EditorTextArea textArea;
-    @FXML private Button fetchInformationByIdentifierButton;
-    @FXML private Button lookupIdentifierButton;
+    @FXML
+    private BaseIdentifierEditorViewModel<?> viewModel;
+    @FXML
+    private EditorTextArea textArea;
+    @FXML
+    private Button fetchInformationByIdentifierButton;
+    @FXML
+    private Button lookupIdentifierButton;
 
-    @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private GuiPreferences preferences;
-    @Inject private UndoManager undoManager;
-    @Inject private StateManager stateManager;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private UndoManager undoManager;
+    @Inject
+    private StateManager stateManager;
 
     private Optional<BibEntry> entry = Optional.empty();
 
@@ -55,6 +61,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         // Viewloader must be called after the viewmodel is loaded,
         // but we need the injected vars to create the viewmodels.
         Injector.registerExistingAndInject(this);
+
+        initKeyBindings();
+
 
         switch (field) {
             case DOI ->
@@ -71,8 +80,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
@@ -88,6 +97,15 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+    }
+
+    private void initKeyBindings() {
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
+            if (keyBinding.isPresent() && keyBinding.get() == KeyBinding.GET_BIBLIOGRAPHIC_DATA) {
+                this.fetchInformationByIdentifier();
+            }
+        });
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {

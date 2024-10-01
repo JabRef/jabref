@@ -113,7 +113,7 @@ public enum StandardActions implements Action {
     ABBREVIATE_DOTLESS(Localization.lang("dotless"), Localization.lang("Abbreviate journal names of the selected entries (DOTLESS abbreviation)")),
     ABBREVIATE_SHORTEST_UNIQUE(Localization.lang("shortest unique"), Localization.lang("Abbreviate journal names of the selected entries (SHORTEST UNIQUE abbreviation)")),
     UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
-
+    GET_BIBLIOGRAPHIC_DATA(Localization.lang("Get bibliographic data"), IconTheme.JabRefIcons.SEARCH,KeyBinding.GET_BIBLIOGRAPHIC_DATA),
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),
     MANAGE_CUSTOM_IMPORTS(Localization.lang("Manage custom imports")),
     CUSTOMIZE_ENTRY_TYPES(Localization.lang("Customize entry types")),
