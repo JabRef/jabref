@@ -142,7 +142,7 @@ Set the environment variable `DBMS` to `mysql`.
 
 ## Fetchers in tests
 
-Fetcher tests could be done by executing the Gradle task `fetcherTest`. This could be done by typing the following in the command line:
+Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. This can be done by running the following command in the command line:
 
 ```shell
 ./gradlew fetcherTest
