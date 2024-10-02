@@ -65,6 +65,12 @@ More information on the architecture can be found at [../getting-into-the-code/h
 
 This test is triggered when any kind of documentation is touched (be it the JabRef docs, or JavaDoc in code). If you changed something in the documentation, and particularly added/changed any links (to external files or websites), check if the links are correct and working. If you didn't change/add any link, or added correct links, the test is most probably failing due to any of the existing links being broken, and thus can be ignored (in the context of your contribution).
 
+### Failing <b>Fetcher</b> tests
+
+Check first if you have changed any fetcher logic.
+If you have, check if the changes you have made are correct. You can look for more details on running fetcher tests in [here](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
+Otherwise, these errors can be caused by the network or an external server. For more information, you can look in [here](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
+
 ## Gradle outputs
 
 ### `ANTLR Tool version 4.12.0 used for code generation does not match the current runtime version 4.13.1`
