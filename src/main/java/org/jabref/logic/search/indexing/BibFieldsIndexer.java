@@ -136,34 +136,19 @@ public class BibFieldsIndexer {
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops)
+                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops, "%s" gin_trgm_ops)
                     """.formatted(
                     mainTable, FIELD_VALUE_LITERAL,
                     schemaMainTableReference,
-                    FIELD_VALUE_LITERAL));
+                    FIELD_VALUE_LITERAL, FIELD_VALUE_TRANSFORMED));
 
-            // trigram index on field value transformed column
+            // region btree index on spilt table
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops)
+                    CREATE INDEX "%s_%s_index" ON %s ("%s", "%s")
                     """.formatted(
-                    mainTable, FIELD_VALUE_TRANSFORMED,
-                    schemaMainTableReference,
-                    FIELD_VALUE_TRANSFORMED));
-
-            // region btree index on spilt values column
-//            connection.createStatement().executeUpdate("""
-//                    CREATE INDEX "%s" ON "%s" ("%s")
-//                    """.formatted(
-//                    FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues),
-//                    tableName,
-//                    FIELD_VALUE_LITERAL));
-//
-//            connection.createStatement().executeUpdate("""
-//                    CREATE INDEX "%s" ON "%s" ("%s")
-//                    """.formatted(
-//                    FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues),
-//                    tableName,
-//                    FIELD_VALUE_TRANSFORMED));
+                    splitValuesTable, FIELD_VALUE_LITERAL,
+                    schemaSplitValuesTableReference,
+                    FIELD_VALUE_LITERAL, FIELD_VALUE_TRANSFORMED));
             // endregion
 
             LOGGER.debug("Created indexes for library: {}", libraryName);
