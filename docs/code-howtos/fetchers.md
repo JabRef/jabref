@@ -87,6 +87,6 @@ When executing `./gradlew run`, gradle executes `processResources` and populates
 ## Committing and pushing changes to fetcher files
 
 Fetcher tests are run when pushing changes from any file in the `src/main/java/org/jabref/logic/importer/fetcher/` directory.
-Since these tests rely on remote services, some tests may fail due to the network or the external server.
+Since these tests rely on remote services, some of them may fail due to the network or the external server.
 
 To learn more about doing fetcher tests locally, see Fetchers in tests in [Testing](https://devdocs.jabref.org/code-howtos/testing.html).
