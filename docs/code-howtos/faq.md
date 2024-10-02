@@ -67,9 +67,8 @@ This test is triggered when any kind of documentation is touched (be it the JabR
 
 ### Failing <b>Fetcher</b> tests
 
-Check first if you have changed any fetcher logic.
-If you have, check if the changes you have made are correct. You can look for more details on running fetcher tests in [here](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
-Otherwise, these errors can be caused by the network or an external server. For more information, you can look in [here](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
+Fetcher tests are run when any file in the `.../fetcher` directory has been touched. If you have changed any fetcher logic, check if the changes are correct. You can look for more details on how to locally run fetcher tests [here](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
+Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look [here](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
 
 ## Gradle outputs
 
