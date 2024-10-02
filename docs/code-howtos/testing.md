@@ -148,7 +148,7 @@ Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. Thi
 ./gradlew fetcherTest
 ```
 
-Or, if one is using IntelliJ, by double-clicking `fetcherTest` in the Gradle sidebar; this could be found through the following path: `JabRef > Tasks > other`.
+Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `fetcherTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > fetcherTest`).
 
 ## Advanced testing and further reading
 
