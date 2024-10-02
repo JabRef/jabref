@@ -6,9 +6,14 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.jabref.logic.util.Directories;
+
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
+import static org.jabref.model.search.PostgreConstants.LINKED_FILES_SCHEME;
 
 public class PostgreServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
@@ -19,6 +24,9 @@ public class PostgreServer {
         EmbeddedPostgres embeddedPostgres;
         try {
             embeddedPostgres = EmbeddedPostgres.builder()
+                                               .setCleanDataDirectory(false)
+                                               .setDataDirectory(Directories.getPostgresDataDirectory())
+                                               .setPort(10456)
                                                .start();
             LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
         } catch (IOException e) {
@@ -29,9 +37,22 @@ public class PostgreServer {
         }
 
         this.embeddedPostgres = embeddedPostgres;
-        // TODO: Use the default database (postgres) and the default schema (public) or create a new one?
         this.dataSource = embeddedPostgres.getPostgresDatabase();
         addTrigramExtension();
+        createScheme();
+    }
+
+    private void createScheme() {
+        try (Connection connection = getConnection()) {
+            if (connection != null) {
+                LOGGER.debug("Creating scheme for bib fields and linked files");
+                connection.createStatement().execute("DROP SCHEMA IF EXISTS " + BIB_FIELDS_SCHEME);
+                connection.createStatement().execute("CREATE SCHEMA " + BIB_FIELDS_SCHEME);
+                connection.createStatement().execute("CREATE SCHEMA IF NOT EXISTS " + LINKED_FILES_SCHEME);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Could not create scheme for bib fields and linked files", e);
+        }
     }
 
     private void addTrigramExtension() {

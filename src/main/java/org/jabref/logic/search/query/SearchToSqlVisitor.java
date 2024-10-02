@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.search.SearchBaseVisitor;
@@ -20,7 +21,7 @@ import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
 import static org.jabref.model.search.PostgreConstants.TABLE_NAME_SUFFIX;
 
 /**
- * Converts to a query processable by the scheme created by {@link org.jabref.logic.search.indexing.PostgreIndexer}.
+ * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
  *
  * @implNote Similar class: {@link org.jabref.migrations.SearchToLuceneMigration}
  */

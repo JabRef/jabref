@@ -49,6 +49,13 @@ public class Directories {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
+    public static Path getPostgresDataDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "postgres" + File.separator,
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
+
     public static Path getAiFilesDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                 .getUserDataDir(OS.APP_DIR_APP_NAME,

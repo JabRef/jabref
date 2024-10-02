@@ -9,7 +9,7 @@ import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
-import org.jabref.logic.search.indexing.PostgreIndexer;
+import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
@@ -39,7 +39,7 @@ public class IndexManager {
     private final BooleanProperty shouldIndexLinkedFiles;
     private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
-    private final PostgreIndexer bibFieldsIndexer;
+    private final BibFieldsIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
@@ -52,7 +52,7 @@ public class IndexManager {
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        bibFieldsIndexer = new PostgreIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
+        bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
 
         LuceneIndexer indexer;
         try {
@@ -229,7 +229,7 @@ public class IndexManager {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             // TODO: merge results from lucene and postgres
         } else {
-            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getTableName())));
+            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getMainTable())));
         }
         return query.getSearchResults();
     }

@@ -27,35 +27,47 @@ import org.jabref.model.search.SearchFieldConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PostgreIndexer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgreIndexer.class);
+import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
+import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
+import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+import static org.jabref.model.search.PostgreConstants.TABLE_NAME_SUFFIX;
+
+public class BibFieldsIndexer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
-    private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
     private final String libraryName;
-    private final String tableName;
-    private final String tableNameSplitValues;
+    private final String mainTable;
+    private final String schemaMainTableReference;
+    private final String splitValuesTable;
+    private final String schemaSplitValuesTableReference;
     private final Character keywordSeparator;
 
-    public PostgreIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
+    public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.databaseContext = databaseContext;
         this.connection = connection;
         this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
-        if ("unsaved".equals(databaseContext.getPostgreTableName())) {
-            this.tableName = "unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++;
-        } else {
-            this.tableName = databaseContext.getPostgreTableName();
-        }
-        tableNameSplitValues = tableName + PostgreConstants.TABLE_NAME_SUFFIX;
+
+        this.mainTable = databaseContext.getUniqueName();
+        this.splitValuesTable = mainTable + TABLE_NAME_SUFFIX;
+
+        this.schemaMainTableReference = """
+                "%s"."%s"
+                """.formatted(PostgreConstants.BIB_FIELDS_SCHEME, mainTable);
+        this.schemaSplitValuesTableReference = """
+                "%s"."%s"
+                """.formatted(PostgreConstants.BIB_FIELDS_SCHEME, splitValuesTable);
+        // TODO: Set-up should be in a background task
         setup();
     }
 
-    public String getTableName() {
-        return tableName;
+    public String getMainTable() {
+        return mainTable;
     }
 
     /**
@@ -64,7 +76,7 @@ public class PostgreIndexer {
     private void setup() {
         try {
             connection.createStatement().executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS "%s" (
+                    CREATE TABLE IF NOT EXISTS %s (
                         %s TEXT NOT NULL,
                         %s TEXT NOT NULL,
                         %s TEXT,
@@ -72,27 +84,26 @@ public class PostgreIndexer {
                         PRIMARY KEY (%s, %s)
                     )
                     """.formatted(
-                    tableName,
-                    PostgreConstants.ENTRY_ID,
-                    PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE_LITERAL,
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED,
-                    PostgreConstants.ENTRY_ID,
-                    PostgreConstants.FIELD_NAME));
+                    schemaMainTableReference,
+                    ENTRY_ID,
+                    FIELD_NAME,
+                    FIELD_VALUE_LITERAL,
+                    FIELD_VALUE_TRANSFORMED,
+                    ENTRY_ID, FIELD_NAME));
 
             connection.createStatement().executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS "%s" (
+                    CREATE TABLE IF NOT EXISTS %s (
                         %s TEXT NOT NULL,
                         %s TEXT NOT NULL,
                         %s TEXT,
                         %s TEXT
                         )
                     """.formatted(
-                    tableNameSplitValues,
-                    PostgreConstants.ENTRY_ID,
-                    PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE_LITERAL,
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
+                    schemaSplitValuesTableReference,
+                    ENTRY_ID,
+                    FIELD_NAME,
+                    FIELD_VALUE_LITERAL,
+                    FIELD_VALUE_TRANSFORMED));
 
             LOGGER.debug("Created tables for library: {}", libraryName);
         } catch (SQLException e) {
@@ -101,66 +112,66 @@ public class PostgreIndexer {
         try {
             // region btree index on id column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
+                    CREATE INDEX "%s_%s_index" ON %s ("%s")
                     """.formatted(
-                    PostgreConstants.ENTRY_ID.getIndexName(tableName),
-                    tableName,
-                    PostgreConstants.ENTRY_ID));
+                    mainTable, ENTRY_ID,
+                    schemaMainTableReference,
+                    ENTRY_ID));
 
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
+                    CREATE INDEX "%s_%s_index" ON %s ("%s")
                     """.formatted(
-                    PostgreConstants.ENTRY_ID.getIndexName(tableNameSplitValues),
-                    tableName,
-                    PostgreConstants.ENTRY_ID));
+                    splitValuesTable, ENTRY_ID,
+                    schemaSplitValuesTableReference,
+                    ENTRY_ID));
             // endregion
 
             // region btree index on field name column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
+                    CREATE INDEX "%s_%s_index" ON %s ("%s")
                     """.formatted(
-                    PostgreConstants.FIELD_NAME.getIndexName(tableName),
-                    tableName,
-                    PostgreConstants.FIELD_NAME));
+                    mainTable, FIELD_NAME,
+                    schemaMainTableReference,
+                    FIELD_NAME));
 
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" ("%s")
+                    CREATE INDEX "%s_%s_index" ON %s ("%s")
                     """.formatted(
-                    PostgreConstants.FIELD_NAME.getIndexName(tableNameSplitValues),
-                    tableName,
-                    PostgreConstants.FIELD_NAME));
+                    splitValuesTable, FIELD_NAME,
+                    schemaSplitValuesTableReference,
+                    FIELD_NAME));
             // endregion
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
+                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops)
                     """.formatted(
-                    PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableName),
-                    tableName,
-                    PostgreConstants.FIELD_VALUE_LITERAL));
+                    mainTable, FIELD_VALUE_LITERAL,
+                    schemaMainTableReference,
+                    FIELD_VALUE_LITERAL));
 
             // trigram index on field value transformed column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s" ON "%s" USING gin ("%s" gin_trgm_ops)
+                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops)
                     """.formatted(
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableName),
-                    tableName,
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
+                    mainTable, FIELD_VALUE_TRANSFORMED,
+                    schemaMainTableReference,
+                    FIELD_VALUE_TRANSFORMED));
 
             // region btree index on spilt values column
 //            connection.createStatement().executeUpdate("""
 //                    CREATE INDEX "%s" ON "%s" ("%s")
 //                    """.formatted(
-//                    PostgreConstants.FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues),
+//                    FIELD_VALUE_LITERAL.getIndexName(tableNameSplitValues),
 //                    tableName,
-//                    PostgreConstants.FIELD_VALUE_LITERAL));
+//                    FIELD_VALUE_LITERAL));
 //
 //            connection.createStatement().executeUpdate("""
 //                    CREATE INDEX "%s" ON "%s" ("%s")
 //                    """.formatted(
-//                    PostgreConstants.FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues),
+//                    FIELD_VALUE_TRANSFORMED.getIndexName(tableNameSplitValues),
 //                    tableName,
-//                    PostgreConstants.FIELD_VALUE_TRANSFORMED));
+//                    FIELD_VALUE_TRANSFORMED));
             // endregion
 
             LOGGER.debug("Created indexes for library: {}", libraryName);
@@ -196,24 +207,24 @@ public class PostgreIndexer {
 
     private void addToIndex(BibEntry bibEntry) {
         String insertFieldQuery = """
-                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
                 """.formatted(
-                tableName,
-                PostgreConstants.ENTRY_ID,
-                PostgreConstants.FIELD_NAME,
-                PostgreConstants.FIELD_VALUE_LITERAL,
-                PostgreConstants.FIELD_VALUE_TRANSFORMED);
+                schemaMainTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED);
 
         String insertIntoSplitTable = """
-                INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
                 """.formatted(
-                tableNameSplitValues,
-                PostgreConstants.ENTRY_ID,
-                PostgreConstants.FIELD_NAME,
-                PostgreConstants.FIELD_VALUE_LITERAL,
-                PostgreConstants.FIELD_VALUE_TRANSFORMED);
+                schemaSplitValuesTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
              PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
@@ -339,9 +350,9 @@ public class PostgreIndexer {
     private void removeFromIndex(BibEntry entry) {
         try {
             connection.createStatement().executeUpdate("""
-                    DELETE FROM "%s"
+                    DELETE FROM %s
                     WHERE "%s" = '%s'
-                    """.formatted(tableName, PostgreConstants.ENTRY_ID, entry.getId()));
+                    """.formatted(schemaMainTableReference, ENTRY_ID, entry.getId()));
             LOGGER.debug("Entry {} removed from index", entry.getId());
         } catch (SQLException e) {
             LOGGER.error("Error deleting entry from index", e);
@@ -351,13 +362,13 @@ public class PostgreIndexer {
     public void updateEntry(BibEntry entry, Field field, String oldValue, String newValue) {
         try {
             String updateQuery = """
-            INSERT INTO "%s" ("%s", "%s", "%s", "%s")
+            INSERT INTO %s ("%s", "%s", "%s", "%s")
             VALUES (?, ?, ?, ?)
-            """.formatted(tableName,
-                    PostgreConstants.ENTRY_ID,
-                    PostgreConstants.FIELD_NAME,
-                    PostgreConstants.FIELD_VALUE_LITERAL,
-                    PostgreConstants.FIELD_VALUE_TRANSFORMED);
+            """.formatted(schemaSplitValuesTableReference,
+                    ENTRY_ID,
+                    FIELD_NAME,
+                    FIELD_VALUE_LITERAL,
+                    FIELD_VALUE_TRANSFORMED);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                 preparedStatement.setString(1, entry.getId());
@@ -383,8 +394,11 @@ public class PostgreIndexer {
         try {
             LOGGER.debug("Closing connection to Postgres server for library: {}", libraryName);
             connection.createStatement().executeUpdate("""
-                        DROP TABLE IF EXISTS "%s"
-                        """.formatted(tableName));
+                        DROP TABLE IF EXISTS %s
+                        """.formatted(schemaMainTableReference));
+            connection.createStatement().executeUpdate("""
+                        DROP TABLE IF EXISTS %s
+                        """.formatted(schemaSplitValuesTableReference));
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not drop table for library: {}", libraryName, e);
