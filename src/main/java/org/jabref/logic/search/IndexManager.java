@@ -8,8 +8,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
+import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
+import org.jabref.logic.search.indexing.PostgresLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
@@ -42,6 +43,7 @@ public class IndexManager {
     private final BibFieldsIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
     private final BibFieldsSearcher bibFieldsSearcher;
+    private final PostgresLinkedFilesIndexer postgresLinkedFilesIndexer;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
     public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences) {
@@ -53,6 +55,7 @@ public class IndexManager {
 
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
         bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
+        postgresLinkedFilesIndexer = new PostgresLinkedFilesIndexer(databaseContext, preferences.getFilePreferences(), postgreServer.getConnection());
 
         LuceneIndexer indexer;
         try {

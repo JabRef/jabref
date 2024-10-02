@@ -18,7 +18,7 @@ import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
-import static org.jabref.model.search.PostgreConstants.TABLE_NAME_SUFFIX;
+import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
 
 /**
  * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
@@ -40,7 +40,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     public SearchToSqlVisitor(String mainTableName) {
         this.mainTableName = mainTableName;
-        this.splitValuesTableName = mainTableName + TABLE_NAME_SUFFIX;
+        this.splitValuesTableName = mainTableName + SPLIT_TABLE_SUFFIX;
     }
 
     private enum SearchTermFlag {

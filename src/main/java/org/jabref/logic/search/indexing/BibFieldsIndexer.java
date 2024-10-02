@@ -31,7 +31,7 @@ import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
-import static org.jabref.model.search.PostgreConstants.TABLE_NAME_SUFFIX;
+import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
 
 public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
@@ -54,7 +54,7 @@ public class BibFieldsIndexer {
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
 
         this.mainTable = databaseContext.getUniqueName();
-        this.splitValuesTable = mainTable + TABLE_NAME_SUFFIX;
+        this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;
 
         this.schemaMainTableReference = """
                 "%s"."%s"
@@ -97,7 +97,7 @@ public class BibFieldsIndexer {
                         %s TEXT NOT NULL,
                         %s TEXT,
                         %s TEXT
-                        )
+                    )
                     """.formatted(
                     schemaSplitValuesTableReference,
                     ENTRY_ID,

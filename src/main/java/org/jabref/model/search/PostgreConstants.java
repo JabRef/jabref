@@ -2,12 +2,20 @@ package org.jabref.model.search;
 
 public enum PostgreConstants {
     BIB_FIELDS_SCHEME("bib_fields"),
-    LINKED_FILES_SCHEME("linked_files"),
+    SPLIT_TABLE_SUFFIX("_split_values"),
     ENTRY_ID("entry_id"),
     FIELD_NAME("field_name"),
     FIELD_VALUE_LITERAL("field_value_literal"), // contains the value as-is
     FIELD_VALUE_TRANSFORMED("field_value_transformed"), // contains the value transformed for better querying
-    TABLE_NAME_SUFFIX("_split_values");
+    LINKED_FILES_SCHEME("linked_files"),
+    CONTENT_TABLE_SUFFIX("_file_content"),
+    FILE_PATH("path"),
+    FILE_MODIFIED("modified"),
+    LINKED_ENTRIES("entries"),
+    PAGE_NUMBER("pageNumber"),
+    PAGE_CONTENT("content"),
+    PAGE_ANNOTATIONS("annotations");
+
     private final String value;
 
     PostgreConstants(String value) {
