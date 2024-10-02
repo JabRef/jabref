@@ -101,8 +101,8 @@ public class SearchQuery {
         }
     }
 
-    public SqlSearchQuery getSqlQuery(String tableName) {
-        return new SqlSearchQuery(SearchToSqlConversion.searchToSql(tableName, query));
+    public SqlSearchQuery getSqlQuery(String table) {
+        return new SqlSearchQuery(SearchToSqlConversion.searchToSql(table, query));
     }
 
     public String getSearchExpression() {

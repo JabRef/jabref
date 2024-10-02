@@ -22,6 +22,14 @@ public enum PostgreConstants {
         this.value = value;
     }
 
+    public static String getMainTableSchemaReference(String mainTable) {
+        return BIB_FIELDS_SCHEME + ".\"" + mainTable + "\"";
+    }
+
+    public static String getSplitTableSchemaReference(String mainTable) {
+        return BIB_FIELDS_SCHEME + ".\"" + mainTable + SPLIT_TABLE_SUFFIX + "\"";
+    }
+
     @Override
     public String toString() {
         return value;

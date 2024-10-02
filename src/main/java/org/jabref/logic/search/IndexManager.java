@@ -232,7 +232,7 @@ public class IndexManager {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             // TODO: merge results from lucene and postgres
         } else {
-            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getMainTable())));
+            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getTable())));
         }
         return query.getSearchResults();
     }

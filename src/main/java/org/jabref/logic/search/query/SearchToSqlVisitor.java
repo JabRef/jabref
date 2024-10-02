@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.PostgreConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
@@ -18,7 +19,6 @@ import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
-import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
 
 /**
  * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
@@ -38,9 +38,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private final List<String> ctes = new ArrayList<>();
     private int cteCounter = 0;
 
-    public SearchToSqlVisitor(String mainTableName) {
-        this.mainTableName = mainTableName;
-        this.splitValuesTableName = mainTableName + SPLIT_TABLE_SUFFIX;
+    public SearchToSqlVisitor(String table) {
+        this.mainTableName = PostgreConstants.getMainTableSchemaReference(table);
+        this.splitValuesTableName = PostgreConstants.getSplitTableSchemaReference(table);
     }
 
     private enum SearchTermFlag {
@@ -73,7 +73,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         String cte = """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE %s.%s NOT IN (
                     SELECT %s
                     FROM %s
@@ -223,7 +223,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
                 )
                 """.formatted(
@@ -244,10 +244,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE %s.%s NOT IN (
                     SELECT %s.%s
-                    FROM "%s" AS %s
+                    FROM %s AS %s
                     WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
                     )
                 )
@@ -272,8 +272,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
-                 LEFT JOIN "%s" AS %s
+                 FROM %s AS %s
+                 LEFT JOIN %s AS %s
                  ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                  WHERE (
                     (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
@@ -300,11 +300,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE %s.%s NOT IN (
                     SELECT %s.%s
-                    FROM "%s" AS %s
-                    LEFT JOIN "%s" AS %s
+                    FROM %s AS %s
+                    LEFT JOIN %s AS %s
                     ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                     WHERE (
                       (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
@@ -335,7 +335,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
                 )
                 """.formatted(
@@ -354,8 +354,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                   SELECT %s.%s
-                  FROM "%s" AS %s
-                  LEFT JOIN "%s" AS %s
+                  FROM %s AS %s
+                  LEFT JOIN %s AS %s
                   ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                   WHERE (
                     (%s.%s %s '%s') OR (%s.%s %s '%s')
@@ -380,11 +380,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE %s.%s NOT IN (
                     SELECT %s.%s
-                    FROM "%s" AS %s
-                    LEFT JOIN "%s" AS %s
+                    FROM %s AS %s
+                    LEFT JOIN %s AS %s
                     ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                     WHERE (
                       (%s.%s %s '%s') OR (%s.%s %s '%s')
@@ -413,10 +413,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         return """
                 cte%d AS (
                  SELECT %s.%s
-                 FROM "%s" AS %s
+                 FROM %s AS %s
                  WHERE %s.%s NOT IN (
                     SELECT %s.%s
-                    FROM "%s" AS %s
+                    FROM %s AS %s
                     WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
                     )
                 )

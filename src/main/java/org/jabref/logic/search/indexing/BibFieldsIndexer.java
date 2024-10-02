@@ -56,18 +56,10 @@ public class BibFieldsIndexer {
         this.mainTable = databaseContext.getUniqueName();
         this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;
 
-        this.schemaMainTableReference = """
-                "%s"."%s"
-                """.formatted(PostgreConstants.BIB_FIELDS_SCHEME, mainTable);
-        this.schemaSplitValuesTableReference = """
-                "%s"."%s"
-                """.formatted(PostgreConstants.BIB_FIELDS_SCHEME, splitValuesTable);
+        this.schemaMainTableReference = PostgreConstants.getMainTableSchemaReference(mainTable);
+        this.schemaSplitValuesTableReference = PostgreConstants.getSplitTableSchemaReference(mainTable);
         // TODO: Set-up should be in a background task
         setup();
-    }
-
-    public String getMainTable() {
-        return mainTable;
     }
 
     /**
@@ -380,6 +372,10 @@ public class BibFieldsIndexer {
         } catch (SQLException e) {
             LOGGER.error("Error updating entry in index", e);
         }
+    }
+
+    public String getTable() {
+        return mainTable;
     }
 
     public void close() {
