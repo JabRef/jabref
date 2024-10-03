@@ -80,7 +80,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+            // TODO: Make use of org.jabref.model.metadata.event.MetaDataChangedEvent (and also do Added/Removed there)
             synchronizeLocalMetaData();
+
             pullWithLastEntry();
             synchronizeLocalDatabase();
             dbmsProcessor.insertEntries(event.getBibEntries());
