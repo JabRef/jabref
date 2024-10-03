@@ -1,9 +1,11 @@
 package org.jabref.logic.importer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
@@ -13,6 +15,7 @@ import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
+import org.jabref.logic.importer.fetcher.LlmCitationFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
@@ -116,7 +119,9 @@ class WebFetchersTest {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            Set<Class<?>> expected = new TreeSet<>(Comparator.comparing(Class::getName));
+            expected.addAll(controlClasses.loadClasses());
 
             // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -132,8 +137,9 @@ class WebFetchersTest {
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
 
-            // Remove GROBID, because we don't want to show this to the user
-            expected.remove(GrobidPlainCitationParser.class);
+            // Remove GROBID and LLM, because we don't want to show this to the user (since they convert text to BibTeX)
+            expected.remove(GrobidCitationFetcher.class);
+            expected.remove(LlmCitationFetcher.class);
 
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
@@ -178,6 +184,8 @@ class WebFetchersTest {
     }
 
     private Set<? extends Class<?>> getClasses(Collection<?> objects) {
-        return objects.stream().map(Object::getClass).collect(Collectors.toSet());
+        return objects.stream()
+                      .map(Object::getClass)
+                      .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Class::getName))));
     }
 }
