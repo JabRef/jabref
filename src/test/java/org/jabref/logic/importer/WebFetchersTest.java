@@ -10,7 +10,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
@@ -18,6 +17,7 @@ import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
+import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.model.database.BibDatabaseContext;
 
 import io.github.classgraph.ClassGraph;
@@ -133,7 +133,7 @@ class WebFetchersTest {
             expected.remove(PagedSearchBasedFetcher.class);
 
             // Remove GROBID, because we don't want to show this to the user
-            expected.remove(GrobidCitationFetcher.class);
+            expected.remove(GrobidPlainCitationParser.class);
 
             assertEquals(expected, getClasses(searchBasedFetchers));
         }

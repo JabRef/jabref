@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexextractor;
+package org.jabref.gui.plaincitationparser;
 
 import javax.swing.undo.UndoManager;
 
@@ -17,7 +17,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,8 +34,7 @@ import jakarta.inject.Inject;
  * @implNote Instead of using inheritance, we do if/else checks.
  *
  */
-public class ExtractBibtexDialog extends BaseDialog<Void> {
-
+public class PlainCitationParserDialog extends BaseDialog<Void> {
     @Inject protected StateManager stateManager;
     @Inject protected DialogService dialogService;
     @Inject protected AiService aiService;
@@ -46,30 +45,21 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
     @FXML protected TextArea input;
     @FXML protected ButtonType parseButtonType;
-    @FXML protected ComboBox<OnlinePlainCitationParser> parserChoice;
+    @FXML protected ComboBox<PlainCitationParserChoice> parserChoice;
 
-    private final boolean onlineMode;
-
-    public ExtractBibtexDialog(boolean onlineMode) {
-        this.onlineMode = onlineMode;
-
+    public PlainCitationParserDialog() {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
-        if (onlineMode) {
-            this.setTitle(Localization.lang("Plain References Parser (online)"));
-        } else {
-            this.setTitle(Localization.lang("Plain References Parser (offline)"));
-        }
+        this.setTitle(Localization.lang("Plain Citations Parser"));
     }
 
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
 
-        BibtexExtractorViewModel viewModel = new BibtexExtractorViewModel(
-                onlineMode,
+        PlainCitationParserViewModel viewModel = new PlainCitationParserViewModel(
                 database,
                 dialogService,
                 aiService,
@@ -79,17 +69,17 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
                 undoManager,
                 stateManager);
 
-        new ViewModelListCellFactory<OnlinePlainCitationParser>()
-                .withText(OnlinePlainCitationParser::getLocalizedName)
+        new ViewModelListCellFactory<PlainCitationParserChoice>()
+                .withText(PlainCitationParserChoice::getLocalizedName)
                 .install(parserChoice);
         parserChoice.getItems().setAll(viewModel.onlinePlainCitationParsers());
         parserChoice.valueProperty().bindBidirectional(viewModel.parserChoice());
-        parserChoice.setDisable(!onlineMode);
 
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
+
         String clipText = ClipBoardManager.getContents();
         if (StringUtil.isBlank(clipText)) {
-            input.setPromptText(Localization.lang("Please enter the plain references to extract from separated by double empty lines."));
+            input.setPromptText(Localization.lang("Please enter the plain citations to parse from separated by double empty lines."));
         } else {
             input.setText(clipText);
             input.selectAll();
@@ -98,7 +88,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         Platform.runLater(() -> {
             input.requestFocus();
             Button buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-            buttonParse.setTooltip(new Tooltip((Localization.lang("Starts the extraction and adds the resulting entries to the currently opened database"))));
+            buttonParse.setTooltip(new Tooltip((Localization.lang("Starts the parsing and adds the resulting entries to the currently opened database"))));
             buttonParse.setOnAction(event -> viewModel.startParsing());
             buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         });

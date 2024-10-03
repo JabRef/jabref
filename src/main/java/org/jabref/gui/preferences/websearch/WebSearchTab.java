@@ -19,7 +19,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.fetcher.OnlinePlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
 
@@ -33,7 +33,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
-    @FXML private ComboBox<OnlinePlainCitationParser> defaultOnlinePlainCitationParser;
+    @FXML private ComboBox<PlainCitationParserChoice> defaultOnlinePlainCitationParser;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -73,8 +73,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
         keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
 
-        new ViewModelListCellFactory<OnlinePlainCitationParser>()
-                .withText(OnlinePlainCitationParser::getLocalizedName)
+        new ViewModelListCellFactory<PlainCitationParserChoice>()
+                .withText(PlainCitationParserChoice::getLocalizedName)
                 .install(defaultOnlinePlainCitationParser);
         defaultOnlinePlainCitationParser.itemsProperty().bind(viewModel.onlinePlainCitationParsers());
         defaultOnlinePlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultOnlinePlainCitationParserProperty());

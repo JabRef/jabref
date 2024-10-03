@@ -13,7 +13,7 @@
         prefWidth="586.0"
         xmlns="http://javafx.com/javafx/8.0.171"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.jabref.gui.bibtexextractor.ExtractBibtexDialog">
+        fx:controller="org.jabref.gui.plaincitationparser.PlainCitationParserDialog">
     <content>
         <VBox fx:id="contentVbox"
               spacing="10"
@@ -31,7 +31,7 @@
                 <HBox alignment="BASELINE_LEFT"
                       spacing="10">
                     <children>
-                        <Label text="%Parser choice (only for online extraction):"/>
+                        <Label text="%Parser choice:"/>
                         <ComboBox
                                 fx:id="parserChoice"
                                 HBox.hgrow="ALWAYS"/>

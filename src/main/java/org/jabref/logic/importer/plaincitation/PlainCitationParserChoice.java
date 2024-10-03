@@ -1,13 +1,16 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.plaincitation;
 
 import org.jabref.logic.l10n.Localization;
 
-public enum OnlinePlainCitationParser {
+public enum PlainCitationParserChoice {
+    RULE_BASED,
     GROBID,
     LLM;
 
     public String getLocalizedName() {
         return switch (this) {
+            case RULE_BASED ->
+                    Localization.lang("Rule-based");
             case GROBID ->
                     Localization.lang("GROBID");
             case LLM ->
