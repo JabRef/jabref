@@ -6,9 +6,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.collections.ListChangeListener;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
@@ -47,8 +45,7 @@ public class SummariesService {
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
-    public SummariesService(StateManager stateManager,
-                            AiPreferences aiPreferences,
+    public SummariesService(AiPreferences aiPreferences,
                             SummariesStorage summariesStorage,
                             ChatLanguageModel chatLanguageModel,
                             BooleanProperty shutdownSignal,
@@ -61,21 +58,9 @@ public class SummariesService {
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
-
-        configureDatabaseListeners(stateManager);
     }
 
-    private void configureDatabaseListeners(StateManager stateManager) {
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
-                }
-            }
-        });
-    }
-
-    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
+    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
         // GC was eating the listeners, so we have to fall back to the event bus.
         bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));
     }

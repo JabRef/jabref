@@ -166,7 +166,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         JabRefGUI.aiService = new AiService(
-                stateManager,
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
                 dialogService,
@@ -174,7 +173,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(AiService.class, aiService);
 
         JabRefGUI.chatHistoryService = new ChatHistoryService(
-                stateManager,
                 preferences.getCitationKeyPatternPreferences(),
                 dialogService);
         Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);

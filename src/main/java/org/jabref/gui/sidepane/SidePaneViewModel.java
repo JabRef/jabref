@@ -22,6 +22,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -42,6 +43,7 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
                              GuiPreferences preferences,
+                             AiService aiService,
                              ChatHistoryService chatHistoryService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
@@ -57,6 +59,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
                 preferences,
+                aiService,
                 chatHistoryService,
                 abbreviationRepository,
                 taskExecutor,

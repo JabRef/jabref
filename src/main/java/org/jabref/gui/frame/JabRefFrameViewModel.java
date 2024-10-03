@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
@@ -50,6 +51,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     private final GuiPreferences preferences;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final LibraryTabContainer tabContainer;
@@ -61,6 +63,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     public JabRefFrameViewModel(GuiPreferences preferences,
                                 AiService aiService,
+                                ChatHistoryService chatHistoryService,
                                 StateManager stateManager,
                                 DialogService dialogService,
                                 LibraryTabContainer tabContainer,
@@ -71,6 +74,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
@@ -214,6 +218,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                             dialogService,
                             preferences,
                             aiService,
+                            chatHistoryService,
                             stateManager,
                             entryTypesManager,
                             fileUpdateMonitor,

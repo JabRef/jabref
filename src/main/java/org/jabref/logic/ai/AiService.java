@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
@@ -53,8 +52,7 @@ public class AiService implements AutoCloseable {
     private final IngestionService ingestionService;
     private final SummariesService summariesService;
 
-    public AiService(StateManager stateManager,
-                     AiPreferences aiPreferences,
+    public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
@@ -70,7 +68,6 @@ public class AiService implements AutoCloseable {
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
 
         this.ingestionService = new IngestionService(
-                stateManager,
                 aiPreferences,
                 shutdownSignal,
                 jabRefEmbeddingModel,
@@ -81,7 +78,6 @@ public class AiService implements AutoCloseable {
         );
 
         this.summariesService = new SummariesService(
-                stateManager,
                 aiPreferences,
                 mvStoreSummariesStorage,
                 jabRefChatLanguageModel,

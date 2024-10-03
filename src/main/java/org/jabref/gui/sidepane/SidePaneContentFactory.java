@@ -14,6 +14,7 @@ import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -22,6 +23,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
+    private final AiService aiService;
     private final ChatHistoryService chatHistoryService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
@@ -34,6 +36,7 @@ public class SidePaneContentFactory {
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
+                                  AiService aiService,
                                   ChatHistoryService chatHistoryService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
@@ -45,6 +48,7 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
+        this.aiService = aiService;
         this.chatHistoryService = chatHistoryService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
@@ -74,6 +78,8 @@ public class SidePaneContentFactory {
                     abbreviationRepository,
                     (UiTaskExecutor) taskExecutor,
                     dialogService,
+                    aiService,
+                    chatHistoryService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

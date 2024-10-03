@@ -34,6 +34,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -42,6 +43,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -103,6 +105,8 @@ public class OpenOfficePanel {
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
+    private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final StyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -121,6 +125,8 @@ public class OpenOfficePanel {
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
+                           AiService aiService,
+                           ChatHistoryService chatHistoryService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
@@ -134,6 +140,8 @@ public class OpenOfficePanel {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
@@ -322,6 +330,8 @@ public class OpenOfficePanel {
                     databaseContext,
                     tabContainer,
                     dialogService,
+                    aiService,
+                    chatHistoryService,
                     preferences,
                     stateManager,
                     fileUpdateMonitor,

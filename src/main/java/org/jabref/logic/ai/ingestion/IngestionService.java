@@ -6,9 +6,7 @@ import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ListChangeListener;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
@@ -43,8 +41,7 @@ public class IngestionService {
 
     private final ReadOnlyBooleanProperty shutdownSignal;
 
-    public IngestionService(StateManager stateManager,
-                            AiPreferences aiPreferences,
+    public IngestionService(AiPreferences aiPreferences,
                             ReadOnlyBooleanProperty shutdownSignal,
                             EmbeddingModel embeddingModel,
                             EmbeddingStore<TextSegment> embeddingStore,
@@ -65,21 +62,9 @@ public class IngestionService {
         );
 
         this.shutdownSignal = shutdownSignal;
-
-        configureDatabaseListeners(stateManager);
     }
 
-    private void configureDatabaseListeners(StateManager stateManager) {
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
-                }
-            }
-        });
-    }
-
-    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
+    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
         // GC was eating the listeners, so we have to fall back to the event bus.
         bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));
     }
@@ -153,6 +138,7 @@ public class IngestionService {
 
     private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo<LinkedFile, Void> processingInfo) {
         new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences, shutdownSignal)
+                .showToUser(true)
                 .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);

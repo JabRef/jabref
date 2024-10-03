@@ -135,7 +135,7 @@ public class AiChatTab extends EntryEditorTab {
 
         setContent(new AiChatGuardedComponent(
                 chatName,
-                chatHistoryService.getChatHistoryForEntry(entry),
+                chatHistoryService.getChatHistoryForEntry(bibDatabaseContext, entry),
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 aiService,

@@ -27,6 +27,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -85,6 +86,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -105,6 +107,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               DialogService dialogService,
                                               GuiPreferences preferences,
                                               AiService aiService,
+                                              ChatHistoryService chatHistoryService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -115,6 +118,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -197,6 +201,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     dialogService,
                     preferences,
                     aiService,
+                    chatHistoryService,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,

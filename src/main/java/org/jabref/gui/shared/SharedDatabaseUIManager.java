@@ -15,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
@@ -50,6 +51,7 @@ public class SharedDatabaseUIManager {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -61,6 +63,7 @@ public class SharedDatabaseUIManager {
                                    DialogService dialogService,
                                    GuiPreferences preferences,
                                    AiService aiService,
+                                   ChatHistoryService chatHistoryService,
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
@@ -71,6 +74,7 @@ public class SharedDatabaseUIManager {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -175,6 +179,8 @@ public class SharedDatabaseUIManager {
                 bibDatabaseContext,
                 tabContainer,
                 dialogService,
+                aiService,
+                chatHistoryService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

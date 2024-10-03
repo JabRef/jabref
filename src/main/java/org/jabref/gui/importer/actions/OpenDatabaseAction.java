@@ -18,6 +18,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -62,6 +63,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
@@ -73,6 +75,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               GuiPreferences preferences,
                               AiService aiService,
+                              ChatHistoryService chatHistoryService,
                               DialogService dialogService,
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
@@ -83,6 +86,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -200,6 +204,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                 backgroundTask,
                 file,
                 dialogService,
+                aiService,
+                chatHistoryService,
                 preferences,
                 stateManager,
                 tabContainer,
@@ -253,6 +259,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  dialogService,
                                  preferences,
                                  aiService,
+                                 chatHistoryService,
                                  stateManager,
                                  entryTypesManager,
                                  fileUpdateMonitor,
@@ -268,6 +275,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           DialogService dialogService,
                                           GuiPreferences preferences,
                                           AiService aiService,
+                                          ChatHistoryService chatHistoryService,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
@@ -281,6 +289,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     dialogService,
                     preferences,
                     aiService,
+                    chatHistoryService,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,

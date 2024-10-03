@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
@@ -57,12 +56,13 @@ public class ChatHistoryService implements AutoCloseable {
 
     private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
 
-    private final StateManager stateManager;
-
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     private final ChatHistoryStorage implementation;
 
+    // Note about `Optional<BibDatabaseContext>`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
+    // However, we decided to left it here: to reduce migrations and to make possible to chat with a {@link BibEntry} without {@link BibDatabaseContext}
+    // ({@link BibDatabaseContext} is required only for load/store of the chat).
     private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
 
     // We use a {@link TreeMap} here to store {@link BibEntry} chat histories by their id.
@@ -78,25 +78,12 @@ public class ChatHistoryService implements AutoCloseable {
         return o1 == o2 ? 0 : o1.getGroup().getName().compareTo(o2.getGroup().getName());
     });
 
-    public ChatHistoryService(StateManager stateManager, CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
-        this.stateManager = stateManager;
+    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.implementation = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
-
-        configureDatabaseListeners();
     }
 
-    private void configureDatabaseListeners() {
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::configureDatabaseListeners);
-                }
-            }
-        });
-    }
-
-    private void configureDatabaseListeners(BibDatabaseContext bibDatabaseContext) {
+    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
         bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> {
             rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
                 groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
@@ -118,20 +105,18 @@ public class ChatHistoryService implements AutoCloseable {
         });
     }
 
-    public ObservableList<ChatMessage> getChatHistoryForEntry(BibEntry entry) {
+    public ObservableList<ChatMessage> getChatHistoryForEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         return bibEntriesChatHistory.computeIfAbsent(entry, entryArg -> {
-            Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForEntry(entry);
-
             ObservableList<ChatMessage> chatHistory;
 
-            if (bibDatabaseContext.isEmpty() || entry.getCitationKey().isEmpty() || !correctCitationKey(bibDatabaseContext.get(), entry) || bibDatabaseContext.get().getDatabasePath().isEmpty()) {
+            if (entry.getCitationKey().isEmpty() || !correctCitationKey(bibDatabaseContext, entry) || bibDatabaseContext.getDatabasePath().isEmpty()) {
                 chatHistory = FXCollections.observableArrayList();
             } else {
-                List<ChatMessage> chatMessagesList = implementation.loadMessagesForEntry(bibDatabaseContext.get().getDatabasePath().get(), entry.getCitationKey().get());
+                List<ChatMessage> chatMessagesList = implementation.loadMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
             }
 
-            return new ChatHistoryManagementRecord(bibDatabaseContext, chatHistory);
+            return new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), chatHistory);
         }).chatHistory;
     }
 
@@ -166,24 +151,22 @@ public class ChatHistoryService implements AutoCloseable {
         bibEntriesChatHistory.remove(entry);
     }
 
-    public ObservableList<ChatMessage> getChatHistoryForGroup(GroupTreeNode group) {
+    public ObservableList<ChatMessage> getChatHistoryForGroup(BibDatabaseContext bibDatabaseContext, GroupTreeNode group) {
         return groupsChatHistory.computeIfAbsent(group, groupArg -> {
-            Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForGroup(group);
-
             ObservableList<ChatMessage> chatHistory;
 
-            if (bibDatabaseContext.isEmpty() || bibDatabaseContext.get().getDatabasePath().isEmpty()) {
+            if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 chatHistory = FXCollections.observableArrayList();
             } else {
                 List<ChatMessage> chatMessagesList = implementation.loadMessagesForGroup(
-                        bibDatabaseContext.get().getDatabasePath().get(),
+                        bibDatabaseContext.getDatabasePath().get(),
                         group.getGroup().getName()
                 );
 
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
             }
 
-            return new ChatHistoryManagementRecord(bibDatabaseContext, chatHistory);
+            return new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), chatHistory);
         }).chatHistory;
     }
 
@@ -226,26 +209,6 @@ public class ChatHistoryService implements AutoCloseable {
 
     private void tryToGenerateCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences).generateAndSetKey(bibEntry);
-    }
-
-    private Optional<BibDatabaseContext> findBibDatabaseForEntry(BibEntry entry) {
-        return stateManager
-                .getOpenDatabases()
-                .stream()
-                .filter(dbContext -> dbContext.getDatabase().getEntries().contains(entry))
-                .findFirst();
-    }
-
-    private Optional<BibDatabaseContext> findBibDatabaseForGroup(GroupTreeNode group) {
-        return stateManager
-                .getOpenDatabases()
-                .stream()
-                .filter(dbContext ->
-                        dbContext.getMetaData().groupsBinding().get().map(groupTreeNode ->
-                                groupTreeNode.containsGroup(group.getGroup())
-                        ).orElse(false)
-                )
-                .findFirst();
     }
 
     @Override

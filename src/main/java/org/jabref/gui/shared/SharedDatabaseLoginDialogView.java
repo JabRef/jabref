@@ -16,6 +16,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -59,6 +60,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private AiService aiService;
+    @Inject private ChatHistoryService chatHistoryService;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
@@ -103,6 +105,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 dialogService,
                 preferences,
                 aiService,
+                chatHistoryService,
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,

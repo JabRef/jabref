@@ -18,6 +18,7 @@ import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -38,6 +39,7 @@ class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     GuiPreferences preferences = mock(GuiPreferences.class);
+    AiService aiService = mock(AiService.class);
     ChatHistoryService chatHistoryService = mock(ChatHistoryService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
@@ -67,6 +69,7 @@ class SidePaneViewModelTest {
         sidePaneViewModel = new SidePaneViewModel(
                 tabContainer,
                 preferences,
+                aiService,
                 chatHistoryService,
                 abbreviationRepository,
                 stateManager,
