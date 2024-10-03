@@ -1,6 +1,7 @@
 package org.jabref.logic.ai;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -14,7 +15,10 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 import org.jabref.model.strings.StringUtil;
@@ -55,6 +59,8 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
+    private final ObservableMap<AiTemplate, String> templates;
+
     private Runnable apiKeyChangeListener;
 
     public AiPreferences(boolean enableAi,
@@ -75,14 +81,14 @@ public class AiPreferences {
                          int documentSplitterChunkSize,
                          int documentSplitterOverlapSize,
                          int ragMaxResultsCount,
-                         double ragMinScore
+                         double ragMinScore,
+                         Map<AiTemplate, String> templates
     ) {
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
-        this.openAiChatModel = new SimpleStringProperty(openAiChatModel);
-        this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
+        this.openAiChatModel = new SimpleStringProperty(openAiChatModel); this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
 
@@ -101,6 +107,8 @@ public class AiPreferences {
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
+
+        this.templates = FXCollections.observableMap(templates);
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
@@ -480,5 +488,9 @@ public class AiPreferences {
      */
     public void apiKeyUpdated() {
         apiKeyChangeListener.run();
+    }
+
+    public ObservableMap<AiTemplate, String> getTemplates() {
+        return templates;
     }
 }

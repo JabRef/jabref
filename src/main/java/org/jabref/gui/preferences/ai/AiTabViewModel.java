@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.ai;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,9 +19,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.fieldeditors.SimpleEditor;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
@@ -73,7 +76,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty geminiApiBaseUrl = new SimpleStringProperty();
     private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();
 
-    private final StringProperty instruction = new SimpleStringProperty();
+    private final ListProperty<AiTemplate> templatesList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(AiTemplate.values()));
+    private final ObjectProperty<AiTemplate> currentEditingTemplate = new SimpleObjectProperty<>(AiTemplate.CHATTING_SYSTEM_MESSAGE);
+
+    private final Map<AiTemplate, StringProperty> templateSources = Map.of(
+            AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(),
+            AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty()
+    );
+    private final StringProperty currentEditingTemplateSource = new SimpleStringProperty();
+
     private final StringProperty temperature = new SimpleStringProperty();
     private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
@@ -90,7 +104,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator chatModelValidator;
     private final Validator apiBaseUrlValidator;
     private final Validator embeddingModelValidator;
-    private final Validator instructionValidator;
     private final Validator temperatureTypeValidator;
     private final Validator temperatureRangeValidator;
     private final Validator contextWindowSizeValidator;
@@ -210,6 +223,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        this.currentEditingTemplateSource.addListener((observable, oldValue, newValue) -> {
+            templateSources.get(currentEditingTemplate.get()).set(newValue);
+        });
+
+        this.currentEditingTemplate.addListener((observable, oldValue, newValue) -> {
+            currentEditingTemplateSource.set(templateSources.get(newValue).get());
+        });
+
         this.apiKeyValidator = new FunctionBasedValidator<>(
                 currentApiKey,
                 token -> !StringUtil.isBlank(token),
@@ -229,11 +250,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 selectedEmbeddingModel,
                 Objects::nonNull,
                 ValidationMessage.error(Localization.lang("Embedding model has to be provided")));
-
-        this.instructionValidator = new FunctionBasedValidator<>(
-                instruction,
-                message -> !StringUtil.isBlank(message),
-                ValidationMessage.error(Localization.lang("The instruction has to be provided")));
 
         this.temperatureTypeValidator = new FunctionBasedValidator<>(
                 temperature,
@@ -301,7 +317,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
 
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
-        instruction.setValue(aiPreferences.getInstruction());
+
+        Arrays.stream(AiTemplate.values()).forEach(template ->
+                templateSources.get(template).set(aiPreferences.getTemplates().get(template)));
+
         temperature.setValue(LocalizedNumbers.doubleToString(aiPreferences.getTemperature()));
         contextWindowSize.setValue(aiPreferences.getContextWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
@@ -337,7 +356,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
         aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
 
-        aiPreferences.setInstruction(instruction.get());
+        Arrays.stream(AiTemplate.values()).forEach(template ->
+                aiPreferences.getTemplates().put(template, templateSources.get(template).get()));
+
         // We already check the correctness of temperature and RAG minimum score in validators, so we don't need to check it here.
         aiPreferences.setTemperature(LocalizedNumbers.stringToDouble(oldLocale, temperature.get()).get());
         aiPreferences.setContextWindowSize(contextWindowSize.get());
@@ -351,8 +372,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         String resetApiBaseUrl = AiDefaultPreferences.PROVIDERS_API_URLS.get(selectedAiProvider.get());
         currentApiBaseUrl.set(resetApiBaseUrl);
 
-        instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
-
         int resetContextWindowSize = AiDefaultPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(selectedAiProvider.get(), Map.of()).getOrDefault(currentChatModel.get(), 0);
         contextWindowSize.set(resetContextWindowSize);
 
@@ -361,6 +380,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         ragMaxResultsCount.set(AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         ragMinScore.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.RAG_MIN_SCORE));
+    }
+
+    public void resetTemplates() {
+        Arrays.stream(AiTemplate.values()).forEach(template ->
+                templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
     }
 
     @Override
@@ -389,7 +413,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         List<Validator> validators = List.of(
                 apiBaseUrlValidator,
                 embeddingModelValidator,
-                instructionValidator,
                 temperatureTypeValidator,
                 temperatureRangeValidator,
                 contextWindowSizeValidator,
@@ -447,8 +470,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return disableApiBaseUrl;
     }
 
-    public StringProperty instructionProperty() {
-        return instruction;
+    public ListProperty<AiTemplate> templatesProperty() {
+        return templatesList;
+    }
+
+    public ObjectProperty<AiTemplate> currentEditingTemplate() {
+        return currentEditingTemplate;
+    }
+
+    public StringProperty currentEditingTemplateSource() {
+        return currentEditingTemplateSource;
     }
 
     public StringProperty temperatureProperty() {
@@ -497,10 +528,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus getEmbeddingModelValidationStatus() {
         return embeddingModelValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getSystemMessageValidationStatus() {
-        return instructionValidator.getValidationStatus();
     }
 
     public ValidationStatus getTemperatureTypeValidationStatus() {

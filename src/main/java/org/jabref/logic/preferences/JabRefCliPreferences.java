@@ -37,6 +37,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -359,6 +360,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
+    private static final String AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE = "aiChattingSystemMessageTemplate";
+    private static final String AI_CHATTING_USER_MESSAGE_TEMPLATE = "aiChattingUserMessageTemplate";
+    private static final String AI_SUMMARIZATION_CHUNK_TEMPLATE = "aiSummarizationChunkTemplate";
+    private static final String AI_SUMMARIZATION_COMBINE_TEMPLATE = "aiSummarizationCombineTemplate";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -638,6 +644,14 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+
+        // region:AI templates
+        defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
+        defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));
+        defaults.put(AI_SUMMARIZATION_CHUNK_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK));
+        defaults.put(AI_SUMMARIZATION_COMBINE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE));
+        // endregion
+
         // endregion
     }
 
@@ -1828,7 +1842,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
                 getInt(AI_RAG_MAX_RESULTS_COUNT),
-                getDouble(AI_RAG_MIN_SCORE));
+                getDouble(AI_RAG_MIN_SCORE),
+                Map.of(
+                        AiTemplate.CHATTING_SYSTEM_MESSAGE, get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE),
+                        AiTemplate.CHATTING_USER_MESSAGE, get(AI_CHATTING_USER_MESSAGE_TEMPLATE),
+                        AiTemplate.SUMMARIZATION_CHUNK, get(AI_SUMMARIZATION_CHUNK_TEMPLATE),
+                        AiTemplate.SUMMARIZATION_COMBINE, get(AI_SUMMARIZATION_COMBINE_TEMPLATE)
+                ));
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
 

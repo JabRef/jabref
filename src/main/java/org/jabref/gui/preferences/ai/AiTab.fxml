@@ -147,10 +147,6 @@
             </children>
         </HBox>
 
-        <ResizableTextArea
-                fx:id="instructionTextArea"
-                wrapText="true"/>
-
         <GridPane hgap="10" vgap="10">
             <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
@@ -215,6 +211,32 @@
 
         <Button onAction="#onResetExpertSettingsButtonClick"
                 text="%Reset expert settings to default">
+            <graphic>
+                <JabRefIconView
+                        glyph="REFRESH"/>
+            </graphic>
+        </Button>
+
+        <HBox alignment="BASELINE_CENTER">
+            <Label styleClass="sectionHeader"
+                   text="%Templates"
+                   maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+            <Button fx:id="templatesHelp"
+                    prefWidth="20.0"/>
+        </HBox>
+
+        <ComboBox
+                fx:id="currentEditingTemplateComboBox"
+                maxWidth="1.7976931348623157E308"
+                HBox.hgrow="ALWAYS"/>
+
+        <ResizableTextArea
+                fx:id="currentEditingTemplateSourceTextArea"
+                wrapText="true"/>
+
+        <Button onAction="#onResetTemplatesButtonClick"
+                text="%Reset templates to default">
             <graphic>
                 <JabRefIconView
                         glyph="REFRESH"/>

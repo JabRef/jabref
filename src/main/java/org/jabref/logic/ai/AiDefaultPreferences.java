@@ -3,6 +3,7 @@ package org.jabref.logic.ai;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
@@ -65,7 +66,7 @@ public class AiDefaultPreferences {
     public static final boolean CUSTOMIZE_SETTINGS = false;
 
     public static final EmbeddingModel EMBEDDING_MODEL = EmbeddingModel.SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2;
-    public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers. You answer questions about papers. You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'. Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key. Here are the papers you are analyzing:\n";
+    public static final String SYSTEM_MESSAGE = "";
     public static final double TEMPERATURE = 0.7;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;
     public static final int DOCUMENT_SPLITTER_OVERLAP = 100;
@@ -77,4 +78,43 @@ public class AiDefaultPreferences {
     public static int getContextWindowSize(AiProvider aiProvider, String model) {
         return CONTEXT_WINDOW_SIZES.getOrDefault(aiProvider, Map.of()).getOrDefault(model, 0);
     }
+
+    public static final Map<AiTemplate, String> TEMPLATES = Map.of(
+            AiTemplate.CHATTING_SYSTEM_MESSAGE,
+                    "You are an AI assistant that analyses research papers. You answer questions about papers.\n" +
+                            "You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.\n" +
+                            "Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.\n\n" +
+                            "Here are the papers you are analyzing:\n" +
+                            "#foreach( $entry in $entries )\n" +
+                            "${CanonicalBibEntry.getCanonicalRepresentation($entry)}\n" +
+                            "#end",
+
+            AiTemplate.CHATTING_USER_MESSAGE, """
+                    $message
+
+                    Here is some relevant information for you:
+                    #foreach( $excerpt in $excerpts )
+                    ${excerpt.citationKey()}:
+                    ${excerpt.text()}
+                    #end""",
+
+            AiTemplate.SUMMARIZATION_CHUNK, """
+                Please provide an overview of the following text. It's a part of a scientific paper.
+                The summary should include the main objectives, methodologies used, key findings, and conclusions.
+                Mention any significant experiments, data, or discussions presented in the paper.
+
+                DOCUMENT:
+                $document
+
+                OVERVIEW:""",
+
+            AiTemplate.SUMMARIZATION_COMBINE, """
+                You have written an overview of a scientific paper. You have been collecting notes from various parts
+                of the paper. Now your task is to combine all of the notes in one structured message.
+
+                SUMMARIES:
+                $summaries
+
+                FINAL OVERVIEW:"""
+    );
 }

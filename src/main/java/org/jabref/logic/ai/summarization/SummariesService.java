@@ -11,6 +11,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,6 +38,7 @@ public class SummariesService {
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
     private final ChatLanguageModel chatLanguageModel;
+    private final TemplatesService templatesService;
     private final BooleanProperty shutdownSignal;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
@@ -44,6 +46,7 @@ public class SummariesService {
     public SummariesService(AiPreferences aiPreferences,
                             SummariesStorage summariesStorage,
                             ChatLanguageModel chatLanguageModel,
+                            TemplatesService templatesService,
                             BooleanProperty shutdownSignal,
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
@@ -51,6 +54,7 @@ public class SummariesService {
         this.aiPreferences = aiPreferences;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
+        this.templatesService = templatesService;
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
@@ -110,6 +114,7 @@ public class SummariesService {
                 bibEntry.getCitationKey().orElse("<no citation key>"),
                 bibEntry.getFiles(),
                 chatLanguageModel,
+                templatesService,
                 shutdownSignal,
                 aiPreferences,
                 filePreferences)

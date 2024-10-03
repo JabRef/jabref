@@ -15,6 +15,7 @@ import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
@@ -57,14 +58,14 @@ public class AiService implements AutoCloseable {
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
     ) {
+        TemplatesService templatesService = new TemplatesService(aiPreferences);
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
-
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
-
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
-        this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
+        this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, templatesService);
+
         this.ingestionService = new IngestionService(
                 aiPreferences,
                 shutdownSignal,
@@ -74,7 +75,8 @@ public class AiService implements AutoCloseable {
                 filePreferences,
                 taskExecutor
         );
-        this.summariesService = new SummariesService(aiPreferences, mvStoreSummariesStorage, jabRefChatLanguageModel, shutdownSignal, filePreferences, taskExecutor);
+
+        this.summariesService = new SummariesService(aiPreferences, mvStoreSummariesStorage, jabRefChatLanguageModel, templatesService, shutdownSignal, filePreferences, taskExecutor);
     }
 
     public JabRefChatLanguageModel getChatLanguageModel() {
