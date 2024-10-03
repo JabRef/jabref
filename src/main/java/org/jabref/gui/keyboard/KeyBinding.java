@@ -90,7 +90,6 @@ public enum KeyBinding {
     SHOW_PREFS("Preferences", Localization.lang("Preferences"), "ctrl+,", KeyBindingCategory.FILE),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl+V", KeyBindingCategory.EDIT),
-    PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift+F9", KeyBindingCategory.VIEW),
     PREVIOUS_LIBRARY("Previous library", Localization.lang("Previous library"), "ctrl+PAGE_UP", KeyBindingCategory.VIEW),
     SCROLL_TO_NEXT_MATCH_CATEGORY("Scroll to next match category", Localization.lang("Scroll to next match category"), "right", KeyBindingCategory.VIEW),
