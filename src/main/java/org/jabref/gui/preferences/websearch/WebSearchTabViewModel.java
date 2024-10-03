@@ -5,10 +5,6 @@ import java.net.HttpURLConnection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -231,15 +227,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         if (!apiKey.isEmpty()) {
             URLDownload urlDownload;
             try {
-                SSLSocketFactory defaultSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
-                HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-
                 urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
                 // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
                 int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
                 keyValid = (statusCode >= 200) && (statusCode < 300);
-
-                URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
             } catch (IOException | UnirestException e) {
                 keyValid = false;
             }

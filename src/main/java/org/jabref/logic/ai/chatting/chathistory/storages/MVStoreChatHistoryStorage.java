@@ -119,10 +119,6 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
         return mvStore.openMap(bibDatabasePath + "-" + type + "-" + name);
     }
 
-    public void commit() {
-        mvStore.commit();
-    }
-
     @Override
     protected String errorMessageForOpening() {
         return "An error occurred while opening chat history storage. Chat history of entries and groups will not be stored in the next session.";

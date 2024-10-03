@@ -32,7 +32,7 @@
         <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
         <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search Selected'"/>
+    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search pre-configured'"/>
     <TableView
             fx:id="catalogTable"
             VBox.vgrow="ALWAYS"
