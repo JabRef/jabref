@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * And it also will store the summaries.
  */
 public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.ai.ingestion.GenerateEmbeddingsForSeveralTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryForSeveralTask.class);
 
     private final StringProperty groupName;
     private final List<ProcessingInfo<BibEntry, Summary>> entries;
