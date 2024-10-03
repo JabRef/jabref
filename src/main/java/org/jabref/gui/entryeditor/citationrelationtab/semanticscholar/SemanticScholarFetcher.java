@@ -33,7 +33,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
-        if (!entry.getDOI().isPresent()) {
+        if (entry.getDOI().isEmpty()) {
             return List.of();
         }
 
@@ -59,7 +59,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
-        if (!entry.getDOI().isPresent()) {
+        if (entry.getDOI().isEmpty()) {
             return List.of();
         }
 

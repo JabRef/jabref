@@ -126,7 +126,7 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
 
         for (String key : result.getUniqueKeys()) {
-            if (!result.getGeneratedBibDatabase().getEntryByCitationKey(key).isPresent()) {
+            if (result.getGeneratedBibDatabase().getEntryByCitationKey(key).isEmpty()) {
                 Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(key);
                 if (entry.isPresent()) {
                     entriesToInsert.add(entry.get());
@@ -155,7 +155,7 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
         for (BibEntry entry : entries) {
             entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
-                if (!result.getGeneratedBibDatabase().getEntryByCitationKey(crossref).isPresent()) {
+                if (result.getGeneratedBibDatabase().getEntryByCitationKey(crossref).isEmpty()) {
                     Optional<BibEntry> refEntry = masterDatabase.getEntryByCitationKey(crossref);
 
                     if (refEntry.isPresent()) {

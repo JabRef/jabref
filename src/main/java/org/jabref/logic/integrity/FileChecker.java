@@ -36,7 +36,7 @@ public class FileChecker implements ValueChecker {
 
         for (LinkedFile file : linkedFiles) {
             Optional<Path> linkedFile = file.findIn(context, filePreferences);
-            if ((!linkedFile.isPresent()) || !Files.exists(linkedFile.get())) {
+            if ((linkedFile.isEmpty()) || !Files.exists(linkedFile.get())) {
                 return Optional.of(Localization.lang("link should refer to a correct file path"));
             }
         }

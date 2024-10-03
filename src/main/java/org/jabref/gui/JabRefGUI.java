@@ -392,7 +392,9 @@ public class JabRefGUI extends Application {
 
     public static void shutdownThreadPools() {
         LOGGER.trace("Shutting down taskExecutor");
-        taskExecutor.shutdown();
+        if (taskExecutor != null) {
+            taskExecutor.shutdown();
+        }
         LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
         LOGGER.trace("Shutting down directoryMonitor");
