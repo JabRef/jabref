@@ -15,12 +15,12 @@ import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
-import org.jabref.logic.importer.fetcher.LlmCitationFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
+import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.model.database.BibDatabaseContext;
 
 import io.github.classgraph.ClassGraph;
@@ -138,8 +138,8 @@ class WebFetchersTest {
             expected.remove(PagedSearchBasedFetcher.class);
 
             // Remove GROBID and LLM, because we don't want to show this to the user (since they convert text to BibTeX)
-            expected.remove(GrobidCitationFetcher.class);
-            expected.remove(LlmCitationFetcher.class);
+            expected.remove(GrobidPlainCitationParser.class);
+            expected.remove(LlmPlainCitationParser.class);
 
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
