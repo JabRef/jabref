@@ -59,6 +59,12 @@ public class SummariesService {
         this.taskExecutor = taskExecutor;
     }
 
+    /**
+     * Start generating summary of a {@link BibEntry}, if it was already generated.
+     * This method returns a {@link ProcessingInfo} that can be used for tracking state of the summarization.
+     * Returned {@link ProcessingInfo} is related to the passed {@link BibEntry}, so if you call this method twice
+     * on the same {@link BibEntry}, the method will return the same {@link ProcessingInfo}.
+     */
     public ProcessingInfo<BibEntry, Summary> summarize(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         ProcessingInfo<BibEntry, Summary> processingInfo = getProcessingInfo(bibEntry);
 
