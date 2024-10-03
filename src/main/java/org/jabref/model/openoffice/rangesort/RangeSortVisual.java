@@ -67,7 +67,7 @@ public class RangeSortVisual {
         // collect ordered result
         List<RangeSortable<T>> result = new ArrayList<>(comparableMarks.size());
         for (ComparableMark<RangeSortable<T>> mark : comparableMarks) {
-            result.add(mark.getContent());
+            result.add(mark.content());
         }
 
         if (result.size() != inputSize) {
@@ -111,20 +111,6 @@ public class RangeSortVisual {
      * <p>
      * Used for sorting reference marks by their visual positions.
      */
-    private static class ComparableMark<T> {
-
-        private final Point position;
-        private final int indexInPosition;
-        private final T content;
-
-        public ComparableMark(Point position, int indexInPosition, T content) {
-            this.position = position;
-            this.indexInPosition = indexInPosition;
-            this.content = content;
-        }
-
-        public T getContent() {
-            return content;
-        }
+    private record ComparableMark<T>(Point position, int indexInPosition, T content) {
     }
 }

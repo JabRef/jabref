@@ -1,6 +1,7 @@
 package org.jabref.gui.maintable;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -39,12 +40,14 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -75,6 +78,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final UndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
+    private final ClipboardContentGenerator clipboardContentGenerator;
+
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -100,6 +105,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
+        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -392,12 +398,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        // The following is necessary to initiate the drag and drop in JavaFX,
-        // although we don't need the contents, it does not work without
-        // Drag'n'drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
-        ClipboardContent content = new ClipboardContent();
-        Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);
+        ClipboardContent content;
+        try {
+            content = clipboardContentGenerator.generate(entries, CitationStyleOutputFormat.HTML, database);
+        } catch (IOException e) {
+            LOGGER.warn("Could not generate clipboard content. Falling back to empty clipboard", e);
+            content = new ClipboardContent();
+        }
+        // Required to be able to drop the entries inside JabRef
         content.put(DragAndDropDataFormats.ENTRIES, "");
+
+        // Drag'n'drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
+        Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);
         dragboard.setContent(content);
 
         if (!entries.isEmpty()) {

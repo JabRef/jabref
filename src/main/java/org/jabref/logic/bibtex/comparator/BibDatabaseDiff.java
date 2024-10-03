@@ -41,7 +41,7 @@ public class BibDatabaseDiff {
     }
 
     private boolean isEmpty() {
-        return !metaDataDiff.isPresent() && !preambleDiff.isPresent() && bibStringDiffs.isEmpty() && entryDiffs.isEmpty();
+        return metaDataDiff.isEmpty() && preambleDiff.isEmpty() && bibStringDiffs.isEmpty() && entryDiffs.isEmpty();
     }
 
     private List<BibEntryDiff> getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
