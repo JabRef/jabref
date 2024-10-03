@@ -30,13 +30,13 @@ public class PostgresSQLNotificationListener implements Runnable {
     public void run() {
         stop = false;
         try {
-            // noinspection InfiniteLoopStatement
-            while (!stop) {
-                PGNotification notifications[] = pgConnection.getNotifications();
+            while (!stop && !Thread.currentThread().isInterrupted()) {
+                PGNotification[] notifications = pgConnection.getNotifications();
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
                         if (!notification.getName().equals(DBMSProcessor.PROCESSOR_ID)) {
+                            // Only process notifications that are not sent by this processor
                             dbmsSynchronizer.pullChanges();
                         }
                     }

@@ -9,14 +9,25 @@ For user documentation, see <https://docs.jabref.org/collaborative-work/sqldatab
 
 ## Handling large shared databases
 
-Synchronization times may get long when working with a large database containing several thousand entries. Therefore, synchronization only happens if several conditions are fulfilled:
+Synchronization times may get long when working with a large database containing several thousand entries.
+Therefore, we use PostgreSQL's `LISTEN` and `NOTIFY` commands to inform the client about changes in the database on an entry level.
+
+Background reading: <https://www.baeldung.com/spring-postgresql-message-broker>.
+
+## Handling synchronization of "micro-edits"
+
+It causes too much load both on the server and at all subscribed clients to synchronize every single letter change.
+Therefore, synchronization only happens if several conditions are fulfilled:
 
 * Edit to another field.
 * Major changes have been made (pasting or deleting more than one character).
 
 Class `org.jabref.logic.util.CoarseChangeFilter.java` checks both conditions.
 
-Remaining changes that have not been synchronized yet are saved at closing the database rendering additional closing time. Saving is realized in `org.jabref.logic.shared.DBMSSynchronizer.java`. Following methods account for synchronization modes:
+Remaining changes that have not been synchronized yet are saved at closing the database rendering additional closing time.
+Saving is realized in `org.jabref.logic.shared.DBMSSynchronizer.java`.
+
+Following methods account for synchronization modes:
 
 * `pullChanges` synchronizes the database unconditionally.
 * `pullLastEntryChanges` synchronizes only if there are remaining entry changes. It is invoked when closing the shared database (`closeSharedDatabase`).

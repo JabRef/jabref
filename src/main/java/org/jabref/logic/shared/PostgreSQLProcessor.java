@@ -35,7 +35,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
     @Override
     public void setUp() throws SQLException {
-
         if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
             // checkTableAvailability does not distinguish if same table name exists in different schemas
             // VERSION_DB_STRUCT_DEFAULT must be forced
