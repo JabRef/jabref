@@ -205,18 +205,10 @@ dependencies {
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
-
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // Support unix socket connection types
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
-    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0'
-
-    implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
-        // causing module issues
-        exclude module: 'oraclepki'
-    }
 
     implementation ('com.google.guava:guava:33.1.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
@@ -803,24 +795,8 @@ jlink {
         uses 'kong.unirest.core.json.JsonEngine'
         uses 'org.eclipse.jgit.lib.Signer'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
-        uses 'org.mariadb.jdbc.LocalInfileInterceptor'
-        uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
-        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
-        uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
 
-        provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.NativePasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.OldPasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.SendGssApiAuthPacket',
-                'org.mariadb.jdbc.internal.com.send.authentication.SendPamAuthPacket',
-                'org.mariadb.jdbc.internal.com.send.authentication.Sha256PasswordPlugin'
-        provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
-                'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
-                'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';

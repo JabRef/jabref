@@ -59,16 +59,12 @@ public abstract class DBMSProcessor {
         boolean databasePassesIntegrityCheck = false;
         DBMSType type = this.connectionProperties.getType();
         Map<String, String> metadata = getSharedMetaData();
-        if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
-            String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
-            if (metadataVersion != null) {
-                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, "").replace(";", ""));
-                if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
-                    databasePassesIntegrityCheck = true;
-                }
+        String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
+        if (metadataVersion != null) {
+            int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, "").replace(";", ""));
+            if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
+                databasePassesIntegrityCheck = true;
             }
-        } else {
-            databasePassesIntegrityCheck = checkTableAvailability("ENTRY", "FIELD", "METADATA");
         }
         return databasePassesIntegrityCheck;
     }
@@ -667,15 +663,7 @@ public abstract class DBMSProcessor {
      * Returns a new instance of the abstract type {@link DBMSProcessor}
      */
     public static DBMSProcessor getProcessorInstance(DatabaseConnection connection) {
-        DBMSType type = connection.getProperties().getType();
-        if (type == DBMSType.MYSQL) {
-            return new MySQLProcessor(connection);
-        } else if (type == DBMSType.POSTGRESQL) {
-            return new PostgreSQLProcessor(connection);
-        } else if (type == DBMSType.ORACLE) {
-            return new OracleProcessor(connection);
-        }
-        return null; // can never happen except new types were added without updating this method.
+        return new PostgreSQLProcessor(connection);
     }
 
     public DatabaseConnectionProperties getDBMSConnectionProperties() {
