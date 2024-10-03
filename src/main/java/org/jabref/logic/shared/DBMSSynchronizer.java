@@ -247,7 +247,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
+            // TODO: Either reenable (compare with fix https://github.com/JabRef/jabref/pull/11282) or write user documentation that "cleanup actions" should be used or introduce SQL databse cleanup (stored procedure, ...)
+            // BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
+
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
