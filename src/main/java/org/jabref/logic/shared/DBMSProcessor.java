@@ -291,7 +291,7 @@ public abstract class DBMSProcessor {
                 preparedFieldStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
@@ -302,6 +302,7 @@ public abstract class DBMSProcessor {
      * @throws SQLException in case of error
      */
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
+        // FIXME: either two connections (one with auto commit and one without) or better auto commit state - this line here can lead to issues if autocommit is required in a parallel thread
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
         try {
@@ -345,7 +346,7 @@ public abstract class DBMSProcessor {
                 throw new OfflineLockException(localBibEntry, sharedBibEntry);
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
             connection.rollback(); // undo changes made in current transaction
         } finally {
             connection.setAutoCommit(true); // enable auto commit mode again
