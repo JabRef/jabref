@@ -230,6 +230,18 @@ class LayoutEntry {
         }
     }
 
+    private String resolveFieldEntry(BibEntry bidEntry, BibDatabase database) {
+        // resolve field (recognized by leading backslash) or text
+        if (text.startsWith("\\")) {
+            return bidEntry.getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database)
+                           .orElse("");
+        }
+        if (database == null) {
+            return text;
+        }
+        return database.resolveForStrings(text);
+    }
+
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
@@ -239,12 +251,7 @@ class LayoutEntry {
             LOGGER.warn("'{}' is an obsolete name for the entry type. Please update your layout to use '{}' instead.", InternalField.OBSOLETE_TYPE_HEADER, InternalField.TYPE_HEADER);
             fieldEntry = bibtex.getType().getDisplayName();
         } else {
-            // changed section begin - arudert
-            // resolve field (recognized by leading backslash) or text
-            fieldEntry = text.startsWith("\\") ? bibtex
-                    .getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database)
-                    .orElse("") : BibDatabase.getText(text, database);
-            // changed section end - arudert
+            fieldEntry = resolveFieldEntry(bibtex, database);
         }
 
         if (option != null) {
@@ -360,7 +367,9 @@ class LayoutEntry {
                 throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
 
             case LayoutHelper.IS_OPTION_FIELD:
-                String field = BibDatabase.getText(text, databaseContext.getDatabase());
+                String field = Optional.ofNullable(databaseContext.getDatabase())
+                                       .map(db -> db.resolveForStrings(text))
+                                       .orElse(text);
                 if (option != null) {
                     for (LayoutFormatter anOption : option) {
                         field = anOption.format(field);
