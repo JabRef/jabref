@@ -15,14 +15,13 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private int majorCharacterChange = 0;
 
     /**
+     * @param location Location affected by this event
      * @param bibEntry Affected BibEntry object
      * @param field    Name of field which has been changed
      * @param oldValue old field value
      * @param newValue new field value
-     * @param location Location affected by this event
      */
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue,
-                             EntriesEventSource location) {
+    public FieldChangedEvent(EntriesEventSource location, BibEntry bibEntry, Field field, String oldValue, String newValue) {
         super(bibEntry, location);
         this.field = field;
         this.newValue = newValue;
@@ -35,7 +34,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
      * @param field    Name of field which has been changed
      * @param newValue new field value
      */
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {
+    public FieldChangedEvent(BibEntry bibEntry, Field field, String oldValue, String newValue) {
         super(bibEntry);
         this.field = field;
         this.newValue = newValue;

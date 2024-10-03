@@ -373,10 +373,7 @@ public class BibEntry implements Cloneable {
     @VisibleForTesting
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
-        String oldId = this.id;
-
-        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
+        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, this.id, id));
         this.id = id;
         changed = true;
     }
