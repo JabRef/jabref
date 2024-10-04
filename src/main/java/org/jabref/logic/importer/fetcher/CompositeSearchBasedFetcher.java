@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
-    public static final String FETCHER_NAME = "Search Selected";
+    public static final String FETCHER_NAME = "Search pre-configured";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 

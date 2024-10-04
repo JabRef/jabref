@@ -93,21 +93,11 @@ public class EditMerge {
         return madeModifications;
     }
 
-    private static class JoinableGroupData {
-        /**
-         * A list of consecutive citation groups only separated by spaces.
-         */
-        List<CitationGroup> group;
-
-        /**
-         * A cursor covering the XTextRange of each entry in group (and the spaces between them)
-         */
-        XTextCursor groupCursor;
-
-        JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
-            this.group = group;
-            this.groupCursor = groupCursor;
-        }
+    /**
+     * @param group       A list of consecutive citation groups only separated by spaces.
+     * @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
+     */
+    private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
     }
 
     private static class ScanState {
