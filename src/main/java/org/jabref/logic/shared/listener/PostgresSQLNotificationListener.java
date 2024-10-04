@@ -31,21 +31,20 @@ public class PostgresSQLNotificationListener implements Runnable {
         stop = false;
         try {
             while (!stop && !Thread.currentThread().isInterrupted()) {
-                PGNotification[] notifications = pgConnection.getNotifications();
+                // Wait for 12 seconds for notifications. Result will be null if no notifications arrive
+                PGNotification[] notifications = pgConnection.getNotifications(12_000);
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
                         if (!notification.getName().equals(DBMSProcessor.PROCESSOR_ID)) {
+                            notification.getParameter();
                             // Only process notifications that are not sent by this processor
                             dbmsSynchronizer.pullChanges();
                         }
                     }
                 }
-
-                // Wait a while before checking again for new notifications
-                Thread.sleep(500);
             }
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             LOGGER.error("Error while listening for updates to PostgresSQL", exception);
         }
     }
