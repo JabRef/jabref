@@ -327,13 +327,14 @@ public class GroupDialogViewModel {
                     // Otherwise, it means that the user did not accept the migration to the new version.
                     Optional<GroupTreeNode> groups = currentDatabase.getMetaData().getGroups();
                     if (groups.filter(this::groupOrSubgroupIsSearchGroup).isEmpty()) {
-                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA);
+                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1);
                     }
                 }
 
                 Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
                 if (indexManager.isPresent()) {
                     SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                    // TODO: search should be done in a background thread
                     searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
                 }
             } else if (typeAutoProperty.getValue()) {

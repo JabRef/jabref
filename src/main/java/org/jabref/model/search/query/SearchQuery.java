@@ -9,10 +9,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.search.query.SearchToSqlConversion;
+import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.search.SearchFlags;
-
-import org.apache.lucene.search.Query;
 
 public class SearchQuery {
     /**
@@ -57,7 +55,7 @@ public class SearchQuery {
 
     private String parseError;
     private String sqlQuery;
-    private Query luceneQuery;
+    private String luceneQuery;
     private SearchResults searchResults;
 
     public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
@@ -67,14 +65,14 @@ public class SearchQuery {
 
     public String getSqlQuery(String table) {
         if (sqlQuery == null) {
-            sqlQuery = SearchToSqlConversion.searchToSql(table, searchExpression);
+            sqlQuery = SearchQueryConversion.searchToSql(table, searchExpression);
         }
         return sqlQuery;
     }
 
-    public Query getLuceneQuery() {
+    public String getLuceneQuery() {
         if (luceneQuery == null) {
-            // TODO: convert to lucene query
+            luceneQuery = SearchQueryConversion.searchToLucene(searchExpression);
         }
         return luceneQuery;
     }

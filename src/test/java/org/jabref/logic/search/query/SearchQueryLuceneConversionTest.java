@@ -1,4 +1,4 @@
-package org.jabref.migrations;
+package org.jabref.logic.search.query;
 
 import java.util.stream.Stream;
 
@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SearchToLuceneMigrationTest {
+class SearchQueryLuceneConversionTest {
 
     public static Stream<Arguments> transformationNormal() {
         return Stream.of(
@@ -50,7 +50,7 @@ class SearchToLuceneMigrationTest {
     @ParameterizedTest
     @MethodSource
     void transformationNormal(String expected, String query) {
-        String result = SearchToLuceneMigration.migrateToLuceneSyntax(query, false);
+        String result = SearchQueryConversion.searchToLucene(query);
         assertEquals(expected, result);
     }
 
@@ -67,7 +67,7 @@ class SearchToLuceneMigrationTest {
     @ParameterizedTest
     @MethodSource
     void transformationRegularExpression(String expected, String query) {
-        String result = SearchToLuceneMigration.migrateToLuceneSyntax(query, true);
+        String result = SearchQueryConversion.searchToLucene(query);
         assertEquals(expected, result);
     }
 }

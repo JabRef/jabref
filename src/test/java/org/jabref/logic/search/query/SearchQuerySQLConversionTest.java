@@ -1,13 +1,11 @@
-package org.jabref.logic.search;
-
-import org.jabref.logic.search.query.SearchToSqlConversion;
+package org.jabref.logic.search.query;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SearchToSqlConversionTest {
+class SearchQuerySQLConversionTest {
     @ParameterizedTest
     @CsvSource({
             "(), alex",
@@ -87,6 +85,6 @@ class SearchToSqlConversionTest {
     })
 
     void conversion(String expectedWhereClause, String input) {
-        assertEquals(expectedWhereClause, SearchToSqlConversion.searchToSql("tableName", input));
+        assertEquals(expectedWhereClause, SearchQueryConversion.searchToSql("tableName", input));
     }
 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.query;
 
 import java.util.stream.Stream;
 

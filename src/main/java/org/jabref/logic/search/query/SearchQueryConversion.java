@@ -1,5 +1,8 @@
 package org.jabref.logic.search.query;
 
+import java.util.EnumSet;
+
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -10,14 +13,25 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SearchToSqlConversion {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlConversion.class);
+public class SearchQueryConversion {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchQueryConversion.class);
 
     public static String searchToSql(String table, String searchExpression) {
         LOGGER.debug("Converting search expression to SQL: {}", searchExpression);
         SearchParser.StartContext context = getStartContext(searchExpression);
         SearchToSqlVisitor searchToSqlVisitor = new SearchToSqlVisitor(table);
         return searchToSqlVisitor.visit(context);
+    }
+
+    public static String flagsToSearchExpression(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        LOGGER.debug("Converting search flags to search expression: {}, flags {}", searchExpression, searchFlags);
+        SearchParser.StartContext context = getStartContext(searchExpression);
+        return new SearchFlagsToExpressionVisitor(searchFlags).visit(context);
+    }
+
+    public static String searchToLucene(String searchExpression) {
+        LOGGER.debug("Converting search expression to Lucene: {}", searchExpression);
+        return "";
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {

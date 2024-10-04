@@ -222,7 +222,7 @@ public class IndexManager {
 
     public SearchResults search(SearchQuery query) {
         SearchResults searchResults = new SearchResults();
-
+        searchResults.mergeSearchResults(bibFieldsSearcher.search(query));
 //        if (query.isValid()) {
 //            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
 //        } else {
@@ -230,10 +230,9 @@ public class IndexManager {
 //        }
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             // TODO: merge results from lucene and postgres
-        } else {
-            query.setSearchResults(bibFieldsSearcher.search(query));
         }
-        return query.getSearchResults();
+        query.setSearchResults(searchResults);
+        return searchResults;
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.jabref.migrations;
+package org.jabref.logic.search.query;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Converts to a Lucene index with the assumption that the ngram analyzer is used.
- *
+ * <p>
  * Tests are located in {@link org.jabref.migrations.SearchToLuceneMigrationTest}.
  */
 public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
