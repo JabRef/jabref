@@ -290,7 +290,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 

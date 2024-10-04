@@ -24,8 +24,8 @@ public class FieldChangedEvent extends EntryChangedEvent {
     public FieldChangedEvent(EntriesEventSource location, BibEntry bibEntry, Field field, String oldValue, String newValue) {
         super(bibEntry, location);
         this.field = field;
-        this.newValue = newValue;
         this.oldValue = oldValue;
+        this.newValue = newValue;
         this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
@@ -57,7 +57,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this(fieldChange, EntriesEventSource.LOCAL);
     }
 
-    private int computeMajorCharacterChange(String oldValue, String newValue) {
+    private static int computeMajorCharacterChange(String oldValue, String newValue) {
         // We do == because of performance reasons
         if (oldValue == newValue) {
             return 0;

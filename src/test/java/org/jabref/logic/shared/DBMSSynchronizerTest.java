@@ -36,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * More tests are located at {@link org.jabref.logic.shared.SynchronizationSimulatorTest} and {@link org.jabref.logic.shared.DBMSProcessorTest}.
+ */
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class DBMSSynchronizerTest {
@@ -100,6 +103,7 @@ class DBMSSynchronizerTest {
         expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
+
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer");
 
