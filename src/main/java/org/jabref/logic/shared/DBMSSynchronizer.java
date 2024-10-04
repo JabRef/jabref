@@ -186,7 +186,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedID())) {
+                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedId())) {
                     remoteEntryMatchingOneLocalEntryFound = true;
                     if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
@@ -230,7 +230,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =
                 localEntries.stream()
-                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedID()))
+                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedId()))
                             .collect(Collectors.toList());
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));

@@ -916,7 +916,7 @@ public class BibEntry implements Cloneable {
     }
 
     public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
+        sharedBibEntryData.setSharedId(sharedId);
         sharedBibEntryData.setVersion(version);
         return this;
     }

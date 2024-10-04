@@ -11,23 +11,23 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     // It has to be unique on remote DBS for all connected JabRef instances.
     // The old id above does not satisfy this requirement.
     // This is "ID" in JabDrive sync
-    private int sharedID;
+    private int sharedId;
 
     // Needed for version controlling if used on shared database
     // This is "Revision" in JabDrive sync
     private int version;
 
     public SharedBibEntryData() {
-        this.sharedID = -1;
+        this.sharedId = -1;
         this.version = 1;
     }
 
-    public int getSharedID() {
-        return sharedID;
+    public int getSharedId() {
+        return sharedId;
     }
 
-    public void setSharedID(int sharedID) {
-        this.sharedID = sharedID;
+    public void setSharedId(int sharedId) {
+        this.sharedId = sharedId;
     }
 
     public int getVersion() {
@@ -41,17 +41,17 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                          .add("sharedID", sharedID)
+                          .add("sharedId", sharedId)
                           .add("version", version)
                           .toString();
     }
 
     @Override
     public int compareTo(SharedBibEntryData o) {
-        if (this.sharedID == o.sharedID) {
+        if (this.sharedId == o.sharedId) {
             return Integer.compare(this.version, o.version);
         } else {
-            return Integer.compare(this.sharedID, o.sharedID);
+            return Integer.compare(this.sharedId, o.sharedId);
         }
     }
 }

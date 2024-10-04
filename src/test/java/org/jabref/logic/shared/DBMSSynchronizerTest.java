@@ -54,7 +54,7 @@ class DBMSSynchronizerTest {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J" + index)
                 .withField(StandardField.TITLE, "The nano processor" + index);
-        bibEntry.getSharedBibEntryData().setSharedID(index);
+        bibEntry.getSharedBibEntryData().setSharedId(index);
         return bibEntry;
     }
 
@@ -207,7 +207,7 @@ class DBMSSynchronizerTest {
         modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedId());
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());

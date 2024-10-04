@@ -72,7 +72,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(expectedEntry);
 
         BibEntry emptyEntry = getBibEntryExample();
-        emptyEntry.getSharedBibEntryData().setSharedID(1);
+        emptyEntry.getSharedBibEntryData().setSharedId(1);
         dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
 
         Map<String, String> actualFieldMap = new HashMap<>();
@@ -136,7 +136,7 @@ class DBMSProcessorTest {
         expectedEntry.clearField(StandardField.BOOKTITLE);
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedId());
         assertEquals(Optional.of(expectedEntry), actualEntry);
     }
 
@@ -150,7 +150,7 @@ class DBMSProcessorTest {
         // Update field should now find the entry
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedId());
         assertEquals(Optional.of(expectedEntry), actualEntry);
     }
 
@@ -192,7 +192,7 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(expectedBibEntry);
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
-                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
+                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedId());
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
@@ -274,7 +274,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedBibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedId());
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
@@ -296,8 +296,8 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(secondEntry);
 
         Map<Integer, Integer> expectedIDVersionMap = new HashMap<>();
-        expectedIDVersionMap.put(firstEntry.getSharedBibEntryData().getSharedID(), 1);
-        expectedIDVersionMap.put(secondEntry.getSharedBibEntryData().getSharedID(), 2);
+        expectedIDVersionMap.put(firstEntry.getSharedBibEntryData().getSharedId(), 1);
+        expectedIDVersionMap.put(secondEntry.getSharedBibEntryData().getSharedId(), 2);
 
         Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
@@ -344,7 +344,7 @@ class DBMSProcessorTest {
                 .withField(StandardField.AUTHOR, "Author")
                 .withField(StandardField.TITLE, "")
                 .withField(StandardField.YEAR, "");
-        bibEntry.getSharedBibEntryData().setSharedID(1);
+        bibEntry.getSharedBibEntryData().setSharedId(1);
         return bibEntry;
     }
 
@@ -417,7 +417,7 @@ class DBMSProcessorTest {
             }
         }
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
-                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
+                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedId(),
                                                                             bibEntry -> bibEntry.getFieldMap().entrySet().stream()
                                                                                                   .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
