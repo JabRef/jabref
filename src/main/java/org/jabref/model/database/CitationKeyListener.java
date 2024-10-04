@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Updates references of citation keys if the citation key of an entry is changed.
@@ -28,9 +29,7 @@ public class CitationKeyListener {
     @Subscribe
     public void listen(FieldChangedEvent event) {
         if (event.getField().equals(InternalField.KEY_FIELD)) {
-            String newKey = event.getNewValue();
-            String oldKey = event.getOldValue();
-            updateEntryLinks(newKey, oldKey);
+            updateEntryLinks(event.getOldValue(), event.getNewValue());
         }
     }
 
@@ -39,11 +38,11 @@ public class CitationKeyListener {
         List<BibEntry> entries = event.getBibEntries();
         for (BibEntry entry : entries) {
             Optional<String> citeKey = entry.getCitationKey();
-            citeKey.ifPresent(oldkey -> updateEntryLinks(null, oldkey));
+            citeKey.ifPresent(oldkey -> updateEntryLinks(oldkey, null));
         }
     }
 
-    private void updateEntryLinks(String newKey, String oldKey) {
+    private void updateEntryLinks(String oldKey, @Nullable String newKey) {
         for (BibEntry entry : database.getEntries()) {
             entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
                  .forEach(field -> {
@@ -53,12 +52,15 @@ public class CitationKeyListener {
             entry.getFields(field -> field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK))
                  .forEach(field -> {
                      String fieldContent = entry.getField(field).orElseThrow();
-                     replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+                     replaceKeyInMultiplesKeyField(entry, field, fieldContent, oldKey, newKey);
                  });
         }
     }
 
-    private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
+    /**
+     * @param newKey The new key. If null, the key is removed.
+     */
+    private void replaceKeyInMultiplesKeyField(BibEntry entry, Field field, String fieldContent, String oldKey, @Nullable String newKey) {
         List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(BibEntry.ENTRY_LINK_SEPARATOR)));
         int index = keys.indexOf(oldKey);
         if (index != -1) {
