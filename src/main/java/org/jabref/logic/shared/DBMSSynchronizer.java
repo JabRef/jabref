@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
@@ -134,9 +133,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
             synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
-            synchronizeLocalDatabase();
-            applyMetaData();
-            dbmsProcessor.notifyClients();
+            // TODO: applyMetaData();
         }
     }
 
@@ -289,6 +286,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         try {
             dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
+            // TODO: synchronize with server - currently, only data is written to the server
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
@@ -304,13 +302,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
             try {
                 // synchronize only if changes were present
-                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
+                // TODO: apply save actions
+                // if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
+                if (false) {
                     dbmsProcessor.updateEntry(bibEntry);
                 }
             } catch (OfflineLockException exception) {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
             } catch (SQLException e) {
-                LOGGER.error("SQL Error: ", e);
+                LOGGER.error("SQL Error", e);
             }
         }
     }
