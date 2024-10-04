@@ -97,7 +97,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (event.isFilteredOut() || !isEventSourceAccepted(event) || !checkCurrentConnection()) {
+        if (event.isFiltered() || !isEventSourceAccepted(event) || !checkCurrentConnection()) {
             return;
         }
 
