@@ -448,7 +448,7 @@ public class BibEntry implements Cloneable {
         this.type.setValue(newType);
 
         FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldChangedEvent(eventSource, change));
         return Optional.of(change);
     }
 
@@ -640,7 +640,7 @@ public class BibEntry implements Cloneable {
         if (isNewField) {
             eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
         } else {
-            eventBus.post(new FieldChangedEvent(change, eventSource));
+            eventBus.post(new FieldChangedEvent(eventSource, change));
         }
         return Optional.of(change);
     }

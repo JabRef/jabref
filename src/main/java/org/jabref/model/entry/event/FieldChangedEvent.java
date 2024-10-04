@@ -15,14 +15,14 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private int majorCharacterChange = 0;
 
     /**
-     * @param location Location affected by this event
+     * @param source source of this event
      * @param bibEntry Affected BibEntry object
      * @param field    Name of field which has been changed
      * @param oldValue old field value
      * @param newValue new field value
      */
-    public FieldChangedEvent(EntriesEventSource location, BibEntry bibEntry, Field field, String oldValue, String newValue) {
-        super(bibEntry, location);
+    public FieldChangedEvent(EntriesEventSource source, BibEntry bibEntry, Field field, String oldValue, String newValue) {
+        super(bibEntry, source);
         this.field = field;
         this.oldValue = oldValue;
         this.newValue = newValue;
@@ -42,11 +42,8 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
-    /**
-     * @param location Location affected by this event
-     */
-    public FieldChangedEvent(FieldChange fieldChange, EntriesEventSource location) {
-        super(fieldChange.getEntry(), location);
+    public FieldChangedEvent(EntriesEventSource source, FieldChange fieldChange) {
+        super(fieldChange.getEntry(), source);
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
@@ -54,7 +51,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
-        this(fieldChange, EntriesEventSource.LOCAL);
+        this(EntriesEventSource.LOCAL, fieldChange);
     }
 
     private static int computeMajorCharacterChange(String oldValue, String newValue) {
