@@ -17,7 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
@@ -33,6 +32,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Lists;
+import io.github.thibaultmeyer.cuid.CUID;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DBMSProcessor {
 
-    public static final String PROCESSOR_ID = UUID.randomUUID().toString();
-
+    public static final String PROCESSOR_ID = CUID.randomCUID2(8).toString();
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
