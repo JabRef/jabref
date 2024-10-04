@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
+import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.SharedBibEntryData;
@@ -51,7 +51,7 @@ public final class DBMSProcessor {
 
     protected DatabaseConnectionProperties connectionProperties;
 
-    private PostgresSQLNotificationListener listener;
+    private NotificationListener listener;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
@@ -711,7 +711,7 @@ public final class DBMSProcessor {
             // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
             // Otherwise, the listener is going to be deleted by Java's garbage collector.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
-            listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
+            listener = new NotificationListener(dbmsSynchronizer, pgConnection);
             HeadlessExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
             LOGGER.error("SQL Error during starting the notification listener", e);
@@ -731,4 +731,3 @@ public final class DBMSProcessor {
     }
 }
 
-//             connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");

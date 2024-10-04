@@ -1,4 +1,4 @@
-package org.jabref.logic.shared.listener;
+package org.jabref.logic.shared.notifications;
 
 import java.sql.SQLException;
 
@@ -13,15 +13,15 @@ import org.slf4j.LoggerFactory;
 /**
  * A listener for PostgreSQL database notifications.
  */
-public class PostgresSQLNotificationListener implements Runnable {
+public class NotificationListener implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationListener.class);
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
     private volatile boolean stop;
 
-    public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
+    public NotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
