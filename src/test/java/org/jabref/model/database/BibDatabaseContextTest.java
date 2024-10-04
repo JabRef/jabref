@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -109,7 +110,7 @@ class BibDatabaseContextTest {
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-        Path userDirJabRef = OS.getNativeDesktop().getDefaultFileChooserDirectory();
+        Path userDirJabRef = NativeDesktop.get().getDefaultFileChooserDirectory();
 
         when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
@@ -150,7 +151,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(null);
 
-        Path expectedPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory().resolve("unsaved");
+        Path expectedPath = Directories.getFulltextIndexBaseDirectory().resolve("unsaved");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
 
         assertEquals(expectedPath, actualPath);
@@ -166,7 +167,7 @@ class BibDatabaseContextTest {
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
         assertNotNull(actualPath);
 
-        String fulltextIndexBaseDirectory = OS.getNativeDesktop().getFulltextIndexBaseDirectory().toString();
+        String fulltextIndexBaseDirectory = Directories.getFulltextIndexBaseDirectory().toString();
         String actualPathStart = actualPath.toString().substring(0, fulltextIndexBaseDirectory.length());
         assertEquals(fulltextIndexBaseDirectory, actualPathStart);
     }

@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

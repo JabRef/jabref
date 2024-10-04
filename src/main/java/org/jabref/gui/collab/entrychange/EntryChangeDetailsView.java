@@ -11,14 +11,14 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -30,7 +30,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   ThemeManager themeManager,
-                                  PreferencesService preferencesService,
+                                  GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor) {
@@ -40,7 +40,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, themeManager, taskExecutor);
+        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferences, themeManager, taskExecutor);
 
         // The scroll bar used is not part of ScrollPane, but the attached WebView.
         WebView previewCloneView = (WebView) previewClone.getContent();
@@ -50,9 +50,9 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         // TODO: Also sync scrolling for BibTeX view.
 
         PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
-        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
+        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferences, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
         PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
-        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
+        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferences, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
 
         EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
             newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());

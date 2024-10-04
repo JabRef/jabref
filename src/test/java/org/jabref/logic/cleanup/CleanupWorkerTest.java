@@ -9,6 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -28,8 +29,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

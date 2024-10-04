@@ -33,6 +33,7 @@ abstract class StyleSheet {
 
     abstract void reload();
 
+    // TODO: How to solve this? without jabref gui
     static Optional<StyleSheet> create(String name) {
         Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefGUI.class.getResource(name));
 
@@ -40,9 +41,9 @@ abstract class StyleSheet {
             try {
                 styleSheetUrl = Optional.of(Path.of(name).toUri().toURL());
             } catch (InvalidPathException e) {
-                LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage());
+                LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage(), e);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
+                LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage(), e);
             }
         }
 

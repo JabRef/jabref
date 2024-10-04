@@ -18,8 +18,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
@@ -27,12 +26,13 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
 
@@ -63,7 +63,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   UndoManager undoManager,
-                                  PreferencesService preferences,
+                                  GuiPreferences preferences,
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor) {

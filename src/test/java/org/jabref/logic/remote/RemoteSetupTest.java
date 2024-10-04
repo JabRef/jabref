@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
-import org.jabref.logic.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;

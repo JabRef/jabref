@@ -43,7 +43,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new EntryTabViewModel(preferencesService);
+        this.viewModel = new EntryTabViewModel(preferences);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
@@ -72,7 +72,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferencesService.getFilePreferences()), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
 
     @Override

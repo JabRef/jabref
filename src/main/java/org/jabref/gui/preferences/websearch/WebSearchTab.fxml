@@ -20,13 +20,14 @@
     <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+    <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
         <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search Selected'"/>
+    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search pre-configured'"/>
     <TableView
             fx:id="catalogTable"
             VBox.vgrow="ALWAYS"

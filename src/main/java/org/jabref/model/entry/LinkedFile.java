@@ -18,15 +18,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -253,19 +249,5 @@ public class LinkedFile implements Serializable {
         } catch (InvalidPathException ex) {
             return Optional.empty();
         }
-    }
-
-    public LinkedFileViewModel toModel(BibEntry entry,
-                                       BibDatabaseContext databaseContext,
-                                       TaskExecutor taskExecutor,
-                                       DialogService dialogService,
-                                       PreferencesService preferencesService) {
-        return new LinkedFileViewModel(
-                this,
-                entry,
-                databaseContext,
-                taskExecutor,
-                dialogService,
-                preferencesService);
     }
 }

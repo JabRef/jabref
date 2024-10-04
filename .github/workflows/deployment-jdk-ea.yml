@@ -37,7 +37,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
         jdk: [22]
-        javafx: [23]
+        javafx: [24]
         include:
           - os: ubuntu-latest
             displayName: linux

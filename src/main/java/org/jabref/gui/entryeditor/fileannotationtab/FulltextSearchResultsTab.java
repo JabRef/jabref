@@ -19,22 +19,24 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.PdfSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResult;
+import org.jabref.model.search.SearchResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +47,10 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
+    private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
@@ -55,13 +58,15 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
-                                    PreferencesService preferencesService,
+                                    GuiPreferences preferences,
                                     DialogService dialogService,
+                                    BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,
                                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
+        this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
         this.searchQueryProperty = searchQueryProperty;
@@ -77,9 +82,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return searchQueryProperty.get().map(query ->
-                !query.getQuery().isEmpty() && query.getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT)
-        ).orElse(false);
+        return searchQueryProperty.get().map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT)).orElse(false);
     }
 
     @Override
@@ -91,37 +94,41 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        PdfSearchResults searchResults = searchQueryProperty.get().get().getRule().getFulltextResults(searchQueryProperty.get().get().getQuery(), entry);
-
         content.getChildren().clear();
 
-        if (searchResults.numSearchResults() == 0) {
-            content.getChildren().add(new Text(Localization.lang("No search matches.")));
-        }
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
+            SearchResults searchResults = searchQuery.getSearchResults();
+            if (searchResults != null) {
+                Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);
+                if (searchResultsForEntry.isEmpty()) {
+                    content.getChildren().add(new Text(Localization.lang("No search matches.")));
+                } else {
+                    // Iterate through files with search hits
+                    for (Map.Entry<String, List<SearchResult>> iterator : searchResultsForEntry.entrySet()) {
+                        entry.getFiles().stream().filter(file -> file.getLink().equals(iterator.getKey())).findFirst().ifPresent(linkedFile -> {
+                            content.getChildren().addAll(createFileLink(linkedFile), lineSeparator());
+                            // Iterate through pages (within file) with search hits
+                            for (SearchResult searchResult : iterator.getValue()) {
+                                for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
+                                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
+                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                }
+                                if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
+                                    Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
+                                    annotationsText.setStyle("-fx-font-style: italic;");
+                                    content.getChildren().add(annotationsText);
 
-        // Iterate through files with search hits
-        for (Map.Entry<String, List<SearchResult>> resultsForPath : searchResults.getSearchResultsByPath().entrySet()) {
-            entry.getFiles().stream().filter(file -> file.getLink().equals(resultsForPath.getKey())).findFirst().ifPresent(linkedFile -> {
-                content.getChildren().addAll(createFileLink(linkedFile), lineSeparator());
-
-                // Iterate through pages (within file) with search hits
-                for (SearchResult searchResult : resultsForPath.getValue()) {
-                    for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
-                    }
-                    if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
-                        Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
-                        annotationsText.setStyle("-fx-font-style: italic;");
-                        content.getChildren().add(annotationsText);
-                    }
-                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
+                                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
+                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     private Text createFileLink(LinkedFile linkedFile) {
@@ -129,13 +136,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setStyle("-fx-font-weight: bold;");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
-        Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
+        Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
                 try {
-                    JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
+                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath, e);
                 }
@@ -164,9 +171,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private ContextMenu getFileContextMenu(LinkedFile file) {
         ContextMenu fileContextMenu = new ContextMenu();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         return fileContextMenu;
     }
 

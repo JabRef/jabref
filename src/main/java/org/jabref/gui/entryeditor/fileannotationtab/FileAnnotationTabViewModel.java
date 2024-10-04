@@ -20,8 +20,8 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.util.FileUpdateListener;
@@ -97,7 +97,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
-            LOGGER.error("Problem while watching file for changes " + currentFile, e);
+            LOGGER.error("Problem while watching file for changes {}", currentFile, e);
         }
     }
 

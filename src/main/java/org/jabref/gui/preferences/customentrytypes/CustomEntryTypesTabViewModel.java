@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -32,7 +33,6 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -48,7 +48,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[]{extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final DialogService dialogService;
     private final BibDatabaseMode bibDatabaseMode;
@@ -62,13 +62,13 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
                                         BibEntryTypesManager entryTypesManager,
                                         DialogService dialogService,
-                                        PreferencesService preferencesService) {
-        this.preferencesService = preferencesService;
+                                        CliPreferences preferences) {
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
         this.bibDatabaseMode = mode;
 
-        this.multiLineFields.addAll(preferencesService.getFieldPreferences().getNonWrappableFields());
+        this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -130,8 +130,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        preferencesService.getFieldPreferences().setNonWrappableFields(multilineFields);
-        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
+        preferences.getFieldPreferences().setNonWrappableFields(multilineFields);
+        preferences.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
@@ -179,7 +179,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public void resetAllCustomEntryTypes() {
         entryTypesManager.clearAllCustomEntryTypes(bibDatabaseMode);
-        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
+        preferences.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     public ObjectProperty<EntryTypeViewModel> selectedEntryTypeProperty() {

@@ -9,13 +9,13 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 public class GroupEditor extends SimpleEditor {
 
@@ -24,7 +24,7 @@ public class GroupEditor extends SimpleEditor {
     public GroupEditor(final Field field,
                        final SuggestionProvider<?> suggestionProvider,
                        final FieldCheckers fieldCheckers,
-                       final PreferencesService preferences,
+                       final GuiPreferences preferences,
                        final boolean isMultiLine,
                        final UndoManager undoManager,
                        final UndoAction undoAction,

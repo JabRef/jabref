@@ -9,12 +9,12 @@ import javafx.beans.binding.Bindings;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
 
 public class CopySingleFileAction extends SimpleCommand {
 

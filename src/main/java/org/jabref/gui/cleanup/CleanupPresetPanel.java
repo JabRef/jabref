@@ -12,12 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 

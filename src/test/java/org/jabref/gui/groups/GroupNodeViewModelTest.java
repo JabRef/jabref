@@ -7,10 +7,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -20,7 +21,6 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class GroupNodeViewModelTest {
     private BibDatabaseContext databaseContext;
     private GroupNodeViewModel viewModel;
     private TaskExecutor taskExecutor;
-    private PreferencesService preferencesService;
+    private GuiPreferences preferences;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +44,8 @@ class GroupNodeViewModelTest {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
-        preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
+        preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
@@ -169,7 +169,7 @@ class GroupNodeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
         model.addEntriesToGroup(databaseContext.getEntries());
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
@@ -177,10 +177,10 @@ class GroupNodeViewModelTest {
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }
 
     private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }
 }

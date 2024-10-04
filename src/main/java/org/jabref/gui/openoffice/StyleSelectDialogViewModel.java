@@ -20,12 +20,13 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -33,18 +34,19 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
     private final StyleLoader styleLoader;
-    private final OpenOfficePreferences openOfficePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
+    private final OpenOfficePreferences openOfficePreferences;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
@@ -52,10 +54,15 @@ public class StyleSelectDialogViewModel {
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
 
-    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
+    public StyleSelectDialogViewModel(DialogService dialogService,
+                                      StyleLoader styleLoader,
+                                      GuiPreferences preferences,
+                                      TaskExecutor taskExecutor,
+                                      BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
-        this.filePreferences = preferencesService.getFilePreferences();
-        this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.filePreferences = preferences.getFilePreferences();
+        this.openOfficePreferences = preferences.getOpenOfficePreferences();
         this.styleLoader = styleLoader;
 
         styles.addAll(loadStyles());
@@ -128,9 +135,9 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         JStyle jStyle = selectedItem.getValue().getJStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, jStyle.getPath(), type);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type);
         } catch (
                 IOException e) {
             dialogService.showErrorDialogAndWait(e);

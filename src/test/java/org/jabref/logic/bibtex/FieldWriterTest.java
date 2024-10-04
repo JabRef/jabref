@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;

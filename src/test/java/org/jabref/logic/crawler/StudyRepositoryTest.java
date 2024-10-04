@@ -10,6 +10,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -17,6 +18,7 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,8 +29,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.LibraryPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
-    PreferencesService preferencesService;
+    CliPreferences preferences;
     LibraryPreferences libraryPreferences;
     ImportFormatPreferences importFormatPreferences;
     SaveConfiguration saveConfiguration;
@@ -67,7 +67,7 @@ class StudyRepositoryTest {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -79,11 +79,11 @@ class StudyRepositoryTest {
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
-        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
     }
@@ -95,7 +95,7 @@ class StudyRepositoryTest {
         assertThrows(IOException.class, () -> new StudyRepository(
                 nonExistingRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager));
     }
@@ -168,7 +168,7 @@ class StudyRepositoryTest {
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager);
         return studyRepository;

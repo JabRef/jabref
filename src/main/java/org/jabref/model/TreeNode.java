@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -625,5 +626,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         }
 
         return hits;
+    }
+
+    public Stream<T> iterateOverTree() {
+        return Stream.concat(Stream.of((T) this), getChildren().stream().flatMap(TreeNode::iterateOverTree));
     }
 }

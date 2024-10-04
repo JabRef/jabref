@@ -1427,17 +1427,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-label-padding: 5 0 10 10;
 }
 
-.chips-pane > .editor {
-    -fx-pref-height: 30px;
-    -fx-padding: 0px 0px 0px -8px;
-    -fx-margin: 0em;
-    -fx-border-style: none;
-}
-
 .tags-field {
     -fx-pref-height: 30px;
     -fx-margin: 0em;
     -fx-border-style: none;
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+}
+
+.tags-field:focused {
+    -fx-border-color: -jr-accent;
 }
 
 .tags-field > .flow-pane > .tag-view {
@@ -1452,6 +1450,9 @@ We want to have a look that matches our icons in the tool-bar */
 
 .tags-field-editor {
     -fx-border-width: 0;
+    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-highlight-text-fill: -fx-text-inner-color;
+    -fx-highlight-fill: derive(-jr-accent, 20%);
 }
 
 .searchBar:invalid {
@@ -1496,3 +1497,24 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 2em;
     -fx-min-width: 10em;
 }
+
+.chat-message-text-area {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* region: fix for making text area round corners (source: https://stackoverflow.com/a/49617953) */
+
+.chat-message-text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.chat-message-text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.chat-message-text-area .scroll-pane .content {
+    -fx-background-color: transparent;
+}
+
+/* endregion */

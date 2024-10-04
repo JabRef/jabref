@@ -26,34 +26,38 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {
-            if ((arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) && !escaped) {
-                parts.add(current.toString());
-                current = new StringBuilder();
-            } else if (arg.charAt(i) == '\\') {
-                if (escaped) {
-                    escaped = false;
-                    current.append(arg.charAt(i));
-                } else {
-                    escaped = true;
-                }
-            } else if (escaped) {
-                // Handle newline and tab:
-                if (arg.charAt(i) == 'n') {
-                    current.append('\n');
-                } else if (arg.charAt(i) == 't') {
-                    current.append('\t');
-                } else {
-                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"')) {
-                        current.append('\\');
-                    }
-                    current.append(arg.charAt(i));
-                }
+            char currentChar = arg.charAt(i);
+            if (escaped) {
+                handleEscapedCharacter(current, currentChar);
                 escaped = false;
+            } else if (currentChar == '\\') {
+                escaped = true;
+            } else if (currentChar == AbstractParamLayoutFormatter.SEPARATOR) {
+                addPart(parts, current);
             } else {
-                current.append(arg.charAt(i));
+                current.append(currentChar);
             }
         }
-        parts.add(current.toString());
+        addPart(parts, current);
         return parts;
+    }
+
+    private static void handleEscapedCharacter(StringBuilder current, char currentChar) {
+        switch (currentChar) {
+            case 'n' -> current.append('\n');
+            case 't' -> current.append('\t');
+            case ',' -> current.append(',');
+            case '"' -> current.append('"');
+            case '\\' -> current.append('\\');
+            default -> {
+                current.append('\\');
+                current.append(currentChar);
+            }
+        }
+    }
+
+    private static void addPart(List<String> parts, StringBuilder current) {
+        parts.add(current.toString());
+        current.setLength(0);
     }
 }

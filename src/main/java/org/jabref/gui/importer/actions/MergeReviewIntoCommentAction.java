@@ -4,19 +4,19 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, PreferencesService preferencesService) {
+    public boolean isActionNecessary(ParserResult parserResult, CliPreferences preferences) {
         return MergeReviewIntoCommentMigration.needsMigration(parserResult);
     }
 
     @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
+    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         MergeReviewIntoCommentMigration migration = new MergeReviewIntoCommentMigration();
 
         migration.performMigration(parserResult);

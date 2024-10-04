@@ -8,13 +8,13 @@ import java.util.Map;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.StreamGobbler;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +25,8 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
-    public PushToSublimeText(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToSublimeText(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {

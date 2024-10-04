@@ -1,6 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.field.StandardField;
 
 /**

@@ -8,11 +8,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
 
 public class OpenExternalFileAction extends SimpleCommand {
 
@@ -20,7 +20,7 @@ public class OpenExternalFileAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     private final BibEntry entry;
     private final LinkedFile linkedFile;
@@ -28,20 +28,20 @@ public class OpenExternalFileAction extends SimpleCommand {
 
     public OpenExternalFileAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  PreferencesService preferencesService,
+                                  GuiPreferences preferences,
                                   TaskExecutor taskExecutor) {
-        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
+        this(dialogService, stateManager, preferences, null, null, taskExecutor);
     }
 
     public OpenExternalFileAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  PreferencesService preferencesService,
+                                  GuiPreferences preferences,
                                   BibEntry entry,
                                   LinkedFile linkedFile,
                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
@@ -77,7 +77,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                                 databaseContext,
                                 taskExecutor,
                                 dialogService,
-                                preferencesService);
+                                preferences);
 
                         linkedFileViewModelList.add(linkedFileViewModel);
                     }
@@ -101,7 +101,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                         databaseContext,
                         taskExecutor,
                         dialogService,
-                        preferencesService);
+                        preferences);
                 linkedFileViewModel.open();
             }
         });

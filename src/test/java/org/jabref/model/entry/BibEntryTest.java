@@ -1,6 +1,6 @@
 package org.jabref.model.entry;
 
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -259,7 +259,7 @@ class BibEntryTest {
     void replaceOfLinkWorks() throws Exception {
         List<LinkedFile> files = new ArrayList<>();
         String urlAsString = "https://www.example.org/file.pdf";
-        files.add(new LinkedFile(new URL(urlAsString), ""));
+        files.add(new LinkedFile(URI.create(urlAsString).toURL(), ""));
         entry.setFiles(files);
 
         LinkedFile linkedFile = new LinkedFile("", Path.of("file.pdf", ""), "");

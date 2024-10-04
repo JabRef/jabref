@@ -9,9 +9,9 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -23,7 +23,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -39,7 +39,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences);
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)

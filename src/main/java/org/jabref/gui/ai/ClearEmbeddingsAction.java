@@ -5,10 +5,10 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -46,7 +46,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Clearing embeddings cache..."));
 
-        List<LinkedFile> linkedFile = stateManager
+        List<LinkedFile> linkedFiles = stateManager
                 .getActiveDatabase()
                 .get()
                 .getDatabase()
@@ -55,7 +55,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
                 .flatMap(entry -> entry.getFiles().stream())
                 .toList();
 
-        BackgroundTask.wrap(() -> aiService.getEmbeddingsManager().clearEmbeddingsFor(linkedFile))
+        BackgroundTask.wrap(() -> aiService.getIngestionService().clearEmbeddingsFor(linkedFiles))
                       .executeWith(taskExecutor);
     }
 }

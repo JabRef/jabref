@@ -16,12 +16,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -40,7 +40,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
     @SuppressWarnings("FieldCanBeLocal") private Subscription keepOnTopSubscription;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
@@ -59,17 +59,17 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferencesService.getSearchPreferences());
+        GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferences.getSearchPreferences());
 
-        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferences, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
-        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferences, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
+        previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
 
-        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager, taskExecutor);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferences, stateManager, taskExecutor);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 
@@ -112,16 +112,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         });
 
         stage.setOnShown(event -> {
-            stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
-            stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
-            container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
+            stage.setHeight(preferences.getSearchPreferences().getSearchWindowHeight());
+            stage.setWidth(preferences.getSearchPreferences().getSearchWindowWidth());
+            container.setDividerPositions(preferences.getSearchPreferences().getSearchWindowDividerPosition());
             searchBar.requestFocus();
         });
 
         stage.setOnHidden(event -> {
-            preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
-            preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
-            preferencesService.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
+            preferences.getSearchPreferences().setSearchWindowHeight(getHeight());
+            preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
+            preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
         });
     }
 }

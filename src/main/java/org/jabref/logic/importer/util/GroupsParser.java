@@ -27,8 +27,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -280,10 +279,10 @@ public class GroupsParser {
         String expression = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
         if (Integer.parseInt(tok.nextToken()) == 1) {
-            searchFlags.add(SearchRules.SearchFlags.CASE_SENSITIVE);
+            searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }
         if (Integer.parseInt(tok.nextToken()) == 1) {
-            searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+            searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched

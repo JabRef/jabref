@@ -5,8 +5,8 @@ import java.nio.file.Paths;
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
@@ -14,12 +14,13 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
- * This class checks JabRef's shipped classes for architecture quality
+ * This class checks JabRef's shipped classes for architecture quality.
+ *
+ * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
  */
-@AnalyzeClasses(packages = "org.jabref")
+@AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.DoNotIncludeTests.class)
 class MainArchitectureTest {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
@@ -40,14 +41,14 @@ class MainArchitectureTest {
         noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .should().accessClassesThat()
                    .resideInAnyPackage("javax.swing",
-                                       "javax.swing.border..",
-                                       "javax.swing.colorchooser..",
-                                       "javax.swing.event..",
-                                       "javax.swing.filechooser..",
-                                       "javax.swing.plaf..",
-                                       "javax.swing.table..",
-                                       "javax.swing.text..",
-                                       "javax.swing.tree..")
+                           "javax.swing.border..",
+                           "javax.swing.colorchooser..",
+                           "javax.swing.event..",
+                           "javax.swing.filechooser..",
+                           "javax.swing.plaf..",
+                           "javax.swing.table..",
+                           "javax.swing.text..",
+                           "javax.swing.tree..")
                    .check(classes);
     }
 
@@ -86,25 +87,28 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    @ArchIgnore
-    // Fails currently
     public void respectLayeredArchitecture(JavaClasses classes) {
+        String Logic = "Logic";
+        String Model = "Model";
+        String Migrations = "Migrations";
+        String CLI = "Cli";
+        String GUI = "Gui";
         layeredArchitecture().consideringOnlyDependenciesInLayers()
-                             .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
-                             .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
-                             .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
-                             .layer("Cli").definedBy(PACKAGE_ORG_JABREF_CLI)
-                             .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
-                             .layer("Preferences").definedBy("org.jabref.preferences..")
-                             .layer("Styletester").definedBy("org.jabref.styletester..")
+                             .layer(GUI).definedBy(PACKAGE_ORG_JABREF_GUI)
+                             .layer(Logic).definedBy(PACKAGE_ORG_JABREF_LOGIC)
+                             .layer(Model).definedBy(PACKAGE_ORG_JABREF_MODEL)
+                             .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
+                             .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
 
-                             .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
-                             .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
-                             .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
-                             .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
-                             .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
-                             .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
+                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI, Migrations)
+                             .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations)
+                             .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
 
+                             // Needs to be fixed
+                             .whereLayer(CLI).mayOnlyBeAccessedByLayers(GUI)
+                             // .whereLayer(CLI).mayNotBeAccessedByAnyLayer()
+
+                             .whereLayer(Migrations).mayOnlyBeAccessedByLayers(GUI, Logic)
                              .check(classes);
     }
 
@@ -125,7 +129,6 @@ class MainArchitectureTest {
                    .and().areNotAssignableFrom("org.jabref.model.search.rules.GrammarBasedSearchRule")
                    .and().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
 
@@ -135,7 +138,6 @@ class MainArchitectureTest {
                    .and().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
-                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
 
@@ -146,21 +148,6 @@ class MainArchitectureTest {
                    .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                    .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
                    .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
-                   .check(classes);
-    }
-
-    @ArchTest
-    public void nativeDesktopIsRestricted(JavaClasses classes) {
-        noClasses().that().doNotHaveSimpleName("JabRefDesktop")
-                   .and().doNotHaveSimpleName("Launcher")
-                   .and().doNotHaveSimpleName("DefaultDesktop")
-                   .and().doNotHaveSimpleName("OS")
-                   .and().doNotHaveSimpleName("Linux")
-                   .and().doNotHaveSimpleName("OSX")
-                   .and().doNotHaveSimpleName("Windows")
-                   .and().doNotHaveSimpleName("JabRefPreferences")
-                   .and().haveNameNotMatching(".*Test")
-                   .should().dependOnClassesThat().haveSimpleName("NativeDesktop")
                    .check(classes);
     }
 }

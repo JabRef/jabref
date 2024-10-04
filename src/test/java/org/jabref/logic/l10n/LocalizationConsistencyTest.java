@@ -157,18 +157,22 @@ class LocalizationConsistencyTest {
 
     @Test
     void localizationParameterMustIncludeAString() throws IOException {
-        // Must start or end with "
-        // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
-        // TODO: Localization.lang(var1 + "test" + var2) not covered
-        // Localization.lang("Problem downloading from %1", address)
+        // Must start with "
+        // - Localization.lang("test")
+        // - Localization.lang("test %1", var)
+        // - Localization.lang("Problem downloading from %1", address)
+        // - Localization.lang("test %1 %2", var1, var2)
         Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            // TODO: Forbidden Localization.lang("test" + var2) not covered by the test
+            //       In case this kind of code is found, an error should be reported
+            //       JabRef's infrastructure only supports Localization.lang("Some Message"); and not something else.
+            assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
 
         keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
     }
 

@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
+import org.jabref.logic.integrity.BracesCorrector;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -92,9 +94,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
-    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Collections.unmodifiableMap(Map.of(
+    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Map.of(
             "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
-            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing"));
+            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing");
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -390,9 +392,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
      * <a href="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
      */
-    protected class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+    protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.ArXiv.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
@@ -545,7 +547,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
-            URL url = null;
+            URL url;
             try {
                 url = uriBuilder.build().toURL();
             } catch (MalformedURLException | URISyntaxException e) {
@@ -614,6 +616,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .stream()
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
                     .collect(Collectors.toList());
+
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
 
@@ -684,7 +687,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
                 // Abstract of the article
                 abstractText = XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
-                                      .map(String::trim);
+                                      .map(String::trim).map(BracesCorrector::apply);
 
                 // Authors of the article
                 authorNames = new ArrayList<>();
@@ -707,7 +710,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     if (linkTitle.equals(Optional.of("pdf"))) {
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
-                                return new URL(url);
+                                return URI.create(url).toURL();
                             } catch (MalformedURLException e) {
                                 return null;
                             }

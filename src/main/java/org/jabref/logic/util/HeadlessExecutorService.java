@@ -14,17 +14,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.FallbackExceptionHandler;
-import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for managing of all threads (<em>except</em> GUI threads) in JabRef.
  * <p>
- * GUI background tasks should run in {@link UiTaskExecutor}.
+ * GUI background tasks should run in {@link org.jabref.gui.util.UiTaskExecutor}.
  * <p>
  * This is a wrapper around {@link ExecutorService}
  * <p>
@@ -161,9 +157,6 @@ public class HeadlessExecutorService implements Executor {
 
         LOGGER.trace("Gracefully shut down low priority executor service");
         gracefullyShutdown(this.lowPriorityExecutorService);
-
-        LOGGER.trace("Shutting down PdfIndexer");
-        PdfIndexerManager.shutdownAllIndexers();
 
         LOGGER.trace("Canceling timer");
         timer.cancel();

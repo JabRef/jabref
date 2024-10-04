@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -23,7 +24,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

@@ -16,7 +16,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.LOBIDQueryTransformer;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;

@@ -26,10 +26,10 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ColorUtil;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -74,7 +74,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(
-                preferencesService.getJournalAbbreviationPreferences(),
+                preferences.getJournalAbbreviationPreferences(),
                 dialogService,
                 taskExecutor,
                 abbreviationRepository);

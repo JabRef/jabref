@@ -16,11 +16,11 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
 
@@ -47,7 +47,7 @@ public class SpecialFieldAction extends SimpleCommand {
                               boolean nullFieldIfValueIsTheSame,
                               String undoText,
                               DialogService dialogService,
-                              PreferencesService preferencesService,
+                              CliPreferences preferences,
                               UndoManager undoManager,
                               StateManager stateManager) {
         this.tabSupplier = tabSupplier;
@@ -56,7 +56,7 @@ public class SpecialFieldAction extends SimpleCommand {
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
         this.undoText = undoText;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
 
@@ -101,7 +101,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private String getTextDone(SpecialField field, String... params) {
         Objects.requireNonNull(params);
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferencesService, undoManager);
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferences, undoManager);
 
         if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only

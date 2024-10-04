@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 <fx:root type="ScrollPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
       <VBox spacing="10.0">
          <padding>
@@ -28,7 +32,7 @@
             </Label>
             <TextFlow fx:id="openAiPrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -37,16 +41,25 @@
             </TextFlow>
             <TextFlow fx:id="mistralAiPrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
                </children>
             </TextFlow>
+             <TextFlow fx:id="geminiPrivacyTextFlow">
+                 <children>
+                     <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
+                         <font>
+                             <Font size="14.0" />
+                         </font>
+                     </Text>
+                 </children>
+             </TextFlow>
             <TextFlow fx:id="huggingFacePrivacyTextFlow">
                <children>
-                  <Text text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
+                   <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
                      <font>
                         <Font size="14.0" />
                      </font>

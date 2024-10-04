@@ -46,7 +46,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferencesService);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
@@ -65,7 +65,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferencesService.getFilePreferences()), generalFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), generalFieldsHelp);
     }
 
     @FXML

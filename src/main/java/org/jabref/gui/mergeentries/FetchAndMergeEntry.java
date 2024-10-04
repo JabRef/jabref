@@ -11,11 +11,10 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -24,13 +23,14 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +47,11 @@ public class FetchAndMergeEntry {
     private final UndoManager undoManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
 
     public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
                               TaskExecutor taskExecutor,
-                              PreferencesService preferences,
+                              GuiPreferences preferences,
                               DialogService dialogService,
                               UndoManager undoManager) {
         this.bibDatabaseContext = bibDatabaseContext;

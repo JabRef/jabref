@@ -3,6 +3,7 @@ package org.jabref.gui.frame;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -35,6 +36,7 @@ public class FileHistoryMenu extends Menu {
         } else {
             setItems();
         }
+        history.addListener((InvalidationListener) obs -> setItems());
     }
 
     /**

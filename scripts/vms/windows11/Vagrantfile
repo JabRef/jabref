@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME = "jabref-windows-11-sandbox"
+
+Vagrant.configure("2") do |config|
+  # config.vm.box = "Caden/windows-11-pro-jp-22h2-22621.1992"
+  config.vm.box = "stromweld/windows-11"
+
+  config.vm.define NAME
+  config.vm.hostname = NAME
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = NAME
+
+    vb.memory = 6000
+    vb.cpus = 2
+
+    vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
+    vb.gui = true
+  end
+
+  config.vm.provision "shell", privileged: "true", powershell_elevated_interactive: "true", inline: <<-SHELL
+    # Install chocolatey
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    choco feature enable -n=allowGlobalConfirmation
+
+    choco install libericajdk
+    choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal /WindowsTerminalProfile"
+
+    # Required by AI functionaltiy
+    choco choco install vcredist140
+
+    # choco install firefox
+    # choco install libreoffice-fresh
+  SHELL
+
+  config.vm.provision "shell", reboot: true
+
+  config.vm.provision "shell", privileged: "false", inline: <<-SHELL
+    cd \\users\\vagrant
+    git clone --depth=1 --recurse-submodules https://github.com/JabRef/jabref.git
+    # cd jabref
+    # .\\gradlew jar
+  SHELL
+end

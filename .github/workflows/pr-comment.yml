@@ -43,7 +43,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
-        uses: jbangdev/jbang-action@v0.117.1
+        uses: jbangdev/jbang-action@v0.119.0
         with:
           script: ghprcomment@koppor/ghprcomment
           scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"

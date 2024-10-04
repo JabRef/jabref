@@ -17,12 +17,12 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
@@ -69,7 +69,7 @@ public class AbbreviateAction extends SimpleCommand {
             case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
             case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
             case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
-            default -> LOGGER.debug("Unknown action: " + action.name());
+            default -> LOGGER.debug("Unknown action: {}", action.name());
         }
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -92,7 +92,7 @@ public class AbbreviateAction extends SimpleCommand {
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
         } else {
-            LOGGER.debug("Unknown action: " + action.name());
+            LOGGER.debug("Unknown action: {}", action.name());
         }
     }
 

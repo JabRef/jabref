@@ -5,12 +5,11 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.ScrollPane?>
 <fx:root VBox.vgrow="ALWAYS" alignment="TOP_CENTER" prefHeight="800.0" prefWidth="1200.0" spacing="10.0" styleClass="info-container" type="VBox" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.fieldeditors.journalinfo.JournalInfoView">
     <Label fx:id="title" styleClass="info-heading">
         <opaqueInsets>

@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
@@ -106,7 +106,7 @@ public class DuplicateCheck {
 
     private static boolean isFarFromThreshold(double value) {
         if (value < 0.0) {
-            LOGGER.debug("Value {} is below zero. Should not happen", value);
+            LOGGER.trace("Value {} is below zero. Should not happen", value);
         }
         return value - DuplicateCheck.DUPLICATE_THRESHOLD > DuplicateCheck.DOUBT_RANGE;
     }
@@ -309,7 +309,7 @@ public class DuplicateCheck {
         }
         final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
         final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
-        LOGGER.debug("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
+        LOGGER.trace("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
         return similarity;
     }
 

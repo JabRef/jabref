@@ -124,7 +124,7 @@ public class CitationStyle implements OOStyle {
                 return Optional.empty();
             }
         } catch (XMLStreamException e) {
-            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
+            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
             return Optional.empty();
         }
     }
