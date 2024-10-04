@@ -103,7 +103,7 @@ public class GroupNodeViewModel {
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
             stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
                 BackgroundTask.wrap(() -> {
-                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getQuery()).getMatchedEntries());
+                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
                 }).onSuccess(success -> {
                     refreshGroup();
                     databaseContext.getMetaData().groupsBinding().invalidate();
@@ -542,7 +542,7 @@ public class GroupNodeViewModel {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
                     BackgroundTask.wrap(() -> {
-                        searchGroup.setMatchedEntries(indexManager.search(searchGroup.getQuery()).getMatchedEntries());
+                        searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
                     }).onSuccess(success -> {
                         refreshGroup();
                         databaseContext.getMetaData().groupsBinding().invalidate();
@@ -557,7 +557,7 @@ public class GroupNodeViewModel {
                 stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
                     BackgroundTask.wrap(() -> {
                         for (BibEntry entry : event.entries()) {
-                            searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getQuery()));
+                            searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
                         }
                     }).onFinished(() -> {
                         for (BibEntry entry : event.entries()) {

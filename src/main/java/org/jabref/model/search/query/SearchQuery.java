@@ -1,11 +1,8 @@
 package org.jabref.model.search.query;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -13,15 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.search.query.SearchToSqlConversion;
-import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchFlags;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.highlight.QueryTermExtractor;
-import org.apache.lucene.search.highlight.WeightedTerm;
 
 public class SearchQuery {
     /**
@@ -61,52 +52,35 @@ public class SearchQuery {
         abstract String format(String regex);
     }
 
-    private final String query;
+    private final String searchExpression;
     private final EnumSet<SearchFlags> searchFlags;
 
-    private Query parsedQuery;
     private String parseError;
+    private String sqlQuery;
+    private Query luceneQuery;
     private SearchResults searchResults;
 
-    public SearchQuery(String query, EnumSet<SearchFlags> searchFlags) {
-        this.query = Objects.requireNonNull(query);
+    public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        this.searchExpression = Objects.requireNonNull(searchExpression);
         this.searchFlags = searchFlags;
-
-        Map<String, Float> boosts = new HashMap<>();
-        Map<String, Analyzer> fieldAnalyzers = new HashMap<>();
-
-        if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-            boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 4F);
-            SearchFieldConstants.PDF_FIELDS.forEach(field -> {
-                boosts.put(field, 1F);
-                fieldAnalyzers.put(field, SearchFieldConstants.LINKED_FILES_ANALYZER);
-            });
-        } else {
-            boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 1F);
-        }
-
-        String[] fieldsToSearchArray = new String[boosts.size()];
-        boosts.keySet().toArray(fieldsToSearchArray);
-
-        PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(SearchFieldConstants.LATEX_AWARE_ANALYZER, fieldAnalyzers);
-        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, analyzerWrapper, boosts);
-        queryParser.setAllowLeadingWildcard(true);
-
-        try {
-            parsedQuery = queryParser.parse(query);
-            parseError = null;
-        } catch (Exception e) {
-            parsedQuery = null;
-            parseError = e.getMessage();
-        }
     }
 
-    public SqlSearchQuery getSqlQuery(String table) {
-        return new SqlSearchQuery(SearchToSqlConversion.searchToSql(table, query));
+    public String getSqlQuery(String table) {
+        if (sqlQuery == null) {
+            sqlQuery = SearchToSqlConversion.searchToSql(table, searchExpression);
+        }
+        return sqlQuery;
+    }
+
+    public Query getLuceneQuery() {
+        if (luceneQuery == null) {
+            // TODO: convert to lucene query
+        }
+        return luceneQuery;
     }
 
     public String getSearchExpression() {
-        return query;
+        return searchExpression;
     }
 
     public SearchResults getSearchResults() {
@@ -119,7 +93,7 @@ public class SearchQuery {
 
     @Override
     public String toString() {
-        return query;
+        return searchExpression;
     }
 
     @Override
@@ -130,21 +104,17 @@ public class SearchQuery {
         if (!(o instanceof SearchQuery that)) {
             return false;
         }
-        return Objects.equals(query, that.query)
+        return Objects.equals(searchExpression, that.searchExpression)
                 && Objects.equals(searchFlags, that.searchFlags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(query, searchFlags);
+        return Objects.hash(searchExpression, searchFlags);
     }
 
     public boolean isValid() {
         return parseError == null;
-    }
-
-    public Query getParsedQuery() {
-        return parsedQuery;
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -156,14 +126,12 @@ public class SearchQuery {
      */
     public List<String> getSearchWords() {
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-            return Collections.singletonList(query);
+            return Collections.singletonList(searchExpression);
         }
         if (!isValid()) {
             return List.of();
         }
-        return Arrays.stream(QueryTermExtractor.getTerms(parsedQuery))
-                     .map(WeightedTerm::getTerm)
-                     .toList();
+        return List.of();
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled

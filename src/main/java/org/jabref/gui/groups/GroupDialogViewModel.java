@@ -334,7 +334,7 @@ public class GroupDialogViewModel {
                 Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
                 if (indexManager.isPresent()) {
                     SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                    searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
                 }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {

@@ -63,7 +63,7 @@ public class IndexManager {
         }
         linkedFilesIndexer = indexer;
 
-        this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection());
+        this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
         updateOnStart();
     }
@@ -221,6 +221,8 @@ public class IndexManager {
     }
 
     public SearchResults search(SearchQuery query) {
+        SearchResults searchResults = new SearchResults();
+
 //        if (query.isValid()) {
 //            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
 //        } else {
@@ -229,12 +231,15 @@ public class IndexManager {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
             // TODO: merge results from lucene and postgres
         } else {
-            query.setSearchResults(bibFieldsSearcher.search(query.getSqlQuery(bibFieldsIndexer.getTable())));
+            query.setSearchResults(bibFieldsSearcher.search(query));
         }
         return query.getSearchResults();
     }
 
+    /**
+     * @implNote No need to check for full-text searches as this method only used by the search groups
+     */
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
-        return true;
+        return bibFieldsSearcher.isMatched(entry, query);
     }
 }

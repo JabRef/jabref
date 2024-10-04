@@ -195,7 +195,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
             default -> field;
         };
 
-        if ("anyfield".equals(field) || "any".equals(field)) {
+        if (ENTRY_ID.toString().equals(field)) {
+            cte = """
+                    cte%d AS (
+                     SELECT %s
+                     FROM %s
+                     WHERE %s = '%s'
+                    )
+                    """.formatted(
+                    cteCounter,
+                    ENTRY_ID,
+                    mainTableName,
+                    ENTRY_ID, term);
+        } else if ("anyfield".equals(field) || "any".equals(field)) {
             if (searchFlags.contains(SearchTermFlag.EXACT_MATCH)) {
                 cte = searchFlags.contains(SearchTermFlag.NEGATION)
                         ? buildExactNegationAnyFieldQuery(operator, term)

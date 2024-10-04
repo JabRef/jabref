@@ -27,7 +27,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
-import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
@@ -39,6 +38,8 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.Nullable;
+
+import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 
 public class MainTableDataModel {
 
@@ -207,16 +208,17 @@ public class MainTableDataModel {
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
                         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
-                        boolean isMatched = true;
+                        boolean isMatched;
                         if (searchQueryProperty.get().isPresent()) {
                             SearchQuery searchQuery = searchQueryProperty.get().get();
-                            String newSearchExpression = "+" + SearchFieldConstants.ENTRY_ID + ":" + entry.getId() + " +" + searchQuery.getSearchExpression();
+                            String newSearchExpression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
                             SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
                             SearchResults results = indexManager.search(entryQuery);
 
-                            viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
                             isMatched = results.isMatched(entry);
+                            viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
                         } else {
+                            isMatched = true;
                             viewModel.hasFullTextResultsProperty().set(false);
                         }
 

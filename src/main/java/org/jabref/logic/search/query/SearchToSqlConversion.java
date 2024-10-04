@@ -7,10 +7,14 @@ import org.jabref.search.SearchParser;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SearchToSqlConversion {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlConversion.class);
 
     public static String searchToSql(String table, String searchExpression) {
+        LOGGER.debug("Converting search expression to SQL: {}", searchExpression);
         SearchParser.StartContext context = getStartContext(searchExpression);
         SearchToSqlVisitor searchToSqlVisitor = new SearchToSqlVisitor(table);
         return searchToSqlVisitor.visit(context);
