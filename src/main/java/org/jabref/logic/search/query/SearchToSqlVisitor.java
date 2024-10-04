@@ -29,6 +29,7 @@ import static org.jabref.model.search.query.SearchTermFlag.REGULAR_EXPRESSION;
 
 /**
  * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
+ * Tests are located in {@link org.jabref.logic.search.query.SearchQuerySQLConversionTest}.
  */
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
@@ -36,6 +37,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private static final String MAIN_TABLE = "main_table";
     private static final String SPLIT_TABLE = "split_table";
     private static final String INNER_TABLE = "inner_table";
+    private static final String GROUPS_FIELD = StandardField.GROUPS.getName();
 
     private final String mainTableName;
     private final String splitValuesTableName;
@@ -70,12 +72,12 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         String subQuery = visit(ctx.expression());
         String cte = """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE %s.%s NOT IN (
-                    SELECT %s
-                    FROM %s
-                 )
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE %s.%s NOT IN (
+                       SELECT %s
+                       FROM %s
+                    )
                 )
                 """.formatted(
                 cteCounter,
@@ -96,11 +98,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
         String cte = """
                 cte%d AS (
-                 SELECT %s
-                 FROM %s
-                 %s
-                 SELECT %s
-                 FROM %s
+                    SELECT %s
+                    FROM %s
+                    %s
+                    SELECT %s
+                    FROM %s
                 )
                 """.formatted(
                 cteCounter,
@@ -196,9 +198,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         if (ENTRY_ID.toString().equals(field)) {
             cte = """
                     cte%d AS (
-                     SELECT %s
-                     FROM %s
-                     WHERE %s = '%s'
+                        SELECT %s
+                        FROM %s
+                        WHERE %s = '%s'
                     )
                     """.formatted(
                     cteCounter,
@@ -232,9 +234,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildContainsFieldQuery(String field, String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE (
+                        (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    )
                 )
                 """.formatted(
                 cteCounter,
@@ -253,12 +257,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildContainsNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE %s.%s NOT IN (
                     SELECT %s.%s
                     FROM %s AS %s
-                    WHERE (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        WHERE (
+                            (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                        )
                     )
                 )
                 """.formatted(
@@ -281,15 +287,15 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildExactFieldQuery(String field, String operator, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 LEFT JOIN %s AS %s
-                 ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                 WHERE (
-                    (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
-                    OR
-                    (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
-                 )
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    LEFT JOIN %s AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (
+                        ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                        OR
+                        ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                    )
                 )
                 """.formatted(
                 cteCounter,
@@ -309,19 +315,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildExactNegationFieldQuery(String field, String operator, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE %s.%s NOT IN (
                     SELECT %s.%s
                     FROM %s AS %s
-                    LEFT JOIN %s AS %s
-                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                    WHERE (
-                      (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
-                      OR
-                      (%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        LEFT JOIN %s AS %s
+                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                        WHERE (
+                            ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                            OR
+                            ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                        )
                     )
-                 )
                 )
                 """.formatted(
                 cteCounter,
@@ -344,14 +350,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE (
+                        (%s.%s != '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    )
                 )
                 """.formatted(
                 cteCounter,
                 MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
+                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
                 MAIN_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
@@ -363,15 +372,18 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildExactAnyFieldQuery(String operator, String term) {
         return """
                 cte%d AS (
-                  SELECT %s.%s
-                  FROM %s AS %s
-                  LEFT JOIN %s AS %s
-                  ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                  WHERE (
-                    (%s.%s %s '%s') OR (%s.%s %s '%s')
-                    OR
-                    (%s.%s %s '%s') OR (%s.%s %s '%s')
-                  )
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    LEFT JOIN %s AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (
+                        (%s.%s != '%s')
+                        AND (
+                            ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                            OR
+                            ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                        )
+                    )
                 )
                 """.formatted(
                 cteCounter,
@@ -380,6 +392,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 splitValuesTableName, SPLIT_TABLE,
                 MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
                 MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
                 MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
                 MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
                 SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
@@ -389,19 +402,22 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildExactNegationAnyFieldQuery(String operator, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE %s.%s NOT IN (
                     SELECT %s.%s
                     FROM %s AS %s
-                    LEFT JOIN %s AS %s
-                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                    WHERE (
-                      (%s.%s %s '%s') OR (%s.%s %s '%s')
-                      OR
-                      (%s.%s %s '%s') OR (%s.%s %s '%s')
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        LEFT JOIN %s AS %s
+                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                        WHERE (
+                            (%s.%s != '%s')
+                            AND (
+                                ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                                OR
+                                ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                            )
+                        )
                     )
-                 )
                 )
                 """.formatted(
                 cteCounter,
@@ -411,10 +427,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 INNER_TABLE, ENTRY_ID,
                 mainTableName, INNER_TABLE,
                 splitValuesTableName, SPLIT_TABLE,
-                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator, term,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
                 SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
                 SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
     }
@@ -422,12 +439,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     private String buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
         return """
                 cte%d AS (
-                 SELECT %s.%s
-                 FROM %s AS %s
-                 WHERE %s.%s NOT IN (
                     SELECT %s.%s
                     FROM %s AS %s
-                    WHERE ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        WHERE (
+                            (%s.%s != '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                        )
                     )
                 )
                 """.formatted(
@@ -437,6 +456,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, ENTRY_ID,
                 INNER_TABLE, ENTRY_ID,
                 mainTableName, INNER_TABLE,
+                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
                 INNER_TABLE, FIELD_VALUE_LITERAL,
                 operator,
                 prefixSuffix, term, prefixSuffix,
