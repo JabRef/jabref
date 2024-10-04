@@ -620,42 +620,30 @@ public abstract class DBMSProcessor {
      * @param data JabRef meta data as map
      */
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
-        StringBuilder updateQuery = new StringBuilder()
-                .append("UPDATE ")
-                .append(escape_Table("METADATA"))
-                .append(" SET ")
-                .append(escape("VALUE"))
-                .append(" = ? ")
-                .append(" WHERE ")
-                .append(escape("KEY"))
-                .append(" = ?");
-
-        StringBuilder insertQuery = new StringBuilder()
+        String insertOrUpdateQuery = new StringBuilder()
                 .append("INSERT INTO ")
                 .append(escape_Table("METADATA"))
-                .append("(")
+                .append(" (")
                 .append(escape("KEY"))
                 .append(", ")
                 .append(escape("VALUE"))
-                .append(") VALUES(?, ?)");
+                .append(") VALUES (?, ?) ")
+                .append("ON CONFLICT (")
+                .append(escape("KEY"))
+                .append(") DO UPDATE SET ")
+                .append(escape("VALUE"))
+                .append(" = EXCLUDED.")
+                .append(escape("VALUE"))
+                .toString();
 
-        for (Map.Entry<String, String> metaEntry : data.entrySet()) {
-            try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery.toString())) {
-                updateStatement.setString(2, metaEntry.getKey());
-                updateStatement.setString(1, metaEntry.getValue());
-                if (updateStatement.executeUpdate() == 0) {
-                    // No rows updated -> insert data
-                    try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery.toString())) {
-                        insertStatement.setString(1, metaEntry.getKey());
-                        insertStatement.setString(2, metaEntry.getValue());
-                        insertStatement.executeUpdate();
-                    } catch (SQLException e) {
-                        LOGGER.error("SQL Error", e);
-                    }
-                }
-            } catch (SQLException e) {
-                LOGGER.error("SQL Error", e);
+        try (PreparedStatement statement = connection.prepareStatement(insertOrUpdateQuery)) {
+            for (Map.Entry<String, String> metaEntry : data.entrySet()) {
+                statement.setString(1, metaEntry.getKey());
+                statement.setString(2, metaEntry.getValue());
+                statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error", e);
         }
     }
 
