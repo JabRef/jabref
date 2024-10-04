@@ -340,17 +340,12 @@ public class BibFieldsIndexer {
         }
     }
 
-    public void updateEntry(BibEntry entry, Field field, String oldValue, String newValue) {
-        if (oldValue == null || oldValue.isEmpty()) {
-            insertField(entry, field, true);
-        } else if (newValue == null || newValue.isEmpty()) {
-            removeField(entry, field, true);
-        } else {
-            updateField(entry, field);
-        }
+    public void updateEntry(BibEntry entry, Field field) {
+        removeField(entry, field);
+        insertField(entry, field);
     }
 
-    private void insertField(BibEntry entry, Field field, boolean insertIntoMainTable) {
+    private void insertField(BibEntry entry, Field field) {
         String insertFieldQuery = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
@@ -361,18 +356,16 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED);
 
-        if (insertIntoMainTable) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
-                String entryId = entry.getId();
-                String value = entry.getField(field).orElse("");
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
+            String entryId = entry.getId();
+            String value = entry.getField(field).orElse("");
 
-                Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                assert resolvedFieldLatexFree.isPresent();
-                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
-                preparedStatement.executeBatch();
-            } catch (SQLException e) {
-                LOGGER.error("Could not add an entry to the index.", e);
-            }
+            Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+            assert resolvedFieldLatexFree.isPresent();
+            addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+            preparedStatement.executeBatch();
+        } catch (SQLException e) {
+            LOGGER.error("Could not add an entry to the index.", e);
         }
 
         String insertIntoSplitTable = """
@@ -406,14 +399,12 @@ public class BibFieldsIndexer {
         }
     }
 
-    private void removeField(BibEntry entry, Field field, boolean removeFromMainTable) {
+    private void removeField(BibEntry entry, Field field) {
         try {
-            if (removeFromMainTable) {
-                connection.createStatement().executeUpdate("""
-                        DELETE FROM %s
-                        WHERE "%s" = '%s' AND "%s" = '%s'
-                        """.formatted(schemaMainTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));
-            }
+            connection.createStatement().executeUpdate("""
+                    DELETE FROM %s
+                    WHERE "%s" = '%s' AND "%s" = '%s'
+                    """.formatted(schemaMainTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));
             connection.createStatement().executeUpdate("""
                     DELETE FROM %s
                     WHERE "%s" = '%s' AND "%s" = '%s'
@@ -421,37 +412,6 @@ public class BibFieldsIndexer {
             LOGGER.debug("Field {} removed from entry {} in index", field.getName(), entry.getId());
         } catch (SQLException e) {
             LOGGER.error("Error deleting field from entry in index", e);
-        }
-    }
-
-    private void updateField(BibEntry entry, Field field) {
-        // remove from split table, and reinsert to it, and update in the main table
-        removeField(entry, field, false);
-        insertField(entry, field, false);
-        String updateFieldQuery = """
-                UPDATE %s
-                SET "%s" = ?, "%s" = ?
-                WHERE "%s" = ? AND "%s" = ?
-                """.formatted(
-                schemaMainTableReference,
-                FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED,
-                ENTRY_ID,
-                FIELD_NAME);
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateFieldQuery)) {
-            String entryId = entry.getId();
-            String value = entry.getField(field).orElse("");
-
-            Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-            assert resolvedFieldLatexFree.isPresent();
-            preparedStatement.setString(1, value);
-            preparedStatement.setString(2, resolvedFieldLatexFree.orElse(""));
-            preparedStatement.setString(3, entryId);
-            preparedStatement.setString(4, field.getName());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("Could not update an entry in the index.", e);
         }
     }
 

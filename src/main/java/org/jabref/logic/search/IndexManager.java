@@ -150,7 +150,7 @@ public class IndexManager {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField(), event.getOldValue(), event.getNewValue());
+                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
@@ -168,6 +168,15 @@ public class IndexManager {
     }
 
     public void updateAfterDropFiles(BibEntry entry) {
+        new BackgroundTask<>() {
+            @Override
+            public Object call() {
+                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
+                return null;
+            }
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
+         .executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
