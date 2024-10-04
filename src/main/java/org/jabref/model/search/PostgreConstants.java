@@ -6,15 +6,7 @@ public enum PostgreConstants {
     ENTRY_ID("entry_id"),
     FIELD_NAME("field_name"),
     FIELD_VALUE_LITERAL("field_value_literal"), // contains the value as-is
-    FIELD_VALUE_TRANSFORMED("field_value_transformed"), // contains the value transformed for better querying
-    LINKED_FILES_SCHEME("linked_files"),
-    CONTENT_TABLE_SUFFIX("_file_content"),
-    FILE_PATH("path"),
-    FILE_MODIFIED("modified"),
-    LINKED_ENTRIES("entries"),
-    PAGE_NUMBER("pageNumber"),
-    PAGE_CONTENT("content"),
-    PAGE_ANNOTATIONS("annotations");
+    FIELD_VALUE_TRANSFORMED("field_value_transformed"); // contains the value transformed for better querying
 
     private final String value;
 
