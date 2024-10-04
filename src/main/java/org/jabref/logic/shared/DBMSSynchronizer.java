@@ -415,10 +415,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         return dbName;
     }
 
-    public DBMSProcessor getDBProcessor() {
-        return dbmsProcessor;
-    }
-
     @Override
     public DatabaseConnectionProperties getConnectionProperties() {
         return dbmsProcessor.getDBMSConnectionProperties();
