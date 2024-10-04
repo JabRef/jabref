@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class OpenAccessDoi implements FulltextFetcher {
         Optional<DOI> doi = entry.getField(StandardField.DOI)
                                  .flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
@@ -66,7 +67,7 @@ public class OpenAccessDoi implements FulltextFetcher {
                        .map(location -> location.optString("url"))
                        .flatMap(url -> {
                            try {
-                               return Optional.of(new URL(url));
+                               return Optional.of(URI.create(url).toURL());
                            } catch (MalformedURLException e) {
                                LOGGER.debug("Could not determine URL to fetch full text from", e);
                                return Optional.empty();

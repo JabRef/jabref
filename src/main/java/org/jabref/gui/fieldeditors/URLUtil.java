@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +39,7 @@ public class URLUtil {
         }
         // Extract destination URL
         try {
-            URL searchURL = new URL(url);
+            URL searchURL = URI.create(url).toURL();
             // URL parameters
             String query = searchURL.getQuery();
             // no parameters
@@ -76,9 +77,9 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            new URL(url);
+            URI.create(url).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -95,7 +96,7 @@ public class URLUtil {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
-            URL url = new URL(link);
+            URL url = URI.create(link).toURL();
             if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }

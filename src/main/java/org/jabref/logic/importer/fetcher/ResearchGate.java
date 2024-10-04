@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             html = getHTML(entry);
         } catch (FetcherException | NullPointerException e) {
-            LOGGER.debug("ResearchGate server is not available");
+            LOGGER.debug("ResearchGate server is not available", e);
             return Optional.empty();
         }
         Elements eLink = html.getElementsByTag("section");
@@ -76,7 +77,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         LOGGER.debug("PDF link: {}", link);
 
         if (link.contains("researchgate.net")) {
-            return Optional.of(new URL(link));
+            return Optional.of(URI.create(link).toURL());
         }
         return Optional.empty();
     }
@@ -253,7 +254,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     private BufferedReader getInputStream(String urlString) {
         try {
-            URL url = new URL(urlString);
+            URL url = URI.create(urlString).toURL();
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL", e);

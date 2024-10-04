@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -198,19 +198,19 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprint() throws IOException {
         entry.setField(StandardField.EPRINT, "1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprintWithPrefix() throws IOException {
         entry.setField(StandardField.EPRINT, "arXiv:1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -218,21 +218,21 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/unknown");
         entry.setField(StandardField.EPRINT, "1603.06570");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitle() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitleWithCurlyBracket() throws IOException {
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2010.15942v3").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -240,7 +240,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.JOURNAL, "arXiv:2002.10248v4 [cs]");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2002.10248v4").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -248,7 +248,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.URL, "http://arxiv.org/abs/2002.10248v4");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2002.10248v4").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -256,7 +256,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -264,7 +264,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
         entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2010.15942v3").toURL()), fetcher.findFullText(entry));
     }
 
     @Test

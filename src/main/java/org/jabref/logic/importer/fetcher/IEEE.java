@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -117,10 +119,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        try {
-            entry.addFile(new LinkedFile(new URL(jsonEntry.optString("pdf_url")), "PDF"));
-        } catch (MalformedURLException e) {
-            LOGGER.error("Fetched PDF URL String is malformed.");
+        String pdfUrl = jsonEntry.optString("pdf_url");
+        if (!StringUtil.isBlank(pdfUrl)) {
+            entry.addFile(new LinkedFile("", pdfUrl, "PDF"));
         }
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
@@ -203,7 +204,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             LOGGER.debug("Full text document found on IEEE Xplore");
             URL value;
             try {
-                value = new URL(matcher.group(1));
+                value = URI.create(matcher.group(1)).toURL();
             } catch (MalformedURLException e) {
                 throw new FetcherException("Malformed URL", e);
             }

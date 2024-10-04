@@ -15,6 +15,7 @@ import java.net.CookiePolicy;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,6 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,9 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
@@ -64,7 +67,7 @@ import org.slf4j.LoggerFactory;
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_RETRIES = 3;
@@ -73,6 +76,7 @@ public class URLDownload {
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    private SSLContext sslContext;
 
     static {
         Unirest.config()
@@ -86,7 +90,7 @@ public class URLDownload {
      * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
      */
     public URLDownload(String source) throws MalformedURLException {
-        this(new URL(source));
+        this(URI.create(source).toURL());
     }
 
     /**
@@ -95,18 +99,14 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
-    }
 
-    /**
-     * @param socketFactory trust manager
-     * @param verifier      host verifier
-     */
-    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
         try {
-            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
-            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
-        } catch (Exception e) {
-            LOGGER.error("A problem occurred when reset SSL verification", e);
+            sslContext = SSLContext.getInstance("TLSv1.2");
+            sslContext.init(null, null, new SecureRandom());
+            // Note: SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            LOGGER.error("Could not initialize SSL context", e);
+            sslContext = null;
         }
     }
 
@@ -153,7 +153,7 @@ public class URLDownload {
 
         // Try to resolve local URIs
         try {
-            URLConnection connection = new URL(source.toString()).openConnection();
+            URLConnection connection = URI.create(source.toString()).toURL().openConnection();
             contentType = connection.getContentType();
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
@@ -383,7 +383,7 @@ public class URLDownload {
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("{}", httpResponse);
+                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source), httpResponse);
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
                 } else {
@@ -396,6 +396,15 @@ public class URLDownload {
 
     private URLConnection getUrlConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
+
+        if (connection instanceof HttpURLConnection httpConnection) {
+            httpConnection.setInstanceFollowRedirects(true);
+        }
+
+        if ((sslContext != null) && (connection instanceof HttpsURLConnection httpsConnection)) {
+            httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+        }
+
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());

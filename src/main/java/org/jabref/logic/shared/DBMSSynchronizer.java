@@ -327,7 +327,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries only if last entry changes still remain
      */
     public void pullLastEntryChanges() {
-        if (!lastEntryChanged.isEmpty()) {
+        if (lastEntryChanged.isPresent()) {
             if (!checkCurrentConnection()) {
                 return;
             }
@@ -342,7 +342,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries and pulls remaining last entry changes
      */
     private void pullWithLastEntry() {
-        if (!lastEntryChanged.isEmpty() && isPresentLocalBibEntry(lastEntryChanged.get())) {
+        if (lastEntryChanged.isPresent() && isPresentLocalBibEntry(lastEntryChanged.get())) {
             synchronizeSharedEntry(lastEntryChanged.get());
         }
         lastEntryChanged = Optional.empty();
