@@ -259,8 +259,8 @@ public class LibraryTab extends Tab {
         Supplier<LibraryTab> tabSupplier = () -> this;
         return new EntryEditor(this,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(tabSupplier, dialogService, stateManager),
-                new RedoAction(tabSupplier, dialogService, stateManager));
+                new UndoAction(tabSupplier, undoManager, dialogService, stateManager),
+                new RedoAction(tabSupplier, undoManager, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
