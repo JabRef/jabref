@@ -23,7 +23,6 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -31,6 +30,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.postgresql.PGConnection;
@@ -244,6 +244,7 @@ public final class DBMSProcessor {
      *
      * @param bibEntry {@link BibEntry} to be inserted.
      */
+    @VisibleForTesting
     public void insertEntry(BibEntry bibEntry) {
         insertEntries(Collections.singletonList(bibEntry));
     }
@@ -254,12 +255,9 @@ public final class DBMSProcessor {
      * @param bibEntries List of {@link BibEntry} to be inserted
      */
     public void insertEntries(List<BibEntry> bibEntries) {
-        List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
-        if (notYetExistingEntries.isEmpty()) {
-            return;
-        }
-        insertIntoEntryTable(notYetExistingEntries);
-        insertIntoFieldTable(notYetExistingEntries);
+        assert bibEntries.stream().filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedId() != "").findAny().isEmpty();
+        insertIntoEntryTable(bibEntries);
+        insertIntoFieldTable(bibEntries);
     }
 
     /**
@@ -299,39 +297,6 @@ public final class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error during entry insertion", e);
         }
-    }
-
-    /**
-     * Filters a list of BibEntry to and returns those which do not exist in the database
-     *
-     * @param bibEntries {@link BibEntry} to be checked
-     * @return <code>true</code> if existent, else <code>false</code>
-     */
-    private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
-        List<Integer> remoteIds = new ArrayList<>();
-        List<Integer> localIds = bibEntries.stream()
-                                           .map(BibEntry::getSharedBibEntryData)
-                                           .map(SharedBibEntryData::getSharedId)
-                                           .filter(id -> id != -1)
-                                           .toList();
-        if (localIds.isEmpty()) {
-            return bibEntries;
-        }
-        try {
-            String selectQuery = "SELECT * FROM ENTRY";
-
-            try (ResultSet resultSet = connection.createStatement().executeQuery(selectQuery)) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("SHARED_ID");
-                    remoteIds.add(id);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
-        }
-        return bibEntries.stream().filter(entry ->
-                                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedId()))
-                         .collect(Collectors.toList());
     }
 
     /**
