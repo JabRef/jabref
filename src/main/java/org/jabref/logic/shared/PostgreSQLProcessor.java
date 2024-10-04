@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -22,7 +23,9 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     private PostgresSQLNotificationListener listener;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
-    private final int CURRENT_VERSION_DB_STRUCT = 1;
+
+    // TODO: We need to migrate data - or ask the user to recreate
+    private final int CURRENT_VERSION_DB_STRUCT = 2;
 
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -41,24 +44,37 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             VERSION_DB_STRUCT_DEFAULT = 0;
         }
 
-        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+        // TODO: Before a release, fix the names (and migrate data to the new names)
+        //       Think of using Flyway or Liquibase instead of manual migration
+        // If changed, also adjust {@link org.jabref.logic.shared.TestManager.clearTables}
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
+        connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
 
-        connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS " + escape_Table("ENTRY") + " (" +
-                        "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
-                        "\"TYPE\" VARCHAR, " +
-                        "\"VERSION\" INTEGER DEFAULT 1)");
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS entry (
+                        shared_id SERIAL PRIMARY KEY,
+                        entrytype VARCHAR,
+                        version INTEGER DEFAULT 1
+                    )
+                """);
 
-        connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS " + escape_Table("FIELD") + " (" +
-                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES " + escape_Table("ENTRY") + "(\"SHARED_ID\") ON DELETE CASCADE, " +
-                        "\"NAME\" VARCHAR, " +
-                        "\"VALUE\" TEXT)");
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS field (
+                        entry_shared_id INTEGER REFERENCES entry(shared_id) ON DELETE CASCADE,
+                        name VARCHAR,
+                        value TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("CREATE INDEX idx_field_entry_shared_id ON FIELD (ENTRY_SHARED_ID);");
+        connection.createStatement().executeUpdate("CREATE INDEX idx_field_name ON FIELD (NAME);");
 
-        connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS " + escape_Table("METADATA") + " ("
-                        + "\"KEY\" VARCHAR,"
-                        + "\"VALUE\" TEXT)");
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS metadata (
+                        key VARCHAR,
+                        value TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("CREATE UNIQUE INDEX idx_metadata_key ON METADATA (key);");
 
         Map<String, String> metadata = getSharedMetaData();
 
@@ -100,29 +116,34 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // We can migrate data from old tables in new table
             if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
-                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
-                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
-                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
-                connection.createStatement().execute("SELECT setval(\'jabref.\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from jabref.\"ENTRY\"))");
+                connection.createStatement().executeUpdate("INSERT INTO ENTRY SELECT * FROM \"ENTRY\"");
+                connection.createStatement().executeUpdate("INSERT INTO FIELD SELECT * FROM \"FIELD\"");
+                connection.createStatement().executeUpdate("INSERT INTO METADATA SELECT * FROM \"METADATA\"");
+                connection.createStatement().execute("SELECT setval(\'\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from \"ENTRY\"))");
                 metadata = getSharedMetaData();
             }
 
             metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
             setSharedMetaData(metadata);
         }
+
+        // TODO: implement migration of changes from version 1 to 2
+        // - "TYPE" is now called entrytype (to be consistent with org.jabref.model.entry.field.InternalField.TYPE_HEADER)
+        // - table names and field names now lower case
     }
 
     @Override
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
-        StringBuilder insertIntoEntryQuery = new StringBuilder()
-                .append("INSERT INTO ")
-                .append(escape_Table("ENTRY"))
-                .append("(")
-                .append(escape("TYPE"))
-                .append(") VALUES(?)");
-        // Number of commas is bibEntries.size() - 1
-        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
-        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
+        if (bibEntries.isEmpty()) {
+            return;
+        }
+
+        StringJoiner insertIntoEntryQuery = new StringJoiner(", ", "INSERT INTO entry (entrytype) values ", ";");
+        for (int i = 0; i < bibEntries.size(); i++) {
+            insertIntoEntryQuery.add("(?)");
+        }
+        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(
+                insertIntoEntryQuery.toString(),
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
@@ -143,16 +164,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error during entry insertion", e);
         }
-    }
-
-    @Override
-    String escape(String expression) {
-        return "\"" + expression + "\"";
-    }
-
-    @Override
-    String escape_Table(String expression) {
-        return "jabref." + escape(expression);
     }
 
     @Override

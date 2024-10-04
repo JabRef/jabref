@@ -77,14 +77,14 @@ class DBMSProcessorTest {
 
         Map<String, String> actualFieldMap = new HashMap<>();
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("inproceedings", entryResultSet.getString("TYPE"));
+            assertEquals("inproceedings", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
-            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection)) {
                 while (fieldResultSet.next()) {
                     actualFieldMap.put(fieldResultSet.getString("NAME"), fieldResultSet.getString("VALUE"));
                 }
@@ -102,15 +102,15 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
             // Adding an empty entry should not create an entry in field table, only in entry table
-            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection)) {
                 assertFalse(fieldResultSet.next());
             }
         }
@@ -206,7 +206,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(secondEntry);
         dbmsProcessor.removeEntries(entriesToRemove);
 
-        try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertFalse(resultSet.next());
         }
     }
@@ -225,7 +225,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(thirdEntry);
         dbmsProcessor.removeEntries(entriesToRemove);
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertTrue(entryResultSet.next());
             assertEquals(2, entryResultSet.getInt("SHARED_ID"));
             assertFalse(entryResultSet.next());
@@ -238,7 +238,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(entryToRemove);
         dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertFalse(entryResultSet.next());
         }
     }
@@ -252,7 +252,7 @@ class DBMSProcessorTest {
     void removeEmptyEntryList() throws SQLException {
         dbmsProcessor.removeEntries(Collections.emptyList());
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertFalse(entryResultSet.next());
         }
     }
@@ -288,9 +288,10 @@ class DBMSProcessorTest {
     @Test
     void getSharedIDVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
-        BibEntry secondEntry = getBibEntryExample();
-
         dbmsProcessor.insertEntry(firstEntry);
+
+        // insert duplicate entry
+        BibEntry secondEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(secondEntry);
         dbmsProcessor.updateEntry(secondEntry);
 
@@ -305,11 +306,10 @@ class DBMSProcessorTest {
 
     @Test
     void getSharedMetaData() {
-        insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);
-        insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
-        insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
-        insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;", dbmsConnection, dbmsProcessor);
-        insertMetaData("VersionDBStructure", "1", dbmsConnection, dbmsProcessor);
+        insertMetaData("databaseType", "bibtex;", dbmsConnection);
+        insertMetaData("protectedFlag", "true;", dbmsConnection);
+        insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection);
+        insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;", dbmsConnection);
 
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
@@ -334,7 +334,7 @@ class DBMSProcessorTest {
         expectedMetaData.put("protectedFlag", "true;");
         expectedMetaData.put("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
         expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
-        expectedMetaData.put("VersionDBStructure", "1");
+        expectedMetaData.put("VersionDBStructure", "2");
 
         return expectedMetaData;
     }
@@ -378,30 +378,30 @@ class DBMSProcessorTest {
 
         Map<Integer, Map<String, String>> actualFieldMap = new HashMap<>();
 
-        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(2, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(3, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(4, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("thesis", entryResultSet.getString("TYPE"));
+            assertEquals("thesis", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(5, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("entrytype"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
-            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection)) {
                 while (fieldResultSet.next()) {
                     if (actualFieldMap.containsKey(fieldResultSet.getInt("ENTRY_SHARED_ID"))) {
                         actualFieldMap.get(fieldResultSet.getInt("ENTRY_SHARED_ID")).put(
@@ -424,9 +424,9 @@ class DBMSProcessorTest {
         assertEquals(expectedFieldMap, actualFieldMap);
     }
 
-    private ResultSet selectFrom(String table, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
+    private ResultSet selectFrom(String table, DBMSConnection dbmsConnection) {
         try {
-            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape_Table(table, dbmsProcessor));
+            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + table);
         } catch (SQLException e) {
             fail(e.getMessage());
             return null;
@@ -434,24 +434,11 @@ class DBMSProcessorTest {
     }
 
     // Oracle does not support multiple tuple insertion in one INSERT INTO command.
-    // Therefore this function was defined to improve the readability and to keep the code short.
-    private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
+    // Therefore, this function was defined to improve the readability and to keep the code short.
+    private void insertMetaData(String key, String value, DBMSConnection dbmsConnection) {
         assertDoesNotThrow(() -> {
-            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA", dbmsProcessor) + "("
-                    + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
-                    + escapeValue(key) + ", " + escapeValue(value) + ")");
+            // TODO: maybe use a prepared statement here
+            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO metadata (\"key\", value) VALUES ('" + key + "', '" + value + "');");
         });
-    }
-
-    private static String escape(String expression, DBMSProcessor dbmsProcessor) {
-        return dbmsProcessor.escape(expression);
-    }
-
-    private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
-        return dbmsProcessor.escape_Table(expression);
-    }
-
-    private static String escapeValue(String value) {
-        return "'" + value + "'";
     }
 }
