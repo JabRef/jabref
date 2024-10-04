@@ -59,7 +59,7 @@ public class CitationKeyListener {
     }
 
     private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
-        List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
+        List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(BibEntry.ENTRY_LINK_SEPARATOR)));
         int index = keys.indexOf(oldKey);
         if (index != -1) {
             if (newKey == null) {

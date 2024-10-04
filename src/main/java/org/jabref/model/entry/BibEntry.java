@@ -96,7 +96,11 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+
+    public static final String ENTRY_LINK_SEPARATOR = ",";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
+
     private final SharedBibEntryData sharedBibEntryData;
 
     /**
