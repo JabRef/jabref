@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the performance when pasting and importing entries in an existing library. [#11843](https://github.com/JabRef/jabref/pull/11843)
 - When fulltext search is selected but indexing is deactivated, a dialog is now shown asking if the user wants to enable indexing now [#9491](https://github.com/JabRef/jabref/issues/9491)
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
+- We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 
 ### Fixed
 
