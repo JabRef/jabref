@@ -35,6 +35,8 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               TaskExecutor taskExecutor) {
         super();
 
+        this.getStyleClass().add("main-table");
+
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
         List<TableColumn<BibEntryTableViewModel, ?>> allCols = new MainTableColumnFactory(
@@ -67,8 +69,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
-
-        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, preferences.getSearchDialogColumnPreferences()).addListeners();

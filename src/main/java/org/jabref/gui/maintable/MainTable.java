@@ -114,6 +114,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
+        this.getStyleClass().add("main-table");
+
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
                 database,
                 preferences,
@@ -164,7 +166,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 }
             });
 
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+        System.out.println("STyle class "+ this.getStyleClass());
+
+    mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
@@ -184,8 +188,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
-
-        this.getStylesheets().add(Objects.requireNonNull(MainTable.class.getResource("MainTable.css")).toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
