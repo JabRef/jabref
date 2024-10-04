@@ -67,14 +67,37 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 // replace semicolon so we can parse it
                 VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
             } catch (Exception e) {
-                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
+                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] is not an Integer.");
             }
         } else {
-            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
+            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] does not exist.");
         }
 
+        String upsertMetadata = """
+                CREATE OR REPLACE FUNCTION upsert_metadata(key TEXT, value TEXT) RETURNS VOID AS $$
+                DECLARE
+                    existing_value TEXT;
+                BEGIN
+                    -- Check if the key already exists and get its current value
+                    SELECT VALUE INTO existing_value FROM METADATA WHERE KEY = key;
+
+                    -- Perform the upsert
+                    INSERT INTO METADATA (KEY, VALUE)
+                    VALUES (key, value)
+                    ON CONFLICT (KEY)
+                    DO UPDATE SET VALUE = EXCLUDED.VALUE;
+
+                    -- Notify only if the value has changed
+                    IF existing_value IS DISTINCT FROM value THEN
+                        PERFORM pg_notify('metadata_update', json_build_object('key', key, 'value', value)::TEXT);
+                    END IF;
+                END;
+                $$ LANGUAGE plpgsql;
+                """;
+        connection.createStatement().executeUpdate(upsertMetadata);
+
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
-            // We can to migrate from old table in new table
+            // We can migrate data from old tables in new table
             if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
