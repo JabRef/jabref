@@ -10,8 +10,8 @@ import org.jabref.model.entry.field.Field;
 public class FieldChangedEvent extends EntryChangedEvent {
 
     private final Field field;
-    private final String newValue;
     private final String oldValue;
+    private final String newValue;
     private int charactersChangedCount = 0;
 
     /**
