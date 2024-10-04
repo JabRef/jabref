@@ -166,7 +166,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 }
             });
 
-    mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
