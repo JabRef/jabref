@@ -12,7 +12,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final Field field;
     private final String newValue;
     private final String oldValue;
-    private int majorCharacterChange = 0;
+    private int charactersChangedCount = 0;
 
     /**
      * @param source source of this event
@@ -26,7 +26,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.oldValue = oldValue;
         this.newValue = newValue;
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
@@ -39,7 +39,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
     public FieldChangedEvent(EntriesEventSource source, FieldChange fieldChange) {
@@ -47,7 +47,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
@@ -73,15 +73,15 @@ public class FieldChangedEvent extends EntryChangedEvent {
         return field;
     }
 
-    public String getNewValue() {
-        return newValue;
-    }
-
     public String getOldValue() {
         return oldValue;
     }
 
-    public int getMajorCharacterChange() {
-        return majorCharacterChange;
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public int charactersChangedCount() {
+        return charactersChangedCount;
     }
 }
