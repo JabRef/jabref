@@ -84,7 +84,6 @@ public final class LinkedFilesSearcher {
                 List<String> entriesWithFile = linkedFilesMap.get(fileLink);
                 if (entriesWithFile != null && !entriesWithFile.isEmpty()) {
                     SearchResult searchResult = new SearchResult(
-                            scoreDoc.score,
                             fileLink,
                             getFieldContents(document, SearchFieldConstants.CONTENT),
                             getFieldContents(document, SearchFieldConstants.ANNOTATIONS),

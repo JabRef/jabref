@@ -71,13 +71,11 @@ public class SearchResultsTableDataModel {
                     });
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.searchScoreProperty().set(searchResults.getSearchScoreForEntry(entry.getEntry()));
                     entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));
-                    entry.isVisibleBySearch().set(entry.searchScoreProperty().get() > 0);
+                    entry.isVisibleBySearch().set(searchResults.isMatched(entry.getEntry()));
                 }
             } else {
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.searchScoreProperty().set(0);
                     entry.hasFullTextResultsProperty().set(false);
                     entry.isVisibleBySearch().set(true);
                 }

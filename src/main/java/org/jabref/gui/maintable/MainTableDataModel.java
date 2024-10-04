@@ -98,8 +98,7 @@ public class MainTableDataModel {
     private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
             if (query.isPresent()) {
-                SearchResults results = indexManager.search(query.get());
-                setSearchMatches(results);
+                setSearchMatches(indexManager.search(query.get()));
             } else {
                 clearSearchMatches();
             }
@@ -109,16 +108,15 @@ public class MainTableDataModel {
     private void setSearchMatches(SearchResults results) {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.searchScoreProperty().set(results.getSearchScoreForEntry(entry.getEntry()));
             entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
-            updateEntrySearchMatch(entry, entry.searchScoreProperty().get() > 0, isFloatingMode);
+            updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isFloatingMode);
         });
     }
 
     private void clearSearchMatches() {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.searchScoreProperty().set(0);
+            entry.isMatchedBySearch().set(true);
             entry.hasFullTextResultsProperty().set(false);
             updateEntrySearchMatch(entry, true, isFloatingMode);
         });
@@ -216,11 +214,9 @@ public class MainTableDataModel {
                             SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
                             SearchResults results = indexManager.search(entryQuery);
 
-                            viewModel.searchScoreProperty().set(results.getSearchScoreForEntry(entry));
                             viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
-                            isMatched = viewModel.searchScoreProperty().get() > 0;
+                            isMatched = results.isMatched(entry);
                         } else {
-                            viewModel.searchScoreProperty().set(0);
                             viewModel.hasFullTextResultsProperty().set(false);
                         }
 

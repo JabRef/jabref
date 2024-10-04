@@ -25,14 +25,8 @@ public class SearchResults {
         entries.forEach(entry -> addSearchResult(entry, result));
     }
 
-    public float getSearchScoreForEntry(BibEntry entry) {
-        if (searchResults.containsKey(entry.getId())) {
-            return searchResults.get(entry.getId())
-                                .stream()
-                                .map(SearchResult::getSearchScore)
-                                .reduce(0f, Float::max);
-        }
-        return 0f;
+    public boolean isMatched(BibEntry entry) {
+        return searchResults.containsKey(entry.getId());
     }
 
     public boolean hasFulltextResults(BibEntry entry) {

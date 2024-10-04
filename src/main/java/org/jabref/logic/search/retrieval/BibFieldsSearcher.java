@@ -28,7 +28,7 @@ public class BibFieldsSearcher {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 String entryId = resultSet.getString(1);
-                searchResults.addSearchResult(entryId, new SearchResult(1));
+                searchResults.addSearchResult(entryId, new SearchResult());
             }
         } catch (SQLException e) {
             LOGGER.error("Error during bib fields search execution", e);
