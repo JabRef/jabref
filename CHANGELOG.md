@@ -75,6 +75,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
 - We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
 - We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
+- We fixed an issue where listeners were being attached without being released later leading to a memory leak. [#11809](https://github.com/JabRef/jabref/issues/11809)
+- We fixed an issue where the Undo/Redo buttons were active when all libraries were closed. [#11837](https://github.com/JabRef/jabref/issues/11837)
 
 ### Removed
 
