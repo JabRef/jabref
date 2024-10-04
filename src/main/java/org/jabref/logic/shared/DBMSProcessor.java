@@ -57,7 +57,6 @@ public abstract class DBMSProcessor {
      */
     public boolean checkBaseIntegrity() throws SQLException {
         boolean databasePassesIntegrityCheck = false;
-        DBMSType type = this.connectionProperties.getType();
         Map<String, String> metadata = getSharedMetaData();
         String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
         if (metadataVersion != null) {
