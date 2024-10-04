@@ -14,11 +14,14 @@ import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 
-public class KeyChangeListener {
+/**
+ * Updates references of citation keys if the citation key of an entry is changed.
+ */
+public class CitationKeyListener {
 
     private final BibDatabase database;
 
-    public KeyChangeListener(BibDatabase database) {
+    public CitationKeyListener(BibDatabase database) {
         this.database = database;
     }
 

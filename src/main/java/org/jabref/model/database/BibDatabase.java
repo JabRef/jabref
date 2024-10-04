@@ -78,7 +78,7 @@ public class BibDatabase {
     }
 
     public BibDatabase() {
-        this.registerListener(new KeyChangeListener(this));
+        this.registerListener(new CitationKeyListener(this));
     }
 
     /**
