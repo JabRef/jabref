@@ -62,7 +62,7 @@ class DBMSSynchronizerTest {
     void setup() throws Exception {
         this.connectorTest = new ConnectorTest();
         this.dbmsConnection = connectorTest.getTestDBMSConnection();
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
+        this.dbmsProcessor = new DBMSProcessor(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
 

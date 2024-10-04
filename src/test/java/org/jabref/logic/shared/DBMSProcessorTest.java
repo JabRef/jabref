@@ -44,7 +44,7 @@ class DBMSProcessorTest {
     void setup() throws Exception {
         this.connectorTest = new ConnectorTest();
         this.dbmsConnection = connectorTest.getTestDBMSConnection();
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
+        this.dbmsProcessor = new DBMSProcessor(dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }

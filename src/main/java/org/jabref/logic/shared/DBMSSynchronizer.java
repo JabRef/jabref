@@ -390,7 +390,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
+        this.dbmsProcessor = new DBMSProcessor(connection);
         initializeDatabases();
     }
 

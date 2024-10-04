@@ -694,13 +694,6 @@ public final class DBMSProcessor {
         }
     }
 
-    /**
-     * Returns a new instance of the abstract type {@link DBMSProcessor}
-     */
-    public static DBMSProcessor getProcessorInstance(DatabaseConnection connection) {
-        return new PostgreSQLProcessor(connection);
-    }
-
     public DatabaseConnectionProperties getDBMSConnectionProperties() {
         return this.connectionProperties;
     }
