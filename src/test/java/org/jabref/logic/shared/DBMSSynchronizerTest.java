@@ -48,7 +48,7 @@ class DBMSSynchronizerTest {
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
-    private DBMSType dbmsType;
+    private ConnectorTest connectorTest;
 
     private BibEntry createExampleBibEntry(int index) {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
@@ -60,8 +60,8 @@ class DBMSSynchronizerTest {
 
     @BeforeEach
     void setup() throws Exception {
-        this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
+        this.connectorTest = new ConnectorTest();
+        this.dbmsConnection = connectorTest.getTestDBMSConnection();
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
@@ -79,8 +79,8 @@ class DBMSSynchronizerTest {
     }
 
     @AfterEach
-    void clear() {
-        dbmsSynchronizer.closeSharedDatabase();
+    void closeDbmsConnection() throws Exception {
+        connectorTest.close();
     }
 
     @Test

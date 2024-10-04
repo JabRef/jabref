@@ -641,8 +641,6 @@ public abstract class DBMSProcessor {
                 statement.setString(2, metaEntry.getValue());
                 statement.executeUpdate();
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
         }
     }
 

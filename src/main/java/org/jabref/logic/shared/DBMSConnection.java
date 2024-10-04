@@ -9,6 +9,7 @@ import java.util.Set;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,12 @@ public class DBMSConnection implements DatabaseConnection {
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
+
+    @VisibleForTesting
+    public DBMSConnection(Connection connection) {
+        this.connection = connection;
+        this.properties = null;
+    }
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
         if (!connectionProperties.isValid()) {

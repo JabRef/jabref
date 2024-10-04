@@ -38,20 +38,20 @@ class DBMSProcessorTest {
 
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
-    private DBMSType dbmsType;
+    private ConnectorTest connectorTest;
 
     @BeforeEach
     void setup() throws Exception {
-        this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
+        this.connectorTest = new ConnectorTest();
+        this.dbmsConnection = connectorTest.getTestDBMSConnection();
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
 
     @AfterEach
-    void closeDbmsConnection() throws SQLException {
-        this.dbmsConnection.getConnection().close();
+    void closeDbmsConnection() throws Exception {
+        connectorTest.close();
     }
 
     @Test

@@ -72,3 +72,8 @@ PostgreSQL supports to register listeners on the database on changes.
 The listening is implemented at [`org.jabref.logic.shared.listener.PostgresSQLNotificationListener`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/logic/shared/listener/PostgresSQLNotificationListener.java#L16).
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.
+
+## Tests
+
+Tests are executed using [Zonky Embedded Postgres](https://github.com/zonkyio/embedded-postgres).
+This installs and runs a PostgreSQL server and frees the developer from the need to install a PostgreSQL server on the local machine.

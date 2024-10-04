@@ -402,7 +402,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             dbmsProcessor.stopNotificationListener();
             currentConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
