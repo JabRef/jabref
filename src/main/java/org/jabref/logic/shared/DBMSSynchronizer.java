@@ -56,7 +56,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
     private final FieldPreferences fieldPreferences;
     private final FileUpdateMonitor fileMonitor;
-    private Optional<BibEntry> lastEntryChanged;
+    private Optional<BibEntry> lastEntryChanged_REMOVEME;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
                             FieldPreferences fieldPreferences,
@@ -69,7 +69,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
-        this.lastEntryChanged = Optional.empty();
+        this.lastEntryChanged_REMOVEME = Optional.empty();
     }
 
     /**
@@ -87,27 +87,29 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             synchronizeLocalDatabase();
             dbmsProcessor.insertEntries(event.getBibEntries());
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
-            lastEntryChanged = Optional.empty();
+            lastEntryChanged_REMOVEME = Optional.empty();
         }
     }
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
+     *
+     * In JabRef (UI), the field is modified
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
+        if (event.isFilteredOut() || !isEventSourceAccepted(event) || !checkCurrentConnection()) {
+            return;
+        }
+
         BibEntry bibEntry = event.getBibEntry();
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isPresentLocalBibEntry(bibEntry) && isEventSourceAccepted(event) && checkCurrentConnection() && !event.isFilteredOut()) {
+
             synchronizeLocalMetaData();
             pullWithLastEntry();
             synchronizeSharedEntry(bibEntry);
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
-        } else {
-            // Set new BibEntry that has been changed last
-            lastEntryChanged = Optional.of(bibEntry);
-        }
     }
 
     /**
@@ -331,7 +333,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries only if last entry changes still remain
      */
     public void pullLastEntryChanges() {
-        if (lastEntryChanged.isPresent()) {
+        if (lastEntryChanged_REMOVEME.isPresent()) {
             if (!checkCurrentConnection()) {
                 return;
             }
@@ -346,10 +348,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries and pulls remaining last entry changes
      */
     private void pullWithLastEntry() {
-        if (lastEntryChanged.isPresent() && isPresentLocalBibEntry(lastEntryChanged.get())) {
-            synchronizeSharedEntry(lastEntryChanged.get());
+        if (lastEntryChanged_REMOVEME.isPresent() && isPresentLocalBibEntry(lastEntryChanged_REMOVEME.get())) {
+            synchronizeSharedEntry(lastEntryChanged_REMOVEME.get());
         }
-        lastEntryChanged = Optional.empty();
+        lastEntryChanged_REMOVEME = Optional.empty();
     }
 
     /**
