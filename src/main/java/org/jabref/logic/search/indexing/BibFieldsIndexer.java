@@ -22,11 +22,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
-import org.jabref.model.search.SearchFieldConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.model.entry.field.InternalField.TYPE_HEADER;
 import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
@@ -240,69 +240,12 @@ public class BibFieldsIndexer {
             }
 
             // add entry type
-            // Separate code, because ENTRY_TYPE is not a Field
-            preparedStatement.setString(1, entryId);
-            preparedStatement.setString(2, SearchFieldConstants.ENTRY_TYPE.toString());
-            preparedStatement.setString(3, bibEntry.getType().getName());
-            preparedStatement.setString(4, bibEntry.getType().getName());
-            preparedStatement.addBatch();
+            addBatch(preparedStatement, entryId, TYPE_HEADER, bibEntry.getType().getName());
 
             preparedStatement.executeBatch();
             preparedStatementSplitValues.executeBatch();
         } catch (SQLException e) {
             LOGGER.error("Could not add an entry to the index.", e);
-        }
-    }
-
-    private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
-        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> {
-            addBatch(preparedStatementSplitValues, entryId, field, link.getKey());
-        });
-    }
-
-    private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
-        // We could use KeywordList, but we are afraid that group names could have ">" in their name, and then they would not be handled correctly
-        Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))
-              .distinct()
-              .forEach(group -> {
-                  addBatch(preparedStatementSplitValues, entryId, field, group);
-              });
-    }
-
-    private static void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field, Character keywordSeparator) {
-        KeywordList keywordList = KeywordList.parse(keywordsString, keywordSeparator);
-        keywordList.stream().flatMap(keyword -> keyword.flatten().stream()).forEach(keyword -> {
-            String value = keyword.toString();
-            addBatch(preparedStatementSplitValues, entryId, field, value);
-        });
-    }
-
-    private static void addAuthors(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
-        AuthorList.parse(value).getAuthors().forEach(author -> {
-            // Author object does not support literal values
-            // We use the method giving us the most complete information for the literal value;
-            String literal = author.getGivenFamily(false);
-            String transformed = author.latexFree().getGivenFamily(false);
-            addBatch(preparedStatementSplitValues, entryId, field, literal, transformed);
-        });
-    }
-
-    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
-        addBatch(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
-    }
-
-    /**
-     * The values are passed as they should be inserted into the database table
-     */
-    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
-        try {
-            preparedStatement.setString(1, entryId);
-            preparedStatement.setString(2, field.getName());
-            preparedStatement.setString(3, value);
-            preparedStatement.setString(4, normalized);
-            preparedStatement.addBatch();
-        } catch (SQLException e) {
-            LOGGER.error("Could not add field {} having value {} of entry {} to the index.", field.getName(), value, entryId, e);
         }
     }
 
@@ -415,10 +358,6 @@ public class BibFieldsIndexer {
         }
     }
 
-    public String getTable() {
-        return mainTable;
-    }
-
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
     }
@@ -439,6 +378,62 @@ public class BibFieldsIndexer {
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not drop table for library: {}", libraryName, e);
+        }
+    }
+
+    public String getTable() {
+        return mainTable;
+    }
+
+    private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
+        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> {
+            addBatch(preparedStatementSplitValues, entryId, field, link.getKey());
+        });
+    }
+
+    private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+        // We could use KeywordList, but we are afraid that group names could have ">" in their name, and then they would not be handled correctly
+        Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))
+              .distinct()
+              .forEach(group -> {
+                  addBatch(preparedStatementSplitValues, entryId, field, group);
+              });
+    }
+
+    private static void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field, Character keywordSeparator) {
+        KeywordList keywordList = KeywordList.parse(keywordsString, keywordSeparator);
+        keywordList.stream().flatMap(keyword -> keyword.flatten().stream()).forEach(keyword -> {
+            String value = keyword.toString();
+            addBatch(preparedStatementSplitValues, entryId, field, value);
+        });
+    }
+
+    private static void addAuthors(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+        AuthorList.parse(value).getAuthors().forEach(author -> {
+            // Author object does not support literal values
+            // We use the method giving us the most complete information for the literal value;
+            String literal = author.getGivenFamily(false);
+            String transformed = author.latexFree().getGivenFamily(false);
+            addBatch(preparedStatementSplitValues, entryId, field, literal, transformed);
+        });
+    }
+
+    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
+        addBatch(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
+    }
+
+    /**
+     * The values are passed as they should be inserted into the database table
+     */
+    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
+        try {
+            preparedStatement.setString(1, entryId);
+            preparedStatement.setString(2, field.getName());
+            preparedStatement.setString(3, value);
+            preparedStatement.setString(4, normalized);
+            preparedStatement.addBatch();
+        } catch (SQLException e) {
+            LOGGER.error("Could not add field {} having value {} of entry {} to the index.", field.getName(), value, entryId, e);
         }
     }
 }
