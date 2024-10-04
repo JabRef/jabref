@@ -330,6 +330,10 @@ public class BibFieldsIndexer {
                     DELETE FROM %s
                     WHERE "%s" = '%s'
                     """.formatted(schemaMainTableReference, ENTRY_ID, entry.getId()));
+            connection.createStatement().executeUpdate("""
+                    DELETE FROM %s
+                    WHERE "%s" = '%s'
+                    """.formatted(schemaSplitValuesTableReference, ENTRY_ID, entry.getId()));
             LOGGER.debug("Entry {} removed from index", entry.getId());
         } catch (SQLException e) {
             LOGGER.error("Error deleting entry from index", e);
@@ -337,25 +341,117 @@ public class BibFieldsIndexer {
     }
 
     public void updateEntry(BibEntry entry, Field field, String oldValue, String newValue) {
-        try {
-            String updateQuery = """
-            INSERT INTO %s ("%s", "%s", "%s", "%s")
-            VALUES (?, ?, ?, ?)
-            """.formatted(schemaSplitValuesTableReference,
-                    ENTRY_ID,
-                    FIELD_NAME,
-                    FIELD_VALUE_LITERAL,
-                    FIELD_VALUE_TRANSFORMED);
+        if (oldValue == null || oldValue.isEmpty()) {
+            insertField(entry, field, true);
+        } else if (newValue == null || newValue.isEmpty()) {
+            removeField(entry, field, true);
+        } else {
+            updateField(entry, field);
+        }
+    }
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                preparedStatement.setString(1, entry.getId());
-                preparedStatement.setString(2, field.getName());
-                preparedStatement.setString(3, entry.getField(field).orElse(""));
-                preparedStatement.executeUpdate();
-                LOGGER.debug("Updated entry {} in index", entry.getId());
+    private void insertField(BibEntry entry, Field field, boolean insertIntoMainTable) {
+        String insertFieldQuery = """
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                """.formatted(
+                schemaMainTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED);
+
+        if (insertIntoMainTable) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
+                String entryId = entry.getId();
+                String value = entry.getField(field).orElse("");
+
+                Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+                assert resolvedFieldLatexFree.isPresent();
+                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                LOGGER.error("Could not add an entry to the index.", e);
             }
+        }
+
+        String insertIntoSplitTable = """
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                """.formatted(
+                schemaSplitValuesTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED);
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertIntoSplitTable)) {
+            String entryId = entry.getId();
+            String value = entry.getField(field).orElse("");
+
+            if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                addAuthors(value, preparedStatement, entryId, field);
+            } else if (field == StandardField.KEYWORDS) {
+                addKeywords(value, preparedStatement, entryId, field, keywordSeparator);
+            } else if (field == StandardField.GROUPS) {
+                addGroups(value, preparedStatement, entryId, field);
+            } else if (field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+                addEntryLinks(entry, field, preparedStatement, entryId);
+            } else if (field == StandardField.FILE) {
+                // No handling of File, because due to relative paths, we think, there won't be any exact match operation
+            }
+            preparedStatement.executeBatch();
         } catch (SQLException e) {
-            LOGGER.error("Error updating entry in index", e);
+            LOGGER.error("Could not add an entry to the index.", e);
+        }
+    }
+
+    private void removeField(BibEntry entry, Field field, boolean removeFromMainTable) {
+        try {
+            if (removeFromMainTable) {
+                connection.createStatement().executeUpdate("""
+                        DELETE FROM %s
+                        WHERE "%s" = '%s' AND "%s" = '%s'
+                        """.formatted(schemaMainTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));
+            }
+            connection.createStatement().executeUpdate("""
+                    DELETE FROM %s
+                    WHERE "%s" = '%s' AND "%s" = '%s'
+                    """.formatted(schemaSplitValuesTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));
+            LOGGER.debug("Field {} removed from entry {} in index", field.getName(), entry.getId());
+        } catch (SQLException e) {
+            LOGGER.error("Error deleting field from entry in index", e);
+        }
+    }
+
+    private void updateField(BibEntry entry, Field field) {
+        // remove from split table, and reinsert to it, and update in the main table
+        removeField(entry, field, false);
+        insertField(entry, field, false);
+        String updateFieldQuery = """
+                UPDATE %s
+                SET "%s" = ?, "%s" = ?
+                WHERE "%s" = ? AND "%s" = ?
+                """.formatted(
+                schemaMainTableReference,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED,
+                ENTRY_ID,
+                FIELD_NAME);
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateFieldQuery)) {
+            String entryId = entry.getId();
+            String value = entry.getField(field).orElse("");
+
+            Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+            assert resolvedFieldLatexFree.isPresent();
+            preparedStatement.setString(1, value);
+            preparedStatement.setString(2, resolvedFieldLatexFree.orElse(""));
+            preparedStatement.setString(3, entryId);
+            preparedStatement.setString(4, field.getName());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Could not update an entry in the index.", e);
         }
     }
 

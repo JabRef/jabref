@@ -171,15 +171,6 @@ public class IndexManager {
     }
 
     public void updateAfterDropFiles(BibEntry entry) {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-//                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
-         .executeWith(taskExecutor);
-
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
                 @Override
