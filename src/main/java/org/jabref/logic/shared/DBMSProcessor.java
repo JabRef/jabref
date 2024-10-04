@@ -5,6 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,10 +16,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -29,21 +33,30 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Lists;
+import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
  */
-public abstract class DBMSProcessor {
+public final class DBMSProcessor {
 
     public static final String PROCESSOR_ID = UUID.randomUUID().toString();
+
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
     protected final Connection connection;
 
     protected DatabaseConnectionProperties connectionProperties;
+
+    private PostgresSQLNotificationListener listener;
+
+    private int VERSION_DB_STRUCT_DEFAULT = -1;
+
+    // TODO: We need to migrate data - or ask the user to recreate
+    private final int CURRENT_VERSION_DB_STRUCT = 2;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.connection = dbmsConnection.getConnection();
@@ -128,9 +141,104 @@ public abstract class DBMSProcessor {
      *
      * @throws SQLException in case of error
      */
-    protected abstract void setUp() throws SQLException;
+    public void setUp() throws SQLException {
+        if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
+            // checkTableAvailability does not distinguish if same table name exists in different schemas
+            // VERSION_DB_STRUCT_DEFAULT must be forced
+            VERSION_DB_STRUCT_DEFAULT = 0;
+        }
 
-    abstract Integer getCURRENT_VERSION_DB_STRUCT();
+        // TODO: Before a release, fix the names (and migrate data to the new names)
+        //       Think of using Flyway or Liquibase instead of manual migration
+        // If changed, also adjust {@link org.jabref.logic.shared.TestManager.clearTables}
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
+        connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
+
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS entry (
+                        shared_id SERIAL PRIMARY KEY,
+                        entrytype VARCHAR,
+                        version INTEGER DEFAULT 1
+                    )
+                """);
+
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS field (
+                        entry_shared_id INTEGER REFERENCES entry(shared_id) ON DELETE CASCADE,
+                        name VARCHAR,
+                        value TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("CREATE INDEX idx_field_entry_shared_id ON FIELD (ENTRY_SHARED_ID);");
+        connection.createStatement().executeUpdate("CREATE INDEX idx_field_name ON FIELD (NAME);");
+
+        connection.createStatement().executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS metadata (
+                        key VARCHAR,
+                        value TEXT
+                    )
+                """);
+        connection.createStatement().executeUpdate("CREATE UNIQUE INDEX idx_metadata_key ON METADATA (key);");
+
+        Map<String, String> metadata = getSharedMetaData();
+
+        if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
+            try {
+                // replace semicolon so we can parse it
+                VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
+            } catch (Exception e) {
+                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] is not an Integer.");
+            }
+        } else {
+            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] does not exist.");
+        }
+
+        String upsertMetadata = """
+                CREATE OR REPLACE FUNCTION upsert_metadata(key TEXT, value TEXT) RETURNS VOID AS $$
+                DECLARE
+                    existing_value TEXT;
+                BEGIN
+                    -- Check if the key already exists and get its current value
+                    SELECT VALUE INTO existing_value FROM METADATA WHERE KEY = key;
+
+                    -- Perform the upsert
+                    INSERT INTO METADATA (KEY, VALUE)
+                    VALUES (key, value)
+                    ON CONFLICT (KEY)
+                    DO UPDATE SET VALUE = EXCLUDED.VALUE;
+
+                    -- Notify only if the value has changed
+                    IF existing_value IS DISTINCT FROM value THEN
+                        PERFORM pg_notify('metadata_update', json_build_object('key', key, 'value', value)::TEXT);
+                    END IF;
+                END;
+                $$ LANGUAGE plpgsql;
+                """;
+        connection.createStatement().executeUpdate(upsertMetadata);
+
+        if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
+            // We can migrate data from old tables in new table
+            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
+                LOGGER.info("Migrating from VersionDBStructure == 0");
+                connection.createStatement().executeUpdate("INSERT INTO ENTRY SELECT * FROM \"ENTRY\"");
+                connection.createStatement().executeUpdate("INSERT INTO FIELD SELECT * FROM \"FIELD\"");
+                connection.createStatement().executeUpdate("INSERT INTO METADATA SELECT * FROM \"METADATA\"");
+                connection.createStatement().execute("SELECT setval(\'\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from \"ENTRY\"))");
+                metadata = getSharedMetaData();
+            }
+
+            metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
+            setSharedMetaData(metadata);
+        }
+
+        // TODO: implement migration of changes from version 1 to 2
+        // - "TYPE" is now called entrytype (to be consistent with org.jabref.model.entry.field.InternalField.TYPE_HEADER)
+        // - table names and field names now lower case
+    }
+
+    Integer getCURRENT_VERSION_DB_STRUCT() {
+        return CURRENT_VERSION_DB_STRUCT;
+    }
 
     /**
      * For use in test only. Inserts the BibEntry into the shared database.
@@ -165,12 +273,14 @@ public abstract class DBMSProcessor {
             return;
         }
 
-        StringBuilder insertIntoEntryQuery = new StringBuilder().append("INSERT INTO entry (entrytype) VALUES (?)");
-        // Number of commas is bibEntries.size() - 1
-        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, (bibEntries.size() - 1))));
+        StringJoiner insertIntoEntryQuery = new StringJoiner(", ", "INSERT INTO entry (entrytype) values ", ";");
+        for (int i = 0; i < bibEntries.size(); i++) {
+            insertIntoEntryQuery.add("(?)");
+        }
 
-        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[]{"SHARED_ID"})) {
+        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(
+                insertIntoEntryQuery.toString(),
+                Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -184,11 +294,11 @@ public abstract class DBMSProcessor {
                     bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
                 }
                 if (generatedKeys.next()) {
-                    LOGGER.error("Error: Some shared IDs left unassigned");
+                    LOGGER.error("Some shared IDs left unassigned");
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            LOGGER.error("SQL Error during entry insertion", e);
         }
     }
 
@@ -600,22 +710,32 @@ public abstract class DBMSProcessor {
      *
      * @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
      */
-    public void startNotificationListener(@SuppressWarnings("unused") DBMSSynchronizer dbmsSynchronizer) {
-        // nothing to do
+    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+        // Disable cleanup output of ThreadedHousekeeper
+        // Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
+        try {
+            connection.createStatement().execute("LISTEN \"jabref-FieldChangeEvent\"");
+            // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
+            // Otherwise, the listener is going to be deleted by Java's garbage collector.
+            PGConnection pgConnection = connection.unwrap(PGConnection.class);
+            listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
+            HeadlessExecutorService.INSTANCE.execute(listener);
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error during starting the notification listener", e);
+        }
     }
 
     /**
      * Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
      */
     public void stopNotificationListener() {
-        // nothing to do
-    }
-
-    /**
-     * Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS. Needs to be implemented if
-     * LiveUpdate is supported by the DBMS
-     */
-    public void notifyClients() {
-        // nothing to do
+        try {
+            listener.stop();
+            connection.close();
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error during stopping the notification listener", e);
+        }
     }
 }
+
+//             connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
