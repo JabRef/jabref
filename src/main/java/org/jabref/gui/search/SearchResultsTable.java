@@ -12,7 +12,6 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.PersistenceVisualStateTable;
