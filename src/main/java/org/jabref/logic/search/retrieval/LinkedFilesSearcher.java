@@ -13,7 +13,7 @@ import org.jabref.logic.search.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
@@ -78,16 +78,16 @@ public final class LinkedFilesSearcher {
 
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document document = storedFields.document(scoreDoc.doc);
-            String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
+            String fileLink = getFieldContents(document, LinkedFilesConstants.PATH);
 
             if (!fileLink.isEmpty()) {
                 List<String> entriesWithFile = linkedFilesMap.get(fileLink);
                 if (entriesWithFile != null && !entriesWithFile.isEmpty()) {
                     SearchResult searchResult = new SearchResult(
                             fileLink,
-                            getFieldContents(document, SearchFieldConstants.CONTENT),
-                            getFieldContents(document, SearchFieldConstants.ANNOTATIONS),
-                            Integer.parseInt(getFieldContents(document, SearchFieldConstants.PAGE_NUMBER)),
+                            getFieldContents(document, LinkedFilesConstants.CONTENT),
+                            getFieldContents(document, LinkedFilesConstants.ANNOTATIONS),
+                            Integer.parseInt(getFieldContents(document, LinkedFilesConstants.PAGE_NUMBER)),
                             highlighter);
                     searchResults.addSearchResult(entriesWithFile, searchResult);
                 }
@@ -108,7 +108,7 @@ public final class LinkedFilesSearcher {
         return linkedFilesMap;
     }
 
-    private static String getFieldContents(Document document, SearchFieldConstants field) {
+    private static String getFieldContents(Document document, LinkedFilesConstants field) {
         return Optional.ofNullable(document.get(field.toString())).orElse("");
     }
 

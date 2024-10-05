@@ -3,6 +3,7 @@ package org.jabref.logic.search.query;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
@@ -174,7 +175,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
             }
 
-            cte = getFieldQueryNode(field, right, searchFlags);
+            cte = getFieldQueryNode(field.toLowerCase(Locale.ROOT), right, searchFlags);
         } else {
             // Query without any field name
             cte = getFieldQueryNode("any", right, EnumSet.of(INEXACT_MATCH, CASE_INSENSITIVE));

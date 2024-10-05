@@ -163,8 +163,8 @@ open module org.jabref {
     // endregion
 
     // region: Lucene
-    /**
-     * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
+    /*
+     * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
     uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
     requires org.apache.lucene.analysis.common;

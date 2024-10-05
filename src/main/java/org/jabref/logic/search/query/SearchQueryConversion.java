@@ -10,6 +10,7 @@ import org.jabref.search.SearchParser;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.lucene.search.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,10 @@ public class SearchQueryConversion {
         return new SearchFlagsToExpressionVisitor(searchFlags).visit(context);
     }
 
-    public static String searchToLucene(String searchExpression) {
+    public static Query searchToLucene(String searchExpression) {
         LOGGER.debug("Converting search expression to Lucene: {}", searchExpression);
-        return "";
+        SearchParser.StartContext context = getStartContext(searchExpression);
+        return new SearchToLuceneVisitor().visit(context);
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {

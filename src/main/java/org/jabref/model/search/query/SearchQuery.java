@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.search.SearchFlags;
 
+import org.apache.lucene.search.Query;
+
 public class SearchQuery {
     /**
      * The mode of escaping special characters in regular expressions
@@ -55,7 +57,7 @@ public class SearchQuery {
 
     private String parseError;
     private String sqlQuery;
-    private String luceneQuery;
+    private Query luceneQuery;
     private SearchResults searchResults;
 
     public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
@@ -70,7 +72,7 @@ public class SearchQuery {
         return sqlQuery;
     }
 
-    public String getLuceneQuery() {
+    public Query getLuceneQuery() {
         if (luceneQuery == null) {
             luceneQuery = SearchQueryConversion.searchToLucene(searchExpression);
         }

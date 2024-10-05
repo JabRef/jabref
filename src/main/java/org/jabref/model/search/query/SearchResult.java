@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -46,14 +46,14 @@ public final class SearchResult {
 
     public List<String> getContentResultStringsHtml() {
         if (contentResultStringsHtml == null) {
-            return contentResultStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.CONTENT, pageContent);
+            return contentResultStringsHtml = getHighlighterFragments(highlighter, LinkedFilesConstants.CONTENT, pageContent);
         }
         return contentResultStringsHtml;
     }
 
     public List<String> getAnnotationsResultStringsHtml() {
         if (annotationsResultStringsHtml == null) {
-            annotationsResultStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.ANNOTATIONS, annotation);
+            annotationsResultStringsHtml = getHighlighterFragments(highlighter, LinkedFilesConstants.ANNOTATIONS, annotation);
         }
         return annotationsResultStringsHtml;
     }
@@ -70,8 +70,8 @@ public final class SearchResult {
         return pageNumber;
     }
 
-    private static List<String> getHighlighterFragments(Highlighter highlighter, SearchFieldConstants field, String content) {
-        try (TokenStream contentStream = SearchFieldConstants.LINKED_FILES_ANALYZER.tokenStream(field.toString(), content)) {
+    private static List<String> getHighlighterFragments(Highlighter highlighter, LinkedFilesConstants field, String content) {
+        try (TokenStream contentStream = LinkedFilesConstants.LINKED_FILES_ANALYZER.tokenStream(field.toString(), content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
             return Arrays.stream(frags).map(TextFragment::toString).toList();
         } catch (IOException | InvalidTokenOffsetsException e) {

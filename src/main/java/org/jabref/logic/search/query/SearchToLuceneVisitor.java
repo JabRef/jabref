@@ -1,148 +1,138 @@
 package org.jabref.logic.search.query;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.AndQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.nodes.RegexpQueryNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.antlr.v4.runtime.Token;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchNoDocsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RegexpQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.QueryBuilder;
 
 /**
- * Converts to a Lucene index with the assumption that the ngram analyzer is used.
- * <p>
- * Tests are located in {@link org.jabref.migrations.SearchToLuceneMigrationTest}.
+ * Tests are located in {@link org.jabref.logic.search.query.SearchToLuceneVisitor}.
  */
-public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
+public class SearchToLuceneVisitor extends SearchBaseVisitor<Query> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchToLuceneVisitor.class);
+    private static final List<String> SEARCH_FIELDS = LinkedFilesConstants.PDF_FIELDS;
 
-    private final boolean isRegularExpression;
+    private final QueryBuilder queryBuilder;
 
-    public SearchToLuceneVisitor(boolean isRegularExpression) {
-        this.isRegularExpression = isRegularExpression;
+    public SearchToLuceneVisitor() {
+        this.queryBuilder = new QueryBuilder(LinkedFilesConstants.LINKED_FILES_ANALYZER);
     }
 
     @Override
-    public QueryNode visitStart(SearchParser.StartContext ctx) {
-        QueryNode result = visit(ctx.expression());
+    public Query visitStart(SearchParser.StartContext ctx) {
+        return visit(ctx.expression());
+    }
 
-        // If user searches for a single negation, Lucene also (!) interprets it as filter on the entities matched by the other terms
-        // We need to add a "filter" to match all entities
-        // See https://github.com/LoayGhreeb/lucene-mwe/issues/1 for more details
-        if (result instanceof ModifierQueryNode modifierQueryNode) {
-            if (modifierQueryNode.getModifier() == ModifierQueryNode.Modifier.MOD_NOT) {
-                return new AndQueryNode(List.of(new FieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), "*", 0, 0), modifierQueryNode));
-            }
+    @Override
+    public Query visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+        return visit(ctx.expression());
+    }
+
+    @Override
+    public Query visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
+        Query innerQuery = visit(ctx.expression());
+        if (innerQuery instanceof MatchNoDocsQuery) {
+            return innerQuery;
+        }
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        builder.add(innerQuery, BooleanClause.Occur.MUST_NOT);
+        return builder.build();
+    }
+
+    @Override
+    public Query visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+        Query left = visit(ctx.left);
+        Query right = visit(ctx.right);
+
+        if (left instanceof MatchNoDocsQuery) {
+            return right;
+        }
+        if (right instanceof MatchNoDocsQuery) {
+            return left;
         }
 
-        // User might search for NOT this AND NOT that - we also need to convert properly
-        if (result instanceof AndQueryNode andQueryNode) {
-            if (andQueryNode.getChildren().stream().allMatch(child -> child instanceof ModifierQueryNode modifierQueryNode && modifierQueryNode.getModifier() == ModifierQueryNode.Modifier.MOD_NOT)) {
-                List<QueryNode> children = andQueryNode.getChildren().stream()
-                                                       // prepend "any:* AND" to each child
-                                                       .map(child -> new AndQueryNode(List.of(new FieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), "*", 0, 0), child)))
-                                                       .map(child -> (QueryNode) child)
-                                                       .toList();
-                return new AndQueryNode(children);
-            }
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
+        if (ctx.operator.getType() == SearchParser.AND) {
+            builder.add(left, BooleanClause.Occur.MUST);
+            builder.add(right, BooleanClause.Occur.MUST);
+        } else if (ctx.operator.getType() == SearchParser.OR) {
+            builder.add(left, BooleanClause.Occur.SHOULD);
+            builder.add(right, BooleanClause.Occur.SHOULD);
         }
 
-        return result;
+        return builder.build();
     }
 
     @Override
-    public QueryNode visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
-        return new ModifierQueryNode(visit(ctx.expression()), ModifierQueryNode.Modifier.MOD_NOT);
-    }
+    public Query visitComparison(SearchParser.ComparisonContext ctx) {
+        String field = ctx.left != null ? ctx.left.getText().toLowerCase() : null;
+        String term = ctx.right.getText();
 
-    @Override
-    public QueryNode visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return new GroupQueryNode(visit(ctx.expression()));
-    }
+        if (term.startsWith("\"") && term.endsWith("\"")) {
+            term = term.substring(1, term.length() - 1);
+        }
 
-    @Override
-    public QueryNode visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-        if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
-            return new AndQueryNode(List.of(visit(ctx.left), visit(ctx.right)));
+        if (field == null || "anyfield".equals(field) || "any".equals(field)) {
+            return createMultiFieldQuery(term, ctx.operator);
+        } else if (SEARCH_FIELDS.contains(field)) {
+            return createFieldQuery(field, term, ctx.operator);
         } else {
-            return new OrQueryNode(List.of(visit(ctx.left), visit(ctx.right)));
+            return new MatchNoDocsQuery();
         }
     }
 
-    @Override
-    public QueryNode visitComparison(SearchParser.ComparisonContext context) {
-        // The comparison is a leaf node in the tree
-
-        // remove possible enclosing " symbols
-        String right = context.right.getText();
-        if (right.startsWith("\"") && right.endsWith("\"")) {
-            right = right.substring(1, right.length() - 1);
+    private Query createMultiFieldQuery(String value, Token operator) {
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        for (String field : SEARCH_FIELDS) {
+            builder.add(createFieldQuery(field, value, operator), BooleanClause.Occur.SHOULD);
         }
-
-        Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
-        int startIndex = context.getStart().getStartIndex();
-        int stopIndex = context.getStop().getStopIndex();
-        if (fieldDescriptor.isPresent()) {
-            String field = fieldDescriptor.get().getText();
-
-            // Direct comparison does not work
-            // context.CONTAINS() and others are null if absent (thus, we cannot check for getText())
-            if (context.CONTAINS() != null ||
-                    context.MATCHES() != null ||
-                    context.EQUAL() != null ||
-                    context.EEQUAL() != null) { // exact match
-                if (LOGGER.isDebugEnabled() && context.EEQUAL() != null) {
-                    LOGGER.warn("Exact match is currently not supported by Lucene, using contains instead. Term: {}", context.getText());
-                }
-                return getFieldQueryNode(field, right, startIndex, stopIndex, false);
-            }
-
-            assert (context.NEQUAL() != null);
-
-            // Treating of "wrong" query field != "". This did not work in v5.x, but should work in v6.x
-            boolean forceRegex;
-            if (right.isEmpty()) {
-                forceRegex = true;
-                right = ".+";
-            } else {
-                forceRegex = false;
-            }
-
-            return new ModifierQueryNode(getFieldQueryNode(field, right, startIndex, stopIndex, forceRegex), ModifierQueryNode.Modifier.MOD_NOT);
-        } else {
-            return getFieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), right, startIndex, stopIndex, false);
-        }
+        return builder.build();
     }
 
-    /**
-     * A search query can be either a regular expression or a normal query.
-     * In Lucene, this is represented by a RegexpQueryNode or a FieldQueryNode.
-     * They are created in this class accordingly.
-     */
-    private QueryNode getFieldQueryNode(String field, String term, int startIndex, int stopIndex, boolean forceRegex) {
-        field = switch (field) {
-            case "anyfield" -> SearchFieldConstants.DEFAULT_FIELD.toString();
-            case "anykeyword" -> StandardField.KEYWORDS.getName();
-            case "key" -> InternalField.KEY_FIELD.getName();
-            default -> field;
+    private Query createFieldQuery(String field, String value, Token operator) {
+        if (operator == null) {
+            return createTermOrPhraseQuery(field, value);
+        }
+
+        return switch (operator.getType()) {
+            case SearchParser.REQUAL,
+                 SearchParser.CREEQUAL ->
+                    new RegexpQuery(new Term(field, value));
+            case SearchParser.NEQUAL,
+                 SearchParser.NCEQUAL,
+                 SearchParser.NEEQUAL,
+                 SearchParser.NCEEQUAL ->
+                    createNegatedQuery(createTermOrPhraseQuery(field, value));
+            case SearchParser.NREQUAL,
+                 SearchParser.NCREEQUAL ->
+                    createNegatedQuery(new RegexpQuery(new Term(field, value)));
+            default ->
+                    createTermOrPhraseQuery(field, value);
         };
+    }
 
-        if (isRegularExpression || forceRegex) {
-            // Lucene does a sanity check on the positions, thus we provide other fake positions
-            return new RegexpQueryNode(field, term, 0, term.length());
+    private Query createNegatedQuery(Query query) {
+        BooleanQuery.Builder negatedQuery = new BooleanQuery.Builder();
+        negatedQuery.add(query, BooleanClause.Occur.MUST_NOT);
+        return negatedQuery.build();
+    }
+
+    private Query createTermOrPhraseQuery(String field, String value) {
+        if (value.contains("*") || value.contains("?")) {
+            return new TermQuery(new Term(field, value));
         }
-        return new FieldQueryNode(field, term, startIndex, stopIndex);
+        return queryBuilder.createPhraseQuery(field, value);
     }
 }
