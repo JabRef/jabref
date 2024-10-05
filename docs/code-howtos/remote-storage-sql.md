@@ -7,6 +7,21 @@ grand_parent: Code Howtos
 
 For user documentation, see <https://docs.jabref.org/collaborative-work/sqldatabase>.
 
+## Involved classes
+
+- `org.jabref.logic.shared.listener.PostgresSQLNotificationListener`: handles and routes notifications from the PostgreSQL database to the `DBMSSynchronizer`.
+
+## Flow of calls
+
+The idea is to "publish" the change event with data both locally and remotely.
+The change event should contain the new value, which can be directly applied remotely.
+The change event should contain the old value to enable sanity checks while applying the change.
+
+```mermaid
+sequenceDiagram
+  BibEntry (A)->>DBMSSynchronizer (A): "FieldChangedEvent"
+```
+
 ## Handling large shared databases
 
 Synchronization times may get long when working with a large database containing several thousand entries.
