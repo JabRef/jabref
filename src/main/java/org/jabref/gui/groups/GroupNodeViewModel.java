@@ -102,12 +102,9 @@ public class GroupNodeViewModel {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
             stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                BackgroundTask.wrap(() -> {
-                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                }).onSuccess(success -> {
-                    refreshGroup();
-                    databaseContext.getMetaData().groupsBinding().invalidate();
-                }).executeWith(taskExecutor);
+                searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
+                refreshGroup();
+                databaseContext.getMetaData().groupsBinding().invalidate();
             });
         }
 
@@ -541,12 +538,9 @@ public class GroupNodeViewModel {
         public void listen(IndexStartedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                    BackgroundTask.wrap(() -> {
-                        searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                    }).onSuccess(success -> {
-                        refreshGroup();
-                        databaseContext.getMetaData().groupsBinding().invalidate();
-                    }).executeWith(taskExecutor);
+                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
+                    refreshGroup();
+                    databaseContext.getMetaData().groupsBinding().invalidate();
                 });
             }
         }

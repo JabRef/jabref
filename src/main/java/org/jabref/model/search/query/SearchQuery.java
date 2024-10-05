@@ -7,7 +7,6 @@ import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.search.SearchFlags;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.apache.lucene.search.Query;
 
 public class SearchQuery {
 
@@ -15,8 +14,6 @@ public class SearchQuery {
     private final EnumSet<SearchFlags> searchFlags;
 
     private boolean isValidExpression;
-    private String sqlQuery;
-    private Query luceneQuery;
     private SearchResults searchResults;
 
     public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
@@ -28,20 +25,6 @@ public class SearchQuery {
         } catch (ParseCancellationException e) {
             isValidExpression = false;
         }
-    }
-
-    public String getSqlQuery(String table) {
-        if (sqlQuery == null) {
-            sqlQuery = SearchQueryConversion.searchToSql(table, searchExpression);
-        }
-        return sqlQuery;
-    }
-
-    public Query getLuceneQuery() {
-        if (luceneQuery == null) {
-            luceneQuery = SearchQueryConversion.searchToLucene(searchExpression);
-        }
-        return luceneQuery;
     }
 
     public String getSearchExpression() {

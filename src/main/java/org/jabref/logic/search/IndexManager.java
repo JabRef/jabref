@@ -1,7 +1,11 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,6 +18,7 @@ import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -221,11 +226,22 @@ public class IndexManager {
     }
 
     public SearchResults search(SearchQuery query) {
-        SearchResults searchResults = new SearchResults();
-        searchResults.mergeSearchResults(bibFieldsSearcher.search(query));
+        List<Callable<SearchResults>> tasks = new ArrayList<>();
+        tasks.add(() -> bibFieldsSearcher.search(query));
 
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
-            searchResults.mergeSearchResults(linkedFilesSearcher.search(query));
+            tasks.add(() -> linkedFilesSearcher.search(query));
+        }
+
+        List<Future<SearchResults>> futures = HeadlessExecutorService.INSTANCE.executeAll(tasks);
+
+        SearchResults searchResults = new SearchResults();
+        for (Future<SearchResults> future : futures) {
+            try {
+                searchResults.mergeSearchResults(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("Error while searching", e);
+            }
         }
         query.setSearchResults(searchResults);
         return searchResults;

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
@@ -37,11 +38,10 @@ public class BibFieldsSearcher {
     }
 
     public SearchResults search(SearchQuery searchQuery) {
-        String sqlQuery = searchQuery.getSqlQuery(tableName);
         if (!searchQuery.isValid()) {
-            LOGGER.error("Invalid SQL query: {}", sqlQuery);
             return new SearchResults();
         }
+        String sqlQuery = SearchQueryConversion.searchToSql(tableName, searchQuery.getSearchExpression());
         LOGGER.debug("Searching in bib fields with query: {}", sqlQuery);
         SearchResults searchResults = new SearchResults();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {

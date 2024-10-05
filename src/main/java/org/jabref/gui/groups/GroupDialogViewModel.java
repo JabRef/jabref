@@ -334,7 +334,6 @@ public class GroupDialogViewModel {
                 Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
                 if (indexManager.isPresent()) {
                     SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    // TODO: search should be done in a background thread
                     searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
                 }
             } else if (typeAutoProperty.getValue()) {

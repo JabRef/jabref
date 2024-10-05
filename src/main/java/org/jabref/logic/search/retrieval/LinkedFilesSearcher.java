@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -46,10 +47,14 @@ public final class LinkedFilesSearcher {
     }
 
     public SearchResults search(SearchQuery searchQuery) {
-        Query luceneQuery = searchQuery.getLuceneQuery();
+        if (!searchQuery.isValid()) {
+            return new SearchResults();
+        }
+
+        Query luceneQuery = SearchQueryConversion.searchToLucene(searchQuery.getSearchExpression());
         EnumSet<SearchFlags> searchFlags = searchQuery.getSearchFlags();
         boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) && filePreferences.shouldFulltextIndexLinkedFiles();
-        if (!shouldSearchInLinkedFiles || !searchQuery.isValid()) {
+        if (!shouldSearchInLinkedFiles) {
             return new SearchResults();
         }
 

@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.model.entry.BibEntry;
 
 public class SearchResults {
 
-    private final Map<String, List<SearchResult>> searchResults = new HashMap<>();
+    private final Map<String, List<SearchResult>> searchResults = new ConcurrentHashMap<>();
 
     public void mergeSearchResults(SearchResults additionalResults) {
         this.searchResults.putAll(additionalResults.searchResults);
