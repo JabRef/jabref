@@ -299,7 +299,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferences, libraryTab, taskExecutor));
+                undoManager, stateManager, fileMonitor, preferences, libraryTab, taskExecutor, bibEntryTypesManager));
         tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferences, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,

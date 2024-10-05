@@ -12,7 +12,6 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.PersistenceVisualStateTable;
@@ -34,6 +33,8 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               StateManager stateManager,
                               TaskExecutor taskExecutor) {
         super();
+
+        this.getStyleClass().add("main-table");
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -67,8 +68,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
-
-        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, preferences.getSearchDialogColumnPreferences()).addListeners();
