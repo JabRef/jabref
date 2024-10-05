@@ -15,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.LinkedFilesConstants;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
 
@@ -44,16 +45,18 @@ public final class LinkedFilesSearcher {
         this.filePreferences = filePreferences;
     }
 
-    public SearchResults search(Query searchQuery, EnumSet<SearchFlags> searchFlags) {
+    public SearchResults search(SearchQuery searchQuery) {
+        Query luceneQuery = searchQuery.getLuceneQuery();
+        EnumSet<SearchFlags> searchFlags = searchQuery.getSearchFlags();
         boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) && filePreferences.shouldFulltextIndexLinkedFiles();
-        if (!shouldSearchInLinkedFiles) {
+        if (!shouldSearchInLinkedFiles || !searchQuery.isValid()) {
             return new SearchResults();
         }
 
-        LOGGER.debug("Searching in linked files with query: {}", searchQuery);
+        LOGGER.debug("Searching in linked files with query: {}", luceneQuery);
         try {
             IndexSearcher linkedFilesIndexSearcher = acquireIndexSearcher(searcherManager);
-            SearchResults searchResults = search(linkedFilesIndexSearcher, searchQuery);
+            SearchResults searchResults = search(linkedFilesIndexSearcher, luceneQuery);
             releaseIndexSearcher(searcherManager, linkedFilesIndexSearcher);
             return searchResults;
         } catch (IOException | IndexSearcher.TooManyClauses e) {

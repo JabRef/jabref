@@ -36,7 +36,7 @@ public class SearchQueryConversion {
         return new SearchToLuceneVisitor().visit(context);
     }
 
-    private static SearchParser.StartContext getStartContext(String searchExpression) {
+    public static SearchParser.StartContext getStartContext(String searchExpression) {
         SearchLexer lexer = new SearchLexer(CharStreams.fromString(searchExpression));
         lexer.removeErrorListeners(); // no infos on file system
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);

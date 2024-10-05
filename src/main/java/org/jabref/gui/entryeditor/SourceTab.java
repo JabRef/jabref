@@ -119,7 +119,7 @@ public class SourceTab extends EntryEditorTab {
         this.keyBindingRepository = keyBindingRepository;
 
         searchQueryProperty.addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            // TODO: get search pattern from the search query
             highlightSearchPattern();
         });
     }

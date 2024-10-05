@@ -38,6 +38,10 @@ public class BibFieldsSearcher {
 
     public SearchResults search(SearchQuery searchQuery) {
         String sqlQuery = searchQuery.getSqlQuery(tableName);
+        if (!searchQuery.isValid()) {
+            LOGGER.error("Invalid SQL query: {}", sqlQuery);
+            return new SearchResults();
+        }
         LOGGER.debug("Searching in bib fields with query: {}", sqlQuery);
         SearchResults searchResults = new SearchResults();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {

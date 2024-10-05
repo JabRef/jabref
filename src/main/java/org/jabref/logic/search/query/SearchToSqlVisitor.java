@@ -14,9 +14,6 @@ import org.jabref.model.search.query.SearchTermFlag;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
@@ -34,7 +31,6 @@ import static org.jabref.model.search.query.SearchTermFlag.REGULAR_EXPRESSION;
  */
 public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchToSqlVisitor.class);
     private static final String MAIN_TABLE = "main_table";
     private static final String SPLIT_TABLE = "split_table";
     private static final String INNER_TABLE = "inner_table";
@@ -64,7 +60,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         }
 
         sql.append("SELECT * FROM ").append(query).append(" GROUP BY ").append(ENTRY_ID);
-        LOGGER.trace("Converted search query to SQL: {}", sql);
         return sql.toString();
     }
 

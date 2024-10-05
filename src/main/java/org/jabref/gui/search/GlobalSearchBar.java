@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.UndoManager;
 
@@ -349,16 +347,6 @@ public class GlobalSearchBar extends HBox {
             illegalSearch.set(false);
         }
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
-    }
-
-    private boolean validRegex() {
-        try {
-            Pattern.compile(searchField.getText());
-        } catch (PatternSyntaxException e) {
-            LOGGER.debug(e.getMessage());
-            return false;
-        }
-        return true;
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {

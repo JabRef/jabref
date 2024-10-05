@@ -126,7 +126,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final WebView previewView;
     private final BibDatabaseContext database;
     private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
+        // TODO: update search pattern
         highlightSearchPattern();
     };
 
@@ -161,7 +161,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
 
             if (!registered) {
-                searchHighlightPattern = searchQueryProperty.get().flatMap(SearchQuery::getJavaScriptPatternForWords);
+                // TODO: update search pattern
                 searchQueryProperty.addListener(listener);
                 registered = true;
             }

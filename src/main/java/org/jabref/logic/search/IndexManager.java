@@ -223,13 +223,9 @@ public class IndexManager {
     public SearchResults search(SearchQuery query) {
         SearchResults searchResults = new SearchResults();
         searchResults.mergeSearchResults(bibFieldsSearcher.search(query));
-//        if (query.isValid()) {
-//            query.setSearchResults(linkedFilesSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
-//        } else {
-//            query.setSearchResults(new SearchResults());
-//        }
+
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
-            // TODO: merge results from lucene and postgres
+            searchResults.mergeSearchResults(linkedFilesSearcher.search(query));
         }
         query.setSearchResults(searchResults);
         return searchResults;
