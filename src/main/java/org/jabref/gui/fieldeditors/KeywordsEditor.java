@@ -55,7 +55,6 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
 
-    private final KeywordsEditorViewModel viewModel;
     private Keyword draggedKeyword;
 
     public KeywordsEditor(Field field,
