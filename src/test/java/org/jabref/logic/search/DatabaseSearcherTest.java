@@ -14,6 +14,7 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
@@ -35,11 +36,17 @@ public class DatabaseSearcherTest {
     private BibDatabaseContext databaseContext;
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     @TempDir
     private Path indexDir;
 
     @BeforeEach
     void setUp() {
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(false);
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
         databaseContext = spy(new BibDatabaseContext());
