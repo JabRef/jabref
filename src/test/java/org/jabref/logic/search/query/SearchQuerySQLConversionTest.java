@@ -1,90 +1,631 @@
 package org.jabref.logic.search.query;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SearchQuerySQLConversionTest {
+    public static Stream<Arguments> testSearchConversion() {
+        return Stream.of(
+                Arguments.of(
+                        "author CONTAINS smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE '%smith%') OR (main_table.field_value_transformed ILIKE '%smith%'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author = smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE '%smith%') OR (main_table.field_value_transformed ILIKE '%smith%'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author =! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE '%smith%') OR (main_table.field_value_transformed LIKE '%smith%'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author != smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ILIKE '%smith%') OR (inner_table.field_value_transformed ILIKE '%smith%'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author !=! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name = 'author') AND ((inner_table.field_value_literal LIKE '%smith%') OR (inner_table.field_value_transformed LIKE '%smith%'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author MATCHES smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            WHERE (
+                                ((main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE 'smith') OR (main_table.field_value_transformed ILIKE 'smith')))
+                                OR
+                                ((split_table.field_name = 'author') AND ((split_table.field_value_literal ILIKE 'smith') OR (split_table.field_value_transformed ILIKE 'smith')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author == smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            WHERE (
+                                ((main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE 'smith') OR (main_table.field_value_transformed ILIKE 'smith')))
+                                OR
+                                ((split_table.field_name = 'author') AND ((split_table.field_value_literal ILIKE 'smith') OR (split_table.field_value_transformed ILIKE 'smith')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author ==! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            WHERE (
+                                ((main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE 'smith') OR (main_table.field_value_transformed LIKE 'smith')))
+                                OR
+                                ((split_table.field_name = 'author') AND ((split_table.field_value_literal LIKE 'smith') OR (split_table.field_value_transformed LIKE 'smith')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author !== smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                                ON (inner_table.entry_id = split_table.entry_id AND inner_table.field_name = split_table.field_name)
+                                WHERE (
+                                    ((inner_table.field_name = 'author') AND ((inner_table.field_value_literal ILIKE 'smith') OR (inner_table.field_value_transformed ILIKE 'smith')))
+                                    OR
+                                    ((split_table.field_name = 'author') AND ((split_table.field_value_literal ILIKE 'smith') OR (split_table.field_value_transformed ILIKE 'smith')))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author !==! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                                ON (inner_table.entry_id = split_table.entry_id AND inner_table.field_name = split_table.field_name)
+                                WHERE (
+                                    ((inner_table.field_name = 'author') AND ((inner_table.field_value_literal LIKE 'smith') OR (inner_table.field_value_transformed LIKE 'smith')))
+                                    OR
+                                    ((split_table.field_name = 'author') AND ((split_table.field_value_literal LIKE 'smith') OR (split_table.field_value_transformed LIKE 'smith')))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author =~ smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal ~* 'smith') OR (main_table.field_value_transformed ~* 'smith'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author =~! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal ~ 'smith') OR (main_table.field_value_transformed ~ 'smith'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author !=~ smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ~* 'smith') OR (inner_table.field_value_transformed ~* 'smith'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "author !=~! smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ~ 'smith') OR (inner_table.field_value_transformed ~ 'smith'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%smith%') OR (main_table.field_value_transformed ILIKE '%smith%'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "any == smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            LEFT JOIN bib_fields."tableName_split_values" AS split_table
+                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            WHERE (
+                                (main_table.field_name != 'groups')
+                                AND (
+                                    ((main_table.field_value_literal ILIKE 'smith') OR (main_table.field_value_transformed ILIKE 'smith'))
+                                    OR
+                                    ((split_table.field_value_literal ILIKE 'smith') OR (split_table.field_value_transformed ILIKE 'smith'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "anyfield != smith",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                                SELECT inner_table.entry_id
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name != 'groups') AND ((inner_table.field_value_literal ILIKE '%smith%') OR (inner_table.field_value_transformed ILIKE '%smith%'))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "title = \"computer science\"",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE '%computer science%') OR (main_table.field_value_transformed ILIKE '%computer science%'))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                    "a OR b AND c",
+                    """
+                    WITH
+                    cte0 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                        )
+                    )
+                    ,
+                    cte1 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                        )
+                    )
+                    ,
+                    cte2 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                        )
+                    )
+                    ,
+                    cte3 AS (
+                        SELECT entry_id
+                        FROM cte1
+                        INTERSECT
+                        SELECT entry_id
+                        FROM cte2
+                    )
+                    ,
+                    cte4 AS (
+                        SELECT entry_id
+                        FROM cte0
+                        UNION
+                        SELECT entry_id
+                        FROM cte3
+                    )
+                    SELECT * FROM cte4 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                    "a AND b OR c",
+                    """
+                    WITH
+                    cte0 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                        )
+                    )
+                    ,
+                    cte1 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                        )
+                    )
+                    ,
+                    cte2 AS (
+                        SELECT entry_id
+                        FROM cte0
+                        INTERSECT
+                        SELECT entry_id
+                        FROM cte1
+                    )
+                    ,
+                    cte3 AS (
+                        SELECT main_table.entry_id
+                        FROM bib_fields."tableName" AS main_table
+                        WHERE (
+                            (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                        )
+                    )
+                    ,
+                    cte4 AS (
+                        SELECT entry_id
+                        FROM cte2
+                        UNION
+                        SELECT entry_id
+                        FROM cte3
+                    )
+                    SELECT * FROM cte4 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "(a OR b) AND c",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            UNION
+                            SELECT entry_id
+                            FROM cte1
+                        )
+                        ,
+                        cte3 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                            )
+                        )
+                        ,
+                        cte4 AS (
+                            SELECT entry_id
+                            FROM cte2
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte3
+                        )
+                        SELECT * FROM cte4 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "a OR (b AND c)",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                            )
+                        )
+                        ,
+                        cte3 AS (
+                            SELECT entry_id
+                            FROM cte1
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte2
+                        )
+                        ,
+                        cte4 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            UNION
+                            SELECT entry_id
+                            FROM cte3
+                        )
+                        SELECT * FROM cte4 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "(a OR b) AND (c OR d)",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            UNION
+                            SELECT entry_id
+                            FROM cte1
+                        )
+                        ,
+                        cte3 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                            )
+                        )
+                        ,
+                        cte4 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%d%') OR (main_table.field_value_transformed ILIKE '%d%'))
+                            )
+                        )
+                        ,
+                        cte5 AS (
+                            SELECT entry_id
+                            FROM cte3
+                            UNION
+                            SELECT entry_id
+                            FROM cte4
+                        )
+                        ,
+                        cte6 AS (
+                            SELECT entry_id
+                            FROM cte2
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte5
+                        )
+                        SELECT * FROM cte6 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "a AND NOT (b OR c)",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%a%') OR (main_table.field_value_transformed ILIKE '%a%'))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%b%') OR (main_table.field_value_transformed ILIKE '%b%'))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE '%c%') OR (main_table.field_value_transformed ILIKE '%c%'))
+                            )
+                        )
+                        ,
+                        cte3 AS (
+                            SELECT entry_id
+                            FROM cte1
+                            UNION
+                            SELECT entry_id
+                            FROM cte2
+                        )
+                        ,
+                        cte4 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entry_id NOT IN (
+                               SELECT entry_id
+                               FROM cte3
+                            )
+                        )
+                        ,
+                        cte5 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte4
+                        )
+                        SELECT * FROM cte5 GROUP BY entry_id"""
+                )
+                // Throws exceptions
+                // computer science, !computer, R\"ock, Breitenb{\"{u}}cher
+        );
+    }
+
     @ParameterizedTest
-    @CsvSource({
-            "(), alex",
-            "(), author=alex",
-            "(), title=dino AND author=alex",
-            "(), author=computer AND editor=science OR title=math",
-            "(), (author=computer AND editor=science) OR title=math",
-            "(), author=computer AND (editor=science OR title=math)",
-            "(), (title = computer OR comment = science) AND (title = math OR comment = physics)",
-            "(), (author=computer AND editor=science) OR (title=math AND year=2021)",
-            // case insensitive contains
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE '%compute%') OR (main_table.field_value_transformed ILIKE '%compute%'))), title=compute",
-
-            // case sensitive contains
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal LIKE '%compute%') OR (main_table.field_value_transformed LIKE '%compute%'))), title=!compute",
-
-            // exact match case insensitive
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE 'compute') OR (main_table.field_value_transformed ILIKE 'compute'))) OR ((split_table.field_name = 'title') AND ((split_table.field_value_literal ILIKE 'compute') OR (split_table.field_value_transformed ILIKE 'compute'))), title==compute",
-
-            // exact match case sensitive
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal LIKE 'compute') OR (main_table.field_value_transformed LIKE 'compute'))) OR ((split_table.field_name = 'title') AND ((split_table.field_value_literal LIKE 'compute') OR (split_table.field_value_transformed LIKE 'compute'))), title==!compute",
-
-            // Regex search case insensitive
-            "(main_table.field_value_literal ~* 'Jabref.*Search') OR (main_table.field_value_transformed ~* 'Jabref.*Search'), any=~Jabref.*Search",
-
-            // Regex search case sensitive
-            "(main_table.field_value_literal ~ 'Jabref.*Search') OR (main_table.field_value_transformed ~ 'Jabref.*Search'), any=~!Jabref.*Search",
-
-            // negated case insensitive contains
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal NOT ILIKE '%compute%') OR (main_table.field_value_transformed NOT ILIKE '%compute%'))), title!=compute",
-
-            // negated case sensitive contains
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal NOT LIKE '%compute%') OR (main_table.field_value_transformed NOT LIKE '%compute%'))), title !=! compute",
-
-            // negated case insensitive exact match
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal NOT ILIKE 'compute') OR (main_table.field_value_transformed NOT ILIKE 'compute'))) OR ((split_table.field_name = 'title') AND ((split_table.field_value_literal NOT ILIKE 'compute') OR (split_table.field_value_transformed NOT ILIKE 'compute'))), title !== compute",
-
-            // negated case sensitive exact match
-            "((main_table.field_name = 'title') AND ((main_table.field_value_literal NOT LIKE 'compute') OR (main_table.field_value_transformed NOT LIKE 'compute'))) OR ((split_table.field_name = 'title') AND ((split_table.field_value_literal NOT LIKE 'compute') OR (split_table.field_value_transformed NOT LIKE 'compute'))), title !==! compute",
-
-            // negated regex search case insensitive
-            "(main_table.field_value_literal !~* 'Jabref.*Search') OR (main_table.field_value_transformed !~* 'Jabref.*Search'), any!=~Jabref.*Search",
-
-            // negated regex search case sensitive
-            "(main_table.field_value_literal !~ 'Jabref.*Search') OR (main_table.field_value_transformed !~ 'Jabref.*Search'), any!=~!Jabref.*Search",
-
-            // Default search, query without any field name (case insensitive contains)
-            "(main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%'), computer",
-            "(main_table.field_value_literal ILIKE '%computer science%') OR (main_table.field_value_transformed ILIKE '%computer science%'), \"computer science\"",      // Phrase search
-            "(field_value ILIKE '%computer%') OR (field_value ILIKE '%science%'), computer science",     // Should be searched as a phrase or as two separate words (OR)? (Throw exception)
-            "(field_value ILIKE '%!computer%'), !computer",         // Is the explanation should be escaped?  (Throw exception)
-            "(main_table.field_value_literal ILIKE '%!computer%') OR (main_table.field_value_transformed ILIKE '%!computer%'), \"!computer\"",
-
-            // search in all fields case sensitive contains
-            "(main_table.field_value_literal LIKE '%computer%') OR (main_table.field_value_transformed LIKE '%computer%'), any=!computer",
-            "(field_value LIKE '%!computer%'), any=! !computer",  // Is the explanation should be escaped? (Throw exception)
-
-            // And
-            "(main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%') AND (main_table.field_value_literal ILIKE '%science%') OR (main_table.field_value_transformed ILIKE '%science%'), computer AND science",
-
-            // Or
-            "(main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%') OR (main_table.field_value_literal ILIKE '%science%') OR (main_table.field_value_transformed ILIKE '%science%'), computer OR science",
-
-            // Grouping
-            "((main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%') AND (main_table.field_value_literal ILIKE '%science%') OR (main_table.field_value_transformed ILIKE '%science%')) OR (main_table.field_value_literal ILIKE '%math%') OR (main_table.field_value_transformed ILIKE '%math%'), (computer AND science) OR math",
-            "(main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%') AND ((main_table.field_value_literal ILIKE '%science%') OR (main_table.field_value_transformed ILIKE '%science%') OR (main_table.field_value_literal ILIKE '%math%') OR (main_table.field_value_transformed ILIKE '%math%')), computer AND (science OR math)",
-            "((main_table.field_value_literal ILIKE '%computer%') OR (main_table.field_value_transformed ILIKE '%computer%') OR (main_table.field_value_literal ILIKE '%science%') OR (main_table.field_value_transformed ILIKE '%science%')) AND ((main_table.field_value_literal ILIKE '%math%') OR (main_table.field_value_transformed ILIKE '%math%') OR (main_table.field_value_literal ILIKE '%physics%') OR (main_table.field_value_transformed ILIKE '%physics%')), (computer OR science) AND (math OR physics)",
-
-            // Special characters
-            "(main_table.field_value_literal ILIKE '%{IEEE}%') OR (main_table.field_value_transformed ILIKE '%{IEEE}%'), {IEEE}",
-            "((main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE '%{IEEE}%') OR (main_table.field_value_transformed ILIKE '%{IEEE}%'))), author={IEEE}",
-
-            // R\"ock
-            "(field_value ILIKE '%R\\\"ock%'), R\\\"ock",  // (Throw exception)
-            // Breitenb{\"{u}}cher
-            "(field_value ILIKE '%Breitenb{\\\"{u}}cher%'), Breitenb{\\\"{u}}cher", // (Throw exception)
-    })
-
-    void conversion(String expectedWhereClause, String input) {
-        assertEquals(expectedWhereClause, SearchQueryConversion.searchToSql("tableName", input));
+    @MethodSource
+    void testSearchConversion(String input, String expected) {
+        assertEquals(expected, SearchQueryConversion.searchToSql("tableName", input));
     }
 }
