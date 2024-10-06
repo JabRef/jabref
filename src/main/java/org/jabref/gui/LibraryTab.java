@@ -37,7 +37,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -63,7 +62,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.util.AiUiConnector;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -173,7 +171,6 @@ public class LibraryTab extends Tab {
     private LuceneManager luceneManager;
 
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
 
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
@@ -185,7 +182,6 @@ public class LibraryTab extends Tab {
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
                        AiService aiService,
-                       ChatHistoryService chatHistoryService,
                        GuiPreferences preferences,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -206,7 +202,6 @@ public class LibraryTab extends Tab {
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
 
         initializeComponentsAndListeners(isDummyContext);
 
@@ -259,7 +254,7 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = createEntryEditor();
 
-        AiUiConnector.setupDatabase(aiService, chatHistoryService, bibDatabaseContext);
+        aiService.setupDatabase(bibDatabaseContext);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -1065,7 +1060,6 @@ public class LibraryTab extends Tab {
                                               Path file,
                                               DialogService dialogService,
                                               AiService aiService,
-                                              ChatHistoryService chatHistoryService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
@@ -1082,7 +1076,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 aiService,
-                chatHistoryService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
@@ -1105,7 +1098,6 @@ public class LibraryTab extends Tab {
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               AiService aiService,
-                                              ChatHistoryService chatHistoryService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1120,7 +1112,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 aiService,
-                chatHistoryService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

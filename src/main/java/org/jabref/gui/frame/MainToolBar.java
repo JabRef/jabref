@@ -20,7 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
@@ -59,7 +59,6 @@ public class MainToolBar extends ToolBar {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
@@ -77,7 +76,6 @@ public class MainToolBar extends ToolBar {
                        StateManager stateManager,
                        GuiPreferences preferences,
                        AiService aiService,
-                       ChatHistoryService chatHistoryService,
                        FileUpdateMonitor fileUpdateMonitor,
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
@@ -90,7 +88,6 @@ public class MainToolBar extends ToolBar {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.entryTypesManager = entryTypesManager;
@@ -118,7 +115,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, chatHistoryService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
 
                 leftSpacer,

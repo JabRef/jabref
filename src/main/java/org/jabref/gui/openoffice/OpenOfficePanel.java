@@ -34,7 +34,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -106,7 +106,6 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
     private final StyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -126,7 +125,6 @@ public class OpenOfficePanel {
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
                            AiService aiService,
-                           ChatHistoryService chatHistoryService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
@@ -141,7 +139,6 @@ public class OpenOfficePanel {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
@@ -331,7 +328,6 @@ public class OpenOfficePanel {
                     tabContainer,
                     dialogService,
                     aiService,
-                    chatHistoryService,
                     preferences,
                     stateManager,
                     fileUpdateMonitor,

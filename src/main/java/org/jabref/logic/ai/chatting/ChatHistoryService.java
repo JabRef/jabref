@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.chatting.chathistory;
+package org.jabref.logic.ai.chatting;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -54,10 +54,7 @@ import org.slf4j.LoggerFactory;
 public class ChatHistoryService implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryService.class);
 
-    private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
-
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-
     private final ChatHistoryStorage implementation;
 
     // Note about `Optional<BibDatabaseContext>`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
@@ -72,15 +69,11 @@ public class ChatHistoryService implements AutoCloseable {
     private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
     // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
-    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>((o1, o2) -> {
-        // The most important thing is to catch equality/non-equality.
-        // For "less" or "bigger" comparison, we will fall back to group names.
-        return o1 == o2 ? 0 : o1.getGroup().getName().compareTo(o2.getGroup().getName());
-    });
+    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>(Comparator.comparing(GroupTreeNode::getName));
 
-    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
+    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, ChatHistoryStorage implementation) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
-        this.implementation = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
+        this.implementation = implementation;
     }
 
     public void setupDatabase(BibDatabaseContext bibDatabaseContext) {

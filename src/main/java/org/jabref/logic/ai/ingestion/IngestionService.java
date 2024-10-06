@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.ingestion;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -29,7 +30,7 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
  */
 public class IngestionService {
     // We use a {@link TreeMap} here for the same reasons we use it in {@link ChatHistoryService}.
-    private final TreeMap<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new TreeMap<>((o1, o2) -> o1 == o2 ? 0 : o1.getLink().compareTo(o2.getLink()));
+    private final TreeMap<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new TreeMap<>(Comparator.comparing(LinkedFile::getLink));
 
     private final List<List<LinkedFile>> listsUnderIngestion = new ArrayList<>();
 
