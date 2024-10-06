@@ -11,7 +11,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;

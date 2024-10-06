@@ -21,7 +21,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;

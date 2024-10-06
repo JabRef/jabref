@@ -34,7 +34,6 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;

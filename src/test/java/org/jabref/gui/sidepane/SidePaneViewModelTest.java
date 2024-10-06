@@ -13,7 +13,6 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -40,7 +39,6 @@ class SidePaneViewModelTest {
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     GuiPreferences preferences = mock(GuiPreferences.class);
     AiService aiService = mock(AiService.class);
-    ChatHistoryService chatHistoryService = mock(ChatHistoryService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
@@ -70,7 +68,6 @@ class SidePaneViewModelTest {
                 tabContainer,
                 preferences,
                 aiService,
-                chatHistoryService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,

@@ -11,12 +11,9 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
-import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.util.Directories;
-import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;

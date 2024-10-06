@@ -30,7 +30,6 @@ import javafx.scene.layout.BorderPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;

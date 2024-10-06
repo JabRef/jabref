@@ -33,7 +33,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;

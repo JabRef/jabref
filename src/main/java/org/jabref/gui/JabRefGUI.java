@@ -14,7 +14,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;

@@ -20,7 +20,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
