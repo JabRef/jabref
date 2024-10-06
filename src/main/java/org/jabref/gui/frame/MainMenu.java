@@ -2,8 +2,6 @@ package org.jabref.gui.frame;
 
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -70,6 +68,7 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -98,7 +97,7 @@ public class MainMenu extends MenuBar {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final BibEntryTypesManager entryTypesManager;
-    private final UndoManager undoManager;
+    private final CountingUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
@@ -114,7 +113,7 @@ public class MainMenu extends MenuBar {
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
-                    UndoManager undoManager,
+                    CountingUndoManager undoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService) {
@@ -184,8 +183,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
