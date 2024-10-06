@@ -140,6 +140,16 @@ docker run -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=jabref -p 3800:3307 mys
 
 Set the environment variable `DBMS` to `mysql`.
 
+## Fetchers in tests
+
+Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. This can be done by running the following command in the command line:
+
+```shell
+./gradlew fetcherTest
+```
+
+Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `fetcherTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > fetcherTest`).
+
 ## Advanced testing and further reading
 
 On top of basic unit testing, there are more ways to test a software:
