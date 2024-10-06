@@ -1,7 +1,7 @@
 package org.jabref.gui.importer;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.importer.fetcher.GrobidPreferences;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 
 /**

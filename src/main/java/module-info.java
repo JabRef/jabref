@@ -149,6 +149,7 @@ open module org.jabref {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
+    requires langchain4j.google.ai.gemini;
     requires langchain4j.hugging.face;
     requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
@@ -156,6 +157,7 @@ open module org.jabref {
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    requires velocity.engine.core;
     // endregion
 
     // region: Lucene
@@ -188,7 +190,5 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires langchain4j.google.ai.gemini;
-    requires velocity.engine.core;
     // endregion
 }

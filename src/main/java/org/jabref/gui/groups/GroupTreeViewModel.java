@@ -24,7 +24,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -44,7 +43,6 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 
@@ -54,7 +52,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final ChatHistoryService chatHistoryService;
+    private final AiService aiService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
@@ -78,10 +76,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, GuiPreferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager,
+                              DialogService dialogService,
+                              AiService aiService,
+                              GuiPreferences preferences,
+                              TaskExecutor taskExecutor,
+                              CustomLocalDragboard localDragboard
+    ) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.chatHistoryService = Objects.requireNonNull(chatHistoryService);
+        this.aiService = Objects.requireNonNull(aiService);
         this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
@@ -399,7 +403,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
         groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
 
-        ObservableList<ChatMessage> chatHistory = chatHistoryService.getChatHistoryForGroup(group.getGroupNode());
+        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(currentDatabase.get(), group.getGroupNode());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
 
         openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
@@ -412,7 +416,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             existingWindow.get().requestFocus();
         } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
-                    Injector.instantiateModelOrService(AiService.class),
+                    aiService,
                     dialogService,
                     preferences.getAiPreferences(),
                     preferences.getExternalApplicationsPreferences(),

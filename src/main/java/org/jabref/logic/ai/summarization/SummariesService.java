@@ -1,9 +1,9 @@
 package org.jabref.logic.ai.summarization;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javafx.beans.property.BooleanProperty;
 
@@ -15,8 +15,12 @@ import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class SummariesService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummariesService.class);
 
-    private final Map<BibEntry, ProcessingInfo<BibEntry, Summary>> summariesStatusMap = new HashMap<>();
+    private final TreeMap<BibEntry, ProcessingInfo<BibEntry, Summary>> summariesStatusMap = new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
@@ -58,6 +62,35 @@ public class SummariesService {
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+    }
+
+    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
+        // GC was eating the listeners, so we have to fall back to the event bus.
+        bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));
+    }
+
+    private class EntriesChangedListener {
+        private final BibDatabaseContext bibDatabaseContext;
+
+        public EntriesChangedListener(BibDatabaseContext bibDatabaseContext) {
+            this.bibDatabaseContext = bibDatabaseContext;
+        }
+
+        @Subscribe
+        public void listen(EntriesAddedEvent e) {
+            e.getBibEntries().forEach(entry -> {
+                if (aiPreferences.getAutoGenerateSummaries()) {
+                    summarize(entry, bibDatabaseContext);
+                }
+            });
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent e) {
+            if (e.getField() == StandardField.FILE && aiPreferences.getAutoGenerateSummaries()) {
+                summarize(e.getBibEntry(), bibDatabaseContext);
+            }
+        }
     }
 
     /**

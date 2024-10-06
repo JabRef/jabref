@@ -15,8 +15,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -33,7 +33,7 @@ public class SidePane extends VBox {
 
     public SidePane(LibraryTabContainer tabContainer,
                     GuiPreferences preferences,
-                    ChatHistoryService chatHistoryService,
+                    AiService aiService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
@@ -47,7 +47,7 @@ public class SidePane extends VBox {
         this.viewModel = new SidePaneViewModel(
                 tabContainer,
                 preferences,
-                chatHistoryService,
+                aiService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,

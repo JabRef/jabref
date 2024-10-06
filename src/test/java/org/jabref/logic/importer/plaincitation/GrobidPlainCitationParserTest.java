@@ -1,14 +1,14 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.plaincitation;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -29,14 +29,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class GrobidCitationFetcherTest {
+public class GrobidPlainCitationParserTest {
 
     static ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     static GrobidPreferences grobidPreferences = new GrobidPreferences(
             true,
             false,
             "http://grobid.jabref.org:8070");
-    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(grobidPreferences, importFormatPreferences);
+    static GrobidPlainCitationParser grobidPlainCitationParser = new GrobidPlainCitationParser(grobidPreferences, importFormatPreferences);
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
@@ -103,36 +103,30 @@ public class GrobidCitationFetcherTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideExamplesForCorrectResultTest")
     void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
-        assertEquals(List.of(expectedBibEntry), entries);
+        Optional<BibEntry> entry = grobidPlainCitationParser.parsePlainCitation(searchQuery);
+        assertEquals(Optional.of(expectedBibEntry), entry);
     }
 
     @Test
-    void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
-        assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
-    }
-
-    @Test
-    void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
-        assertEquals(Collections.emptyList(), entries);
+    void grobidPerformSearchWithEmptyStringTest() throws FetcherException {
+        Optional<BibEntry> entry = grobidPlainCitationParser.parsePlainCitation("");
+        assertEquals(Optional.empty(), entry);
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidInput")
     void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
         assertThrows(FetcherException.class, () ->
-                grobidCitationFetcher.performSearch("invalidInput"), "performSearch should throw an FetcherException.");
+                grobidPlainCitationParser.parsePlainCitation("invalidInput"), "performSearch should throw an FetcherException.");
     }
 
     @Test
     void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
         when(grobidServiceMock.processCitation(anyString(), any(), any())).thenThrow(new SocketTimeoutException("Timeout"));
-        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
+        grobidPlainCitationParser = new GrobidPlainCitationParser(importFormatPreferences, grobidServiceMock);
 
         assertThrows(FetcherException.class, () ->
-                grobidCitationFetcher.performSearch("any text"), "performSearch should throw an FetcherException, when there are underlying IOException.");
+                grobidPlainCitationParser.parsePlainCitation("any text"), "performSearch should throw an FetcherException, when there are underlying IOException.");
     }
 }
