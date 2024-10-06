@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.ClipBoardManager;
@@ -72,14 +73,14 @@ public class EditorMenus {
     /**
      * The default context menu with a specific menu item to cleanup URL.
      *
-     * @param textArea text-area that this menu will be connected to
+     * @param textField text-area that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL
      */
-    public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextArea textArea) {
+    public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextField textField) {
         return () -> {
             MenuItem cleanupURL = new MenuItem(Localization.lang("Cleanup URL link"));
-            cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
-            cleanupURL.setOnAction(event -> textArea.setText(new CleanupUrlFormatter().format(textArea.getText())));
+            cleanupURL.setDisable(textField.textProperty().isEmpty().get());
+            cleanupURL.setOnAction(event -> textField.setText(new CleanupUrlFormatter().format(textField.getText())));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
             return menuItems;
