@@ -14,7 +14,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -61,7 +60,6 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
-    private static ChatHistoryService chatHistoryService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -102,7 +100,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor,
                 preferences,
                 aiService,
-                chatHistoryService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -168,14 +165,10 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
-
-        JabRefGUI.chatHistoryService = new ChatHistoryService(
-                preferences.getCitationKeyPatternPreferences(),
-                dialogService);
-        Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);
     }
 
     private void setupProxy() {
@@ -375,8 +368,6 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
-        LOGGER.trace("Closing chat history service");
-        chatHistoryService.close();
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
         LOGGER.trace("Stopping background tasks");

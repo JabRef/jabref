@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.util;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

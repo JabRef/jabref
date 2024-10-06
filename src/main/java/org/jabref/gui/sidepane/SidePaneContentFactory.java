@@ -8,7 +8,6 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
@@ -23,7 +22,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
-    private final ChatHistoryService chatHistoryService;
+    private final AiService aiService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
@@ -36,7 +35,7 @@ public class SidePaneContentFactory {
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
-                                  ChatHistoryService chatHistoryService,
+                                  AiService aiService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
@@ -48,7 +47,7 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
-        this.chatHistoryService = chatHistoryService;
+        this.aiService = aiService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
@@ -67,8 +66,7 @@ public class SidePaneContentFactory {
                     stateManager,
                     preferences,
                     dialogService,
-                    aiService,
-                    chatHistoryService);
+                    aiService);
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
@@ -79,6 +77,7 @@ public class SidePaneContentFactory {
                     abbreviationRepository,
                     (UiTaskExecutor) taskExecutor,
                     dialogService,
+                    aiService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

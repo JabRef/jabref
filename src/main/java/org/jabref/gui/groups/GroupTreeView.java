@@ -50,7 +50,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -84,7 +83,6 @@ public class GroupTreeView extends BorderPane {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
 
@@ -110,15 +108,13 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService,
-                         ChatHistoryService chatHistoryService
+                         AiService aiService
     ) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
 
         createNodes();
         this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
@@ -168,7 +164,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, chatHistoryService, preferences, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

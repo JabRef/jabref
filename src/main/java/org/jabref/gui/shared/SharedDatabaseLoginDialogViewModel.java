@@ -33,6 +33,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -85,6 +86,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -105,6 +107,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               DialogService dialogService,
                                               GuiPreferences preferences,
                                               AiService aiService,
+                                              ChatHistoryService chatHistoryService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -115,6 +118,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
