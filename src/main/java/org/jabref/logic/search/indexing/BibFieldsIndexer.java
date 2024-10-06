@@ -104,14 +104,14 @@ public class BibFieldsIndexer {
         try {
             // region btree index on id column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s ("%s")
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s ("%s")
                     """.formatted(
                     mainTable, ENTRY_ID,
                     schemaMainTableReference,
                     ENTRY_ID));
 
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s ("%s")
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s ("%s")
                     """.formatted(
                     splitValuesTable, ENTRY_ID,
                     schemaSplitValuesTableReference,
@@ -120,14 +120,14 @@ public class BibFieldsIndexer {
 
             // region btree index on field name column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s ("%s")
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s ("%s")
                     """.formatted(
                     mainTable, FIELD_NAME,
                     schemaMainTableReference,
                     FIELD_NAME));
 
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s ("%s")
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s ("%s")
                     """.formatted(
                     splitValuesTable, FIELD_NAME,
                     schemaSplitValuesTableReference,
@@ -136,7 +136,7 @@ public class BibFieldsIndexer {
 
             // trigram index on field value column
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops, "%s" gin_trgm_ops)
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s USING gin ("%s" gin_trgm_ops, "%s" gin_trgm_ops)
                     """.formatted(
                     mainTable, FIELD_VALUE_LITERAL,
                     schemaMainTableReference,
@@ -144,7 +144,7 @@ public class BibFieldsIndexer {
 
             // region btree index on spilt table
             connection.createStatement().executeUpdate("""
-                    CREATE INDEX "%s_%s_index" ON %s ("%s", "%s")
+                    CREATE INDEX IF NOT EXISTS "%s_%s_index" ON %s ("%s", "%s")
                     """.formatted(
                     splitValuesTable, FIELD_VALUE_LITERAL,
                     schemaSplitValuesTableReference,
