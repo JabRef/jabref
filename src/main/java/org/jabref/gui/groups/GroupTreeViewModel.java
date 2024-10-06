@@ -396,10 +396,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void chatWithGroup(GroupNodeViewModel group) {
-        if (currentDatabase.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
-            return;
-        }
+        assert currentDatabase.isPresent();
 
         StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
 
@@ -440,10 +437,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void generateEmbeddings(GroupNodeViewModel groupNode) {
-        if (currentDatabase.isEmpty()) {
-            dialogService.notify(Localization.lang("Unable to generate embeddings. No library is selected."));
-            return;
-        }
+        assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
 
@@ -466,10 +460,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void generateSummaries(GroupNodeViewModel groupNode) {
-        if (currentDatabase.isEmpty()) {
-            dialogService.notify(Localization.lang("Unable to generate summaries. No library is selected."));
-            return;
-        }
+        assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
 
