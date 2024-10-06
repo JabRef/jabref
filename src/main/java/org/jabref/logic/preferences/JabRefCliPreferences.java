@@ -340,6 +340,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     private static final String AI_ENABLED = "aiEnabled";
+    private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
+    private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_OPEN_AI_CHAT_MODEL = "aiOpenAiChatModel";
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
@@ -620,6 +622,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // region:AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
+        defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI));
         defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI));
@@ -1811,6 +1815,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         aiPreferences = new AiPreferences(
                 aiEnabled,
+                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
+                getBoolean(AI_AUTO_GENERATE_SUMMARIES),
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
@@ -1831,6 +1837,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDouble(AI_RAG_MIN_SCORE));
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
 

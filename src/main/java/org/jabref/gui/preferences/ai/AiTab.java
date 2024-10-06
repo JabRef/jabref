@@ -29,6 +29,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
 
     @FXML private CheckBox enableAi;
+    @FXML private CheckBox autoGenerateEmbeddings;
+    @FXML private CheckBox autoGenerateSummaries;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -61,6 +63,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         this.viewModel = new AiTabViewModel(preferences);
 
         enableAi.selectedProperty().bindBidirectional(viewModel.enableAi());
+        autoGenerateSummaries.selectedProperty().bindBidirectional(viewModel.autoGenerateSummaries());
+        autoGenerateSummaries.disableProperty().bind(viewModel.disableAutoGenerateSummaries());
+        autoGenerateEmbeddings.selectedProperty().bindBidirectional(viewModel.autoGenerateEmbeddings());
+        autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
 
         new ViewModelListCellFactory<AiProvider>()
                 .withText(AiProvider::toString)

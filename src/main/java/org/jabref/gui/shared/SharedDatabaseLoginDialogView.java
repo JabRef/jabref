@@ -21,6 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatHistoryService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
@@ -59,6 +60,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private AiService aiService;
+    @Inject private ChatHistoryService chatHistoryService;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
@@ -103,6 +105,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 dialogService,
                 preferences,
                 aiService,
+                chatHistoryService,
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,

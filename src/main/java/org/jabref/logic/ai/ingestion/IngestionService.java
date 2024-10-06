@@ -1,9 +1,9 @@
 package org.jabref.logic.ai.ingestion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
@@ -14,8 +14,12 @@ import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -25,10 +29,12 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
  * Use this class in the logic and UI.
  */
 public class IngestionService {
-    private final Map<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new HashMap<>();
+    // We use a {@link TreeMap} here for the same reasons we use it in {@link ChatHistoryService}.
+    private final TreeMap<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new TreeMap<>(Comparator.comparing(LinkedFile::getLink));
 
     private final List<List<LinkedFile>> listsUnderIngestion = new ArrayList<>();
 
+    private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
@@ -44,6 +50,7 @@ public class IngestionService {
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
     ) {
+        this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
 
@@ -56,6 +63,37 @@ public class IngestionService {
         );
 
         this.shutdownSignal = shutdownSignal;
+    }
+
+    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
+        // GC was eating the listeners, so we have to fall back to the event bus.
+        bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));
+    }
+
+    private class EntriesChangedListener {
+        private final BibDatabaseContext bibDatabaseContext;
+
+        public EntriesChangedListener(BibDatabaseContext bibDatabaseContext) {
+            this.bibDatabaseContext = bibDatabaseContext;
+        }
+
+        @Subscribe
+        public void listen(EntriesAddedEvent e) {
+            e.getBibEntries().forEach(entry -> {
+                if (aiPreferences.getAutoGenerateEmbeddings()) {
+                    entry.getFiles().forEach(linkedFile -> ingest(linkedFile, bibDatabaseContext));
+                }
+
+                entry.registerListener(this);
+            });
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent e) {
+            if (e.getField() == StandardField.FILE && aiPreferences.getAutoGenerateEmbeddings()) {
+                e.getBibEntry().getFiles().forEach(linkedFile -> ingest(linkedFile, bibDatabaseContext));
+            }
+        }
     }
 
     /**
@@ -101,6 +139,7 @@ public class IngestionService {
 
     private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo<LinkedFile, Void> processingInfo) {
         new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences, shutdownSignal)
+                .showToUser(true)
                 .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
