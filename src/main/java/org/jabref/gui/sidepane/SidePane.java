@@ -33,7 +33,6 @@ public class SidePane extends VBox {
 
     public SidePane(LibraryTabContainer tabContainer,
                     GuiPreferences preferences,
-                    AiService aiService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
@@ -48,7 +47,6 @@ public class SidePane extends VBox {
         this.viewModel = new SidePaneViewModel(
                 tabContainer,
                 preferences,
-                aiService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,

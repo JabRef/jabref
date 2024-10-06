@@ -42,7 +42,6 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
                              GuiPreferences preferences,
-                             AiService aiService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
@@ -58,7 +57,6 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
                 preferences,
-                aiService,
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,

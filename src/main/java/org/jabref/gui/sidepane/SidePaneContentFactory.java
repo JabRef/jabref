@@ -22,7 +22,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
-    private final AiService aiService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
@@ -35,7 +34,6 @@ public class SidePaneContentFactory {
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   GuiPreferences preferences,
-                                  AiService aiService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
@@ -47,7 +45,6 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
-        this.aiService = aiService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

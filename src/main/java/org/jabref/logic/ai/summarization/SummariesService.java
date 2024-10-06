@@ -1,13 +1,9 @@
 package org.jabref.logic.ai.summarization;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.TreeMap;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;

@@ -38,7 +38,6 @@ class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     GuiPreferences preferences = mock(GuiPreferences.class);
-    AiService aiService = mock(AiService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
@@ -68,7 +67,6 @@ class SidePaneViewModelTest {
         sidePaneViewModel = new SidePaneViewModel(
                 tabContainer,
                 preferences,
-                aiService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
