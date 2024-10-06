@@ -15,8 +15,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
@@ -59,7 +57,7 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    private final ObservableMap<AiTemplate, String> templates;
+    private final Map<AiTemplate, StringProperty> templates;
 
     private Runnable apiKeyChangeListener;
 
@@ -88,7 +86,8 @@ public class AiPreferences {
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
-        this.openAiChatModel = new SimpleStringProperty(openAiChatModel); this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
+        this.openAiChatModel = new SimpleStringProperty(openAiChatModel);
+        this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
 
@@ -108,7 +107,12 @@ public class AiPreferences {
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
-        this.templates = FXCollections.observableMap(templates);
+        this.templates = Map.of(
+                AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
+                AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
+                AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_CHUNK)),
+                AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE))
+        );
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
@@ -490,7 +494,15 @@ public class AiPreferences {
         apiKeyChangeListener.run();
     }
 
-    public ObservableMap<AiTemplate, String> getTemplates() {
-        return templates;
+    public void setTemplate(AiTemplate aiTemplate, String template) {
+        templates.get(aiTemplate).set(template);
+    }
+
+    public String getTemplate(AiTemplate aiTemplate) {
+        return templates.get(aiTemplate).get();
+    }
+
+    public StringProperty templateProperty(AiTemplate aiTemplate) {
+        return templates.get(aiTemplate);
     }
 }

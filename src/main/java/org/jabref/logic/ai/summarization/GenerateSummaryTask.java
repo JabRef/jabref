@@ -2,7 +2,6 @@ package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,8 +25,6 @@ import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.input.Prompt;
-import dev.langchain4j.model.input.PromptTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +163,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
     public String summarizeOneDocument(String filePath, String document) throws InterruptedException {
         addMoreWork(1); // For the combination of summary chunks.
 
-        DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplates().get(AiTemplate.SUMMARIZATION_CHUNK)), MAX_OVERLAP_SIZE_IN_CHARS);
+        DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_CHUNK)), MAX_OVERLAP_SIZE_IN_CHARS);
 
         List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
 
@@ -198,7 +195,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
             }
 
             chunkSummaries = list;
-        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(aiPreferences.getTemplates().get(AiTemplate.SUMMARIZATION_COMBINE)));
+        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_COMBINE)));
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.

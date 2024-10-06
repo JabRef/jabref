@@ -19,7 +19,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.fieldeditors.SimpleEditor;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
@@ -319,7 +318,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
 
         Arrays.stream(AiTemplate.values()).forEach(template ->
-                templateSources.get(template).set(aiPreferences.getTemplates().get(template)));
+                templateSources.get(template).set(aiPreferences.getTemplate(template)));
+
+        currentEditingTemplateSource.set(templateSources.get(currentEditingTemplate.get()).get());
 
         temperature.setValue(LocalizedNumbers.doubleToString(aiPreferences.getTemperature()));
         contextWindowSize.setValue(aiPreferences.getContextWindowSize());
@@ -357,7 +358,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
 
         Arrays.stream(AiTemplate.values()).forEach(template ->
-                aiPreferences.getTemplates().put(template, templateSources.get(template).get()));
+                aiPreferences.setTemplate(template, templateSources.get(template).get()));
 
         // We already check the correctness of temperature and RAG minimum score in validators, so we don't need to check it here.
         aiPreferences.setTemperature(LocalizedNumbers.stringToDouble(oldLocale, temperature.get()).get());
@@ -385,6 +386,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void resetTemplates() {
         Arrays.stream(AiTemplate.values()).forEach(template ->
                 templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
+
+        currentEditingTemplateSource.set(templateSources.get(currentEditingTemplate.get()).get());
     }
 
     @Override

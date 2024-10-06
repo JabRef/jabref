@@ -55,7 +55,7 @@ public class TemplatesService {
     private String makeTemplate(AiTemplate template, VelocityContext context) {
         StringWriter writer = new StringWriter();
 
-        velocityEngine.evaluate(context, writer, template.name(), aiPreferences.getTemplates().get(template));
+        velocityEngine.evaluate(context, writer, template.name(), aiPreferences.getTemplate(template));
 
         return writer.toString();
     }

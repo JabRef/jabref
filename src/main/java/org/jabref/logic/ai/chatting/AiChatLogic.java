@@ -2,13 +2,9 @@ package org.jabref.logic.ai.chatting;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
@@ -20,13 +16,9 @@ import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.ListUtil;
 
-import ai.djl.training.optimizer.Optimizer;
-import dev.langchain4j.chain.Chain;
-import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -37,10 +29,6 @@ import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
-import dev.langchain4j.rag.DefaultRetrievalAugmentor;
-import dev.langchain4j.rag.RetrievalAugmentor;
-import dev.langchain4j.rag.content.retriever.ContentRetriever;
-import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
@@ -68,7 +56,7 @@ public class AiChatLogic {
     private ChatMemory chatMemory;
 
     // You must not pass an empty list to langchain4j {@link IsIn} filter. We forced to use null here, instead of Optional.
-    @Nullable Filter filter;
+    private @Nullable Filter filter;
 
     public AiChatLogic(AiPreferences aiPreferences,
                        ChatLanguageModel chatLanguageModel,
@@ -97,11 +85,10 @@ public class AiChatLogic {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.getTemplates().addListener((MapChangeListener<AiTemplate, String>) change -> {
-            if (change.getKey() == AiTemplate.CHATTING_SYSTEM_MESSAGE) {
-                setSystemMessage(templatesService.makeChattingSystemMessage(entries));
-            }
-        });
+        aiPreferences
+                .templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE)
+                .addListener(obs ->
+                        setSystemMessage(templatesService.makeChattingSystemMessage(entries)));
 
         aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuildFull(chatMemory.messages()));
     }
@@ -139,13 +126,7 @@ public class AiChatLogic {
     }
 
     private void setSystemMessage(String systemMessage) {
-        chatMemory.add(new SystemMessage(augmentSystemMessage(systemMessage)));
-    }
-
-    private String augmentSystemMessage(String systemMessage) {
-        String entriesInfo = entries.stream().map(CanonicalBibEntry::getCanonicalRepresentation).collect(Collectors.joining("\n"));
-
-        return systemMessage + "\n" + entriesInfo;
+        chatMemory.add(new SystemMessage(systemMessage));
     }
 
     public AiMessage execute(UserMessage message) {

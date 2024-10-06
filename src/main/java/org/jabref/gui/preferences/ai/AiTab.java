@@ -69,14 +69,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         new ViewModelListCellFactory<AiProvider>()
                 .withText(AiProvider::toString)
                 .install(aiProviderComboBox);
-        aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
+        aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
         aiProviderComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         new ViewModelListCellFactory<String>()
                 .withText(text -> text)
                 .install(chatModelComboBox);
-        chatModelComboBox.setItems(viewModel.chatModelsProperty());
+        chatModelComboBox.itemsProperty().bind(viewModel.chatModelsProperty());
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
         chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
@@ -176,7 +176,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         new ViewModelListCellFactory<AiTemplate>()
                 .withText(AiTemplate::getLocalizedName)
                 .install(currentEditingTemplateComboBox);
+        currentEditingTemplateComboBox.itemsProperty().bind(viewModel.templatesProperty());
         currentEditingTemplateComboBox.valueProperty().bindBidirectional(viewModel.currentEditingTemplate());
+
         currentEditingTemplateSourceTextArea.textProperty().bindBidirectional(viewModel.currentEditingTemplateSource());
 
         ActionFactory actionFactory = new ActionFactory();

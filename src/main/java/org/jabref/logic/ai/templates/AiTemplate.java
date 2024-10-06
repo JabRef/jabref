@@ -1,5 +1,7 @@
 package org.jabref.logic.ai.templates;
 
+import org.jabref.logic.l10n.Localization;
+
 public enum AiTemplate {
     // System message that is applied in the AI chat.
     CHATTING_SYSTEM_MESSAGE,
@@ -16,13 +18,13 @@ public enum AiTemplate {
     public String getLocalizedName() {
         return switch (this) {
             case CHATTING_SYSTEM_MESSAGE ->
-                    "System message for chatting";
+                    Localization.lang("System message for chatting");
             case CHATTING_USER_MESSAGE ->
-                    "User message for chatting";
+                    Localization.lang("User message for chatting");
             case SUMMARIZATION_CHUNK ->
-                    "Summarization chunk";
+                    Localization.lang("Summarization chunk");
             case SUMMARIZATION_COMBINE ->
-                    "Summarization combine";
+                    Localization.lang("Summarization combine");
         };
     }
 }

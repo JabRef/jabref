@@ -75,10 +75,6 @@ public class AiDefaultPreferences {
 
     public static final int CONTEXT_WINDOW_SIZE = 8196;
 
-    public static int getContextWindowSize(AiProvider aiProvider, String model) {
-        return CONTEXT_WINDOW_SIZES.getOrDefault(aiProvider, Map.of()).getOrDefault(model, 0);
-    }
-
     public static final Map<AiTemplate, String> TEMPLATES = Map.of(
             AiTemplate.CHATTING_SYSTEM_MESSAGE,
                     "You are an AI assistant that analyses research papers. You answer questions about papers.\n" +
@@ -117,4 +113,8 @@ public class AiDefaultPreferences {
 
                 FINAL OVERVIEW:"""
     );
+
+    public static int getContextWindowSize(AiProvider aiProvider, String model) {
+        return CONTEXT_WINDOW_SIZES.getOrDefault(aiProvider, Map.of()).getOrDefault(model, 0);
+    }
 }

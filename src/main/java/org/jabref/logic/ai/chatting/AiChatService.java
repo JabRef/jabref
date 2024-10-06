@@ -1,7 +1,5 @@
 package org.jabref.logic.ai.chatting;
 
-import java.util.concurrent.Executor;
-
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
