@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -192,5 +193,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML
     private void onResetExpertSettingsButtonClick() {
         viewModel.resetExpertSettings();
+    }
+
+    public ReadOnlyBooleanProperty aiEnabledProperty() {
+        return enableAi.selectedProperty();
     }
 }
