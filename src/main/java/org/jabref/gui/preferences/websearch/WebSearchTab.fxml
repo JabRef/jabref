@@ -23,8 +23,8 @@
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
     <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
     <HBox alignment="BASELINE_LEFT" spacing="10">
-        <Label text="%Default online plain citation parser"/>
-        <ComboBox fx:id="defaultOnlinePlainCitationParser" HBox.hgrow="ALWAYS"/>
+        <Label text="%Default plain citation parser"/>
+        <ComboBox fx:id="defaultPlainCitationParser" HBox.hgrow="ALWAYS"/>
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>

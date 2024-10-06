@@ -43,7 +43,7 @@ public class PlainCitationParserViewModel {
     private final ImportHandler importHandler;
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
-    private final ListProperty<PlainCitationParserChoice> onlinePlainCitationParsers
+    private final ListProperty<PlainCitationParserChoice> plainCitationParsers
             = new SimpleListProperty<>(FXCollections.observableArrayList(List.of(PlainCitationParserChoice.RULE_BASED)));
     private final ObjectProperty<PlainCitationParserChoice> parserChoice;
 
@@ -69,15 +69,15 @@ public class PlainCitationParserViewModel {
                 dialogService,
                 taskExecutor);
 
-        this.parserChoice = new SimpleObjectProperty<>(preferences.getImporterPreferences().defaultPlainCitationParserProperty().get());
-
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-            onlinePlainCitationParsers.add(PlainCitationParserChoice.GROBID);
+            plainCitationParsers.add(PlainCitationParserChoice.GROBID);
         }
 
         if (preferences.getAiPreferences().getEnableAi()) {
-            onlinePlainCitationParsers.add(PlainCitationParserChoice.LLM);
+            plainCitationParsers.add(PlainCitationParserChoice.LLM);
         }
+
+        this.parserChoice = new SimpleObjectProperty<>(preferences.getImporterPreferences().defaultPlainCitationParserProperty().get());
     }
 
     public void startParsing() {
@@ -112,8 +112,8 @@ public class PlainCitationParserViewModel {
         return this.inputTextProperty;
     }
 
-    public ListProperty<PlainCitationParserChoice> onlinePlainCitationParsers() {
-        return this.onlinePlainCitationParsers;
+    public ListProperty<PlainCitationParserChoice> plainCitationParsers() {
+        return this.plainCitationParsers;
     }
 
     public ObjectProperty<PlainCitationParserChoice> parserChoice() {

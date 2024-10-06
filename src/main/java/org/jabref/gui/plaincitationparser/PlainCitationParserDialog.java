@@ -72,7 +72,7 @@ public class PlainCitationParserDialog extends BaseDialog<Void> {
         new ViewModelListCellFactory<PlainCitationParserChoice>()
                 .withText(PlainCitationParserChoice::getLocalizedName)
                 .install(parserChoice);
-        parserChoice.getItems().setAll(viewModel.onlinePlainCitationParsers());
+        parserChoice.getItems().setAll(viewModel.plainCitationParsers());
         parserChoice.valueProperty().bindBidirectional(viewModel.parserChoice());
 
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());

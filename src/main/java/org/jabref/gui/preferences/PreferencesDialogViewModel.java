@@ -59,12 +59,15 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
+        // TODO: This is a dirty hack of passing "currently-not-set" preferences values from different preferences tabs.
+        AiTab aiTab = new AiTab();
+
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(),
-                new AiTab(),
+                new WebSearchTab(aiTab.aiEnabledProperty()),
+                aiTab,
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

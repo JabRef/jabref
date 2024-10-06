@@ -31,7 +31,7 @@
                 <HBox alignment="BASELINE_LEFT"
                       spacing="10">
                     <children>
-                        <Label text="%Parser choice:"/>
+                        <Label text="%Parser choice"/>
                         <ComboBox
                                 fx:id="parserChoice"
                                 HBox.hgrow="ALWAYS"/>

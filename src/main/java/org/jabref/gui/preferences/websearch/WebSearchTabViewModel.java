@@ -44,8 +44,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldkeepDownloadUrl = new SimpleBooleanProperty();
-    private final ListProperty<PlainCitationParserChoice> onlinePlainCitationParsers = new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
-    private final ObjectProperty<PlainCitationParserChoice> defaultOnlinePlainCitationParser = new SimpleObjectProperty<>();
+
+    private final ListProperty<PlainCitationParserChoice> plainCitationParsers =
+            new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
+    private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser = new SimpleObjectProperty<>();
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
@@ -67,7 +69,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public WebSearchTabViewModel(CliPreferences preferences, DialogService dialogService) {
+    private final ReadOnlyBooleanProperty refAiEnabled;
+
+    public WebSearchTabViewModel(CliPreferences preferences, DialogService dialogService, ReadOnlyBooleanProperty refAiEnabled) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.importerPreferences = preferences.getImporterPreferences();
@@ -75,6 +79,48 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.doiPreferences = preferences.getDOIPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.importFormatPreferences = preferences.getImportFormatPreferences();
+
+        this.refAiEnabled = refAiEnabled;
+
+        setupPlainCitationParsers(preferences);
+    }
+
+    private void setupPlainCitationParsers(CliPreferences preferences) {
+        if (!refAiEnabled.get()) {
+            plainCitationParsers.remove(PlainCitationParserChoice.LLM);
+        }
+
+        refAiEnabled.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                plainCitationParsers.add(PlainCitationParserChoice.LLM);
+            } else {
+                PlainCitationParserChoice oldChoice = defaultPlainCitationParser.get();
+
+                plainCitationParsers.remove(PlainCitationParserChoice.LLM);
+
+                if (oldChoice == PlainCitationParserChoice.LLM) {
+                    defaultPlainCitationParser.set(plainCitationParsers.getFirst());
+                }
+            }
+        });
+
+        if (!grobidEnabledProperty().get()) {
+            plainCitationParsers.remove(PlainCitationParserChoice.GROBID);
+        }
+
+        grobidEnabledProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                plainCitationParsers.add(PlainCitationParserChoice.GROBID);
+            } else {
+                PlainCitationParserChoice oldChoice = defaultPlainCitationParser.get();
+
+                plainCitationParsers.remove(PlainCitationParserChoice.GROBID);
+
+                if (oldChoice == PlainCitationParserChoice.GROBID) {
+                    defaultPlainCitationParser.set(plainCitationParsers.getFirst());
+                }
+            }
+        });
     }
 
     @Override
@@ -84,7 +130,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
-        defaultOnlinePlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
+        defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
@@ -113,7 +159,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
-        importerPreferences.setDefaultPlainCitationParser(defaultOnlinePlainCitationParser.getValue());
+        importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
@@ -139,12 +185,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         return generateKeyOnImportProperty;
     }
 
-    public ListProperty<PlainCitationParserChoice> onlinePlainCitationParsers() {
-        return onlinePlainCitationParsers;
+    public ListProperty<PlainCitationParserChoice> plainCitationParsers() {
+        return plainCitationParsers;
     }
 
-    public ObjectProperty<PlainCitationParserChoice> defaultOnlinePlainCitationParserProperty() {
-        return defaultOnlinePlainCitationParser;
+    public ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParserProperty() {
+        return defaultPlainCitationParser;
     }
 
     public BooleanProperty useCustomDOIProperty() {

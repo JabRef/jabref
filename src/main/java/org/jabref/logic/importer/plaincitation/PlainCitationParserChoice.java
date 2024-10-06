@@ -12,7 +12,7 @@ public enum PlainCitationParserChoice {
             case RULE_BASED ->
                     Localization.lang("Rule-based");
             case GROBID ->
-                    Localization.lang("GROBID");
+                    Localization.lang("Grobid");
             case LLM ->
                     Localization.lang("LLM");
         };
