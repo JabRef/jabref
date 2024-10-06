@@ -48,7 +48,8 @@ public enum HelpFile {
     SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),
     PUSH_TO_APPLICATION("cite/pushtoapplications"),
     AI_GENERAL_SETTINGS("ai/preferences"),
-    AI_EXPERT_SETTINGS("ai/preferences#ai-expert-settings");
+    AI_EXPERT_SETTINGS("ai/preferences#ai-expert-settings"),
+    AI_TEMPLATES("ai/preferences#templates");
 
     private final String pageName;
 

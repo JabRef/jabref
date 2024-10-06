@@ -351,7 +351,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
     }
 
-
+    implementation 'org.apache.velocity:velocity-engine-core:2.3'
     implementation platform('ai.djl:bom:0.30.0')
     implementation 'ai.djl:api'
     implementation 'ai.djl.huggingface:tokenizers'
