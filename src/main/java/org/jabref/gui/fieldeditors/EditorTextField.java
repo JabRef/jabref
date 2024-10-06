@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -19,6 +20,9 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
+    private PasteActionHandler pasteActionHandler = () -> {
+        // Set empty paste behavior by default
+    };
 
     public EditorTextField() {
         this("");
@@ -46,5 +50,32 @@ public class EditorTextField extends TextField implements Initializable, Context
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // not needed
+    }
+
+    /**
+     * Set pasteActionHandler variable to passed handler
+     *
+     * @param handler an instance of PasteActionHandler that describes paste behavior
+     */
+    public void setPasteActionHandler(PasteActionHandler handler) {
+        Objects.requireNonNull(handler);
+        this.pasteActionHandler = handler;
+    }
+
+    /**
+     * Override javafx TextField method applying TextField.paste() and pasteActionHandler after
+     */
+    @Override
+    public void paste() {
+        super.paste();
+        pasteActionHandler.handle();
+    }
+
+    /**
+     * Interface presents user-described paste behaviour applying to paste method
+     */
+    @FunctionalInterface
+    public interface PasteActionHandler {
+        void handle();
     }
 }
