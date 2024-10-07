@@ -175,6 +175,7 @@ public class SharedDatabaseUIManager {
                 bibDatabaseContext,
                 tabContainer,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

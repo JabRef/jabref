@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.chatting.AiChatService;
+import org.jabref.logic.ai.chatting.ChatHistoryService;
+import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
 import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.ingestion.MVStoreEmbeddingStore;
@@ -15,9 +17,11 @@ import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -32,6 +36,7 @@ public class AiService implements AutoCloseable {
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
     private static final String FULLY_INGESTED_FILE_NAME = "fully-ingested.mv";
     private static final String SUMMARIES_FILE_NAME = "summaries.mv";
+    private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
 
     // This field is used to shut down AI-related background tasks.
     // If a background task processes a big document and has a loop, then the task should check the status
@@ -42,10 +47,12 @@ public class AiService implements AutoCloseable {
             new ThreadFactoryBuilder().setNameFormat("ai-retrieval-pool-%d").build()
     );
 
+    private final MVStoreChatHistoryStorage mvStoreChatHistoryStorage;
     private final MVStoreEmbeddingStore mvStoreEmbeddingStore;
     private final MVStoreFullyIngestedDocumentsTracker mvStoreFullyIngestedDocumentsTracker;
     private final MVStoreSummariesStorage mvStoreSummariesStorage;
 
+    private final ChatHistoryService chatHistoryService;
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
     private final JabRefEmbeddingModel jabRefEmbeddingModel;
     private final AiChatService aiChatService;
@@ -54,17 +61,22 @@ public class AiService implements AutoCloseable {
 
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
+                     CitationKeyPatternPreferences citationKeyPatternPreferences,
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
     ) {
-        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
 
+        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
 
+        this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
+        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
+
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
+
         this.ingestionService = new IngestionService(
                 aiPreferences,
                 shutdownSignal,
@@ -74,7 +86,15 @@ public class AiService implements AutoCloseable {
                 filePreferences,
                 taskExecutor
         );
-        this.summariesService = new SummariesService(aiPreferences, mvStoreSummariesStorage, jabRefChatLanguageModel, shutdownSignal, filePreferences, taskExecutor);
+
+        this.summariesService = new SummariesService(
+                aiPreferences,
+                mvStoreSummariesStorage,
+                jabRefChatLanguageModel,
+                shutdownSignal,
+                filePreferences,
+                taskExecutor
+        );
     }
 
     public JabRefChatLanguageModel getChatLanguageModel() {
@@ -83,6 +103,10 @@ public class AiService implements AutoCloseable {
 
     public JabRefEmbeddingModel getEmbeddingModel() {
         return jabRefEmbeddingModel;
+    }
+
+    public ChatHistoryService getChatHistoryService() {
+        return chatHistoryService;
     }
 
     public AiChatService getAiChatService() {
@@ -95,6 +119,12 @@ public class AiService implements AutoCloseable {
 
     public SummariesService getSummariesService() {
         return summariesService;
+    }
+
+    public void setupDatabase(BibDatabaseContext context) {
+        chatHistoryService.setupDatabase(context);
+        ingestionService.setupDatabase(context);
+        summariesService.setupDatabase(context);
     }
 
     @Override

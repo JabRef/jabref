@@ -15,8 +15,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
-import org.jabref.gui.bibtexextractor.ExtractBibtexActionOffline;
-import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
@@ -54,6 +52,7 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
+import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -230,11 +229,9 @@ public class MainMenu extends MenuBar {
             }
         });
 
-        MenuItem newEntryFromPlainTextOnline = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT_ONLINE, new ExtractBibtexActionOnline(dialogService, preferences, stateManager, true));
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                newEntryFromPlainTextOnline,
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT_OFFLINE, new ExtractBibtexActionOffline(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),

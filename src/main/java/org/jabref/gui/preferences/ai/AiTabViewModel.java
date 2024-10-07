@@ -37,6 +37,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Locale oldLocale;
 
     private final BooleanProperty enableAi = new SimpleBooleanProperty();
+    private final BooleanProperty autoGenerateEmbeddings = new SimpleBooleanProperty();
+    private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();
+    private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();
+    private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
@@ -295,6 +299,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
         enableAi.setValue(aiPreferences.getEnableAi());
+        autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
+        autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
@@ -313,6 +319,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         aiPreferences.setEnableAi(enableAi.get());
+        aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
+        aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
@@ -405,6 +413,22 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableAi() {
         return enableAi;
+    }
+
+    public BooleanProperty autoGenerateEmbeddings() {
+        return autoGenerateEmbeddings;
+    }
+
+    public BooleanProperty disableAutoGenerateEmbeddings() {
+        return disableAutoGenerateEmbeddings;
+    }
+
+    public BooleanProperty autoGenerateSummaries() {
+        return autoGenerateSummaries;
+    }
+
+    public BooleanProperty disableAutoGenerateSummaries() {
+        return disableAutoGenerateSummaries;
     }
 
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {
