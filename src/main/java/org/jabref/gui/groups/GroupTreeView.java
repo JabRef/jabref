@@ -555,6 +555,8 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
@@ -668,6 +670,10 @@ public class GroupTreeView extends BorderPane {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
+                case GROUP_GENERATE_EMBEDDINGS ->
+                        viewModel.generateEmbeddings(group);
+                case GROUP_GENERATE_SUMMARIES ->
+                        viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
                     viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->
