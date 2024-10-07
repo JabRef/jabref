@@ -84,6 +84,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
             pullWithLastEntry();
             synchronizeLocalDatabase();
+            // TODO: Rewrite
             dbmsProcessor.insertEntries(event.getBibEntries());
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
             lastEntryChanged_REMOVEME = Optional.empty();

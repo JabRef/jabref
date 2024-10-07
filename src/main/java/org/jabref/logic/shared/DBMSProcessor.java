@@ -153,6 +153,7 @@ public final class DBMSProcessor {
         connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
         connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
 
+        // TODO: entrytype should be moved to table "field" (org.jabref.model.entry.field.InternalField.TYPE_HEADER)
         connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS entry (
                         shared_id SERIAL PRIMARY KEY,
@@ -301,6 +302,7 @@ public final class DBMSProcessor {
 
     /**
      * Inserts the given list of BibEntry into FIELD table.
+     * These entries do not yet exist in the remote database
      *
      * @param bibEntries {@link BibEntry} to be inserted
      */
@@ -324,11 +326,12 @@ public final class DBMSProcessor {
             }
 
             if (numFields == 0) {
-                return; // Prevent SQL Exception
+                // Nothing to insert
+                return;
             }
 
             // Number of commas is fields.size() - 1
-            insertFieldQuery.append(", (?, ?, ?)".repeat(Math.max(0, (numFields - 1))));
+            insertFieldQuery.append(", (?, ?, ?)".repeat(numFields - 1));
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                 int fieldsCompleted = 0;
                 for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
@@ -435,7 +438,7 @@ public final class DBMSProcessor {
             }
 
             String selectFieldQuery = """
-                        SELECT * FROM FIELD
+                        SELECT name FROM FIELD
                         WHERE NAME = ? AND ENTRY_SHARED_ID = ?
                     """;
 
