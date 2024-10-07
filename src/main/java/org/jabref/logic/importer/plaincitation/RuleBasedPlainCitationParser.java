@@ -1,19 +1,25 @@
-package org.jabref.gui.bibtexextractor;
+package org.jabref.logic.importer.plaincitation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-public class BibtexExtractor {
-
+/**
+ * Parse a plain citation using regex rules.
+ * <p>
+ * TODO: This class is similar to {@link org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter}, we need to unify them.
+ */
+public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String AUTHOR_TAG = "[author_tag]";
     private static final String URL_TAG = "[url_tag]";
     private static final String YEAR_TAG = "[year_tag]";
@@ -54,8 +60,9 @@ public class BibtexExtractor {
     private boolean isArticle = true;
     private String journalOrPublisher = "";
 
-    public BibEntry extract(String input) {
-        String inputWithoutUrls = findUrls(input);
+    @Override
+    public Optional<BibEntry> parsePlainCitation(String text) throws FetcherException {
+        String inputWithoutUrls = findUrls(text);
         String inputWithoutAuthors = findAuthors(inputWithoutUrls);
         String inputWithoutYear = findYear(inputWithoutAuthors);
         String inputWithoutPages = findPages(inputWithoutYear);
@@ -63,7 +70,7 @@ public class BibtexExtractor {
         return generateEntity(nonParsed);
     }
 
-    private BibEntry generateEntity(String input) {
+    private Optional<BibEntry> generateEntity(String input) {
         EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
         BibEntry extractedEntity = new BibEntry(type);
         extractedEntity.setField(StandardField.AUTHOR, String.join(" and ", authors));
@@ -77,7 +84,7 @@ public class BibtexExtractor {
             extractedEntity.setField(StandardField.PUBLISHER, journalOrPublisher);
         }
         extractedEntity.setField(StandardField.COMMENT, input);
-        return extractedEntity;
+        return Optional.of(extractedEntity);
     }
 
     private String findUrls(String input) {

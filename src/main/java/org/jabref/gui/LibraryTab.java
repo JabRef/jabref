@@ -64,6 +64,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -168,6 +169,8 @@ public class LibraryTab extends Tab {
     private ImportHandler importHandler;
     private IndexManager indexManager;
 
+    private final AiService aiService;
+
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
      *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
@@ -177,6 +180,7 @@ public class LibraryTab extends Tab {
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
+                       AiService aiService,
                        GuiPreferences preferences,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -196,6 +200,7 @@ public class LibraryTab extends Tab {
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
+        this.aiService = aiService;
 
         initializeComponentsAndListeners(isDummyContext);
 
@@ -247,6 +252,8 @@ public class LibraryTab extends Tab {
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
 
         this.entryEditor = createEntryEditor();
+
+        aiService.setupDatabase(bibDatabaseContext);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -1051,6 +1058,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,
+                                              AiService aiService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
@@ -1066,6 +1074,7 @@ public class LibraryTab extends Tab {
                 context,
                 tabContainer,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
@@ -1087,6 +1096,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
+                                              AiService aiService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1100,6 +1110,7 @@ public class LibraryTab extends Tab {
                 databaseContext,
                 tabContainer,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
