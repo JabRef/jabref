@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
  */
-public final class DBMSProcessor {
+public class DBMSProcessor {
 
     public static final String PROCESSOR_ID = CUID.randomCUID2(8).toString();
 
@@ -55,7 +55,7 @@ public final class DBMSProcessor {
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
     // TODO: We need to migrate data - or ask the user to recreate
-    private final int CURRENT_VERSION_DB_STRUCT = 2;
+    private int CURRENT_VERSION_DB_STRUCT = 2;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.connection = dbmsConnection.getConnection();
@@ -235,7 +235,7 @@ public final class DBMSProcessor {
         // - table names and field names now lower case
     }
 
-    Integer getCURRENT_VERSION_DB_STRUCT() {
+    int getCURRENT_VERSION_DB_STRUCT() {
         return CURRENT_VERSION_DB_STRUCT;
     }
 
@@ -255,7 +255,8 @@ public final class DBMSProcessor {
      * @param bibEntries List of {@link BibEntry} to be inserted
      */
     public void insertEntries(List<BibEntry> bibEntries) {
-        assert bibEntries.stream().filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedId() != "").findAny().isEmpty();
+        // TODO: Check if this condition makes sense?
+        assert bibEntries.stream().filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedId() != -1).findAny().isEmpty();
         insertIntoEntryTable(bibEntries);
         insertIntoFieldTable(bibEntries);
     }
@@ -488,11 +489,11 @@ public final class DBMSProcessor {
         if (bibEntries.isEmpty()) {
             return;
         }
-        StringBuilder query = new StringBuilder().append("DELETE FROM ENTRY WHERE SHARED_ID IN (");
-        query.append("?, ".repeat(bibEntries.size() - 1));
-        query.append("?)");
+        String query = "DELETE FROM ENTRY WHERE SHARED_ID IN (" +
+                       "?, ".repeat(bibEntries.size() - 1) +
+                       "?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (int j = 0; j < bibEntries.size(); j++) {
                 preparedStatement.setInt(j + 1, bibEntries.get(j).getSharedBibEntryData().getSharedId());
             }
