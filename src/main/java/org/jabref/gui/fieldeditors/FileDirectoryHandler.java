@@ -62,9 +62,10 @@ public class FileDirectoryHandler {
         MetaData metaData = databaseContext.getMetaData();
 
         // Main file directory
-        databaseContext.getFileDirectories(filePreferences).stream().findFirst()
-                       .ifPresent(path -> directories
-                               .add(new DirectoryInfo(Localization.lang("main file directory"), path, DirectoryType.MAIN)));
+        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
+        if (mainFilePath != null) { // Check if the path is not null
+            directories.add(new DirectoryInfo(Localization.lang("main file directory"), Path.of(mainFilePath), DirectoryType.MAIN));
+        }
 
         // General (library) specific directory from MetaData
         metaData.getDefaultFileDirectory().ifPresent(path ->
@@ -84,6 +85,10 @@ public class FileDirectoryHandler {
                 ))
         );
 
+        for (DirectoryInfo directory : directories) {
+            System.out.println(directory);
+        }
+
         return directories;
     }
 
@@ -91,8 +96,8 @@ public class FileDirectoryHandler {
         MetaData metaData = databaseContext.getMetaData();
 
         // Check main directory
-        if (databaseContext.getFileDirectories(filePreferences).stream()
-                       .anyMatch(filePath::startsWith)) {
+        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
+        if (mainFilePath != null && filePath.startsWith(mainFilePath)) {
             return Optional.of(DirectoryType.MAIN);
         }
 
@@ -114,6 +119,8 @@ public class FileDirectoryHandler {
     }
 
     private Optional<DirectoryInfo> handleTwoDirectoriesCase(Optional<DirectoryType> currentDirectory, List<DirectoryInfo> availableDirectories) {
+        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
+
         if (currentDirectory.isEmpty()) {
             // File outside both directories - prefer general, then user-specific, then main
             return availableDirectories.stream()
@@ -121,10 +128,10 @@ public class FileDirectoryHandler {
                                        .findFirst()
                                        .or(() -> availableDirectories.stream()
                                                                      .filter(dir -> dir.type == DirectoryType.USER_SPECIFIC)
-                                                                     .findFirst()
-                                                                     .or(() -> availableDirectories.stream()
-                                                                                                   .filter(dir -> dir.type == DirectoryType.MAIN)
-                                                                                                   .findFirst()));
+                                                                     .findFirst())
+                                       .or(() -> mainFilePath != null ? availableDirectories.stream()
+                                                                                            .filter(dir -> dir.type == DirectoryType.MAIN && dir.path.startsWith(mainFilePath))
+                                                                                            .findFirst() : Optional.empty());
         }
 
         DirectoryType current = currentDirectory.get();
@@ -136,17 +143,19 @@ public class FileDirectoryHandler {
         } else if (current == DirectoryType.GENERAL) {
             // If file is in general directory, prefer main (user-specific cannot exist in this case)
             return availableDirectories.stream()
-                                       .filter(dir -> dir.type == DirectoryType.MAIN)
+                                       .filter(dir -> dir.type == DirectoryType.MAIN && dir.path.startsWith(mainFilePath))
                                        .findFirst();
         } else {
             // If file is in user-specific directory, prefer main (general cannot exist in this case)
             return availableDirectories.stream()
-                                       .filter(dir -> dir.type == DirectoryType.MAIN)
+                                       .filter(dir -> dir.type == DirectoryType.MAIN && dir.path.startsWith(mainFilePath))
                                        .findFirst();
         }
     }
 
     private Optional<DirectoryInfo> handleThreeDirectoriesCase(Optional<DirectoryType> currentDirectory, List<DirectoryInfo> availableDirectories) {
+        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
+
         if (currentDirectory.isEmpty()) {
             // File outside all directories - show general
             return availableDirectories.stream()
@@ -156,15 +165,12 @@ public class FileDirectoryHandler {
 
         DirectoryType current = currentDirectory.get();
         return switch (current) {
-            case MAIN,
-                 USER_SPECIFIC ->
-                    availableDirectories.stream()
-                                        .filter(dir -> dir.type == DirectoryType.GENERAL)
-                                        .findFirst();
-            case GENERAL ->
-                    availableDirectories.stream()
-                                        .filter(dir -> dir.type == DirectoryType.USER_SPECIFIC)
-                                        .findFirst();
+            case MAIN, USER_SPECIFIC -> availableDirectories.stream()
+                                                            .filter(dir -> dir.type == DirectoryType.GENERAL)
+                                                            .findFirst();
+            case GENERAL -> availableDirectories.stream()
+                                                .filter(dir -> dir.type == DirectoryType.USER_SPECIFIC)
+                                                .findFirst();
         };
     }
 }
