@@ -62,8 +62,8 @@ public class Highlighter {
                 String highlightedText = highlightNode(textNode.text(), searchTerms);
                 textNode.text("");
                 textNode.after(highlightedText);
-            } else if (node instanceof Element) {
-                highlightTextNodes((Element) node, searchTerms);
+            } else if (node instanceof Element element1) {
+                highlightTextNodes(element1, searchTerms);
             }
         }
     }
@@ -74,7 +74,7 @@ public class Highlighter {
         }
 
         try {
-            String query = String.format(HIGHLIGHT_QUERY, text, terms);
+            String query = HIGHLIGHT_QUERY.formatted(text, terms);
             ResultSet resultSet = connection.createStatement().executeQuery(query);
             resultSet.next();
             return resultSet.getString(1);
