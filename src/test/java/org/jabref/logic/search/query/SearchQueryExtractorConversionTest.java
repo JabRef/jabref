@@ -3,6 +3,8 @@ package org.jabref.logic.search.query;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.model.search.query.SearchQuery;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,8 +30,8 @@ public class SearchQueryExtractorConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(Set<String> expected, String query) {
-        Set<String> result = SearchQueryConversion.extractSearchTerms(query);
+    void testSearchConversion(Set<String> expected, String searchExpression) {
+        Set<String> result = SearchQueryConversion.extractSearchTerms(new SearchQuery(searchExpression));
         assertEquals(expected, result);
     }
 }

@@ -2,7 +2,6 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.time.Duration;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -219,7 +218,7 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.orElseGet(() -> new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
+                query -> setSearchTerm(query.orElseGet(() -> new SearchQuery(""))));
 
         /*
          * The listener tracks a change on the focus property value.

@@ -51,7 +51,7 @@ public final class LinkedFilesSearcher {
             return new SearchResults();
         }
 
-        Query luceneQuery = SearchQueryConversion.searchToLucene(searchQuery.getSearchExpression());
+        Query luceneQuery = SearchQueryConversion.searchToLucene(searchQuery);
         EnumSet<SearchFlags> searchFlags = searchQuery.getSearchFlags();
         boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) && filePreferences.shouldFulltextIndexLinkedFiles();
         if (!shouldSearchInLinkedFiles) {

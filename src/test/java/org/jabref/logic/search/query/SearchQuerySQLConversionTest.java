@@ -2,6 +2,8 @@ package org.jabref.logic.search.query;
 
 import java.util.stream.Stream;
 
+import org.jabref.model.search.query.SearchQuery;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -625,7 +627,7 @@ class SearchQuerySQLConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(String input, String expected) {
-        assertEquals(expected, SearchQueryConversion.searchToSql("tableName", input));
+    void testSearchConversion(String searchExpression, String expected) {
+        assertEquals(expected, SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression)));
     }
 }

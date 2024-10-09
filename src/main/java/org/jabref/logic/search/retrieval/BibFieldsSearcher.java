@@ -41,7 +41,7 @@ public class BibFieldsSearcher {
         if (!searchQuery.isValid()) {
             return new SearchResults();
         }
-        String sqlQuery = SearchQueryConversion.searchToSql(tableName, searchQuery.getSearchExpression());
+        String sqlQuery = SearchQueryConversion.searchToSql(tableName, searchQuery);
         LOGGER.debug("Searching in bib fields with query: {}", sqlQuery);
         SearchResults searchResults = new SearchResults();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {

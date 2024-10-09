@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.stream.Stream;
 
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -72,19 +73,19 @@ class SearchQueryFlagsConversionTest {
         ).flatMap(stream -> stream);
     }
 
-    private static Stream<Arguments> createTestCases(String query, String noneExpected, String caseSensitiveExpected, String regexExpected, String bothExpected) {
+    private static Stream<Arguments> createTestCases(String searchExpression, String noneExpected, String caseSensitiveExpected, String regexExpected, String bothExpected) {
         return Stream.of(
-                Arguments.of(noneExpected, query, EnumSet.noneOf(SearchFlags.class)),
-                Arguments.of(caseSensitiveExpected, query, EnumSet.of(SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(regexExpected, query, EnumSet.of(SearchFlags.REGULAR_EXPRESSION)),
-                Arguments.of(bothExpected, query, EnumSet.of(SearchFlags.CASE_SENSITIVE, SearchFlags.REGULAR_EXPRESSION))
+                Arguments.of(noneExpected, searchExpression, EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of(caseSensitiveExpected, searchExpression, EnumSet.of(SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(regexExpected, searchExpression, EnumSet.of(SearchFlags.REGULAR_EXPRESSION)),
+                Arguments.of(bothExpected, searchExpression, EnumSet.of(SearchFlags.CASE_SENSITIVE, SearchFlags.REGULAR_EXPRESSION))
         );
     }
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(String expected, String query, EnumSet<SearchFlags> flags) {
-        String result = SearchQueryConversion.flagsToSearchExpression(query, flags);
+    void testSearchConversion(String expected, String searchExpression, EnumSet<SearchFlags> flags) {
+        String result = SearchQueryConversion.flagsToSearchExpression(new SearchQuery(searchExpression, flags));
         assertEquals(expected, result);
     }
 }

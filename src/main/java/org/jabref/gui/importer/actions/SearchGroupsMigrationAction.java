@@ -68,7 +68,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     private void migrateGroups(GroupTreeNode node, DialogService dialogService) {
         if (node.getGroup() instanceof SearchGroup searchGroup) {
             try {
-                String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchExpression(), searchGroup.getSearchFlags());
+                String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchQuery());
                 searchGroup.setSearchExpression(newSearchExpression);
             } catch (ParseCancellationException e) {
                 Optional<String> newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(

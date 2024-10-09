@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,7 +16,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -73,18 +71,18 @@ public class DatabaseSearcherTest {
         inCollectionEntry.setField(StandardField.AUTHOR, "tonho");
 
         return Stream.of(
-                Arguments.of(List.of(), new SearchQuery("whatever", EnumSet.noneOf(SearchFlags.class)), List.of()),
-                Arguments.of(List.of(), new SearchQuery("whatever", EnumSet.noneOf(SearchFlags.class)), List.of(emptyEntry)),
-                Arguments.of(List.of(), new SearchQuery("whatever", EnumSet.noneOf(SearchFlags.class)), List.of(emptyEntry, articleEntry, inCollectionEntry)),
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of()),
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of(emptyEntry)),
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of(emptyEntry, articleEntry, inCollectionEntry)),
 
                 // invalid search syntax
-                Arguments.of(List.of(), new SearchQuery("author:", EnumSet.noneOf(SearchFlags.class)), List.of(articleEntry)),
+                Arguments.of(List.of(), new SearchQuery("author:"), List.of(articleEntry)),
 
-                Arguments.of(List.of(articleEntry), new SearchQuery("harrer", EnumSet.noneOf(SearchFlags.class)), List.of(articleEntry)),
-                Arguments.of(List.of(), new SearchQuery("title: harrer", EnumSet.noneOf(SearchFlags.class)), List.of(articleEntry)),
+                Arguments.of(List.of(articleEntry), new SearchQuery("harrer"), List.of(articleEntry)),
+                Arguments.of(List.of(), new SearchQuery("title: harrer"), List.of(articleEntry)),
 
-                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho", EnumSet.noneOf(SearchFlags.class)), List.of(inCollectionEntry)),
-                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho", EnumSet.noneOf(SearchFlags.class)), List.of(articleEntry, inCollectionEntry))
+                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(inCollectionEntry)),
+                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(articleEntry, inCollectionEntry))
         );
     }
 }
