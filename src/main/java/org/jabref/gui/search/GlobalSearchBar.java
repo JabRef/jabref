@@ -127,17 +127,14 @@ public class GlobalSearchBar extends HBox {
         currentResults.textProperty().bind(EasyBind.combine(
                 stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch,
                 (searchQuery, matched, illegal) -> {
+                    searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, illegal);
                     if (illegal) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
-                        return Localization.lang("Search failed: illegal search expression");
+                        return Localization.lang("Illegal search expression");
                     } else if (searchQuery.isEmpty()) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return "";
                     } else if (matched.intValue() == 0) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("No results found.");
                     } else {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
                 }
@@ -339,12 +336,7 @@ public class GlobalSearchBar extends HBox {
         }
 
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
-        if (!searchQuery.isValid()) {
-            illegalSearch.set(true);
-            return;
-        } else {
-            illegalSearch.set(false);
-        }
+        illegalSearch.set(!searchQuery.isValid());
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
     }
 
