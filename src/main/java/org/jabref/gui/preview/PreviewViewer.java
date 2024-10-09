@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -77,13 +76,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final WebView previewView;
     private final BibDatabaseContext database;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
-    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        highlightLayoutText();
-    };
 
     private Optional<BibEntry> entry = Optional.empty();
     private PreviewLayout layout;
-    private boolean registered;
     private String layoutText;
 
     /**
@@ -100,6 +95,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.searchQueryProperty = searchQueryProperty;
+        this.searchQueryProperty.addListener((queryObservable, queryOldValue, queryNewValue) -> highlightLayoutText());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -111,11 +107,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
-            }
-
-            if (!registered) {
-                searchQueryProperty.addListener(listener);
-                registered = true;
             }
 
             // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
