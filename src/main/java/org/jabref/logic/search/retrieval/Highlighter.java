@@ -1,6 +1,7 @@
 package org.jabref.logic.search.retrieval;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
@@ -24,8 +25,8 @@ public class Highlighter {
     private final static String HIGHLIGHT_QUERY = """
             SELECT
             regexp_replace(
-                '%s',
-                '(%s)',
+                ?,
+                ?,
                 '<mark style="background: orange">\\1</mark>',
                 'gi'
             )
@@ -68,19 +69,23 @@ public class Highlighter {
         }
     }
 
-    public static String highlightNode(String text, String terms) {
+    private static String highlightNode(String text, String searchTerms) {
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
 
-        try {
-            String query = HIGHLIGHT_QUERY.formatted(text, terms);
-            ResultSet resultSet = connection.createStatement().executeQuery(query);
-            resultSet.next();
-            return resultSet.getString(1);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(HIGHLIGHT_QUERY)) {
+            preparedStatement.setString(1, text);
+            preparedStatement.setString(2, '(' + searchTerms + ')');
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString(1);
+                }
+            }
         } catch (SQLException e) {
             LOGGER.error("Error highlighting search terms in text", e);
-            return text;
         }
+        return text;
     }
 }
