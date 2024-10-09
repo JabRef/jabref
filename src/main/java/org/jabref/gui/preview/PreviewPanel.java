@@ -14,6 +14,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -105,6 +106,7 @@ public class PreviewPanel extends VBox {
             event.consume();
         });
         this.getChildren().add(previewView);
+        VBox.setVgrow(previewView, Priority.ALWAYS);
 
         createKeyBindings();
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
