@@ -1,6 +1,7 @@
 package org.jabref.logic.search.query;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
@@ -34,6 +35,12 @@ public class SearchQueryConversion {
         LOGGER.debug("Converting search expression to Lucene: {}", searchExpression);
         SearchParser.StartContext context = getStartContext(searchExpression);
         return new SearchToLuceneVisitor().visit(context);
+    }
+
+    public static Set<String> extractSearchTerms(String searchExpression) {
+        LOGGER.debug("Extracting search terms from search expression: {}", searchExpression);
+        SearchParser.StartContext context = getStartContext(searchExpression);
+        return new SearchQueryExtractorVisitor().visit(context);
     }
 
     public static SearchParser.StartContext getStartContext(String searchExpression) {
