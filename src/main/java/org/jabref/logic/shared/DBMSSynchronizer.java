@@ -19,6 +19,7 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -33,6 +34,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,16 +47,19 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
+    private Connection currentConnection;
+    private Notifier notifier;
     private String dbName;
-    private final BibDatabaseContext bibDatabaseContext;
+
     private MetaData metaData;
+    private final BibDatabaseContext bibDatabaseContext;
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
-    private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
     private final FieldPreferences fieldPreferences;
     private final FileUpdateMonitor fileMonitor;
+
     private Optional<BibEntry> lastEntryChanged_REMOVEME;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
@@ -102,14 +107,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
 
+        notifier.notifyAboutChangedField(event);
+
         BibEntry bibEntry = event.getBibEntry();
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            synchronizeSharedEntry(bibEntry);
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+        // connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
     }
 
     /**
@@ -187,7 +190,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedId())) {
+                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedIdAsInt())) {
                     remoteEntryMatchingOneLocalEntryFound = true;
                     if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
@@ -231,7 +234,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =
                 localEntries.stream()
-                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedId()))
+                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedIdAsInt()))
                             .collect(Collectors.toList());
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
@@ -391,6 +394,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
+        try {
+            this.notifier = new Notifier(currentConnection.unwrap(PGConnection.class));
+        } catch (SQLException e) {
+            LOGGER.error("Could not get Postgres driver", e);
+            throw new DatabaseNotSupportedException();
+        }
         this.dbmsProcessor = new DBMSProcessor(connection);
         initializeDatabases();
     }

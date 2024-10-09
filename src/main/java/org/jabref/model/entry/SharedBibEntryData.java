@@ -1,6 +1,9 @@
 package org.jabref.model.entry;
 
+import java.util.Objects;
+
 import com.google.common.base.MoreObjects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Stores all information needed to manage entries on a shared (SQL) database.
@@ -11,23 +14,46 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     // It has to be unique on remote DBS for all connected JabRef instances.
     // The old id above does not satisfy this requirement.
     // This is "ID" in JabDrive sync
-    private int sharedId;
+    private String sharedIdAsString;
+
+    private int sharedIdAsInt;
 
     // Needed for version controlling if used on shared database
     // This is "Revision" in JabDrive sync
     private int version;
 
     public SharedBibEntryData() {
-        this.sharedId = -1;
+        this.sharedIdAsString = "";
+        this.sharedIdAsInt = -1;
         this.version = 1;
     }
 
-    public int getSharedId() {
-        return sharedId;
+    /**
+     * @return Empty string if no sharedId is set yet
+     */
+    public String getSharedIdAsString() {
+        return sharedIdAsString;
     }
 
-    public void setSharedId(int sharedId) {
-        this.sharedId = sharedId;
+    /**
+     * @return -1 if no sharedId is set yet
+     */
+    public int getSharedIdAsInt() {
+        return sharedIdAsInt;
+    }
+
+    public void setSharedId(@NonNull String sharedIdAsString) {
+        this.sharedIdAsString = sharedIdAsString;
+        try {
+            this.sharedIdAsInt = Integer.parseInt(sharedIdAsString);
+        } catch (NumberFormatException e) {
+            this.sharedIdAsInt = Objects.hash(sharedIdAsString);
+        }
+    }
+
+    public void setSharedId(@NonNull int sharedId) {
+        this.sharedIdAsString = String.valueOf(sharedId);
+        this.sharedIdAsInt = sharedId;
     }
 
     public int getVersion() {
@@ -41,17 +67,17 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                          .add("sharedId", sharedId)
+                          .add("sharedId", sharedIdAsString)
                           .add("version", version)
                           .toString();
     }
 
     @Override
     public int compareTo(SharedBibEntryData o) {
-        if (this.sharedId == o.sharedId) {
+        if (this.sharedIdAsString == o.sharedIdAsString) {
             return Integer.compare(this.version, o.version);
         } else {
-            return Integer.compare(this.sharedId, o.sharedId);
+            return this.sharedIdAsString.compareTo(o.sharedIdAsString);
         }
     }
 }

@@ -61,7 +61,7 @@ public class CanonicalBibEntry {
             sj.add(line);
         }
 
-        sj.add("  _jabref_shared = {sharedId: %d, version: %d}".formatted(entry.getSharedBibEntryData().getSharedId(), entry.getSharedBibEntryData().getVersion()));
+        sj.add("  _jabref_shared = {sharedId: %d, version: %d}".formatted(entry.getSharedBibEntryData().getSharedIdAsInt(), entry.getSharedBibEntryData().getVersion()));
 
         sb.append(sj);
 

@@ -207,7 +207,7 @@ class DBMSSynchronizerTest {
         modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedId());
+        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());

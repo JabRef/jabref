@@ -136,7 +136,7 @@ class DBMSProcessorTest {
         expectedEntry.clearField(StandardField.BOOKTITLE);
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedId());
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedIdAsInt());
         assertEquals(Optional.of(expectedEntry), actualEntry);
     }
 
@@ -150,7 +150,7 @@ class DBMSProcessorTest {
         // Update field should now find the entry
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedId());
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedIdAsInt());
         assertEquals(Optional.of(expectedEntry), actualEntry);
     }
 
@@ -192,7 +192,7 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(expectedBibEntry);
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
-                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedId());
+                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
@@ -274,7 +274,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedBibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedId());
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
@@ -286,7 +286,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getSharedIDVersionMapping() throws OfflineLockException, SQLException {
+    void getSharedIdVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(firstEntry);
 
@@ -296,8 +296,8 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(secondEntry);
 
         Map<Integer, Integer> expectedIDVersionMap = new HashMap<>();
-        expectedIDVersionMap.put(firstEntry.getSharedBibEntryData().getSharedId(), 1);
-        expectedIDVersionMap.put(secondEntry.getSharedBibEntryData().getSharedId(), 2);
+        expectedIDVersionMap.put(firstEntry.getSharedBibEntryData().getSharedIdAsInt(), 1);
+        expectedIDVersionMap.put(secondEntry.getSharedBibEntryData().getSharedIdAsInt(), 2);
 
         Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
@@ -403,21 +403,16 @@ class DBMSProcessorTest {
 
             try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection)) {
                 while (fieldResultSet.next()) {
-                    if (actualFieldMap.containsKey(fieldResultSet.getInt("ENTRY_SHARED_ID"))) {
-                        actualFieldMap.get(fieldResultSet.getInt("ENTRY_SHARED_ID")).put(
-                                fieldResultSet.getString("NAME"), fieldResultSet.getString("VALUE"));
-                    } else {
-                        int sharedId = fieldResultSet.getInt("ENTRY_SHARED_ID");
-                        actualFieldMap.put(sharedId,
-                                new HashMap<>());
-                        actualFieldMap.get(sharedId).put(fieldResultSet.getString("NAME"),
-                                fieldResultSet.getString("VALUE"));
-                    }
+                    int sharedId = fieldResultSet.getInt("ENTRY_SHARED_ID");
+                    actualFieldMap.putIfAbsent(sharedId, new HashMap<>());
+                    actualFieldMap.get(sharedId).put(
+                            fieldResultSet.getString("NAME"),
+                            fieldResultSet.getString("VALUE"));
                 }
             }
         }
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
-                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedId(),
+                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt(),
                                                                             bibEntry -> bibEntry.getFieldMap().entrySet().stream()
                                                                                                   .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
