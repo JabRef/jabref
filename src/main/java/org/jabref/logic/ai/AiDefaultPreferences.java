@@ -78,14 +78,15 @@ public class AiDefaultPreferences {
     public static final int CONTEXT_WINDOW_SIZE = 8196;
 
     public static final Map<AiTemplate, String> TEMPLATES = Map.of(
-            AiTemplate.CHATTING_SYSTEM_MESSAGE,
-                    "You are an AI assistant that analyses research papers. You answer questions about papers.\n" +
-                            "You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.\n" +
-                            "Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.\n\n" +
-                            "Here are the papers you are analyzing:\n" +
-                            "#foreach( $entry in $entries )\n" +
-                            "${CanonicalBibEntry.getCanonicalRepresentation($entry)}\n" +
-                            "#end",
+            AiTemplate.CHATTING_SYSTEM_MESSAGE, """
+                    You are an AI assistant that analyses research papers. You answer questions about papers.
+                    You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
+                    Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.
+
+                    Here are the papers you are analyzing:
+                    #foreach( $entry in $entries )
+                    ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
+                    #end""",
 
             AiTemplate.CHATTING_USER_MESSAGE, """
                     $message
@@ -97,7 +98,7 @@ public class AiDefaultPreferences {
                     #end""",
 
             AiTemplate.SUMMARIZATION_CHUNK, """
-                Please provide an overview of the following text. It's a part of a scientific paper.
+                Please provide an overview of the following text. It is a part of a scientific paper.
                 The summary should include the main objectives, methodologies used, key findings, and conclusions.
                 Mention any significant experiments, data, or discussions presented in the paper.
 

@@ -35,7 +35,6 @@ import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +54,7 @@ public class AiChatLogic {
 
     private ChatMemory chatMemory;
 
-    // You must not pass an empty list to langchain4j {@link IsIn} filter. We forced to use null here, instead of Optional.
-    private @Nullable Filter filter;
+    private Optional<Filter> filter = Optional.empty();
 
     public AiChatLogic(AiPreferences aiPreferences,
                        ChatLanguageModel chatLanguageModel,
@@ -113,15 +111,15 @@ public class AiChatLogic {
         List<LinkedFile> linkedFiles = ListUtil.getLinkedFiles(entries).toList();
 
         if (linkedFiles.isEmpty()) {
-            filter = null;
+            filter = Optional.empty();
         } else {
-            filter = MetadataFilterBuilder
+            filter = Optional.of(MetadataFilterBuilder
                     .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)
                     .isIn(linkedFiles
                             .stream()
                             .map(LinkedFile::getLink)
                             .toList()
-                    );
+                    ));
         }
     }
 
@@ -143,7 +141,7 @@ public class AiChatLogic {
                 .builder()
                 .maxResults(aiPreferences.getRagMaxResultsCount())
                 .minScore(aiPreferences.getRagMinScore())
-                .filter(filter)
+                .filter(filter.orElse(null))
                 .queryEmbedding(embeddingModel.embed(message.singleText()).content())
                 .build();
 
