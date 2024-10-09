@@ -57,7 +57,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final EventBus eventBus;
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
+
+    // will be required later for save actions
     private final FieldPreferences fieldPreferences;
+
     private final FileUpdateMonitor fileMonitor;
 
     private Optional<BibEntry> lastEntryChanged_REMOVEME;
@@ -161,7 +164,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 dbmsProcessor.setupSharedDatabase();
             }
         } catch (SQLException e) {
-            LOGGER.error("Could not check intergrity", e);
+            LOGGER.error("Could not check integrity", e);
             throw new IllegalStateException(e);
         }
 
