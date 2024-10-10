@@ -1,6 +1,8 @@
 package org.jabref.logic.cleanup;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -18,15 +20,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MoveFilesCleanup implements CleanupJob {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
+    private final List<FileSystemException> errors;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
+        this.errors = new ArrayList<>();
     }
 
     @Override
@@ -41,6 +44,8 @@ public class MoveFilesCleanup implements CleanupJob {
                 if (fileChanged) {
                     changed = true;
                 }
+            } catch (FileSystemException exception) {
+                errors.add(exception);
             } catch (IOException exception) {
                 LOGGER.error("Error while moving file {}", file.getLink(), exception);
             }
@@ -52,5 +57,9 @@ public class MoveFilesCleanup implements CleanupJob {
         }
 
         return Collections.emptyList();
+    }
+
+    public List<FileSystemException> getErrors() {
+        return errors;
     }
 }
