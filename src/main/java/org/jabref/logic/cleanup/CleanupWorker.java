@@ -1,5 +1,6 @@
 package org.jabref.logic.cleanup;
 
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,11 +16,13 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final List<FileSystemException> fileSystemExceptions;
 
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.fileSystemExceptions = new ArrayList<>();
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
@@ -31,6 +34,10 @@ public class CleanupWorker {
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
+
+            if (job instanceof MoveFilesCleanup) {
+                fileSystemExceptions.addAll(((MoveFilesCleanup) job).getFileSystemExceptions());
+            }
         }
 
         return changes;
@@ -85,5 +92,9 @@ public class CleanupWorker {
             default ->
                     throw new UnsupportedOperationException(action.name());
         };
+    }
+
+    public List<FileSystemException> getFileSystemExceptions() {
+        return fileSystemExceptions;
     }
 }

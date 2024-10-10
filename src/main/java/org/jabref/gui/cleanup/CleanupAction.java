@@ -1,5 +1,7 @@
 package org.jabref.gui.cleanup;
 
+import java.nio.file.FileSystemException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -31,6 +33,7 @@ public class CleanupAction extends SimpleCommand {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    private List<FileSystemException> exceptions;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
@@ -47,6 +50,7 @@ public class CleanupAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
+        this.exceptions = new ArrayList<>();
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -113,6 +117,8 @@ public class CleanupAction extends SimpleCommand {
         for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
         }
+
+        exceptions = cleaner.getFileSystemExceptions();
     }
 
     private void showResults() {
@@ -132,6 +138,20 @@ public class CleanupAction extends SimpleCommand {
         } else {
             dialogService.notify(Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount)));
         }
+
+        if (!exceptions.isEmpty()) {
+            showExceptions();
+        }
+    }
+
+    private void showExceptions() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Localization.lang("The following errors occurred while moving files:")).append("\n\n");
+        for (FileSystemException exception : exceptions) {
+            FileSystemException fse = exception;
+            sb.append("- ").append(Localization.lang("Could not move file %0. Please close this file and retry.", fse.getFile())).append("\n");
+        }
+        dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), sb.toString());
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
