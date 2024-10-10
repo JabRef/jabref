@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @FXML private OwnerEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
 
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
@@ -38,9 +38,9 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
                   .load();
 
         this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferences, fieldCheckers, undoManager);
-        establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
-        textArea.initContextMenu(EditorMenus.getNameMenu(textArea), keyBindingRepository);
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(EditorMenus.getNameMenu(textField), keyBindingRepository);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public OwnerEditorViewModel getViewModel() {

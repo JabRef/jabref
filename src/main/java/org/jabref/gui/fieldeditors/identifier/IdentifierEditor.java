@@ -13,7 +13,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.EditorTextArea;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
@@ -36,7 +36,7 @@ import static org.jabref.model.entry.field.StandardField.ISBN;
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML private BaseIdentifierEditorViewModel<?> viewModel;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
 
@@ -74,7 +74,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get bibliographic data from %0", field.getDisplayName())));
@@ -82,12 +82,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(DOI)) {
-            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService), preferences.getKeyBindingRepository());
+            textField.initContextMenu(EditorMenus.getDOIMenu(textField, dialogService), preferences.getKeyBindingRepository());
         } else {
-            textArea.initContextMenu(new DefaultMenu(textArea), preferences.getKeyBindingRepository());
+            textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
         }
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {
