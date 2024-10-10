@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
 
