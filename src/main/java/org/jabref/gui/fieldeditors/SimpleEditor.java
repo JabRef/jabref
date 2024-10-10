@@ -4,8 +4,10 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.HitInfo;
 
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
@@ -71,5 +73,23 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     @Override
     public void requestFocus() {
         textInput.requestFocus();
+    }
+
+    public void insertTextFromDragInput(double x, double y, String text) {
+        TextAreaSkin skin = (TextAreaSkin) textInput.getSkin();
+
+        HitInfo hit = skin.getIndex(x, y);
+
+        skin.positionCaret(hit, false);
+
+        int insertionPoint = hit.getInsertionIndex();
+
+        textInput.getLength();
+
+        if (insertionPoint > textInput.getLength()) {
+            textInput.appendText("\n\n" + text);
+        } else {
+            textInput.insertText(insertionPoint, text);
+        }
     }
 }

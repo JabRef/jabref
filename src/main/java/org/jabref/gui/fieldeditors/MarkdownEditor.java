@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.File;
+import java.util.List;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
@@ -20,6 +23,30 @@ public class MarkdownEditor extends SimpleEditor {
 
     public MarkdownEditor(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, GuiPreferences preferences, UndoManager undoManager, UndoAction undoAction, RedoAction redoAction) {
         super(field, suggestionProvider, fieldCheckers, preferences, true, undoManager, undoAction, redoAction);
+
+        this.setOnDragDropped(event -> {
+            boolean success = false;
+            if (event.getDragboard().hasFiles()) {
+                String mdText = insertImages(event.getDragboard().getFiles());
+
+                this.insertTextFromDragInput(event.getX(), event.getY(), mdText);
+
+                success = true;
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+    }
+
+    private String insertImages(List<File> files) {
+        String mdImageTemplate = "![%s](file://%s)\n";
+        StringBuilder allImagesText = new StringBuilder();
+
+        for (File file: files) {
+            allImagesText.append(mdImageTemplate.formatted(file.getName(), file.getAbsolutePath()));
+        }
+
+        return allImagesText.toString();
     }
 
     @Override
@@ -30,6 +57,12 @@ public class MarkdownEditor extends SimpleEditor {
                 if (ClipBoardManager.hasHtml()) {
                     String htmlText = ClipBoardManager.getHtmlContents();
                     String mdText = flexmarkHtmlConverter.convert(htmlText);
+                    super.replaceSelection(mdText);
+                } else if (ClipBoardManager.hasFiles()) {
+                    List<File> files = ClipBoardManager.getFiles();
+
+                    String mdText = insertImages(files);
+
                     super.replaceSelection(mdText);
                 } else {
                     super.paste();

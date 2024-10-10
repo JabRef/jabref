@@ -5,8 +5,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
@@ -94,8 +96,20 @@ public class ClipBoardManager {
         return result;
     }
 
+    public static List<File> getFiles() {
+        return clipboard.getFiles();
+    }
+
     public static boolean hasHtml() {
         return clipboard.hasHtml();
+    }
+
+    public static boolean hasFiles() {
+        return clipboard.hasFiles();
+    }
+
+    public static Set<DataFormat> getTypes() {
+        return clipboard.getContentTypes();
     }
 
     /**
