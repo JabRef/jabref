@@ -73,7 +73,6 @@ class DBMSProcessorTest {
 
         BibEntry emptyEntry = getBibEntryExample();
         emptyEntry.getSharedBibEntryData().setSharedId(1);
-        dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
 
         Map<String, String> actualFieldMap = new HashMap<>();
 
@@ -263,6 +262,9 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(bibEntry);
 
+        bibEntry = getBibEntryExampleWithEmptyFields();
+        bibEntry.getSharedBibEntryData().setSharedId(1);
+
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(List.of(bibEntry), actualEntries);
@@ -270,13 +272,16 @@ class DBMSProcessorTest {
 
     @Test
     void getSharedEntry() {
-        BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
+        BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
-        dbmsProcessor.insertEntry(expectedBibEntry);
+        dbmsProcessor.insertEntry(bibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
+        bibEntry = getBibEntryExampleWithEmptyFields();
+        bibEntry.getSharedBibEntryData().setSharedId(1);
 
-        assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(bibEntry.getSharedBibEntryData().getSharedIdAsInt());
+
+        assertEquals(Optional.of(bibEntry), actualBibEntryOptional);
     }
 
     @Test
@@ -344,7 +349,6 @@ class DBMSProcessorTest {
                 .withField(StandardField.AUTHOR, "Author")
                 .withField(StandardField.TITLE, "")
                 .withField(StandardField.YEAR, "");
-        bibEntry.getSharedBibEntryData().setSharedId(1);
         return bibEntry;
     }
 

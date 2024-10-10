@@ -535,7 +535,7 @@ public class DBMSProcessor {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder()
-                .append("SELECT entry.shared_id, entry.version, entry.entrytype ")
+                .append("SELECT entry.shared_id, entry.version, entry.entrytype, ")
                 .append("F.entry_shared_id, F.name, F.value ")
                 .append("FROM entry ")
                 .append("LEFT OUTER JOIN field F ON entry.shared_id = F.entry_shared_id");
