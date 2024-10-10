@@ -16,7 +16,7 @@ import org.jabref.logic.xmp.XmpUtilShared;
 /**
  * Wraps the XMPUtility function to be used as an Importer.
  */
-public class PdfXmpImporter extends Importer {
+public class PdfXmpImporter extends PdfImporter {
 
     private final XmpPreferences xmpPreferences;
 

@@ -20,7 +20,7 @@ import org.jabref.model.entry.LinkedFile;
 /**
  * Wraps the GrobidService function to be used as an Importer.
  */
-public class PdfGrobidImporter extends Importer {
+public class PdfGrobidImporter extends PdfImporter {
 
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
