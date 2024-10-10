@@ -24,12 +24,12 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
-    private final List<FileSystemException> errors;
+    private final List<FileSystemException> fileSystemExceptions;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
-        this.errors = new ArrayList<>();
+        this.fileSystemExceptions = new ArrayList<>();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MoveFilesCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (FileSystemException exception) {
-                errors.add(exception);
+                fileSystemExceptions.add(exception);
             } catch (IOException exception) {
                 LOGGER.error("Error while moving file {}", file.getLink(), exception);
             }
@@ -59,7 +59,7 @@ public class MoveFilesCleanup implements CleanupJob {
         return Collections.emptyList();
     }
 
-    public List<FileSystemException> getErrors() {
-        return errors;
+    public List<FileSystemException> getFileSystemExceptions() {
+        return fileSystemExceptions;
     }
 }
