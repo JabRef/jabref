@@ -28,7 +28,7 @@ More information:
 * Only validate input after leaving the field (or after the user stopped typing for some time)
 * The user shouldn't be able to submit the form if there are errors
 * However, disabling the submit button in case there are errors is also not optimal. Instead, clicking the submit button should highlight the errors.
-* Empty required files shouldn't be marked as invalid until the user a) tried to submit the form or b) focused the field, deleted its contents and then left the field (see [Example](https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_input_required)
+* Empty required files should not be marked as invalid until the user a) tried to submit the form or b) focused the field, deleted its contents and then left the field (see [Example](https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_input_required)
 * Ideally, the error message should be shown below the text field and not as a tooltip (so that users quickly understand what's the problem). For example as [in Boostrap](https://mdbootstrap.com/docs/jquery/forms/validation/?#custom-styles).
 
 <!-- markdownlint-disable-file MD022 -->
