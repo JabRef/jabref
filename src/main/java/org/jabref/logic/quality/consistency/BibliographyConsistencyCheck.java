@@ -34,7 +34,7 @@ public class BibliographyConsistencyCheck {
      * This class <em>does not</em> check whether all required fields are present or if the fields are valid for the entry type.
      * That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindingsAsCsv(Result, Path, BibEntryTypesManager, BibDatabaseMode)}
      *
-     * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine grained.
+     * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
     public Result check(List<BibEntry> entries) {
         // collects fields existing in any entry, scoped by entry type
