@@ -32,7 +32,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -327,14 +327,14 @@ public class GroupDialogViewModel {
                     // Otherwise, it means that the user did not accept the migration to the new version.
                     Optional<GroupTreeNode> groups = currentDatabase.getMetaData().getGroups();
                     if (groups.filter(this::groupOrSubgroupIsSearchGroup).isEmpty()) {
-                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA);
+                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1);
                     }
                 }
 
-                Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
-                if (luceneManager.isPresent()) {
+                Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
+                if (indexManager.isPresent()) {
                     SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    searchGroup.setMatchedEntries(luceneManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                    searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
                 }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {

@@ -2,12 +2,9 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.time.Duration;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.UndoManager;
 
@@ -61,11 +58,11 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.Author;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -130,17 +127,14 @@ public class GlobalSearchBar extends HBox {
         currentResults.textProperty().bind(EasyBind.combine(
                 stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch,
                 (searchQuery, matched, illegal) -> {
+                    searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, illegal);
                     if (illegal) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
-                        return Localization.lang("Search failed: illegal search expression");
+                        return Localization.lang("Illegal search expression");
                     } else if (searchQuery.isEmpty()) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return "";
                     } else if (matched.intValue() == 0) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("No results found.");
                     } else {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
                 }
@@ -221,7 +215,7 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.orElseGet(() -> new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
+                query -> setSearchTerm(query.orElseGet(() -> new SearchQuery(""))));
 
         /*
          * The listener tracks a change on the focus property value.
@@ -342,23 +336,8 @@ public class GlobalSearchBar extends HBox {
         }
 
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
-        if (!searchQuery.isValid()) {
-            illegalSearch.set(true);
-            return;
-        } else {
-            illegalSearch.set(false);
-        }
+        illegalSearch.set(!searchQuery.isValid());
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
-    }
-
-    private boolean validRegex() {
-        try {
-            Pattern.compile(searchField.getText());
-        } catch (PatternSyntaxException e) {
-            LOGGER.debug(e.getMessage());
-            return false;
-        }
-        return true;
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {

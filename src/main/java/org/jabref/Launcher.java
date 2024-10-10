@@ -30,6 +30,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -91,6 +92,9 @@ public class Launcher {
 
                 DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
                 Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
+
+                PostgreServer postgreServer = new PostgreServer();
+                Injector.setModelOrService(PostgreServer.class, postgreServer);
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(

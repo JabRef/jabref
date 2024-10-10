@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.os.OS;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 
 import net.harawata.appdirs.AppDirsFactory;
 
@@ -45,7 +45,7 @@ public class Directories {
     public static Path getFulltextIndexBaseDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(OS.APP_DIR_APP_NAME,
-                                             "lucene" + File.separator + SearchFieldConstants.VERSION,
+                                             "lucene" + File.separator + LinkedFilesConstants.VERSION,
                                              OS.APP_DIR_APP_AUTHOR));
     }
 

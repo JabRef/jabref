@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public class BibDatabaseContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseContext.class);
+    private static int NUMBER_OF_UNSAVED_LIBRARIES = 0;
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -272,6 +273,14 @@ public class BibDatabaseContext {
         indexPath = appData.resolve("unsaved");
         LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
+    }
+
+    public String getUniqueName() {
+        if (getDatabasePath().isPresent()) {
+            Path databasePath = getDatabasePath().get();
+            return BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+        }
+        return "unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++;
     }
 
     @Override

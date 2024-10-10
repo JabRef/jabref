@@ -49,7 +49,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -119,7 +119,7 @@ public class SourceTab extends EntryEditorTab {
         this.keyBindingRepository = keyBindingRepository;
 
         searchQueryProperty.addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            // TODO: get search pattern from the search query
             highlightSearchPattern();
         });
     }
