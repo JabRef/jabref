@@ -1,14 +1,12 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -66,32 +64,6 @@ public class ExternalFilesEntryLinker {
 
     public void moveLinkedFilesToFileDir(BibEntry entry) {
         moveFilesCleanup.cleanup(entry);
-        List<FileSystemException> errors = moveFilesCleanup.getErrors();
-        if (!errors.isEmpty()) {
-            handleOpenFileErrors(errors);
-        }
-    }
-
-    private void handleOpenFileErrors(List<FileSystemException> errors) {
-        List<String> errorMessages = errors.stream()
-                                               .map(this::formatExceptionMessage)
-                                               .collect(Collectors.toList());
-
-        String errorDialog = formatErrorDialog(errorMessages);
-        dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), errorDialog);
-    }
-
-    private String formatExceptionMessage(FileSystemException exception) {
-        return Localization.lang("Could not move file %0. Please close this file and retry.", exception.getFile());
-    }
-
-    private String formatErrorDialog(List<String> errors) {
-        StringBuilder errorMessage = new StringBuilder();
-        errorMessage.append(Localization.lang("The following errors occurred while moving files:")).append("\n\n");
-        for (String error : errors) {
-            errorMessage.append("- ").append(error).append("\n");
-        }
-        return errorMessage.toString();
     }
 
     public void addFilesToEntry(BibEntry entry, List<Path> files) {
