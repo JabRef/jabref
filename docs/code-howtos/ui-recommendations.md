@@ -17,8 +17,8 @@ parent: Code Howtos
 
 More information:
 
-- [StackOverflow: What are some alternatives to the phrase "Are you sure you want to XYZ" in confirmation dialogs?](https://ux.stackexchange.com/q/756/93436).
-- JabRef issue discussing Yes/No/Cancel: [koppor#149](https://github.com/koppor/jabref/issues/149).
+* [StackOverflow: What are some alternatives to the phrase "Are you sure you want to XYZ" in confirmation dialogs?](https://ux.stackexchange.com/q/756/93436).
+* JabRef issue discussing Yes/No/Cancel: [koppor#149](https://github.com/koppor/jabref/issues/149).
 
 ### Name your buttons for the actions
 `req~ui.dialogs.confirmation.naming~1`
