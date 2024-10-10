@@ -21,9 +21,9 @@ public class DBMSConnection implements DatabaseConnection {
     private final DBMSConnectionProperties properties;
 
     @VisibleForTesting
-    public DBMSConnection(Connection connection) {
+    public DBMSConnection(Connection connection, String databaseName) {
         this.connection = connection;
-        this.properties = null;
+        this.properties = new DBMSConnectionProperties(databaseName);
     }
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
