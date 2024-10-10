@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
  */
-public class PdfMergeMetadataImporter extends Importer {
+public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
@@ -48,7 +48,7 @@ public class PdfMergeMetadataImporter extends Importer {
         this.importFormatPreferences = importFormatPreferences;
 
         this.metadataImporters = new ArrayList<>(5);
-        this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
+        this.metadataImporters.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));

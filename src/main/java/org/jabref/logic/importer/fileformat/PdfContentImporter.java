@@ -38,8 +38,10 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * <p>
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
  * please see {@link BibliographyFromPdfImporter}.
+ * <p>
+ * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
-public class PdfContentImporter extends Importer {
+public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 

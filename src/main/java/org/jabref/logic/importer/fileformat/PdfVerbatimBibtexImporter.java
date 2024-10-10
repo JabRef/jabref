@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -24,11 +23,11 @@ import org.apache.pdfbox.text.PDFTextStripper;
 /**
  * This importer imports a verbatim BibTeX entry from the first page of the PDF.
  */
-public class PdfVerbatimBibTextImporter extends Importer {
+public class PdfVerbatimBibtexImporter extends PdfImporter {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfVerbatimBibTextImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfVerbatimBibtexImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 

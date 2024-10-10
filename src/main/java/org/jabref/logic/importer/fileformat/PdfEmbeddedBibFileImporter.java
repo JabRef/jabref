@@ -32,7 +32,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachme
 /**
  * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
  */
-public class PdfEmbeddedBibFileImporter extends Importer {
+public class PdfEmbeddedBibFileImporter extends PdfImporter {
 
     private final BibtexParser bibtexParser;
 
