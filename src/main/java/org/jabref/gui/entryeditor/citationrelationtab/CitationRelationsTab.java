@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -12,11 +13,15 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -28,22 +33,29 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.repository.LRUBibEntryRelationsCache;
 import org.jabref.logic.citation.repository.LRUBibEntryRelationsRepository;
 import org.jabref.logic.citation.service.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.CitationFetcher;
 import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,6 +66,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +91,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final SearchCitationsRelationsService searchCitationsRelationsService;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
+    private final BibEntryTypesManager entryTypesManager;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -85,7 +100,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 LibraryTab libraryTab,
-                                TaskExecutor taskExecutor) {
+                                TaskExecutor taskExecutor,
+                                BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
@@ -94,7 +110,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
-        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        this.entryTypesManager = bibEntryTypesManager;
+        this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
             new LRUBibEntryRelationsCache()
         );
@@ -270,6 +287,14 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
+                    Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
+                    showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
+                    showEntrySource.setOnMouseClicked(event -> {
+                        showEntrySourceDialog(entry.entry());
+                    });
+
+                    vContainer.getChildren().addLast(showEntrySource);
+
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
@@ -284,6 +309,43 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    /**
+     * @implNote This code is similar to {@link PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)}.
+     */
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
+        return writer.toString();
+    }
+
+    private void showEntrySourceDialog(BibEntry entry) {
+        CodeArea ca = new CodeArea();
+        try {
+            ca.appendText(getSourceString(entry, databaseContext.getMode(), preferences.getFieldPreferences(), this.entryTypesManager));
+        } catch (IOException e) {
+            LOGGER.warn("Incorrect entry, could not load source:", e);
+            return;
+        }
+
+        ca.setWrapText(true);
+        ca.setPadding(new Insets(0, 10, 0, 10));
+        ca.showParagraphAtTop(0);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setContent(new VirtualizedScrollPane<>(ca));
+
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setPrefSize(800, 400);
+        dialogPane.setContent(scrollPane);
+        String title = Localization.lang("Show BibTeX source");
+
+        dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
     }
 
     /**

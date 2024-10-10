@@ -33,7 +33,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -77,7 +76,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final SplitPane splitPane = new SplitPane();
     private final GuiPreferences preferences;
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
@@ -106,7 +104,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
                        AiService aiService,
-                       ChatHistoryService chatHistoryService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
@@ -117,7 +114,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
@@ -157,10 +153,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
-                chatHistoryService,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -437,6 +433,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 databaseContext,
                 this,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

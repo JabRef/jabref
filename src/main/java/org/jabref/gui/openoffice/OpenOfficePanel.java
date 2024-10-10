@@ -42,6 +42,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -103,6 +104,7 @@ public class OpenOfficePanel {
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
+    private final AiService aiService;
     private final StyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -121,6 +123,7 @@ public class OpenOfficePanel {
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
+                           AiService aiService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
@@ -134,6 +137,7 @@ public class OpenOfficePanel {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
@@ -322,6 +326,7 @@ public class OpenOfficePanel {
                     databaseContext,
                     tabContainer,
                     dialogService,
+                    aiService,
                     preferences,
                     stateManager,
                     fileUpdateMonitor,
