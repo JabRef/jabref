@@ -3,6 +3,7 @@ package org.jabref.logic.search.query;
 import java.util.Set;
 
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SqlQuery;
 
 import org.apache.lucene.search.Query;
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class SearchQueryConversion {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQueryConversion.class);
 
-    public static String searchToSql(String table, SearchQuery searchQuery) {
+    public static SqlQuery searchToSql(String table, SearchQuery searchQuery) {
         LOGGER.debug("Converting search expression to SQL: {}", searchQuery.getSearchExpression());
         return new SearchToSqlVisitor(table).visit(searchQuery.getContext());
     }

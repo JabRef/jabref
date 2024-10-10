@@ -1,6 +1,7 @@
 package org.jabref.logic.search.query;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +12,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.query.SearchTermFlag;
+import org.jabref.model.search.query.SqlQuery;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
@@ -29,7 +31,7 @@ import static org.jabref.model.search.query.SearchTermFlag.REGULAR_EXPRESSION;
  * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
  * Tests are located in {@link org.jabref.logic.search.query.SearchQuerySQLConversionTest}.
  */
-public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
+public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
 
     private static final String MAIN_TABLE = "main_table";
     private static final String SPLIT_TABLE = "split_table";
@@ -38,8 +40,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
 
     private final String mainTableName;
     private final String splitValuesTableName;
-
-    private final List<String> ctes = new ArrayList<>();
+    private final List<SqlQuery> nodes = new ArrayList<>();
     private int cteCounter = 0;
 
     public SearchToSqlVisitor(String table) {
@@ -48,24 +49,31 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
     }
 
     @Override
-    public String visitStart(SearchParser.StartContext ctx) {
-        String query = visit(ctx.expression());
+    public SqlQuery visitStart(SearchParser.StartContext ctx) {
+        SqlQuery finalNode = visit(ctx.expression());
 
         StringBuilder sql = new StringBuilder("WITH\n");
-        ctes.forEach(cte -> sql.append(cte).append(",\n"));
+        List<String> params = new ArrayList<>();
+
+        for (SqlQuery node : nodes) {
+            sql.append(node.cte()).append(",\n");
+            params.addAll(node.params());
+        }
 
         // Remove the last comma and newline
-        if (!ctes.isEmpty()) {
+        if (!nodes.isEmpty()) {
             sql.setLength(sql.length() - 2);
         }
 
-        sql.append("SELECT * FROM ").append(query).append(" GROUP BY ").append(ENTRY_ID);
-        return sql.toString();
+        sql.append("SELECT * FROM ").append(finalNode.cte()).append(" GROUP BY ").append(ENTRY_ID);
+        params.addAll(finalNode.params());
+
+        return new SqlQuery(sql.toString(), params);
     }
 
     @Override
-    public String visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
-        String subQuery = visit(ctx.expression());
+    public SqlQuery visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
+        SqlQuery subNode = visit(ctx.expression());
         String cte = """
                 cte%d AS (
                     SELECT %s.%s
@@ -81,15 +89,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 mainTableName, MAIN_TABLE,
                 MAIN_TABLE, ENTRY_ID,
                 ENTRY_ID,
-                subQuery);
-        ctes.add(cte);
-        return "cte" + cteCounter++;
+                subNode.cte());
+
+        SqlQuery node = new SqlQuery(cte, subNode.params());
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
     @Override
-    public String visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-        String left = visit(ctx.left);
-        String right = visit(ctx.right);
+    public SqlQuery visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+        SqlQuery left = visit(ctx.left);
+        SqlQuery right = visit(ctx.right);
         String operator = "AND".equalsIgnoreCase(ctx.operator.getText()) ? "INTERSECT" : "UNION";
 
         String cte = """
@@ -103,31 +113,31 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 """.formatted(
                 cteCounter,
                 ENTRY_ID,
-                left,
+                left.cte(),
                 operator,
                 ENTRY_ID,
-                right);
-        ctes.add(cte);
-        return "cte" + cteCounter++;
+                right.cte());
+
+        List<String> params = new ArrayList<>(left.params());
+        params.addAll(right.params());
+
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
     @Override
-    public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+    public SqlQuery visitParenExpression(SearchParser.ParenExpressionContext ctx) {
         return visit(ctx.expression());
     }
 
     @Override
-    public String visitAtomExpression(SearchParser.AtomExpressionContext ctx) {
+    public SqlQuery visitAtomExpression(SearchParser.AtomExpressionContext ctx) {
         return visit(ctx.comparison());
     }
 
     @Override
-    public String visitName(SearchParser.NameContext ctx) {
-        return ctx.getText();
-    }
-
-    @Override
-    public String visitComparison(SearchParser.ComparisonContext context) {
+    public SqlQuery visitComparison(SearchParser.ComparisonContext context) {
         // The comparison is a leaf node in the tree
 
         // remove possible enclosing " symbols
@@ -137,7 +147,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         }
 
         Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
-        String cte;
         if (fieldDescriptor.isPresent()) {
             String field = fieldDescriptor.get().getText();
 
@@ -170,17 +179,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
             }
 
-            cte = getFieldQueryNode(field.toLowerCase(Locale.ROOT), right, searchFlags);
+            return getFieldQueryNode(field.toLowerCase(Locale.ROOT), right, searchFlags);
         } else {
             // Query without any field name
-            cte = getFieldQueryNode("any", right, EnumSet.of(INEXACT_MATCH, CASE_INSENSITIVE));
+            return getFieldQueryNode("any", right, EnumSet.of(INEXACT_MATCH, CASE_INSENSITIVE));
         }
-        ctes.add(cte);
-        return "cte" + cteCounter++;
     }
 
-    private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
-        String cte;
+    private SqlQuery getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
         String operator = getOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
@@ -192,66 +198,68 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
         };
 
         if (ENTRY_ID.toString().equals(field)) {
-            cte = """
-                    cte%d AS (
-                        SELECT %s
-                        FROM %s
-                        WHERE %s = '%s'
-                    )
-                    """.formatted(
-                    cteCounter,
-                    ENTRY_ID,
-                    mainTableName,
-                    ENTRY_ID, term);
+            return buildEntryIdQuery(term);
         } else if ("anyfield".equals(field) || "any".equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
-                cte = searchFlags.contains(NEGATION)
+                return searchFlags.contains(NEGATION)
                         ? buildExactNegationAnyFieldQuery(operator, term)
                         : buildExactAnyFieldQuery(operator, term);
             } else {
-                cte = searchFlags.contains(NEGATION)
+                return searchFlags.contains(NEGATION)
                         ? buildContainsNegationAnyFieldQuery(operator, prefixSuffix, term)
                         : buildContainsAnyFieldQuery(operator, prefixSuffix, term);
             }
         } else {
             if (searchFlags.contains(EXACT_MATCH)) {
-                cte = searchFlags.contains(NEGATION)
+                return searchFlags.contains(NEGATION)
                         ? buildExactNegationFieldQuery(field, operator, term)
                         : buildExactFieldQuery(field, operator, term);
             } else {
-                cte = searchFlags.contains(NEGATION)
+                return searchFlags.contains(NEGATION)
                         ? buildContainsNegationFieldQuery(field, operator, prefixSuffix, term)
                         : buildContainsFieldQuery(field, operator, prefixSuffix, term);
             }
         }
-        return cte;
     }
 
-    private String buildContainsFieldQuery(String field, String operator, String prefixSuffix, String term) {
-        return """
+    private SqlQuery buildEntryIdQuery(String entryId) {
+        String cte = """
+                cte%d AS (
+                    SELECT %s
+                    FROM %s
+                    WHERE %s = ?
+                )
+                """.formatted(cteCounter, ENTRY_ID, mainTableName, ENTRY_ID);
+        SqlQuery node = new SqlQuery(cte, List.of(entryId));
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
+    }
+
+    private SqlQuery buildContainsFieldQuery(String field, String operator, String prefixSuffix, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
                     WHERE (
-                        (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                        (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                     )
                 )
                 """.formatted(
                 cteCounter,
                 MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME,
-                field,
-                MAIN_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                prefixSuffix, term, prefixSuffix,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator,
-                prefixSuffix, term, prefixSuffix);
+                MAIN_TABLE, FIELD_NAME, field,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildContainsNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
-        return """
+    private SqlQuery buildContainsNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
@@ -259,7 +267,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                         SELECT %s.%s
                         FROM %s AS %s
                         WHERE (
-                            (%s.%s = '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                            (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                         )
                     )
                 )
@@ -270,27 +278,29 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, ENTRY_ID,
                 INNER_TABLE, ENTRY_ID,
                 mainTableName, INNER_TABLE,
-                INNER_TABLE, FIELD_NAME,
-                field,
+                INNER_TABLE, FIELD_NAME, field,
                 INNER_TABLE, FIELD_VALUE_LITERAL,
                 operator,
-                prefixSuffix, term, prefixSuffix,
                 INNER_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator,
-                prefixSuffix, term, prefixSuffix);
+                operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildExactFieldQuery(String field, String operator, String term) {
-        return """
+    private SqlQuery buildExactFieldQuery(String field, String operator, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
                     LEFT JOIN %s AS %s
                     ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                     WHERE (
-                        ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                        ((%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?)))
                         OR
-                        ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                        ((%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?)))
                     )
                 )
                 """.formatted(
@@ -301,15 +311,20 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
                 MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
                 MAIN_TABLE, FIELD_NAME, field,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
                 SPLIT_TABLE, FIELD_NAME, field,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildExactNegationFieldQuery(String field, String operator, String term) {
-        return """
+    private SqlQuery buildExactNegationFieldQuery(String field, String operator, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
@@ -319,9 +334,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                         LEFT JOIN %s AS %s
                         ON (%s.%s = %s.%s AND %s.%s = %s.%s)
                         WHERE (
-                            ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                            ((%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?)))
                             OR
-                            ((%s.%s = '%s') AND ((%s.%s %s '%s') OR (%s.%s %s '%s')))
+                            ((%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?)))
                         )
                     )
                 )
@@ -336,20 +351,25 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
                 INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
                 INNER_TABLE, FIELD_NAME, field,
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
                 SPLIT_TABLE, FIELD_NAME, field,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
-        return """
+    private SqlQuery buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
                     WHERE (
-                        (%s.%s != '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                        (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                     )
                 )
                 """.formatted(
@@ -359,14 +379,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
                 MAIN_TABLE, FIELD_VALUE_LITERAL,
                 operator,
-                prefixSuffix, term, prefixSuffix,
                 MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator,
-                prefixSuffix, term, prefixSuffix);
+                operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildExactAnyFieldQuery(String operator, String term) {
-        return """
+    private SqlQuery buildExactAnyFieldQuery(String operator, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
@@ -375,9 +398,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                     WHERE (
                         (%s.%s != '%s')
                         AND (
-                            ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                            ((%s.%s %s ?) OR (%s.%s %s ?))
                             OR
-                            ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                            ((%s.%s %s ?) OR (%s.%s %s ?))
                         )
                     )
                 )
@@ -389,14 +412,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
                 MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
                 MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildExactNegationAnyFieldQuery(String operator, String term) {
-        return """
+    private SqlQuery buildExactNegationAnyFieldQuery(String operator, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
@@ -408,9 +436,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                         WHERE (
                             (%s.%s != '%s')
                             AND (
-                                ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                                ((%s.%s %s ?) OR (%s.%s %s ?))
                                 OR
-                                ((%s.%s %s '%s') OR (%s.%s %s '%s'))
+                                ((%s.%s %s ?) OR (%s.%s %s ?))
                             )
                         )
                     )
@@ -426,14 +454,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
                 INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
                 INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, term,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator, term);
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
-    private String buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
-        return """
+    private SqlQuery buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
+        String cte = """
                 cte%d AS (
                     SELECT %s.%s
                     FROM %s AS %s
@@ -441,7 +474,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                         SELECT %s.%s
                         FROM %s AS %s
                         WHERE (
-                            (%s.%s != '%s') AND ((%s.%s %s '%s%s%s') OR (%s.%s %s '%s%s%s'))
+                            (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                         )
                     )
                 )
@@ -455,10 +488,13 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<String> {
                 INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
                 INNER_TABLE, FIELD_VALUE_LITERAL,
                 operator,
-                prefixSuffix, term, prefixSuffix,
                 INNER_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator,
-                prefixSuffix, term, prefixSuffix);
+                operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQuery node = new SqlQuery(cte, params);
+        nodes.add(node);
+        return new SqlQuery("cte" + cteCounter++);
     }
 
     private static void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
