@@ -134,6 +134,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         Objects.requireNonNull(childNode);
         int index = children.indexOf(childNode);
         if (index == -1) {
+            System.out.println("h");
             return Optional.empty();
         } else {
             return Optional.of(index);
