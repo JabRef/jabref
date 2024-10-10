@@ -250,22 +250,12 @@ public class DBMSProcessor {
         insertEntries(Collections.singletonList(bibEntry));
     }
 
-    /**
-     * Inserts the List of BibEntry into the shared database.
-     *
-     * @param bibEntries List of {@link BibEntry} to be inserted
-     */
     public void insertEntries(List<BibEntry> bibEntries) {
         assert bibEntries.stream().filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt() != -1).findAny().isEmpty();
         insertIntoEntryTable(bibEntries);
         insertIntoFieldTable(bibEntries);
     }
 
-    /**
-     * Inserts the given List of BibEntry into the ENTRY table.
-     *
-     * @param bibEntries List of {@link BibEntry} to be inserted
-     */
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         if (bibEntries.isEmpty()) {
             return;
