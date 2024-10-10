@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;

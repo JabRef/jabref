@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
