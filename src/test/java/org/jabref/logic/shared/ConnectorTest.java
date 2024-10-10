@@ -25,7 +25,7 @@ public class ConnectorTest implements AutoCloseable {
         postgres = EmbeddedPostgres.builder().start();
         String url = postgres.getJdbcUrl("postgres", "postgres");
         connection = DriverManager.getConnection(url, "postgres", "postgres");
-        return new DBMSConnection(connection);
+        return new DBMSConnection(connection, "postgres");
     }
 
     /**
