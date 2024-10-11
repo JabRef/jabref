@@ -11,7 +11,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -325,9 +324,7 @@ public class JabRefCLI {
         String importFormatsIntro = Localization.lang("Available import formats");
         String importFormatsList = "%s:%n%s%n".formatted(importFormatsIntro, alignStringTable(importFormats));
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                preferences,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class));
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences);
         List<Pair<String, String>> exportFormats = exporterFactory
                 .getExporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))

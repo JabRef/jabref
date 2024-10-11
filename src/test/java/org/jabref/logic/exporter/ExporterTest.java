@@ -42,10 +42,9 @@ public class ExporterTest {
         CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.getCustomEntryTypesRepository()).thenReturn(mock(BibEntryTypesManager.class));
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                preferences,
-                mock(BibEntryTypesManager.class));
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences);
 
         Collection<Object[]> result = new ArrayList<>();
         for (Exporter format : exporterFactory.getExporters()) {

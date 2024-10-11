@@ -258,7 +258,7 @@ public class ArgumentProcessor {
                         cliPreferences.getXmpPreferences(),
                         cliPreferences.getFilePreferences(),
                         cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                        Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                        cliPreferences.getCustomEntryTypesRepository(),
                         cliPreferences.getFieldPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         cli.isWriteXmpToPdf() || cli.isWriteMetadataToPdf(),
@@ -499,9 +499,7 @@ public class ArgumentProcessor {
                 LOGGER.debug("Finished export");
             } else {
                 // export new database
-                ExporterFactory exporterFactory = ExporterFactory.create(
-                        cliPreferences,
-                        Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
                     System.err.println(Localization.lang("Unknown export format %0", formatName));
@@ -679,9 +677,7 @@ public class ArgumentProcessor {
             List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(cliPreferences.getFilePreferences());
             System.out.println(Localization.lang("Exporting %0", data[0]));
-            ExporterFactory exporterFactory = ExporterFactory.create(
-                    cliPreferences,
-                    Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format %0", data[1]));
