@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
@@ -241,10 +240,6 @@ public class ArgumentProcessor {
 
         if (cli.isGenerateCitationKeys()) {
             regenerateCitationKeys(loaded);
-        }
-
-        if (cli.isAutomaticallySetFileLinks()) {
-            automaticallySetFileLinks(loaded);
         }
 
         if ((cli.isWriteXmpToPdf() && cli.isEmbedBibFileInPdf()) || (cli.isWriteMetadataToPdf() && (cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()))) {
@@ -726,24 +721,6 @@ public class ArgumentProcessor {
                     System.out.println(e.getMessage());
                 }
             }
-        }
-    }
-
-    private void automaticallySetFileLinks(List<ParserResult> loaded) {
-        for (ParserResult parserResult : loaded) {
-            BibDatabase database = parserResult.getDatabase();
-            LOGGER.info("Automatically setting file links for {}",
-                    parserResult.getDatabaseContext().getDatabasePath()
-                                .map(Path::getFileName)
-                                .map(Path::toString).orElse("UNKNOWN"));
-
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                    parserResult.getDatabaseContext(),
-                    guiPreferences.getExternalApplicationsPreferences(),
-                    cliPreferences.getFilePreferences(),
-                    cliPreferences.getAutoLinkPreferences());
-
-            util.linkAssociatedFiles(database.getEntries(), (linkedFile, bibEntry) -> bibEntry.addFile(linkedFile));
         }
     }
 
