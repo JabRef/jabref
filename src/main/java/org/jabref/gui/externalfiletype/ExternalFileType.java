@@ -4,6 +4,9 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+/**
+ * "Twin" interface: {@link org.jabref.logic.util.FileType}
+ */
 public interface ExternalFileType {
     String getName();
 
