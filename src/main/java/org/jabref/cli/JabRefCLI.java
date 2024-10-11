@@ -211,7 +211,7 @@ public class JabRefCLI {
                 .longOpt("importBibtex")
                 .desc("%s: '%s'".formatted(Localization.lang("Import BibTeX"), "-ib @article{entry}"))
                 .hasArg()
-                .argName("BIBTEXT_STRING")
+                .argName("BIBTEX_STRING")
                 .build());
 
         options.addOption(Option
