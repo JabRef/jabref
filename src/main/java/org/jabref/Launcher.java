@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.cli.JabRefCLI;
+import org.jabref.cli.CliOptions;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -112,7 +112,7 @@ public class Launcher {
                 JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
-                JabRefCLI.printUsage(preferences);
+                CliOptions.printUsage(preferences);
             }
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
@@ -132,8 +132,8 @@ public class Launcher {
         // argument parsing workflow to parse logging options .e.g. --debug
         boolean isDebugEnabled;
         try {
-            JabRefCLI jabRefCLI = new JabRefCLI(args);
-            isDebugEnabled = jabRefCLI.isDebugLogging();
+            CliOptions cliOptions = new CliOptions(args);
+            isDebugEnabled = cliOptions.isDebugLogging();
         } catch (ParseException e) {
             isDebugEnabled = false;
         }

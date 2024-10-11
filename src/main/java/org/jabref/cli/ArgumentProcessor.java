@@ -68,7 +68,7 @@ public class ArgumentProcessor {
 
     public enum Mode { INITIAL_START, REMOTE_START }
 
-    private final JabRefCLI cli;
+    private final CliOptions cli;
 
     private final Mode startupMode;
 
@@ -91,7 +91,7 @@ public class ArgumentProcessor {
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager)
             throws org.apache.commons.cli.ParseException {
-        this.cli = new JabRefCLI(args);
+        this.cli = new CliOptions(args);
         this.startupMode = startupMode;
         this.cliPreferences = cliPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -201,7 +201,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            JabRefCLI.printUsage(cliPreferences);
+            CliOptions.printUsage(cliPreferences);
             guiNeeded = false;
             return;
         }
@@ -477,7 +477,7 @@ public class ArgumentProcessor {
                         formatName = "bib";
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                                                   .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                                                   .concat(Localization.lang("Usage")).concat(": ") + CliOptions.getExportMatchesSyntax());
                     guiNeeded = false;
                     return false;
                 }
