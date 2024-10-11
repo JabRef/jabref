@@ -9,7 +9,7 @@ import org.jabref.gui.JabRefGUI;
 ///
 /// - Handle the command line arguments
 /// - Start the JavaFX application (if not in CLI mode)
-public class Launcher extends JabKit {
+public class Launcher {
 
     public static void main(String[] args) {
         Result result = JabKit.processArguments(args);
