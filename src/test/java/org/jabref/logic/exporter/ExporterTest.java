@@ -12,11 +12,9 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,15 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ExporterTest {
-
-    public BibDatabaseContext databaseContext;
-    public List<BibEntry> entries;
-
-    @BeforeEach
-    void setUp() {
-        databaseContext = new BibDatabaseContext();
-        entries = Collections.emptyList();
-    }
 
     private static Stream<Object[]> exportFormats() {
         CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -58,7 +47,7 @@ public class ExporterTest {
     void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
-        exportFormat.export(databaseContext, tmpFile, entries);
+        exportFormat.export(new BibDatabaseContext(), tmpFile, List.of());
         assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile));
     }
 
@@ -68,7 +57,7 @@ public class ExporterTest {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
-            exportFormat.export(null, tmpFile, entries);
+            exportFormat.export(null, tmpFile, List.of());
         });
     }
 }
