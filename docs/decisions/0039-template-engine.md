@@ -15,7 +15,7 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* It should support different formats, in case JabRef changes in the future. Also, AI features require just plain text manipulation.
+* Text output has to be supported.
 * It should have all necessary constructs from programming languages: loops, conditions, variables. It should support list or object (map) variables.
 * It should be fast. 
 * It should be possible to provide templates out of Strings (required by the AI feature)
