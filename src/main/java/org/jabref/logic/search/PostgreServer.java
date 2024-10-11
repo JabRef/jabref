@@ -6,6 +6,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.jabref.model.search.PostgreConstants;
+
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ public class PostgreServer {
         this.dataSource = embeddedPostgres.getPostgresDatabase();
         addTrigramExtension();
         createScheme();
+        addFunctions();
     }
 
     private void createScheme() {
@@ -56,6 +59,19 @@ public class PostgreServer {
             }
         } catch (SQLException e) {
             LOGGER.error("Could not add trigram extension to Postgres server", e);
+        }
+    }
+
+    private void addFunctions() {
+        try (Connection connection = getConnection()) {
+            if (connection != null) {
+                LOGGER.debug("Adding functions to Postgres server");
+                for (String function : PostgreConstants.POSTGRES_FUNCTIONS) {
+                    connection.createStatement().execute(function);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Could not add functions to Postgres server", e);
         }
     }
 

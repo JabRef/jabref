@@ -4,10 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javafx.util.Pair;
 
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
+import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -22,39 +29,55 @@ import org.slf4j.LoggerFactory;
 
 public class Highlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);
-    private final static String HIGHLIGHT_QUERY = """
-            SELECT
-            regexp_replace(
-                ?,
-                ?,
-                '<mark style="background: orange">\\1</mark>',
-                'gi'
-            )
-            """;
+
+    /**
+     * Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
+     */
+    private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
+    private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;
 
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
-        if (!searchQuery.isValid()) {
+        Optional<String> searchTerms = getSearchTerms(searchQuery);
+        if (searchTerms.isEmpty()) {
             return htmlText;
         }
 
-        LOGGER.debug("Highlighting search terms in text: {}", searchQuery);
-        Set<String> terms = SearchQueryConversion.extractSearchTerms(searchQuery);
-        if (terms.isEmpty()) {
-            return htmlText;
-        }
-
-        String joinedTerms = String.join("|", terms);
         Document document = Jsoup.parse(htmlText);
         try {
-            highlightTextNodes(document.body(), joinedTerms);
-            String highlightedHtml = document.outerHtml();
-            LOGGER.debug("Highlighted HTML: {}", highlightedHtml);
-            return highlightedHtml;
+            highlightTextNodes(document.body(), searchTerms.get());
+            return document.outerHtml();
         } catch (InvalidTokenOffsetsException e) {
             LOGGER.debug("Error highlighting search terms in HTML", e);
             return htmlText;
         }
+    }
+
+    public static List<Pair<Integer, Integer>> getMatchPositions(String text, SearchQuery searchQuery) {
+        Optional<String> searchTerms = getSearchTerms(searchQuery);
+        if (searchTerms.isEmpty()) {
+            return List.of();
+        }
+
+        if (connection == null) {
+            connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_POSITIONS)) {
+            preparedStatement.setString(1, text);
+            preparedStatement.setString(2, searchTerms.get());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Pair<Integer, Integer>> positions = new ArrayList<>();
+                while (resultSet.next()) {
+                    positions.add(new Pair<>(resultSet.getInt(1), resultSet.getInt(2)));
+                }
+                return positions;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Error getting match positions in text", e);
+        }
+        return List.of();
     }
 
     private static void highlightTextNodes(Element element, String searchTerms) throws InvalidTokenOffsetsException {
@@ -74,9 +97,9 @@ public class Highlighter {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(HIGHLIGHT_QUERY)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_MARK)) {
             preparedStatement.setString(1, text);
-            preparedStatement.setString(2, '(' + searchTerms + ')');
+            preparedStatement.setString(2, searchTerms);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -87,5 +110,19 @@ public class Highlighter {
             LOGGER.error("Error highlighting search terms in text", e);
         }
         return text;
+    }
+
+    private static Optional<String> getSearchTerms(SearchQuery searchQuery) {
+        if (!searchQuery.isValid()) {
+            return Optional.empty();
+        }
+
+        Set<String> terms = SearchQueryConversion.extractSearchTerms(searchQuery);
+        if (terms.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(terms.stream()
+                                .collect(Collectors.joining(")|(", "(", ")")));
     }
 }

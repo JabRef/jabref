@@ -3,11 +3,9 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -19,6 +17,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
+import javafx.util.Pair;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
@@ -43,6 +42,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.search.retrieval.Highlighter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -73,29 +73,10 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private Map<Field, BibEntryWriter.FieldPosition> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
-
-    private class EditAction extends SimpleCommand {
-
-        private final StandardActions command;
-
-        public EditAction(StandardActions command) {
-            this.command = command;
-        }
-
-        @Override
-        public void execute() {
-            switch (command) {
-                case COPY -> codeArea.copy();
-                case CUT -> codeArea.cut();
-                case PASTE -> codeArea.paste();
-                case SELECT_ALL -> codeArea.selectAll();
-            }
-            codeArea.requestFocus();
-        }
-    }
 
     public SourceTab(BibDatabaseContext bibDatabaseContext,
                      CountingUndoManager undoManager,
@@ -117,21 +98,20 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
-
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> {
-            // TODO: get search pattern from the search query
-            highlightSearchPattern();
-        });
+        this.searchQueryProperty = searchQueryProperty;
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
     }
 
     private void highlightSearchPattern() {
         if (codeArea != null) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            if (searchHighlightPattern.isPresent()) {
-                Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
-                while (matcher.find()) {
-                    for (int i = 0; i <= matcher.groupCount(); i++) {
-                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+            if (searchQueryProperty.get().isPresent()) {
+                for (BibEntryWriter.FieldPosition fieldPosition : fieldPositions.values()) {
+                    int start = fieldPosition.start();
+                    int end = fieldPosition.end();
+                    List<Pair<Integer, Integer>> matchedPositions = Highlighter.getMatchPositions(codeArea.getText(start, end), searchQueryProperty.get().get());
+                    for (Pair<Integer, Integer> pair : matchedPositions) {
+                        codeArea.setStyleClass(start + pair.getKey(), start + pair.getValue(), "search");
                     }
                 }
             }
@@ -144,10 +124,8 @@ public class SourceTab extends EntryEditorTab {
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
         bibEntryWriter.write(entry, bibWriter, type, true);
+        fieldPositions = bibEntryWriter.getFieldPositions();
         String sourceString = writer.toString();
-        bibEntryWriter.getFieldPositions().forEach((field, position) -> {
-            System.out.printf("Field: %s, value: %s\n", field.getName(), sourceString.substring(position.start(), position.end()));
-        });
         writer.close();
         return sourceString;
     }
@@ -239,7 +217,12 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
+                String sourceText = getSourceString(currentEntry, mode, fieldPreferences);
+                LOGGER.info("sourceText length: {}", sourceText.length());
+                LOGGER.info("sourceText: {}", sourceText);
+                codeArea.appendText(sourceText);
+                LOGGER.info("codeArea length: {}", codeArea.getLength());
+                LOGGER.info("codeArea: {}", codeArea.getText());
                 codeArea.setEditable(true);
                 highlightSearchPattern();
             } catch (IOException ex) {
@@ -344,12 +327,30 @@ public class SourceTab extends EntryEditorTab {
 
     private void listenForSaveKeybinding(KeyEvent event) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
-
             switch (binding) {
-                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS -> {
-                    storeSource(currentEntry, codeArea.textProperty().getValue());
-                }
+                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS ->
+                        storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
+    }
+
+    private class EditAction extends SimpleCommand {
+
+        private final StandardActions command;
+
+        public EditAction(StandardActions command) {
+            this.command = command;
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case COPY -> codeArea.copy();
+                case CUT -> codeArea.cut();
+                case PASTE -> codeArea.paste();
+                case SELECT_ALL -> codeArea.selectAll();
+            }
+            codeArea.requestFocus();
+        }
     }
 }
