@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
@@ -74,7 +73,6 @@ public class ArgumentProcessor {
     private final Mode startupMode;
 
     private final CliPreferences cliPreferences;
-    private final GuiPreferences guiPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -90,14 +88,12 @@ public class ArgumentProcessor {
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              CliPreferences cliPreferences,
-                             GuiPreferences guiPreferences,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager)
             throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.cliPreferences = cliPreferences;
-        this.guiPreferences = guiPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
     }
