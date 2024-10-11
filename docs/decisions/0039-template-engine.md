@@ -43,7 +43,7 @@ Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>
 * Good, because it is possible to use `String` as a template.
 * Good, because it is minimalistic.
 * Bad, because {argument d}
-* Bad, because not in active development (but support is still available).
+* Bad, because it is in maintenance mode.
 
 ### Apache FreeMarker
 
