@@ -142,8 +142,14 @@ public class SourceTab extends EntryEditorTab {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
-        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
-        return writer.toString();
+        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+        bibEntryWriter.write(entry, bibWriter, type, true);
+        String sourceString = writer.toString();
+        bibEntryWriter.getFieldPositions().forEach((field, position) -> {
+            System.out.printf("Field: %s, value: %s\n", field.getName(), sourceString.substring(position.start(), position.end()));
+        });
+        writer.close();
+        return sourceString;
     }
 
     /* Work around for different input methods.

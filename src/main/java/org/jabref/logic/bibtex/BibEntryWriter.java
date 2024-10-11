@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -33,6 +35,7 @@ public class BibEntryWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
 
+    private final Map<Field, FieldPosition> fieldPositions = new HashMap<>();
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
 
@@ -90,10 +93,7 @@ public class BibEntryWriter {
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, BibWriter out,
                                                                BibDatabaseMode bibDatabaseMode) throws IOException {
-        // Write header with type and bibtex-key
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
-        out.write('@' + typedEntry.getTypeForDisplay() + '{');
-
+        writeEntryType(entry, out, bibDatabaseMode);
         writeKeyField(entry, out);
 
         Set<Field> written = new HashSet<>();
@@ -141,9 +141,20 @@ public class BibEntryWriter {
         out.writeLine("}");
     }
 
+    private void writeEntryType(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
+        int start = out.getCurrentPosition();
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
+        out.write('@' + typedEntry.getTypeForDisplay() + '{');
+        int end = out.getCurrentPosition() - 1; // exclude the '{'
+        fieldPositions.put(InternalField.TYPE_HEADER, new FieldPosition(start, end));
+    }
+
     private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
+        int start = out.getCurrentPosition();
         String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
         out.writeLine(keyField + ',');
+        int end = out.getCurrentPosition() - 1; // exclude the ','
+        fieldPositions.put(InternalField.KEY_FIELD, new FieldPosition(start, end));
     }
 
     /**
@@ -162,9 +173,12 @@ public class BibEntryWriter {
             out.write("  ");
             out.write(getFormattedFieldName(field, indent));
             try {
+                int start = out.getCurrentPosition();
                 out.write(fieldWriter.write(field, value.get()));
+                int end = out.getCurrentPosition();
+                fieldPositions.put(field, new FieldPosition(start, end));
             } catch (InvalidFieldValueException ex) {
-                LOGGER.warn("Invalid field value {} of field {} of entry {]", value.get(), field, entry.getCitationKey().orElse(""), ex);
+                LOGGER.warn("Invalid field value {} of field {} of entry {}", value.get(), field, entry.getCitationKey().orElse(""), ex);
                 throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
             }
             out.writeLine(",");
@@ -196,5 +210,12 @@ public class BibEntryWriter {
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
         return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
+    }
+
+    public Map<Field, FieldPosition> getFieldPositions() {
+        return fieldPositions;
+    }
+
+    public record FieldPosition(int start, int end) {
     }
 }
