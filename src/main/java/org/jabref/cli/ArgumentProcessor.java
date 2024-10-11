@@ -300,7 +300,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdf(List<ParserResult> loaded,
+    private static void writeMetadataToPdf(List<ParserResult> loaded,
                                     String filesAndCiteKeys,
                                     XmpPreferences xmpPreferences,
                                     FilePreferences filePreferences,
@@ -366,7 +366,7 @@ public class ArgumentProcessor {
                 embeddBibfile);
     }
 
-    private void writeMetadataToPDFsOfEntry(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPDFsOfEntry(BibDatabaseContext databaseContext,
                                             String citeKey,
                                             BibEntry entry,
                                             FilePreferences filePreferences,
@@ -395,7 +395,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
                                              List<String> citeKeys,
                                              FilePreferences filePreferences,
                                              XmpPdfExporter xmpPdfExporter,
@@ -415,7 +415,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
                                                List<String> pdfs,
                                                FilePreferences filePreferences,
                                                XmpPdfExporter xmpPdfExporter,
