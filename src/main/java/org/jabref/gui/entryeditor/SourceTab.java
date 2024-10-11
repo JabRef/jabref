@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -17,7 +18,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Pair;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
@@ -41,7 +41,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.search.retrieval.Highlighter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,6 +50,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.Range;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -74,7 +74,7 @@ public class SourceTab extends EntryEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
-    private Map<Field, BibEntryWriter.FieldPosition> fieldPositions;
+    private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
 
@@ -106,12 +106,16 @@ public class SourceTab extends EntryEditorTab {
         if (codeArea != null) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
             if (searchQueryProperty.get().isPresent()) {
-                for (BibEntryWriter.FieldPosition fieldPosition : fieldPositions.values()) {
-                    int start = fieldPosition.start();
-                    int end = fieldPosition.end();
-                    List<Pair<Integer, Integer>> matchedPositions = Highlighter.getMatchPositions(codeArea.getText(start, end), searchQueryProperty.get().get());
-                    for (Pair<Integer, Integer> pair : matchedPositions) {
-                        codeArea.setStyleClass(start + pair.getKey(), start + pair.getValue(), "search");
+                Optional<String> searchPattern = Highlighter.getSearchTermsPattern(searchQueryProperty.get().get());
+                if (searchPattern.isPresent()) {
+                    LOGGER.debug("Highlighting search pattern {}", searchPattern.get());
+                    for (Range fieldPosition : fieldPositions.values()) {
+                        int start = fieldPosition.start();
+                        int end = fieldPosition.end();
+                        List<Range> matchedPositions = Highlighter.getMatchPositions(codeArea.getText(start, end), searchPattern.get());
+                        for (Range range: matchedPositions) {
+                            codeArea.setStyleClass(start + range.start() - 1, start + range.end(), "search");
+                        }
                     }
                 }
             }
@@ -120,7 +124,7 @@ public class SourceTab extends EntryEditorTab {
 
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(writer, "\n");
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
         bibEntryWriter.write(entry, bibWriter, type, true);
@@ -217,12 +221,7 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                String sourceText = getSourceString(currentEntry, mode, fieldPreferences);
-                LOGGER.info("sourceText length: {}", sourceText.length());
-                LOGGER.info("sourceText: {}", sourceText);
-                codeArea.appendText(sourceText);
-                LOGGER.info("codeArea length: {}", codeArea.getLength());
-                LOGGER.info("codeArea: {}", codeArea.getText());
+                codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
                 highlightSearchPattern();
             } catch (IOException ex) {

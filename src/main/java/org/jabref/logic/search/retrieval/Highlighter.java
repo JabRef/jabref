@@ -10,12 +10,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javafx.util.Pair;
-
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.util.Range;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
@@ -38,7 +37,7 @@ public class Highlighter {
     private static Connection connection;
 
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
-        Optional<String> searchTerms = getSearchTerms(searchQuery);
+        Optional<String> searchTerms = getSearchTermsPattern(searchQuery);
         if (searchTerms.isEmpty()) {
             return htmlText;
         }
@@ -53,24 +52,19 @@ public class Highlighter {
         }
     }
 
-    public static List<Pair<Integer, Integer>> getMatchPositions(String text, SearchQuery searchQuery) {
-        Optional<String> searchTerms = getSearchTerms(searchQuery);
-        if (searchTerms.isEmpty()) {
-            return List.of();
-        }
-
+    public static List<Range> getMatchPositions(String text, String pattern) {
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_POSITIONS)) {
             preparedStatement.setString(1, text);
-            preparedStatement.setString(2, searchTerms.get());
+            preparedStatement.setString(2, pattern);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                List<Pair<Integer, Integer>> positions = new ArrayList<>();
+                List<Range> positions = new ArrayList<>();
                 while (resultSet.next()) {
-                    positions.add(new Pair<>(resultSet.getInt(1), resultSet.getInt(2)));
+                    positions.add(new Range(resultSet.getInt(1), resultSet.getInt(2)));
                 }
                 return positions;
             }
@@ -112,7 +106,7 @@ public class Highlighter {
         return text;
     }
 
-    private static Optional<String> getSearchTerms(SearchQuery searchQuery) {
+    public static Optional<String> getSearchTermsPattern(SearchQuery searchQuery) {
         if (!searchQuery.isValid()) {
             return Optional.empty();
         }

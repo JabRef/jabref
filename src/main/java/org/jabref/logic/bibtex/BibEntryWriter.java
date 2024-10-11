@@ -27,6 +27,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.Range;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class BibEntryWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
 
-    private final Map<Field, FieldPosition> fieldPositions = new HashMap<>();
+    private final Map<Field, Range> fieldPositions = new HashMap<>();
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
 
@@ -146,7 +147,7 @@ public class BibEntryWriter {
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
         out.write('@' + typedEntry.getTypeForDisplay() + '{');
         int end = out.getCurrentPosition() - 1; // exclude the '{'
-        fieldPositions.put(InternalField.TYPE_HEADER, new FieldPosition(start, end));
+        fieldPositions.put(InternalField.TYPE_HEADER, new Range(start, end));
     }
 
     private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
@@ -154,7 +155,7 @@ public class BibEntryWriter {
         String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
         out.writeLine(keyField + ',');
         int end = out.getCurrentPosition() - 1; // exclude the ','
-        fieldPositions.put(InternalField.KEY_FIELD, new FieldPosition(start, end));
+        fieldPositions.put(InternalField.KEY_FIELD, new Range(start, end));
     }
 
     /**
@@ -176,7 +177,7 @@ public class BibEntryWriter {
                 int start = out.getCurrentPosition();
                 out.write(fieldWriter.write(field, value.get()));
                 int end = out.getCurrentPosition();
-                fieldPositions.put(field, new FieldPosition(start, end));
+                fieldPositions.put(field, new Range(start, end));
             } catch (InvalidFieldValueException ex) {
                 LOGGER.warn("Invalid field value {} of field {} of entry {}", value.get(), field, entry.getCitationKey().orElse(""), ex);
                 throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
@@ -212,10 +213,7 @@ public class BibEntryWriter {
         return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
     }
 
-    public Map<Field, FieldPosition> getFieldPositions() {
+    public Map<Field, Range> getFieldPositions() {
         return fieldPositions;
-    }
-
-    public record FieldPosition(int start, int end) {
     }
 }
