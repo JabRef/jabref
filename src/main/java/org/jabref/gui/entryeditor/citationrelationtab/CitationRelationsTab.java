@@ -238,6 +238,13 @@ public class CitationRelationsTab extends EntryEditorTab {
                             libraryTab.clearAndSelect(entry.localEntry());
                         });
                         vContainer.getChildren().add(jumpTo);
+
+                        Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
+                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
+                        compareButton.setOnMouseClicked(event -> {
+                            openDuplicateEntriesWindow(entry);
+                        });
+                        vContainer.getChildren().add(compareButton);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -503,5 +510,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
 
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
+    }
+
+    /**
+     * Function to open possible duplicate entries window to compare duplicate entries
+     *
+     */
+    private void openDuplicateEntriesWindow(CitationRelationItem duplicateItem) {
+        // TODO：
+        BibEntry localEntry = duplicateItem.localEntry();
+        BibEntry duplicateEntry = duplicateItem.entry();
     }
 }
