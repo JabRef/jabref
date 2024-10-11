@@ -72,7 +72,7 @@ public class EditorMenus {
     /**
      * The default context menu with a specific menu item to cleanup URL.
      *
-     * @param textField text-area that this menu will be connected to
+     * @param textField text field that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL
      */
     public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextField textField) {
