@@ -17,7 +17,8 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 * It should support different formats, in case JabRef changes in the future. Also, AI features require just plain text manipulation.
 * It should have all necessary constructs from programming languages: loops, conditions, variables. It should support list or object (map) variables.
-* It should be embeddable and small. AI features require that templates could be generated out of simple `String` type.
+* It should be fast. 
+* It should be possible to provide templates out of Strings (required by the AI feature)
 
 ## Considered Options
 
