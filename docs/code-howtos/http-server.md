@@ -75,4 +75,3 @@ Note: If you do not do this, you get following error message:
 ```text
 Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
 ```
-
