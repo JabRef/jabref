@@ -14,7 +14,6 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -339,8 +338,7 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        return "JabRef %s".formatted(buildInfo.version);
+        return "JabRef %s".formatted(new BuildInfo().version);
     }
 
     public List<String> getLeftOver() {
