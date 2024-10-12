@@ -15,8 +15,9 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* It should support different formats, in case JabRef changes in the future. Also, AI features require just plain text manipulation.
-* It should be embeddable and small. AI features require that templates could be generated out of simple `String` type.
+* Text output has to be supported.
+* It should be fast. 
+* It should be possible to provide templates out of Strings (required by the AI feature)
 
 ## Considered Options
 
@@ -41,7 +42,7 @@ Chosen option: "{title of option 1}", because
 * Good, because it is possible to use `String` as a template.
 * Good, because it has simple syntax.
 * Bad, because {argument d}
-* Bad, because not in active development (but support is still available).
+* Bad, because it is in maintenance mode.
 
 ### Apache FreeMarker
 
