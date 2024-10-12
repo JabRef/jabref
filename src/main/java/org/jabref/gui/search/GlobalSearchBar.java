@@ -82,10 +82,12 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass ILLEGAL_SEARCH = PseudoClass.getPseudoClass("illegal-search");
 
     private final CustomTextField searchField;
-    private final ToggleButton fulltextButton;
     private final Button openGlobalSearchButton;
+    private final ToggleButton fulltextButton;
     private final ToggleButton keepSearchString;
     private final ToggleButton filterModeButton;
+    private final ToggleButton regexButton;
+    private final ToggleButton caseSensitiveButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
     private final GuiPreferences preferences;
@@ -143,7 +145,7 @@ public class GlobalSearchBar extends HBox {
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
-        updateHintVisibility();
+        setSearchBarHint();
 
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
@@ -166,6 +168,8 @@ public class GlobalSearchBar extends HBox {
             searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
         });
 
+        regexButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
+        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
@@ -174,11 +178,17 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
+                                                    .or(regexButton.focusedProperty())
+                                                    .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(filterModeButton.focusedProperty())
                                                     .or(searchField.textProperty().isNotEmpty());
 
+        regexButton.visibleProperty().unbind();
+        regexButton.visibleProperty().bind(focusedOrActive);
+        caseSensitiveButton.visibleProperty().unbind();
+        caseSensitiveButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
         keepSearchString.visibleProperty().unbind();
@@ -188,10 +198,11 @@ public class GlobalSearchBar extends HBox {
 
         StackPane modifierButtons;
         if (searchType == SearchType.NORMAL_SEARCH) {
-            modifierButtons = new StackPane(new HBox(fulltextButton, keepSearchString, filterModeButton));
+            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton, keepSearchString, filterModeButton));
         } else {
-            modifierButtons = new StackPane(new HBox(fulltextButton));
+            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton));
         }
+
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("global-search-bar");
@@ -263,6 +274,24 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
+        regexButton.setSelected(searchPreferences.isRegularExpression());
+        regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression\nThis only affects unfielded terms. For using RegEx in a fielded term, use =~ operator")));
+        initSearchModifierButton(regexButton);
+        regexButton.setOnAction(event -> {
+            searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());
+            searchField.requestFocus();
+            updateSearchQuery();
+        });
+
+        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
+        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive\nThis only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator")));
+        initSearchModifierButton(caseSensitiveButton);
+        caseSensitiveButton.setOnAction(event -> {
+            searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
+            searchField.requestFocus();
+            updateSearchQuery();
+        });
+
         keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
@@ -284,7 +313,11 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());
 
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> fulltextButton.setSelected(searchPreferences.isFulltext()));
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> {
+            regexButton.setSelected(searchPreferences.isRegularExpression());
+            caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
+            fulltextButton.setSelected(searchPreferences.isFulltext());
+        });
     }
 
     public void openGlobalSearchDialog() {
@@ -367,9 +400,9 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    public void updateHintVisibility() {
+    public void setSearchBarHint() {
         if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith AND title:electrical</tt>");
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author= Smith AND title= electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
             TextFlow emptyHintTooltip = new TextFlow();
