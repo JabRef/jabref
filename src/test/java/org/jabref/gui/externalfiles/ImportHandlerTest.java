@@ -14,7 +14,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -226,7 +225,7 @@ class ImportHandlerTest {
     }
 
     @Test
-    void testCheckCrossRefKeys() {
+    void checkCrossRefKeys() {
         BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
 
         BibEntry childEntry = new BibEntry();

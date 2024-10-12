@@ -309,7 +309,7 @@ public class ImportHandler {
                 Optional<String> crossRef = entry.getField(StandardField.CROSSREF);
                 Optional<String> childYear = entry.getField(StandardField.YEAR);
                 Optional<String> parentKey = possibleParentEntry.getCitationKey();
-                if (crossRef.isPresent() && crossRef.equals(parentKey) && !childYear.isPresent()) {
+                if (crossRef.isPresent() && crossRef.equals(parentKey) && childYear.isEmpty()) {
                     Optional<String> parentYear = possibleParentEntry.getField(StandardField.YEAR);
                     parentYear.ifPresent(year -> {
                         String existingKey = entry.getCitationKey().orElse("");
