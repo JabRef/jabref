@@ -148,11 +148,11 @@ public class MainMenu extends MenuBar {
         Menu help = new Menu(Localization.lang("Help"));
 
         MenuItem saveAllMenuItem = factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService));
-        MenuItem newEntryFromPlainTextMenuItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService));
-
         saveAllMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
-        newEntryFromPlainTextMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
 
+        MenuItem newEntryFromPlainTextMenuItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService));
+        newEntryFromPlainTextMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
+        
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
