@@ -24,7 +24,7 @@ jobs:
 
           Newcomers, we're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
 
-          We request you to adhere to the project's code of conduct and go through the mandatory checks mentioned when you submit a PR once you have solved the issue.
+          We request you to go through the mandatory checks listed when you submit a pull request once you have solved the issue.
 
           In case you encounter failing tests during development, please check our [developer FAQs](https://devdocs.jabref.org/code-howtos/faq.html)!
 
