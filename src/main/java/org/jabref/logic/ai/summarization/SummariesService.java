@@ -138,7 +138,7 @@ public class SummariesService {
     private void startSummarizationTask(BibEntry entry, BibDatabaseContext bibDatabaseContext, ProcessingInfo<BibEntry, Summary> processingInfo) {
         processingInfo.setState(ProcessingState.PROCESSING);
 
-        new GenerateSummaryTask(entry, bibDatabaseContext, summariesStorage, chatLanguageModel, shutdownSignal, aiPreferences, filePreferences)
+        new GenerateSummaryTask(entry, bibDatabaseContext, summariesStorage, chatLanguageModel, templatesService, shutdownSignal, aiPreferences, filePreferences)
                 .onSuccess(processingInfo::setSuccess)
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
@@ -147,7 +147,7 @@ public class SummariesService {
     private void startSummarizationTask(StringProperty groupName, List<ProcessingInfo<BibEntry, Summary>> entries, BibDatabaseContext bibDatabaseContext) {
         entries.forEach(processingInfo -> processingInfo.setState(ProcessingState.PROCESSING));
 
-        new GenerateSummaryForSeveralTask(groupName, entries, bibDatabaseContext, summariesStorage, chatLanguageModel, shutdownSignal, aiPreferences, filePreferences, taskExecutor)
+        new GenerateSummaryForSeveralTask(groupName, entries, bibDatabaseContext, summariesStorage, chatLanguageModel, templatesService, shutdownSignal, aiPreferences, filePreferences, taskExecutor)
                 .executeWith(taskExecutor);
     }
 
