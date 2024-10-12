@@ -303,6 +303,25 @@ public class ImportHandler {
         }
     }
 
+    public void checkCrossRefKeys(List<BibEntry> entries) {
+        for (BibEntry possibleParentEntry : entries) {
+            for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
+                Optional<String> crossRef = entry.getField(StandardField.CROSSREF);
+                Optional<String> childYear = entry.getField(StandardField.YEAR);
+                Optional<String> parentKey = possibleParentEntry.getCitationKey();
+                if (crossRef.isPresent() && crossRef.equals(parentKey) && !childYear.isPresent()) {
+                    Optional<String> parentYear = possibleParentEntry.getField(StandardField.YEAR);
+                    parentYear.ifPresent(year -> {
+                        String existingKey = entry.getCitationKey().orElse("");
+                        String newKey = existingKey+year;
+                        // retroactively set citation key to match parent's year
+                        entry.setCitationKey(newKey);
+                    });
+                }
+            }
+        }
+    }
+
     /**
      * Generate keys for given entries.
      *
@@ -318,6 +337,7 @@ public class ImportHandler {
                 bibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
+        checkCrossRefKeys(entries);
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {

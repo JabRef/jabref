@@ -14,6 +14,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -222,5 +223,29 @@ class ImportHandlerTest {
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+    }
+
+    @Test
+    void testCheckCrossRefKeys() {
+        BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
+
+        BibEntry childEntry = new BibEntry();
+        childEntry.setField(StandardField.CROSSREF, "ParentKey");
+        childEntry.setCitationKey("ChildKey");
+
+        bibDatabase.insertEntry(childEntry);
+
+        assertEquals("ChildKey", childEntry.getCitationKey().orElse(""));
+
+        BibEntry parentEntry = new BibEntry();
+        parentEntry.setCitationKey("ParentKey");
+        parentEntry.setField(StandardField.YEAR, "2021");
+
+        bibDatabase.insertEntry(parentEntry);
+
+        importHandler.checkCrossRefKeys(List.of(parentEntry));
+
+        // The child entry's citation key should now be updated with the parent's year
+        assertEquals("ChildKey2021", childEntry.getCitationKey().orElse(""));
     }
 }
