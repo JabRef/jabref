@@ -59,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 
 ### Fixed
+
 - We fixed an issue where certain actions were not disabled when no libraries were open. [#19129](https://github.com/JabRef/jabref/issues/11923)
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
