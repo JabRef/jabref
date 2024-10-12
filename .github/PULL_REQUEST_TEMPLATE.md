@@ -16,7 +16,7 @@ Don't reference an issue in the PR title because GitHub does not support auto-li
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
-- [ ] The PR contains no or minimal AI-generated code. If any present, it is trivial and I fully understand it
+- [ ] The PR contains no or minimal AI-generated code (If any present, it is trivial and I fully understand it)
 - [ ] Screenshots added in PR description (for UI changes)
 - [ ] [Checked developer's documentation](https://devdocs.jabref.org/): Is the information available and up to date? If not, I outlined it in this pull request.
 - [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request to the documentation repository.
