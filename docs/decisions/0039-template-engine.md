@@ -16,7 +16,6 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 ## Decision Drivers
 
 * It should support different formats, in case JabRef changes in the future. Also, AI features require just plain text manipulation.
-* It should have all necessary constructs from programming languages: loops, conditions, variables. It should support list or object (map) variables.
 * It should be embeddable and small. AI features require that templates could be generated out of simple `String` type.
 
 ## Considered Options
@@ -34,21 +33,21 @@ Chosen option: "{title of option 1}", because
 
 ### Apache Velocity
 
-Main page: <https://velocity.apache.org/>.
-User guide: <https://velocity.apache.org/engine/devel/user-guide.html>.
-Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
+- Main page: <https://velocity.apache.org/>.
+- User guide: <https://velocity.apache.org/engine/devel/user-guide.html>.
+- Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
-* Good, because it is minimalistic.
+* Good, because it has simple syntax.
 * Bad, because {argument d}
 * Bad, because not in active development (but support is still available).
 
 ### Apache FreeMarker
 
-Main page: <https://freemarker.apache.org/index.html>.
-User guide: <https://freemarker.apache.org/docs/dgui.html>.
-Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
+- Main page: <https://freemarker.apache.org/index.html>.
+- User guide: <https://freemarker.apache.org/docs/dgui.html>.
+- Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
@@ -59,8 +58,8 @@ Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
 
 ### Thymeleaf
 
-Main page: <https://www.thymeleaf.org/>.
-Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
+- Main page: <https://www.thymeleaf.org/>.
+- Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
@@ -72,3 +71,5 @@ Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>
 ## More Information
 
 As stated in [the template discussion issue](https://github.com/koppor/jabref/issues/392), we should choose a template engine, and then slowly migrate previous code and templates to the chosen engine.
+
+<!-- markdownlint-disable-file MD004 -->
