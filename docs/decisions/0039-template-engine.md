@@ -15,9 +15,9 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* Text output has to be supported.
 * It should be fast. 
-* It should be possible to provide templates out of Strings (required by the AI feature)
+* It should be possible to provide templates out of Strings (required by the AI feature).
+* It should have short and understandable syntax. Especially. Work with unset fields and empty Optionals should be easy.
 
 ## Considered Options
 
@@ -38,6 +38,16 @@ Chosen option: "{title of option 1}", because
 - User guide: <https://velocity.apache.org/engine/devel/user-guide.html>.
 - Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
 
+Example:
+```text
+You are an AI assistant that analyses research papers. You answer questions about papers.
+
+Here are the papers you are analyzing:
+#foreach( $entry in $entries )
+${CanonicalBibEntry.getCanonicalRepresentation($entry)}
+#end
+```
+
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
 * Good, because it has simple syntax.
@@ -50,6 +60,15 @@ Chosen option: "{title of option 1}", because
 - User guide: <https://freemarker.apache.org/docs/dgui.html>.
 - Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
 
+```text
+You are an AI assistant that analyzes research papers. You answer questions about papers.
+
+Here are the papers you are analyzing:
+<#list entries as entry>
+${CanonicalBibEntry.getCanonicalRepresentation(entry)}
+</#list>
+```
+
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
 * Good, because in active development.
@@ -61,6 +80,18 @@ Chosen option: "{title of option 1}", because
 
 - Main page: <https://www.thymeleaf.org/>.
 - Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
+
+Example (not related to AI):
+```text
+Dear [(${customer.name})],
+
+This is the list of our products:
+[# th:each="p : ${products}"]
+   - [(${p.name})]. Price: [(${#numbers.formatdecimal(p.price,1,2)})] EUR/kg
+[/]
+Thanks,
+  The Thymeleaf Shop
+```
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
