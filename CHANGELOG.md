@@ -60,7 +60,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where certain actions were not disabled when no libraries were open. [#19129](https://github.com/JabRef/jabref/issues/11923)
+- We fixed an issue where certain actions were not disabled when no libraries were open. [#19123](https://github.com/JabRef/jabref/issues/11923)
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
 - We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
