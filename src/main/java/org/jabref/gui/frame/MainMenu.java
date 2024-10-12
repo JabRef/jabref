@@ -84,8 +84,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.util.FileUpdateMonitor;
-import javafx.beans.binding.Bindings;
-import javafx.scene.control.MenuItem;
 
 public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
