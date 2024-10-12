@@ -57,9 +57,9 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         String right = context.right.getText();
 
         Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
-        EnumSet<SearchFlags> termFlags = EnumSet.noneOf(SearchFlags.class);
 
         if (fieldDescriptor.isPresent()) {
+            EnumSet<SearchFlags> termFlags = EnumSet.noneOf(SearchFlags.class);
             String field = fieldDescriptor.get().getText();
 
             termFlags.add(isCaseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);
@@ -78,13 +78,8 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
             }
             return getFieldQueryNode(field, right, termFlags);
         } else {
-            termFlags.add(isCaseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);
-            if (isRegularExpression) {
-                termFlags.add(REGULAR_EXPRESSION);
-            } else {
-                termFlags.add(INEXACT_MATCH);
-            }
-            return getFieldQueryNode("any", right, termFlags);
+            // Unfielded term, do nothing, the search flags will be used for unfielded search
+            return right;
         }
     }
 

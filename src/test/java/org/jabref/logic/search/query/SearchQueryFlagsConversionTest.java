@@ -18,10 +18,10 @@ class SearchQueryFlagsConversionTest {
         return Stream.of(
                 createTestCases(
                         "Term",
-                        "any = Term",
-                        "any =! Term",
-                        "any =~ Term",
-                        "any =~! Term"
+                        "Term",
+                        "Term",
+                        "Term",
+                        "Term"
                 ),
 
                 createTestCases(
@@ -65,10 +65,10 @@ class SearchQueryFlagsConversionTest {
 
                 createTestCases(
                         "(title = \"Tem\" AND author != Alex) OR term",
-                        "(title = \"Tem\" AND author != Alex) OR any = term",
-                        "(title =! \"Tem\" AND author !=! Alex) OR any =! term",
-                        "(title =~ \"Tem\" AND author !=~ Alex) OR any =~ term",
-                        "(title =~! \"Tem\" AND author !=~! Alex) OR any =~! term"
+                        "(title = \"Tem\" AND author != Alex) OR term",
+                        "(title =! \"Tem\" AND author !=! Alex) OR term",
+                        "(title =~ \"Tem\" AND author !=~ Alex) OR term",
+                        "(title =~! \"Tem\" AND author !=~! Alex) OR term"
                 )
         ).flatMap(stream -> stream);
     }
