@@ -55,6 +55,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
+    private boolean justImported = false;
+
     public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -104,6 +106,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                          try {
                              preferences.importPreferences(file);
                              setValues();
+                             justImported = true;
 
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
@@ -171,6 +174,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     public void storeAllSettings() {
         if (!validSettings()) {
+            return;
+        }
+
+        if (justImported) {
+            dialogService.notify(Localization.lang("Preferences were just imported. No additional changes to save."));
+            justImported = false;
             return;
         }
 
