@@ -1,27 +1,23 @@
 package org.jabref.logic.externalfiles;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
-
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 class LinkedFileHandlerTest {
     private Path tempFolder;
     private Path tempFile;
@@ -42,13 +38,6 @@ class LinkedFileHandlerTest {
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
 
         this.tempFolder = tempFolder;
-
-        // Check if there exists a system-wide cookie handler
-        if (CookieHandler.getDefault() == null) {
-            CookieManager cookieManager = new CookieManager();
-            CookieHandler.setDefault(cookieManager);
-            cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        }
     }
 
     void createFile(String fileName) throws Exception {
@@ -65,7 +54,6 @@ class LinkedFileHandlerTest {
         linkedFileHandler.renameToName("newName", true);
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
         assertEquals("newName.pdf", result, "File should retain its original name with extension");
-
    }
 
     @Test
@@ -78,7 +66,6 @@ class LinkedFileHandlerTest {
 
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
         assertEquals("newName.txt", result, "File should be renamed to newName.txt");
-
     }
 
     @Test
@@ -90,7 +77,6 @@ class LinkedFileHandlerTest {
         linkedFileHandler.renameToName("newNameWithoutExtension", false);
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
         assertEquals("test", result, "File should not be renamed without extension");
-
     }
 
     @Test
@@ -102,7 +88,6 @@ class LinkedFileHandlerTest {
         linkedFileHandler.renameToName("newName.pdf", false);
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
         assertEquals("newName.pdf", result, "File without extension should be renamed correctly");
-
     }
 
     @Test
@@ -115,11 +100,5 @@ class LinkedFileHandlerTest {
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
 
         assertEquals("newName..pdf", result, "File without extension should be renamed correctly");
-
     }
-
-
-
-
-
 }

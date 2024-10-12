@@ -89,7 +89,7 @@ public class LinkedFileHandler {
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
 
-        if(oldExtension.isEmpty() && newExtension.isEmpty()) {
+        if (oldExtension.isEmpty() && newExtension.isEmpty()) {
             return false;
         }
 
