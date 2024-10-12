@@ -152,7 +152,6 @@ public class MainMenu extends MenuBar {
         MenuItem saveAllMenuItem = factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService));
         MenuItem newEntryFromPlainTextMenuItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService));
 
-
         saveAllMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
         newEntryFromPlainTextMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
 
