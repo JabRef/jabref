@@ -2,6 +2,7 @@ package org.jabref.gui.frame;
 
 import java.util.function.Supplier;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -146,13 +147,19 @@ public class MainMenu extends MenuBar {
         Menu tools = new Menu(Localization.lang("Tools"));
         Menu help = new Menu(Localization.lang("Help"));
 
+        MenuItem saveAllMenuItem = factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService));
+        saveAllMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
+
+        MenuItem newEntryFromPlainTextMenuItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService));
+        newEntryFromPlainTextMenuItem.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
+        
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
                 fileHistoryMenu,
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService)),
+                saveAllMenuItem, 
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -233,7 +240,7 @@ public class MainMenu extends MenuBar {
 
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService)),
+                newEntryFromPlainTextMenuItem,
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
