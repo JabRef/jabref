@@ -14,7 +14,7 @@ public class SearchQueryConversion {
 
     public static SqlQuery searchToSql(String table, SearchQuery searchQuery) {
         LOGGER.debug("Converting search expression to SQL: {}", searchQuery.getSearchExpression());
-        return new SearchToSqlVisitor(table).visit(searchQuery.getContext());
+        return new SearchToSqlVisitor(table, searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
     public static String flagsToSearchExpression(SearchQuery searchQuery) {

@@ -11,7 +11,7 @@ import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
-import org.jabref.model.search.query.SearchTermFlag;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SqlQuery;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -20,12 +20,12 @@ import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
 import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
-import static org.jabref.model.search.query.SearchTermFlag.CASE_INSENSITIVE;
-import static org.jabref.model.search.query.SearchTermFlag.CASE_SENSITIVE;
-import static org.jabref.model.search.query.SearchTermFlag.EXACT_MATCH;
-import static org.jabref.model.search.query.SearchTermFlag.INEXACT_MATCH;
-import static org.jabref.model.search.query.SearchTermFlag.NEGATION;
-import static org.jabref.model.search.query.SearchTermFlag.REGULAR_EXPRESSION;
+import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
+import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
+import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
+import static org.jabref.model.search.SearchFlags.NEGATION;
+import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 
 /**
  * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
@@ -38,12 +38,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
     private static final String INNER_TABLE = "inner_table";
     private static final String GROUPS_FIELD = StandardField.GROUPS.getName();
 
+    private final EnumSet<SearchFlags> searchBarFlags;
     private final String mainTableName;
     private final String splitValuesTableName;
     private final List<SqlQuery> nodes = new ArrayList<>();
     private int cteCounter = 0;
 
-    public SearchToSqlVisitor(String table) {
+    public SearchToSqlVisitor(String table, EnumSet<SearchFlags> searchBarFlags) {
+        this.searchBarFlags = searchBarFlags;
         this.mainTableName = PostgreConstants.getMainTableSchemaReference(table);
         this.splitValuesTableName = PostgreConstants.getSplitTableSchemaReference(table);
     }
@@ -147,12 +149,12 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
         }
 
         Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
+        EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
         if (fieldDescriptor.isPresent()) {
             String field = fieldDescriptor.get().getText();
 
             // Direct comparison does not work
             // context.CONTAINS() and others are null if absent (thus, we cannot check for getText())
-            EnumSet<SearchTermFlag> searchFlags = EnumSet.noneOf(SearchTermFlag.class);
             if (context.EQUAL() != null || context.CONTAINS() != null) {
                 setFlags(searchFlags, INEXACT_MATCH, false, false);
             } else if (context.CEQUAL() != null) {
@@ -182,11 +184,17 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
             return getFieldQueryNode(field.toLowerCase(Locale.ROOT), right, searchFlags);
         } else {
             // Query without any field name
-            return getFieldQueryNode("any", right, EnumSet.of(INEXACT_MATCH, CASE_INSENSITIVE));
+            boolean isCaseSensitive = searchBarFlags.contains(CASE_SENSITIVE);
+            if (searchBarFlags.contains(REGULAR_EXPRESSION)) {
+                setFlags(searchFlags, REGULAR_EXPRESSION, isCaseSensitive, false);
+            } else {
+                setFlags(searchFlags, INEXACT_MATCH, isCaseSensitive, false);
+            }
+            return getFieldQueryNode("any", right, searchFlags);
         }
     }
 
-    private SqlQuery getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
+    private SqlQuery getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
         String operator = getOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
@@ -497,7 +505,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
         return new SqlQuery("cte" + cteCounter++);
     }
 
-    private static void setFlags(EnumSet<SearchTermFlag> flags, SearchTermFlag matchType, boolean caseSensitive, boolean negation) {
+    private static void setFlags(EnumSet<SearchFlags> flags, SearchFlags matchType, boolean caseSensitive, boolean negation) {
         flags.add(matchType);
 
         flags.add(caseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);
@@ -506,7 +514,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQuery> {
         }
     }
 
-    private static String getOperator(EnumSet<SearchTermFlag> searchFlags) {
+    private static String getOperator(EnumSet<SearchFlags> searchFlags) {
         return searchFlags.contains(REGULAR_EXPRESSION)
                 ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*")
                 : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");

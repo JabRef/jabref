@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.stream.Stream;
 
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SqlQuery;
 
@@ -16,6 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SearchQuerySQLConversionTest {
@@ -664,6 +668,178 @@ class SearchQuerySQLConversionTest {
     void testSearchConversion(String searchExpression, String expected) throws SQLException {
         try (Connection connection = pg.getPostgresDatabase().getConnection()) {
             SqlQuery sqlQuery = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression));
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery.cte())) {
+                for (int i = 0; i < sqlQuery.params().size(); i++) {
+                    preparedStatement.setString(i + 1, sqlQuery.params().get(i));
+                }
+                String sql = preparedStatement.toString();
+                assertEquals(expected, sql);
+            }
+        }
+    }
+
+    public static Stream<Arguments> testUnFieldedTermsWithSearchBarFlags() {
+        return Stream.of(
+                Arguments.of(
+                        "Test",
+                        EnumSet.noneOf(SearchFlags.class),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%Test%')) OR (main_table.field_value_transformed ILIKE ('%Test%')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "Test",
+                        EnumSet.of(CASE_SENSITIVE),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal LIKE ('%Test%')) OR (main_table.field_value_transformed LIKE ('%Test%')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "Test",
+                        EnumSet.of(REGULAR_EXPRESSION),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~* ('Test')) OR (main_table.field_value_transformed ~* ('Test')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "Test",
+                        EnumSet.of(CASE_SENSITIVE, REGULAR_EXPRESSION),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~ ('Test')) OR (main_table.field_value_transformed ~ ('Test')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "Test AND author =! Smith",
+                        EnumSet.noneOf(SearchFlags.class),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%Test%')) OR (main_table.field_value_transformed ILIKE ('%Test%')))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte1
+                        )
+                        SELECT * FROM cte2 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "Test AND author =! Smith",
+                        EnumSet.of(CASE_SENSITIVE),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal LIKE ('%Test%')) OR (main_table.field_value_transformed LIKE ('%Test%')))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte1
+                        )
+                        SELECT * FROM cte2 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
+                        "any =~ Test AND author =! Smith",
+                        EnumSet.of(CASE_SENSITIVE),
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~* ('Test')) OR (main_table.field_value_transformed ~* ('Test')))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT entry_id
+                            FROM cte0
+                            INTERSECT
+                            SELECT entry_id
+                            FROM cte1
+                        )
+                        SELECT * FROM cte2 GROUP BY entry_id"""
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testUnFieldedTermsWithSearchBarFlags(String searchExpression, EnumSet<SearchFlags> searchFlags, String expected) throws SQLException {
+        try (Connection connection = pg.getPostgresDatabase().getConnection()) {
+            SqlQuery sqlQuery = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression, searchFlags));
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery.cte())) {
                 for (int i = 0; i < sqlQuery.params().size(); i++) {
                     preparedStatement.setString(i + 1, sqlQuery.params().get(i));

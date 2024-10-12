@@ -4,19 +4,18 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.query.SearchTermFlag;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.search.query.SearchTermFlag.CASE_INSENSITIVE;
-import static org.jabref.model.search.query.SearchTermFlag.CASE_SENSITIVE;
-import static org.jabref.model.search.query.SearchTermFlag.EXACT_MATCH;
-import static org.jabref.model.search.query.SearchTermFlag.INEXACT_MATCH;
-import static org.jabref.model.search.query.SearchTermFlag.NEGATION;
-import static org.jabref.model.search.query.SearchTermFlag.REGULAR_EXPRESSION;
+import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
+import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
+import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
+import static org.jabref.model.search.SearchFlags.NEGATION;
+import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 
 /**
  * Tests are located in {@link org.jabref.logic.search.query.SearchQueryFlagsConversionTest}.
@@ -58,7 +57,7 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         String right = context.right.getText();
 
         Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
-        EnumSet<SearchTermFlag> termFlags = EnumSet.noneOf(SearchTermFlag.class);
+        EnumSet<SearchFlags> termFlags = EnumSet.noneOf(SearchFlags.class);
 
         if (fieldDescriptor.isPresent()) {
             String field = fieldDescriptor.get().getText();
@@ -89,12 +88,12 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         }
     }
 
-    private String getFieldQueryNode(String field, String term, EnumSet<SearchTermFlag> searchFlags) {
+    private String getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
         String operator = getOperator(searchFlags);
         return field + " " + operator + " " + term;
     }
 
-    private static String getOperator(EnumSet<SearchTermFlag> searchFlags) {
+    private static String getOperator(EnumSet<SearchFlags> searchFlags) {
         StringBuilder operator = new StringBuilder();
 
         if (searchFlags.contains(NEGATION)) {
