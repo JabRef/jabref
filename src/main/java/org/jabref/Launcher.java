@@ -12,7 +12,7 @@ import org.jabref.gui.JabRefGUI;
 public class Launcher {
 
     public static void main(String[] args) {
-        Result result = JabKit.processArguments(args);
+        JabKit.Result result = JabKit.processArguments(args);
         // The method `processArguments` quites the whole JVM if no GUI is needed.
 
         JabRefGUI.setup(result.uiCommands(), result.preferences(), result.fileUpdateMonitor());
