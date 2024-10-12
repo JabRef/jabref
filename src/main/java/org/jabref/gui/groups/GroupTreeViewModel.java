@@ -32,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -390,11 +391,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void chatWithGroup(GroupNodeViewModel group) {
-        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
-        if (currentDatabase.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
-            return;
-        }
+        assert currentDatabase.isPresent();
 
         StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
 
@@ -432,6 +429,51 @@ public class GroupTreeViewModel extends AbstractViewModel {
             aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
             aiChatWindow.requestFocus();
         }
+    }
+
+    public void generateEmbeddings(GroupNodeViewModel groupNode) {
+        assert currentDatabase.isPresent();
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<LinkedFile> linkedFiles = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .flatMap(entry -> entry.getFiles().stream())
+                .toList();
+
+        aiService.getIngestionService().ingest(
+                group.nameProperty(),
+                linkedFiles,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
+    }
+
+    public void generateSummaries(GroupNodeViewModel groupNode) {
+        assert currentDatabase.isPresent();
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<BibEntry> entries = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .toList();
+
+        aiService.getSummariesService().summarize(
+                group.nameProperty(),
+                entries,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

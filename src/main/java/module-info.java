@@ -164,7 +164,7 @@ open module org.jabref {
     /**
      * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
+    uses org.apache.lucene.codecs.lucene912.Lucene912Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
