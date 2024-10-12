@@ -52,6 +52,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -211,10 +212,13 @@ public class GroupDialogViewModel {
 
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %n %s".formatted(
-                        Localization.lang("Free search expression"),
-                        Localization.lang("Search term is empty."))));
+                input -> {
+                    if (StringUtil.isNullOrEmpty(input)) {
+                        return false;
+                    }
+                    return new SearchQuery(input).isValid();
+                },
+                ValidationMessage.error(Localization.lang("Illegal search expression")));
 
         texGroupFilePathValidator = new FunctionBasedValidator<>(
                 texGroupFilePathProperty,
@@ -603,6 +607,14 @@ public class GroupDialogViewModel {
 
     public ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty() {
         return searchFlagsProperty;
+    }
+
+    public void setSearchFlag(SearchFlags searchFlag, boolean value) {
+        if (value) {
+            searchFlagsProperty.getValue().add(searchFlag);
+        } else {
+            searchFlagsProperty.getValue().remove(searchFlag);
+        }
     }
 
     public BooleanProperty autoGroupKeywordsOptionProperty() {

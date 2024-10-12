@@ -275,7 +275,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         regexButton.setSelected(searchPreferences.isRegularExpression());
-        regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression\nThis only affects unfielded terms. For using RegEx in a fielded term, use =~ operator")));
+        regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator")));
         initSearchModifierButton(regexButton);
         regexButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());
@@ -284,7 +284,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
-        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive\nThis only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator")));
+        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator")));
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
