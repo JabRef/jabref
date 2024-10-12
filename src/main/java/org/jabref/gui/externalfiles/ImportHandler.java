@@ -313,7 +313,7 @@ public class ImportHandler {
                     Optional<String> parentYear = possibleParentEntry.getField(StandardField.YEAR);
                     parentYear.ifPresent(year -> {
                         String existingKey = entry.getCitationKey().orElse("");
-                        String newKey = existingKey+year;
+                        String newKey = existingKey + year;
                         // retroactively set citation key to match parent's year
                         entry.setCitationKey(newKey);
                     });
