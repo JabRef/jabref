@@ -110,7 +110,6 @@ public class MainToolBar extends ToolBar {
 
         newEntryFromPlainTextButton.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
 
-
         // Setup Toolbar
 
         getItems().addAll(
@@ -124,10 +123,7 @@ public class MainToolBar extends ToolBar {
                 globalSearchBar,
 
                 rightSpacer,
-
-
-
-
+            
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
