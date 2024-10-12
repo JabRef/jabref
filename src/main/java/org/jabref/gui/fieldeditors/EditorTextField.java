@@ -20,7 +20,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
-    private PasteActionHandler additionalPasteActionHandler = () -> {
+    private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };
 
@@ -52,7 +52,7 @@ public class EditorTextField extends TextField implements Initializable, Context
         // not needed
     }
 
-    public void setAdditionalPasteActionHandler(PasteActionHandler handler) {
+    public void setAdditionalPasteActionHandler(Runnable handler) {
         Objects.requireNonNull(handler);
         this.additionalPasteActionHandler = handler;
     }
@@ -60,14 +60,6 @@ public class EditorTextField extends TextField implements Initializable, Context
     @Override
     public void paste() {
         super.paste();
-        additionalPasteActionHandler.handle();
-    }
-
-    /**
-     * Interface presents user-described paste behaviour applying to paste method
-     */
-    @FunctionalInterface
-    public interface PasteActionHandler {
-        void handle();
+        additionalPasteActionHandler.run();
     }
 }
