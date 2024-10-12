@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -39,6 +40,9 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.mergeentries.EntriesMergeResult;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -89,6 +93,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
+    private final StateManager stateManager;
+    private final UndoManager undoManager;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -104,6 +110,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
@@ -242,7 +250,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
                         compareButton.setOnMouseClicked(event -> {
-                            openDuplicateEntriesWindow(entry);
+                            openPossibleDuplicateEntriesWindow(entry);
                         });
                         vContainer.getChildren().add(compareButton);
                     } else {
@@ -515,10 +523,20 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Function to open possible duplicate entries window to compare duplicate entries
      *
+     * @param duplicateItem duplicate in the citation relations tab
      */
-    private void openDuplicateEntriesWindow(CitationRelationItem duplicateItem) {
-        // TODO：
+    private void openPossibleDuplicateEntriesWindow(CitationRelationItem duplicateItem) {
         BibEntry localEntry = duplicateItem.localEntry();
         BibEntry duplicateEntry = duplicateItem.entry();
+
+        MergeEntriesDialog dialog = new MergeEntriesDialog(localEntry, duplicateEntry, preferences);
+        dialog.setTitle(Localization.lang("Possible duplicate entries"));
+
+        Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
+        mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
+            new MergeTwoEntriesAction(entriesMergeResult, stateManager, undoManager).execute();
+
+            dialogService.notify(Localization.lang("Merged entries"));
+        }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
     }
 }

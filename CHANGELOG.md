@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- Added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
 
 ### Changed
 
