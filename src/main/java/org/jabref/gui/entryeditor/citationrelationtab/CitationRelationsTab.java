@@ -42,8 +42,10 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticSc
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -55,6 +57,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
@@ -248,7 +251,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().add(jumpTo);
 
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
-                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
+                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entries")));
                         compareButton.setOnMouseClicked(event -> {
                             openPossibleDuplicateEntriesWindow(entry);
                         });
@@ -534,9 +537,25 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, stateManager, undoManager).execute();
+            BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
+
+            database.removeEntry(entriesMergeResult.originalLeftEntry());
+            database.insertEntry(entriesMergeResult.mergedEntry());
+
+            NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
+            ce.addEdit(new UndoableRemoveEntries(database, entriesMergeResult.originalLeftEntry()));
+            ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
+            ce.end();
+
+            undoManager.addEdit(ce);
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
+
+        BibEntry current = libraryTab.getEntryEditor().getCurrentlyEditedEntry();
+        stateManager.getActiveDatabase().get().getDatabase().removeEntry(current);
+        stateManager.getActiveDatabase().get().getDatabase().insertEntry(current);
+        libraryTab.showAndEdit(current);
+        libraryTab.clearAndSelect(current);
     }
 }
