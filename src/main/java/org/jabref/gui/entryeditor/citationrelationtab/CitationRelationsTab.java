@@ -537,6 +537,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
+
+            // Merge method is similar to MergeTwoEntriesAction#execute
             BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
 
             database.removeEntry(entriesMergeResult.originalLeftEntry());
@@ -551,11 +553,5 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
-
-        BibEntry current = libraryTab.getEntryEditor().getCurrentlyEditedEntry();
-        stateManager.getActiveDatabase().get().getDatabase().removeEntry(current);
-        stateManager.getActiveDatabase().get().getDatabase().insertEntry(current);
-        libraryTab.showAndEdit(current);
-        libraryTab.clearAndSelect(current);
     }
 }

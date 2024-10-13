@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.CompoundEdit;
@@ -195,7 +194,7 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
-        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).filter(Objects::nonNull).toList();
+        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);

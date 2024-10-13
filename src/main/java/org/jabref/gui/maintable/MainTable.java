@@ -249,8 +249,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
+        // selected entry before merge
+        BibEntry current = getSelectionModel().getSelectedItem().getEntry();
         getSelectionModel().clearSelection();
+
         findEntry(bibEntry).ifPresent(entry -> {
+            getSelectionModel().select(entry);
+            scrollTo(entry);
+        });
+
+        // check if original entry still main table，false if two entries merge into a new entry
+        // make sure original entry selected after citation relations tab merge
+        findEntry(current).ifPresent(entry -> {
+            getSelectionModel().clearSelection();
             getSelectionModel().select(entry);
             scrollTo(entry);
         });
