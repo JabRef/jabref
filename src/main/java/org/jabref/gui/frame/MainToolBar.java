@@ -1,6 +1,5 @@
 package org.jabref.gui.frame;
 
-import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -106,10 +105,6 @@ public class MainToolBar extends ToolBar {
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
-        Button newEntryFromPlainTextButton = factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService));
-
-        newEntryFromPlainTextButton.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
-
         // Setup Toolbar
 
         getItems().addAll(
@@ -123,12 +118,12 @@ public class MainToolBar extends ToolBar {
                 globalSearchBar,
 
                 rightSpacer,
-            
+
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         createNewEntryFromIdButton(),
-                        newEntryFromPlainTextButton, 
+                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
@@ -156,8 +151,6 @@ public class MainToolBar extends ToolBar {
 
                 new HBox(
                         factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
-
-        globalSearchBar.disableProperty().bind(Bindings.isEmpty(stateManager.getOpenDatabases()));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
