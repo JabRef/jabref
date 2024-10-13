@@ -8,6 +8,14 @@ If you are not familiar with this type of workflow, take a look at GitHub's exce
 Before you start, get the JabRef code on your local machine.
 Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
 
+## Table of Contents
+
+- [Choosing a task](#choosing-a-task-join-the-chat-at-httpsgitterimjabrefjabref)
+- [Getting a task assigned](#getting-a-task-assigned)
+- [Pull Request Process](#pull-request-process)
+  - [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
+  - [Development hints](#development-hints)
+
 ## Choosing a task [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref)
 
 In general, we offer small issues perfect for aspiring developers.
@@ -47,6 +55,11 @@ For improving developer's documentation, go on at the [docs/ subdirectory of Jab
 GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
 
 One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/components/callouts/).
+
+## Getting a task assigned
+
+Comment on the issue you want to work at with `/assign-me`.
+GitHub will then automatically assign you.
 
 ## Pull Request Process
 
