@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -66,11 +65,7 @@ public class CitationsRelationsTabViewModel {
         List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
         citeKeys.removeIf(String::isEmpty);
 
-        List<BibEntry> clonedEntries = entries.stream().map(entry -> {
-            return (BibEntry) entry.clone();
-        }).filter(Objects::nonNull).toList();
-
-        for (BibEntry entryToCite : clonedEntries) {
+        for (BibEntry entryToCite : entries) {
             if (generateNewKeyOnImport || entryToCite.getCitationKey().isEmpty()) {
                 String key = generator.generateKey(entryToCite);
                 entryToCite.setCitationKey(key);
@@ -80,7 +75,7 @@ public class CitationsRelationsTabViewModel {
             }
         }
         existingEntry.setField(StandardField.CITES, toCommaSeparatedString(citeKeys));
-        importHandler.importEntries(clonedEntries);
+        importHandler.importEntries(entries);
     }
 
     private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
@@ -88,11 +83,7 @@ public class CitationsRelationsTabViewModel {
         CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
         boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
-        List<BibEntry> clonedEntries = entries.stream().map(entry -> {
-            return (BibEntry) entry.clone();
-        }).filter(Objects::nonNull).toList();
-
-        for (BibEntry entryThatCitesOurExistingEntry : clonedEntries) {
+        for (BibEntry entryThatCitesOurExistingEntry : entries) {
             List<String> existingCites = getExistingEntriesFromCiteField(entryThatCitesOurExistingEntry);
             existingCites.removeIf(String::isEmpty);
             String key;
@@ -106,7 +97,7 @@ public class CitationsRelationsTabViewModel {
             entryThatCitesOurExistingEntry.setField(StandardField.CITES, toCommaSeparatedString(existingCites));
         }
 
-        importHandler.importEntries(clonedEntries);
+        importHandler.importEntries(entries);
     }
 
     private void addToKeyToList(List<String> list, String key) {
