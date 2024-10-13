@@ -11,8 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.util.DefaultDirectoryMonitor;
-import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -28,9 +26,8 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
-import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.DirectoryMonitor;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -42,15 +39,21 @@ import org.tinylog.configuration.Configuration;
 
 /**
  * Entrypoint for a command-line only version of JabRef.
+ *
+ * Does not do any preference migrations
  */
 public class JabKit {
     private static Logger LOGGER;
 
     public static void main(String[] args) {
-        processArguments(args);
-    }
+        initLogging(args);
 
-    public record Result(List<UiCommand> uiCommands, FileUpdateMonitor fileUpdateMonitor) {
+        final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+        Injector.setModelOrService(CliPreferences.class, preferences);
+
+        FileUpdateMonitor fileUpdateMonitor = new DummyFileUpdateMonitor();
+
+        processArguments(args, preferences, fileUpdateMonitor);
     }
 
     private static void systemExit() {
@@ -60,15 +63,9 @@ public class JabKit {
         System.exit(0);
     }
 
-    public static Result processArguments(String[] args) {
-        initLogging(args);
-
+    public static List<UiCommand> processArguments(String[] args, JabRefCliPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
         try {
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
-
-            // Initialize preferences
-            final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
-            Injector.setModelOrService(CliPreferences.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
@@ -87,12 +84,7 @@ public class JabKit {
             clearOldSearchIndices();
 
             try {
-                DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
                 Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
-                HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
-
-                DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
-                Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
@@ -110,7 +102,7 @@ public class JabKit {
                     return null;
                 }
 
-                return new Result(new ArrayList<>(argumentProcessor.getUiCommands()), fileUpdateMonitor);
+                return new ArrayList<>(argumentProcessor.getUiCommands());
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 CliOptions.printUsage(preferences);
@@ -128,7 +120,7 @@ public class JabKit {
      * This needs to be called as early as possible. After the first log write, it
      * is not possible to alter the log configuration programmatically anymore.
      */
-    private static void initLogging(String[] args) {
+    public static void initLogging(String[] args) {
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
