@@ -10,11 +10,11 @@ Detailed instructions about this step can be found in our [guidelines for settin
 
 ## Table of Contents
 
-- [Choosing a task](#choosing-a-task-join-the-chat-at-httpsgitterimjabrefjabref)
-- [Getting a task assigned](#getting-a-task-assigned)
-- [Pull Request Process](#pull-request-process)
-  - [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
-  - [Development hints](#development-hints)
+* [Choosing a task](#choosing-a-task-)
+* [Getting a task assigned](#getting-a-task-assigned)
+* [Pull Request Process](#pull-request-process)
+  * [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
+  * [Development hints](#development-hints)
 
 ## Choosing a task [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref)
 
