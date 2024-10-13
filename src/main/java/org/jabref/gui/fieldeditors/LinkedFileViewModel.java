@@ -362,6 +362,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return false;
         }
 
+        // Ensure both directories exist before comparing
+        if (Files.notExists(targetDir.orElseThrow()) || Files.notExists(currentDir.orElseThrow())) {
+            // One of the directories does not exist, skip comparison
+            return false;
+        }
+
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);

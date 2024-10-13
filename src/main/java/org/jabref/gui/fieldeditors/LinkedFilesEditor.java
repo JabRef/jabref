@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -323,42 +324,77 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
-        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
-        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        System.out.println(databaseContext.getMetaData().getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()));
-        System.out.println(databaseContext.getMetaData().getDefaultFileDirectory());
-
-        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file")); // Default text
+//        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+//        System.out.println(databaseContext.getMetaData().getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()));
+//        System.out.println(databaseContext.getMetaData().getDefaultFileDirectory());
+//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+//        System.out.println(currentFilePath.toString());
+//        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file")); // Default text
+//        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
+//        moveFileItem.disableProperty().bind(isMoveFileDisabled);
+//        if (currentFilePath.isPresent()) {
+//            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
+//                    directoryHandler.determineTargetDirectory(currentFilePath.get());
+//            System.out.println("Choosen Target Directory");
+//            System.out.println(targetDirectory);
+//            if (targetDirectory.isPresent()) {
+//                FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+//                System.out.println("Label for Menu");
+//                System.out.println(dirInfo.label());
+//                moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
+//                isMoveFileDisabled.set(false); // Set the property to false instead of disabling the menu item
+//                moveFileItem.setOnAction(event -> {
+//                    // Refresh the context menu
+//                    Platform.runLater(() -> {
+//                        ContextMenu updatedMenu = createContextMenuForFile(linkedFile);
+//                        listView.setContextMenu(updatedMenu);
+//                    });
+//                    try {
+//                        Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+//                        System.out.println("Current File Path");
+//                        System.out.println(currentFilePath);
+//                        Files.move(currentFilePath.get(), target);
+//                        linkedFile.getFile().setLink(target.toString());
+//                        System.out.println("Current File Path after movement");
+//                        System.out.println(linkedFile.getFile().getLink());
+//                    } catch (
+//                            IOException e) {
+//                        dialogService.showErrorDialogAndWait(
+//                                Localization.lang("Move file"),
+//                                Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
+//                                e);
+//                    }
+//                });
+//            }
+//        }
+        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
         BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
         moveFileItem.disableProperty().bind(isMoveFileDisabled);
 
+        // Context action for MOVE_FILE standard action
+        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences);
+        moveFileItem.setOnAction(event -> moveFileAction.execute());
+
+        // Bind moveFileItem enabling condition based on current file path availability
+        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+
         if (currentFilePath.isPresent()) {
-            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
-                    directoryHandler.determineTargetDirectory(currentFilePath.get());
+            isMoveFileDisabled.set(false);
+            // Determine the target directory
+            FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath.get());
+
             if (targetDirectory.isPresent()) {
                 FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
-                moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
-                isMoveFileDisabled.set(false); // Set the property to false instead of disabling the menu item
-
-                moveFileItem.setOnAction(event -> {
-                    try {
-                        Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
-                        System.out.println("Current File Path");
-                        System.out.println(currentFilePath);
-                        Files.move(currentFilePath.get(), target);
-                        linkedFile.getFile().setLink(target.toString());
-                        System.out.println("Current File Path after movement");
-                        System.out.println(linkedFile.getFile().getLink());
-                    } catch (
-                            IOException e) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Move file"),
-                                Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
-                                e);
-                    }
+                // Update the menu item text with the target directory name asynchronously
+                Platform.runLater(() -> {
+                    moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
                 });
             }
+        } else {
+            isMoveFileDisabled.set(true);
         }
 
         menu.getItems().addAll(
@@ -443,8 +479,30 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         linkedFile.renameToSuggestion();
                 case RENAME_FILE_TO_NAME ->
                         linkedFile.askForNameAndRename();
-                case MOVE_FILE_TO_FOLDER ->
-                        linkedFile.moveToDefaultDirectory();
+                case MOVE_FILE_TO_FOLDER -> {
+                    FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+                    var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+                    Optional<Path> currentFilePath = linkedFile.findIn(dir);
+
+                    if (currentFilePath.isPresent()) {
+                        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
+                                directoryHandler.determineTargetDirectory(currentFilePath.get());
+
+                        if (targetDirectory.isPresent()) {
+                            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+                            try {
+                                Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+                                Files.move(currentFilePath.get(), target);
+                                linkedFile.getFile().setLink(target.toString());
+                            } catch (IOException e) {
+                                dialogService.showErrorDialogAndWait(
+                                        Localization.lang("Move file"),
+                                        Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
+                                        e);
+                            }
+                        }
+                    }
+                }
                 case MOVE_FILE_TO_FOLDER_AND_RENAME ->
                         linkedFile.moveToDefaultDirectoryAndRename();
                 case DELETE_FILE ->

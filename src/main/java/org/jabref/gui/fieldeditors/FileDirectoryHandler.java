@@ -42,7 +42,8 @@ public class FileDirectoryHandler {
         }
 
         Optional<DirectoryType> currentDirectory = determineCurrentDirectory(currentFilePath);
-
+        System.out.println("Current Directory");
+        System.out.println(currentDirectory);
         if (availableDirectories.size() == 1) {
             // If only one directory exists and file is outside, return that directory
             if (currentDirectory.isEmpty()) {
