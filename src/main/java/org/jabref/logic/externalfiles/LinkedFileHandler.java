@@ -89,11 +89,13 @@ public class LinkedFileHandler {
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
 
-        if (oldExtension.isEmpty() && newExtension.isEmpty()) {
-            return false;
+        Path newPath;
+        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            newPath = oldPath.resolveSibling(targetFileName);
+        } else {
+            assert oldExtension.isPresent() && newExtension.isEmpty();
+            newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
-
-        final Path newPath = oldPath.resolveSibling(targetFileName + (newExtension.isPresent() ? "" : oldExtension.map(ext -> "." + ext).orElse("")));
 
         String expandedOldFilePath = oldPath.toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)

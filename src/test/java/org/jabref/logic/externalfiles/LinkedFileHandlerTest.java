@@ -42,7 +42,7 @@ class LinkedFileHandlerTest {
     @CsvSource({
             "test.pdf, newName, newName.pdf",
             "test.pdf, newName.txt, newName.txt",
-            "test, newNameWithoutExtension, test",
+            "test, newNameWithoutExtension, newNameWithoutExtension",
             "testFile, newName.pdf, newName.pdf",
             "test.pdf, newName., newName..pdf"
     })
