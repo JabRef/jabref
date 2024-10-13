@@ -11,9 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.Launcher;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
@@ -25,13 +22,13 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -53,7 +50,7 @@ public class JabKit {
         processArguments(args);
     }
 
-    public record Result(List<UiCommand> uiCommands, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
+    public record Result(List<UiCommand> uiCommands, FileUpdateMonitor fileUpdateMonitor) {
     }
 
     private static void systemExit() {
@@ -70,9 +67,8 @@ public class JabKit {
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             // Initialize preferences
-            final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
+            final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
             Injector.setModelOrService(CliPreferences.class, preferences);
-            Injector.setModelOrService(GuiPreferences.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
@@ -81,8 +77,6 @@ public class JabKit {
 
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-
-            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -116,7 +110,7 @@ public class JabKit {
                     return null;
                 }
 
-                return new Result(new ArrayList<>(argumentProcessor.getUiCommands()), preferences, fileUpdateMonitor);
+                return new Result(new ArrayList<>(argumentProcessor.getUiCommands()), fileUpdateMonitor);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 CliOptions.printUsage(preferences);
@@ -154,7 +148,7 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(Launcher.class);
+            LOGGER = LoggerFactory.getLogger(JabKit.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }

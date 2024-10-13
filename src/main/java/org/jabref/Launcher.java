@@ -2,6 +2,12 @@ package org.jabref;
 
 import org.jabref.cli.JabKit;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.migrations.PreferencesMigrations;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /// The main entry point for the JabRef application.
 ///
@@ -15,7 +21,14 @@ public class Launcher {
         JabKit.Result result = JabKit.processArguments(args);
         // The method `processArguments` quites the whole JVM if no GUI is needed.
 
-        JabRefGUI.setup(result.uiCommands(), result.preferences(), result.fileUpdateMonitor());
+        // Initialize preferences
+        final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
+        Injector.setModelOrService(CliPreferences.class, preferences);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+
+        PreferencesMigrations.runMigrations(preferences);
+
+        JabRefGUI.setup(result.uiCommands(), preferences, result.fileUpdateMonitor());
         JabRefGUI.launch(JabRefGUI.class, args);
     }
 }
