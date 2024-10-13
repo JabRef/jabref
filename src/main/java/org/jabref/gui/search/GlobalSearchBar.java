@@ -275,7 +275,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         regexButton.setSelected(searchPreferences.isRegularExpression());
-        regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator")));
+        regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator.")));
         initSearchModifierButton(regexButton);
         regexButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());
@@ -284,7 +284,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
-        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator")));
+        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator.")));
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
@@ -402,7 +402,7 @@ public class GlobalSearchBar extends HBox {
 
     public void setSearchBarHint() {
         if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author= Smith AND title= electrical</tt>");
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith AND title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
             TextFlow emptyHintTooltip = new TextFlow();
