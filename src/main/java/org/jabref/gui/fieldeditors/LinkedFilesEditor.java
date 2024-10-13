@@ -344,8 +344,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 moveFileItem.setOnAction(event -> {
                     try {
                         Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+                        System.out.println("Current File Path");
+                        System.out.println(currentFilePath);
                         Files.move(currentFilePath.get(), target);
                         linkedFile.getFile().setLink(target.toString());
+                        System.out.println("Current File Path after movement");
+                        System.out.println(linkedFile.getFile().getLink());
                     } catch (
                             IOException e) {
                         dialogService.showErrorDialogAndWait(
