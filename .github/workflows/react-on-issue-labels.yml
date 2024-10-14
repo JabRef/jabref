@@ -1,4 +1,4 @@
-name: Add greeting to issues for first time contributors
+name: React on issue labels
 
 on:
   issues:
@@ -9,7 +9,8 @@ on:
        - labeled
 
 jobs:
-  GreetingFirstTimeCodeContribution:
+  FirstTimeCodeContribution:
+    name: Add greeting to issues for first time contributors
     if: ${{ github.event.label.name == 'FirstTimeCodeContribution' }}
     runs-on: ubuntu-latest
     permissions:
@@ -29,3 +30,19 @@ jobs:
           Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
           Happy coding! 🚀
+    - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
+      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      with:
+       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+       project-url: "https://github.com/orgs/JabRef/projects/3"
+       target-labels: "FirstTimeCodeContribution"
+       target-column: "Assigned"
+       ignored-columns: ""
+    - name: Move Issue to "Assigned" Column in "Good First Issues"
+      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      with:
+       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+       project-url: "https://github.com/orgs/JabRef/projects/5"
+       target-labels: "FirstTimeCodeContribution"
+       target-column: "Assigned"
+       ignored-columns: ""
