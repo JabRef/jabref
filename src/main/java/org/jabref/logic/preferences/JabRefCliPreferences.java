@@ -2104,6 +2104,7 @@ public class JabRefCliPreferences implements CliPreferences {
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
         keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        // SpringerLink uses the same key and fetcher name as SpringerFetcher
 
         return keys;
     }
