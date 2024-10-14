@@ -98,6 +98,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
     private final UndoManager undoManager;
+    private BibEntry entriesMerge;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -254,6 +255,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entries")));
                         compareButton.setOnMouseClicked(event -> {
                             openPossibleDuplicateEntriesWindow(entry);
+                            
+                            // update local entry of selected citation relation item
+                            listView.getItems().set(listView.getItems().indexOf(entry), new CitationRelationItem(entry.entry(), entriesMerge, true));
                             // let main table know this is a citation merge
                             libraryTab.getMainTable().setCitationMerge(true);
                         });
@@ -539,7 +543,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-
+            entriesMerge = entriesMergeResult.mergedEntry();
             // Merge method is similar to MergeTwoEntriesAction#execute
             BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
 
