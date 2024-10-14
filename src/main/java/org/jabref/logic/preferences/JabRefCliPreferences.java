@@ -2094,6 +2094,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private Map<String, String> getDefaultFetcherKeys() {
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         if (buildInfo == null) {
+            LOGGER.warn("Could not instantiate BuildInfo.");
             return Collections.emptyMap();
         }
 
