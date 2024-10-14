@@ -82,6 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
+    private boolean citationMerge = false; // citation merge flag
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
@@ -249,22 +250,25 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
-        // selected entry before merge
-        BibEntry current = getSelectionModel().getSelectedItem().getEntry();
-        getSelectionModel().clearSelection();
-
-        findEntry(bibEntry).ifPresent(entry -> {
-            getSelectionModel().select(entry);
-            scrollTo(entry);
-        });
-
-        // check if original entry still main table，false if two entries merge into a new entry
-        // make sure original entry selected after citation relations tab merge
-        findEntry(current).ifPresent(entry -> {
+        // check if entries merged from citation relations tab
+        if (citationMerge) {
+            // keep original entry selected
+            BibEntry current = getSelectionModel().getSelectedItem().getEntry();
             getSelectionModel().clearSelection();
-            getSelectionModel().select(entry);
-            scrollTo(entry);
-        });
+
+            findEntry(current).ifPresent(entry -> {
+                getSelectionModel().select(entry);
+                scrollTo(entry);
+            });
+            this.citationMerge = false;
+        } else {
+            // selected new entry
+            getSelectionModel().clearSelection();
+            findEntry(bibEntry).ifPresent(entry -> {
+                getSelectionModel().select(entry);
+                scrollTo(entry);
+            });
+        }
     }
 
     private void scrollToNextMatchCategory() {
@@ -502,5 +506,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
+    }
+
+    public void setCitationMerge(boolean merge) {
+        this.citationMerge = merge;
     }
 }

@@ -254,6 +254,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entries")));
                         compareButton.setOnMouseClicked(event -> {
                             openPossibleDuplicateEntriesWindow(entry);
+                            // let main table know this is a citation merge
+                            libraryTab.getMainTable().setCitationMerge(true);
                         });
                         vContainer.getChildren().add(compareButton);
                     } else {
