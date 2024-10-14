@@ -76,11 +76,17 @@ In `build.gradle`, these variables are filled:
 "springerNatureAPIKey" : System.getenv('SpringerNatureAPIKey')
 ```
 
-The `BuildInfo` class reads from that file and the key needs to be put into the map of default api keys in `JabRefCliPreferences::getDefaultFetcherKeys`
+The `BuildInfo` class reads from that file and the key needs to be put into the map of default api keys in `JabRefCliPreferences::getDefaultFetcherKeys`.
 
 ```java
 keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 ```
+The fetcher api key can then be obtained by calling the preferences.
+
+```java
+importerPreferences.getApiKey(SpringerFetcher.FETCHER_NAME);
+```
+
 
 When executing `./gradlew run`, gradle executes `processResources` and populates `build/build.properties` accordingly. However, when working directly in the IDE, Eclipse keeps reading `build.properties` from `src/main/resources`. In IntelliJ, the task `JabRef Main` is executing `./gradlew processResources` before running JabRef from the IDE to ensure the `build.properties` is properly populated.
 
