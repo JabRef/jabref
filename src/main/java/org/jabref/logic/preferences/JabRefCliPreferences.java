@@ -2092,7 +2092,11 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Map<String, String> getDefaultFetcherKeys() {
-        BuildInfo buildInfo = new BuildInfo();
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        if (buildInfo == null) {
+            return Collections.emptyMap();
+        }
+
         Map<String, String> keys = new HashMap<>();
         keys.put(SemanticScholarFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
