@@ -15,7 +15,7 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Drivers
 
-* It should be fast. 
+* It should be fast.
 * It should be possible to provide templates out of Strings (required by the AI feature).
 * It should have short and understandable syntax. Especially. Work with unset fields and empty Optionals should be easy.
 
@@ -39,6 +39,7 @@ Chosen option: "{title of option 1}", because
 - Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
 
 Example:
+
 ```text
 You are an AI assistant that analyses research papers. You answer questions about papers.
 
@@ -51,7 +52,6 @@ ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
 * Good, because it has simple syntax.
-* Bad, because {argument d}
 * Bad, because it is in maintenance mode.
 
 ### Apache FreeMarker
@@ -59,6 +59,8 @@ ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
 - Main page: <https://freemarker.apache.org/index.html>.
 - User guide: <https://freemarker.apache.org/docs/dgui.html>.
 - Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
+
+Example:
 
 ```text
 You are an AI assistant that analyzes research papers. You answer questions about papers.
@@ -73,24 +75,21 @@ ${CanonicalBibEntry.getCanonicalRepresentation(entry)}
 * Good, because it is possible to use `String` as a template.
 * Good, because in active development.
 * Good, because it is powerful and flexible.
-* Neutral, because {argument c}
-* Bad, because {argument d}
 
 ### Thymeleaf
 
 - Main page: <https://www.thymeleaf.org/>.
 - Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
 
-Example (not related to AI):
-```text
-Dear [(${customer.name})],
+Example:
 
-This is the list of our products:
-[# th:each="p : ${products}"]
-   - [(${p.name})]. Price: [(${#numbers.formatdecimal(p.price,1,2)})] EUR/kg
+```text
+You are an AI assistant that analyzes research papers. You answer questions about papers.
+
+Here are the papers you are analyzing:
+[# th:each="entry : ${entries}"]
+[(${CanonicalBibEntry.getCanonicalRepresentation(entry)})]
 [/]
-Thanks,
-  The Thymeleaf Shop
 ```
 
 * Good, because supports plain text templating.
@@ -98,7 +97,7 @@ Thanks,
 * Good, because it has [several template modes](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#what-kind-of-templates-can-thymeleaf-process), that helps to make HTML, XML, and other templates.
 * Good, because it is powerful and flexible.
 * Neutral, because the API is a bit more complex than the other options.
-* Bad, because {argument d}
+* Bad, because the syntax is more complex than the other options. Especially for text output.
 
 ## More Information
 
