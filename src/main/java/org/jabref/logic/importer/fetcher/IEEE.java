@@ -24,7 +24,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -32,7 +31,6 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
@@ -62,14 +60,12 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
-    private final String apiKey;
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
     private IEEEQueryTransformer transformer;
 
     public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).ieeeAPIKey;
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         this.importerPreferences = Objects.requireNonNull(importerPreferences);
     }
@@ -266,10 +262,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
-    private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(apiKey);
-    }
-
     @Override
     public String getTestUrl() {
         return TEST_URL_WITHOUT_API_KEY;
@@ -282,7 +274,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", getApiKey());
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }
