@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -38,12 +39,13 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
-    private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
     private static final String FETCHER_NAME = "ScienceDirect";
 
+    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public ScienceDirect(ImporterPreferences importerPreferences) {
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).scienceDirectApiKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -140,7 +142,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(API_KEY))
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(apiKey))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 

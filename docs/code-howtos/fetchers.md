@@ -79,7 +79,7 @@ In `build.gradle`, these variables are filled:
 The `BuildInfo` class reads from that file.
 
 ```java
-new BuildInfo().springerNatureAPIKey
+Injector.instantiateModelOrService(BuildInfo.class).springerNatureAPIKey
 ```
 
 When executing `./gradlew run`, gradle executes `processResources` and populates `build/build.properties` accordingly. However, when working directly in the IDE, Eclipse keeps reading `build.properties` from `src/main/resources`. In IntelliJ, the task `JabRef Main` is executing `./gradlew processResources` before running JabRef from the IDE to ensure the `build.properties` is properly populated.

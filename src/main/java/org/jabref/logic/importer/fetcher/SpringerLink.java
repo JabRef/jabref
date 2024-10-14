@@ -14,6 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -33,12 +34,13 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
-    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
 
+    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public SpringerLink(ImporterPreferences importerPreferences) {
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).springerNatureAPIKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -55,7 +57,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
         // Available in catalog?
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                         .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY))
+                                                         .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(apiKey))
                                                          .queryString("q", "doi:%s".formatted(doi.get().getDOI()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {

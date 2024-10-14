@@ -12,17 +12,18 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 
 public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyFetcher {
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
-    private static final String API_KEY = new BuildInfo().semanticScholarApiKey;
-
+    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public SemanticScholarFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).semanticScholarApiKey;
     }
 
     public String getAPIUrl(String entry_point, BibEntry entry) {
@@ -90,6 +91,6 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     }
 
     private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(API_KEY);
+        return importerPreferences.getApiKey(getName()).orElse(apiKey);
     }
 }

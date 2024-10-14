@@ -32,6 +32,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
@@ -59,15 +60,16 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
-    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
+    private final String apiKey;
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
     private IEEEQueryTransformer transformer;
 
     public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).ieeeAPIKey;
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         this.importerPreferences = Objects.requireNonNull(importerPreferences);
     }
@@ -265,7 +267,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(API_KEY);
+        return importerPreferences.getApiKey(getName()).orElse(apiKey);
     }
 
     @Override

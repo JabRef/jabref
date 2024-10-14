@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
@@ -38,16 +39,17 @@ import org.tinylog.Logger;
  */
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
 
-    private static final String API_KEY = new BuildInfo().biodiversityHeritageApiKey;
     private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
     private static final String TEST_URL_WITHOUT_API_KEY = "https://www.biodiversitylibrary.org/api3?apikey=";
 
     private static final String FETCHER_NAME = "Biodiversity Heritage";
 
+    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public BiodiversityLibrary(ImporterPreferences importerPreferences) {
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).biodiversityHeritageApiKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -63,7 +65,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {
         URIBuilder baseURI = new URIBuilder(BASE_URL);
-        baseURI.addParameter("apikey", importerPreferences.getApiKey(getName()).orElse(API_KEY));
+        baseURI.addParameter("apikey", importerPreferences.getApiKey(getName()).orElse(apiKey));
         baseURI.addParameter("format", RESPONSE_FORMAT);
 
         return baseURI.build().toURL();

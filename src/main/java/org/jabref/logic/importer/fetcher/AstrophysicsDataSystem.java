@@ -37,6 +37,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -52,12 +53,13 @@ public class AstrophysicsDataSystem
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
+    private final String apiKey;
     private final ImportFormatPreferences preferences;
     private final ImporterPreferences importerPreferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences, ImporterPreferences importerPreferences) {
         this.preferences = Objects.requireNonNull(preferences);
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).astrophysicsDataSystemAPIKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -255,7 +257,7 @@ public class AstrophysicsDataSystem
         try {
             String postData = buildPostData(ids);
             URLDownload download = new URLDownload(urLforExport);
-            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(apiKey));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
             String content = download.asString();
@@ -308,7 +310,7 @@ public class AstrophysicsDataSystem
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload urlDownload = new URLDownload(url);
-        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(apiKey));
         return urlDownload;
     }
 }

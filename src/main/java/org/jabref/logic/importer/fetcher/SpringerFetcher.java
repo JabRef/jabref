@@ -25,6 +25,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Strings;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -45,13 +46,14 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
     private static final String API_URL = "https://api.springernature.com/meta/v1/json";
-    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
+    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public SpringerFetcher(ImporterPreferences importerPreferences) {
+        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).springerNatureAPIKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -188,7 +190,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY)); // API key
+        uriBuilder.addParameter("api_key", importerPreferences.getApiKey(getName()).orElse(apiKey)); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();
