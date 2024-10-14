@@ -89,6 +89,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
 - We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
+- We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
 
 ### Removed
 
