@@ -42,7 +42,7 @@ import org.tinylog.configuration.Configuration;
  *
  * Does not do any preference migrations
  */
-public class JabKit {
+public class JabRefCli {
     private static Logger LOGGER;
 
     public static void main(String[] args) {
@@ -53,7 +53,10 @@ public class JabKit {
 
         FileUpdateMonitor fileUpdateMonitor = new DummyFileUpdateMonitor();
 
-        processArguments(args, preferences, fileUpdateMonitor);
+        List<UiCommand> uiCommands = processArguments(args, preferences, fileUpdateMonitor);
+        if (!uiCommands.isEmpty()) {
+            LOGGER.error("No GUI needed, but UI commands were returned. Exiting.");
+        }
     }
 
     private static void systemExit() {
@@ -140,7 +143,7 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(JabKit.class);
+            LOGGER = LoggerFactory.getLogger(JabRefCli.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -158,7 +161,7 @@ public class JabKit {
                 "writerFile.backups", "30");
         configuration.forEach(Configuration::set);
 
-        LOGGER = LoggerFactory.getLogger(JabKit.class);
+        LOGGER = LoggerFactory.getLogger(JabRefCli.class);
     }
 
     /**
