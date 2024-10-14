@@ -113,6 +113,17 @@ We also show all contributors in our blog posts. See [Release 5.15 blog post](ht
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 
+#### Notes on AI usage
+
+Please keep these two principles in mind when you contribute:
+
+1. Never let an LLM speak for you.
+2. Never let an LLM think for you.
+
+More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
+
+We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
+
 ### Development hints
 
 #### When adding an external dependency
