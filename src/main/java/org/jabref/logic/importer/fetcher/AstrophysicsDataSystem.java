@@ -30,7 +30,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -48,11 +47,11 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  */
 public class AstrophysicsDataSystem
         implements IdBasedParserFetcher, PagedSearchBasedParserFetcher, EntryBasedParserFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "SAO/NASA ADS";
 
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
     private final ImportFormatPreferences preferences;
     private final ImporterPreferences importerPreferences;
 
@@ -79,7 +78,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public String getName() {
-        return "SAO/NASA ADS";
+        return FETCHER_NAME;
     }
 
     /**
@@ -255,7 +254,7 @@ public class AstrophysicsDataSystem
         try {
             String postData = buildPostData(ids);
             URLDownload download = new URLDownload(urLforExport);
-            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+            importerPreferences.getApiKey(getName()).ifPresent(key -> download.addHeader("Authorization", "Bearer " + key));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
             String content = download.asString();
@@ -308,7 +307,7 @@ public class AstrophysicsDataSystem
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload urlDownload = new URLDownload(url);
-        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+        importerPreferences.getApiKey(getName()).ifPresent(key -> urlDownload.addHeader("Authorization", "Bearer " + key));
         return urlDownload;
     }
 }

@@ -25,13 +25,13 @@ public class Directories {
         return Path.of(System.getProperty("user.home"));
     }
 
-    public static Path getLogDirectory() {
+    public static Path getLogDirectory(Version version) {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
                                              OS.APP_DIR_APP_NAME,
                                              "logs",
                                              OS.APP_DIR_APP_AUTHOR))
-                   .resolve(new BuildInfo().version.toString());
+                   .resolve(version.toString());
     }
 
     public static Path getBackupDirectory() {
