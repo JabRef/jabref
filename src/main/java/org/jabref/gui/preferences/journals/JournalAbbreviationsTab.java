@@ -85,7 +85,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         setBindings();
         setAnimations();
 
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
 

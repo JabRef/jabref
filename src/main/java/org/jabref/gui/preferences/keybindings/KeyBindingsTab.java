@@ -91,7 +91,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
                 new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
         );
 
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
 
