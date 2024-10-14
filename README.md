@@ -1,7 +1,6 @@
 # JabRef Fork - Issue #296 - Adding Ctrl+J to jump to a field
 
-JabRef is an open-source, cross-platform citation and reference management tool. FOr more info on JabRef, click [here](https://github.com/JabRef/jabref?tab=readme-ov-file#readme)
-In this repository, we aim to tackle [Issue #296](https://github.com/orgs/JabRef/projects/5/views/1?pane=issue&itemId=14151869&issue=koppor%7Cjabref%7C296) to add a function to give users easier access for navigating fields. 
+JabRef is an open-source, cross-platform citation and reference management tool. For more info on JabRef, click [here](https://github.com/JabRef/jabref?tab=readme-ov-file#readme). In this repository, we aim to tackle [Issue #296](https://github.com/orgs/JabRef/projects/5/views/1?pane=issue&itemId=14151869&issue=koppor%7Cjabref%7C296) to add a function to give users easier access for navigating fields. 
 
 ### Proposed Steps
 
