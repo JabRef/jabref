@@ -33,6 +33,7 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.Version;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
@@ -140,7 +141,8 @@ public class Launcher {
         }
 
         // addLogToDisk
-        Path directory = Directories.getLogDirectory();
+        Version version = Injector.instantiateModelOrService(BuildInfo.class).version;
+        Path directory = Directories.getLogDirectory(version);
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
