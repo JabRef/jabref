@@ -11,12 +11,10 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
-import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -36,16 +34,15 @@ import org.slf4j.LoggerFactory;
  * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
  */
 public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "ScienceDirect";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
-    private static final String FETCHER_NAME = "ScienceDirect";
 
-    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public ScienceDirect(ImporterPreferences importerPreferences) {
-        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).scienceDirectApiKey;
         this.importerPreferences = importerPreferences;
     }
 
@@ -142,7 +139,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(apiKey))
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(""))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 

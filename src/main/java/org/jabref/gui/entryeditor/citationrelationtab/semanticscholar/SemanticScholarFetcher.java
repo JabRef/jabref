@@ -16,6 +16,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 
 public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
+
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     private final String apiKey;
@@ -87,7 +89,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
     @Override
     public String getName() {
-        return "Semantic Scholar Citations Fetcher";
+        return FETCHER_NAME;
     }
 
     private String getApiKey() {
