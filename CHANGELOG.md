@@ -59,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When fulltext search is selected but indexing is deactivated, a dialog is now shown asking if the user wants to enable indexing now [#9491](https://github.com/JabRef/jabref/issues/9491)
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
+- When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
 
 ### Fixed
 
@@ -97,7 +98,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-
+- We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
 
 
 
