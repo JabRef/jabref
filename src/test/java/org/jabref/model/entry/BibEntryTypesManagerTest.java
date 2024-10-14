@@ -13,7 +13,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -176,7 +175,7 @@ class BibEntryTypesManagerTest {
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(new UnknownField("langid"), FieldPriority.IMPORTANT),
+                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT), //added langid standard field
                                                            new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
                                                    Collections.emptySet());
 
@@ -191,7 +190,7 @@ class BibEntryTypesManagerTest {
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(new UnknownField("langid"), FieldPriority.IMPORTANT),
+                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
                                                    Collections.emptySet());
 
@@ -209,7 +208,7 @@ class BibEntryTypesManagerTest {
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(new UnknownField("langid"), FieldPriority.IMPORTANT),
+                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
                                                    Collections.emptySet());
 
