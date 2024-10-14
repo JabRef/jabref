@@ -287,7 +287,7 @@ jobs:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Comment PR
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.

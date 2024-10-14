@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- By double clicking on a local citation in the Citation Relations Tab you can now jump the the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 
 ### Changed
 
@@ -88,6 +89,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Undo/Redo buttons were active even when all libraries are closed. [#11837](https://github.com/JabRef/jabref/issues/11837)
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
+- We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
 
 ### Removed
 
