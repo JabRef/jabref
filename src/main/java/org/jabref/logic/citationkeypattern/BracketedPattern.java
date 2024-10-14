@@ -232,6 +232,7 @@ public class BracketedPattern {
     public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
         Objects.requireNonNull(pattern);
         StringBuilder expandedPattern = new StringBuilder();
+        pattern = pattern.replace("\\\"", "\u0A17");
         StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
 
         while (parsedPattern.hasMoreTokens()) {
@@ -253,7 +254,7 @@ public class BracketedPattern {
             }
         }
 
-        return expandedPattern.toString();
+        return expandedPattern.toString().replace("\u0A17", "\\\"");
     }
 
     /**
@@ -1139,11 +1140,19 @@ public class BracketedPattern {
             } else if (currentChar == '\\') {
                 if (escaped) {
                     escaped = false;
-                    current.append(currentChar);
+                    // Only : needs to be escaped
+                    // " -> regex("...", "...") - escaping should be passed through to the regex parser
+                    // : -> :abc:def
+                    current.append('\\');
+                    current.append('\\');
                 } else {
                     escaped = true;
                 }
             } else if (escaped) {
+                if (currentChar != ':') {
+                    // Only : needs to be escaped
+                    current.append('\\');
+                }
                 current.append(currentChar);
                 escaped = false;
             } else {
