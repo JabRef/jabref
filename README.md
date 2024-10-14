@@ -1,6 +1,23 @@
-# JabRef Bibliography Management
+# JabRef Fork - Issue #296 - Adding Ctrl+J to jump to a field
 
-JabRef is an open-source, cross-platform citation and reference management tool.
+JabRef is an open-source, cross-platform citation and reference management tool. FOr more info on JabRef, click [here](https://github.com/JabRef/jabref?tab=readme-ov-file#readme)
+In this repository, we aim to tackle [Issue #296](https://github.com/orgs/JabRef/projects/5/views/1?pane=issue&itemId=14151869&issue=koppor%7Cjabref%7C296) to add a function to give users easier access for navigating fields. 
+
+### Proposed Steps
+
+- keyboard input Ctrl+J
+- type a file name
+- Then one can select the field using the cursor keys and ENTER
+- Then, it jumps to the right field editor in the entry editor
+  
+### History
+Issue #296 was first posted by [koppor](https://github.com/koppor) on January 30, 2018. It is now assigned to Jude Surin, Project Manager of Team 4-B.
+
+### Commits
+No commitments to date
+
+
+### For more information on JabRef, please read below:
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
 
