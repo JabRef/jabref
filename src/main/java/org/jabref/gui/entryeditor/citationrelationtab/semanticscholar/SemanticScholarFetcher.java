@@ -9,10 +9,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 
 public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyFetcher {
@@ -20,12 +18,10 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
-    private final String apiKey;
     private final ImporterPreferences importerPreferences;
 
     public SemanticScholarFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
-        this.apiKey = Injector.instantiateModelOrService(BuildInfo.class).semanticScholarApiKey;
     }
 
     public String getAPIUrl(String entry_point, BibEntry entry) {
@@ -48,10 +44,8 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
         }
         URLDownload urlDownload = new URLDownload(citationsUrl);
 
-        String apiKey = getApiKey();
-        if (!apiKey.isEmpty()) {
-            urlDownload.addHeader("x-api-key", apiKey);
-        }
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+
         CitationsResponse citationsResponse = new Gson()
                 .fromJson(urlDownload.asString(), CitationsResponse.class);
 
@@ -74,10 +68,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
         }
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
-        String apiKey = getApiKey();
-        if (!apiKey.isEmpty()) {
-            urlDownload.addHeader("x-api-key", apiKey);
-        }
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         ReferencesResponse referencesResponse = new Gson()
                 .fromJson(urlDownload.asString(), ReferencesResponse.class);
 
@@ -90,9 +81,5 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     @Override
     public String getName() {
         return FETCHER_NAME;
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(apiKey);
     }
 }
