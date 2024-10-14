@@ -38,15 +38,15 @@ class LinkedFileHandlerTest {
         this.tempFolder = tempFolder;
     }
 
-    @ParameterizedTest(name = "{0} to {1} should be {2}")
+    @ParameterizedTest(name = "{1} to {2} should be {0}")
     @CsvSource({
-            "test.pdf, newName, newName.pdf",
-            "test.pdf, newName.txt, newName.txt",
-            "test, newNameWithoutExtension, newNameWithoutExtension",
-            "testFile, newName.pdf, newName.pdf",
-            "test.pdf, newName., newName..pdf"
+            "newName.pdf, test.pdf, newName",
+            "newName.txt, test.pdf, newName.txt",
+            "newNameWithoutExtension, test, newNameWithoutExtension",
+            "newName.pdf, testFile, newName.pdf",
+            "newName..pdf, test.pdf, newName."
     })
-    void renameFile(String originalFileName, String newFileName, String expectedFileName) throws Exception {
+    void renameFile(String expectedFileName, String originalFileName, String newFileName) throws Exception {
         final Path tempFile = tempFolder.resolve(originalFileName);
         Files.createFile(tempFile);
 
