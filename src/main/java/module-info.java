@@ -97,10 +97,7 @@ open module org.jabref {
     // endregion
 
     // region: SQL databases
-    requires ojdbc10;
     requires org.postgresql.jdbc;
-    requires org.mariadb.jdbc;
-    uses org.mariadb.jdbc.credential.CredentialPlugin;
     // endregion
 
     // region: Apache Commons and other (similar) helper libraries
