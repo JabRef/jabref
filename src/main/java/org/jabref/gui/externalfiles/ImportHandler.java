@@ -76,6 +76,9 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
+    // list is filled as each entry is passed to importCleanedEntries
+    private final List<BibEntry> finalizedEntries = new ArrayList<>();
+
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
                          FileUpdateMonitor fileupdateMonitor,
@@ -195,9 +198,10 @@ public class ImportHandler {
 
     public void importCleanedEntries(List<BibEntry> entries) {
         bibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
+        finalizedEntries.addAll(entries);
+        generateKeys(finalizedEntries);
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -208,19 +212,19 @@ public class ImportHandler {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
-                      .onFailure(e -> LOGGER.error("Error in duplicate search"))
-                      .onSuccess(existingDuplicateInLibrary -> {
-                          BibEntry finalEntry = entryToInsert;
-                          if (existingDuplicateInLibrary.isPresent()) {
-                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
-                              if (duplicateHandledEntry.isEmpty()) {
-                                  return;
-                              }
-                              finalEntry = duplicateHandledEntry.get();
-                          }
-                          importCleanedEntries(List.of(finalEntry));
-                          downloadLinkedFiles(finalEntry);
-                      }).executeWith(taskExecutor);
+                .onFailure(e -> LOGGER.error("Error in duplicate search"))
+                .onSuccess(existingDuplicateInLibrary -> {
+                    BibEntry finalEntry = entryToInsert;
+                    if (existingDuplicateInLibrary.isPresent()) {
+                        Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
+                        if (duplicateHandledEntry.isEmpty()) {
+                            return;
+                        }
+                        finalEntry = duplicateHandledEntry.get();
+                    }
+                    importCleanedEntries(List.of(finalEntry));
+                    downloadLinkedFiles(finalEntry);
+                }).executeWith(taskExecutor);
     }
 
     @VisibleForTesting
@@ -303,25 +307,6 @@ public class ImportHandler {
         }
     }
 
-    public void checkCrossRefKeys(List<BibEntry> entries) {
-        for (BibEntry possibleParentEntry : entries) {
-            for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-                Optional<String> crossRef = entry.getField(StandardField.CROSSREF);
-                Optional<String> childYear = entry.getField(StandardField.YEAR);
-                Optional<String> parentKey = possibleParentEntry.getCitationKey();
-                if (crossRef.isPresent() && crossRef.equals(parentKey) && childYear.isEmpty()) {
-                    Optional<String> parentYear = possibleParentEntry.getField(StandardField.YEAR);
-                    parentYear.ifPresent(year -> {
-                        String existingKey = entry.getCitationKey().orElse("");
-                        String newKey = existingKey + year;
-                        // retroactively set citation key to match parent's year
-                        entry.setCitationKey(newKey);
-                    });
-                }
-            }
-        }
-    }
-
     /**
      * Generate keys for given entries.
      *
@@ -337,7 +322,6 @@ public class ImportHandler {
                 bibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
-        checkCrossRefKeys(entries);
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {

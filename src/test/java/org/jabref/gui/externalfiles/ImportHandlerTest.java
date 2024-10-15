@@ -223,28 +223,4 @@ class ImportHandlerTest {
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
-
-    @Test
-    void checkCrossRefKeys() {
-        BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
-
-        BibEntry childEntry = new BibEntry();
-        childEntry.setField(StandardField.CROSSREF, "ParentKey");
-        childEntry.setCitationKey("ChildKey");
-
-        bibDatabase.insertEntry(childEntry);
-
-        assertEquals("ChildKey", childEntry.getCitationKey().orElse(""));
-
-        BibEntry parentEntry = new BibEntry();
-        parentEntry.setCitationKey("ParentKey");
-        parentEntry.setField(StandardField.YEAR, "2021");
-
-        bibDatabase.insertEntry(parentEntry);
-
-        importHandler.checkCrossRefKeys(List.of(parentEntry));
-
-        // The child entry's citation key should now be updated with the parent's year
-        assertEquals("ChildKey2021", childEntry.getCitationKey().orElse(""));
-    }
 }
