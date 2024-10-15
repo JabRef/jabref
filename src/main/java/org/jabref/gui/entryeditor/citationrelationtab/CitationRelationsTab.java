@@ -231,11 +231,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
-                        jumpTo.setOnMouseClicked(event -> {
-                            citingTask.cancel();
-                            citedByTask.cancel();
-                            libraryTab.showAndEdit(entry.localEntry());
-                            libraryTab.clearAndSelect(entry.localEntry());
+                        jumpTo.setOnMouseClicked(event -> jumpToEntry(entry));
+                        hContainer.setOnMouseClicked(event -> {
+                                if (event.getClickCount() == 2) {
+                                    jumpToEntry(entry);
+                                }
                         });
                         vContainer.getChildren().add(jumpTo);
                     } else {
@@ -293,6 +293,13 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private void jumpToEntry(CitationRelationItem entry) {
+        citingTask.cancel();
+        citedByTask.cancel();
+        libraryTab.showAndEdit(entry.localEntry());
+        libraryTab.clearAndSelect(entry.localEntry());
     }
 
     /**

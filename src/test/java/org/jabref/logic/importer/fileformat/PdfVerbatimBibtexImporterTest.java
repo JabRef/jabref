@@ -20,27 +20,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class PdfVerbatimBibTextImporterTest {
+class PdfVerbatimBibtexImporterTest {
 
-    private PdfVerbatimBibTextImporter importer;
+    private PdfVerbatimBibtexImporter importer;
 
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfVerbatimBibTextImporter(importFormatPreferences);
+        importer = new PdfVerbatimBibtexImporter(importFormatPreferences);
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfVerbatimBibtexImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfVerbatimBibTextImporterTest.class.getResource("mixedMetadata.pdf").toURI());
+        Path file = Path.of(PdfVerbatimBibtexImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Article);

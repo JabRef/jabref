@@ -265,7 +265,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         }
 
         CustomTextField searchBox = new CustomTextField();
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         searchBox.textProperty().addListener((obs, oldValue, newValue) ->
                 filteredList.setPredicate(ikon -> newValue.isEmpty() || ikon.getDescription().toLowerCase()
