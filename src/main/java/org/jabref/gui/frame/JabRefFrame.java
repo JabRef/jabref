@@ -14,7 +14,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -22,6 +24,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
@@ -185,6 +189,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
         initBindings();
+        bindDatabaseChanges();
+        updateContent();
     }
 
     private void initLayout() {
@@ -229,6 +235,30 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
         setCenter(splitPane);
+    }
+
+    private void updateContent() {
+        tabbedPane.getTabs().clear();
+        if (stateManager.getOpenDatabases().isEmpty()) {
+            tabbedPane.getTabs().add(createEmptyTab());
+        }
+    }
+
+    private Tab createEmptyTab() {
+        Tab emptyTab = new Tab("Welcome");
+        VBox content = new VBox(10);
+        content.setAlignment(Pos.CENTER);
+        Label welcomeLabel = new Label("Welcome to JabRef!");
+        welcomeLabel.setFont(new Font("Arial", 28));
+        welcomeLabel.setTextFill(Color.DARKSLATEGRAY);
+        content.getChildren().add(welcomeLabel);
+        emptyTab.setContent(content);
+        emptyTab.setClosable(false);
+        return emptyTab;
+    }
+
+    private void bindDatabaseChanges() {
+        stateManager.getOpenDatabases().addListener((InvalidationListener) obs -> Platform.runLater(this::updateContent));
     }
 
     private void updateSidePane() {
