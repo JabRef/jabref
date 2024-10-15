@@ -233,20 +233,45 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         // Add welcome page and tabbed pane to content pane
         contentPane.getChildren().addAll(welcomePage, tabbedPane);
-        setCenter(contentPane);  // Use contentPane as the main content area
+
+        // Initially only add contentPane to the splitPane, not sidePane
+        splitPane.getItems().add(contentPane);
 
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
-        updateSidePane();
+
+        setCenter(splitPane);
+        updateContent();  // Ensure layout is consistent on load
     }
 
     private void updateContent() {
         boolean hasOpenDatabases = !stateManager.getOpenDatabases().isEmpty();
 
-        // Show welcome page if no databases are open, otherwise show the tabs
+        // Toggle visibility between welcome page and tabbed pane
         welcomePage.setVisible(!hasOpenDatabases);
         tabbedPane.setVisible(hasOpenDatabases);
+
+        if (hasOpenDatabases) {
+            if (!splitPane.getItems().contains(sidePane)) {
+                // Ensure side pane is added only once, with preferred width
+                sidePane.setPrefWidth(260);
+                splitPane.getItems().addFirst(sidePane);
+                LOGGER.info("SidePane added with preferred width: {}", sidePane.getPrefWidth());
+            }
+
+            // Ensure the divider position is updated appropriately
+            Platform.runLater(() -> {
+                splitPane.setDividerPositions(0.2);  // Set divider to 20% width
+                LOGGER.info("Divider set to 20% after opening database.");
+            });
+
+            updateSidePane();  // Additional updates if necessary
+        } else {
+            // Ensure side pane is removed when no databases are open
+            splitPane.getItems().remove(sidePane);
+            LOGGER.info("SidePane removed as no databases are open.");
+        }
     }
 
     private void bindDatabaseChanges() {
@@ -258,19 +283,37 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (dividerSubscription != null) {
                 dividerSubscription.unsubscribe();
             }
-            splitPane.getItems().remove(sidePane);
+            splitPane.getItems().remove(sidePane);  // Remove side pane if empty
         } else {
             if (!splitPane.getItems().contains(sidePane)) {
-                splitPane.getItems().addFirst(sidePane);
-                updateDividerPosition();
+                splitPane.getItems().addFirst(sidePane);  // Add side pane back
+                updateDividerPosition();  // Adjust the divider position
             }
         }
     }
 
     public void updateDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (obs, old, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
+            double sidePaneWidth = preferences.getGuiPreferences().getSidePaneWidth();
+            double splitPaneWidth = splitPane.getWidth();
+            double dividerPosition = sidePaneWidth / splitPaneWidth;
+
+            LOGGER.info("Updating divider position...");
+            LOGGER.info("SidePane width: {}", sidePaneWidth);
+            LOGGER.info("SplitPane width: {}", splitPaneWidth);
+            LOGGER.info("Calculated divider position: {}", dividerPosition);
+
+            splitPane.setDividerPositions(dividerPosition);
+
+            dividerSubscription = EasyBind.listen(
+                    sidePane.widthProperty(),
+                    (obs, old, newVal) -> {
+                        LOGGER.info("SidePane width changed: old = {}, new = {}", old, newVal);
+                        preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue());
+                    }
+            );
+        } else {
+            LOGGER.info("Divider position not updated: Main stage not showing or sidePane is empty.");
         }
     }
 
@@ -468,13 +511,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void addTab(@NonNull LibraryTab libraryTab, boolean raisePanel) {
         tabbedPane.getTabs().add(libraryTab);
+
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
             tabbedPane.requestFocus();
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
+
+        // Ensure layout is updated
         updateContent();
+        updateSidePane();
+
+        // Set the preferred width and divider position explicitly
+        sidePane.setPrefWidth(260);
+        Platform.runLater(() -> {
+            if (!sidePane.getChildren().isEmpty() && !splitPane.getItems().contains(sidePane)) {
+                splitPane.getItems().addFirst(sidePane);
+
+                // Force divider to a known position (e.g., 0.2 of the total width)
+                LOGGER.info("Forcing divider position after adding tab.");
+                splitPane.setDividerPositions(0.2);
+
+                updateDividerPosition();  // Ensure any further updates are applied
+            }
+        });
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
