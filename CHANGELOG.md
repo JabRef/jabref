@@ -34,6 +34,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
+- By double clicking on a local citation in the Citation Relations Tab you can now jump the the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 
 ### Changed
 
@@ -57,9 +59,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When fulltext search is selected but indexing is deactivated, a dialog is now shown asking if the user wants to enable indexing now [#9491](https://github.com/JabRef/jabref/issues/9491)
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
+- When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
 
 ### Fixed
 
+- We fixed an issue where certain actions were not disabled when no libraries were open. [#11923](https://github.com/JabRef/jabref/issues/11923)
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
 - We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
@@ -88,13 +92,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
 - We fixed an issue where adding a crossreferenced entry would not correctly generate a citation key for the child entry [#11136](https://github.com/JabRef/jabref/issues/11136)
+- We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
 
 ### Removed
 
 - We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-
+- We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
 
 
 
