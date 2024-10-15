@@ -1560,6 +1560,153 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: -2 0 0 0;
 }
 
+/** even and odd are swapped around somehow. Below "odd" matches lines 2, 4, ... **/
+
+
+.main-table .table-row-cell:matching-search-and-groups > .table-cell {
+    -fx-text-fill: -jr-match-1-text-color;
+}
+.main-table .table-row-cell:matching-search-and-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-1-text-color;
+}
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-1-odd;
+}
+.main-table .table-row-cell:matching-search-and-groups:odd:selected,
+.main-table .table-row-cell:matching-search-and-groups:odd:focused,
+.main-table .table-row-cell:matching-search-and-groups:odd:focused:hover,
+.main-table .table-row-cell:matching-search-and-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.main-table .table-row-cell:matching-search-and-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:matching-search-not-groups {
+    -fx-background-color: -jr-match-2-even;
+}
+.main-table .table-row-cell:matching-search-not-groups > .table-cell {
+    -fx-text-fill: -jr-match-2-text-color;
+}
+.main-table .table-row-cell:matching-search-not-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-2-text-color;
+}
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-search-not-groups:odd {
+    -fx-background-color: -jr-match-2-odd;
+}
+.main-table .table-row-cell:matching-search-not-groups:odd:selected,
+.main-table .table-row-cell:matching-search-not-groups:odd:focused,
+.main-table .table-row-cell:matching-search-not-groups:odd:focused:hover,
+.main-table .table-row-cell:matching-search-not-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.main-table .table-row-cell:matching-search-not-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:matching-groups-not-search {
+    -fx-background-color: -jr-match-3-even;
+}
+.main-table .table-row-cell:matching-groups-not-search > .table-cell {
+    -fx-text-fill: -jr-match-3-text-color;
+}
+.main-table .table-row-cell:matching-groups-not-search:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-3-text-color;
+}
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.main-table .table-row-cell:matching-groups-not-search:odd {
+    -fx-background-color: -jr-match-3-odd;
+}
+.main-table .table-row-cell:matching-groups-not-search:odd:selected,
+.main-table .table-row-cell:matching-groups-not-search:odd:focused,
+.main-table .table-row-cell:matching-groups-not-search:odd:focused:hover,
+.main-table .table-row-cell:matching-groups-not-search:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.main-table .table-row-cell:matching-groups-not-search:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups {
+    -fx-background-color: -jr-match-4-even;
+}
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell {
+    -fx-text-fill: -jr-match-4-text-color;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-4-text-color;
+}
+.main-table.table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-4-odd;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:odd:selected,
+.main-table .table-row-cell:not-matching-search-and-groups:odd:focused,
+.main-table .table-row-cell:not-matching-search-and-groups:odd:focused:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.main-table .table-row-cell:not-matching-search-and-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
 
 .rating > .container {
     -fx-spacing: 2;
