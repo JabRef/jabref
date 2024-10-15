@@ -98,7 +98,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private BibEntry entriesMerge;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -254,12 +253,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
                         compareButton.setOnMouseClicked(event -> {
-                            openPossibleDuplicateEntriesWindow(entry);
-
-                            // update local entry of selected citation relation item
-                            listView.getItems().set(listView.getItems().indexOf(entry), new CitationRelationItem(entry.entry(), entriesMerge, true));
-                            // let main table know this is a citation merge
-                            libraryTab.getMainTable().setCitationMerge(true);
+                            openPossibleDuplicateEntriesWindow(entry, listView);
                         });
                         vContainer.getChildren().add(compareButton);
                     } else {
@@ -540,26 +534,32 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Function to open possible duplicate entries window to compare duplicate entries
      *
      * @param duplicateItem duplicate in the citation relations tab
+     * @param listView CheckListView to display citations
      */
-    private void openPossibleDuplicateEntriesWindow(CitationRelationItem duplicateItem) {
+    private void openPossibleDuplicateEntriesWindow(CitationRelationItem duplicateItem, CheckListView<CitationRelationItem> listView) {
         BibEntry localEntry = duplicateItem.localEntry();
         BibEntry duplicateEntry = duplicateItem.entry();
 
         MergeEntriesDialog dialog = new MergeEntriesDialog(localEntry, duplicateEntry, preferences);
         dialog.setTitle(Localization.lang("Possible duplicate entries"));
 
-        Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
-        mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            entriesMerge = entriesMergeResult.mergedEntry();
+        Optional<EntriesMergeResult> entriesMergeResult = dialogService.showCustomDialogAndWait(dialog);
+        entriesMergeResult.ifPresentOrElse(mergeResult -> {
+
+            BibEntry mergedEntry = mergeResult.mergedEntry();
+            libraryTab.getMainTable().setCitationMergeMode(true);
+            // update local entry of selected citation relation item
+            listView.getItems().set(listView.getItems().indexOf(duplicateItem), new CitationRelationItem(duplicateItem.entry(), mergedEntry, true));
+
             // Merge method is similar to MergeTwoEntriesAction#execute
             BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
 
-            database.removeEntry(entriesMergeResult.originalLeftEntry());
-            database.insertEntry(entriesMergeResult.mergedEntry());
+            database.removeEntry(mergeResult.originalLeftEntry());
+            database.insertEntry(mergedEntry);
 
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableRemoveEntries(database, entriesMergeResult.originalLeftEntry()));
-            ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
+            ce.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+            ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), mergedEntry));
             ce.end();
 
             undoManager.addEdit(ce);

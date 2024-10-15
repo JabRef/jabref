@@ -82,7 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
-    private boolean citationMerge = false; // citation merge flag
+    private boolean citationMergeMode = false;
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
@@ -251,11 +251,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void clearAndSelect(BibEntry bibEntry) {
         // check if entries merged from citation relations tab
-        if (citationMerge) {
-            // keep original entry selected and change flag to false
-            this.citationMerge = false;
+        if (citationMergeMode) {
+            // keep original entry selected and reset citation merge mode
+            this.citationMergeMode = false;
         } else {
-            // selected new entry
+            // select new entry
             getSelectionModel().clearSelection();
             findEntry(bibEntry).ifPresent(entry -> {
                 getSelectionModel().select(entry);
@@ -501,7 +501,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .findFirst();
     }
 
-    public void setCitationMerge(boolean merge) {
-        this.citationMerge = merge;
+    public void setCitationMergeMode(boolean citationMerge) {
+        this.citationMergeMode = citationMerge;
     }
 }
