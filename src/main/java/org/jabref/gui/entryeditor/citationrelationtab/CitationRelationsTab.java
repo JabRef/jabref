@@ -252,10 +252,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().add(jumpTo);
 
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
-                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entries")));
+                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
                         compareButton.setOnMouseClicked(event -> {
                             openPossibleDuplicateEntriesWindow(entry);
-                            
+
                             // update local entry of selected citation relation item
                             listView.getItems().set(listView.getItems().indexOf(entry), new CitationRelationItem(entry.entry(), entriesMerge, true));
                             // let main table know this is a citation merge
