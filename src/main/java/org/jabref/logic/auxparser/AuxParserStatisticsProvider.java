@@ -1,15 +1,14 @@
-package org.jabref.gui.auximport;
+package org.jabref.logic.auxparser;
 
 import java.util.stream.Collectors;
 
-import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.l10n.Localization;
 
-public class AuxParserResultViewModel {
+public class AuxParserStatisticsProvider {
 
     private AuxParserResult auxParserResult;
 
-    public AuxParserResultViewModel(AuxParserResult auxParserResult) {
+    public AuxParserStatisticsProvider(AuxParserResult auxParserResult) {
         this.auxParserResult = auxParserResult;
     }
 
