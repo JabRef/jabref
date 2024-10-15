@@ -95,10 +95,11 @@ public class FileDirectoryHandler {
 
     private Optional<DirectoryType> determineCurrentDirectory(Path filePath) {
         MetaData metaData = databaseContext.getMetaData();
-
+        System.out.println("File Path");
+        System.out.println(filePath);
         // Check main directory
-        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
-        if (mainFilePath != null && filePath.startsWith(mainFilePath)) {
+        Optional<Path> mainFilePath = filePreferences.getMainFileDirectory();
+        if (mainFilePath.isPresent() && filePath.startsWith(mainFilePath.get())) {
             return Optional.of(DirectoryType.MAIN);
         }
 

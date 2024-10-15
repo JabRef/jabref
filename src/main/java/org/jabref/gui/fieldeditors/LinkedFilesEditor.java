@@ -368,12 +368,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 //                });
 //            }
 //        }
+
         MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
         BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
         moveFileItem.disableProperty().bind(isMoveFileDisabled);
 
-        // Context action for MOVE_FILE standard action
-        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences);
+        // Context action for MOVE_FILE_TO_FOLDER standard action
+        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem);
         moveFileItem.setOnAction(event -> moveFileAction.execute());
 
         // Bind moveFileItem enabling condition based on current file path availability
@@ -382,19 +383,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         if (currentFilePath.isPresent()) {
             isMoveFileDisabled.set(false);
-            // Determine the target directory
-            FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
-            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath.get());
-
-            if (targetDirectory.isPresent()) {
-                FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
-                // Update the menu item text with the target directory name asynchronously
-                Platform.runLater(() -> {
-                    moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
-                });
-            }
+            updateMoveFileItemText(moveFileItem, currentFilePath.get());
         } else {
             isMoveFileDisabled.set(true);
+            moveFileItem.setText(Localization.lang("Move file"));
         }
 
         menu.getItems().addAll(
@@ -417,14 +409,32 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return menu;
     }
 
+    private void updateMoveFileItemText(MenuItem moveFileItem, Path currentFilePath) {
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
+
+        if (targetDirectory.isPresent()) {
+            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
+        } else {
+            moveFileItem.setText(Localization.lang("Move file"));
+        }
+    }
+
     private class ContextAction extends SimpleCommand {
 
         private final StandardActions command;
         private final LinkedFileViewModel linkedFile;
+        private final MenuItem menuItem;
 
         public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
+            this(command, linkedFile, preferences, null);
+        }
+
+        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences, MenuItem menuItem) {
             this.command = command;
             this.linkedFile = linkedFile;
+            this.menuItem = menuItem;
 
             this.executable.bind(
                     switch (command) {
@@ -494,7 +504,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                                 Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
                                 Files.move(currentFilePath.get(), target);
                                 linkedFile.getFile().setLink(target.toString());
-                            } catch (IOException e) {
+
+                                // Update the menu item text after moving the file
+                                if (menuItem != null) {
+                                    Platform.runLater(() -> updateMoveFileItemText(menuItem, target));
+                                }
+                            } catch (
+                                    IOException e) {
                                 dialogService.showErrorDialogAndWait(
                                         Localization.lang("Move file"),
                                         Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
