@@ -135,20 +135,16 @@ public class AuthorListParser {
      * @param listOfNames the String containing the person names to be parsed
      * @return a parsed list of persons
      */
-
     public AuthorList parse(@NonNull String listOfNames) {
-
-        // Handle " and others" suffix
         SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
         listOfNames = simpleNormalForm.authors;
         boolean andOthersPresent = simpleNormalForm.andOthersPresent;
 
-        // Split the author list using the new method that respects braces
+        // Split the author list
         List<String> authorsArray = splitAuthors(listOfNames);
         List<Author> authors = new ArrayList<>(authorsArray.size());
 
         for (String authorString : authorsArray) {
-            // Trim whitespace
             authorString = authorString.trim();
             Optional<Author> author = Optional.empty();
             if (authorString.startsWith("family=")) {
@@ -162,14 +158,14 @@ public class AuthorListParser {
                 int savedTokenStart = tokenStart;
                 int savedTokenEnd = tokenEnd;
 
-                // Set original to authorString, reset token positions
+                // set original to authorString and reset token positions
                 original = authorString;
                 tokenStart = 0;
                 tokenEnd = 0;
 
                 author = getAuthor();
 
-                // Restore original state
+                // restore original state
                 original = savedOriginal;
                 tokenStart = savedTokenStart;
                 tokenEnd = savedTokenEnd;
@@ -184,7 +180,14 @@ public class AuthorListParser {
         return AuthorList.of(authors);
     }
 
-
+    /**
+     * Attempts to parse a single author string using the BibLaTeX extended name format.
+     * The format includes attributes such as family, given, prefix, and suffix.
+     * Also handles the 'useprefix=false' case where the prefix should be ignored.
+     *
+     * @param authorString the string representing a single author in extended format
+     * @return Optional containing an Author object if parsing is successful, or empty if not
+     */
     private Optional<Author> parseExtendedNameFormat(String authorString) {
         Map<String, String> nameParts = new HashMap<>();
         Matcher matcher = Pattern.compile("(\\w+)\\s*=\\s*([^,]+)(?:,\\s*|$)").matcher(authorString);
@@ -202,18 +205,26 @@ public class AuthorListParser {
         String nameSuffix = nameParts.get("suffix");
         String usePrefix = nameParts.get("useprefix");
 
-        // Handle 'useprefix=false'
+        // handle useprefix=false
         if ("false".equalsIgnoreCase(usePrefix)) {
             namePrefix = null;
         }
 
-        // Abbreviate given name
+        // abbreviate given name
         String givenNameAbbreviated = abbreviateGivenName(givenName);
 
-        // Create Author object
+        // create Author object
         return Optional.of(new Author(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix));
     }
 
+
+    /**
+     * Abbreviates the given name by taking the first letter of each word and appending a dot.
+     * Handles cases where the given name is already in an abbreviated format.
+     *
+     * @param givenName the given name string to abbreviate
+     * @return the abbreviated version of the given name
+     */
     private String abbreviateGivenName(String givenName) {
         if (givenName == null || givenName.isEmpty()) {
             return null;
@@ -222,14 +233,14 @@ public class AuthorListParser {
         StringBuilder abbreviated = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             if (!parts[i].isEmpty()) {
-                // Check if the part is already an initial with a dot
+                // check if the part is already an initial with a dot
                 if (parts[i].matches("[A-Z]\\.")) {
                     abbreviated.append(parts[i]);
                 } else {
                     abbreviated.append(parts[i].charAt(0)).append('.');
                 }
                 if (i < parts.length - 1) {
-                    abbreviated.append(' '); // Add space between initials
+                    abbreviated.append(' ');
                 }
             }
         }
@@ -237,9 +248,9 @@ public class AuthorListParser {
     }
 
     /**
-     * Splits the author list into individual authors while respecting braces.
+     * Splits the author list into individual authors
      *
-     * @param authorList the raw author list string
+     * @param authorList the author list string
      * @return a list of individual author strings
      */
     private List<String> splitAuthors(String authorList) {
@@ -254,11 +265,10 @@ public class AuthorListParser {
                 bracesLevel--;
             } else if (i <= authorList.length() - 5 && authorList.substring(i, i + 5).equals(" and ") && bracesLevel == 0) {
                 authors.add(authorList.substring(start, i));
-                i += 4; // Skip ' and '
+                i += 4;
                 start = i + 1;
             }
         }
-        // Add the last author
         authors.add(authorList.substring(start));
         return authors;
     }
@@ -295,14 +305,13 @@ public class AuthorListParser {
     private Optional<Author> getAuthor() {
         int savedTokenStart = tokenStart;
 
-        // Skip whitespace
         while (tokenStart < original.length() && Character.isWhitespace(original.charAt(tokenStart))) {
             tokenStart++;
         }
 
-        // Check if the substring starting at tokenStart begins with 'family='
+        // check if the substring starting at tokenStart starts with "family="
         if (original.startsWith("family=", tokenStart)) {
-            // Try to parse up to the next ' and ' or end of string
+            // try to parse up to the next 'and' or end of string
             int indexOfAnd = original.indexOf(" and ", tokenStart);
             String authorString;
             if (indexOfAnd >= 0) {
@@ -318,7 +327,7 @@ public class AuthorListParser {
             if (extendedAuthor.isPresent()) {
                 return extendedAuthor;
             } else {
-                // Parsing failed, reset tokenStart
+                // parsing failed so reset tokenStart
                 tokenStart = savedTokenStart;
             }
         }
@@ -639,4 +648,3 @@ public class AuthorListParser {
         WORD
     }
 }
-
