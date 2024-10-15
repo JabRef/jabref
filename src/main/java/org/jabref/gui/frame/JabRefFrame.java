@@ -14,18 +14,15 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
-import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
@@ -49,6 +46,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.WelcomePage;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -102,6 +100,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TabPane tabbedPane = new TabPane();
 
     private Subscription dividerSubscription;
+
+    private final WelcomePage welcomePage = new WelcomePage();
+    private final StackPane contentPane = new StackPane();  // Holds both WelcomePage and TabPane
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -185,6 +186,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
         });
 
+        // Initialize layout and bindings
         initLayout();
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
@@ -229,32 +231,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        // Add welcome page and tabbed pane to content pane
+        contentPane.getChildren().addAll(welcomePage, tabbedPane);
+        setCenter(contentPane);  // Use contentPane as the main content area
+
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
-        setCenter(splitPane);
     }
 
     private void updateContent() {
-        tabbedPane.getTabs().clear();
-        if (stateManager.getOpenDatabases().isEmpty()) {
-            tabbedPane.getTabs().add(createEmptyTab());
-        }
-    }
+        boolean hasOpenDatabases = !stateManager.getOpenDatabases().isEmpty();
 
-    private Tab createEmptyTab() {
-        Tab emptyTab = new Tab("Welcome");
-        VBox content = new VBox(10);
-        content.setAlignment(Pos.CENTER);
-        Label welcomeLabel = new Label("Welcome to JabRef!");
-        welcomeLabel.setFont(new Font("Arial", 28));
-        welcomeLabel.setTextFill(Color.DARKSLATEGRAY);
-        content.getChildren().add(welcomeLabel);
-        emptyTab.setContent(content);
-        emptyTab.setClosable(false);
-        return emptyTab;
+        // Show welcome page if no databases are open, otherwise show the tabs
+        welcomePage.setVisible(!hasOpenDatabases);
+        tabbedPane.setVisible(hasOpenDatabases);
     }
 
     private void bindDatabaseChanges() {
@@ -482,6 +474,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
+        updateContent();
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
