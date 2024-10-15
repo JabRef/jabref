@@ -333,7 +333,7 @@ jobs:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   requirements_coverage:
-    name: "Validate requiremenet coverage"
+    name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
