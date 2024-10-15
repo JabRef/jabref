@@ -10,7 +10,6 @@ on:
 
 jobs:
   FirstTimeCodeContribution:
-    name: Add greeting to issues for first time contributors
     if: ${{ github.event.label.name == 'FirstTimeCodeContribution' }}
     runs-on: ubuntu-latest
     permissions:
@@ -47,7 +46,7 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
   Assigned:
-    name: "Update project boards for label '📍 Assigned'"
+    name: "📍 Assigned"
     if: ${{ github.event.label.name == '📍 Assigned' }}
     runs-on: ubuntu-latest
     permissions:
@@ -70,6 +69,7 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
   good-first-issue:
+    name: "good first issue"
     if: "${{ github.event.label.name == 'good first issue' }}"
     runs-on: ubuntu-latest
     steps:
@@ -90,6 +90,7 @@ jobs:
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
           gh project item-add 15 --owner JabRef --url $ISSUE_URL
   status-freeze:
+    name: "status: freeze"
     if: "${{ github.event.label.name == 'status: freeze' }}"
     runs-on: ubuntu-latest
     steps:
