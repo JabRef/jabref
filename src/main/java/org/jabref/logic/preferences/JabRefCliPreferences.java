@@ -31,6 +31,7 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -52,9 +53,12 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -81,6 +85,7 @@ import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -1998,6 +2003,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getCustomImportFormats(),
                 getFetcherKeys(),
+                getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
                 PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER))
@@ -2081,6 +2087,24 @@ public class JabRefCliPreferences implements CliPreferences {
         } catch (Exception ex) {
             LOGGER.warn("JabRef could not open the key store");
         }
+
+        return keys;
+    }
+
+    private Map<String, String> getDefaultFetcherKeys() {
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        if (buildInfo == null) {
+            LOGGER.warn("Could not instantiate BuildInfo.");
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> keys = new HashMap<>();
+        keys.put(SemanticScholarFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
+        keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
+        keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
+        keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
+        keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        // SpringerLink uses the same key and fetcher name as SpringerFetcher
 
         return keys;
     }
