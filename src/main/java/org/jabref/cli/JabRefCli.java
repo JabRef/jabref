@@ -26,7 +26,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
-import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -140,8 +139,8 @@ public class JabRefCli {
         }
 
         // addLogToDisk
-        Version version = Injector.instantiateModelOrService(BuildInfo.class).version;
-        Path directory = Directories.getLogDirectory(version);
+        // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
+        Path directory = Directories.getLogDirectory(new BuildInfo().version);
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {

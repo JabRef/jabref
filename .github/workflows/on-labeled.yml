@@ -1,4 +1,4 @@
-name: React on issue labels
+name: On labeled
 
 on:
   issues:
@@ -31,7 +31,7 @@ jobs:
 
           Happy coding! 🚀
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      uses: m7kvqbe1/github-action-move-issues@v1.0.9
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -39,7 +39,7 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      uses: m7kvqbe1/github-action-move-issues@v1.0.9
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -54,7 +54,7 @@ jobs:
       issues: write
     steps:
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      uses: m7kvqbe1/github-action-move-issues@v1.0.9
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -62,10 +62,52 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.0
+      uses: m7kvqbe1/github-action-move-issues@v1.0.9
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/5"
        target-labels: "📍 Assigned"
        target-column: "Assigned"
        ignored-columns: ""
+  good-first-issue:
+    if: "${{ github.event.label.name == 'good first issue' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "good first issue"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 5 --owner JabRef --url $ISSUE_URL
+  needs-refinement:
+    if: github.event.label.name == 'needs-refinement'
+    runs-on: ubuntu-latest
+    steps:
+      - name: needs-refinement
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 15 --owner JabRef --url $ISSUE_URL
+  status-freeze:
+    if: "${{ github.event.label.name == 'status: freeze' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "status: freeze"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 9 --owner JabRef --url $ISSUE_URL
+  ui:
+    if: "${{ github.event.label.name == 'ui' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: ui
+        env:
+          GH_DEBUG: api
+          GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          echo $ISSUE_URL
+          gh project item-add 8 --owner JabRef --url $ISSUE_URL
