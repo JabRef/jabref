@@ -49,7 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
 - The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
-- We relaxed the escaping requirements for [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns). [#11967](https://github.com/JabRef/jabref/pull/11967)
+- ⚠️ We relaxed the escaping requirements for [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns). One only needs to write `\"` if a quote sign should be escaped. All other escapings are not necessary (and working) any more. [#11967](https://github.com/JabRef/jabref/pull/11967)
 - JabRef now uses TLS 1.2 for all HTTPS connections. [#11852](https://github.com/JabRef/jabref/pull/11852)
 - We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 - We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
