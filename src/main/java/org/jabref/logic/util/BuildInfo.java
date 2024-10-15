@@ -20,7 +20,6 @@ public final class BuildInfo {
     public final Version version;
     public final String maintainers;
     public final String year;
-    public final String azureInstrumentationKey;
     public final String springerNatureAPIKey;
     public final String astrophysicsDataSystemAPIKey;
     public final String ieeeAPIKey;
@@ -50,7 +49,6 @@ public final class BuildInfo {
         version = Version.parse(properties.getProperty("version"));
         year = properties.getProperty("year", "");
         maintainers = properties.getProperty("maintainers", "");
-        azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");

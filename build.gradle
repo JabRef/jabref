@@ -166,7 +166,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "9.12.0"
+    def luceneVersion = "10.0.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -238,7 +238,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.51.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.58.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -302,7 +302,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.8'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.9'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.8'
     implementation 'org.glassfish.hk2:hk2-api:3.1.1'
@@ -311,7 +311,7 @@ dependencies {
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
     // HTTP server
     // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
-    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.8'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.9'
     testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.8'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
@@ -370,7 +370,7 @@ dependencies {
     // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.176'
+    testImplementation 'io.github.classgraph:classgraph:4.8.177'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
