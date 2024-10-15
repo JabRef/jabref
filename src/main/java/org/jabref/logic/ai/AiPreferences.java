@@ -497,7 +497,7 @@ public class AiPreferences {
                         geminiApiBaseUrl.get();
             };
         } else {
-            return AiDefaultPreferences.PROVIDERS_API_URLS.get(aiProvider.get());
+            return aiProvider.get().getApiUrl();
         }
     }
 

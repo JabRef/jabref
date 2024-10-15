@@ -8,7 +8,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.util.ErrorMessage;
@@ -160,7 +159,7 @@ public class AiChatLogic {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
 
         LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
-                AiDefaultPreferences.PROVIDERS_API_URLS.get(aiPreferences.getAiProvider()),
+                aiPreferences.getAiProvider().getApiUrl(),
                 name.get(),
                 message.singleText());
 
