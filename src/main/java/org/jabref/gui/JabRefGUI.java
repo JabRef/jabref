@@ -25,6 +25,7 @@ import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.welcome.WelcomeScreen;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
@@ -85,12 +86,10 @@ public class JabRefGUI extends Application {
     public void start(Stage stage) {
         this.mainStage = stage;
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> {
-            UiTaskExecutor.runInJavaFXThread(() -> {
-                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-                dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-            });
-        });
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
+            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+        }));
 
         initialize();
 
@@ -232,7 +231,13 @@ public class JabRefGUI extends Application {
         mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
-        Scene scene = new Scene(JabRefGUI.mainFrame);
+        // Check if databases are open and display the appropriate screen
+        Scene scene;
+        if (stateManager.getOpenDatabases().isEmpty()) {
+            scene = WelcomeScreen.createWelcomeScene(); // Display the welcome screen
+        } else {
+            scene = new Scene(mainFrame); // Display the main frame
+        }
 
         LOGGER.debug("installing CSS");
         themeManager.installCss(scene);
