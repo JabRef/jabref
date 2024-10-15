@@ -1,4 +1,4 @@
-name: React on issue labels
+name: On labeled
 
 on:
   issues:
