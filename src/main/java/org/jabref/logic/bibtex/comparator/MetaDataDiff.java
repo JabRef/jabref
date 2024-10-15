@@ -114,7 +114,7 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
         addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
-        addToListIfDiff(changes, DifferenceType.LIBRARY_FILE_DIRECTORY, originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory());
+        addToListIfDiff(changes, DifferenceType.LIBRARY_FILE_DIRECTORY, originalMetaData.getLibraryFileDirectory(), newMetaData.getLibraryFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
         return changes;
     }

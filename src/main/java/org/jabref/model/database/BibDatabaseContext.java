@@ -165,7 +165,7 @@ public class BibDatabaseContext {
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        Optional<Path> generalFileDirectory = metaData.getLibraryFileDirectory().map(dir -> getFileDirectoryPath(dir));
         generalFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
