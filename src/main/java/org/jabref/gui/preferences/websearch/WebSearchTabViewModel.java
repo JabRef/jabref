@@ -68,6 +68,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final ListProperty<FetcherApiKey> tempApiKeys = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -138,7 +139,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        apiKeys.setValue(FXCollections.observableArrayList(preferences.getImporterPreferences().getApiKeys()));
+        tempApiKeys.set(FXCollections.observableArrayList(
+                preferences.getImporterPreferences().getApiKeys().stream()
+                           .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
+                           .collect(Collectors.toList())
+        ));
+
+        apiKeys.set(tempApiKeys);
+
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(preferences.getImporterPreferences().shouldPersistCustomKeys());
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
@@ -154,6 +162,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        preferences.getImporterPreferences().getApiKeys().clear();
+        preferences.getImporterPreferences().getApiKeys().addAll(apiKeys);
+
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
