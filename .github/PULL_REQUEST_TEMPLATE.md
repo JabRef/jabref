@@ -13,6 +13,7 @@ Don't reference an issue in the PR title because GitHub does not support auto-li
 - [x] done; [ ] not done / not applicable
 -->
 
+- [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
