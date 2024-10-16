@@ -14,11 +14,37 @@ The problem is how to store the default values.
 
 ## Considered Options
 
-* _Localize Defaults_ (current implementation)
-* _Store the Preference only when it was changed by the user_. Otherwise, leave it empty. When a consumer gets such an empty preference, it knows that it needs to read the default and localize it. This won't work if users actually want something to be empty.
-* _Store the unlocalized String._ Consumers then check the String they got as a preference against the defaults. If it matches, localize it. Otherwise, use it.
-* _Localize any stored value in the preferences if the string is 'escaped' by `%` as the first character._ Already used in fxml files to indicate translateable strings.
+* Localize Defaults
+* Store the preference only when it was changed by the user
+* Store the unlocalized string
+* Mark default value with `%`
 
 ## Decision Outcome
 
-Chosen option: "Localize any stored value in the preferences if the string is 'escaped' by `%` as the first character.", because it achieves goals without requiring too much refactoring and reuses a pattern already in use.
+Chosen option: "Mark default value with `%`", because it achieves goals without requiring too much refactoring and reuses a pattern already in use.
+
+## Considered Options
+
+### Localize Defaults
+
+* Good, because it is the current implementaton
+
+### Store the pPreference only when it was changed by the user
+
+Otherwise, leave it empty. When a consumer gets such an empty preference, it knows that it needs to read the default and localize it.
+
+- Bad, because this won't work if users actually want something to be empty.
+
+### Store the unlocalized string
+
+Consumers then check the string they got as a preference against the defaults. If it matches, localize it. Otherwise, use it.
+
+### Mark default value with `%`
+
+If user stores value, the value is stored as is.
+The default value is stored with `%` in front.
+A caller has to localize any stored value in the preferences if the string is 'escaped' by `%` as the first character
+
+- Good, because clear distinction between default value and user-supplied value
+- Good, because on update of JabRef's defaults, the string is not modified
+- Good, because already used in fxml files to indicate translateable strings.
