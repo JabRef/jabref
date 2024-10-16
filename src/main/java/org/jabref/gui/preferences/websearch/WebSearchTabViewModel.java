@@ -56,7 +56,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    // ObservableList to store API keys for editing in the UI
     private final ObservableList<FetcherApiKey> apiKeys = FXCollections.observableArrayList();
     private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
     private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
@@ -139,7 +138,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        // Initialize apiKeys with a deep copy of the actual API Keys
         apiKeys.setAll(preferences.getImporterPreferences().getApiKeys().stream()
                                   .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
                                   .collect(Collectors.toList()));
