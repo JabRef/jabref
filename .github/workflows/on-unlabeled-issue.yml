@@ -1,11 +1,8 @@
-name: On unlabeled
+name: On unlabeled issue
 
 on:
   issues:
      types:
-       - unlabeled
-  pull_request_target:
-    types:
        - unlabeled
 
 jobs:

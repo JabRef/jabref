@@ -1,11 +1,8 @@
-name: On labeled
+name: On labeled issue
 
 on:
   issues:
      types:
-       - labeled
-  pull_request_target:
-    types:
        - labeled
 
 jobs:
