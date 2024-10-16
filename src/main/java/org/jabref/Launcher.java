@@ -2,7 +2,7 @@ package org.jabref;
 
 import java.util.List;
 
-import org.jabref.cli.JabRefCli;
+import org.jabref.cli.JabKit;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -23,7 +23,7 @@ import com.airhacks.afterburner.injection.Injector;
 public class Launcher {
 
     public static void main(String[] args) {
-        JabRefCli.initLogging(args);
+        JabKit.initLogging(args);
 
         // Initialize preferences
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
@@ -33,7 +33,7 @@ public class Launcher {
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
-        List<UiCommand> uiCommands = JabRefCli.processArguments(args, preferences, fileUpdateMonitor);
+        List<UiCommand> uiCommands = JabKit.processArguments(args, preferences, fileUpdateMonitor);
         // The method `processArguments` quites the whole JVM if no GUI is needed.
 
         PreferencesMigrations.runMigrations(preferences);
