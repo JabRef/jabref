@@ -13,6 +13,8 @@ import java.util.Optional;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
+import javafx.scene.input.TransferMode;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -36,6 +38,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
@@ -75,6 +78,7 @@ public class ImportHandler {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final LuceneManager luceneManager;
 
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
@@ -82,7 +86,8 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         LuceneManager luceneManager) {
 
         this.bibDatabaseContext = database;
         this.preferences = preferences;
@@ -90,6 +95,7 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.luceneManager = luceneManager;
 
         this.linker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
@@ -100,7 +106,7 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
@@ -127,15 +133,37 @@ public class ImportHandler {
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()), pdfEntriesInFile);
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
-                            if (!pdfEntriesInFile.isEmpty()) {
-                                entriesToAdd.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
-                                addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"), pdfEntriesInFile);
-                            } else {
+                            if (pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."), pdfEntriesInFile);
+                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
+                            } else {
+                                pdfEntriesInFile.forEach(entry -> {
+                                    if (entry.getFiles().size() > 1) {
+                                        LOGGER.warn("Entry has more than one file attached. This is not supported.");
+                                        LOGGER.warn("Entry's files: {}", entry.getFiles());
+                                    }
+                                    entry.clearField(StandardField.FILE);
+                                    switch (transferMode) {
+                                        case LINK -> {
+                                            LOGGER.debug("Mode LINK");
+                                            // FIXME:luceneManager.updateAfterDropFiles(entry) not called. Should be fixed after merge of Postgres PR.
+                                            linker.addFilesToEntry(entry, List.of(file));
+                                        }
+                                        case MOVE -> {
+                                            LOGGER.debug("Mode MOVE");
+                                            linker.moveFilesToFileDirRenameAndAddToEntry(entry, List.of(file), luceneManager);
+                                        }
+                                        case COPY -> {
+                                            LOGGER.debug("Mode COPY");
+                                            linker.copyFilesToFileDirAndAddToEntry(entry, List.of(file), luceneManager);
+                                        }
+                                    }
+                                    entriesToAdd.addAll(pdfEntriesInFile);
+                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
+                                });
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -148,20 +176,21 @@ public class ImportHandler {
                             } else {
                                 message = bibtexParserResult.getErrorMessage();
                             }
-                            addResultToList(file, success, message, entries);
+                            addResultToList(file, success, message);
                         } else {
                             BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
                             entriesToAdd.add(emptyEntryWithLink);
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."), List.of(emptyEntryWithLink));
+                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
-                        addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()), List.of());
+                        addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
 
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
 
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                    // That method does a clone() on each entry
                     UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
@@ -174,8 +203,8 @@ public class ImportHandler {
                 return results;
             }
 
-            private void addResultToList(Path newFile, boolean success, String logMessage, List<BibEntry> entries) {
-                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage, entries);
+            private void addResultToList(Path newFile, boolean success, String logMessage) {
+                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
                 results.add(result);
             }
         };

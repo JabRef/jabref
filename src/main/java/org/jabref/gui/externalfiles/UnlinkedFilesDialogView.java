@@ -121,7 +121,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 fileUpdateMonitor,
                 preferences,
                 stateManager,
-                taskExecutor);
+                taskExecutor,
+                stateManager.getLuceneManager(bibDatabaseContext).get());
 
         this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("No active library"));
 

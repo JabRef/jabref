@@ -37,7 +37,15 @@ public class LinkedFileHandler {
         this.filePreferences = Objects.requireNonNull(filePreferences);
     }
 
+    public boolean copyToDefaultDirectory() throws IOException {
+        return copyOrMoveToDefaultDirectory(false);
+    }
+
     public boolean moveToDefaultDirectory() throws IOException {
+        return copyOrMoveToDefaultDirectory(true);
+    }
+
+    private boolean copyOrMoveToDefaultDirectory(boolean isMove) throws IOException {
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
             return false;
@@ -67,8 +75,11 @@ public class LinkedFileHandler {
             Files.createDirectories(targetPath.getParent());
         }
 
-        // Move
-        Files.move(oldFile.get(), targetPath);
+        if (isMove) {
+            Files.move(oldFile.get(), targetPath);
+        } else {
+            Files.copy(oldFile.get(), targetPath);
+        }
 
         // Update path
         linkedFile.setLink(FileUtil.relativize(targetPath, databaseContext, filePreferences).toString());
