@@ -533,14 +533,16 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Function to open possible duplicate entries window to compare duplicate entries
      *
-     * @param duplicateItem duplicate in the citation relations tab
+     * @param citationRelationItem duplicate in the citation relations tab
      * @param listView CheckListView to display citations
      */
-    private void openPossibleDuplicateEntriesWindow(CitationRelationItem duplicateItem, CheckListView<CitationRelationItem> listView) {
-        BibEntry localEntry = duplicateItem.localEntry();
-        BibEntry duplicateEntry = duplicateItem.entry();
+    private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
+        BibEntry libraryEntry = citationRelationItem.localEntry();
+        BibEntry citationEntry = citationRelationItem.entry();
+        String leftHeader = Localization.lang("Library Entry");
+        String rightHeader = Localization.lang("Citation Entry");
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(localEntry, duplicateEntry, preferences);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(libraryEntry, citationEntry, leftHeader, rightHeader, preferences);
         dialog.setTitle(Localization.lang("Possible duplicate entries"));
 
         Optional<EntriesMergeResult> entriesMergeResult = dialogService.showCustomDialogAndWait(dialog);
@@ -548,7 +550,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             BibEntry mergedEntry = mergeResult.mergedEntry();
             // update local entry of selected citation relation item
-            listView.getItems().set(listView.getItems().indexOf(duplicateItem), new CitationRelationItem(duplicateItem.entry(), mergedEntry, true));
+            listView.getItems().set(listView.getItems().indexOf(citationRelationItem), new CitationRelationItem(citationRelationItem.entry(), mergedEntry, true));
 
             // Merge method is similar to MergeTwoEntriesAction#execute
             BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
