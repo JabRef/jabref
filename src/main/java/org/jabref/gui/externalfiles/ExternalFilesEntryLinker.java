@@ -52,6 +52,10 @@ public class ExternalFilesEntryLinker {
         Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
+            if (file.equals(targetFile)) {
+                // In case of source == target, we pretend, we have success
+                return Optional.of(targetFile);
+            }
             if (FileUtil.copyFile(file, targetFile, false)) {
                 return Optional.of(targetFile);
             }
