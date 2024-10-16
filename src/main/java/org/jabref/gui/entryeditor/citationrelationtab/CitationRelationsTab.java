@@ -547,14 +547,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         entriesMergeResult.ifPresentOrElse(mergeResult -> {
 
             BibEntry mergedEntry = mergeResult.mergedEntry();
-            libraryTab.getMainTable().setCitationMergeMode(true);
             // update local entry of selected citation relation item
             listView.getItems().set(listView.getItems().indexOf(duplicateItem), new CitationRelationItem(duplicateItem.entry(), mergedEntry, true));
 
             // Merge method is similar to MergeTwoEntriesAction#execute
             BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
-
             database.removeEntry(mergeResult.originalLeftEntry());
+            libraryTab.getMainTable().setCitationMergeMode(true);
             database.insertEntry(mergedEntry);
 
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
