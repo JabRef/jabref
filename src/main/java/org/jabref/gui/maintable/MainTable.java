@@ -443,11 +443,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
                         case LINK -> {
-                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
+                            LOGGER.debug("Mode LINK"); // alt win
                             importHandler.getLinker().addFilesToEntry(entry, files);
                         }
                         case MOVE -> {
-                            LOGGER.debug("Mode MOVE"); // alt on win
+                            LOGGER.debug("Mode MOVE"); // shift on win or no modifier
                             importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                         case COPY -> {
