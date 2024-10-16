@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -10,14 +11,16 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.model.entry.BibEntry;
 
 public class ImportFilesResultItemViewModel {
 
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<JabRefIcon> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.WARNING);
     private final StringProperty message = new SimpleStringProperty("");
+    private final List<BibEntry> entries;
 
-    public ImportFilesResultItemViewModel(Path file, boolean success, String message) {
+    public ImportFilesResultItemViewModel(Path file, boolean success, String message, List<BibEntry> entries) {
         this.file.setValue(file.toString());
         this.message.setValue(message);
         if (success) {
@@ -25,6 +28,7 @@ public class ImportFilesResultItemViewModel {
         } else {
             this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
         }
+        this.entries = entries;
     }
 
     public ObjectProperty<JabRefIcon> icon() {
@@ -42,5 +46,9 @@ public class ImportFilesResultItemViewModel {
     @Override
     public String toString() {
         return "ImportFilesResultItemViewModel [file=" + file.get() + ", message=" + message.get() + "]";
+    }
+
+    public List<BibEntry> getEntries() {
+        return entries;
     }
 }

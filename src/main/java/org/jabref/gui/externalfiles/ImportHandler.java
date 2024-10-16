@@ -127,31 +127,36 @@ public class ImportHandler {
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()), pdfEntriesInFile);
                             }
 
                             if (!pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
-                                addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
+                                addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"), pdfEntriesInFile);
                             } else {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
+                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."), pdfEntriesInFile);
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
-                            if (bibtexParserResult.hasWarnings()) {
-                                addResultToList(file, false, bibtexParserResult.getErrorMessage());
+                            List<BibEntry> entries = bibtexParserResult.getDatabaseContext().getEntries();
+                            entriesToAdd.addAll(entries);
+                            boolean success = !bibtexParserResult.hasWarnings();
+                            String message;
+                            if (success) {
+                                message = Localization.lang("Bib entry was successfully imported");
+                            } else {
+                                message = bibtexParserResult.getErrorMessage();
                             }
-
-                            entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
-                            addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
+                            addResultToList(file, success, message, entries);
                         } else {
-                            entriesToAdd.add(createEmptyEntryWithLink(file));
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                            BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
+                            entriesToAdd.add(emptyEntryWithLink);
+                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."), List.of(emptyEntryWithLink));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
-                        addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
+                        addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()), List.of());
 
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
@@ -169,8 +174,8 @@ public class ImportHandler {
                 return results;
             }
 
-            private void addResultToList(Path newFile, boolean success, String logMessage) {
-                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
+            private void addResultToList(Path newFile, boolean success, String logMessage, List<BibEntry> entries) {
+                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage, entries);
                 results.add(result);
             }
         };
