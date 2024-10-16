@@ -13,7 +13,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -106,30 +105,26 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             contextMenu.getItems().add(pasteItem);
             contextMenu.show(keywordTagsField.getEditor(), event.getScreenX(), event.getScreenY());
         });
+
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 
     private void handlePasteAction() {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        if (clipboard.hasString()) {
-            String pastedText = clipboard.getString().trim();
+            String pastedText = ClipBoardManager.getContents();
 
             if (!pastedText.isEmpty()) {
-                // Split keywords by the separator and add them
                 String[] keywords = pastedText.split(String.valueOf(viewModel.getKeywordSeparator()));
 
                 for (String keywordText : keywords) {
-                    Keyword keyword = viewModel.getStringConverter().fromString(keywordText.trim());
+                    Keyword keyword = Keyword.of(keywordText.trim());
 
-                    // Add keyword if it's valid and not already present
-                    if (keyword != null && !keywordTagsField.getTags().contains(keyword)) {
-                        keywordTagsField.getTags().add(keyword);
+                    if (keyword != null && !viewModel.keywordListProperty().contains(keyword)) {
+                        viewModel.keywordListProperty().add(keyword);
                     }
                 }
-                // Clear the editor after pasting
+
                 keywordTagsField.getEditor().clear();
             }
-        }
     }
 
     private Node createTag(Keyword keyword) {
@@ -139,10 +134,10 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         tagLabel.getGraphic().setOnMouseClicked(event -> keywordTagsField.removeTags(keyword));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {  // Detect double-click
-                keywordTagsField.removeTags(keyword);  // Remove the keyword
-                keywordTagsField.getEditor().setText(keyword.get());  // Enter edit mode with the keyword text
-                keywordTagsField.getEditor().requestFocus();  // Set focus to the editor
+            if (event.getClickCount() == 2) {
+                keywordTagsField.removeTags(keyword);
+                keywordTagsField.getEditor().setText(keyword.get());
+                keywordTagsField.getEditor().requestFocus();
             }
         });
         tagLabel.setOnDragDetected(event -> {
@@ -150,7 +145,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             ClipboardContent content = new ClipboardContent();
             content.putString(keyword.get());
             db.setContent(content);
-            draggedKeyword = keyword;  // Store the dragged keyword
+            draggedKeyword = keyword;
             event.consume();
         });
 
@@ -171,10 +166,9 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             } else {
                 event.setDropCompleted(false);
             }
-            draggedKeyword = null;  // Clear dragged keyword
+            draggedKeyword = null;
             event.consume();
         });
-
         tagLabel.setOnDragDone(DragEvent::consume);
 
         ContextMenu contextMenu = new ContextMenu();
