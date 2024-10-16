@@ -140,7 +140,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         apiKeys.setAll(preferences.getImporterPreferences().getApiKeys().stream()
                                   .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
-                                  .collect(Collectors.toList()));
+                                  .toList());
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(preferences.getImporterPreferences().shouldPersistCustomKeys());
