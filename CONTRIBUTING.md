@@ -78,7 +78,7 @@ GitHub will then automatically assign you.
 In case you have any questions, please
 
 1. comment on the issue,
-2. show up in our [gitter chat](https://gitter.im/JabRef/jabref), or
+2. show up in our [Gitter chat](https://gitter.im/JabRef/jabref), or
 3. show your current code using a draft pull request and ask questions.
 
 We favor looking into your code using a draft pull request, because we can then also load the code into our IDE.
