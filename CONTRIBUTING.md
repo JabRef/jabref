@@ -162,7 +162,7 @@ Add the above snippet to the English translation file located at `src/main/resou
 
 You can also directly run the specific test in your IDE.
 The test "`LocalizationConsistencyTest`" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`.
-Find more information in the [JabRef developer docs](code-howtos/localization.md).
+Find more information in the [JabRef developer docs](https://devdocs.jabref.org/code-howtos/localization.html).
 
 #### **Format of keyboard shortcuts**
 
