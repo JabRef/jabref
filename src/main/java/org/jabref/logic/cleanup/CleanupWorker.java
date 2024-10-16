@@ -41,8 +41,8 @@ public class CleanupWorker {
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
 
-            if (job instanceof MoveFilesCleanup) {
-                fileMoveExceptions.addAll(((MoveFilesCleanup) job).getIoExceptions());
+            if (job instanceof MoveFilesCleanup cleanup) {
+                fileMoveExceptions.addAll(cleanup.getIoExceptions());
             }
         }
 
