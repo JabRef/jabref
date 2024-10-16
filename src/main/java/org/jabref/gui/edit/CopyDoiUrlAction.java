@@ -2,7 +2,7 @@ package org.jabref.gui.edit;
 
 import java.util.Optional;
 
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -16,12 +16,12 @@ import org.jabref.model.entry.identifier.DOI;
  */
 public class CopyDoiUrlAction extends SimpleCommand {
 
-    private final TextArea component;
+    private final TextField component;
     private final StandardActions action;
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
 
-    public CopyDoiUrlAction(TextArea component, StandardActions action, DialogService dialogService, ClipBoardManager clipBoardManager) {
+    public CopyDoiUrlAction(TextField component, StandardActions action, DialogService dialogService, ClipBoardManager clipBoardManager) {
         this.component = component;
         this.action = action;
         this.dialogService = dialogService;

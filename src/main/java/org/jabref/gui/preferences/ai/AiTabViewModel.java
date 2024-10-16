@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.ai;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -119,7 +118,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         );
 
         this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
-            List<String> models = AiDefaultPreferences.AVAILABLE_CHAT_MODELS.get(newValue);
+            List<String> models = AiDefaultPreferences.getAvailableModels(newValue);
 
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
             // It becomes null beause currentChatModel is binded to combobox, and this combobox becomes empty.
@@ -186,14 +185,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 case HUGGING_FACE -> huggingFaceChatModel.set(newValue);
             }
 
-            Map<String, Integer> modelContextWindows = AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get());
-
-            if (modelContextWindows == null) {
-                contextWindowSize.set(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
-                return;
-            }
-
-            contextWindowSize.set(modelContextWindows.getOrDefault(newValue, AiDefaultPreferences.CONTEXT_WINDOW_SIZE));
+            contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));
         });
 
         this.currentApiKey.addListener((observable, oldValue, newValue) -> {
@@ -356,13 +348,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        String resetApiBaseUrl = AiDefaultPreferences.PROVIDERS_API_URLS.get(selectedAiProvider.get());
+        String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();
         currentApiBaseUrl.set(resetApiBaseUrl);
 
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        int resetContextWindowSize = AiDefaultPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(selectedAiProvider.get(), Map.of()).getOrDefault(currentChatModel.get(), 0);
-        contextWindowSize.set(resetContextWindowSize);
+        contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
         temperature.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.TEMPERATURE));
         documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);

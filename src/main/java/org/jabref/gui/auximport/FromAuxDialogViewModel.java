@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -96,7 +97,7 @@ public class FromAuxDialogViewModel {
             AuxParser auxParser = new DefaultAuxParser(referenceDatabase);
             auxParserResult = auxParser.parse(Path.of(auxName));
             notFoundList.setAll(auxParserResult.getUnresolvedKeys());
-            statusTextProperty.set(new AuxParserResultViewModel(auxParserResult).getInformation(false));
+            statusTextProperty.set(new AuxParserStatisticsProvider(auxParserResult).getInformation(false));
 
             if (!auxParserResult.getGeneratedBibDatabase().hasEntries()) {
                 // The generated database contains no entries -> no active generate-button

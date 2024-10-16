@@ -285,7 +285,7 @@ public class GlobalSearchBar extends HBox {
             searchField.requestFocus();
         });
 
-        openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
+        openGlobalSearchButton.disableProperty().bind(globalSearchActive.or(needsDatabase(stateManager).not()));
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());

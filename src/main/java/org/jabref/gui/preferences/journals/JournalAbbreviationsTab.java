@@ -85,7 +85,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         setBindings();
         setAnimations();
 
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
 
@@ -139,7 +139,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private void setAnimations() {
         ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
+        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
 
         searchBox.styleProperty().bind(
                 new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
@@ -181,17 +181,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         viewModel.addAbbreviation();
         selectNewAbbreviation();
         editAbbreviation();
-    }
-
-    private static StringProperty createFlashingColorStringProperty(final ObjectProperty<Color> flashingColor) {
-        final StringProperty flashingColorStringProperty = new SimpleStringProperty();
-        setColorStringFromColor(flashingColorStringProperty, flashingColor);
-        flashingColor.addListener((observable, oldValue, newValue) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
-        return flashingColorStringProperty;
-    }
-
-    private static void setColorStringFromColor(StringProperty colorStringProperty, ObjectProperty<Color> color) {
-        colorStringProperty.set(ColorUtil.toRGBACode(color.get()));
     }
 
     @FXML

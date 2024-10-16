@@ -88,7 +88,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             preferenceTabList.getSelectionModel().clearSelection();
             preferenceTabList.getSelectionModel().selectFirst();
         });
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
