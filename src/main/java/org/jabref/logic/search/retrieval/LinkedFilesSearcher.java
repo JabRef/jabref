@@ -73,7 +73,7 @@ public final class LinkedFilesSearcher {
     private SearchResults search(IndexSearcher indexSearcher, Query searchQuery) throws IOException {
         TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);
         StoredFields storedFields = indexSearcher.storedFields();
-        LOGGER.debug("Found {} matching documents", topDocs.totalHits.value);
+        LOGGER.debug("Found {} matching documents", topDocs.totalHits.value());
         return getSearchResults(topDocs, storedFields, searchQuery);
     }
 
