@@ -230,8 +230,7 @@ public class JabRefGUI extends Application {
         mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
-        Scene scene;
-        scene = new Scene(mainFrame); // Display the main frame
+        Scene scene = new Scene(JabRefGUI.mainFrame);
 
         LOGGER.debug("installing CSS");
         themeManager.installCss(scene);
