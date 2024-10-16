@@ -66,7 +66,8 @@ GitHub will then automatically assign you.
 2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
 3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
 4. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
-5. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
+5. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
+   For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
    1. Ensure that you followed the requirements listed below. They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious.
    2. For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
    3. In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
