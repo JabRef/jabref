@@ -55,8 +55,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    private boolean justImported = false;
-
     public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -105,8 +103,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                      .ifPresent(file -> {
                          try {
                              preferences.importPreferences(file);
-                             setValues();
-                             justImported = true;
+//                             setValues();
+                             updateAllTabs()
 
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
@@ -177,12 +175,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        if (justImported) {
-            dialogService.notify(Localization.lang("Preferences were just imported. No additional changes to save."));
-            justImported = false;
-            return;
-        }
-
         // Store settings
         preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
         List<String> restartWarnings = new ArrayList<>();
@@ -213,6 +205,17 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             preferencesTab.setValues();
         }
     }
+
+    public void updateAllTabs() {
+        for (PreferencesTab tab : preferenceTabs) {
+            if (tab instanceof PreferenceTabViewModel) {
+                ((PreferenceTabViewModel) tab).setValues();
+            }
+        }
+    }
+
+
+
 
     public BooleanProperty getMemoryStickProperty() {
         return memoryStickProperty;
