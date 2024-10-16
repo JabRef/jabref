@@ -56,7 +56,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
+    // ObservableList to store API keys for editing in the UI
+    private final ObservableList<FetcherApiKey> apiKeys = FXCollections.observableArrayList();
     private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
     private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
@@ -68,9 +69,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
-
-    // Property to store a copy of API keys for editing in the UI
-    private final ListProperty<FetcherApiKey> editableApiKeys = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -141,14 +139,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        // Initialize editableApiKeys with a deep copy of the actual API keys,so changes in the UI do not directly affect the actual settings
-        editableApiKeys.set(FXCollections.observableArrayList(
-                preferences.getImporterPreferences().getApiKeys().stream()
-                           .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
-                           .collect(Collectors.toList())
-        ));
-        // Set the UI-bound apiKeys property to editableApiKeys
-        apiKeys.set(editableApiKeys);
+        // Initialize apiKeys with a deep copy of the actual API Keys
+        apiKeys.setAll(preferences.getImporterPreferences().getApiKeys().stream()
+                                  .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
+                                  .collect(Collectors.toList()));
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(preferences.getImporterPreferences().shouldPersistCustomKeys());
@@ -165,10 +159,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        // Save changes from editableApiKeys back to the actual preference
-        preferences.getImporterPreferences().getApiKeys().clear();
-        preferences.getImporterPreferences().getApiKeys().addAll(apiKeys);
-
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
@@ -228,7 +218,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         return grobidURLProperty;
     }
 
-    public ListProperty<FetcherApiKey> fetcherApiKeys() {
+    public ObservableList<FetcherApiKey> fetcherApiKeys() {
         return apiKeys;
     }
 
