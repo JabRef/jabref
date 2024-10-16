@@ -22,6 +22,7 @@ import com.airhacks.afterburner.injection.Injector;
 /// - Start the JavaFX application (if not in CLI mode)
 
 // jabref
+//jabref
 public class Launcher {
 
     public static void main(String[] args) {
