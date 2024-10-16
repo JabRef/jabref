@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign the user or unassign stale assignments
-        uses: takanome-dev/assign-issue-action@v2.1.1
+        uses: takanome-dev/assign-issue-action@refactor-rewrite-action
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           days_until_unassign: 30
           assigned_comment: |
-            👋 Hey @{{ comment.user.login }},
+            👋 Hey @{{ handle }},
 
             Thanks for your interest in this issue! 🎉
 
@@ -27,8 +27,9 @@ jobs:
 
             Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
-            ⚠ Note that this issue will become unassigned if it isn't closed within **{{ totalDays }} days**.
+            Note that you will be unassigned if it isn't closed within **{{ total_days }} days** (**{{ unassigned_date }}**).
 
-            🔧 A maintainer can also add the **{{ inputs.pin_label }}** label to prevent it from being unassigned automatically.
+            > [!NOTE]
+            > A maintainer can also add the **{{ pin_label }}** label to prevent it from being unassigned automatically.
 
             Happy coding! 🚀
