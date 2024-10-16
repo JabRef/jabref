@@ -37,12 +37,16 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
-/**
- * Entrypoint for a command-line only version of JabRef.
- *
- * Does not do any preference migrations
- */
-public class JabRefCli {
+/// Entrypoint for a command-line only version of JabRef.
+/// It does not open any dialogs, just parses the command line arguments and outputs text and creates/modifies files.
+///
+/// See [Command Line Interface Guidelines](https://clig.dev/) for general guidelines how to design a good CLI interface.
+///
+/// It does not open any GUI.
+/// For the GUI application see {@link org.jabref.Launcher}.
+///
+/// Does not do any preference migrations.
+public class JabKit {
     private static Logger LOGGER;
 
     public static void main(String[] args) {
@@ -144,7 +148,7 @@ public class JabRefCli {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(JabRefCli.class);
+            LOGGER = LoggerFactory.getLogger(JabKit.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -162,7 +166,7 @@ public class JabRefCli {
                 "writerFile.backups", "30");
         configuration.forEach(Configuration::set);
 
-        LOGGER = LoggerFactory.getLogger(JabRefCli.class);
+        LOGGER = LoggerFactory.getLogger(JabKit.class);
     }
 
     /**
