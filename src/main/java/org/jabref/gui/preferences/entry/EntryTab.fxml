@@ -54,4 +54,15 @@
     <Label styleClass="sectionHeader" text="%Time stamp"/>
     <CheckBox fx:id="addCreationDate" text="%Add timestamp to new entries (field &quot;creationdate&quot;)"/>
     <CheckBox fx:id="addModificationDate" text="%Add timestamp to modified entries (field &quot;modificationdate&quot;)"/>
+
+
+
+    <CheckBox fx:id="enableViewTracking" text="%Enable user behaviour analysis'"/>
+    <CheckBox fx:id="trackViews" text="%Track entry views"
+              disable="${!enableViewTracking.selected}">
+    <padding>
+        <Insets left="20.0"/>
+    </padding>
+    </CheckBox>
+
 </fx:root>

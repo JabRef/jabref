@@ -78,6 +78,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty typePopularityProperty = new SimpleBooleanProperty();
 
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
@@ -579,6 +580,10 @@ public class GroupDialogViewModel {
 
     public BooleanProperty typeTexProperty() {
         return typeTexProperty;
+    }
+
+    public BooleanProperty typePopularityProperty(){
+        return typePopularityProperty;
     }
 
     public StringProperty keywordGroupSearchTermProperty() {

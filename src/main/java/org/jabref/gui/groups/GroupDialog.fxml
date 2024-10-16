@@ -23,6 +23,7 @@
             <ToggleGroup fx:id="hierarchicalContext"/>
             <ToggleGroup fx:id="type"/>
             <ToggleGroup fx:id="autoGroupOptions"/>
+            <ToggleGroup fx:id="popularityOptions"/>
         </fx:define>
         <VBox spacing="10.0" minWidth="200">
             <padding>
@@ -99,6 +100,12 @@
                             <Tooltip text="%Group containing entries cited in a given TeX file"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="popularityButton" toggleGroup="$type" wrapText="true"
+                                 text="%Popularity">
+                        <tooltip>
+                            <Tooltip text="%Group containing entries cited in a given TeX file"/>
+                        </tooltip>
+                    </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
@@ -170,6 +177,12 @@
                             <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
                             <Button onAction="#texGroupBrowse" text="%Browse" prefHeight="30.0"/>
                         </HBox>
+                    </VBox>
+                    <VBox visible="${popularityButton.selected}" spacing="10.0">
+                        <Label text="%Time Period"/>
+                        <ComboBox fx:id="timePeriodCombo"/>
+                        <Label text="%Maximum Number of Entries"/>
+                        <ComboBox fx:id="maxEntriesCombo"/>
                     </VBox>
                 </StackPane>
             </HBox>
