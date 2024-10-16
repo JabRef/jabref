@@ -68,6 +68,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
+
+    // Added temporary property to store changes made in the UI
     private final ListProperty<FetcherApiKey> tempApiKeys = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final ReadOnlyBooleanProperty refAiEnabled;
@@ -139,12 +141,13 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
+        // Initialize tempApiKeys with a deep copy of the actual API Keys, so changes in the UI do not directly affect the actual settings
         tempApiKeys.set(FXCollections.observableArrayList(
                 preferences.getImporterPreferences().getApiKeys().stream()
                            .map(apiKey -> new FetcherApiKey(apiKey.getName(), apiKey.shouldUse(), apiKey.getKey()))
                            .collect(Collectors.toList())
         ));
-
+        // Set the UI-bound apiKeys property to tempApiKeys
         apiKeys.set(tempApiKeys);
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
@@ -162,6 +165,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        // Save changes from tempApiKeys back to the actual settings
         preferences.getImporterPreferences().getApiKeys().clear();
         preferences.getImporterPreferences().getApiKeys().addAll(apiKeys);
 
