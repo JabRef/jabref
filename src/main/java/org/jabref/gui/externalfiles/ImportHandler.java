@@ -197,6 +197,7 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
+        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
