@@ -16,9 +16,9 @@ The problem is how to store the default values.
 
 * _Localize Defaults_ (current implementation)
 * _Store the Preference only when it was changed by the user_. Otherwise, leave it empty. When a consumer gets such an empty preference, it knows that it needs to read the default and localize it. This won't work if users actually want something to be empty.
-* _Store the unlocalized String._ Consumers then check the String they got as a preference against the defaults. If it matches, localize it. Otherwise, use it. 
+* _Store the unlocalized String._ Consumers then check the String they got as a preference against the defaults. If it matches, localize it. Otherwise, use it.
 * _Localize any stored value in the preferences if the string is 'escaped' by `%` as the first character._ Already used in fxml files to indicate translateable strings.
 
 ## Decision Outcome
 
-Chosen option: "_Localize any stored value in the preferences if the string is 'escaped' by `%` as the first character._", because Achieves goals without requiring too much refactoring and reuses a pattern already in use.
+Chosen option: "Localize any stored value in the preferences if the string is 'escaped' by `%` as the first character.", because it achieves goals without requiring too much refactoring and reuses a pattern already in use.
