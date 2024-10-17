@@ -21,12 +21,14 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final StringProperty nonWrappableFieldsProperty = new SimpleStringProperty("");
 
-    private static final BooleanProperty analysisProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
+
+    // TODO: Change these from static variables 18/10/2024
+    private static final BooleanProperty analysisProperty = new SimpleBooleanProperty();
     private static final BooleanProperty trackViewsProperty = new SimpleBooleanProperty();
 
     private final FieldPreferences fieldPreferences;
@@ -112,6 +114,8 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         return addModificationDateProperty;
     }
 
+    // View analysis
+
     public static BooleanProperty trackViewsProperty() {
         return trackViewsProperty;
     }
@@ -119,8 +123,6 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     public void setTrackViewsEnabled(boolean enabled) {
         trackViewsProperty.set(enabled);
     }
-
-    // Vew Analysis
 
     public void setAnalysisEnabled(boolean enabled) {
         analysisProperty.set(enabled);

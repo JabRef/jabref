@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -159,9 +158,8 @@ public class LibraryTab extends Tab {
     private SuggestionProviders suggestionProviders;
 
     // Used to track how many views each attachment has.
-    private Hashtable<BibEntry, Integer> viewCountTable = new Hashtable<>();
     private final Path viewStorePath = NativeDesktop.getOtherDataDir().resolve("tracking.mv");
-    private static final ReentrantLock fileLock = new ReentrantLock();
+    private final ReentrantLock fileLock = new ReentrantLock();
 
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
@@ -1220,11 +1218,6 @@ public class LibraryTab extends Tab {
                 viewCounts.put(uniqueKey, currentCount + 1);
                 lastViewTimestamps.put(uniqueKey, currentTime);
                 mvStore.commit(); // Save changes
-
-                // Debugging, remove when all good
-                System.out.println("BibEntry: " + entry);
-                System.out.println("UniqueKey: " + uniqueKey);
-                System.out.println(PopularityGroup.getEntryViewCount(entry));
             }
         }
     }

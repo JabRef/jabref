@@ -43,6 +43,7 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.LastNameGroup;
+import org.jabref.model.groups.PopularityGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
@@ -431,6 +432,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof TexGroup) {
             return false;
+        } else if (group instanceof PopularityGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -455,6 +458,8 @@ public class GroupNodeViewModel {
         } else if (group instanceof AutomaticPersonsGroup) {
             return true;
         } else if (group instanceof TexGroup) {
+            return true;
+        } else if (group instanceof PopularityGroup) {
             return true;
         } else {
             throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
@@ -481,6 +486,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof TexGroup) {
             return true;
+        } else if (group instanceof PopularityGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -506,6 +513,8 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof TexGroup) {
             return true;
+        } else if (group instanceof PopularityGroup) {
+            return true;
         } else {
             throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
         }
@@ -530,6 +539,8 @@ public class GroupNodeViewModel {
         } else if (group instanceof AutomaticPersonsGroup) {
             return true;
         } else if (group instanceof TexGroup) {
+            return true;
+        } else if (group instanceof PopularityGroup) {
             return true;
         } else {
             throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
