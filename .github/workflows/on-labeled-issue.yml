@@ -46,29 +46,6 @@ jobs:
        target-labels: "FirstTimeCodeContribution"
        target-column: "Assigned"
        ignored-columns: ""
-  Assigned:
-    name: "📍 Assigned"
-    if: ${{ github.event.label.name == '📍 Assigned' }}
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-    - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.1.1
-      with:
-       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-       project-url: "https://github.com/orgs/JabRef/projects/3"
-       target-labels: "📍 Assigned"
-       target-column: "Assigned"
-       ignored-columns: ""
-    - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.1.1
-      with:
-       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-       project-url: "https://github.com/orgs/JabRef/projects/5"
-       target-labels: "📍 Assigned"
-       target-column: "Assigned"
-       ignored-columns: ""
   good-first-issue:
     name: "good first issue"
     if: "${{ github.event.label.name == 'good first issue' }}"
