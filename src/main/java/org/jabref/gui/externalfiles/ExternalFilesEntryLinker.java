@@ -16,6 +16,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.io.FileNameCleaner;
@@ -51,11 +52,28 @@ public class ExternalFilesEntryLinker {
         Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
+            if (file.equals(targetFile)) {
+                // In case of source == target, we pretend, we have success
+                return Optional.of(targetFile);
+            }
             if (FileUtil.copyFile(file, targetFile, false)) {
                 return Optional.of(targetFile);
             }
         }
         return Optional.empty();
+    }
+
+    public void copyLinkedFilesToFileDir(BibEntry entry) {
+        List<LinkedFile> files = entry.getFiles();
+        for (LinkedFile file : files) {
+            LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, bibDatabaseContext, filePreferences);
+            try {
+                fileHandler.copyToDefaultDirectory();
+            } catch (IOException exception) {
+                LOGGER.error("Error while moving file {}", file.getLink(), exception);
+            }
+        }
+        entry.setFiles(files);
     }
 
     public void renameLinkedFilesToPattern(BibEntry entry) {

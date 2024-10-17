@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -38,6 +39,7 @@ import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -87,7 +89,8 @@ public class UnlinkedFilesDialogViewModel {
                                         FileUpdateMonitor fileUpdateMonitor,
                                         GuiPreferences preferences,
                                         StateManager stateManager,
-                                        TaskExecutor taskExecutor) {
+                                        TaskExecutor taskExecutor,
+                                        LuceneManager luceneManager) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -99,7 +102,8 @@ public class UnlinkedFilesDialogViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                luceneManager);
 
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),
@@ -154,7 +158,7 @@ public class UnlinkedFilesDialogViewModel {
         }
         resultList.clear();
 
-        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences())
+        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
                                                  .onRunning(() -> {
                                                      progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                                                      progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
