@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -39,7 +40,12 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.mergeentries.EntriesMergeResult;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -51,6 +57,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
@@ -89,6 +96,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
+    private final StateManager stateManager;
+    private final UndoManager undoManager;
 
     public CitationRelationsTab(DialogService dialogService,
                                 BibDatabaseContext databaseContext,
@@ -104,6 +113,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
@@ -238,6 +249,13 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 }
                         });
                         vContainer.getChildren().add(jumpTo);
+
+                        Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
+                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
+                        compareButton.setOnMouseClicked(event -> {
+                            openPossibleDuplicateEntriesWindow(entry, listView);
+                        });
+                        vContainer.getChildren().add(compareButton);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -510,5 +528,44 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
 
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
+    }
+
+    /**
+     * Function to open possible duplicate entries window to compare duplicate entries
+     *
+     * @param citationRelationItem duplicate in the citation relations tab
+     * @param listView CheckListView to display citations
+     */
+    private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
+        BibEntry libraryEntry = citationRelationItem.localEntry();
+        BibEntry citationEntry = citationRelationItem.entry();
+        String leftHeader = Localization.lang("Library Entry");
+        String rightHeader = Localization.lang("Citation Entry");
+
+        MergeEntriesDialog dialog = new MergeEntriesDialog(libraryEntry, citationEntry, leftHeader, rightHeader, preferences);
+        dialog.setTitle(Localization.lang("Possible duplicate entries"));
+
+        Optional<EntriesMergeResult> entriesMergeResult = dialogService.showCustomDialogAndWait(dialog);
+        entriesMergeResult.ifPresentOrElse(mergeResult -> {
+
+            BibEntry mergedEntry = mergeResult.mergedEntry();
+            // update local entry of selected citation relation item
+            listView.getItems().set(listView.getItems().indexOf(citationRelationItem), new CitationRelationItem(citationRelationItem.entry(), mergedEntry, true));
+
+            // Merge method is similar to MergeTwoEntriesAction#execute
+            BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
+            database.removeEntry(mergeResult.originalLeftEntry());
+            libraryTab.getMainTable().setCitationMergeMode(true);
+            database.insertEntry(mergedEntry);
+
+            NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
+            ce.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+            ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), mergedEntry));
+            ce.end();
+
+            undoManager.addEdit(ce);
+
+            dialogService.notify(Localization.lang("Merged entries"));
+        }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
     }
 }
