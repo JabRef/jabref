@@ -347,6 +347,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
+      - if: failure()
+        run: cat build/reports/tracing.txt
 
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
   # It ensures that the jar file is from gradle and not by a strange third party.
