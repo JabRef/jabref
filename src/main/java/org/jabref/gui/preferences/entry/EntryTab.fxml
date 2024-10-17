@@ -57,7 +57,7 @@
 
 
 
-    <CheckBox fx:id="enableViewTracking" text="%Enable user behaviour analysis'"/>
+    <CheckBox fx:id="enableViewTracking" text="%Enable user behaviour analysis"/>
     <CheckBox fx:id="trackViews" text="%Track entry views"
               disable="${!enableViewTracking.selected}">
     <padding>

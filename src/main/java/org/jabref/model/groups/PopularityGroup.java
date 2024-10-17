@@ -17,7 +17,7 @@ import org.h2.mvstore.MVStore;
 import static org.jabref.gui.desktop.os.NativeDesktop.getOtherDataDir;
 
 /**
- * This group contains entries that have been viewed more than once.
+ * This group contains popular entries that have been viewed more than once.
  * {@link StandardField#GROUPS}.
  */
 public class PopularityGroup extends AbstractGroup {

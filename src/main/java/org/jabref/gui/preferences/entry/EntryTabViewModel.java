@@ -72,7 +72,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());
 
         timestampPreferences.setAddCreationDate(addCreationDateProperty.getValue());
-        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());}
+        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue()); }
 
     public StringProperty keywordSeparatorProperty() {
         return keywordSeparatorProperty;
