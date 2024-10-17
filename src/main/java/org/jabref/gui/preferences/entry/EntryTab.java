@@ -20,7 +20,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
-
+    @FXML public CheckBox trackViews;
 
     @FXML private TextField keywordSeparator;
 
@@ -70,6 +70,11 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
+        trackViews.selectedProperty().bindBidirectional(viewModel.trackViewsProperty());
+
+        trackViews.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setTrackViewsEnabled(newValue);
+        });
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
@@ -78,5 +83,9 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     @Override
     public String getTabName() {
         return Localization.lang("Entry");
+    }
+
+    public CheckBox getTrackViews() {
+        return trackViews;
     }
 }

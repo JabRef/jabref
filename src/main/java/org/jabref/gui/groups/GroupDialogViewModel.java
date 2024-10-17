@@ -28,6 +28,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.entry.EntryTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -582,10 +583,6 @@ public class GroupDialogViewModel {
         return typeTexProperty;
     }
 
-    public BooleanProperty typePopularityProperty(){
-        return typePopularityProperty;
-    }
-
     public StringProperty keywordGroupSearchTermProperty() {
         return keywordGroupSearchTermProperty;
     }
@@ -648,5 +645,9 @@ public class GroupDialogViewModel {
             }
         }
         return false;
+    }
+
+    public BooleanProperty trackViewsEnabledProperty() {
+        return EntryTabViewModel.trackViewsProperty();
     }
 }

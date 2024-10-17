@@ -26,6 +26,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
+    private static final BooleanProperty trackViewsProperty = new SimpleBooleanProperty();
 
     private final FieldPreferences fieldPreferences;
     private final BibEntryPreferences bibEntryPreferences;
@@ -109,5 +110,17 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty addModificationDateProperty() {
         return addModificationDateProperty;
+    }
+
+    public static BooleanProperty trackViewsProperty() {
+        return trackViewsProperty;
+    }
+
+    public boolean isTrackViewsEnabled() {
+        return trackViewsProperty.get();
+    }
+
+    public void setTrackViewsEnabled(boolean enabled) {
+        trackViewsProperty.set(enabled);
     }
 }

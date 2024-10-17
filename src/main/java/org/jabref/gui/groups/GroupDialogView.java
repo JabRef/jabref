@@ -203,10 +203,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
-        popularityButton.selectedProperty().bindBidirectional(viewModel.typePopularityProperty());
+        popularityButton.disableProperty().bind(viewModel.trackViewsEnabledProperty().not());
 
         timePeriodCombo.setItems(FXCollections.observableArrayList("Last week", "Last month", "Last year", "All time"));
         maxEntriesCombo.setItems(FXCollections.observableArrayList(10, 20, 50, 100, 999));
+
         timePeriodCombo.visibleProperty().bind(popularityButton.selectedProperty());
         maxEntriesCombo.visibleProperty().bind(popularityButton.selectedProperty());
 
