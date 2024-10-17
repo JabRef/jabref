@@ -103,7 +103,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                      .ifPresent(file -> {
                          try {
                              preferences.importPreferences(file);
-                             setValues();
+//                             setValues();
+                             updateAllTabs();
 
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
@@ -204,6 +205,17 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             preferencesTab.setValues();
         }
     }
+
+    public void updateAllTabs() {
+        for (PreferencesTab tab : preferenceTabs) {
+            if (tab instanceof PreferenceTabViewModel) {
+                ((PreferenceTabViewModel) tab).setValues();
+            }
+        }
+    }
+
+
+
 
     public BooleanProperty getMemoryStickProperty() {
         return memoryStickProperty;
