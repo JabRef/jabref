@@ -101,7 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private Subscription dividerSubscription;
 
-    private final WelcomePage welcomePage = new WelcomePage();
+    private final WelcomePage welcomePage;
     private final StackPane contentPane = new StackPane();  // Holds both WelcomePage and TabPane
 
     public JabRefFrame(Stage mainStage,
@@ -124,6 +124,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+
+        this.welcomePage = new WelcomePage(this, preferences);
 
         setId("frame");
 
