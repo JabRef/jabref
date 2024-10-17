@@ -25,6 +25,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
@@ -359,22 +360,13 @@ public class ImportHandler {
             return Collections.emptyList();
         }
 
-        Optional<DOI> doi = DOI.findInText(data);
-        if (doi.isPresent()) {
-            return fetchByDOI(doi.get());
+        if (!CompositeIdFetcher.containsValidId(data)) {
+            return tryImportFormats(data);
         }
 
-        Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
-        if (arXiv.isPresent()) {
-            return fetchByArXiv(arXiv.get());
-        }
-
-        Optional<ISBN> isbn = ISBN.parse(data);
-        if (isbn.isPresent()) {
-            return fetchByISBN(isbn.get());
-        }
-
-        return tryImportFormats(data);
+        CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
+        Optional<BibEntry> optional = compositeIdFetcher.performSearchById(data);
+        return OptionalUtil.toList(optional);
     }
 
     private List<BibEntry> tryImportFormats(String data) {

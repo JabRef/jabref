@@ -14,6 +14,7 @@ Detailed instructions about this step can be found in our [guidelines for settin
 * [Getting a task assigned](#getting-a-task-assigned)
 * [Pull Request Process](#pull-request-process)
   * [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
+  * [After submission of a pull request](#after-submission-of-a-pull-request)
   * [Development hints](#development-hints)
 
 ## Choosing a task [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref)
@@ -125,6 +126,22 @@ Please keep these two principles in mind when you contribute:
 More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
 
 We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
+
+### After submission of a pull request
+
+After you submitted a pull request, automated checks will run.
+You will maybe see "Some checks were not successful".
+Then, please look into them and handle accordingly.
+
+Afterwards, you will receive comments on it.
+Maybe, the pull request is approved immediatly, maybe changes are requested.
+In case changes are requested, please implement them.
+
+After changing your code, commit on the branch and push.
+The pull request will update automatically.
+
+Never ever close the pull request and open a new one.
+This causes much load on our side and is not the style of the GitHub open source community.
 
 ### Development hints
 
