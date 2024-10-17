@@ -58,6 +58,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.entry.EntryTabViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.RedoAction;
@@ -1201,6 +1202,9 @@ public class LibraryTab extends Tab {
         return tabContainer;
     }
 
+    /**
+     * Takes an entry and increments the number of times it has been viewed by 1.
+     */
     private void incrementViewCount(BibEntry entry) {
         MVStore mvStore = PopularityGroup.getMVStore();
         synchronized (mvStore) {
@@ -1211,11 +1215,16 @@ public class LibraryTab extends Tab {
             String uniqueKey = PopularityGroup.getUniqueKeyForEntry(entry);
             long lastViewTime = lastViewTimestamps.getOrDefault(uniqueKey, 0L);
 
-            if (currentTime - lastViewTime >= 3600000) { // 3600000 milliseconds in one hour
+            if (currentTime - lastViewTime >= 3600000 && EntryTabViewModel.trackViewsProperty().get()) { // 3600000 milliseconds in one hour
                 int currentCount = viewCounts.getOrDefault(uniqueKey, 0);
                 viewCounts.put(uniqueKey, currentCount + 1);
                 lastViewTimestamps.put(uniqueKey, currentTime);
                 mvStore.commit(); // Save changes
+
+                // Debugging, remove when all good
+                System.out.println("BibEntry: " + entry);
+                System.out.println("UniqueKey: " + uniqueKey);
+                System.out.println(PopularityGroup.getEntryViewCount(entry));
             }
         }
     }

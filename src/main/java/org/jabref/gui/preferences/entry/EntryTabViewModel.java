@@ -21,6 +21,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final StringProperty nonWrappableFieldsProperty = new SimpleStringProperty("");
 
+    private static final BooleanProperty analysisProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
@@ -69,8 +70,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());
 
         timestampPreferences.setAddCreationDate(addCreationDateProperty.getValue());
-        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());
-    }
+        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());}
 
     public StringProperty keywordSeparatorProperty() {
         return keywordSeparatorProperty;
@@ -116,11 +116,17 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         return trackViewsProperty;
     }
 
-    public boolean isTrackViewsEnabled() {
-        return trackViewsProperty.get();
-    }
-
     public void setTrackViewsEnabled(boolean enabled) {
         trackViewsProperty.set(enabled);
+    }
+
+    // Vew Analysis
+
+    public void setAnalysisEnabled(boolean enabled) {
+        analysisProperty.set(enabled);
+    }
+
+    public static BooleanProperty analysisProperty() {
+        return analysisProperty;
     }
 }

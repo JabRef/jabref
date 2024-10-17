@@ -21,6 +21,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
     @FXML public CheckBox trackViews;
+    @FXML private CheckBox enableViewTracking;
 
     @FXML private TextField keywordSeparator;
 
@@ -70,10 +71,14 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
-        trackViews.selectedProperty().bindBidirectional(viewModel.trackViewsProperty());
+        trackViews.selectedProperty().bindBidirectional(EntryTabViewModel.trackViewsProperty());
+        enableViewTracking.selectedProperty().bindBidirectional(EntryTabViewModel.analysisProperty());
 
         trackViews.selectedProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setTrackViewsEnabled(newValue);
+        });
+        enableViewTracking.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setAnalysisEnabled(newValue);
         });
 
         ActionFactory actionFactory = new ActionFactory();
