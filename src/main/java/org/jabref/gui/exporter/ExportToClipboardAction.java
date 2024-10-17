@@ -27,7 +27,6 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -75,9 +74,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             return;
         }
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                preferences,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class));
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))

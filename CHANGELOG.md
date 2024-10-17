@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
 - We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
@@ -29,8 +30,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved [cleanup](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) of `arXiv` IDs in distributed in the fields `note`, `version`, `institution`, and `eid` fields. [#11306](https://github.com/JabRef/jabref/issues/11306)
 - We added a switch not to store the linked file URL, because it caused troubles at other apps. [#11735](https://github.com/JabRef/jabref/pull/11735)
 - When starting a new SLR, the selected catalogs now persist within and across JabRef sessions. [koppor#614](https://github.com/koppor/jabref/issues/614)
+- We added support for drag'n'drop on an entry in the maintable to an external application to get the entry preview dropped. [#11846](https://github.com/JabRef/jabref/pull/11846)
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
+- We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
+- We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
+- We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
+- By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 
 ### Changed
 
@@ -46,12 +53,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
 - The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
+- ⚠️ We relaxed the escaping requirements for [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns), which are used for the [citaton key generator](https://docs.jabref.org/advanced/entryeditor#autogenerate-citation-key) and [filename and directory patterns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#auto-linking-files). One only needs to write `\"` if a quote sign should be escaped. All other escapings are not necessary (and working) any more. [#11967](https://github.com/JabRef/jabref/pull/11967)
+- When importing BibTeX data starging from on a PDF, the XMP metadata takes precedence over Grobid data. [#11992](https://github.com/JabRef/jabref/pull/11992)
+- JabRef now uses TLS 1.2 for all HTTPS connections. [#11852](https://github.com/JabRef/jabref/pull/11852)
 - We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 - We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
 - We improved the DOI detection in PDF imports. [#11782](https://github.com/JabRef/jabref/pull/11782)
+- We improved the performance when pasting and importing entries in an existing library. [#11843](https://github.com/JabRef/jabref/pull/11843)
+- When fulltext search is selected but indexing is deactivated, a dialog is now shown asking if the user wants to enable indexing now [#9491](https://github.com/JabRef/jabref/issues/9491)
+- We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
+- We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
+- When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
 
 ### Fixed
 
+- We fixed an issue where certain actions were not disabled when no libraries were open. [#11923](https://github.com/JabRef/jabref/issues/11923)
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
 - We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
@@ -71,18 +87,24 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
 - We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
 - We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
+- We fixed an issue with the link to the full text at the BVB fetcher. [#11852](https://github.com/JabRef/jabref/pull/11852)
 - We fixed an issue where two contradicting notifications were shown when cutting an entry in the main table. [#11724](https://github.com/JabRef/jabref/pull/11724)
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
 - We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
 - We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
+- We fixed handling of `\"` in [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns) containing a RegEx. [#11967](https://github.com/JabRef/jabref/pull/11967)
+- We fixed an issue where the Undo/Redo buttons were active even when all libraries are closed. [#11837](https://github.com/JabRef/jabref/issues/11837)
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
+- We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
+- We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
+- We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 
 ### Removed
 
 - We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-
+- We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
 
 
 

@@ -31,6 +31,8 @@ public class AiPreferences {
     private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
 
     private final BooleanProperty enableAi;
+    private final BooleanProperty autoGenerateEmbeddings;
+    private final BooleanProperty autoGenerateSummaries;
 
     private final ObjectProperty<AiProvider> aiProvider;
 
@@ -58,6 +60,8 @@ public class AiPreferences {
     private Runnable apiKeyChangeListener;
 
     public AiPreferences(boolean enableAi,
+                         boolean autoGenerateEmbeddings,
+                         boolean autoGenerateSummaries,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -78,6 +82,8 @@ public class AiPreferences {
                          double ragMinScore
     ) {
         this.enableAi = new SimpleBooleanProperty(enableAi);
+        this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
+        this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
@@ -141,6 +147,30 @@ public class AiPreferences {
 
     public void setEnableAi(boolean enableAi) {
         this.enableAi.set(enableAi);
+    }
+
+    public BooleanProperty autoGenerateEmbeddingsProperty() {
+        return autoGenerateEmbeddings;
+    }
+
+    public boolean getAutoGenerateEmbeddings() {
+        return autoGenerateEmbeddings.get();
+    }
+
+    public void setAutoGenerateEmbeddings(boolean autoGenerateEmbeddings) {
+        this.autoGenerateEmbeddings.set(autoGenerateEmbeddings);
+    }
+
+    public BooleanProperty autoGenerateSummariesProperty() {
+        return autoGenerateSummaries;
+    }
+
+    public boolean getAutoGenerateSummaries() {
+        return autoGenerateSummaries.get();
+    }
+
+    public void setAutoGenerateSummaries(boolean autoGenerateSummaries) {
+        this.autoGenerateSummaries.set(autoGenerateSummaries);
     }
 
     public ObjectProperty<AiProvider> aiProviderProperty() {
@@ -467,7 +497,7 @@ public class AiPreferences {
                         geminiApiBaseUrl.get();
             };
         } else {
-            return AiDefaultPreferences.PROVIDERS_API_URLS.get(aiProvider.get());
+            return aiProvider.get().getApiUrl();
         }
     }
 

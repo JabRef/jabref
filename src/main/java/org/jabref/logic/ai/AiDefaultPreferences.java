@@ -1,5 +1,6 @@
 package org.jabref.logic.ai;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -7,59 +8,61 @@ import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
 public class AiDefaultPreferences {
-    public static final Map<AiProvider, List<String>> AVAILABLE_CHAT_MODELS = Map.of(
-            AiProvider.OPEN_AI, List.of("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"),
-            // "mistral" and "mixtral" are not language mistakes.
-            AiProvider.MISTRAL_AI, List.of("open-mistral-nemo", "open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-large-latest"),
-            AiProvider.GEMINI, List.of("gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"),
-            AiProvider.HUGGING_FACE, List.of()
-    );
+    public enum PredefinedChatModel {
+        GPT_4O_MINI(AiProvider.OPEN_AI, "gpt-4o-mini", 128000),
+        GPT_4O(AiProvider.OPEN_AI, "gpt-4o", 128000),
+        GPT_4(AiProvider.OPEN_AI, "gpt-4", 8192),
+        GPT_4_TURBO(AiProvider.OPEN_AI, "gpt-4-turbo", 128000),
+        GPT_3_5_TURBO(AiProvider.OPEN_AI, "gpt-3.5-turbo", 16385),
+        OPEN_MISTRAL_NEMO(AiProvider.MISTRAL_AI, "open-mistral-nemo", 128000),
+        OPEN_MISTRAL_7B(AiProvider.MISTRAL_AI, "open-mistral-7b", 32000),
+        // "mixtral" is not a typo.
+        OPEN_MIXTRAL_8X7B(AiProvider.MISTRAL_AI, "open-mixtral-8x7b", 32000),
+        OPEN_MIXTRAL_8X22B(AiProvider.MISTRAL_AI, "open-mixtral-8x22b", 64000),
+        GEMINI_1_5_FLASH(AiProvider.GEMINI, "gemini-1.5-flash", 1048576),
+        GEMINI_1_5_PRO(AiProvider.GEMINI, "gemini-1.5-pro", 2097152),
+        GEMINI_1_0_PRO(AiProvider.GEMINI, "gemini-1.0-pro", 32000),
+        // Dummy variant for Hugging Face models.
+        HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
 
-    public static final Map<AiProvider, String> PROVIDERS_PRIVACY_POLICIES = Map.of(
-            AiProvider.OPEN_AI, "https://openai.com/policies/privacy-policy/",
-            AiProvider.MISTRAL_AI, "https://mistral.ai/terms/#privacy-policy",
-            AiProvider.GEMINI, "https://ai.google.dev/gemini-api/terms",
-            AiProvider.HUGGING_FACE, "https://huggingface.co/privacy"
-    );
+        private final AiProvider aiProvider;
+        private final String name;
+        private final int contextWindowSize;
 
-    public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
-            AiProvider.OPEN_AI, "https://api.openai.com/v1",
-            AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
-            AiProvider.GEMINI, "https://generativelanguage.googleapis.com/v1beta/",
-            AiProvider.HUGGING_FACE, "https://huggingface.co/api"
-    );
+        PredefinedChatModel(AiProvider aiProvider, String name, int contextWindowSize) {
+            this.aiProvider = aiProvider;
+            this.name = name;
+            this.contextWindowSize = contextWindowSize;
+        }
 
-    public static final Map<AiProvider, Map<String, Integer>> CONTEXT_WINDOW_SIZES = Map.of(
-            AiProvider.OPEN_AI, Map.of(
-                    "gpt-4o-mini", 128000,
-                    "gpt-4o", 128000,
-                    "gpt-4", 8192,
-                    "gpt-4-turbo", 128000,
-                    "gpt-3.5-turbo", 16385
-            ),
-            AiProvider.MISTRAL_AI, Map.of(
-                    "mistral-large-latest", 128000,
-                    "open-mistral-nemo", 128000,
-                    "open-mistral-7b", 32000,
-                    "open-mixtral-8x7b", 32000,
-                    "open-mixtral-8x22b", 64000
-            ),
-            AiProvider.GEMINI, Map.of(
-                    "gemini-1.5-flash", 1048576,
-                    "gemini-1.5-pro", 2097152,
-                    "gemini-1.0-pro", 32000
-            )
-    );
+        public AiProvider getAiProvider() {
+            return aiProvider;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getContextWindowSize() {
+            return contextWindowSize;
+        }
+
+        public String toString() {
+            return aiProvider.toString() + " " + name;
+        }
+    }
 
     public static final boolean ENABLE_CHAT = false;
+    public static final boolean AUTO_GENERATE_EMBEDDINGS = false;
+    public static final boolean AUTO_GENERATE_SUMMARIES = false;
 
     public static final AiProvider PROVIDER = AiProvider.OPEN_AI;
 
-    public static final Map<AiProvider, String> CHAT_MODELS = Map.of(
-            AiProvider.OPEN_AI, "gpt-4o-mini",
-            AiProvider.MISTRAL_AI, "open-mixtral-8x22b",
-            AiProvider.GEMINI, "gemini-1.5-flash",
-            AiProvider.HUGGING_FACE, ""
+    public static final Map<AiProvider, PredefinedChatModel> CHAT_MODELS = Map.of(
+            AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
+            AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
+            AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
+            AiProvider.HUGGING_FACE, PredefinedChatModel.HUGGING_FACE
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
@@ -72,9 +75,20 @@ public class AiDefaultPreferences {
     public static final int RAG_MAX_RESULTS_COUNT = 10;
     public static final double RAG_MIN_SCORE = 0.3;
 
-    public static final int CONTEXT_WINDOW_SIZE = 8196;
+    public static final int FALLBACK_CONTEXT_WINDOW_SIZE = 8196;
 
-    public static int getContextWindowSize(AiProvider aiProvider, String model) {
-        return CONTEXT_WINDOW_SIZES.getOrDefault(aiProvider, Map.of()).getOrDefault(model, 0);
+    public static List<String> getAvailableModels(AiProvider aiProvider) {
+        return Arrays.stream(AiDefaultPreferences.PredefinedChatModel.values())
+                     .filter(model -> model.getAiProvider() == aiProvider)
+                     .map(AiDefaultPreferences.PredefinedChatModel::getName)
+                     .toList();
+    }
+
+    public static int getContextWindowSize(AiProvider aiProvider, String modelName) {
+        return Arrays.stream(AiDefaultPreferences.PredefinedChatModel.values())
+                     .filter(model -> model.getAiProvider() == aiProvider && model.getName().equals(modelName))
+                     .map(AiDefaultPreferences.PredefinedChatModel::getContextWindowSize)
+                     .findFirst()
+                     .orElse(AiDefaultPreferences.FALLBACK_CONTEXT_WINDOW_SIZE);
     }
 }

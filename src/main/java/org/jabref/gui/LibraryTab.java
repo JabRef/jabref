@@ -64,6 +64,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -169,6 +170,8 @@ public class LibraryTab extends Tab {
     private ImportHandler importHandler;
     private LuceneManager luceneManager;
 
+    private final AiService aiService;
+
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
      *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
@@ -178,6 +181,7 @@ public class LibraryTab extends Tab {
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
+                       AiService aiService,
                        GuiPreferences preferences,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -197,6 +201,7 @@ public class LibraryTab extends Tab {
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
+        this.aiService = aiService;
 
         initializeComponentsAndListeners(isDummyContext);
 
@@ -249,6 +254,8 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = createEntryEditor();
 
+        aiService.setupDatabase(bibDatabaseContext);
+
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
@@ -260,8 +267,8 @@ public class LibraryTab extends Tab {
         Supplier<LibraryTab> tabSupplier = () -> this;
         return new EntryEditor(this,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(tabSupplier, dialogService, stateManager),
-                new RedoAction(tabSupplier, dialogService, stateManager));
+                new UndoAction(tabSupplier, undoManager, dialogService, stateManager),
+                new RedoAction(tabSupplier, undoManager, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -1052,6 +1059,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,
+                                              AiService aiService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
@@ -1067,6 +1075,7 @@ public class LibraryTab extends Tab {
                 context,
                 tabContainer,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
@@ -1088,6 +1097,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
+                                              AiService aiService,
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1101,6 +1111,7 @@ public class LibraryTab extends Tab {
                 databaseContext,
                 tabContainer,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

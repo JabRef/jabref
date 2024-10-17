@@ -149,6 +149,7 @@ open module org.jabref {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
+    requires langchain4j.google.ai.gemini;
     requires langchain4j.hugging.face;
     requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
@@ -162,7 +163,7 @@ open module org.jabref {
     /**
      * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
+    uses org.apache.lucene.codecs.lucene100.Lucene100Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
@@ -188,6 +189,5 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires langchain4j.google.ai.gemini;
     // endregion
 }

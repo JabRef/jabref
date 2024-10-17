@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.websearch.WebSearchTab">
@@ -21,13 +22,17 @@
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
     <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
+    <HBox alignment="BASELINE_LEFT" spacing="10">
+        <Label text="%Default plain citation parser"/>
+        <ComboBox fx:id="defaultPlainCitationParser" HBox.hgrow="ALWAYS"/>
+    </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
         <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search Selected'"/>
+    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search pre-configured'"/>
     <TableView
             fx:id="catalogTable"
             VBox.vgrow="ALWAYS"

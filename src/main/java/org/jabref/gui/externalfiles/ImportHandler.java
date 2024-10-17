@@ -194,6 +194,7 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
+        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
@@ -206,16 +207,21 @@ public class ImportHandler {
 
     private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
-        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
-        if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
-            if (duplicateHandledEntry.isEmpty()) {
-                return;
-            }
-            entryToInsert = duplicateHandledEntry.get();
-        }
-        importCleanedEntries(List.of(entryToInsert));
-        downloadLinkedFiles(entryToInsert);
+
+        BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
+                      .onFailure(e -> LOGGER.error("Error in duplicate search"))
+                      .onSuccess(existingDuplicateInLibrary -> {
+                          BibEntry finalEntry = entryToInsert;
+                          if (existingDuplicateInLibrary.isPresent()) {
+                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
+                              if (duplicateHandledEntry.isEmpty()) {
+                                  return;
+                              }
+                              finalEntry = duplicateHandledEntry.get();
+                          }
+                          importCleanedEntries(List.of(finalEntry));
+                          downloadLinkedFiles(finalEntry);
+                      }).executeWith(taskExecutor);
     }
 
     @VisibleForTesting

@@ -16,7 +16,7 @@ public enum SearchFieldConstants {
      * 2. Lucene codec changes (see module-info.java Lucene section)
      * Incrementing triggers reindexing.
      */
-    VERSION("1"),
+    VERSION("3"),
     DEFAULT_FIELD("any"),
     ENTRY_ID("id"),
     ENTRY_TYPE("entrytype"),

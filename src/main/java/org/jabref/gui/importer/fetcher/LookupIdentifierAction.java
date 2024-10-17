@@ -97,7 +97,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         }
         namedCompound.end();
         if (foundCount > 0) {
-            undoManager.addEdit(namedCompound);
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompound));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

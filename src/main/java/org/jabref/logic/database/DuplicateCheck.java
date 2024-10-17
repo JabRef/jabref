@@ -106,7 +106,7 @@ public class DuplicateCheck {
 
     private static boolean isFarFromThreshold(double value) {
         if (value < 0.0) {
-            LOGGER.debug("Value {} is below zero. Should not happen", value);
+            LOGGER.trace("Value {} is below zero. Should not happen", value);
         }
         return value - DuplicateCheck.DUPLICATE_THRESHOLD > DuplicateCheck.DOUBT_RANGE;
     }
@@ -309,7 +309,7 @@ public class DuplicateCheck {
         }
         final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
         final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
-        LOGGER.debug("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
+        LOGGER.trace("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
         return similarity;
     }
 
