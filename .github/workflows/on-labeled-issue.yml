@@ -1,11 +1,8 @@
-name: On labeled
+name: On labeled issue
 
 on:
   issues:
      types:
-       - labeled
-  pull_request_target:
-    types:
        - labeled
 
 jobs:
@@ -28,9 +25,13 @@ jobs:
 
           Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
+          ⚠ Note that this issue will become unassigned if it isn't closed within **30 days**.
+
+          🔧 A maintainer can also add the **`Pinned`** label to prevent it from being unassigned automatically.
+
           Happy coding! 🚀
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.9
+      uses: m7kvqbe1/github-action-move-issues@v1.1.1
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -38,7 +39,7 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.9
+      uses: m7kvqbe1/github-action-move-issues@v1.1.1
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -53,7 +54,7 @@ jobs:
       issues: write
     steps:
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.9
+      uses: m7kvqbe1/github-action-move-issues@v1.1.1
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -61,7 +62,7 @@ jobs:
        target-column: "Assigned"
        ignored-columns: ""
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.0.9
+      uses: m7kvqbe1/github-action-move-issues@v1.1.1
       with:
        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
        project-url: "https://github.com/orgs/JabRef/projects/5"

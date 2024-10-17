@@ -10,13 +10,15 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import org.jabref.gui.util.UiTaskExecutor;
+
 public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
 
     /**
      * Indicates the number of edits aka balance of edits on the stack +1 when an edit is added/redone and -1 when an edit is undoed.
-     * */
+     */
     private final IntegerProperty balanceProperty = new SimpleIntegerProperty(0);
     private final BooleanProperty undoableProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty redoableProperty = new SimpleBooleanProperty(false);
@@ -67,11 +69,11 @@ public class CountingUndoManager extends UndoManager {
     }
 
     private void updateUndoableStatus() {
-        undoableProperty.setValue(canUndo());
+        UiTaskExecutor.runInJavaFXThread(() -> undoableProperty.setValue(canUndo()));
     }
 
     private void updateRedoableStatus() {
-        redoableProperty.setValue(canRedo());
+        UiTaskExecutor.runInJavaFXThread(() -> redoableProperty.setValue(canRedo()));
     }
 
     public ReadOnlyBooleanProperty getUndoableProperty() {
