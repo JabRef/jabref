@@ -16,6 +16,8 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -112,23 +114,33 @@ public class LayoutEntryTest {
         assertEquals(expected, layoutEntry.doLayout(context, StandardCharsets.UTF_8));
     }
 
-    @Test
-    void doLayoutTest() {
+    @ParameterizedTest
+    @CsvSource({
+            "2",
+            "3",
+            "4",
+            "6",
+            "7"
+    })
+    void testUnsupportedOperationTypes(int type) {
         List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
                 new StringInt("testString", 0));
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), null);
+        assertUnsupportedOperation(type, parsedEntries, bibDatabaseContext);
+    }
 
-        List<Integer> unsupportedOperationTypes = List.of(2, 3, 4, 6, 7);
-        unsupportedOperationTypes.forEach(type -> assertUnsupportedOperation(type, parsedEntries, bibDatabaseContext));
-
-        // test IS_LAYOUT_TEXT
-        assertLayoutResult(1, "testString", parsedEntries, bibDatabaseContext);
-        // test IS_OPTION_FIELD with empty dataBase in BibDatabaseContext
-        assertLayoutResult(5, "testString", parsedEntries, bibDatabaseContext);
-        // test IS_ENCODING_NAME
-        assertLayoutResult(8, StandardCharsets.UTF_8.toString(), parsedEntries, bibDatabaseContext);
-        // test IS_FILENAME and IS_FILEPATH with empty path
-        assertLayoutResult(9, "", parsedEntries, bibDatabaseContext);
-        assertLayoutResult(10, "", parsedEntries, bibDatabaseContext);
+    @ParameterizedTest
+    @CsvSource({
+            "1, testString",
+            "5, testString",
+            "8, UTF-8",
+            "9, ''",
+            "10, ''"
+    })
+    void testLayoutResult(int type, String expectedValue) {
+        List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
+                new StringInt("testString", 0));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), null);
+        assertLayoutResult(type, expectedValue, parsedEntries, bibDatabaseContext);
     }
 }
