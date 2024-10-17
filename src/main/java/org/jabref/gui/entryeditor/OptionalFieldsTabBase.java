@@ -18,7 +18,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
@@ -45,7 +45,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
-                                 LuceneManager luceneManager,
+                                 IndexManager indexManager,
                                  OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(true,
                 databaseContext,
@@ -58,7 +58,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                luceneManager,
+                indexManager,
                 searchQueryProperty);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;

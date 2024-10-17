@@ -10,9 +10,23 @@ WS: [ \t] -> skip; // whitespace is ignored/skipped
 LPAREN:'(';
 RPAREN:')';
 
-EQUAL:'='; // semantically the same as CONTAINS
-EEQUAL:'=='; // semantically the same as MATCHES
-NEQUAL:'!=';
+EQUAL:'='; // case insensitive contains, semantically the same as CONTAINS
+CEQUAL:'=!'; // case sensitive contains
+
+EEQUAL:'=='; // exact match case insensitive, semantically the same as MATCHES
+CEEQUAL:'==!'; // exact match case sensitive
+
+REQUAL:'=~'; // regex check case insensitive
+CREEQUAL:'=~!'; // regex check case sensitive
+
+NEQUAL:'!='; //  negated case insensitive contains
+NCEQUAL:'!=!'; // negated case sensitive contains
+
+NEEQUAL:'!=='; // negated case insensitive exact match
+NCEEQUAL:'!==!'; // negated case sensitive exact match
+
+NREQUAL:'!=~'; // negated regex check case insensitive
+NCREEQUAL:'!=~!'; // negated regex check case sensitive
 
 AND:[aA][nN][dD]; // 'and' case insensitive
 OR:[oO][rR]; // 'or' case insensitive
@@ -42,7 +56,7 @@ expression:
     ;
 
 comparison:
-    left=name operator=(CONTAINS | MATCHES | EQUAL | EEQUAL | NEQUAL) right=name // example: author != miller
+    left=name operator=(CONTAINS | EQUAL | CEQUAL | MATCHES | EEQUAL | CEEQUAL | REQUAL | CREEQUAL | NEQUAL | NCEQUAL | NEEQUAL | NCEEQUAL | NREQUAL | NCREEQUAL) right=name // example: author != miller
     | right=name                                                                 // example: miller (search all fields)
     ;
 

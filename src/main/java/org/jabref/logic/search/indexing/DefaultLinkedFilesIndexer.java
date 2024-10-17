@@ -26,7 +26,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -65,7 +65,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.indexedFiles = new ConcurrentHashMap<>();
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LINKED_FILES_ANALYZER);
+        IndexWriterConfig config = new IndexWriterConfig(LinkedFilesConstants.LINKED_FILES_ANALYZER);
         if ("unsaved".equals(indexDirectoryPath.getFileName().toString())) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);
@@ -192,7 +192,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         for (String fileLink : links) {
             try {
                 LOGGER.debug("Removing file {} from index.", fileLink);
-                indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH.toString(), fileLink));
+                indexWriter.deleteDocuments(new Term(LinkedFilesConstants.PATH.toString(), fileLink));
                 indexedFiles.remove(fileLink);
             } catch (IOException e) {
                 LOGGER.warn("Could not remove linked file {} from index.", fileLink, e);
@@ -236,15 +236,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         LOGGER.debug("Getting all linked files from index.");
         Map<String, Long> linkedFiles = new HashMap<>();
         try {
-            TermQuery query = new TermQuery(new Term(SearchFieldConstants.PAGE_NUMBER.toString(), "1"));
+            TermQuery query = new TermQuery(new Term(LinkedFilesConstants.PAGE_NUMBER.toString(), "1"));
             searcherManager.maybeRefresh();
             IndexSearcher searcher = searcherManager.acquire();
             StoredFields storedFields = searcher.storedFields();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = storedFields.document(scoreDoc.doc);
-                var pathField = doc.getField(SearchFieldConstants.PATH.toString());
-                var modifiedField = doc.getField(SearchFieldConstants.MODIFIED.toString());
+                var pathField = doc.getField(LinkedFilesConstants.PATH.toString());
+                var modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());
                 if (pathField != null && modifiedField != null) {
                     linkedFiles.put(pathField.stringValue(), Long.valueOf(modifiedField.stringValue()));
                 }
