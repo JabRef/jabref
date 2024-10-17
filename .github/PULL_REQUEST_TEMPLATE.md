@@ -1,4 +1,5 @@
-Describe the changes you have made here: what, why, ... Link the issue that will be closed, e.g., "Closes #333". If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47". "Closes" is a keyword GitHub uses to link PRs with issues; do not change it.
+Describe the changes you have made here: what, why, ...
+Link the issue that will be closed, e.g., "Closes #333". If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47".
 
 ### Mandatory checks
 
