@@ -130,7 +130,7 @@ We reserve the right to reject pull requests that contain little or no genuine a
 ### After submission of a pull request
 
 After you submitted a pull request, automated checks will run.
-You will maybe see "Some checks were not successful". 
+You will maybe see "Some checks were not successful".
 Then, please look into them and handle accordingly.
 
 Afterwards, you will receive comments on it.
