@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -139,5 +140,63 @@ public class MetaDataSerializerTest {
     @MethodSource
     void serializeCustomizedEntryType(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
         assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
+    }
+
+    public static Stream<Arguments> serializeCustomizedEntryTypeV2() {
+        return Stream.of(
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
+                        "v2-jabref-entrytype: test: req[author;title] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR)
+                                .withImportantFields(StandardField.TITLE),
+                        "v2-jabref-entrytype: test: req[author] opt[title]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
+                        "v2-jabref-entrytype: test: req[Test1;Test2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
+                        "v2-jabref-entrytype: test: req[tEST;tEsT2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("person"))
+                                .withRequiredFields(new UnknownField("Name", FieldProperty.PERSON_NAMES))
+                                .withImportantFields(
+                                        new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
+                                        new UnknownField("Orcid", FieldProperty.EXTERNAL)
+                                ),
+                        "v2-jabref-entrytype: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.EXTERNAL)),
+                        "v2-jabref-entrytype: test: req[custom1|EXTERNAL,MULTILINE_TEXT] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("custom2", "custom2")),
+                        "v2-jabref-entrytype: test: req[custom2] opt[]"
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void serializeCustomizedEntryTypeV2(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
+        assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypesV2(bibEntryTypeBuilder.build()));
     }
 }
