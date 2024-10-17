@@ -364,7 +364,7 @@ public class ImportHandler {
             return tryImportFormats(data);
         }
 
-        CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher();
+        CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
         Optional<BibEntry> optional = compositeIdFetcher.performSearchById(data);
         return OptionalUtil.toList(optional);
     }

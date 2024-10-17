@@ -19,10 +19,6 @@ public class CompositeIdFetcher {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public CompositeIdFetcher() {
-        importFormatPreferences = null;
-    }
-
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
