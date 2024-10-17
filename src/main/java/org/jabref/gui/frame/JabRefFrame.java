@@ -21,6 +21,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -45,6 +46,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.WelcomePage;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -98,6 +100,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TabPane tabbedPane = new TabPane();
 
     private Subscription dividerSubscription;
+
+    private final WelcomePage welcomePage = new WelcomePage();
+    private final StackPane contentPane = new StackPane();  // Holds both WelcomePage and TabPane
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -181,10 +186,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
         });
 
+        // Initialize layout and bindings
         initLayout();
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
         initBindings();
+        bindDatabaseChanges();
+        updateContent();
     }
 
     private void initLayout() {
@@ -223,12 +231,48 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        // Add welcome page and tabbed pane to content pane
+        contentPane.getChildren().addAll(welcomePage, tabbedPane);
+
+        // Initially only add contentPane to the splitPane, not sidePane
+        splitPane.getItems().add(contentPane);
+
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
-        updateSidePane();
+
         setCenter(splitPane);
+        updateContent();  // Ensure layout is consistent on load
+    }
+
+    private void updateContent() {
+        boolean hasOpenDatabases = !stateManager.getOpenDatabases().isEmpty();
+
+        // Toggle visibility between welcome page and tabbed pane
+        welcomePage.setVisible(!hasOpenDatabases);
+        tabbedPane.setVisible(hasOpenDatabases);
+
+        if (hasOpenDatabases) {
+            if (!splitPane.getItems().contains(sidePane)) {
+                // Ensure side pane is added only once, with preferred width
+                sidePane.setPrefWidth(260);
+                splitPane.getItems().addFirst(sidePane);
+            }
+
+            // Ensure the divider position is updated appropriately
+            Platform.runLater(() -> {
+                splitPane.setDividerPositions(0.2);  // Set divider to 20% width
+            });
+
+            updateSidePane();  // Additional updates if necessary
+        } else {
+            // Ensure side pane is removed when no databases are open
+            splitPane.getItems().remove(sidePane);
+        }
+    }
+
+    private void bindDatabaseChanges() {
+        stateManager.getOpenDatabases().addListener((InvalidationListener) obs -> Platform.runLater(this::updateContent));
     }
 
     private void updateSidePane() {
@@ -236,11 +280,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (dividerSubscription != null) {
                 dividerSubscription.unsubscribe();
             }
-            splitPane.getItems().remove(sidePane);
+            splitPane.getItems().remove(sidePane);  // Remove side pane if empty
         } else {
             if (!splitPane.getItems().contains(sidePane)) {
-                splitPane.getItems().addFirst(sidePane);
-                updateDividerPosition();
+                splitPane.getItems().addFirst(sidePane);  // Add side pane back
+                updateDividerPosition();  // Adjust the divider position
             }
         }
     }
@@ -446,12 +490,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void addTab(@NonNull LibraryTab libraryTab, boolean raisePanel) {
         tabbedPane.getTabs().add(libraryTab);
+
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
             tabbedPane.requestFocus();
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
+
+        // Ensure layout is updated
+        updateContent();
+        updateSidePane();
+
+        // Set the preferred width and divider position explicitly
+        sidePane.setPrefWidth(260);
+        Platform.runLater(() -> {
+            if (!sidePane.getChildren().isEmpty() && !splitPane.getItems().contains(sidePane)) {
+                splitPane.getItems().addFirst(sidePane);
+
+                // Force divider to a known position (e.g., 0.2 of the total width)
+                LOGGER.info("Forcing divider position after adding tab.");
+                splitPane.setDividerPositions(0.2);
+
+                updateDividerPosition();  // Ensure any further updates are applied
+            }
+        });
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
