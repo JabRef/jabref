@@ -13,6 +13,7 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
@@ -20,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.fieldeditors.MarkdownEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
@@ -98,6 +100,7 @@ public class CommentsTab extends FieldsEditorTab {
                         || field.getName().toLowerCase().contains("comment"))
                 .sorted(Comparator.comparing(Field::getName))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
+
         return comments;
     }
 
@@ -140,7 +143,8 @@ public class CommentsTab extends FieldsEditorTab {
             boolean isStandardBibtexComment = field == StandardField.COMMENT;
             boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
-            editor.getNode().setDisable(!shouldBeEnabled);
+            ((MarkdownEditor)editor.getNode()).setEditable(shouldBeEnabled);
+
         }
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the

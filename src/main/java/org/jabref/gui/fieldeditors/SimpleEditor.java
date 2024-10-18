@@ -72,4 +72,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public void requestFocus() {
         textInput.requestFocus();
     }
+
+    public void setEditable(boolean isEditable){
+        textInput.setEditable(isEditable);
+    }
 }
