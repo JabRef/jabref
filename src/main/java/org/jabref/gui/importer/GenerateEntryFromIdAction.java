@@ -92,7 +92,8 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                         libraryTab.getUndoManager(),
                         stateManager,
                         dialogService,
-                        taskExecutor);
+                        taskExecutor,
+                        libraryTab.getLuceneManager());
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");

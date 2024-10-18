@@ -434,24 +434,24 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
             // Different actions depending on where the user releases the drop in the target row
-            // Bottom + top -> import entries
-            // Center -> link files to entry
+            // - Bottom + top -> import entries
+            // - Center -> modify entry: link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences).executeWith(taskExecutor);
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences, event.getTransferMode()).executeWith(taskExecutor);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
                         case LINK -> {
-                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
+                            LOGGER.debug("Mode LINK"); // alt win
                             importHandler.getLinker().addFilesToEntry(entry, files);
                         }
                         case MOVE -> {
-                            LOGGER.debug("Mode MOVE"); // alt on win
+                            LOGGER.debug("Mode MOVE"); // shift on win or no modifier
                             importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                         case COPY -> {
-                            LOGGER.debug("Mode Copy"); // ctrl on win
+                            LOGGER.debug("Mode COPY"); // ctrl on win
                             importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                     }
@@ -470,7 +470,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
-            importHandler.importFilesInBackground(files, this.database, filePreferences).executeWith(taskExecutor);
+            importHandler
+                    .importFilesInBackground(files, this.database, filePreferences, event.getTransferMode())
+                    .executeWith(taskExecutor);
             success = true;
         }
 
