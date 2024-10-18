@@ -22,20 +22,20 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -53,20 +53,20 @@ public class DuplicateSearch extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    private final PreferencesService prefs;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
-                           PreferencesService prefs,
+                           GuiPreferences preferences,
                            BibEntryTypesManager entryTypesManager,
                            TaskExecutor taskExecutor) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.prefs = prefs;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
 
@@ -156,7 +156,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, tabSupplier.get().getBibDatabaseContext(), stateManager, dialogService, prefs);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 
@@ -219,7 +219,7 @@ public class DuplicateSearch extends SimpleCommand {
      */
     static class DuplicateSearchResult {
 
-        private final Map<Integer, BibEntry> toRemove = new HashMap<>();
+        private final Map<String, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
 
         private int duplicates = 0;
@@ -233,7 +233,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized void remove(BibEntry entry) {
-            toRemove.put(System.identityHashCode(entry), entry);
+            // ADR-0038
+            toRemove.put(entry.getId(), entry);
             duplicates++;
         }
 
@@ -250,7 +251,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized boolean isToRemove(BibEntry entry) {
-            return toRemove.containsKey(System.identityHashCode(entry));
+            // ADR-0038
+            return toRemove.containsKey(entry.getId());
         }
 
         public synchronized int getDuplicateCount() {

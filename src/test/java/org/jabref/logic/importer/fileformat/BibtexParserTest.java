@@ -30,7 +30,7 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
@@ -658,6 +658,18 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test {\" Test}");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseRecognizesFieldsWithQuotationMarksInBrackets() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@article{test,title=\"Comments on {\"}Filenames and Fonts{\"}\"}"));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Comments on {\"}Filenames and Fonts{\"}");
 
         assertEquals(List.of(expected), result.getDatabase().getEntries());
     }

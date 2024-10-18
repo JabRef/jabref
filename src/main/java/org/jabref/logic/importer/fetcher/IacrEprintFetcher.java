@@ -173,7 +173,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
             // getRequiredValueBetween refuses to match across the line break.
             fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
             String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
-            return Optional.of(new URL(fulltextLink));
+            return Optional.of(URI.create(fulltextLink).toURL());
         }
         return Optional.empty();
     }

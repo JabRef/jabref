@@ -13,14 +13,14 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -38,23 +38,23 @@ public class PushToApplicationCommand extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     private final List<Object> reconfigurableControls = new ArrayList<>();
     private final TaskExecutor taskExecutor;
 
     private PushToApplication application;
 
-    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor) {
+    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
 
-        setApplication(preferencesService.getPushToApplicationPreferences()
-                                                            .getActiveApplicationName());
+        setApplication(preferences.getPushToApplicationPreferences()
+                                  .getActiveApplicationName());
 
-        EasyBind.subscribe(preferencesService.getPushToApplicationPreferences().activeApplicationNameProperty(),
+        EasyBind.subscribe(preferences.getPushToApplicationPreferences().activeApplicationNameProperty(),
                 this::setApplication);
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
@@ -78,10 +78,10 @@ public class PushToApplicationCommand extends SimpleCommand {
         PushToApplication application = PushToApplications.getApplicationByName(
                                                                   applicationName,
                                                                   dialogService,
-                                                                  preferencesService)
-                                                          .orElse(new PushToEmacs(dialogService, preferencesService));
+                                                                  preferences)
+                                                          .orElse(new PushToEmacs(dialogService, preferences));
 
-        preferencesService.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
+        preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);
 
         reconfigurableControls.forEach(object -> {

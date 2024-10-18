@@ -15,6 +15,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
 import org.jabref.logic.openoffice.action.EditSeparate;
@@ -68,17 +69,13 @@ public class OOBibBase {
 
     private final DialogService dialogService;
 
-    // After inserting a citation, if ooPrefs.getSyncWhenCiting() returns true, shall we also update the bibliography?
-    private final boolean refreshBibliographyDuringSyncWhenCiting;
-
-    // Shall we add "Cited on pages: ..." to resolved bibliography entries?
     private final boolean alwaysAddCitedOnPages;
 
     private final OOBibBaseConnect connection;
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
 
-    public OOBibBase(Path loPath, DialogService dialogService)
+    public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
             BootstrapException,
             CreationException {
@@ -86,13 +83,12 @@ public class OOBibBase {
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
 
-        this.refreshBibliographyDuringSyncWhenCiting = false;
-        this.alwaysAddCitedOnPages = false;
+        this.alwaysAddCitedOnPages = openOfficePreferences.getAlwaysAddCitedOnPages();
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-            this.cslCitationOOAdapter.readExistingMarks();
+        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+        this.cslCitationOOAdapter.readAndUpdateExistingMarks();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
@@ -165,9 +161,9 @@ public class OOBibBase {
 
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
-                             .filter(OOVoidResult::isError)
-                             .map(e -> e.getError().getLocalizedMessage())
-                             .collect(Collectors.joining("\n\n"));
+                            .filter(OOVoidResult::isError)
+                            .map(e -> e.getError().getLocalizedMessage())
+                            .collect(Collectors.joining("\n\n"));
         if (msg.isEmpty()) {
             return OOVoidResult.ok();
         } else {
@@ -237,10 +233,10 @@ public class OOBibBase {
         int maxReportedOverlaps = 10;
         try {
             return frontend.checkRangeOverlaps(doc,
-                                    new ArrayList<>(),
-                                    requireSeparation,
-                                    maxReportedOverlaps)
-                            .mapError(OOError::from);
+                                   new ArrayList<>(),
+                                   requireSeparation,
+                                   maxReportedOverlaps)
+                           .mapError(OOError::from);
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException ex) {
@@ -326,7 +322,7 @@ public class OOBibBase {
         } catch (NoDocumentException ex) {
             return OOResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException
-                | RuntimeException ex) {
+                 | RuntimeException ex) {
             return OOResult.error(OOError.fromMisc(ex).setTitle(errorTitle));
         }
     }
@@ -576,26 +572,18 @@ public class OOBibBase {
         }
 
         /*
-         * For sync we need a FunctionalTextViewCursor.
+         * For sync we need a FunctionalTextViewCursor and an open database.
          */
         OOResult<FunctionalTextViewCursor, OOError> fcursor = null;
         if (syncOptions.isPresent()) {
             fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-            if (testDialog(errorTitle, fcursor.asVoidResult())) {
-                return;
-            }
-        }
-
-        syncOptions
-                .map(e -> e.setUpdateBibliography(this.refreshBibliographyDuringSyncWhenCiting))
-                .map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages));
-
-        if (syncOptions.isPresent()) {
-            if (testDialog(databaseIsRequired(syncOptions.get().databases,
+            if (testDialog(errorTitle, fcursor.asVoidResult()) || testDialog(databaseIsRequired(syncOptions.get().databases,
                     OOError::noDataBaseIsOpenForSyncingAfterCitation))) {
                 return;
             }
         }
+
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages));
 
         try {
 
@@ -613,8 +601,11 @@ public class OOBibBase {
                     this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
+                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), citationStyle, entries);
                 }
+
+                // If "Automatically sync bibliography when inserting citations" is enabled
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
 
@@ -822,7 +813,7 @@ public class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (WrappedTargetException
-                | com.sun.star.lang.IllegalArgumentException ex) {
+                 | com.sun.star.lang.IllegalArgumentException ex) {
             LOGGER.warn("Problem generating new database.", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
@@ -870,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
+                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages); // TODO: Provide option to user: this is always false
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
@@ -890,8 +881,8 @@ public class OOBibBase {
             } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (CreationException
-                    | WrappedTargetException
-                    | com.sun.star.lang.IllegalArgumentException ex) {
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update JStyle bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
@@ -939,7 +930,7 @@ public class OOBibBase {
                         return;
                     }
 
-                    // A separate database and database
+                    // A separate database and database context
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 

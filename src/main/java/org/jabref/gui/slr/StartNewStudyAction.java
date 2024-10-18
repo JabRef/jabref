@@ -9,14 +9,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                                Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                                FileUpdateMonitor fileUpdateMonitor,
                                TaskExecutor taskExecutor,
-                               PreferencesService preferencesService,
+                               CliPreferences preferences,
                                StateManager stateManager,
                                DialogService dialogService) {
         super(tabContainer,
@@ -50,7 +50,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                 dialogService,
                 fileUpdateMonitor,
                 taskExecutor,
-                preferencesService,
+                preferences,
                 stateManager,
                 true);
     }
@@ -70,7 +70,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
     @Override
     public void execute() {
         Optional<SlrStudyAndDirectory> studyAndDirectory = dialogService.showCustomDialogAndWait(
-                new ManageStudyDefinitionView(preferencesService.getFilePreferences().getWorkingDirectory()));
+                new ManageStudyDefinitionView(preferences.getFilePreferences().getWorkingDirectory()));
         if (studyAndDirectory.isEmpty()) {
             return;
         }

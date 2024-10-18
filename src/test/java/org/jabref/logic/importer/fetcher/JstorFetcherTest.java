@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -79,7 +80,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void fetchPDF() throws Exception {
         Optional<URL> url = fetcher.findFullText(bibEntry);
-        assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
+        assertEquals(Optional.of(URI.create("https://www.jstor.org/stable/pdf/90002164.pdf").toURL()), url);
     }
 
     @Override

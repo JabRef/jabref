@@ -13,8 +13,10 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -22,8 +24,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -52,11 +52,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrder saveOrder;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
+    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();
         this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
     }
@@ -94,7 +94,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            CleanupPreferences defaultPreset = preferencesService.getDefaultCleanupPreset();
+            CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
             cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });

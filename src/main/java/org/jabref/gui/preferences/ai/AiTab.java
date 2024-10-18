@@ -1,11 +1,11 @@
 package org.jabref.gui.preferences.ai;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -16,24 +16,22 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiApiKeyProvider;
-import org.jabref.preferences.ai.AiProvider;
-import org.jabref.preferences.ai.EmbeddingModel;
+import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.unitfx.DoubleInputField;
+import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
 
-    @Inject private AiApiKeyProvider aiApiKeyProvider;
-
     @FXML private CheckBox enableAi;
+    @FXML private CheckBox autoGenerateEmbeddings;
+    @FXML private CheckBox autoGenerateSummaries;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -43,26 +41,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<EmbeddingModel> embeddingModelComboBox;
-    @FXML private TextArea instructionTextArea;
-    @FXML private DoubleInputField temperatureTextField;
+    @FXML private ResizableTextArea instructionTextArea;
+    @FXML private TextField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
     @FXML private IntegerInputField ragMaxResultsCountTextField;
-    @FXML private DoubleInputField ragMinScoreTextField;
+    @FXML private TextField ragMinScoreTextField;
 
-    @FXML private Button enableAiHelp;
-    @FXML private Button aiProviderHelp;
-    @FXML private Button chatModelHelp;
-    @FXML private Button apiKeyHelp;
-    @FXML private Button apiBaseUrlHelp;
-    @FXML private Button embeddingModelHelp;
-    @FXML private Button instructionHelp;
-    @FXML private Button contextWindowSizeHelp;
-    @FXML private Button documentSplitterChunkSizeHelp;
-    @FXML private Button documentSplitterOverlapSizeHelp;
-    @FXML private Button ragMaxResultsCountHelp;
-    @FXML private Button ragMinScoreHelp;
+    @FXML private Button generalSettingsHelp;
+    @FXML private Button expertSettingsHelp;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -73,9 +61,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferencesService, aiApiKeyProvider);
+        this.viewModel = new AiTabViewModel(preferences);
 
         enableAi.selectedProperty().bindBidirectional(viewModel.enableAi());
+        autoGenerateSummaries.selectedProperty().bindBidirectional(viewModel.autoGenerateSummaries());
+        autoGenerateSummaries.disableProperty().bind(viewModel.disableAutoGenerateSummaries());
+        autoGenerateEmbeddings.selectedProperty().bindBidirectional(viewModel.autoGenerateEmbeddings());
+        autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
 
         new ViewModelListCellFactory<AiProvider>()
                 .withText(AiProvider::toString)
@@ -123,9 +115,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
         instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
-        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
-
         // bindBidirectional doesn't work well with number input fields ({@link IntegerInputField}, {@link DoubleInputField}),
         // so they are expanded into `addListener` calls.
 
@@ -137,17 +126,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             contextWindowSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
         });
 
-        temperatureTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.temperatureProperty().set(newValue == null ? 0 : newValue);
-        });
-
-        viewModel.temperatureProperty().addListener((observable, oldValue, newValue) -> {
-            temperatureTextField.valueProperty().set(newValue == null ? 0 : newValue.doubleValue());
-        });
-
-        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
-
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
+        temperatureTextField.textProperty().bindBidirectional(viewModel.temperatureProperty());
+        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         documentSplitterChunkSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.documentSplitterChunkSizeProperty().set(newValue == null ? 0 : newValue);
@@ -179,14 +161,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        ragMinScoreTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.ragMinScoreProperty().set(newValue == null ? 0.0 : newValue);
-        });
-
-        viewModel.ragMinScoreProperty().addListener((observable, oldValue, newValue) -> {
-            ragMinScoreTextField.valueProperty().set(newValue == null ? 0.0 : newValue.doubleValue());
-        });
-
+        ragMinScoreTextField.textProperty().bindBidirectional(viewModel.ragMinScoreProperty());
         ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
@@ -195,27 +170,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
             visualizer.initVisualization(viewModel.getEmbeddingModelValidationStatus(), embeddingModelComboBox);
             visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
-            visualizer.initVisualization(viewModel.getTemperatureValidationStatus(), temperatureTextField);
+            visualizer.initVisualization(viewModel.getTemperatureTypeValidationStatus(), temperatureTextField);
+            visualizer.initVisualization(viewModel.getTemperatureRangeValidationStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSizeTextField);
             visualizer.initVisualization(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCountTextField);
-            visualizer.initVisualization(viewModel.getRagMinScoreValidationStatus(), ragMinScoreTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScoreTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScoreTextField);
         });
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_ENABLE, dialogService, preferencesService.getFilePreferences()), enableAiHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_PROVIDER, dialogService, preferencesService.getFilePreferences()), aiProviderHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_KEY, dialogService, preferencesService.getFilePreferences()), apiKeyHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_BASE_URL, dialogService, preferencesService.getFilePreferences()), apiBaseUrlHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_INSTRUCTION, dialogService, preferencesService.getFilePreferences()), instructionHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CONTEXT_WINDOW_SIZE, dialogService, preferencesService.getFilePreferences()), contextWindowSizeHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_CHUNK_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterChunkSizeHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_GENERAL_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), generalSettingsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EXPERT_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), expertSettingsHelp);
     }
 
     @Override
@@ -226,5 +193,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML
     private void onResetExpertSettingsButtonClick() {
         viewModel.resetExpertSettings();
+    }
+
+    public ReadOnlyBooleanProperty aiEnabledProperty() {
+        return enableAi.selectedProperty();
     }
 }

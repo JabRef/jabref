@@ -20,24 +20,25 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +56,11 @@ public class OpenDatabaseAction extends SimpleCommand {
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
-            // AI chat history links BibEntry with citation key. When citation key is changed, chat history should be transferred from old citation key to new citation key
-            new ListenForCitationKeyChangeForAiAction());
+            // Migrate search groups from Search.g4 to Lucene syntax
+            new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -70,7 +71,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
-                              PreferencesService preferencesService,
+                              GuiPreferences preferences,
                               AiService aiService,
                               DialogService dialogService,
                               StateManager stateManager,
@@ -80,7 +81,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -91,15 +92,10 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    /**
-     * Go through the list of post open actions, and perform those that need to be performed.
-     *
-     * @param result     The result of the BIB file parse operation.
-     */
-    public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result, preferencesService)) {
-                action.performAction(result, dialogService, preferencesService);
+            if (action.isActionNecessary(result, preferences)) {
+                action.performAction(result, dialogService, preferences);
             }
         }
     }
@@ -113,7 +109,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .build();
 
         List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        openFiles(filesToOpen);
+        openFiles(new ArrayList<>(filesToOpen));
     }
 
     /**
@@ -121,10 +117,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (tabContainer.getLibraryTabs().isEmpty()) {
-            return preferencesService.getFilePreferences().getWorkingDirectory();
+            return preferences.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
+            return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
         }
     }
 
@@ -171,7 +167,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            FileHistory fileHistory = preferencesService.getGuiPreferences().getFileHistory();
+            FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
             filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
@@ -204,8 +200,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                 backgroundTask,
                 file,
                 dialogService,
-                preferencesService,
                 aiService,
+                preferences,
                 stateManager,
                 tabContainer,
                 fileUpdateMonitor,
@@ -221,14 +217,14 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
-        Path backupDir = preferencesService.getFilePreferences().getBackupDirectory();
+        preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
+        Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor, undoManager, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
                                           .orElse(null);
         }
 
@@ -236,7 +232,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             if (parserResult == null) {
                 // No backup was restored, do the "normal" loading
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
-                        preferencesService.getImportFormatPreferences(),
+                        preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
 
@@ -256,7 +252,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  parserResult,
                                  tabContainer,
                                  dialogService,
-                                 preferencesService,
+                                 preferences,
                                  aiService,
                                  stateManager,
                                  entryTypesManager,
@@ -271,7 +267,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public static void openSharedDatabase(ParserResult parserResult,
                                           LibraryTabContainer tabContainer,
                                           DialogService dialogService,
-                                          PreferencesService preferencesService,
+                                          GuiPreferences preferences,
                                           AiService aiService,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
@@ -284,7 +280,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             new SharedDatabaseUIManager(
                     tabContainer,
                     dialogService,
-                    preferencesService,
+                    preferences,
                     aiService,
                     stateManager,
                     entryTypesManager,

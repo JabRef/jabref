@@ -8,11 +8,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +86,16 @@ public class LinkedFileHandler {
         }
 
         final Path oldPath = oldFile.get();
-        final Path newPath = oldPath.resolveSibling(targetFileName);
+        Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
+        Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
+
+        Path newPath;
+        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            newPath = oldPath.resolveSibling(targetFileName);
+        } else {
+            assert oldExtension.isPresent() && newExtension.isEmpty();
+            newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
+        }
 
         String expandedOldFilePath = oldPath.toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)

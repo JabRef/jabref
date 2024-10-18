@@ -9,14 +9,15 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 public class AttachFileAction extends SimpleCommand {
 
@@ -24,15 +25,18 @@ public class AttachFileAction extends SimpleCommand {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     public AttachFileAction(LibraryTab libraryTab,
                             DialogService dialogService,
                             StateManager stateManager,
-                            FilePreferences filePreferences) {
+                            FilePreferences filePreferences,
+                            ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -64,7 +68,7 @@ public class AttachFileAction extends SimpleCommand {
             LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(
                     newFile,
                     databaseContext.getFileDirectories(filePreferences),
-                    filePreferences);
+                    externalApplicationsPreferences);
 
             LinkedFileEditDialog dialog = new LinkedFileEditDialog(linkedFile);
 

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -34,7 +35,7 @@ public class ApsFetcher implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
@@ -47,7 +48,7 @@ public class ApsFetcher implements FulltextFetcher {
             if (code == 200) {
                 LOGGER.info("Fulltext PDF found @ APS.");
                 try {
-                    return Optional.of(new URL(pdfRequestUrl));
+                    return Optional.of(URI.create(pdfRequestUrl).toURL());
                 } catch (MalformedURLException e) {
                     LOGGER.warn("APS returned malformed URL, cannot find PDF.");
                 }
@@ -76,7 +77,7 @@ public class ApsFetcher implements FulltextFetcher {
 
         URLConnection con;
         try {
-            con = new URL(doiRequest).openConnection();
+            con = URI.create(doiRequest).toURL().openConnection();
             con.connect();
             con.getInputStream();
             String[] urlParts = con.getURL().toString().split("abstract/");

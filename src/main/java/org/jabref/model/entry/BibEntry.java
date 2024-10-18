@@ -50,6 +50,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -309,22 +310,21 @@ public class BibEntry implements Cloneable {
      * If a database is given, this function will try to resolve any string
      * references in the field-value.
      * Also, if a database is given, this function will try to find values for
-     * unset fields in the entry linked by the "crossref" field, if any.
+     * unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
      *
      * @param field    The field to return the value of.
-     * @param database maybenull
-     *                 The database of the bibtex entry.
+     * @param database The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
 
-    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);
     }
 
-    private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
+    private Optional<String> genericGetResolvedFieldOrAlias(Field field, @Nullable BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
         if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {
             return Optional.of(type.get().getDisplayName());
         }
@@ -730,7 +730,15 @@ public class BibEntry implements Cloneable {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
+    public String getAuthorTitleYear() {
+        return getAuthorTitleYear(0);
+    }
+
     /**
+     * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
+     *
+     * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
+     *
      * @param maxCharacters The maximum number of characters (additional
      *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:

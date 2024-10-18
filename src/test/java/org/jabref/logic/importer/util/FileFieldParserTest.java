@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.util;
 
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +65,7 @@ class FileFieldParserTest {
 
                 // parseCorrectOnlineInput
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile(new URL("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
+                        Collections.singletonList(new LinkedFile(URI.create("http://arxiv.org/pdf/2010.08497v1").toURL(), "PDF")),
                         ":http\\://arxiv.org/pdf/2010.08497v1:PDF"
                 ),
 
@@ -164,24 +164,24 @@ class FileFieldParserTest {
 
                 // url
                 Arguments.of(
-                         Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
+                         Collections.singletonList(new LinkedFile(URI.create("https://books.google.de/").toURL(), "")),
                          "https://books.google.de/"
                 ),
 
                 // url with www
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
+                             Collections.singletonList(new LinkedFile(URI.create("https://www.google.de/").toURL(), "")),
                              "https://www.google.de/"
                 ),
 
                 // url as file
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             Collections.singletonList(new LinkedFile("", URI.create("http://ceur-ws.org/Vol-438").toURL(), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // url as file with desc
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             Collections.singletonList(new LinkedFile("desc", URI.create("http://ceur-ws.org/Vol-438").toURL(), "URL")),
                              "desc:http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // link with source url

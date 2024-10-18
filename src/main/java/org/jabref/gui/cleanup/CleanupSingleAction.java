@@ -11,17 +11,17 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class CleanupSingleAction extends SimpleCommand {
 
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final BibEntry entry;
@@ -30,7 +30,7 @@ public class CleanupSingleAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupSingleAction(BibEntry entry, PreferencesService preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
+    public CleanupSingleAction(BibEntry entry, CliPreferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;

@@ -25,22 +25,23 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.search.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -57,15 +58,16 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final UndoAction undoAction;
     private final RedoAction redoAction;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final StateManager stateManager;
-    private final IndexingTaskManager indexingTaskManager;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
+    private final LuceneManager luceneManager;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private Collection<Field> fields = new ArrayList<>();
+    @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
@@ -75,12 +77,12 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            UndoAction undoAction,
                            RedoAction redoAction,
                            DialogService dialogService,
-                           PreferencesService preferences,
-                           StateManager stateManager,
+                           GuiPreferences preferences,
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
-                           IndexingTaskManager indexingTaskManager) {
+                           LuceneManager luceneManager,
+                           OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -92,8 +94,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.themeManager = themeManager;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.stateManager = stateManager;
-        this.indexingTaskManager = indexingTaskManager;
+        this.luceneManager = luceneManager;
+        this.searchQueryProperty = searchQueryProperty;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -261,10 +263,10 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                     dialogService,
                     preferences.getKeyBindingRepository(),
                     preferences,
-                    stateManager,
                     themeManager,
-                    indexingTaskManager,
-                    taskExecutor);
+                    taskExecutor,
+                    luceneManager,
+                    searchQueryProperty);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

@@ -8,7 +8,8 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.util.Directories;
 
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultDesktop extends NativeDesktop {
 
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Desktop.getDesktop().open(new File(filePath));
     }
 
@@ -43,12 +44,7 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        return programName;
-    }
-
-    @Override
     public Path getApplicationDirectory() {
-        return getUserDirectory();
+        return Directories.getUserDirectory();
     }
 }

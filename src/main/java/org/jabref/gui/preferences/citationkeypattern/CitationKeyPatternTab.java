@@ -45,7 +45,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(preferencesService.getCitationKeyPatternPreferences());
+        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences());
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
@@ -61,7 +61,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferences.getExternalApplicationsPreferences()), keyPatternHelp);
     }
 
     @Override
@@ -69,8 +69,8 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         viewModel.setValues();
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         bibtexKeyPatternTable.setValues(
-                entryTypesManager.getAllTypes(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode()),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns());
+                entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
+                preferences.getCitationKeyPatternPreferences().getKeyPatterns());
     }
 
     @Override

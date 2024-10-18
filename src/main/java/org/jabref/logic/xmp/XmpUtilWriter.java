@@ -181,7 +181,7 @@ public class XmpUtilWriter {
             serializer.serialize(meta, os, true);
             return os.toString(StandardCharsets.UTF_8);
         } catch (TransformerException e) {
-            LOGGER.warn("Transformation into XMP not possible: " + e.getMessage(), e);
+            LOGGER.warn("Transformation into XMP not possible: {}", e.getMessage(), e);
             return "";
         } catch (UnsupportedEncodingException e) {
             LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in XMP metadata.", e);

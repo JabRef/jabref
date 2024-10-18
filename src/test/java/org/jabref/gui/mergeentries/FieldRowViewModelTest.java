@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.BibEntryPreferences;
 
 import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;

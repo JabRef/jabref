@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,17 +20,19 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -45,6 +49,7 @@ import org.slf4j.LoggerFactory;
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
  *   <li>dialog window sizes/positions</li>
+ *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
  * </ul>
  */
 public class StateManager {
@@ -56,19 +61,23 @@ public class StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, LuceneManager> luceneManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
-    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
-    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
+    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(() -> !runningBackgroundTasks.isEmpty(), runningBackgroundTasks);
+    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
+    private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -119,6 +128,14 @@ public class StateManager {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
     }
 
+    public void setLuceneManager(BibDatabaseContext database, LuceneManager luceneManager) {
+        luceneManagers.put(database.getUid(), luceneManager);
+    }
+
+    public Optional<LuceneManager> getLuceneManager(BibDatabaseContext database) {
+        return Optional.ofNullable(luceneManagers.get(database.getUid()));
+    }
+
     public Optional<BibDatabaseContext> getActiveDatabase() {
         return activeDatabase.get();
     }
@@ -140,16 +157,19 @@ public class StateManager {
         return focusOwner.get();
     }
 
+    public ObservableList<Task<?>> getBackgroundTasks() {
+        return backgroundTasks;
+    }
+
     public ObservableList<Task<?>> getRunningBackgroundTasks() {
-        FilteredList<Pair<BackgroundTask<?>, Task<?>>> pairs = new FilteredList<>(backgroundTasks, task -> task.getValue().isRunning());
-        return EasyBind.map(pairs, Pair::getValue);
+        return runningBackgroundTasks;
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.addFirst(new Pair<>(backgroundTask, task));
+        this.backgroundTasksPairs.addFirst(new Pair<>(backgroundTask, task));
     }
 
-    public EasyBinding<Boolean> getAnyTaskRunning() {
+    public BooleanBinding getAnyTaskRunning() {
         return anyTaskRunning;
     }
 
@@ -206,5 +226,9 @@ public class StateManager {
 
     public void clearSearchHistory() {
         searchHistory.clear();
+    }
+
+    public List<AiChatWindow> getAiChatWindows() {
+        return aiChatWindows;
     }
 }

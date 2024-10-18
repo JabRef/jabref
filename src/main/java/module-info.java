@@ -89,11 +89,11 @@ open module org.jabref {
     // dependency injection using HK2
     requires org.glassfish.hk2.api;
 
-    // region: http clients
-    requires unirest.java.core;
-    requires unirest.modules.gson;
+    // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     // endregion
 
     // region: SQL databases
@@ -142,25 +142,32 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
-    // region: AI
+    // region AI
     requires ai.djl.api;
+    requires ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
+    requires langchain4j.google.ai.gemini;
     requires langchain4j.hugging.face;
     requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
+    uses ai.djl.engine.EngineProvider;
+    uses ai.djl.repository.RepositoryFactory;
+    uses ai.djl.repository.zoo.ZooProvider;
+    uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
     // endregion
 
-    // region: fulltext search
-    requires org.apache.lucene.core;
-    // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
-    requires org.apache.lucene.queryparser;
-    uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+    // region: Lucene
+    /**
+     * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
+     */
+    uses org.apache.lucene.codecs.lucene100.Lucene100Codec;
     requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
+    requires org.apache.lucene.queryparser;
     // endregion
 
     requires net.harawata.appdirs;
@@ -169,13 +176,14 @@ open module org.jabref {
 
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
-    uses org.eclipse.jgit.lib.GpgSigner;
+    uses org.eclipse.jgit.lib.Signer;
 
     requires transitive org.jspecify;
 
     // region: other libraries (alphabetically)
     requires cuid;
     requires dd.plist;
+    requires io.github.adr;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;

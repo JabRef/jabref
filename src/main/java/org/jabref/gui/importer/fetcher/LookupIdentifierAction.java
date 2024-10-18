@@ -11,13 +11,13 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
@@ -82,7 +82,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
             } catch (FetcherException e) {
-                LOGGER.error("Could not fetch " + fetcher.getIdentifierName(), e);
+                LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
             }
             if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
                 Optional<FieldChange> fieldChange = bibEntry.setField(identifier.get().getDefaultField(), identifier.get().getNormalized());
@@ -97,7 +97,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         }
         namedCompound.end();
         if (foundCount > 0) {
-            undoManager.addEdit(namedCompound);
+            UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(namedCompound));
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

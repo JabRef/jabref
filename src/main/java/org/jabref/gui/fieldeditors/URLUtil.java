@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 public class URLUtil {
     private static final String URL_EXP = "^(https?|ftp)://.+";
@@ -38,7 +39,7 @@ public class URLUtil {
         }
         // Extract destination URL
         try {
-            URL searchURL = new URL(url);
+            URL searchURL = URI.create(url).toURL();
             // URL parameters
             String query = searchURL.getQuery();
             // no parameters
@@ -76,9 +77,9 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            new URL(url);
+            URI.create(url).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -91,11 +92,11 @@ public class URLUtil {
      * @param link The link
      * @return The suffix, excluding the dot (e.g. "pdf")
      */
-    public static Optional<String> getSuffix(final String link, FilePreferences filePreferences) {
+    public static Optional<String> getSuffix(final String link, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
-            URL url = new URL(link);
+            URL url = URI.create(link).toURL();
             if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
@@ -111,7 +112,7 @@ public class URLUtil {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, filePreferences)) {
+        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, externalApplicationsPreferences)) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');

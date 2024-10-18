@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class BibsonomyScraper {
             String cleanURL = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
                                       .replace("&", "%26").replace("=", "%3D");
 
-            URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
+            URL url = URI.create(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST).toURL();
             String bibtex = new URLDownload(url).asString();
             return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException | FetcherException ex) {

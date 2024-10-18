@@ -6,19 +6,19 @@ import java.io.StringWriter;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -28,12 +28,12 @@ public class PreviewWithSourceTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);
 
-    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
-        return getPreviewWithSourceTab(entry, bibDatabaseContext, preferencesService, entryTypesManager, previewViewer, "");
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+        return getPreviewWithSourceTab(entry, bibDatabaseContext, preferences, entryTypesManager, previewViewer, "");
     }
 
-    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
-        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
+        previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
 
         CodeArea codeArea = new CodeArea();
@@ -52,7 +52,7 @@ public class PreviewWithSourceTab {
         }
 
         try {
-            codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferencesService.getFieldPreferences(), entryTypesManager));
+            codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager));
         } catch (IOException e) {
             LOGGER.error("Error getting Bibtex: {}", entry);
         }

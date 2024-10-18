@@ -5,14 +5,15 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.BibEntryPreferences;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,11 @@ class GroupDialogViewModelTest {
     private Path temporaryFolder;
     private BibDatabaseContext bibDatabaseContext;
     private final MetaData metaData = mock(MetaData.class);
+    private final StateManager stateManager = mock(StateManager.class);
     private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
     private final AbstractGroup group = mock(AbstractGroup.class);
-    private final PreferencesService preferencesService = mock(PreferencesService.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {
@@ -43,15 +45,15 @@ class GroupDialogViewModelTest {
 
         when(group.getName()).thenReturn("Group");
 
-        when(preferencesService.getBibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
-        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
-        when(preferencesService.getFilePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
-        when(preferencesService.getGroupsPreferences()).thenReturn(groupsPreferences);
+        when(preferences.getBibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(preferences.getFilePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
+        when(preferences.getGroupsPreferences()).thenReturn(groupsPreferences);
 
         bibDatabaseContext.setMetaData(metaData);
 
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor());
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, group, null, new DummyFileUpdateMonitor(), stateManager);
     }
 
     @Test
@@ -88,7 +90,7 @@ class GroupDialogViewModelTest {
     void hierarchicalContextFromGroup() throws Exception {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor());
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, group, null, new DummyFileUpdateMonitor(), stateManager);
 
         assertEquals(groupHierarchyType, viewModel.groupHierarchySelectedProperty().getValue());
     }
@@ -96,8 +98,8 @@ class GroupDialogViewModelTest {
     @Test
     void defaultHierarchicalContext() throws Exception {
         GroupHierarchyType defaultHierarchicalContext = GroupHierarchyType.REFINING;
-        when(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext()).thenReturn(defaultHierarchicalContext);
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, null, null, new DummyFileUpdateMonitor());
+        when(preferences.getGroupsPreferences().getDefaultHierarchicalContext()).thenReturn(defaultHierarchicalContext);
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, null, null, new DummyFileUpdateMonitor(), stateManager);
 
         assertEquals(defaultHierarchicalContext, viewModel.groupHierarchySelectedProperty().getValue());
     }

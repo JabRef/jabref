@@ -1,13 +1,14 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -31,7 +32,6 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
-    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
 
     private final ImporterPreferences importerPreferences;
@@ -53,7 +53,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
         // Available in catalog?
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                         .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY))
+                                                         .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(""))
                                                          .queryString("q", "doi:%s".formatted(doi.get().getDOI()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {
@@ -62,10 +62,10 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
 
                 if (results > 0) {
                     LOGGER.info("Fulltext PDF found @ Springer.");
-                    return Optional.of(new URL("http", CONTENT_HOST, "/content/pdf/%s.pdf".formatted(doi.get().getDOI())));
+                    return Optional.of(new URI("http", null, CONTENT_HOST, -1, "/content/pdf/%s.pdf".formatted(doi.get().getDOI()), null, null).toURL());
                 }
             }
-        } catch (UnirestException e) {
+        } catch (UnirestException | URISyntaxException e) {
             LOGGER.warn("SpringerLink API request failed", e);
         }
         return Optional.empty();

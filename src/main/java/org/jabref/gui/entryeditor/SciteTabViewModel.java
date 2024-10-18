@@ -13,14 +13,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     private static final String BASE_URL = "https://api.scite.ai/";
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
@@ -45,15 +45,15 @@ public class SciteTabViewModel extends AbstractViewModel {
 
     private Future<?> searchTask;
 
-    public SciteTabViewModel(PreferencesService preferencesService, TaskExecutor taskExecutor) {
-        this.preferencesService = preferencesService;
+    public SciteTabViewModel(GuiPreferences preferences, TaskExecutor taskExecutor) {
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
     }
 
     public boolean shouldShow() {
-        return preferencesService.getEntryEditorPreferences().shouldShowSciteTab();
+        return preferences.getEntryEditorPreferences().shouldShowSciteTab();
     }
 
     public void bindToEntry(BibEntry entry) {

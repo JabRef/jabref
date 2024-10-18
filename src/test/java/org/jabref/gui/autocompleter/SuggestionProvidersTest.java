@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

@@ -29,7 +29,9 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.20.0'
+    id 'org.openrewrite.rewrite' version '6.23.4'
+
+    id "org.itsallcode.openfasttrace" version "3.0.0"
 }
 
 // Enable following for debugging
@@ -140,7 +142,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "22.0.2"
+    version = "23.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -164,7 +166,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "9.11.1"
+    def luceneVersion = "10.0.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -172,15 +174,15 @@ dependencies {
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.16.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-    implementation 'commons-logging:commons-logging:1.3.3'
-    implementation 'com.h2database:h2-mvstore:2.3.230'
+    implementation 'commons-logging:commons-logging:1.3.4'
+    implementation 'com.h2database:h2-mvstore:2.3.232'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
 
-    implementation 'commons-cli:commons-cli:1.8.0'
+    implementation 'commons-cli:commons-cli:1.9.0'
 
     // region: LibreOffice
     implementation 'org.libreoffice:unoloader:24.2.3'
@@ -196,20 +198,20 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.2'
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.10.0.202406032230-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.0.0.202409031743-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.2'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.0'
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.postgresql:postgresql:42.7.4'
 
     // Support unix socket connection types
-    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.0'
-    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.10.1'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -236,7 +238,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.43.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.58.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -249,16 +251,19 @@ dependencies {
     }
     // Required by gemsfx
     implementation 'tech.units:indriya:2.2'
+    // Required by gemsfx and langchain4j
     implementation ('com.squareup.retrofit2:retrofit:2.11.0') {
         exclude group: 'com.squareup.okhttp3'
     }
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
+    // region HTTP clients
     implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'com.konghq:unirest-java-core:4.4.4'
     implementation 'com.konghq:unirest-modules-gson:4.4.4'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+    // endregion
 
     implementation 'org.slf4j:slf4j-api:2.0.16'
     implementation 'org.tinylog:tinylog-api:2.7.0'
@@ -266,9 +271,9 @@ dependencies {
     implementation 'org.tinylog:tinylog-impl:2.7.0'
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.13'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.16'
     // route all requests to log4j to SLF4J
-    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.0'
 
     implementation('de.undercouch:citeproc-java:3.1.0') {
         exclude group: 'org.antlr'
@@ -297,7 +302,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.8'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.9'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.8'
     implementation 'org.glassfish.hk2:hk2-api:3.1.1'
@@ -306,7 +311,7 @@ dependencies {
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
     // HTTP server
     // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
-    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.8'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.9'
     testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.8'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
@@ -321,34 +326,55 @@ dependencies {
     implementation 'com.github.vatbub:mslinks:1.0.6.2'
 
     // YAML formatting
-    implementation 'org.yaml:snakeyaml:2.2'
+    implementation 'org.yaml:snakeyaml:2.3'
 
-    // AI
-    implementation 'dev.langchain4j:langchain4j:0.33.0'
+    // region AI
+    implementation 'dev.langchain4j:langchain4j:0.35.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation('dev.langchain4j:langchain4j-open-ai:0.33.0') {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    implementation('dev.langchain4j:langchain4j-open-ai:0.35.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-mistral-ai:0.33.0')
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.33.0')
-    implementation 'ai.djl:api:0.29.0'
-    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
-    implementation 'ai.djl.huggingface:tokenizers:0.29.0'
-    implementation 'io.github.stefanbratanov:jvm-openai:0.9.3'
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.35.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.35.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+    }
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.35.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+
+    implementation platform('ai.djl:bom:0.30.0')
+    implementation 'ai.djl:api'
+    implementation 'ai.djl.huggingface:tokenizers'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo'
+    implementation 'io.github.stefanbratanov:jvm-openai:0.11.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
     implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20'
+    // endregion
 
-    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'commons-io:commons-io:2.17.0'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.174'
+    // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
+    implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
+
+    testImplementation 'io.github.classgraph:classgraph:4.8.177'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
-    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-core:5.14.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.10.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.3.0'
@@ -357,12 +383,15 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:3.0"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.17.0'
+    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
+    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.18.2'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.17.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.19.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -717,16 +746,14 @@ jlink {
 
     // TODO: Remove the following correction to the merged module
     // The module descriptor automatically generated by the plugin for the merged module contained some invalid entries.
-    // This is based on ./gradlew suggestMergedModuleInfo, sort, strip ";"", comment non-used modules, and include the suggested directives here.
-    //   However, we need to fine-tune this manually (non-alphabetic order)
+    // This is based on ./gradlew suggestMergedModuleInfo, sort, strip ";"", remove non-used modules, and include the suggested directives here.
     mergedModule {
-        requires 'javafx.base'
-        requires 'javafx.controls'
-        requires 'javafx.fxml'
-        requires 'javafx.graphics'
-        requires 'javafx.media'
-        requires 'javafx.swing'
-
+        requires 'com.google.gson'
+        requires 'com.fasterxml.jackson.annotation'
+        requires 'com.fasterxml.jackson.databind'
+        requires 'com.fasterxml.jackson.core'
+        requires 'com.fasterxml.jackson.datatype.jdk8'
+        requires 'jakarta.xml.bind'
         requires 'java.compiler'
         requires 'java.datatransfer'
         requires 'java.desktop'
@@ -734,33 +761,43 @@ jlink {
         requires 'java.management'
         requires 'java.naming'
         requires 'java.net.http'
+        requires 'java.rmi'
         requires 'java.scripting'
         requires 'java.security.jgss'
         requires 'java.security.sasl'
         requires 'java.sql'
         requires 'java.sql.rowset'
         requires 'java.transaction.xa'
-        requires 'java.rmi'
         requires 'java.xml'
+        requires 'javafx.base'
+        requires 'javafx.controls'
+        requires 'javafx.fxml'
+        requires 'javafx.graphics'
+        requires 'javafx.media'
+        requires 'javafx.swing'
         requires 'jdk.jsobject'
+        requires 'jdk.security.jgss'
         requires 'jdk.unsupported'
         requires 'jdk.unsupported.desktop'
-        requires 'jdk.security.jgss'
         requires 'jdk.xml.dom'
-        requires 'com.google.gson'
+        requires 'org.apache.commons.lang3'
+        requires 'org.apache.commons.logging'
+        requires 'org.apache.commons.text'
+        requires 'org.freedesktop.dbus'
         requires 'org.jsoup'
         requires 'org.slf4j'
-        requires 'jakarta.xml.bind'
-        requires 'org.apache.commons.lang3'
-        requires 'org.apache.commons.text'
-        requires 'org.apache.commons.logging';
-        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
-        uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
-        uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
-        uses 'org.mariadb.jdbc.LocalInfileInterceptor'
+        uses 'ai.djl.engine.EngineProvider'
+        uses 'ai.djl.repository.RepositoryFactory'
+        uses 'ai.djl.repository.zoo.ZooProvider'
+        uses 'dev.langchain4j.spi.prompt.PromptTemplateFactory'
+        uses 'kong.unirest.core.json.JsonEngine'
+        uses 'org.eclipse.jgit.lib.Signer'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
-        uses 'org.eclipse.jgit.lib.GpgSigner'
-        uses 'kong.unirest.core.json.JsonEngine';
+        uses 'org.mariadb.jdbc.LocalInfileInterceptor'
+        uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
+        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
+        uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
+
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
@@ -777,7 +814,12 @@ jlink {
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';
-
+        provides 'ai.djl.repository.zoo.ZooProvider' with 'ai.djl.engine.rust.zoo.RsZooProvider',
+                                    'ai.djl.huggingface.zoo.HfZooProvider',
+                                    'ai.djl.pytorch.zoo.PtZooProvider',
+                                    'ai.djl.repository.zoo.DefaultZooProvider';
+        provides 'ai.djl.engine.EngineProvider' with 'ai.djl.engine.rust.RsEngineProvider',
+                                    'ai.djl.pytorch.engine.PtEngineProvider';
     }
 
     jpackage {
@@ -882,4 +924,8 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+requirementTracing {
+    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
 }
