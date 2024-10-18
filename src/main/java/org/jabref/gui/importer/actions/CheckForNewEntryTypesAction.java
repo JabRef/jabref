@@ -21,7 +21,7 @@ import com.airhacks.afterburner.injection.Injector;
 public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, CliPreferences preferences) {
+    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         return !getListOfUnknownAndUnequalCustomizations(parserResult, preferences.getLibraryPreferences()).isEmpty();
     }
 

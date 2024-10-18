@@ -53,6 +53,6 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
-        tabSupplier.get().getLuceneManager().rebuildIndex();
+        tabSupplier.get().getIndexManager().rebuildFullTextIndex();
     }
 }

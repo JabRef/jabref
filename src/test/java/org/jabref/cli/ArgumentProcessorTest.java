@@ -17,12 +17,12 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -96,7 +96,7 @@ class ArgumentProcessorTest {
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "author:Einstein," + outputBibFile, originBibFile);
+        List<String> args = List.of("-n", "--debug", "--exportMatches", "author=Einstein," + outputBibFile, originBibFile);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),

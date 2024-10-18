@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.model.search;
 
 public enum SearchDisplayMode {
     FLOAT,

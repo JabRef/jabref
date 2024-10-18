@@ -32,7 +32,7 @@ public class PostgresSQLNotificationListener implements Runnable {
         try {
             // noinspection InfiniteLoopStatement
             while (!stop) {
-                PGNotification notifications[] = pgConnection.getNotifications();
+                PGNotification[] notifications = pgConnection.getNotifications();
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
