@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PdfContentImporterTest {
 
-    private PdfContentImporter importer = new PdfContentImporter();
+    private final PdfContentImporter importer = new PdfContentImporter();
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
@@ -122,5 +123,12 @@ class PdfContentImporterTest {
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
+    }
+
+    @Test
+    void se2Pdfs() throws Exception {
+        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/se2paper.pdf")).toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        assertEquals("On How and We Can and Teach  and Exploring New and Ways in  and Professional Software and Development for Students", result.get(0).getTitle().toString());
     }
 }
