@@ -12,9 +12,9 @@ class FileNameCleanerTest {
     @ParameterizedTest
     @CsvSource({
         "legalFilename.txt, legalFilename.txt",
-        "illegalFilename/?*<>|.txt, illegalFilename______.txt",
-        "illegalFileName{.txt, illegalFileName_.txt",
-        "?The Evolution of Sentiment} Analysis}.PDF, _The Evolution of Sentiment_ Analysis_.PDF"
+        "illegalFilename______.txt, illegalFilename/?*<>|.txt",
+        "illegalFileName_.txt, illegalFileName{.txt",
+        "_The Evolution of Sentiment_ Analysis_.PDF,?The Evolution of Sentiment} Analysis}.PDF"
     })
     void cleanFileName(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanFileName(input));
@@ -24,9 +24,9 @@ class FileNameCleanerTest {
     @CsvSource({
         "legalFilename.txt, legalFilename.txt",
         "subdir/legalFilename.txt, subdir/legalFilename.txt",
-        "illegalFilename/?*<>|.txt, illegalFilename/_____.txt"
+        "illegalFilename/_____.txt, illegalFilename/?*<>|.txt"
     })
-    void cleanDirectoryName(String input, String expected) {
+    void cleanDirectoryName(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
     }
 
@@ -34,9 +34,9 @@ class FileNameCleanerTest {
     @CsvSource({
         "legalFilename.txt, legalFilename.txt",
         "subdir\\legalFilename.txt, subdir\\legalFilename.txt",
-        "illegalFilename\\?*<>|.txt, illegalFilename\\_____.txt"
+        "illegalFilename\\_____.txt, illegalFilename\\?*<>|.txt"
     })
-    void cleanDirectoryNameForWindows(String input, String expected) {
+    void cleanDirectoryNameForWindows(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
     }
 }
