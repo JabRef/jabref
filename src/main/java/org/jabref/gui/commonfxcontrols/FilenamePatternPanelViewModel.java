@@ -9,8 +9,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.FilenameFormatPattern;
-import org.jabref.logic.citationkeypattern.FilenamePatternPreferences;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.filenameformatpatterns.FilenameFormatPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -37,9 +37,9 @@ public class FilenamePatternPanelViewModel {
     private final ListProperty<FilenamePatternItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<FilenamePatternItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final FilenamePatternPreferences filePreferences;
+    private final FilePreferences filePreferences;
 
-    public FilenamePatternPanelViewModel(FilenamePatternPreferences filePreferences) {
+    public FilenamePatternPanelViewModel(FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
     }
 
