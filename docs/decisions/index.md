@@ -4,7 +4,7 @@ has_children: true
 ---
 # Decision Records
 
-Below, all "any decision records" for JabRef are listed.
+Below, all "architectural decision records" for JabRef are listed.
 This list uses the TOC functionality of the [Just the Docs Jekyll template](https://just-the-docs.github.io/just-the-docs/).
 
 For new ADRs, please use [adr-template.md](adr-template.md) as basis.

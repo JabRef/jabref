@@ -25,7 +25,7 @@ This decision record concerns the UI component that is used for rendering the co
 
 ## Decision Outcome
 
-Chosen option: "Use TextArea".
+Chosen option: "Use `TextArea`".
 All other options require more time to implement.
 Some of the options do not support text selection and copying,
 which for now we value more than Markdown rendering.

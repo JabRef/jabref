@@ -6,7 +6,7 @@ nav_order: 7
 
 ## Context and Problem Statement
 
-Changes of a release have to be communicated. How and which stile to use?
+Changes of a release have to be communicated. How and which style to use?
 
 ## Considered Options
 
