@@ -103,7 +103,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                      .ifPresent(file -> {
                          try {
                              preferences.importPreferences(file);
-                             setValues();
+//                             setValues();
 
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
