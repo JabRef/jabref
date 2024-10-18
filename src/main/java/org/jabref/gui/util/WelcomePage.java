@@ -54,16 +54,16 @@ public class WelcomePage extends VBox {
         Hyperlink newLibraryLink = new Hyperlink("New Library");
         newLibraryLink.setFont(new Font("Arial", 22));
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
-        newLibraryLink.setStyle("-fx-text-fill: blue;"); // Set link color to blue
-        newLibraryLink.setVisited(false); // Prevent it from changing color on click
+        newLibraryLink.setStyle("-fx-text-fill: blue;");
+        newLibraryLink.setVisited(false);
 
         // Text and hyperlink for "Open Library"
         Hyperlink openLibraryLink = new Hyperlink("Existing Library");
         openLibraryLink.setFont(new Font("Arial", 22));
         openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor,
                 entryTypesManager, undoManager, clipBoardManager, taskExecutor).execute());
-        openLibraryLink.setStyle("-fx-text-fill: blue;"); // Set link color to blue
-        openLibraryLink.setVisited(false); // Prevent it from changing color on click
+        openLibraryLink.setStyle("-fx-text-fill: blue;");
+        openLibraryLink.setVisited(false);
 
         Text orExistingDatabaseText = new Text(" or open an ");
         orExistingDatabaseText.setFont(new Font("Arial", 22));
