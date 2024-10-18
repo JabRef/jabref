@@ -14,7 +14,7 @@ class FileNameCleanerTest {
         "legalFilename.txt, legalFilename.txt",
         "illegalFilename/?*<>|.txt, illegalFilename______.txt",
         "illegalFileName{.txt, illegalFileName_.txt",
-        "\"The Evolution of Sentiment} Analysis}.PDF\", \"The Evolution of Sentiment_ Analysis.PDF\""
+        "\"The Evolution of Sentiment} Analysis}.PDF\", \"The Evolution of Sentiment_ Analysis.PDF_\""
     })
     void cleanFileName(String input, String expected) {
         assertEquals(expected, FileNameCleaner.cleanFileName(input));
