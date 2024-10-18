@@ -1,13 +1,6 @@
 package org.jabref.logic.importer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -147,59 +140,37 @@ public class AuthorListParser {
         listOfNames = simpleNormalForm.authors;
         boolean andOthersPresent = simpleNormalForm.andOthersPresent;
 
-        // Handle case names in order lastname, firstname and separated by ","
-        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
-        final boolean authorsContainOpeningBrace = listOfNames.contains("{");
-        final boolean authorsContainSemicolon = listOfNames.contains(";");
-        final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
-        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
-            List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
+        // Split the author list
+        List<String> authorsArray = splitAuthors(listOfNames);
+        List<Author> authors = new ArrayList<>(authorsArray.size());
 
-            // Delete spaces for correct case identification
-            arrayNameList.replaceAll(String::trim);
-
-            // Looking for space between pre- and lastname
-            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" "))
-                                                   .count() == arrayNameList.size();
-
-            // We hit the comma name separator case
-            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
-            // If not, we check if spaces separate pre- and lastname
-            if (spaceInAllParts) {
-                listOfNames = listOfNames.replace(",", " and");
-            } else {
-                // Looking for name affixes to avoid
-                // arrayNameList needs to reduce by the count off avoiding terms
-                // valuePartsCount holds the count of name parts without the avoided terms
-
-                int valuePartsCount = arrayNameList.size();
-                // Holds the index of each term which needs to be avoided
-                Collection<Integer> avoidIndex = new HashSet<>();
-
-                for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
-                        avoidIndex.add(i);
-                        valuePartsCount--;
-                    }
-                }
-
-                if ((valuePartsCount % 2) == 0) {
-                    // We hit the described special case with name affix like Jr
-                    listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();
-                }
+        for (String authorString : authorsArray) {
+            authorString = authorString.trim();
+            Optional<Author> author = Optional.empty();
+            if (authorString.startsWith("family=")) {
+                // Try to parse using extended format
+                author = parseExtendedNameFormat(authorString);
             }
-        }
+            if (author.isEmpty()) {
+                // Parse using getAuthor()
+                // Save current state
+                String savedOriginal = original;
+                int savedTokenStart = tokenStart;
+                int savedTokenEnd = tokenEnd;
 
-        // initialization of parser
-        original = listOfNames;
-        tokenStart = 0;
-        tokenEnd = 0;
+                // set original to authorString and reset token positions
+                original = authorString;
+                tokenStart = 0;
+                tokenEnd = 0;
 
-        // Parse author by author
-        List<Author> authors = new ArrayList<>(5); // 5 seems to be reasonable initial size
-        while (tokenStart < original.length()) {
-            getAuthor().ifPresent(authors::add);
+                author = getAuthor();
+
+                // restore original state
+                original = savedOriginal;
+                tokenStart = savedTokenStart;
+                tokenEnd = savedTokenEnd;
+            }
+            author.ifPresent(authors::add);
         }
 
         if (andOthersPresent) {
@@ -208,6 +179,100 @@ public class AuthorListParser {
 
         return AuthorList.of(authors);
     }
+
+    /**
+     * Attempts to parse a single author string using the BibLaTeX extended name format.
+     * The format includes attributes such as family, given, prefix, and suffix.
+     * Also handles the 'useprefix=false' case where the prefix should be ignored.
+     *
+     * @param authorString the string representing a single author in extended format
+     * @return Optional containing an Author object if parsing is successful, or empty if not
+     */
+    private Optional<Author> parseExtendedNameFormat(String authorString) {
+        Map<String, String> nameParts = new HashMap<>();
+        Matcher matcher = Pattern.compile("(\\w+)\\s*=\\s*([^,]+)(?:,\\s*|$)").matcher(authorString);
+        while (matcher.find()) {
+            nameParts.put(matcher.group(1).trim(), matcher.group(2).trim());
+        }
+
+        if (nameParts.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String familyName = nameParts.get("family");
+        String givenName = nameParts.get("given");
+        String namePrefix = nameParts.get("prefix");
+        String nameSuffix = nameParts.get("suffix");
+        String usePrefix = nameParts.get("useprefix");
+
+        // handle useprefix=false
+        if ("false".equalsIgnoreCase(usePrefix)) {
+            namePrefix = null;
+        }
+
+        // abbreviate given name
+        String givenNameAbbreviated = abbreviateGivenName(givenName);
+
+        // create Author object
+        return Optional.of(new Author(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix));
+    }
+
+
+    /**
+     * Abbreviates the given name by taking the first letter of each word and appending a dot.
+     * Handles cases where the given name is already in an abbreviated format.
+     *
+     * @param givenName the given name string to abbreviate
+     * @return the abbreviated version of the given name
+     */
+    private String abbreviateGivenName(String givenName) {
+        if (givenName == null || givenName.isEmpty()) {
+            return null;
+        }
+        String[] parts = givenName.trim().split("\\s+");
+        StringBuilder abbreviated = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (!parts[i].isEmpty()) {
+                // check if the part is already an initial with a dot
+                if (parts[i].matches("[A-Z]\\.")) {
+                    abbreviated.append(parts[i]);
+                } else {
+                    abbreviated.append(parts[i].charAt(0)).append('.');
+                }
+                if (i < parts.length - 1) {
+                    abbreviated.append(' ');
+                }
+            }
+        }
+        return abbreviated.toString();
+    }
+
+    /**
+     * Splits the author list into individual authors
+     *
+     * @param authorList the author list string
+     * @return a list of individual author strings
+     */
+    private List<String> splitAuthors(String authorList) {
+        List<String> authors = new ArrayList<>();
+        int bracesLevel = 0;
+        int start = 0;
+        for (int i = 0; i < authorList.length(); i++) {
+            char c = authorList.charAt(i);
+            if (c == '{') {
+                bracesLevel++;
+            } else if (c == '}') {
+                bracesLevel--;
+            } else if (i <= authorList.length() - 5 && authorList.substring(i, i + 5).equals(" and ") && bracesLevel == 0) {
+                authors.add(authorList.substring(start, i));
+                i += 4;
+                start = i + 1;
+            }
+        }
+        authors.add(authorList.substring(start));
+        return authors;
+    }
+
 
     /**
      * Handle cases names in order Firstname Lastname, separated by <code>","</code> and a final <code>", and "</code>
@@ -238,6 +303,35 @@ public class AuthorListParser {
      * @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is empty.
      */
     private Optional<Author> getAuthor() {
+        int savedTokenStart = tokenStart;
+
+        while (tokenStart < original.length() && Character.isWhitespace(original.charAt(tokenStart))) {
+            tokenStart++;
+        }
+
+        // check if the substring starting at tokenStart starts with "family="
+        if (original.startsWith("family=", tokenStart)) {
+            // try to parse up to the next 'and' or end of string
+            int indexOfAnd = original.indexOf(" and ", tokenStart);
+            String authorString;
+            if (indexOfAnd >= 0) {
+                authorString = original.substring(tokenStart, indexOfAnd).trim();
+                tokenStart = indexOfAnd + " and ".length();
+            } else {
+                authorString = original.substring(tokenStart).trim();
+                tokenStart = original.length();
+            }
+
+            Optional<Author> extendedAuthor = parseExtendedNameFormat(authorString);
+
+            if (extendedAuthor.isPresent()) {
+                return extendedAuthor;
+            } else {
+                // parsing failed so reset tokenStart
+                tokenStart = savedTokenStart;
+            }
+        }
+
         List<Object> tokens = new ArrayList<>();
         int vonStart = -1;
         int lastStart = -1;
