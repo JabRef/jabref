@@ -4,8 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -44,29 +42,25 @@ public class WelcomePage extends VBox {
 
         // Title
         Label welcomeLabel = new Label("Welcome to JabRef!");
-        welcomeLabel.setFont(new Font("Arial", 40));
-        welcomeLabel.setTextFill(Color.DARKSLATEGRAY);
+        welcomeLabel.getStyleClass().add("welcome-label");
 
         // Text and hyperlink for "New Library"
         Text openNewLibraryText = new Text("Open a ");
-        openNewLibraryText.setFont(new Font("Arial", 22));
+        openNewLibraryText.getStyleClass().add("welcome-text");
 
         Hyperlink newLibraryLink = new Hyperlink("New Library");
-        newLibraryLink.setFont(new Font("Arial", 22));
+        newLibraryLink.getStyleClass().add("welcome-hyperlink");
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
-        newLibraryLink.setStyle("-fx-text-fill: blue;");
-        newLibraryLink.setVisited(false);
 
         // Text and hyperlink for "Open Library"
         Hyperlink openLibraryLink = new Hyperlink("Existing Library");
-        openLibraryLink.setFont(new Font("Arial", 22));
-        openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor,
-                entryTypesManager, undoManager, clipBoardManager, taskExecutor).execute());
-        openLibraryLink.setStyle("-fx-text-fill: blue;");
-        openLibraryLink.setVisited(false);
+        openLibraryLink.getStyleClass().add("welcome-hyperlink");
+        openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
+                stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
+                taskExecutor).execute());
 
         Text orExistingDatabaseText = new Text(" or open an ");
-        orExistingDatabaseText.setFont(new Font("Arial", 22));
+        orExistingDatabaseText.getStyleClass().add("welcome-text");
 
         // TextFlows for each section
         TextFlow newLibraryFlow = new TextFlow(openNewLibraryText, newLibraryLink);
