@@ -64,6 +64,7 @@ public class CitationsRelationsTabViewModel {
 
         List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
         citeKeys.removeIf(String::isEmpty);
+
         for (BibEntry entryToCite : entries) {
             if (generateNewKeyOnImport || entryToCite.getCitationKey().isEmpty()) {
                 String key = generator.generateKey(entryToCite);
