@@ -111,7 +111,7 @@ public final class LuceneSearcher {
     private SearchResults search(IndexSearcher indexSearcher, Query searchQuery, boolean shouldSearchInLinkedFiles) throws IOException {
         TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);
         StoredFields storedFields = indexSearcher.storedFields();
-        LOGGER.debug("Found {} matching documents", topDocs.totalHits.value);
+        LOGGER.debug("Found {} matching documents", topDocs.totalHits.value());
         return getSearchResults(topDocs, storedFields, searchQuery, shouldSearchInLinkedFiles);
     }
 

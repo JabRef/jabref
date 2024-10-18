@@ -13,8 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
@@ -70,12 +68,11 @@ public class ArgumentProcessor {
 
     public enum Mode { INITIAL_START, REMOTE_START }
 
-    private final JabRefCLI cli;
+    private final CliOptions cli;
 
     private final Mode startupMode;
 
     private final CliPreferences cliPreferences;
-    private final GuiPreferences guiPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -91,14 +88,12 @@ public class ArgumentProcessor {
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              CliPreferences cliPreferences,
-                             GuiPreferences guiPreferences,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager)
             throws org.apache.commons.cli.ParseException {
-        this.cli = new JabRefCLI(args);
+        this.cli = new CliOptions(args);
         this.startupMode = startupMode;
         this.cliPreferences = cliPreferences;
-        this.guiPreferences = guiPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
     }
@@ -206,7 +201,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            JabRefCLI.printUsage(cliPreferences);
+            CliOptions.printUsage(cliPreferences);
             guiNeeded = false;
             return;
         }
@@ -243,10 +238,6 @@ public class ArgumentProcessor {
             regenerateCitationKeys(loaded);
         }
 
-        if (cli.isAutomaticallySetFileLinks()) {
-            automaticallySetFileLinks(loaded);
-        }
-
         if ((cli.isWriteXmpToPdf() && cli.isEmbedBibFileInPdf()) || (cli.isWriteMetadataToPdf() && (cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()))) {
             System.err.println("Give only one of [writeXmpToPdf, embedBibFileInPdf, writeMetadataToPdf]");
         }
@@ -258,7 +249,7 @@ public class ArgumentProcessor {
                         cliPreferences.getXmpPreferences(),
                         cliPreferences.getFilePreferences(),
                         cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                        Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                        cliPreferences.getCustomEntryTypesRepository(),
                         cliPreferences.getFieldPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         cli.isWriteXmpToPdf() || cli.isWriteMetadataToPdf(),
@@ -300,7 +291,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdf(List<ParserResult> loaded,
+    private static void writeMetadataToPdf(List<ParserResult> loaded,
                                     String filesAndCiteKeys,
                                     XmpPreferences xmpPreferences,
                                     FilePreferences filePreferences,
@@ -366,7 +357,7 @@ public class ArgumentProcessor {
                 embeddBibfile);
     }
 
-    private void writeMetadataToPDFsOfEntry(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPDFsOfEntry(BibDatabaseContext databaseContext,
                                             String citeKey,
                                             BibEntry entry,
                                             FilePreferences filePreferences,
@@ -395,7 +386,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
                                              List<String> citeKeys,
                                              FilePreferences filePreferences,
                                              XmpPdfExporter xmpPdfExporter,
@@ -415,7 +406,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
+    private static void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
                                                List<String> pdfs,
                                                FilePreferences filePreferences,
                                                XmpPdfExporter xmpPdfExporter,
@@ -486,7 +477,7 @@ public class ArgumentProcessor {
                         formatName = "bib";
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                                                   .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                                                   .concat(Localization.lang("Usage")).concat(": ") + CliOptions.getExportMatchesSyntax());
                     guiNeeded = false;
                     return false;
                 }
@@ -499,9 +490,7 @@ public class ArgumentProcessor {
                 LOGGER.debug("Finished export");
             } else {
                 // export new database
-                ExporterFactory exporterFactory = ExporterFactory.create(
-                        cliPreferences,
-                        Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
                     System.err.println(Localization.lang("Unknown export format %0", formatName));
@@ -679,9 +668,7 @@ public class ArgumentProcessor {
             List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(cliPreferences.getFilePreferences());
             System.out.println(Localization.lang("Exporting %0", data[0]));
-            ExporterFactory exporterFactory = ExporterFactory.create(
-                    cliPreferences,
-                    Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format %0", data[1]));
@@ -730,24 +717,6 @@ public class ArgumentProcessor {
                     System.out.println(e.getMessage());
                 }
             }
-        }
-    }
-
-    private void automaticallySetFileLinks(List<ParserResult> loaded) {
-        for (ParserResult parserResult : loaded) {
-            BibDatabase database = parserResult.getDatabase();
-            LOGGER.info("Automatically setting file links for {}",
-                    parserResult.getDatabaseContext().getDatabasePath()
-                                .map(Path::getFileName)
-                                .map(Path::toString).orElse("UNKNOWN"));
-
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                    parserResult.getDatabaseContext(),
-                    guiPreferences.getExternalApplicationsPreferences(),
-                    cliPreferences.getFilePreferences(),
-                    cliPreferences.getAutoLinkPreferences());
-
-            util.linkAssociatedFiles(database.getEntries(), (linkedFile, bibEntry) -> bibEntry.addFile(linkedFile));
         }
     }
 

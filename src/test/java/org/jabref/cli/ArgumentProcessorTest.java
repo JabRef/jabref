@@ -73,7 +73,6 @@ class ArgumentProcessorTest {
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
                 preferences,
-                preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
         processor.processArguments();
@@ -102,7 +101,6 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
-                preferences,
                 preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
@@ -135,7 +133,6 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
-                preferences,
                 preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
