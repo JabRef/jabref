@@ -125,7 +125,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
-        this.welcomePage = new WelcomePage(this, preferences);
+        this.welcomePage = new WelcomePage(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor
+        );
 
         setId("frame");
 
@@ -256,19 +267,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         if (hasOpenDatabases) {
             if (!splitPane.getItems().contains(sidePane)) {
-                // Ensure side pane is added only once, with preferred width
+                // Set the preferred width for the side pane
                 sidePane.setPrefWidth(260);
                 splitPane.getItems().addFirst(sidePane);
-            }
 
-            // Ensure the divider position is updated appropriately
-            Platform.runLater(() -> {
+                // Ensure divider position is set before rendering
                 splitPane.setDividerPositions(0.2);  // Set divider to 20% width
-            });
 
-            updateSidePane();  // Additional updates if necessary
+                // Ensure smooth transition by updating the layout immediately
+                Platform.runLater(() -> splitPane.setDividerPositions(0.2));
+            }
         } else {
-            // Ensure side pane is removed when no databases are open
             splitPane.getItems().remove(sidePane);
         }
     }
