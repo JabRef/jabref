@@ -2,7 +2,6 @@ package org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
@@ -20,7 +19,7 @@ public class JournalAbbreviationPreferences {
     private final ObjectProperty<Path> journalAbbreviationDir;
 
     public JournalAbbreviationPreferences(List<String> externalJournalLists, boolean useFJournalField) {
-        this(externalJournalLists, useFJournalField, getDefaultAbbreviationDir().toString());
+        this(externalJournalLists, useFJournalField, getDefaultAbbreviationDir());
     }
 
     public JournalAbbreviationPreferences(List<String> externalJournalLists,
