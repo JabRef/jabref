@@ -145,7 +145,7 @@ Your commits will also be automatically squashed upon the pull request being acc
 Please – **Never ever close a pull request and open a new one** -
 This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
 You can push any changes you need to make to the branch your pull request is *from*.
-These changes will be automatically added.
+These changes will be automatically added to your pull request.
 
 ### Development hints
 
