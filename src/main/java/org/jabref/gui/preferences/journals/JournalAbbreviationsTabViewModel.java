@@ -2,20 +2,23 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -29,11 +32,6 @@ import org.jabref.logic.util.TaskExecutor;
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import java.util.Optional;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 
 /**
  * This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
@@ -376,7 +374,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .collect(Collectors.toList());
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
-                    abbreviationsPreferences.setJournalAbbreviationDir(Paths.get(directoryPath.get()));
+                    abbreviationsPreferences.setJournalAbbreviationDir(Path.of(directoryPath.get()));
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
 
                     if (shouldWriteLists) {

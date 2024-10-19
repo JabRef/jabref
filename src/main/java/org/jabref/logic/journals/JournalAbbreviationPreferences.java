@@ -1,12 +1,11 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,16 +16,15 @@ public class JournalAbbreviationPreferences {
     private final BooleanProperty useFJournalField;
     private final ObjectProperty<Path> journalAbbreviationDir;
 
-
     public JournalAbbreviationPreferences(List<String> externalJournalLists, boolean useFJournalField) {
-        this(externalJournalLists, useFJournalField, System.getenv("APPDATA") + "\\local\\org.jabref\\jabref");
+        this(externalJournalLists, useFJournalField, getDefaultAbbreviationDir().toString());
     }
 
     public JournalAbbreviationPreferences(List<String> externalJournalLists,
                                           boolean useFJournalField, String directory) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
-        this.journalAbbreviationDir = new SimpleObjectProperty<>(Paths.get(directory));
+        this.journalAbbreviationDir = new SimpleObjectProperty<>(Path.of(directory));
 
         updateCustomCsvFile(this.journalAbbreviationDir.get());
 
@@ -49,11 +47,16 @@ public class JournalAbbreviationPreferences {
     }
 
     public Path getJournalAbbreviationDir() {
-        return journalAbbreviationDir.get();
+        Path dir = journalAbbreviationDir.get();
+        return (dir != null) ? dir : getDefaultAbbreviationDir();
     }
 
     public static Path getDefaultAbbreviationDir() {
-        return Paths.get(System.getenv("APPDATA"), "..", "local", "org.jabref", "jabref");
+        String appData = System.getenv("APPDATA");
+        if (appData == null) {
+            appData = System.getProperty("user.home");
+        }
+        return Path.of(appData, ".jabref", "journals");
     }
 
     public void setJournalAbbreviationDir(Path journalAbbreviationDir) {
