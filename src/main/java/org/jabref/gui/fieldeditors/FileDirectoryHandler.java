@@ -63,10 +63,7 @@ public class FileDirectoryHandler {
         MetaData metaData = databaseContext.getMetaData();
 
         // Main file directory
-        String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
-        if (mainFilePath != null) { // Check if the path is not null
-            directories.add(new DirectoryInfo(Localization.lang("main file directory"), Path.of(mainFilePath), DirectoryType.MAIN));
-        }
+        filePreferences.getMainFileDirectory().ifPresent(mainFilePath -> directories.add(new DirectoryInfo(Localization.lang("main file directory"), Path.of(mainFilePath.toUri()), DirectoryType.MAIN)));
 
         // General (library) specific directory from MetaData
         metaData.getDefaultFileDirectory().ifPresent(path ->
@@ -95,8 +92,8 @@ public class FileDirectoryHandler {
 
     private Optional<DirectoryType> determineCurrentDirectory(Path filePath) {
         MetaData metaData = databaseContext.getMetaData();
-        System.out.println("File Path");
-        System.out.println(filePath);
+//        System.out.println("File Path");
+//        System.out.println(filePath);
         // Check main directory
         Optional<Path> mainFilePath = filePreferences.getMainFileDirectory();
         if (mainFilePath.isPresent() && filePath.startsWith(mainFilePath.get())) {
@@ -122,7 +119,6 @@ public class FileDirectoryHandler {
 
     private Optional<DirectoryInfo> handleTwoDirectoriesCase(Optional<DirectoryType> currentDirectory, List<DirectoryInfo> availableDirectories) {
         String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
-
         if (currentDirectory.isEmpty()) {
             // File outside both directories - prefer general, then user-specific, then main
             return availableDirectories.stream()
@@ -145,12 +141,12 @@ public class FileDirectoryHandler {
         } else if (current == DirectoryType.GENERAL) {
             // If file is in general directory, prefer main (user-specific cannot exist in this case)
             return availableDirectories.stream()
-                                       .filter(dir -> dir.type == DirectoryType.MAIN && dir.path.startsWith(mainFilePath))
+                                       .filter(dir -> dir.type == DirectoryType.MAIN)
                                        .findFirst();
         } else {
             // If file is in user-specific directory, prefer main (general cannot exist in this case)
             return availableDirectories.stream()
-                                       .filter(dir -> dir.type == DirectoryType.MAIN && dir.path.startsWith(mainFilePath))
+                                       .filter(dir -> dir.type == DirectoryType.MAIN)
                                        .findFirst();
         }
     }

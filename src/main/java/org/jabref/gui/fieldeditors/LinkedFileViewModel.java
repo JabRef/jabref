@@ -370,6 +370,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
                 try {
                     Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+                    System.out.println("Current File Path");
+                    System.out.println(currentFilePath.get());
+                    System.out.println("Target Path");
+                    System.out.println(target);
                     Files.move(currentFilePath.get(), target);
                     linkedFile.setLink(target.toString());
                     // Update the menu item text after moving the file
