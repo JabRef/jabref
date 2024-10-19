@@ -11,11 +11,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -23,18 +21,21 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class JabRefCLI {
+/**
+ * Holds the command line options. It parses it using Apache Commons CLI.
+ */
+public class CliOptions {
     private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
     private static final String STRING_TABLE_DELIMITER = " : ";
 
-    private final CommandLine cl;
+    private final CommandLine commandLine;
     private final List<String> leftOver;
 
-    public JabRefCLI(String[] args) throws ParseException {
+    public CliOptions(String[] args) throws ParseException {
         Options options = getOptions();
-        this.cl = new DefaultParser().parse(options, args, true);
-        this.leftOver = cl.getArgList();
+        this.commandLine = new DefaultParser().parse(options, args, true);
+        this.leftOver = commandLine.getArgList();
     }
 
     public static String getExportMatchesSyntax() {
@@ -45,137 +46,133 @@ public class JabRefCLI {
     }
 
     public boolean isHelp() {
-        return cl.hasOption("help");
+        return commandLine.hasOption("help");
     }
 
     public boolean isShowVersion() {
-        return cl.hasOption("version");
+        return commandLine.hasOption("version");
     }
 
     public boolean isBlank() {
-        return cl.hasOption("blank");
+        return commandLine.hasOption("blank");
     }
 
     public boolean isDisableGui() {
-        return cl.hasOption("nogui");
+        return commandLine.hasOption("nogui");
     }
 
     public boolean isPreferencesExport() {
-        return cl.hasOption("prexp");
+        return commandLine.hasOption("prexp");
     }
 
     public String getPreferencesExport() {
-        return cl.getOptionValue("prexp", "jabref_prefs.xml");
+        return commandLine.getOptionValue("prexp", "jabref_prefs.xml");
     }
 
     public boolean isPreferencesImport() {
-        return cl.hasOption("primp");
+        return commandLine.hasOption("primp");
     }
 
     public String getPreferencesImport() {
-        return cl.getOptionValue("primp", "jabref_prefs.xml");
+        return commandLine.getOptionValue("primp", "jabref_prefs.xml");
     }
 
     public boolean isPreferencesReset() {
-        return cl.hasOption("prdef");
+        return commandLine.hasOption("prdef");
     }
 
     public String getPreferencesReset() {
-        return cl.getOptionValue("prdef");
+        return commandLine.getOptionValue("prdef");
     }
 
     public boolean isFileExport() {
-        return cl.hasOption("output");
+        return commandLine.hasOption("output");
     }
 
     public String getFileExport() {
-        return cl.getOptionValue("output");
+        return commandLine.getOptionValue("output");
     }
 
     public boolean isBibtexImport() {
-        return cl.hasOption("importBibtex");
+        return commandLine.hasOption("importBibtex");
     }
 
     public String getBibtexImport() {
-        return cl.getOptionValue("importBibtex");
+        return commandLine.getOptionValue("importBibtex");
     }
 
     public boolean isFileImport() {
-        return cl.hasOption("import");
+        return commandLine.hasOption("import");
     }
 
     public String getFileImport() {
-        return cl.getOptionValue("import");
+        return commandLine.getOptionValue("import");
     }
 
     public boolean isAuxImport() {
-        return cl.hasOption("aux");
+        return commandLine.hasOption("aux");
     }
 
     public String getAuxImport() {
-        return cl.getOptionValue("aux");
+        return commandLine.getOptionValue("aux");
     }
 
     public boolean isImportToOpenBase() {
-        return cl.hasOption("importToOpen");
+        return commandLine.hasOption("importToOpen");
     }
 
     public String getImportToOpenBase() {
-        return cl.getOptionValue("importToOpen");
+        return commandLine.getOptionValue("importToOpen");
     }
 
     public boolean isDebugLogging() {
-        return cl.hasOption("debug");
+        return commandLine.hasOption("debug");
     }
 
     public boolean isFetcherEngine() {
-        return cl.hasOption("fetch");
+        return commandLine.hasOption("fetch");
     }
 
     public String getFetcherEngine() {
-        return cl.getOptionValue("fetch");
+        return commandLine.getOptionValue("fetch");
     }
 
     public boolean isExportMatches() {
-        return cl.hasOption("exportMatches");
+        return commandLine.hasOption("exportMatches");
     }
 
     public String getExportMatches() {
-        return cl.getOptionValue("exportMatches");
+        return commandLine.getOptionValue("exportMatches");
     }
 
     public boolean isGenerateCitationKeys() {
-        return cl.hasOption("generateCitationKeys");
-    }
-
-    public boolean isAutomaticallySetFileLinks() {
-        return cl.hasOption("automaticallySetFileLinks");
+        return commandLine.hasOption("generateCitationKeys");
     }
 
     public boolean isWriteXmpToPdf() {
-        return cl.hasOption("writeXmpToPdf");
+        return commandLine.hasOption("writeXmpToPdf");
     }
 
     public boolean isEmbedBibFileInPdf() {
-        return cl.hasOption("embedBibFileInPdf");
+        return commandLine.hasOption("embedBibFileInPdf");
     }
 
     public boolean isWriteMetadataToPdf() {
-        return cl.hasOption("writeMetadataToPdf");
+        return commandLine.hasOption("writeMetadataToPdf");
     }
 
     public String getWriteMetadataToPdf() {
-        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadataToPdf") :
-                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXmpToPdf") :
-                        cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+        return commandLine.hasOption("writeMetadatatoPdf") ? commandLine.getOptionValue("writeMetadataToPdf") :
+                commandLine.hasOption("writeXMPtoPdf") ? commandLine.getOptionValue("writeXmpToPdf") :
+                        commandLine.hasOption("embeddBibfileInPdf") ? commandLine.getOptionValue("embeddBibfileInPdf") : null;
     }
 
     public String getJumpToKey() {
-        return cl.getOptionValue("jumpToKey");
+        return commandLine.getOptionValue("jumpToKey");
     }
 
     public boolean isJumpToKey() {
-        return cl.hasOption("jumpToKey");
+        return commandLine.hasOption("jumpToKey");
     }
 
     private static Options getOptions() {
@@ -184,7 +181,6 @@ public class JabRefCLI {
         // boolean options
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
         options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options"));
-        options.addOption("asfl", "automaticallySetFileLinks", false, Localization.lang("Automatically set file links"));
         options.addOption("g", "generateCitationKeys", false, Localization.lang("Regenerate all keys for the entries in a BibTeX file"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
         options.addOption("v", "version", false, Localization.lang("Display version"));
@@ -211,7 +207,7 @@ public class JabRefCLI {
                 .longOpt("importBibtex")
                 .desc("%s: '%s'".formatted(Localization.lang("Import BibTeX"), "-ib @article{entry}"))
                 .hasArg()
-                .argName("BIBTEXT_STRING")
+                .argName("BIBTEX_STRING")
                 .build());
 
         options.addOption(Option
@@ -325,9 +321,7 @@ public class JabRefCLI {
         String importFormatsIntro = Localization.lang("Available import formats");
         String importFormatsList = "%s:%n%s%n".formatted(importFormatsIntro, alignStringTable(importFormats));
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                preferences,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class));
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences);
         List<Pair<String, String>> exportFormats = exporterFactory
                 .getExporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
@@ -342,8 +336,7 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        return "JabRef %s".formatted(buildInfo.version);
+        return "JabRef %s".formatted(new BuildInfo().version);
     }
 
     public List<String> getLeftOver() {

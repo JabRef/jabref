@@ -13,6 +13,8 @@ import java.util.Optional;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
+import javafx.scene.input.TransferMode;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -25,6 +27,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
@@ -36,6 +39,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
@@ -75,6 +79,7 @@ public class ImportHandler {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final LuceneManager luceneManager;
 
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
@@ -82,7 +87,8 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         LuceneManager luceneManager) {
 
         this.bibDatabaseContext = database;
         this.preferences = preferences;
@@ -90,6 +96,7 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.luceneManager = luceneManager;
 
         this.linker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
@@ -100,28 +107,25 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
-            private final List<BibEntry> entriesToAddAllFiles = new ArrayList<>();
 
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (final Path file : files) {
-                    final List<BibEntry> entriesToAddPerFile = new ArrayList<>();
+                    final List<BibEntry> entriesToAdd = new ArrayList<>();
 
                     if (isCancelled()) {
                         break;
                     }
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
-                        setTitle(Localization.lang("Processing %0 file(s) for adding to %1", files.size(), bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled")));
-                        updateMessage(Localization.lang("Processing file %0 | %1 of %2 files processed.", file.getFileName(), counter, files.size()));
+                        updateMessage(Localization.lang("Processing file %0", file.getFileName()));
                         updateProgress(counter, files.size() - 1d);
-                        showToUser(true);
                     });
 
                     try {
@@ -133,23 +137,50 @@ public class ImportHandler {
                                 addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
-                            if (!pdfEntriesInFile.isEmpty()) {
-                                entriesToAddPerFile.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
-                                addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
-                            } else {
-                                entriesToAddPerFile.add(createEmptyEntryWithLink(file));
+                            if (pdfEntriesInFile.isEmpty()) {
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
+                            } else {
+                                pdfEntriesInFile.forEach(entry -> {
+                                    if (entry.getFiles().size() > 1) {
+                                        LOGGER.warn("Entry has more than one file attached. This is not supported.");
+                                        LOGGER.warn("Entry's files: {}", entry.getFiles());
+                                    }
+                                    entry.clearField(StandardField.FILE);
+                                    switch (transferMode) {
+                                        case LINK -> {
+                                            LOGGER.debug("Mode LINK");
+                                            // FIXME:luceneManager.updateAfterDropFiles(entry) not called. Should be fixed after merge of Postgres PR.
+                                            linker.addFilesToEntry(entry, List.of(file));
+                                        }
+                                        case MOVE -> {
+                                            LOGGER.debug("Mode MOVE");
+                                            linker.moveFilesToFileDirRenameAndAddToEntry(entry, List.of(file), luceneManager);
+                                        }
+                                        case COPY -> {
+                                            LOGGER.debug("Mode COPY");
+                                            linker.copyFilesToFileDirAndAddToEntry(entry, List.of(file), luceneManager);
+                                        }
+                                    }
+                                    entriesToAdd.addAll(pdfEntriesInFile);
+                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
+                                });
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
-                            if (bibtexParserResult.hasWarnings()) {
-                                addResultToList(file, false, bibtexParserResult.getErrorMessage());
+                            List<BibEntry> entries = bibtexParserResult.getDatabaseContext().getEntries();
+                            entriesToAdd.addAll(entries);
+                            boolean success = !bibtexParserResult.hasWarnings();
+                            String message;
+                            if (success) {
+                                message = Localization.lang("Bib entry was successfully imported");
+                            } else {
+                                message = bibtexParserResult.getErrorMessage();
                             }
-
-                            entriesToAddPerFile.addAll(bibtexParserResult.getDatabaseContext().getEntries());
-                            addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
+                            addResultToList(file, success, message);
                         } else {
-                            entriesToAddPerFile.add(createEmptyEntryWithLink(file));
+                            BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
+                            entriesToAdd.add(emptyEntryWithLink);
                             addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                         }
                     } catch (IOException ex) {
@@ -159,19 +190,17 @@ public class ImportHandler {
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
 
-                    // Gather all entries extracted from this particular file
-                    entriesToAddAllFiles.addAll(entriesToAddPerFile);
+                    // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                    // That method does a clone() on each entry
+                    UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
-                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAddPerFile));
+                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
 
                     counter++;
                 }
-
-                // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAddAllFiles));
                 return results;
             }
 
@@ -200,6 +229,7 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
+        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
@@ -364,22 +394,13 @@ public class ImportHandler {
             return Collections.emptyList();
         }
 
-        Optional<DOI> doi = DOI.findInText(data);
-        if (doi.isPresent()) {
-            return fetchByDOI(doi.get());
+        if (!CompositeIdFetcher.containsValidId(data)) {
+            return tryImportFormats(data);
         }
 
-        Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
-        if (arXiv.isPresent()) {
-            return fetchByArXiv(arXiv.get());
-        }
-
-        Optional<ISBN> isbn = ISBN.parse(data);
-        if (isbn.isPresent()) {
-            return fetchByISBN(isbn.get());
-        }
-
-        return tryImportFormats(data);
+        CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
+        Optional<BibEntry> optional = compositeIdFetcher.performSearchById(data);
+        return OptionalUtil.toList(optional);
     }
 
     private List<BibEntry> tryImportFormats(String data) {

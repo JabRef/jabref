@@ -237,7 +237,8 @@ public class LibraryTab extends Tab {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                luceneManager);
 
         setupMainPanel();
         setupAutoCompletion();

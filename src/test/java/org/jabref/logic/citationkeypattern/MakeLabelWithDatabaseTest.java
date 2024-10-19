@@ -14,6 +14,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
+ */
 @Execution(ExecutionMode.CONCURRENT)
 class MakeLabelWithDatabaseTest {
 
@@ -461,11 +464,22 @@ class MakeLabelWithDatabaseTest {
     }
 
     @Test
-    void generateKeyTitleRegexe() {
-        bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
+    void generateKeyTitleRegex() {
+        // Note that TITLE is written in upper case to have the verbatim value of the title field
+        // See https://github.com/JabRef/user-documentation/blob/main/en/setup/citationkeypatterns.md#bibentry-fields for information on that.
+        // We cannot use "-", because this is in the set of unwanted characters and removed after the RegEx is applied
+        bibtexKeyPattern.setDefaultValue("[TITLE:regex(\" \",\"X\")]"); // regex(" ", "-")
         entry.setField(StandardField.TITLE, "Please replace the spaces");
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("PleaseReplacetheSpaces"), entry.getCitationKey());
+        assertEquals(Optional.of("PleaseXreplaceXtheXspaces"), entry.getCitationKey());
+    }
+
+    @Test
+    void generateKeyTitleRegexFirstWord() {
+        bibtexKeyPattern.setDefaultValue("[TITLE:regex(\"(\\w+).*\",\"$1\")]");
+        entry.setField(StandardField.TITLE, "First Second Third");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("First"), entry.getCitationKey());
     }
 
     @Test

@@ -49,7 +49,8 @@ public class CitationsRelationsTabViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                stateManager.getLuceneManager(databaseContext).get());
 
         switch (searchType) {
             case CITES -> importCites(entries, existingEntry, importHandler);
@@ -64,6 +65,7 @@ public class CitationsRelationsTabViewModel {
 
         List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
         citeKeys.removeIf(String::isEmpty);
+
         for (BibEntry entryToCite : entries) {
             if (generateNewKeyOnImport || entryToCite.getCitationKey().isEmpty()) {
                 String key = generator.generateKey(entryToCite);

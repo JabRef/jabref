@@ -25,25 +25,33 @@ public class LinkedFileHandler {
     private final FilePreferences filePreferences;
     private final BibEntry entry;
 
-    private final LinkedFile fileEntry;
+    private final LinkedFile linkedFile;
 
-    public LinkedFileHandler(LinkedFile fileEntry,
+    public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
                              BibDatabaseContext databaseContext,
                              FilePreferences filePreferences) {
-        this.fileEntry = fileEntry;
+        this.linkedFile = linkedFile;
         this.entry = entry;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
     }
 
+    public boolean copyToDefaultDirectory() throws IOException {
+        return copyOrMoveToDefaultDirectory(false);
+    }
+
     public boolean moveToDefaultDirectory() throws IOException {
+        return copyOrMoveToDefaultDirectory(true);
+    }
+
+    private boolean copyOrMoveToDefaultDirectory(boolean isMove) throws IOException {
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
             return false;
         }
 
-        Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
+        Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
         if (oldFile.isEmpty()) {
             // Could not find file
             return false;
@@ -67,11 +75,14 @@ public class LinkedFileHandler {
             Files.createDirectories(targetPath.getParent());
         }
 
-        // Move
-        Files.move(oldFile.get(), targetPath);
+        if (isMove) {
+            Files.move(oldFile.get(), targetPath);
+        } else {
+            Files.copy(oldFile.get(), targetPath);
+        }
 
         // Update path
-        fileEntry.setLink(FileUtil.relativize(targetPath, databaseContext, filePreferences).toString());
+        linkedFile.setLink(FileUtil.relativize(targetPath, databaseContext, filePreferences).toString());
         return true;
     }
 
@@ -80,13 +91,22 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
-        Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
+        Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
         if (oldFile.isEmpty()) {
             return false;
         }
 
         final Path oldPath = oldFile.get();
-        final Path newPath = oldPath.resolveSibling(targetFileName);
+        Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
+        Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
+
+        Path newPath;
+        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            newPath = oldPath.resolveSibling(targetFileName);
+        } else {
+            assert oldExtension.isPresent() && newExtension.isEmpty();
+            newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
+        }
 
         String expandedOldFilePath = oldPath.toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
@@ -109,15 +129,15 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        fileEntry.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
+        linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
 
         return true;
     }
 
     public String getSuggestedFileName() {
-        String oldFileName = fileEntry.getLink();
+        String oldFileName = linkedFile.getLink();
 
-        String extension = FileUtil.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+        String extension = FileUtil.getFileExtension(oldFileName).orElse(linkedFile.getFileType());
         return getSuggestedFileName(extension);
     }
 

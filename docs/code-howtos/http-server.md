@@ -3,7 +3,7 @@ parent: Code Howtos
 ---
 # HTTP Server
 
-JabRef has a build in http server.
+JabRef has a built-in http server.
 For example, the resource for a library is implemented at [`org.jabref.http.server.LibraryResource`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/http/server/LibraryResource.java).
 
 ## Start http server

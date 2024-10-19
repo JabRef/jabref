@@ -161,7 +161,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                stateManager.getLuceneManager(databaseContext).get());
         importHandler.importEntriesWithDuplicateCheck(selectedDb.getValue(), entriesToImport);
     }
 
