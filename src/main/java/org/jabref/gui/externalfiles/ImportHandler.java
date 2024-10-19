@@ -32,9 +32,6 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.ArXivFetcher;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -49,9 +46,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -383,24 +377,6 @@ public class ImportHandler {
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();
         }
-    }
-
-    private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI identifier in clipboard");
-        Optional<BibEntry> entry = new DoiFetcher(preferences.getImportFormatPreferences()).performSearchById(doi.getDOI());
-        return OptionalUtil.toList(entry);
-    }
-
-    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
-        LOGGER.info("Found arxiv identifier in clipboard");
-        Optional<BibEntry> entry = new ArXivFetcher(preferences.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
-        return OptionalUtil.toList(entry);
-    }
-
-    private List<BibEntry> fetchByISBN(ISBN isbn) throws FetcherException {
-        LOGGER.info("Found ISBN identifier in clipboard");
-        Optional<BibEntry> entry = new IsbnFetcher(preferences.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
-        return OptionalUtil.toList(entry);
     }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
