@@ -50,7 +50,7 @@ If that does not exist, just select JDK 21.
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
 
-## Enable compiliation by IntelliJ
+## Enable compilation by IntelliJ
 
 To prepare IntelliJ's build system additional steps are required:
 

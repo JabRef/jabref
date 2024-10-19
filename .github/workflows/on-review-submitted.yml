@@ -1,0 +1,17 @@
+name: On reviewed PR
+
+on:
+  pull_request_review:
+     types:
+       - submitted
+
+jobs:
+  add-label-changes-required:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          gh pr edit "$PR_URL" --remove-label "status: ready-for-review"
+          gh pr edit "$PR_URL" --add-label "status: changes required"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
