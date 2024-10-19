@@ -1,6 +1,8 @@
 package org.jabref.cli;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -42,6 +44,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -288,6 +293,46 @@ public class ArgumentProcessor {
 
         if (!cli.isBlank() && !loaded.isEmpty()) {
             uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
+
+        if (cli.isCheckConsistency()) {
+            checkConsistency();
+        }
+    }
+
+
+    private void checkConsistency() {
+        String fileName = cli.getCheckConsistency();
+        String outputFormat = cli.getCheckConsistencyOutputFormat().toUpperCase();
+
+        if (fileName == null) {
+            System.out.println(Localization.lang("No file specified for consistency check."));
+            return;
+        }
+
+        try {
+            Path filePath = Path.of(fileName);
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath,
+                    cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
+            BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
+
+            BibliographyConsistencyCheck checker = new BibliographyConsistencyCheck();
+            BibliographyConsistencyCheck.Result result = checker.check(databaseContext.getDatabase().getEntries());
+
+            String outputFileName = fileName + "_consistency_check." + outputFormat.toLowerCase();
+            try (Writer writer = new FileWriter(outputFileName)) {
+                if ("CSV".equals(outputFormat)) {
+                    BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                    csvWriter.writeFindings();
+                } else {
+                    BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                    txtWriter.writeFindings();
+                }
+            }
+
+            System.out.println(Localization.lang("Consistency check completed. Results written to %0", outputFileName));
+        } catch (IOException e) {
+            System.err.println(Localization.lang("Error reading file") + ": " + e.getLocalizedMessage());
         }
     }
 
