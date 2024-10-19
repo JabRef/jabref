@@ -24,7 +24,9 @@ public class JournalAbbreviationPreferences {
                                           boolean useFJournalField, String directory) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
-        this.journalAbbreviationDir = new SimpleObjectProperty<>(Path.of(directory));
+        this.journalAbbreviationDir = new SimpleObjectProperty<>(
+                directory != null ? Path.of(directory) : getDefaultAbbreviationDir()
+        );
 
         updateCustomCsvFile(this.journalAbbreviationDir.get());
 
@@ -34,6 +36,9 @@ public class JournalAbbreviationPreferences {
     }
 
     private void updateCustomCsvFile(Path directory) {
+        if (directory == null) {
+            return;
+        }
         Path newFilePath = JournalAbbreviationLoader.ensureJournalAbbreviationFileExists(directory);
         if (newFilePath != null) {
             String newFilePathString = newFilePath.toString();
@@ -47,8 +52,7 @@ public class JournalAbbreviationPreferences {
     }
 
     public Path getJournalAbbreviationDir() {
-        Path dir = journalAbbreviationDir.get();
-        return (dir != null) ? dir : getDefaultAbbreviationDir();
+        return journalAbbreviationDir.get() != null ? journalAbbreviationDir.get() : getDefaultAbbreviationDir();
     }
 
     public static Path getDefaultAbbreviationDir() {

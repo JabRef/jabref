@@ -64,7 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
-- We added the ability for users to change the directory (in the preferences dialog. The directory is stored as a preference).  [#10557](https://github.com/JabRef/jabref/issues/10557)
+- We added the ability for users to change the journal abbreviation directory via the preferences dialog. The chosen directory is stored as a preference. [#10557](https://github.com/JabRef/jabref/issues/10557)
 
 ### Fixed
 
@@ -130,7 +130,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 
--  We fixed an issue where JabRef did not automatically create and add a `custom.csv` file to the Journal lists when it was missing from the specified directory. [#10557](https://github.com/JabRef/jabref/issues/10557)
+- We fixed an issue where JabRef did not automatically create and add a `custom.csv` file to the Journal lists when it was missing from the specified directory. [#10557](https://github.com/JabRef/jabref/issues/10557)
 
   
 
