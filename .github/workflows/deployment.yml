@@ -291,7 +291,7 @@ jobs:
         with:
           message: |
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
-          comment_tag: download-link
+          comment-tag: download-link
           mode: recreate
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
