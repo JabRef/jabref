@@ -70,72 +70,82 @@ public class FetchAndMergeEntry {
     }
 
     public void fetchAndMerge(BibEntry entry, List<Field> fields) {
-        for (Field field : fields) {
-            Optional<String> fieldContent = entry.getField(field);
-            if (fieldContent.isPresent()) {
-                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences());
-                if (fetcher.isPresent()) {
-                    BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
-                                  .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                      String type = field.getDisplayName();
-                                      if (fetchedEntry.isPresent()) {
-                                          cleanup.doPostCleanup(fetchedEntry.get());
-                                          showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
-                                      } else {
-                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
-                                      }
-                                  })
-                                  .onFailure(exception -> {
-                                      LOGGER.error("Error while fetching bibliographic information", exception);
-                                      if (exception instanceof FetcherClientException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
-                                      } else if (exception instanceof FetcherServerException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
-                                      } else {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occurred %0", exception.getMessage()));
-                                      }
-                                  })
-                                  .executeWith(taskExecutor);
-                }
-            } else {
-                dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
-            }
+        fields.forEach(field -> fetchAndMergeEntryWithDialog(entry, field));
+    }
+
+    private void fetchAndMergeEntryWithDialog(BibEntry entry, Field field) {
+        entry.getField(field).ifPresent(
+                fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()).ifPresent(
+                        fetcher -> executeFetchTaskWithDialog(fetcher, field, fieldContent, entry)
+                )
+        );
+    }
+
+    private void executeFetchTaskWithDialog(IdBasedFetcher fetcher, Field field, String fieldContent, BibEntry entry) {
+        BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
+                      .onSuccess(fetchedEntry -> processFetchedEntryWithDialog(fetchedEntry, field, fieldContent, entry, fetcher))
+                      .onFailure(exception -> handleFetchException(exception, fetcher, entry))
+                      .executeWith(taskExecutor);
+    }
+
+    private void processFetchedEntryWithDialog(Optional<BibEntry> fetchedEntry, Field field, String fieldContent, BibEntry originalEntry, IdBasedFetcher fetcher) {
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+        if (fetchedEntry.isPresent()) {
+            cleanup.doPostCleanup(fetchedEntry.get());
+            showMergeDialog(originalEntry, fetchedEntry.get(), fetcher);
+        } else {
+            dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), fieldContent));
         }
     }
 
     public void fetchAndMergeBatch(List<BibEntry> entries) {
-        for (BibEntry entry : entries) {
-            for (Field field : SUPPORTED_FIELDS) {
-                Optional<String> fieldContent = entry.getField(field);
-                if (fieldContent.isPresent()) {
-                    Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences());
-                    if (fetcher.isPresent()) {
-                        BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
-                                      .onSuccess(fetchedEntry -> {
-                                          if (fetchedEntry.isPresent()) {
-                                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                              cleanup.doPostCleanup(fetchedEntry.get());
-                                              mergeWithoutDialog(entry, fetchedEntry.get());
-                                          } else {
-                                              dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), fieldContent.get()));
-                                          }
-                                      })
-                                      .onFailure(exception -> {
-                                          LOGGER.error("Error while fetching bibliographic information", exception);
-                                          if (exception instanceof FetcherClientException) {
-                                              dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
-                                          } else if (exception instanceof FetcherServerException) {
-                                              dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
-                                          } else {
-                                              dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occurred %0", exception.getMessage()));
-                                          }
-                                      })
-                                      .executeWith(taskExecutor);
+        entries.forEach(entry -> SUPPORTED_FIELDS.forEach(field -> fetchAndMergeEntry(entry, field)));
+    }
+
+    private void fetchAndMergeEntry(BibEntry entry, Field field) {
+        entry.getField(field).ifPresentOrElse(
+                fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()).ifPresent(
+                        fetcher -> executeFetchTask(fetcher, field, fieldContent, entry)
+                ),
+                () -> {
+                    if (hasAnySupportedField(entry)) {
+                        dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                     }
-                } else {
-                    dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                 }
+        );
+    }
+
+    private boolean hasAnySupportedField(BibEntry entry) {
+        return SUPPORTED_FIELDS.stream().noneMatch(field -> entry.getField(field).isPresent());
+    }
+
+    private void executeFetchTask(IdBasedFetcher fetcher, Field field, String fieldContent, BibEntry entry) {
+        BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
+                      .onSuccess(fetchedEntry -> processFetchedEntry(fetchedEntry, field, fieldContent, entry))
+                      .onFailure(exception -> handleFetchException(exception, fetcher, entry))
+                      .executeWith(taskExecutor);
+    }
+
+    private void processFetchedEntry(Optional<BibEntry> fetchedEntry, Field field, String fieldContent, BibEntry originalEntry) {
+        if (fetchedEntry.isPresent()) {
+            ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+            cleanup.doPostCleanup(fetchedEntry.get());
+            mergeWithoutDialog(originalEntry, fetchedEntry.get());
+        } else {
+            dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), fieldContent));
+        }
+    }
+
+    private void handleFetchException(Exception exception, IdBasedFetcher fetcher, BibEntry entry) {
+        if (hasAnySupportedField(entry)) {
+            LOGGER.error("Error while fetching bibliographic information", exception);
+            String fetcherName = fetcher.getName();
+            if (exception instanceof FetcherClientException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("No data was found for the identifier"));
+            } else if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Server not available"));
+            } else {
+                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Error occurred %0", exception.getMessage()));
             }
         }
     }
