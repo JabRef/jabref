@@ -104,21 +104,24 @@ public class ImportHandler {
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
+            private final List<BibEntry> entriesToAddAllFiles = new ArrayList<>();
 
             @Override
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (final Path file : files) {
-                    final List<BibEntry> entriesToAdd = new ArrayList<>();
+                    final List<BibEntry> entriesToAddPerFile = new ArrayList<>();
 
                     if (isCancelled()) {
                         break;
                     }
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
-                        updateMessage(Localization.lang("Processing file %0", file.getFileName()));
+                        setTitle(Localization.lang("Processing %0 file(s) for adding to %1", files.size(), bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled")));
+                        updateMessage(Localization.lang("Processing file %0 | %1 of %2 files processed.", file.getFileName(), counter, files.size()));
                         updateProgress(counter, files.size() - 1d);
+                        showToUser(true);
                     });
 
                     try {
@@ -131,10 +134,10 @@ public class ImportHandler {
                             }
 
                             if (!pdfEntriesInFile.isEmpty()) {
-                                entriesToAdd.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
+                                entriesToAddPerFile.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
                                 addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                             } else {
-                                entriesToAdd.add(createEmptyEntryWithLink(file));
+                                entriesToAddPerFile.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             }
                         } else if (FileUtil.isBibFile(file)) {
@@ -143,10 +146,10 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
-                            entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
+                            entriesToAddPerFile.addAll(bibtexParserResult.getDatabaseContext().getEntries());
                             addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
                         } else {
-                            entriesToAdd.add(createEmptyEntryWithLink(file));
+                            entriesToAddPerFile.add(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                         }
                     } catch (IOException ex) {
@@ -156,16 +159,19 @@ public class ImportHandler {
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
 
-                    // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                    UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
+                    // Gather all entries extracted from this particular file
+                    entriesToAddAllFiles.addAll(entriesToAddPerFile);
 
-                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
+                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAddPerFile));
                     ce.end();
                     // prevent fx thread exception in undo manager
                     UiTaskExecutor.runInJavaFXThread(() -> undoManager.addEdit(ce));
 
                     counter++;
                 }
+
+                // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAddAllFiles));
                 return results;
             }
 
