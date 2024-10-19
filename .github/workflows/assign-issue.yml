@@ -10,12 +10,16 @@ on:
 jobs:
   assign:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Assign the user or unassign stale assignments
-        uses: takanome-dev/assign-issue-action@v2.1.1
+        id: assign
+        uses: takanome-dev/assign-issue-action@refactor-rewrite-action
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           days_until_unassign: 30
+          maintainers: koppor, Siedlerchr, ThiloteE, calixtus, HoussemNasri
           assigned_comment: |
             👋 Hey @{{ comment.user.login }},
 
@@ -32,3 +36,25 @@ jobs:
             🔧 A maintainer can also add the **{{ inputs.pin_label }}** label to prevent it from being unassigned automatically.
 
             Happy coding! 🚀
+      - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
+        if: steps.assign.outputs.assigned == 'yes'
+        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+      - name: Move Issue to "Assigned" Column in "Good First Issues"
+        if: steps.assign.outputs.assigned == 'yes'
+        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
