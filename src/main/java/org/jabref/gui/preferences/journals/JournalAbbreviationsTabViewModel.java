@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,6 +30,11 @@ import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import java.util.Optional;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+
 /**
  * This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
  * modify or delete journal abbreviations and files. To visualize the model one can bind the properties to UI elements.
@@ -49,6 +55,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
+
+    private final StringProperty directoryPath = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -103,6 +111,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 }
             }
         });
+        directoryPath.set(abbreviationsPreferences.getJournalAbbreviationDir().toString());
     }
 
     @Override
@@ -209,6 +218,39 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 currentFile.set(null);
             }
         }
+    }
+
+    public void handleChangeDirectory() {
+        DirectoryDialogConfiguration config = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Path.of(directoryPath.get()))
+                .build();
+
+        Optional<Path> newDirectory = dialogService.showDirectorySelectionDialog(config);
+        newDirectory.ifPresent(path -> {
+            directoryPath.set(path.toString());
+            abbreviationsPreferences.setJournalAbbreviationDir(path);
+            updateJournalFiles();
+            storeSettings();
+            // Optionally trigger any updates needed due to directory change
+        });
+    }
+
+    private void updateJournalFiles() {
+        List<String> externalLists = abbreviationsPreferences.getExternalJournalLists();
+
+        // Remove files that are no longer in the external lists
+        journalFiles.removeIf(file -> !externalLists.contains(file.getAbsolutePath().map(Path::toString).orElse("")));
+
+        // Add new files
+        for (String filePath : externalLists) {
+            if (journalFiles.stream().noneMatch(file -> file.getAbsolutePath().map(Path::toString).orElse("").equals(filePath))) {
+                openFile(Path.of(filePath));
+            }
+        }
+    }
+
+    public StringProperty directoryPathProperty() {
+        return directoryPath;
     }
 
     /**
@@ -334,6 +376,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .collect(Collectors.toList());
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
+                    abbreviationsPreferences.setJournalAbbreviationDir(Paths.get(directoryPath.get()));
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
 
                     if (shouldWriteLists) {

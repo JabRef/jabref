@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,24 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
+
+    public static Path ensureJournalAbbreviationFileExists(Path baseDirectory) {
+        try {
+            // Ensure the subdirectory 'journal-abbreviations' exists
+            Path directory = baseDirectory.resolve("journal-abbreviations");
+            Files.createDirectories(directory);
+
+            Path customCsvPath = directory.resolve("custom.csv");
+            if (!Files.exists(customCsvPath)) {
+                Files.createFile(customCsvPath);
+                LOGGER.info("Created custom.csv at {}", customCsvPath);
+            }
+            return customCsvPath;
+        } catch (IOException e) {
+            LOGGER.error("Could not initialize journal abbreviation directory or file", e);
+            return null;
+        }
+    }
 
     public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
@@ -70,6 +89,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, System.getenv("APPDATA") + "\\local\\org.jabref\\jabref\\journal-abbreviations"));
     }
 }
