@@ -162,9 +162,16 @@ public class AiChatLogic {
                 aiPreferences.getAiProvider().getApiUrl(),
                 name.get(),
                 message.singleText());
-
+        System.out.println("The API URL being used is: " + aiPreferences.getAiProvider().getApiUrl());
+        System.out.println("API Base URL: " + aiPreferences.getSelectedApiBaseUrl());
+        System.out.println("Using model ID: " + aiPreferences.getSelectedChatModel());
         chatHistory.add(message);
+
+        LOGGER.info("Sending request to URL: " + aiPreferences.getSelectedApiBaseUrl());
+        LOGGER.info("Using model ID: " + aiPreferences.getSelectedChatModel());
+        LOGGER.info("Request message: " + message.singleText());
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
+        LOGGER.info("Received response: " + result.text());
         chatHistory.add(result);
 
         LOGGER.debug("Message was answered by the AI provider for {}: {}", name.get(), result.text());

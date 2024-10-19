@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ai.chatting.model.Chat4AllModel;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
@@ -62,6 +63,15 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+//                langchainChatModel = Optional.of(Chat4AllModel
+//                        .builder()
+//                        .modelName(aiPreferences.getSelectedChatModel())
+//                        .baseUrl(aiPreferences.getSelectedApiBaseUrl())
+//                        .httpClient(httpClient)
+//                        .temperature(aiPreferences.getTemperature())
+//                        .build()
+//                );
+
             }
 
             case MISTRAL_AI -> {
