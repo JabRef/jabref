@@ -20,6 +20,8 @@ public class CompositeIdFetcher {
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        // All identifiers listed here should also be appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
