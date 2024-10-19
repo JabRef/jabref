@@ -64,40 +64,75 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
+- We added the ability for users to change the directory (in the preferences dialog. The directory is stored as a preference).  [#10557](https://github.com/JabRef/jabref/issues/10557)
 
 ### Fixed
 
 - We fixed an issue where certain actions were not disabled when no libraries were open. [#11923](https://github.com/JabRef/jabref/issues/11923)
+
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
+
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
+
 - We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
+
 - We fixed an issue that online and offline mode for new library creation were handled incorrectly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+
 - We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
+
 - We fixed an issue with query transformers (JStor and others). [#11643](https://github.com/JabRef/jabref/pull/11643)
+
 - We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
+
 - We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
+
 - We fixed an issue where the entry preview highlight was not working when searching before opening the entry editor. [#11659](https://github.com/JabRef/jabref/pull/11659)
+
 - We fixed an issue where text in Dark mode inside "Citation information" was not readable. [#11512](https://github.com/JabRef/jabref/issues/11512)
+
 - We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
+
 - We fixed the non-functionality of the option "Automatically sync bibliography when inserting citations" in the OpenOffice panel, when enabled in case of JStyles. [#11684](https://github.com/JabRef/jabref/issues/11684)
+
 - We fixed an issue where the library was not marked changed after a migration. [#11542](https://github.com/JabRef/jabref/pull/11542)
+
 - We fixed an issue where rebuilding the full-text search index was not working. [#11374](https://github.com/JabRef/jabref/issues/11374)
+
 - We fixed an issue where the progress of indexing linked files showed an incorrect number of files. [#11378](https://github.com/JabRef/jabref/issues/11378)
+
 - We fixed an issue where the full-text search results were incomplete. [#8626](https://github.com/JabRef/jabref/issues/8626)
+
 - We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
+
 - We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
+
 - We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
+
 - We fixed an issue with the link to the full text at the BVB fetcher. [#11852](https://github.com/JabRef/jabref/pull/11852)
+
 - We fixed an issue where two contradicting notifications were shown when cutting an entry in the main table. [#11724](https://github.com/JabRef/jabref/pull/11724)
+
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated. [#11704](https://github.com/JabRef/jabref/issues/11704)
+
 - We fixed an issue where HTML instead of the fulltext pdf was downloaded when importing arXiv entries. [#4913](https://github.com/JabRef/jabref/issues/4913)
+
 - We fixed an issue where the keywords and crossref fields were not properly focused. [#11177](https://github.com/JabRef/jabref/issues/11177)
+
 - We fixed handling of `\"` in [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns) containing a RegEx. [#11967](https://github.com/JabRef/jabref/pull/11967)
+
 - We fixed an issue where the Undo/Redo buttons were active even when all libraries are closed. [#11837](https://github.com/JabRef/jabref/issues/11837)
+
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
+
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
+
 - We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
+
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
+
+-  We fixed an issue where JabRef did not automatically create and add a `custom.csv` file to the Journal lists when it was missing from the specified directory. [#10557](https://github.com/JabRef/jabref/issues/10557)
+
+  
 
 ### Removed
 
