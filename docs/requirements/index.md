@@ -20,7 +20,7 @@ Example:
 It is important that there is no empty line directly after the heading.
 
 {: note}
-One needs to add `<!-- markdownlint-disable-file MD022 -->` to the end of the file, because the id of the requirement needs to follow the heading directly.
+One needs to add `<!-- markdownlint-disable-file MD022 -->` to the end of the file, because the ID of the requirement needs to follow the heading directly.
 
 ## Linking implementations
 

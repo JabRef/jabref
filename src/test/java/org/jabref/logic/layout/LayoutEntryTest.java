@@ -2,17 +2,25 @@ package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -23,20 +31,17 @@ import static org.mockito.Mockito.mock;
  * instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
  * is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by
  * LayoutEntry.
- *
  * There are five test cases: - The shown result text has no words which should be highlighted. - There is one word
  * which will be highlighted ignoring case sensitivity. - There are two words which will be highlighted ignoring case
  * sensitivity. - There is one word which will be highlighted case sensitivity. - There are more words which will be
  * highlighted case sensitivity.
  */
 
-public class LayoutEntryTest {
-
-    private BibEntry mBTE;
+class LayoutEntryTest {
 
     @BeforeEach
     void setUp() {
-        mBTE = new BibEntry();
+        BibEntry mBTE = new BibEntry();
         mBTE.setField(StandardField.ABSTRACT, "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
         mBTE.setField(StandardField.KEYWORDS, "android, mobile devices, security");
@@ -94,5 +99,37 @@ public class LayoutEntryTest {
         assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).getFirst());
         assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst()).get(1));
         assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "2",
+            "3",
+            "4",
+            "6",
+            "7"
+    })
+    void unsupportedOperationTypes(int type) {
+        List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
+                new StringInt("testString", 0));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), null);
+        LayoutEntry layoutEntry = new LayoutEntry(parsedEntries, type, null, null, null);
+        assertThrows(UnsupportedOperationException.class, () -> layoutEntry.doLayout(bibDatabaseContext, StandardCharsets.UTF_8));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1, testString",
+            "5, testString",
+            "8, UTF-8",
+            "9, ''",
+            "10, ''"
+    })
+    void layoutResult(int type, String expectedValue) {
+        List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
+                new StringInt("testString", 0));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), null);
+        LayoutEntry layoutEntry = new LayoutEntry(parsedEntries, type, null, null, null);
+        assertEquals(expectedValue, layoutEntry.doLayout(bibDatabaseContext, StandardCharsets.UTF_8));
     }
 }
