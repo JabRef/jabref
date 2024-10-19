@@ -26,9 +26,9 @@ jobs:
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
+          GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Merge PR
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
+          GH_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
