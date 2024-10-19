@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -19,6 +20,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -172,7 +174,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
                     ControlHelper.EllipsisPosition.CENTER) + " (" +
                     ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
-                    ControlHelper.EllipsisPosition.CENTER) + ")";
+                            ControlHelper.EllipsisPosition.CENTER) + ")";
         }
     }
 
@@ -217,7 +219,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
         }
     }
@@ -237,7 +240,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
-        } catch (IOException ex) {
+        } catch (
+                IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
         }
     }
@@ -287,7 +291,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         try {
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
     }
@@ -310,7 +315,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
+            } catch (
+                    IOException exception) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Move file"),
                         Localization.lang("Could not move file '%0'.", file.get().toString()),
@@ -319,6 +325,76 @@ public class LinkedFileViewModel extends AbstractViewModel {
         } else {
             // File doesn't exist, so we can't move it.
             dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        }
+    }
+
+    public void updateMoveFileItemText(MenuItem moveFileItem, Path currentFilePath) {
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
+
+        if (targetDirectory.isPresent()) {
+            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
+        } else {
+            moveFileItem.setText(Localization.lang("Move file"));
+        }
+    }
+
+    public void updateMoveAndRenameFileItemText(MenuItem moveAndRenameFileItem, Path currentFilePath) {
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
+
+        if (targetDirectory.isPresent()) {
+            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            moveAndRenameFileItem.setText(Localization.lang("Move file to %0 and Rename", dirInfo.label()));
+        } else {
+            moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
+        }
+    }
+
+    public void moveToDirectory(MenuItem menuItem, boolean toRename) {
+        if (linkedFile.isOnlineLink()) {
+            // Cannot move remote links
+            return;
+        }
+
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+
+        if (currentFilePath.isPresent()) {
+            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
+                    directoryHandler.determineTargetDirectory(currentFilePath.get());
+
+            if (targetDirectory.isPresent()) {
+                FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+                try {
+                    Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+                    Files.move(currentFilePath.get(), target);
+                    linkedFile.setLink(target.toString());
+                    // Update the menu item text after moving the file
+                    if (menuItem != null) {
+                        if (toRename) {
+                            Platform.runLater(() -> updateMoveAndRenameFileItemText(menuItem, target));
+                        } else {
+                            Platform.runLater(() -> updateMoveFileItemText(menuItem, target));
+                        }
+                    }
+                } catch (
+                        IOException e) {
+                    if (toRename) {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Move file to directory and Rename"),
+                                Localization.lang("Could not move file '%0'. and Rename", currentFilePath.get().toString()),
+                                e);
+                    } else {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Move file"),
+                                Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
+                                e);
+                    }
+                }
+            }
         }
     }
 
@@ -380,6 +456,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void moveToDefaultDirectoryAndRename() {
         moveToDefaultDirectory();
+        renameToSuggestion();
+    }
+
+    public void moveToDirectoryAndRename(MenuItem menuItem) {
+        boolean toRename = true;
+        moveToDirectory(menuItem, toRename);
         renameToSuggestion();
     }
 
