@@ -77,7 +77,7 @@ public class ImportHandler {
     private final TaskExecutor taskExecutor;
 
     // list is filled as each entry is passed to importCleanedEntries
-    private final List<BibEntry> finalizedEntries = new ArrayList<>();
+    private final List<BibEntry> addedEntries = new ArrayList<>();
 
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
@@ -197,11 +197,12 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
+        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
-        finalizedEntries.addAll(entries);
-        generateKeys(finalizedEntries);
+        addedEntries.addAll(entries);
+        generateKeys(addedEntries);
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -416,7 +417,7 @@ public class ImportHandler {
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
         boolean firstEntry = true;
-        finalizedEntries.clear();
+        generateKeys(entriesToAdd);
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
@@ -429,8 +430,8 @@ public class ImportHandler {
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(database, entry, decision);
             } else {
-                LOGGER.debug("not first entry, not pref flag, break will  be used");
-                importEntryWithDuplicateCheck(database, entry);
+                    LOGGER.debug("not first entry, not pref flag, break will  be used");
+                    importEntryWithDuplicateCheck(database, entry);
             }
         }
     }
