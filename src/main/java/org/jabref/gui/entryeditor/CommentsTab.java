@@ -13,7 +13,6 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
@@ -143,8 +142,7 @@ public class CommentsTab extends FieldsEditorTab {
             boolean isStandardBibtexComment = field == StandardField.COMMENT;
             boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
-            ((MarkdownEditor)editor.getNode()).setEditable(shouldBeEnabled);
-
+            ((MarkdownEditor) editor.getNode()).setEditable(shouldBeEnabled);
         }
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
