@@ -99,7 +99,6 @@ public class CommentsTab extends FieldsEditorTab {
                         || field.getName().toLowerCase().contains("comment"))
                 .sorted(Comparator.comparing(Field::getName))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
-
         return comments;
     }
 
@@ -137,12 +136,12 @@ public class CommentsTab extends FieldsEditorTab {
         Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
-            FieldEditorFX editor = fieldEditorEntry.getValue();
+            MarkdownEditor editor = (MarkdownEditor) fieldEditorEntry.getValue().getNode();
 
             boolean isStandardBibtexComment = field == StandardField.COMMENT;
             boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
-            ((MarkdownEditor) editor.getNode()).setEditable(shouldBeEnabled);
+            editor.setEditable(shouldBeEnabled);
         }
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
