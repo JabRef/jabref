@@ -352,7 +352,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void moveToDirectory(MenuItem menuItem, boolean toRename) {
+    public void moveToDirectory(MenuItem moveFileItem, MenuItem moveAndRenameFileItem, boolean toRename) {
         if (linkedFile.isOnlineLink()) {
             // Cannot move remote links
             return;
@@ -373,12 +373,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Files.move(currentFilePath.get(), target);
                     linkedFile.setLink(target.toString());
                     // Update the menu item text after moving the file
-                    if (menuItem != null) {
-                        if (toRename) {
-                            Platform.runLater(() -> updateMoveAndRenameFileItemText(menuItem, target));
-                        } else {
-                            Platform.runLater(() -> updateMoveFileItemText(menuItem, target));
-                        }
+                    if (moveFileItem != null) {
+                        Platform.runLater(() -> updateMoveFileItemText(moveFileItem, target));
+                        Platform.runLater(() -> updateMoveAndRenameFileItemText(moveAndRenameFileItem, target));
                     }
                 } catch (
                         IOException e) {
@@ -459,9 +456,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         renameToSuggestion();
     }
 
-    public void moveToDirectoryAndRename(MenuItem menuItem) {
-        boolean toRename = true;
-        moveToDirectory(menuItem, toRename);
+    public void moveToDirectoryAndRename(MenuItem moveFileItem, MenuItem moveAndRenameFileItem) {
+        moveToDirectory(moveFileItem, moveAndRenameFileItem, true);
         renameToSuggestion();
     }
 

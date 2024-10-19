@@ -318,14 +318,22 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return 3;
     }
 
-    private MenuItem createMoveFileItem(LinkedFileViewModel linkedFile) {
+    private MenuItem[] createMenuItem(LinkedFileViewModel linkedFile) {
         MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
         BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
         moveFileItem.disableProperty().bind(isMoveFileDisabled);
 
+        MenuItem moveAndRenameFileItem = new MenuItem(Localization.lang("Move file to directory and Rename"));
+        BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
+        moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
+
         // Context action for MOVE_FILE_TO_FOLDER standard action
-        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem);
+        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem, moveAndRenameFileItem);
         moveFileItem.setOnAction(event -> moveFileAction.execute());
+
+        // Context action for MOVE_FILE_TO_FOLDER_AND_RENAME standard action
+        ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveFileItem, moveAndRenameFileItem);
+        moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
 
         // Bind moveFileItem enabling condition based on current file path availability
         var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
@@ -339,22 +347,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             moveFileItem.setText(Localization.lang("Move file"));
         }
 
-        return moveFileItem;
-    }
-
-    private MenuItem createMoveAndRenameFileItem(LinkedFileViewModel linkedFile) {
-        MenuItem moveAndRenameFileItem = new MenuItem(Localization.lang("Move file to directory and Rename"));
-        BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
-        moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
-
-        // Context action for MOVE_FILE_TO_FOLDER_AND_RENAME standard action
-        ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveAndRenameFileItem);
-        moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
-
         // Bind moveFileItem enabling condition based on current file path availability
-        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-
         if (currentFilePath.isPresent()) {
             isMoveAndRenameFileDisabled.set(false);
             linkedFile.updateMoveAndRenameFileItemText(moveAndRenameFileItem, currentFilePath.get());
@@ -363,8 +356,56 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
         }
 
-        return moveAndRenameFileItem;
+        return new MenuItem[] {moveFileItem, moveAndRenameFileItem};
     }
+
+//    private MenuItem createMoveFileItem(LinkedFileViewModel linkedFile) {
+//        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
+//        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
+//        moveFileItem.disableProperty().bind(isMoveFileDisabled);
+//
+//        // Context action for MOVE_FILE_TO_FOLDER standard action
+//        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem);
+//        moveFileItem.setOnAction(event -> moveFileAction.execute());
+//
+//        // Bind moveFileItem enabling condition based on current file path availability
+//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+//
+//        if (currentFilePath.isPresent()) {
+//            isMoveFileDisabled.set(false);
+//            linkedFile.updateMoveFileItemText(moveFileItem, currentFilePath.get());
+//        } else {
+//            isMoveFileDisabled.set(true);
+//            moveFileItem.setText(Localization.lang("Move file"));
+//        }
+//
+//        return moveFileItem;
+//    }
+
+//    private MenuItem createMoveAndRenameFileItem(LinkedFileViewModel linkedFile) {
+//        MenuItem moveAndRenameFileItem = new MenuItem(Localization.lang("Move file to directory and Rename"));
+//        BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
+//        moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
+//
+//        // Context action for MOVE_FILE_TO_FOLDER_AND_RENAME standard action
+//        ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveAndRenameFileItem);
+//        moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
+//
+//        // Bind moveFileItem enabling condition based on current file path availability
+//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+//
+//        if (currentFilePath.isPresent()) {
+//            isMoveAndRenameFileDisabled.set(false);
+//            linkedFile.updateMoveAndRenameFileItemText(moveAndRenameFileItem, currentFilePath.get());
+//        } else {
+//            isMoveAndRenameFileDisabled.set(true);
+//            moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
+//        }
+//
+//        return moveAndRenameFileItem;
+//    }
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
@@ -433,8 +474,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 //            isMoveFileDisabled.set(true);
 //            moveFileItem.setText(Localization.lang("Move file"));
 //        }
-        MenuItem moveFileItem = createMoveFileItem(linkedFile);
-        MenuItem moveAndRenameFileItem = createMoveAndRenameFileItem(linkedFile);
+//        MenuItem moveFileItem = createMoveFileItem(linkedFile);
+//        MenuItem moveAndRenameFileItem = createMoveAndRenameFileItem(linkedFile);
+        MenuItem[] moveFileItems = createMenuItem(linkedFile);
 
         menu.getItems().addAll(
                 factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferences)),
@@ -443,8 +485,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferences)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
-                moveFileItem,
-                moveAndRenameFileItem,
+                moveFileItems[0],
+                moveFileItems[1],
 //                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
@@ -473,16 +515,18 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         private final StandardActions command;
         private final LinkedFileViewModel linkedFile;
-        private final MenuItem menuItem;
+        private final MenuItem moveFileItem;
+        private final MenuItem moveAndRenameFileItem;
 
         public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
-            this(command, linkedFile, preferences, null);
+            this(command, linkedFile, preferences, null, null);
         }
 
-        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences, MenuItem menuItem) {
+        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences, MenuItem moveFileItem, MenuItem moveAndRenameFileItem) {
             this.command = command;
             this.linkedFile = linkedFile;
-            this.menuItem = menuItem;
+            this.moveFileItem = moveFileItem;
+            this.moveAndRenameFileItem = moveAndRenameFileItem;
 
             this.executable.bind(
                     switch (command) {
@@ -566,10 +610,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 //                            }
 //                        }
 //                    }
-                    linkedFile.moveToDirectory(menuItem, false);
+                    linkedFile.moveToDirectory(moveFileItem, moveAndRenameFileItem, false);
                 }
                 case MOVE_FILE_TO_FOLDER_AND_RENAME ->
-                        linkedFile.moveToDirectoryAndRename(menuItem);
+                        linkedFile.moveToDirectoryAndRename(moveFileItem, moveAndRenameFileItem);
                 case DELETE_FILE ->
                         viewModel.deleteFile(linkedFile);
                 case REMOVE_LINK ->
