@@ -2,6 +2,8 @@ package org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,6 +14,7 @@ import javafx.collections.ObservableList;
 
 public class JournalAbbreviationPreferences {
 
+    private static final Logger logger = Logger.getLogger(JournalAbbreviationPreferences.class.getName());
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final ObjectProperty<Path> journalAbbreviationDir;
@@ -60,7 +63,11 @@ public class JournalAbbreviationPreferences {
         if (appData == null) {
             appData = System.getProperty("user.home");
         }
-        return Path.of(appData, ".jabref", "journals");
+        Path defaultPath = Path.of(appData, ".jabref", "journals");
+        if (!defaultPath.toFile().exists()) {
+            defaultPath.toFile().mkdirs();
+        }
+        return defaultPath;
     }
 
     public void setJournalAbbreviationDir(Path journalAbbreviationDir) {
