@@ -69,6 +69,7 @@ public class SSRN extends EprintIdentifier {
 
     /**
      * Generate the DOI of the article
+     *
      * @return a short doi formatted as "10.2139/ssrn.[article]"
      */
     public DOI intoDoi() {
