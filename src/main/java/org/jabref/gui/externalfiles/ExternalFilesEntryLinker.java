@@ -52,9 +52,15 @@ public class ExternalFilesEntryLinker {
         Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
-            if (file.equals(targetFile)) {
-                // In case of source == target, we pretend, we have success
-                return Optional.of(targetFile);
+            try {
+                // See discussion at https://stackoverflow.com/questions/29368308/java-nio-how-is-files-issamefile-different-from-path-equals for using Files.isSameFile instead of Path.equals()
+                if (Files.isSameFile(file, targetFile)) {
+                    // In case of source == target, we pretend, we have success
+                    return Optional.of(targetFile);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Could not check pre-condition for copy file.", e);
+                return Optional.empty();
             }
             if (FileUtil.copyFile(file, targetFile, false)) {
                 return Optional.of(targetFile);
