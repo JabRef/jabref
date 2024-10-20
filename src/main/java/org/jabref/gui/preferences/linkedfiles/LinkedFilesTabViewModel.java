@@ -42,16 +42,23 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
 
+    private final BooleanProperty autoRenameLinkedFiles = new SimpleBooleanProperty();
+
+
     private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
+    private final CliPreferences cliPreferences;
 
     public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.filePreferences = preferences.getFilePreferences();
         this.autoLinkPreferences = preferences.getAutoLinkPreferences();
+        this.cliPreferences = preferences;
+
+        autoRenameLinkedFiles.set(preferences.shouldAutoRenameLinkedFiles());
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
@@ -85,6 +92,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
 
+        autoRenameLinkedFiles.set(cliPreferences.shouldAutoRenameLinkedFiles());
+
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
             case START -> autolinkFileStartsBibtexProperty.setValue(true);
@@ -103,6 +112,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
+
+        cliPreferences.setAutoRenameLinkedFiles(autoRenameLinkedFiles.get());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -191,6 +202,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty autoRenameLinkedFilesProperty() {
+        return autoRenameLinkedFiles;
     }
 }
 
