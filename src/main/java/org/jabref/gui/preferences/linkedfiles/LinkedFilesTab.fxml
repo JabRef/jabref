@@ -58,7 +58,20 @@
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
 
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
+    <Label text="%( Note: Press return to commit changes in the table! )"/>
+    <AnchorPane>
+        <FilenamePatternPanel fx:id="bibtexKeyPatternTable" 
+                                  AnchorPane.leftAnchor="0.0" 
+                                  AnchorPane.rightAnchor="0.0"
+                                  AnchorPane.topAnchor="0.0"
+                                  AnchorPane.bottomAnchor="0.0"
+                                  prefHeight="180.0"/>
+        <Button text="%Reset All" onAction="#resetAllFileNamePatterns" 
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+    </AnchorPane>
+
     <GridPane hgap="4.0" vgap="4.0">
+
         <!-- <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
@@ -72,10 +85,10 @@
                   prefWidth="300" minWidth="300" maxWidth="300"/> -->
 
 
-        <AnchorPane>
-            <FilenamePatternPanel fx:id="filenamePatternPanel" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="180.0"/>
+        <!-- <AnchorPane>
+            <FilenamePatternPanel fx:id="bibtexKeyPatternTable" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="180.0"/>
             <Button text="%Reset All" onAction="#resetAllFileNamePatterns" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-        </AnchorPane>
+        </AnchorPane> -->
 
         <Label text="%File directory pattern" GridPane.rowIndex="1"/>
         <TextField fx:id="fileDirectoryPattern" GridPane.columnIndex="1" GridPane.rowIndex="1"

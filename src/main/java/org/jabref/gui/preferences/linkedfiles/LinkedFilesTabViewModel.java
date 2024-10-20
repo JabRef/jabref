@@ -15,14 +15,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.commonfxcontrols.FilenamePatternItemModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.filenameformatpatterns.GlobalFilenamePattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -123,12 +120,12 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
 //        filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         GlobalFilenamePattern newKeyPattern =
-                new GlobalFilenamePattern(filePreferences.getKeyPatterns().getDefaultValue());
+                new GlobalFilenamePattern(filePreferences.getFileNamePatternObj().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!"default".equals(item.getEntryType().getName())) {
                 if (!patternString.trim().isEmpty()) {
-                    newKeyPattern.addFilenamePattern(item.getEntryType(), patternString);
+                    newKeyPattern.addFilenameFormatPattern(item.getEntryType(), patternString);
                 }
             }
         });
@@ -155,6 +152,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+        filePreferences.setFileNamePattern(newKeyPattern);
     }
 
     ValidationStatus mainFileDirValidationStatus() {

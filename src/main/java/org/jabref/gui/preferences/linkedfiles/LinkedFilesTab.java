@@ -106,7 +106,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         bibtexKeyPatternTable.setValues(
                 entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
-                preferences.getFilePreferences().getKeyPatterns());
+                preferences.getFilePreferences().getFileNamePatternObj());
     }
 
     @Override
@@ -115,7 +115,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     }
 
     @FXML
-    public void resetAllKeyPatterns() {
+    public void resetAllFileNamePatterns() {
         bibtexKeyPatternTable.resetAll();
     }
 }

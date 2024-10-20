@@ -131,7 +131,7 @@ public class LinkedFileHandler {
     }
 
     public String getSuggestedFileName(String extension) {
-        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim()
+        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern().toString()).trim()
                 + '.'
                 + extension;
 
