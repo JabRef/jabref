@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 /**
  * Interface for {@link StandardFileType} which allows us to extend the underlying enum with own filetypes for custom exporters
+ *
+ * "Twin" interface: {@link org.jabref.gui.externalfiletype.ExternalFileType}
  */
 public interface FileType {
 

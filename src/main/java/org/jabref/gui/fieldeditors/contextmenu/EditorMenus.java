@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.ClipBoardManager;
@@ -51,20 +51,20 @@ public class EditorMenus {
     /**
      * The default context menu with a specific menu copying a DOI/ DOI URL.
      *
-     * @param textArea text-area that this menu will be connected to
+     * @param textField text-field that this menu will be connected to
      * @return menu containing items of the default menu and an item for copying a DOI/DOI URL
      */
-    public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea, DialogService dialogService) {
+    public static Supplier<List<MenuItem>> getDOIMenu(TextField textField, DialogService dialogService) {
         return () -> {
             ActionFactory factory = new ActionFactory();
             ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
-            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI, dialogService, clipBoardManager));
-            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL, dialogService, clipBoardManager));
+            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textField, StandardActions.COPY_DOI, dialogService, clipBoardManager));
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textField, StandardActions.COPY_DOI_URL, dialogService, clipBoardManager));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiMenuItem);
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
-            menuItems.addAll(new DefaultMenu(textArea).get());
+            menuItems.addAll(new DefaultMenu(textField).get());
             return menuItems;
         };
     }
@@ -72,14 +72,14 @@ public class EditorMenus {
     /**
      * The default context menu with a specific menu item to cleanup URL.
      *
-     * @param textArea text-area that this menu will be connected to
+     * @param textField text field that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL
      */
-    public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextArea textArea) {
+    public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextField textField) {
         return () -> {
             MenuItem cleanupURL = new MenuItem(Localization.lang("Cleanup URL link"));
-            cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
-            cleanupURL.setOnAction(event -> textArea.setText(new CleanupUrlFormatter().format(textArea.getText())));
+            cleanupURL.setDisable(textField.textProperty().isEmpty().get());
+            cleanupURL.setOnAction(event -> textField.setText(new CleanupUrlFormatter().format(textField.getText())));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
             return menuItems;
