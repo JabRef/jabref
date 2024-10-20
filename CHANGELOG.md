@@ -35,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
 - We added a welcome screen that displays when no database is open [koppor#96](https://github.com/koppor/jabref/issues/96)
+- We added an importer for SSRN URLs. [#12021](https://github.com/JabRef/jabref/pull/12021)
 - We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
