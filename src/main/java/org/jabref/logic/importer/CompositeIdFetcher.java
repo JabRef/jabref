@@ -10,6 +10,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.SSRN;
 
 public class CompositeIdFetcher {
 
@@ -20,6 +21,8 @@ public class CompositeIdFetcher {
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        // All identifiers listed here should also be appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
@@ -41,6 +44,11 @@ public class CompositeIdFetcher {
             return new IacrEprintFetcher(importFormatPreferences).performSearchById(iacrEprint.get().getNormalized());
         }*/
 
+        Optional<SSRN> ssrn = SSRN.parse(identifier);
+        if (ssrn.isPresent()) {
+            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().getNormalized());
+        }
+
         return Optional.empty();
     }
 
@@ -52,7 +60,8 @@ public class CompositeIdFetcher {
         Optional<DOI> doi = DOI.findInText(identifier);
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         Optional<ISBN> isbn = ISBN.parse(identifier);
+        Optional<SSRN> ssrn = SSRN.parse(identifier);
 
-        return Stream.of(doi, arXivIdentifier, isbn).anyMatch(Optional::isPresent);
+        return Stream.of(doi, arXivIdentifier, isbn, ssrn).anyMatch(Optional::isPresent);
     }
 }
