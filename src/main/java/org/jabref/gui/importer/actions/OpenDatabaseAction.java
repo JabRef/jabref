@@ -34,6 +34,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
@@ -102,11 +103,20 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+        FileDialogConfiguration.Builder builder = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(getInitialDirectory())
-                .build();
+                .withDefaultExtension(StandardFileType.BIBTEX_DB);
+
+        FileDialogConfiguration fileDialogConfiguration;
+        try {
+            fileDialogConfiguration = builder
+                    .withInitialDirectory(getInitialDirectory())
+                    .build();
+        } catch (IllegalArgumentException e) { // something went wrong with the directory, fallback to user directory
+            fileDialogConfiguration = builder
+                    .withInitialDirectory(Directories.getUserDirectory())
+                    .build();
+        }
 
         List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
         openFiles(new ArrayList<>(filesToOpen));

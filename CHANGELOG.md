@@ -162,6 +162,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where DatabaseChangeDetailsView was not scrollable when reviewing external metadata changes [#11220](https://github.com/JabRef/jabref/issues/11220)
 - We fixed undo/redo for text fields. [#11420](https://github.com/JabRef/jabref/issues/11420)
 - We fixed an issue where clicking on a page number in the search results tab opens a wrong file in the document viewer. [#11432](https://github.com/JabRef/jabref/pull/11432)
+- We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10458](https://github.com/JabRef/jabref/issues/10548)
 
 ### Removed
 
