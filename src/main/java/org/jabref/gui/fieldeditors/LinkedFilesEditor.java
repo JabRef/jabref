@@ -372,16 +372,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
                 moveFileItems[0],
-                moveFileItems[1],
-//                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
+                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
+                moveFileItems[1],
                 factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
                 factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferences))
         );
-
         return menu;
     }
 
