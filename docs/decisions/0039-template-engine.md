@@ -51,7 +51,8 @@ ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
-* Good, because it has simple syntax.
+* Good, because it has simple syntax and it is designed for simple template workflows.
+* Good, because it has a stable syntax ([source](https://stackoverflow.com/a/1984458/10037342)).
 * Bad, because it is in maintenance mode.
 
 ### Apache FreeMarker
@@ -75,6 +76,9 @@ ${CanonicalBibEntry.getCanonicalRepresentation(entry)}
 * Good, because it is possible to use `String` as a template.
 * Good, because in active development.
 * Good, because it is powerful and flexible.
+* Good, because it has extensive documentation ([source](https://stackoverflow.com/a/1984458/10037342)).
+* Neutral, because it has received some API and syntax changes recently ([source](https://stackoverflow.com/a/1984458/10037342)).
+* Neutral, because FreeMarker is used for complex template workflow, which we do not need in JabRef.
 
 ### Thymeleaf
 
