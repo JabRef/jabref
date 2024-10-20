@@ -88,6 +88,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, System.getenv("APPDATA") + "\\local\\org.jabref\\jabref\\journal-abbreviations"));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
     }
 }

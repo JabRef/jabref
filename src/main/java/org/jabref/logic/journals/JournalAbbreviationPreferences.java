@@ -1,11 +1,7 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
-import java.nio.file.Files;
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,8 +12,6 @@ import javafx.collections.ObservableList;
 
 public class JournalAbbreviationPreferences {
 
-    private static final Logger logger = Logger.getLogger(JournalAbbreviationPreferences.class.getName());
-    private static final Path JABREF_DATA_DIRECTORY = Path.of(System.getenv("APPDATA"), "..", "Local", "org.jabref", "jabref");
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final ObjectProperty<Path> journalAbbreviationDir;
@@ -58,31 +52,16 @@ public class JournalAbbreviationPreferences {
     }
 
     public Path getJournalAbbreviationDir() {
-        return journalAbbreviationDir.get() != null ? journalAbbreviationDir.get() : getDefaultAbbreviationDir();
+        Path dir = journalAbbreviationDir.get();
+        return dir != null ? dir : getDefaultAbbreviationDir();
     }
 
     public static Path getDefaultAbbreviationDir() {
-        Path journalDir = JABREF_DATA_DIRECTORY.resolve("journals");
-        try {
-            Files.createDirectories(journalDir);
-            logger.info("Using journal abbreviation directory: " + journalDir);
-            return journalDir;
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to create journal abbreviation directory in JabRef data folder", e);
-            return getTempDirectory();
+        String appData = System.getenv("APPDATA");
+        if (appData == null) {
+            appData = System.getProperty("user.home");
         }
-    }
-
-    private static Path getTempDirectory() {
-        Path tempDir = Path.of(System.getProperty("java.io.tmpdir"), "JabRef", "journals");
-        try {
-            Files.createDirectories(tempDir);
-            logger.info("Using temporary directory for journal abbreviations: " + tempDir);
-            return tempDir;
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to create temporary directory", e);
-            throw new IllegalStateException("Unable to create journal abbreviation directory", e);
-        }
+        return Path.of(appData, ".jabref", "journals");
     }
 
     public void setJournalAbbreviationDir(Path journalAbbreviationDir) {
