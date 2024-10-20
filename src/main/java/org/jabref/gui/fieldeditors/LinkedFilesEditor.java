@@ -374,7 +374,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 moveFileItems[0],
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
-//                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
                 moveFileItems[1],
                 factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
                 factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
