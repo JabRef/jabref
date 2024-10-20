@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -176,7 +177,25 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
+        fieldTypeMultilineColumn.setCellValueFactory(item -> {
+            BooleanProperty property = item.getValue().multilineProperty();
+            property.addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected) {
+                    viewModel.entryTypes().forEach(typeViewModel -> {
+                        typeViewModel.fields().stream()
+                                     .filter(f -> f.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                                     .forEach(f -> f.multilineProperty().set(true));
+                    });
+                } else {
+                    viewModel.entryTypes().forEach(typeViewModel -> {
+                        typeViewModel.fields().stream()
+                                     .filter(f -> f.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                                     .forEach(f -> f.multilineProperty().set(false));
+                    });
+                }
+            });
+            return property;
+        });
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
