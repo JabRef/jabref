@@ -284,6 +284,7 @@ public class MainToolBar extends ToolBar {
         // 将菜单项添加到菜单按钮
         menuButton.getItems().addAll(newArticleItem, newEntryItem, newEntryFromIdItem, newEntryFromPlainTextItem);
 
+
         return menuButton;
     }
 
