@@ -31,7 +31,7 @@
 
         <Label styleClass="sectionHeader" text="%Override default file directories"
                GridPane.columnSpan="3" GridPane.rowIndex="0"/>
-        <Label text="%Library file directory"
+        <Label text="%Library-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="generalFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
