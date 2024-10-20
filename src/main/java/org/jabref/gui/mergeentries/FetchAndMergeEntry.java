@@ -1,12 +1,13 @@
+
 package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchAndMergeEntry {
 
-    public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
+    public static final List<Field> SUPPORTED_IDENTIFIER_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
     private final DialogService dialogService;
@@ -62,11 +63,11 @@ public class FetchAndMergeEntry {
     }
 
     public void fetchAndMerge(BibEntry entry) {
-        fetchAndMerge(entry, SUPPORTED_FIELDS);
+        fetchAndMerge(entry, SUPPORTED_IDENTIFIER_FIELDS);
     }
 
     public void fetchAndMerge(BibEntry entry, Field field) {
-        fetchAndMerge(entry, Collections.singletonList(field));
+        fetchAndMerge(entry, List.of(field));
     }
 
     public void fetchAndMerge(BibEntry entry, List<Field> fields) {
@@ -74,206 +75,206 @@ public class FetchAndMergeEntry {
     }
 
     private void fetchAndMergeEntryWithDialog(BibEntry entry, Field field) {
-        entry.getField(field).ifPresent(
-                fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()).ifPresent(
-                        fetcher -> executeFetchTaskWithDialog(fetcher, field, fieldContent, entry)
-                )
-        );
+        entry.getField(field)
+             .flatMap(fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()))
+             .ifPresent(fetcher -> executeFetchTaskWithDialog(fetcher, field, entry));
     }
 
-    private void executeFetchTaskWithDialog(IdBasedFetcher fetcher, Field field, String fieldContent, BibEntry entry) {
-        BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
-                      .onSuccess(fetchedEntry -> processFetchedEntryWithDialog(fetchedEntry, field, fieldContent, entry, fetcher))
-                      .onFailure(exception -> handleFetchException(exception, fetcher, entry))
-                      .executeWith(taskExecutor);
+    private void executeFetchTaskWithDialog(IdBasedFetcher fetcher, Field field, BibEntry entry) {
+        entry.getField(field)
+             .ifPresent(fieldContent ->
+                     BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
+                                   .onSuccess(fetchedEntry -> processFetchedEntryWithDialog(fetchedEntry, field, entry, fetcher))
+                                   .onFailure(exception -> handleFetchException(exception, fetcher))
+                                   .executeWith(taskExecutor)
+             );
     }
 
-    private void processFetchedEntryWithDialog(Optional<BibEntry> fetchedEntry, Field field, String fieldContent, BibEntry originalEntry, IdBasedFetcher fetcher) {
+    private void processFetchedEntryWithDialog(Optional<BibEntry> fetchedEntry, Field field, BibEntry originalEntry, IdBasedFetcher fetcher) {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-        if (fetchedEntry.isPresent()) {
-            cleanup.doPostCleanup(fetchedEntry.get());
-            showMergeDialog(originalEntry, fetchedEntry.get(), fetcher);
-        } else {
-            dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), fieldContent));
-        }
+        fetchedEntry.ifPresentOrElse(
+                entry -> {
+                    cleanup.doPostCleanup(entry);
+                    showMergeDialog(originalEntry, entry, fetcher);
+                },
+                () -> dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), originalEntry.getField(field).orElse("")))
+        );
     }
 
     public void fetchAndMergeBatch(List<BibEntry> entries) {
-        entries.forEach(entry -> SUPPORTED_FIELDS.forEach(field -> fetchAndMergeEntry(entry, field)));
+        entries.forEach(entry -> SUPPORTED_IDENTIFIER_FIELDS.forEach(field -> fetchAndMergeEntry(entry, field)));
     }
 
     private void fetchAndMergeEntry(BibEntry entry, Field field) {
-        entry.getField(field).ifPresentOrElse(
-                fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()).ifPresent(
-                        fetcher -> executeFetchTask(fetcher, field, fieldContent, entry)
-                ),
-                () -> {
-                    if (hasAnySupportedField(entry)) {
-                        dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
-                    }
-                }
+        entry.getField(field)
+             .flatMap(fieldContent -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences()))
+             .ifPresent(fetcher -> executeFetchTask(fetcher, field, entry));
+    }
+
+    private void executeFetchTask(IdBasedFetcher fetcher, Field field, BibEntry entry) {
+        entry.getField(field)
+             .ifPresent(fieldContent -> BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
+                                                      .onSuccess(fetchedEntry -> processFetchedEntry(fetchedEntry, field, entry))
+                                                      .onFailure(exception -> handleFetchException(exception, fetcher))
+                                                      .executeWith(taskExecutor));
+    }
+
+    private void processFetchedEntry(Optional<BibEntry> fetchedEntry, Field field, BibEntry originalEntry) {
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+        fetchedEntry.ifPresentOrElse(
+                entry -> {
+                    cleanup.doPostCleanup(entry);
+                    mergeWithoutDialog(originalEntry, entry);
+                },
+                // Notify if no entry was fetched
+                () -> dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), originalEntry.getField(field).orElse("")))
         );
     }
 
-    private boolean hasAnySupportedField(BibEntry entry) {
-        return SUPPORTED_FIELDS.stream().noneMatch(field -> entry.getField(field).isPresent());
-    }
-
-    private void executeFetchTask(IdBasedFetcher fetcher, Field field, String fieldContent, BibEntry entry) {
-        BackgroundTask.wrap(() -> fetcher.performSearchById(fieldContent))
-                      .onSuccess(fetchedEntry -> processFetchedEntry(fetchedEntry, field, fieldContent, entry))
-                      .onFailure(exception -> handleFetchException(exception, fetcher, entry))
-                      .executeWith(taskExecutor);
-    }
-
-    private void processFetchedEntry(Optional<BibEntry> fetchedEntry, Field field, String fieldContent, BibEntry originalEntry) {
-        if (fetchedEntry.isPresent()) {
-            ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-            cleanup.doPostCleanup(fetchedEntry.get());
-            mergeWithoutDialog(originalEntry, fetchedEntry.get());
+    private void handleFetchException(Exception exception, IdBasedFetcher fetcher) {
+        LOGGER.error("Error while fetching bibliographic information", exception);
+        String fetcherName = fetcher.getName();
+        // Handle different types of exceptions with specific error messages
+        if (exception instanceof FetcherClientException) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("No data was found for the identifier"));
+        } else if (exception instanceof FetcherServerException) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Server not available"));
         } else {
-            dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", field.getDisplayName(), fieldContent));
-        }
-    }
-
-    private void handleFetchException(Exception exception, IdBasedFetcher fetcher, BibEntry entry) {
-        if (hasAnySupportedField(entry)) {
-            LOGGER.error("Error while fetching bibliographic information", exception);
-            String fetcherName = fetcher.getName();
-            if (exception instanceof FetcherClientException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("No data was found for the identifier"));
-            } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Server not available"));
-            } else {
-                dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Error occurred %0", exception.getMessage()));
-            }
+            dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcherName), Localization.lang("Error occurred %0", exception.getMessage()));
         }
     }
 
     private void mergeWithoutDialog(BibEntry originalEntry, BibEntry fetchedEntry) {
         NamedCompound ce = new NamedCompound(Localization.lang("Merge entry without user interaction"));
 
-        // Set of fields present in both the original and fetched entries
-        Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        jointFields.addAll(fetchedEntry.getFields());
-        Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        originalFields.addAll(originalEntry.getFields());
+        updateEntryTypeIfDifferent(originalEntry, fetchedEntry, ce);
+        updateFieldsWithNewInfo(originalEntry, fetchedEntry, ce);
+        removeObsoleteFields(originalEntry, fetchedEntry, ce);
 
-        boolean edited = false;
+        finalizeMerge(ce, originalEntry);
+    }
 
-        // Compare entry type and update if needed
+    private void updateFieldsWithNewInfo(BibEntry originalEntry, BibEntry fetchedEntry, NamedCompound ce) {
+        Set<Field> jointFields = getJointFields(originalEntry, fetchedEntry);
+        for (Field field : jointFields) {
+            updateFieldIfNecessary(originalEntry, fetchedEntry, field, ce);
+        }
+    }
+
+    private void updateFieldIfNecessary(BibEntry originalEntry, BibEntry fetchedEntry, Field field, NamedCompound ce) {
+        fetchedEntry.getField(field).ifPresent(fetchedValue -> {
+            Optional<String> originalValue = originalEntry.getField(field);
+            if (originalValue.isEmpty() || fetchedValue.length() > originalValue.get().length()) {
+                originalEntry.setField(field, fetchedValue);
+                ce.addEdit(new UndoableFieldChange(originalEntry, field, originalValue.orElse(null), fetchedValue));
+            }
+        });
+    }
+
+    private void removeObsoleteFields(BibEntry originalEntry, BibEntry fetchedEntry, NamedCompound ce) {
+        Set<Field> jointFields = getJointFields(originalEntry, fetchedEntry);
+        Set<Field> originalFields = getFields(originalEntry);
+
+        for (Field field : originalFields) {
+            if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
+                removeField(originalEntry, field, ce);
+            }
+        }
+    }
+
+    private void removeField(BibEntry entry, Field field, NamedCompound ce) {
+        Optional<String> originalValue = entry.getField(field);
+        entry.clearField(field);
+        ce.addEdit(new UndoableFieldChange(entry, field, originalValue.orElse(null), null));
+    }
+
+    private void finalizeMerge(NamedCompound ce, BibEntry entry) {
+        String citationKey = entry.getCitationKey().orElse(entry.getAuthorTitleYear(40));
+        String message = ce.hasEdits()
+                ? Localization.lang("Updated entry with fetched information [%0]", citationKey)
+                : Localization.lang("No new information was added [%0]", citationKey);
+
+        if (ce.hasEdits()) {
+            ce.end();
+            undoManager.addEdit(ce);
+        }
+        dialogService.notify(message);
+    }
+
+    private Set<Field> getFields(BibEntry entry) {
+        // Get sorted set of fields for consistent ordering
+        return entry.getFields().stream()
+                    .sorted(Comparator.comparing(Field::getName))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private Set<Field> getJointFields(BibEntry entry1, BibEntry entry2) {
+        Set<Field> fields = new LinkedHashSet<>();
+        fields.addAll(getFields(entry1));
+        fields.addAll(getFields(entry2));
+        return fields;
+    }
+
+    private void updateEntryTypeIfDifferent(BibEntry originalEntry, BibEntry fetchedEntry, NamedCompound ce) {
         EntryType oldType = originalEntry.getType();
         EntryType newType = fetchedEntry.getType();
 
         if (!oldType.equals(newType)) {
             originalEntry.setType(newType);
             ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
-            edited = true;
         }
-
-        // Compare fields and set the longer value
-        for (Field field : jointFields) {
-            Optional<String> originalString = originalEntry.getField(field);
-            Optional<String> fetchedString = fetchedEntry.getField(field);
-
-            if (fetchedString.isPresent()) {
-                if (originalString.isEmpty() || fetchedString.get().length() > originalString.get().length()) {
-                    originalEntry.setField(field, fetchedString.get());
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null), fetchedString.get()));
-                    edited = true;
-                }
-            }
-        }
-
-        // Remove fields not present in fetched entry, unless they are internal
-        edited = isEdited(originalEntry, ce, jointFields, originalFields, edited);
-
-        if (edited) {
-            ce.end();
-            undoManager.addEdit(ce);
-            dialogService.notify(Localization.lang("Updated entry with fetched information"));
-        } else {
-            dialogService.notify(Localization.lang("No new information was added"));
-        }
-    }
-
-    private boolean isEdited(BibEntry originalEntry, NamedCompound ce, Set<Field> jointFields, Set<Field> originalFields, boolean edited) {
-        for (Field field : originalFields) {
-            if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
-                Optional<String> originalString = originalEntry.getField(field);
-                originalEntry.clearField(field);
-                ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null));
-                edited = true;
-            }
-        }
-        return edited;
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
+        MergeEntriesDialog dialog = createMergeDialog(originalEntry, fetchedEntry, fetcher);
+        Optional<BibEntry> mergedEntry = showDialogAndGetResult(dialog);
+
+        mergedEntry.ifPresentOrElse(
+                entry -> processMergedEntry(originalEntry, entry, fetcher),
+                () -> notifyCanceledMerge(originalEntry)
+        );
+    }
+
+    private MergeEntriesDialog createMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
-        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
+        return dialog;
+    }
 
-        if (mergedEntry.isPresent()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
+    private Optional<BibEntry> showDialogAndGetResult(MergeEntriesDialog dialog) {
+        return dialogService.showCustomDialogAndWait(dialog)
+                            .map(EntriesMergeResult::mergedEntry);
+    }
 
-            // Updated the original entry with the new fields
-            Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            jointFields.addAll(mergedEntry.get().getFields());
-            Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
-            originalFields.addAll(originalEntry.getFields());
-            boolean edited = false;
+    private void processMergedEntry(BibEntry originalEntry, BibEntry mergedEntry, WebFetcher fetcher) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 
-            // entry type
-            EntryType oldType = originalEntry.getType();
-            EntryType newType = mergedEntry.get().getType();
+        updateEntryTypeIfDifferent(originalEntry, mergedEntry, ce);
+        updateFieldsWithNewInfo(originalEntry, mergedEntry, ce);
+        removeObsoleteFields(originalEntry, mergedEntry, ce);
 
-            if (!oldType.equals(newType)) {
-                originalEntry.setType(newType);
-                ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
-                edited = true;
-            }
+        finalizeMerge(ce, originalEntry);
+    }
 
-            // fields
-            for (Field field : jointFields) {
-                Optional<String> originalString = originalEntry.getField(field);
-                Optional<String> mergedString = mergedEntry.get().getField(field);
-                if (originalString.isEmpty() || !originalString.equals(mergedString)) {
-                    originalEntry.setField(field, mergedString.get()); // mergedString always present
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
-                            mergedString.get()));
-                    edited = true;
-                }
-            }
-
-            // Remove fields which are not in the merged entry, unless they are internal fields
-            edited = isEdited(originalEntry, ce, jointFields, originalFields, edited);
-
-            if (edited) {
-                ce.end();
-                undoManager.addEdit(ce);
-                dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
-            } else {
-                dialogService.notify(Localization.lang("No information added"));
-            }
-        } else {
-            dialogService.notify(Localization.lang("Canceled merging entries"));
-        }
+    private void notifyCanceledMerge(BibEntry entry) {
+        String citationKey = entry.getCitationKey().orElse(entry.getAuthorTitleYear(40));
+        dialogService.notify(Localization.lang("Canceled merging entries") + " [" + citationKey + "]");
     }
 
     public void fetchAndMerge(BibEntry entry, EntryBasedFetcher fetcher) {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
-                      .onSuccess(fetchedEntry -> {
-                          if (fetchedEntry.isPresent()) {
-                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                              cleanup.doPostCleanup(fetchedEntry.get());
-                              showMergeDialog(entry, fetchedEntry.get(), fetcher);
-                          } else {
-                              dialogService.notify(Localization.lang("Could not find any bibliographic information."));
-                          }
-                      })
+                      .onSuccess(fetchedEntry -> fetchedEntry
+                              .map(fe -> {
+                                  ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+                                  cleanup.doPostCleanup(fe);
+                                  return fe;
+                              })
+                              .ifPresentOrElse(
+                                      fe -> showMergeDialog(entry, fe, fetcher),
+                                      () -> dialogService.notify(Localization.lang("Could not find any bibliographic information."))
+                              ))
                       .onFailure(exception -> {
                           LOGGER.error("Error while fetching entry with {} ", fetcher.getName(), exception);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
