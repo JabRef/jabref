@@ -24,7 +24,6 @@ import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
-import org.jabref.gui.mergeentries.MultiEntryMergeWithFetchedDataAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -93,8 +92,7 @@ public class RightClickMenu {
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                factory.createMenuItem(StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRIES, new MultiEntryMergeWithFetchedDataAction(libraryTab, preferences, taskExecutor, libraryTab.getBibDatabaseContext(), dialogService, undoManager))
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager))
         );
 
         EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
