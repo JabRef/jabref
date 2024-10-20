@@ -1,8 +1,8 @@
 package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
