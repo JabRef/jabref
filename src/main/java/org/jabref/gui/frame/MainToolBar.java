@@ -116,7 +116,7 @@ public class MainToolBar extends ToolBar {
 
 
                 new HBox() {{
-                    setAlignment(Pos.CENTER); // 设置对齐方式为居中
+                    setAlignment(Pos.CENTER); // center style
                     getChildren().addAll(
                             createNewEntryMenuButton(factory),
                             factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))
@@ -275,13 +275,13 @@ public class MainToolBar extends ToolBar {
         MenuButton menuButton = new MenuButton();
         menuButton.setGraphic(IconTheme.JabRefIcons.NEW_GROUP.getGraphicNode()); // 设置菜单按钮的图标
 
-        // 创建菜单项
+        // create the menu
         MenuItem newArticleItem = factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager));
         MenuItem newEntryItem = factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager));
         MenuItem newEntryFromIdItem = createNewEntryFromIdMenuItem(factory, menuButton); // 传递 menuButton
         MenuItem newEntryFromPlainTextItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager));
 
-        // 将菜单项添加到菜单按钮
+        //add the button
         menuButton.getItems().addAll(newArticleItem, newEntryItem, newEntryFromIdItem, newEntryFromPlainTextItem);
 
 
