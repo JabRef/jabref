@@ -142,4 +142,8 @@ public class PushToApplicationCommand extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
     }
+//    private void jump(Path fileName, int line, int column) {
+//        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+//        application.publicJumpToLine(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
+//    }
 }

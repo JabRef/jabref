@@ -1,5 +1,7 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -26,5 +28,14 @@ public class PushToTeXstudio extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-cite", "%s%s%s".formatted(getCitePrefix(), keyString, getCiteSuffix())};
+    }
+
+    /**
+     * Method to open TeXstudio at the given line number in the specified LaTeX file.
+     */
+    @Override
+    public String jumpString(Path fileName, int line, int column) {
+        // Construct the TeXstudio command
+        return commandPath + " --line " + line + " " + fileName.toString();
     }
 }
