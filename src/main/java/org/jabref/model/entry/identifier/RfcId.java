@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 /**
  * Represents an RFC identifier, which can be used to fetch bibliographic information about the RFC document.
- * This class supports both plain RFC IDs (e.g., "rfc7276") and full URLs (e.g., "https://www.rfc-editor.org/rfc/rfc7276.html").
+ * This class supports both plain RFC IDs (e.g., "rfc7276") and full URLs (e.g., "https://www.rfc-editor.org/rfc/" + rfc****.html).
  */
 public class RfcId implements Identifier {
     private static final String RFC_URL_REGEX = "(https?://)?(www\\.)?rfc-editor\\.org/rfc/rfc(?<id>\\d+)(\\.html)?.*";
@@ -55,11 +55,6 @@ public class RfcId implements Identifier {
         return RFC_URL_MATCH.matcher(rfcString).matches();
     }
 
-    /**
-     * Checks if the stored RFC string is valid according to the defined RFC pattern.
-     *
-     * @return true if the RFC string matches the expected pattern, otherwise false.
-     */
     @Override
     public String getNormalized() {
         return rfcString;
