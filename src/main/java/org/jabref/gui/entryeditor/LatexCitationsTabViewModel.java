@@ -168,7 +168,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         Citation selectedItem = citationsDisplay.getSelectionModel().getSelectedItem();
 
         // Check if the left mouse button was double-clicked
-        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1 && selectedItem != null) {
+        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             // Perform a jump or other actions
             System.out.println("Double-clicked on: " + selectedItem);
             PushToApplicationCommand abstractPushToApplication;
