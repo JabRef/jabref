@@ -267,11 +267,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 sidePane.setPrefWidth(260);
                 splitPane.getItems().addFirst(sidePane);
 
-                // Ensure divider position is set before rendering
-                splitPane.setDividerPositions(0.2);
-
-                // Ensure smooth transition by updating the layout immediately
-                Platform.runLater(() -> splitPane.setDividerPositions(0.2));
+                splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
             }
         } else {
             splitPane.getItems().remove(sidePane);
