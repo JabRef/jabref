@@ -394,7 +394,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base:editable > .arrow-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-background-radius: 4px;
+    -fx-background-radius: 0.25em;
     -fx-text-fill: -fx-text-base-color;
 }
 
@@ -402,8 +402,8 @@ TextFlow > .tooltip-text-monospaced {
 .button {
     -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px;
+    -fx-border-width: 0.062em;
+    -fx-border-radius: 0.25em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
@@ -434,7 +434,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .text-button {
-    -fx-border-width: 0px;
+    -fx-border-width: 0.0em;
 }
 
 .contained-button {
@@ -445,7 +445,7 @@ TextFlow > .tooltip-text-monospaced {
 .icon-buttonNoSpaceBottom,
 .icon-buttonNoSpaceTop,
 .icon-button {
-    -fx-border-width: 0px;
+    -fx-border-width: 0.0em;
     -fx-background-color: -jr-icon-background;
     -fx-padding: 0.5em;
 }
@@ -490,7 +490,7 @@ TextFlow > .tooltip-text-monospaced {
 
 .progress-indicator {
     -fx-progress-color: -jr-theme;
-    -fx-border-width: 0px;
+    -fx-border-width: 0.0em;
     -fx-background-color: -jr-icon-background;
 }
 
@@ -513,13 +513,13 @@ TextFlow > .tooltip-text-monospaced {
 
 .check-box > .box {
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.54); */
-    -fx-border-width: 2px;
-    -fx-border-radius: 1px;
+    -fx-border-width: 0.125em;
+    -fx-border-radius: 0.062em;
     -fx-padding: 0.1em 0.1em 0.2em 0.2em;
 }
 
 .check-box:selected > .box {
-    -fx-background-insets: 2px;
+    -fx-background-insets: 0.125em;
     -fx-border-color: -jr-checked;
     -fx-background-color: -jr-checked;
 }
@@ -538,7 +538,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
     -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
     -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
-    -fx-background-insets: 0, 2px;
+    -fx-background-insets: 0, 0.125em;
 }
 
 .radio-button:selected > .radio {
@@ -645,7 +645,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
-    -glyph-size: 13px;
+    -glyph-size: 0.812em;
     -fx-fill: -fx-mid-text-color;
     -fx-text-fill: -fx-mid-text-color;
 }
@@ -1000,7 +1000,7 @@ TextFlow > .tooltip-text-monospaced {
 .sidePaneComponentHeader .ikonli-font-icon {
     -fx-fill: -jr-sidepane-header-color;
     -fx-text-fill: -jr-sidepane-header-color;
-    -fx-font-size: 16px;
+    -fx-font-size: 1.0em;
     -fx-icon-color: -jr-theme-text;
 }
 
@@ -1241,7 +1241,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .notification-bar > .pane {
     -fx-background-color: -jr-gray-3;
-    -fx-background-radius: 4px;
+    -fx-background-radius: 0.25em;
 }
 
 .notification-bar > .pane > .title,
@@ -1253,17 +1253,17 @@ We want to have a look that matches our icons in the tool-bar */
 
 .notification-bar > .pane {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
-    -fx-padding: 6px 7px 6px 32px;
-    -fx-background-radius: 0px;
-    -fx-border-radius: 0px;
+    -fx-padding: 0.375em 0.438em 0.375em 2.0em;
+    -fx-background-radius: 0.0em;
+    -fx-border-radius: 0.0em;
 }
 
 .notification-bar > .pane > .button-bar > .container {
-    -fx-padding: 0px 24px 0px 0px;
+    -fx-padding: 0.0em 1.5em 0.0em 0.0em;
 }
 
 .notification-bar > .pane > .label {
-    -fx-graphic-text-gap: 8px;
+    -fx-graphic-text-gap: 0.5em;
 }
 
 .notification-pane .notification-bar > .pane .close-button > .graphic {
@@ -1271,7 +1271,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .notification-bar > .pane > .label > .ikonli-font-icon {
-    -fx-icon-size: 16px;
+    -fx-icon-size: 1.0em;
     -fx-icon-color: -jr-base;
 }
 
@@ -1292,19 +1292,19 @@ We want to have a look that matches our icons in the tool-bar */
 .color-picker:focused,
 .color-picker {
     -fx-background-color: transparent, transparent, transparent, transparent;
-    -fx-background-radius: 0px;
-    -fx-background-insets: 0px;
+    -fx-background-radius: 0.0em;
+    -fx-background-insets: 0.0em;
     -fx-effect: null;
 }
 
 .color-palette {
     -fx-background-color: -fx-background;
-    -fx-background-radius: 0px;
-    -fx-background-insets: 0px;
+    -fx-background-radius: 0.0em;
+    -fx-background-insets: 0.0em;
 }
 
 .color-palette-region .button {
-    -fx-border-width: 0px;
+    -fx-border-width: 0.0em;
 }
 
 .bibEntry {
@@ -1427,7 +1427,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .tags-field {
-    -fx-pref-height: 30px;
+    -fx-pref-height: 1.875em;
     -fx-margin: 0em;
     -fx-border-style: none;
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
@@ -1477,7 +1477,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .rating {
     -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
-    -fx-padding: 0.5em 0px 0px 0px;
+    -fx-padding: 0.5em 0.0em 0.0em 0.0em;
 }
 
 .rating > .container > .button {
@@ -1753,7 +1753,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .sub-heading {
     -fx-font-size: 18;
-    -fx-padding: 5px;
+    -fx-padding: 0.312em;
 }
 
 .about-top {
@@ -1769,7 +1769,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .info-sections {
-    -fx-padding: 5px;
+    -fx-padding: 0.312em;
 }
 
 .contrib-section {
@@ -1857,12 +1857,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-.tool-bar > .container > .separator {
-    -fx-background-color: -jr-separator;
-}
+/*.tool-bar > .container > .separator {*/
+/*    -fx-background-color: -jr-separator;*/
+/*}*/
 
 .tool-bar .glyph-icon {
-    -glyph-size: 16px;
+    -glyph-size: 1.0em;
     -fx-font-size: 2em;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
@@ -1967,11 +1967,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* import from ErrorConsole.css*/
 .list-content {
-    -fx-padding: 10px;
+    -fx-padding: 0.625em;
 }
 
 .info-section {
-    -fx-padding: 10px;
+    -fx-padding: 0.625em;
     -fx-background-color: -fx-background;
 }
 
@@ -1995,7 +1995,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .custom-buttons {
-    -fx-padding: 5px;
+    -fx-padding: 0.312em;
 }
 
 .exception {
@@ -2173,7 +2173,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-padding: 0;
+    -fx-padding: 0.5em;
     -fx-background-radius: 0;
 }
 
@@ -2319,17 +2319,17 @@ We want to have a look that matches our icons in the tool-bar */
 
 .grid-cell {
     -fx-border-color: transparent -fx-outer-border -fx-outer-border transparent;
-    -fx-border-width: 0 1px 1px 0;
+    -fx-border-width: 0 0.062em 0.062em 0;
 }
 
 .grid-cell-r {
     -fx-border-color: transparent -fx-outer-border transparent transparent;
-    -fx-border-width: 0 1px 0 0;
+    -fx-border-width: 0 0.062em 0 0;
 }
 
 .grid-cell-b {
     -fx-border-color: transparent transparent -fx-outer-border transparent;
-    -fx-border-width: 0 0 1px 0;
+    -fx-border-width: 0 0 0.062em 0;
 }
 
 
