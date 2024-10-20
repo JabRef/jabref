@@ -15,7 +15,7 @@ public class SSRN extends EprintIdentifier {
     private static final Pattern SSRN_URL_FULL_MATCH = Pattern.compile("^" + SSRN_URL_REGEX + "$", Pattern.CASE_INSENSITIVE);
     private static final Pattern SSRN_URL_MATCH = Pattern.compile(SSRN_URL_REGEX, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
-    private final int abstractId;
+    private final Integer abstractId;
 
     /**
      * Tries to parse an SSRN identifier
@@ -42,7 +42,7 @@ public class SSRN extends EprintIdentifier {
         throw new IllegalArgumentException(string + " is not a valid SSRN identifier");
     }
 
-    public SSRN(int abstractId) {
+    public SSRN(Integer abstractId) {
         this.abstractId = abstractId;
     }
 
@@ -68,11 +68,11 @@ public class SSRN extends EprintIdentifier {
     }
 
     /**
-     * Generate the DOI of the article
+     * Generate the DOI based on the SSRN
      *
-     * @return a short doi formatted as "10.2139/ssrn.[article]"
+     * @return a doi formatted as <code>10.2139/ssrn.[article]</code>
      */
-    public DOI intoDoi() {
+    public DOI toDoi() {
         return new DOI("10.2139/ssrn." + abstractId);
     }
 }
