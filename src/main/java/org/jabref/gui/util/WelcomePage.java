@@ -40,11 +40,9 @@ public class WelcomePage extends VBox {
         setAlignment(Pos.CENTER);
         setSpacing(10);
 
-        // Title
         Label welcomeLabel = new Label("Welcome to JabRef!");
         welcomeLabel.getStyleClass().add("welcome-label");
 
-        // Text and hyperlink for "New Library"
         Text openNewLibraryText = new Text("Open a ");
         openNewLibraryText.getStyleClass().add("welcome-text");
 
@@ -52,7 +50,6 @@ public class WelcomePage extends VBox {
         newLibraryLink.getStyleClass().add("welcome-hyperlink");
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
 
-        // Text and hyperlink for "Open Library"
         Hyperlink openLibraryLink = new Hyperlink("Existing Library");
         openLibraryLink.getStyleClass().add("welcome-hyperlink");
         openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
@@ -62,14 +59,12 @@ public class WelcomePage extends VBox {
         Text orExistingDatabaseText = new Text(" or open an ");
         orExistingDatabaseText.getStyleClass().add("welcome-text");
 
-        // TextFlows for each section
         TextFlow newLibraryFlow = new TextFlow(openNewLibraryText, newLibraryLink);
         newLibraryFlow.setTextAlignment(TextAlignment.CENTER);
 
         TextFlow openLibraryFlow = new TextFlow(orExistingDatabaseText, openLibraryLink);
         openLibraryFlow.setTextAlignment(TextAlignment.CENTER);
 
-        // Add elements to the VBox
         getChildren().addAll(welcomeLabel, newLibraryFlow, openLibraryFlow);
     }
 }
