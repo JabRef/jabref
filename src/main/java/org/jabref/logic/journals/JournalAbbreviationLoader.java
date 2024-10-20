@@ -24,6 +24,24 @@ public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
+    public static Path ensureJournalAbbreviationFileExists(Path baseDirectory) {
+        try {
+            // Ensure the subdirectory 'journal-abbreviations' exists
+            Path directory = baseDirectory.resolve("journal-abbreviations");
+            Files.createDirectories(directory);
+
+            Path customCsvPath = directory.resolve("custom.csv");
+            if (!Files.exists(customCsvPath)) {
+                Files.createFile(customCsvPath);
+                LOGGER.info("Created custom.csv at {}", customCsvPath);
+            }
+            return customCsvPath;
+        } catch (IOException e) {
+            LOGGER.error("Could not initialize journal abbreviation directory or file", e);
+            return null;
+        }
+    }
+
     public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
         AbbreviationParser parser = new AbbreviationParser();

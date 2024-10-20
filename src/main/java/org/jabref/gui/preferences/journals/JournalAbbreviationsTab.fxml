@@ -49,6 +49,11 @@
         </Button>
     </HBox>
 
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Button fx:id="changeDirectoryButton" onAction="#handleChangeDirectory" text="Change Directory"/>
+        <CustomTextField fx:id="directoryPathField" editable="false" minWidth="200"/>
+    </HBox>
+
     <VBox spacing="10.0" HBox.hgrow="ALWAYS">
         <CustomTextField fx:id="searchBox" promptText="%Filter" VBox.vgrow="NEVER">
             <VBox.margin>
