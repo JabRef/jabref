@@ -16,4 +16,4 @@ jobs:
           gh pr edit "$PR_URL" --add-label "status: changes required"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{ secrets.GH_TOKEN_GH_EDIT_LABELS }}
+          GH_TOKEN: ${{ github.token }}
