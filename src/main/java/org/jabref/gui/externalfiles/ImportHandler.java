@@ -430,8 +430,8 @@ public class ImportHandler {
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(database, entry, decision);
             } else {
-                    LOGGER.debug("not first entry, not pref flag, break will  be used");
-                    importEntryWithDuplicateCheck(database, entry);
+                LOGGER.debug("not first entry, not pref flag, break will  be used");
+                importEntryWithDuplicateCheck(database, entry);
             }
         }
     }
