@@ -70,7 +70,7 @@ public class SSRN extends EprintIdentifier {
     /**
      * Generate the DOI based on the SSRN
      *
-     * @return a doi formatted as <code>10.2139/ssrn.[article]</code>
+     * @return a DOI formatted as <code>10.2139/ssrn.[article]</code>
      */
     public DOI toDoi() {
         return new DOI("10.2139/ssrn." + abstractId);
