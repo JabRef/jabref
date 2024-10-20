@@ -34,8 +34,8 @@ public class PushToTeXstudio extends AbstractPushToApplication {
      * Method to open TeXstudio at the given line number in the specified LaTeX file.
      */
     @Override
-    public String jumpString(Path fileName, int line, int column) {
+    public String[] jumpString(Path fileName, int line, int column) {
         // Construct the TeXstudio command
-        return commandPath + " --line " + line + " " + fileName.toString();
+        return new String[] {commandPath, "--line", Integer.toString(line), fileName.toString()};
     }
 }

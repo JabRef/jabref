@@ -195,20 +195,24 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             notDefined = true;
             return;
         }
+
         // Execute the command
-        String command = jumpString(fileName, line, column);
+        String[] command = jumpString(fileName, line, column);
+
         try {
-            Runtime.getRuntime().exec(command);
-        } catch (
-                IOException e) {
-            // Handle exceptions (log or show error message)
-            e.printStackTrace();
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.start();
+        } catch (IOException e) {
+            // Use robust logging instead of printStackTrace()
+            LOGGER.error("Could not open TeXstudio at the specified location.", e);
+
+            // Show an error dialog to the user
             dialogService.showErrorDialogAndWait("Error", "Could not open TeXstudio at the specified location.");
         }
     }
 
-    protected String jumpString(Path fileName, int line, int column) {
-        return "";
+    protected String[] jumpString(Path fileName, int line, int column) {
+        return new String[0];
     }
 
     public void publicJumpToLine(Path fileName, int line, int column) {

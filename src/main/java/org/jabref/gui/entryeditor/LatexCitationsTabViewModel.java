@@ -20,10 +20,8 @@ import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.texparser.CitationsDisplay;
@@ -170,21 +168,13 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         // Check if the left mouse button was double-clicked
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             // Perform a jump or other actions
-            System.out.println("Double-clicked on: " + selectedItem);
-            PushToApplicationCommand abstractPushToApplication;
-//            abstractPushToApplication = new PushToApplicationCommand(dialogService, preferences);
-//            };
-//            abstractPushToApplication.publicJumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
-//            jumpToAction(selectedItem);
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
-            final ActionFactory factory = new ActionFactory();
             PushToApplication application = PushToApplications.getApplicationByName(
                                                                       applicationName,
                                                                       dialogService,
                                                                       preferences)
                                                               .orElse(new PushToEmacs(dialogService, preferences));
-
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.publicJumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }
