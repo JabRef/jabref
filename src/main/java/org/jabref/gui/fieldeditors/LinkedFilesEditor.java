@@ -359,123 +359,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return new MenuItem[] {moveFileItem, moveAndRenameFileItem};
     }
 
-//    private MenuItem createMoveFileItem(LinkedFileViewModel linkedFile) {
-//        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
-//        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
-//        moveFileItem.disableProperty().bind(isMoveFileDisabled);
-//
-//        // Context action for MOVE_FILE_TO_FOLDER standard action
-//        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem);
-//        moveFileItem.setOnAction(event -> moveFileAction.execute());
-//
-//        // Bind moveFileItem enabling condition based on current file path availability
-//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-//
-//        if (currentFilePath.isPresent()) {
-//            isMoveFileDisabled.set(false);
-//            linkedFile.updateMoveFileItemText(moveFileItem, currentFilePath.get());
-//        } else {
-//            isMoveFileDisabled.set(true);
-//            moveFileItem.setText(Localization.lang("Move file"));
-//        }
-//
-//        return moveFileItem;
-//    }
-
-//    private MenuItem createMoveAndRenameFileItem(LinkedFileViewModel linkedFile) {
-//        MenuItem moveAndRenameFileItem = new MenuItem(Localization.lang("Move file to directory and Rename"));
-//        BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
-//        moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
-//
-//        // Context action for MOVE_FILE_TO_FOLDER_AND_RENAME standard action
-//        ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveAndRenameFileItem);
-//        moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
-//
-//        // Bind moveFileItem enabling condition based on current file path availability
-//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-//
-//        if (currentFilePath.isPresent()) {
-//            isMoveAndRenameFileDisabled.set(false);
-//            linkedFile.updateMoveAndRenameFileItemText(moveAndRenameFileItem, currentFilePath.get());
-//        } else {
-//            isMoveAndRenameFileDisabled.set(true);
-//            moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
-//        }
-//
-//        return moveAndRenameFileItem;
-//    }
-
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
-//        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
-//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-//        System.out.println(databaseContext.getMetaData().getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()));
-//        System.out.println(databaseContext.getMetaData().getDefaultFileDirectory());
-//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-//        System.out.println(currentFilePath.toString());
-//        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file")); // Default text
-//        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
-//        moveFileItem.disableProperty().bind(isMoveFileDisabled);
-//        if (currentFilePath.isPresent()) {
-//            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
-//                    directoryHandler.determineTargetDirectory(currentFilePath.get());
-//            System.out.println("Choosen Target Directory");
-//            System.out.println(targetDirectory);
-//            if (targetDirectory.isPresent()) {
-//                FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
-//                System.out.println("Label for Menu");
-//                System.out.println(dirInfo.label());
-//                moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
-//                isMoveFileDisabled.set(false); // Set the property to false instead of disabling the menu item
-//                moveFileItem.setOnAction(event -> {
-//                    // Refresh the context menu
-//                    Platform.runLater(() -> {
-//                        ContextMenu updatedMenu = createContextMenuForFile(linkedFile);
-//                        listView.setContextMenu(updatedMenu);
-//                    });
-//                    try {
-//                        Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
-//                        System.out.println("Current File Path");
-//                        System.out.println(currentFilePath);
-//                        Files.move(currentFilePath.get(), target);
-//                        linkedFile.getFile().setLink(target.toString());
-//                        System.out.println("Current File Path after movement");
-//                        System.out.println(linkedFile.getFile().getLink());
-//                    } catch (
-//                            IOException e) {
-//                        dialogService.showErrorDialogAndWait(
-//                                Localization.lang("Move file"),
-//                                Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
-//                                e);
-//                    }
-//                });
-//            }
-//        }
-
-//        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
-//        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
-//        moveFileItem.disableProperty().bind(isMoveFileDisabled);
-//
-//        // Context action for MOVE_FILE_TO_FOLDER standard action
-//        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem);
-//        moveFileItem.setOnAction(event -> moveFileAction.execute());
-//
-//        // Bind moveFileItem enabling condition based on current file path availability
-//        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-//        Optional<Path> currentFilePath = linkedFile.findIn(dir);
-//
-//        if (currentFilePath.isPresent()) {
-//            isMoveFileDisabled.set(false);
-//            linkedFile.updateMoveFileItemText(moveFileItem, currentFilePath.get());
-//        } else {
-//            isMoveFileDisabled.set(true);
-//            moveFileItem.setText(Localization.lang("Move file"));
-//        }
-//        MenuItem moveFileItem = createMoveFileItem(linkedFile);
-//        MenuItem moveAndRenameFileItem = createMoveAndRenameFileItem(linkedFile);
         MenuItem[] moveFileItems = createMenuItem(linkedFile);
 
         menu.getItems().addAll(
@@ -498,18 +384,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         return menu;
     }
-
-//    private void updateMoveFileItemText(MenuItem moveFileItem, Path currentFilePath) {
-//        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
-//        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
-//
-//        if (targetDirectory.isPresent()) {
-//            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
-//            moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
-//        } else {
-//            moveFileItem.setText(Localization.lang("Move file"));
-//        }
-//    }
 
     private class ContextAction extends SimpleCommand {
 
@@ -581,37 +455,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         linkedFile.renameToSuggestion();
                 case RENAME_FILE_TO_NAME ->
                         linkedFile.askForNameAndRename();
-                case MOVE_FILE_TO_FOLDER -> {
-//                    FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
-//                    var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
-//                    Optional<Path> currentFilePath = linkedFile.findIn(dir);
-//
-//                    if (currentFilePath.isPresent()) {
-//                        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
-//                                directoryHandler.determineTargetDirectory(currentFilePath.get());
-//
-//                        if (targetDirectory.isPresent()) {
-//                            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
-//                            try {
-//                                Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
-//                                Files.move(currentFilePath.get(), target);
-//                                linkedFile.getFile().setLink(target.toString());
-//
-//                                // Update the menu item text after moving the file
-//                                if (menuItem != null) {
-//                                    Platform.runLater(() -> updateMoveFileItemText(menuItem, target));
-//                                }
-//                            } catch (
-//                                    IOException e) {
-//                                dialogService.showErrorDialogAndWait(
-//                                        Localization.lang("Move file"),
-//                                        Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
-//                                        e);
-//                            }
-//                        }
-//                    }
-                    linkedFile.moveToDirectory(moveFileItem, moveAndRenameFileItem, false);
-                }
+                case MOVE_FILE_TO_FOLDER ->
+                        linkedFile.moveToDirectory(moveFileItem, moveAndRenameFileItem, false);
                 case MOVE_FILE_TO_FOLDER_AND_RENAME ->
                         linkedFile.moveToDirectoryAndRename(moveFileItem, moveAndRenameFileItem);
                 case DELETE_FILE ->
