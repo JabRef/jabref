@@ -145,6 +145,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
             task.updateProgress(i, linkedFiles.size());
             task.updateMessage(Localization.lang("Indexing %0 | %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
+            task.showToUser(true);
             i++;
         }
         LOGGER.debug("Added {} files to index", linkedFiles.size());
