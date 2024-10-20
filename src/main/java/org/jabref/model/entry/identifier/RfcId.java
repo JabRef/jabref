@@ -1,15 +1,15 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 /**
  * Represents an RFC identifier, which can be used to fetch bibliographic information about the RFC document.
@@ -83,5 +83,4 @@ public class RfcId implements Identifier {
             return Optional.empty();
         }
     }
-
 }
