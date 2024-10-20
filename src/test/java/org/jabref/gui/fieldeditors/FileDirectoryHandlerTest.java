@@ -1,15 +1,16 @@
 package org.jabref.gui.fieldeditors;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.nio.file.Path;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -18,16 +19,14 @@ import static org.mockito.Mockito.when;
 public class FileDirectoryHandlerTest {
 
     private FileDirectoryHandler fileDirectoryHandler;
-    private BibDatabaseContext databaseContext;
     private FilePreferences filePreferences;
-    private DialogService dialogService;
     private MetaData metaData;
 
     @BeforeEach
     public void setUp() {
-        databaseContext = mock(BibDatabaseContext.class);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         filePreferences = mock(FilePreferences.class);
-        dialogService = mock(DialogService.class);
+        DialogService dialogService = mock(DialogService.class);
         metaData = mock(MetaData.class);
 
         when(databaseContext.getMetaData()).thenReturn(metaData);
