@@ -336,6 +336,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
             moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
         } else {
+            BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
+            moveFileItem.disableProperty().bind(isMoveFileDisabled);
             moveFileItem.setText(Localization.lang("Move file"));
         }
     }
@@ -348,6 +350,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
             moveAndRenameFileItem.setText(Localization.lang("Move file to %0 and Rename", dirInfo.label()));
         } else {
+            BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
+            moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
             moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
         }
     }
