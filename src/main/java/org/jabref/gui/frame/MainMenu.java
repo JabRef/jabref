@@ -278,16 +278,14 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                // Adding new menu item for mass bibliographic data fetching
                 factory.createMenuItem(
                         StandardActions.MASS_GET_BIBLIOGRAPHIC_DATA,
                         new MultiEntryMergeWithFetchedDataAction(
                                 frame::getCurrentLibraryTab,
                                 preferences,
-                                taskExecutor,
                                 dialogService,
-                                undoManager,
-                                stateManager
+                                stateManager,
+                                taskExecutor
                         )
                 )
         );
