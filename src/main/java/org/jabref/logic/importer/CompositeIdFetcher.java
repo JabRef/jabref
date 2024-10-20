@@ -8,7 +8,11 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.*;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.SSRN;
+import org.jabref.model.entry.identifier.RfcId;
 
 public class CompositeIdFetcher {
 
