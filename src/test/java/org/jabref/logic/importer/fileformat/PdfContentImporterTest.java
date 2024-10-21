@@ -126,9 +126,9 @@ class PdfContentImporterTest {
     }
 
     @Test
-    void se2Pdfs() throws Exception {
+    void se2Pdf() throws Exception {
         Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/se2paper.pdf")).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals("On How and We Can and Teach  and Exploring New and Ways in  and Professional Software and Development for Students", result.getFirst().getTitle().orElse(""));
+        assertEquals(Optional.of("On How and We Can and Teach  and Exploring New and Ways in  and Professional Software and Development for Students"), result.getFirst().getTitle());
     }
 }
