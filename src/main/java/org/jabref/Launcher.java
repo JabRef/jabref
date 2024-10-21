@@ -9,6 +9,7 @@ import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.migrations.PreferencesMigrations;
 
@@ -37,6 +38,9 @@ public class Launcher {
         // The method `processArguments` quites the whole JVM if no GUI is needed.
 
         PreferencesMigrations.runMigrations(preferences);
+
+        PostgreServer postgreServer = new PostgreServer();
+        Injector.setModelOrService(PostgreServer.class, postgreServer);
 
         JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
         JabRefGUI.launch(JabRefGUI.class, args);

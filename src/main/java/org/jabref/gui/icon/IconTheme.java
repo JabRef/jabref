@@ -169,6 +169,7 @@ public class IconTheme {
         ADD_NOBOX(MaterialDesignP.PLUS),
         ADD_ARTICLE(MaterialDesignP.PLUS),
         ADD_ENTRY(MaterialDesignP.PLAYLIST_PLUS),
+        CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         EDIT_ENTRY(MaterialDesignT.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignT.TOOLTIP_TEXT),
         FOLDER(MaterialDesignF.FOLDER_OUTLINE),

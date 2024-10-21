@@ -146,7 +146,7 @@ class SynchronizationSimulatorTest {
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
         assertNotNull(eventListenerB.getSharedEntriesNotPresentEvent());
-        assertEquals(List.of(bibEntryOfClientB), eventListenerB.getSharedEntriesNotPresentEvent().getBibEntries());
+        assertEquals(List.of(bibEntryOfClientB), eventListenerB.getSharedEntriesNotPresentEvent().bibEntries());
     }
 
     @Test

@@ -121,6 +121,18 @@
                             <Label text="%Search expression"/>
                             <TextField fx:id="searchGroupSearchTerm"/>
                         </VBox>
+                        <HBox spacing="10.0">
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive">
+                                <tooltip>
+                                    <Tooltip text="%This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator."/>
+                                </tooltip>
+                            </CheckBox>
+                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression">
+                                <tooltip>
+                                    <Tooltip text="%This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator."/>
+                                </tooltip>
+                            </CheckBox>
+                        </HBox>
                     </VBox>
                     <VBox visible="${autoRadioButton.selected}" spacing="10.0">
                         <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"

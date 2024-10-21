@@ -370,6 +370,9 @@ dependencies {
     // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
 
+    implementation 'io.zonky.test:embedded-postgres:2.0.7'
+    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.0.0')
+
     testImplementation 'io.github.classgraph:classgraph:4.8.177'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
@@ -793,9 +796,13 @@ jlink {
         requires 'org.apache.commons.lang3'
         requires 'org.apache.commons.logging'
         requires 'org.apache.commons.text'
+        requires 'org.apache.commons.codec'
+        requires 'org.apache.commons.io'
+        requires 'org.apache.commons.compress'
         requires 'org.freedesktop.dbus'
         requires 'org.jsoup'
         requires 'org.slf4j'
+        requires 'org.tukaani.xz';
         uses 'ai.djl.engine.EngineProvider'
         uses 'ai.djl.repository.RepositoryFactory'
         uses 'ai.djl.repository.zoo.ZooProvider'
@@ -807,6 +814,7 @@ jlink {
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
+        uses 'org.postgresql.shaded.com.ongres.stringprep.Profile'
 
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'

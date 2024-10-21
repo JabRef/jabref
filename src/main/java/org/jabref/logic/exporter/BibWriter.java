@@ -16,6 +16,7 @@ public class BibWriter {
     private boolean precedingNewLineRequired = false;
     private boolean somethingWasWritten = false;
     private boolean lastWriteWasNewline = false;
+    private int currentPosition = 0;
 
     /**
      * @param newLineSeparator the string used for a line break
@@ -35,6 +36,7 @@ public class BibWriter {
         }
         string = StringUtil.unifyLineBreaks(string, newLineSeparator);
         writer.write(string);
+        currentPosition += string.length();
         lastWriteWasNewline = string.endsWith(newLineSeparator);
         somethingWasWritten = true;
     }
@@ -68,5 +70,9 @@ public class BibWriter {
         }
         this.somethingWasWritten = false;
         this.precedingNewLineRequired = true;
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 }
