@@ -4,63 +4,82 @@
  * These search expressions are used for searching the bibtex library. They are heavily used for search groups.
  */
 grammar Search;
+options { caseInsensitive = true; }
 
-WS: [ \t] -> skip; // whitespace is ignored/skipped
+WS: [ \t\n\r]+ -> skip; // whitespace is ignored/skipped
 
-LPAREN:'(';
-RPAREN:')';
+LPAREN: '(';
+RPAREN: ')';
 
-EQUAL:'='; // case insensitive contains, semantically the same as CONTAINS
-CEQUAL:'=!'; // case sensitive contains
+EQUAL: '='; // case insensitive contains, semantically the same as CONTAINS
+CEQUAL: '=!'; // case sensitive contains
 
-EEQUAL:'=='; // exact match case insensitive, semantically the same as MATCHES
-CEEQUAL:'==!'; // exact match case sensitive
+EEQUAL: '=='; // exact match case insensitive, semantically the same as MATCHES
+CEEQUAL: '==!'; // exact match case sensitive
 
-REQUAL:'=~'; // regex check case insensitive
-CREEQUAL:'=~!'; // regex check case sensitive
+REQUAL: '=~'; // regex check case insensitive
+CREEQUAL: '=~!'; // regex check case sensitive
 
-NEQUAL:'!='; //  negated case insensitive contains
-NCEQUAL:'!=!'; // negated case sensitive contains
+NEQUAL: '!='; //  negated case insensitive contains
+NCEQUAL: '!=!'; // negated case sensitive contains
 
-NEEQUAL:'!=='; // negated case insensitive exact match
-NCEEQUAL:'!==!'; // negated case sensitive exact match
+NEEQUAL: '!=='; // negated case insensitive exact match
+NCEEQUAL: '!==!'; // negated case sensitive exact match
 
-NREQUAL:'!=~'; // negated regex check case insensitive
-NCREEQUAL:'!=~!'; // negated regex check case sensitive
+NREQUAL: '!=~'; // negated regex check case insensitive
+NCREEQUAL: '!=~!'; // negated regex check case sensitive
 
-AND:[aA][nN][dD]; // 'and' case insensitive
-OR:[oO][rR]; // 'or' case insensitive
-CONTAINS:[cC][oO][nN][tT][aA][iI][nN][sS]; // 'contains' case insensitive
-MATCHES:[mM][aA][tT][cC][hH][eE][sS]; // 'matches' case insensitive
-NOT:[nN][oO][tT]; // 'not' case insensitive
+AND: 'AND';
+OR: 'OR';
+CONTAINS: 'CONTAINS';
+MATCHES: 'MATCHES';
+NOT: 'NOT';
 
-STRING:QUOTE (~'"')* QUOTE;
-QUOTE:'"';
+FIELD: [A-Z]+;
+TERM: ('\\' [=!~()"] | ~[ \t\n\r=!~()"])+;     // =!~()" should be escaped with a backslash
+STRING_LITERAL: '"' ( '\\"' | ~["] )* '"';
 
-FIELDTYPE:LETTER+;
-// fragments are not accessible from the code, they are only for describing the grammar better
-fragment LETTER : ~[ \t"()=!];
-
-
-start:
-    expression EOF;
-
-// labels are used to refer to parts of the rules in the generated code later on
-// label=actualThingy
-expression:
-    LPAREN expression RPAREN                         #parenExpression  // example: (author=miller)
-    | NOT expression                                 #unaryExpression  // example: not author = miller
-    | left=expression operator=AND right=expression  #binaryExpression // example: author = miller and title = test
-    | left=expression operator=OR right=expression   #binaryExpression // example: author = miller or title = test
-    | comparison                                     #atomExpression
+start
+    : EOF
+    | orExpression EOF
     ;
 
-comparison:
-    left=name operator=(CONTAINS | EQUAL | CEQUAL | MATCHES | EEQUAL | CEEQUAL | REQUAL | CREEQUAL | NEQUAL | NCEQUAL | NEEQUAL | NCEEQUAL | NREQUAL | NCREEQUAL) right=name // example: author != miller
-    | right=name                                                                 // example: miller (search all fields)
+orExpression
+    : expression+                                         #implicitOrExpression   // example: author = miller OR year = 2010
     ;
 
-name:
-    STRING // example: "miller"
-    | FIELDTYPE // example: author
+expression
+    : LPAREN orExpression RPAREN                          #parenExpression        // example: (author = miller)
+    | NOT expression                                      #negatedExpression      // example: NOT author = miller
+    | left = expression bin_op = AND right = expression   #binaryExpression       // example: author = miller AND year = 2010
+    | left = expression bin_op = OR right = expression    #binaryExpression       // example: author = miller OR year = 2010
+    | comparison                                          #comparisonExpression   // example: miller OR author = miller
+    ;
+
+comparison
+    : FIELD operator searchValue    // example: author = miller
+    | searchValue                   // example: miller
+    ;
+
+operator
+    : EQUAL
+    | CEQUAL
+    | EEQUAL
+    | CEEQUAL
+    | REQUAL
+    | CREEQUAL
+    | NEQUAL
+    | NCEQUAL
+    | NEEQUAL
+    | NCEEQUAL
+    | NREQUAL
+    | NCREEQUAL
+    | CONTAINS
+    | MATCHES
+    ;
+
+searchValue
+    : STRING_LITERAL
+    | FIELD
+    | TERM
     ;
