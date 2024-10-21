@@ -460,6 +460,8 @@ public class EntryEditor extends BorderPane {
                         && fieldsEditorTab.getShownFields().contains(field)) {
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
+                    // This line explicitly brings focus back to the main window containing the Entry Editor.
+                    getScene().getWindow().requestFocus();
                 }
             }
         });
