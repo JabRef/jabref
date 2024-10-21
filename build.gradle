@@ -304,7 +304,7 @@ dependencies {
     // Implementation of the API
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.9'
     // injection framework
-    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.8'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.9'
     implementation 'org.glassfish.hk2:hk2-api:3.1.1'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
