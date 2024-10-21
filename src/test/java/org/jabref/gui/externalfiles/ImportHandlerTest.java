@@ -1,19 +1,28 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +30,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +44,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,21 +70,49 @@ class ImportHandlerTest {
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        when(preferences.getImporterPreferences().isGenerateNewKeyOnImport()).thenReturn(true);
+
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+
+        OwnerPreferences ownerPreferences = mock(OwnerPreferences.class);
+        when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+        when(preferences.getOwnerPreferences().isUseOwner()).thenReturn(true);
+
+        TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
+        when(preferences.getTimestampPreferences()).thenReturn(timestampPreferences);
+
+        MergeDialogPreferences mergeDialogPreferences = mock(MergeDialogPreferences.class);
+        when(preferences.getMergeDialogPreferences()).thenReturn(mergeDialogPreferences);
+
+        AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
+        GroupTreeNode groupTreeNode = new GroupTreeNode(allEntriesGroup);
+        StateManager stateManager = mock(StateManager.class);
+        ObservableList<GroupTreeNode> selectedGroups = FXCollections.observableArrayList(groupTreeNode);
+        when(stateManager.getSelectedGroups(any(BibDatabaseContext.class))).thenReturn(selectedGroups);
 
         bibDatabaseContext = mock(BibDatabaseContext.class);
         BibDatabase bibDatabase = new BibDatabase();
         when(bibDatabaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
+        when(bibDatabaseContext.getMetaData()).thenReturn(mock(MetaData.class));
+
+        GlobalCitationKeyPatterns keyPatterns = new GlobalCitationKeyPatterns(new CitationKeyPattern("[author][year]"));
+        when(bibDatabaseContext.getMetaData().getCiteKeyPatterns(any())).thenReturn(keyPatterns);
+
+        CitationKeyPatternPreferences keyPatternPreferences = mock(CitationKeyPatternPreferences.class);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(keyPatternPreferences);
+        when(keyPatternPreferences.getUnwantedCharacters()).thenReturn("-`ʹ:!;?^");
         importHandler = new ImportHandler(
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
-                mock(StateManager.class),
+                stateManager,
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()
                 );
@@ -222,5 +263,48 @@ class ImportHandlerTest {
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+    }
+
+    @Test
+    void importCrossRefParentFirstTest() {
+        BibEntry parentEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("parent")
+                .withField(StandardField.AUTHOR, "Parent")
+                .withField(StandardField.OWNER, "default owner")
+                .withField(StandardField.YEAR, "2024");
+
+        BibEntry childEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("child")
+                .withField(StandardField.AUTHOR, "Child")
+                .withField(StandardField.CROSSREF, "parent")
+                .withField(StandardField.OWNER, "default owner");
+
+        importHandler.importCleanedEntries(List.of(childEntry));
+        bibDatabaseContext.getDatabase().insertEntry(parentEntry); // not otherwise done by mock, required for child to get year
+        importHandler.importCleanedEntries(List.of(parentEntry));
+
+        assertNotEquals(bibDatabaseContext.getDatabase().getEntryByCitationKey("Parent2024"), Optional.empty());
+        assertNotEquals(bibDatabaseContext.getDatabase().getEntryByCitationKey("Child2024"), Optional.empty());
+    }
+
+    @Test
+    void importCrossRefChildFirstTest() {
+        BibEntry parentEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("parent")
+                .withField(StandardField.AUTHOR, "Parent")
+                .withField(StandardField.OWNER, "default owner")
+                .withField(StandardField.YEAR, "2024");
+
+        BibEntry childEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("child")
+                .withField(StandardField.AUTHOR, "Child")
+                .withField(StandardField.CROSSREF, "parent")
+                .withField(StandardField.OWNER, "default owner");
+
+        importHandler.importCleanedEntries(List.of(childEntry));
+        importHandler.importCleanedEntries(List.of(parentEntry));
+
+        assertNotEquals(bibDatabaseContext.getDatabase().getEntryByCitationKey("Child2024"), Optional.empty());
+        assertNotEquals(bibDatabaseContext.getDatabase().getEntryByCitationKey("Parent2024"), Optional.empty());
     }
 }
