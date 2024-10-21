@@ -52,6 +52,7 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
+import org.jabref.gui.mergeentries.MultiEntryMergeWithFetchedDataAction;
 import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
@@ -273,7 +274,20 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(
+                        StandardActions.MASS_GET_BIBLIOGRAPHIC_DATA,
+                        new MultiEntryMergeWithFetchedDataAction(
+                                frame::getCurrentLibraryTab,
+                                preferences,
+                                dialogService,
+                                stateManager,
+                                taskExecutor
+                        )
+                )
         );
 
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
