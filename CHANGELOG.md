@@ -51,7 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
 - JabRef does not show finished background tasks in the status bar popup. [#11821](https://github.com/JabRef/jabref/pull/11821)
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
-- When dropping a file into the main table, after copy or move, the file is now renamed according to the configured patterns. [#12001](https://github.com/JabRef/jabref/pull/12001)
+- When dropping a file into the main table, after copy or move, the file is now put in the [configured directory and renamed according to the configured patterns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#filename-format-and-file-directory-pattern). [#12001](https://github.com/JabRef/jabref/pull/12001)
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
 - The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
