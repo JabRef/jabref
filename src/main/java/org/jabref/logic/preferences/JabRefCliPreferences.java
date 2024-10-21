@@ -665,10 +665,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @return Instance of JaRefPreferences
-     * @deprecated Use {@link CliPreferences} instead
+     * Never ever add a call to this method. There should be only one caller.
+     * All other usages should get the preferences passed (or injected).
      */
-    @Deprecated
     public static JabRefCliPreferences getInstance() {
         if (JabRefCliPreferences.singleton == null) {
             JabRefCliPreferences.singleton = new JabRefCliPreferences();
