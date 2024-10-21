@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -180,5 +181,41 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         public Optional<KeyBinding> getKeyBinding() {
             return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
         }
+    }
+
+    /**
+     * This function is to jump to a specific line due to different editor.
+     *
+     */
+    protected void jumpToLine(Path fileName, int line, int column) {
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+
+        // Check if a path to the command has been specified
+        if (StringUtil.isNullOrEmpty(commandPath)) {
+            notDefined = true;
+            return;
+        }
+
+        // Execute the command
+        String[] command = jumpString(fileName, line, column);
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.start();
+        } catch (IOException e) {
+            // Use robust logging instead of printStackTrace()
+            LOGGER.error("Could not open TeXstudio at the specified location.", e);
+
+            // Show an error dialog to the user
+            dialogService.showErrorDialogAndWait("Error", "Could not open TeXstudio at the specified location.");
+        }
+    }
+
+    protected String[] jumpString(Path fileName, int line, int column) {
+        return new String[0];
+    }
+
+    public void publicJumpToLine(Path fileName, int line, int column) {
+        jumpToLine(fileName, line, column);
     }
 }
