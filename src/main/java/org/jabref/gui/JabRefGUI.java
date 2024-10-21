@@ -208,6 +208,7 @@ public class JabRefGUI extends Application {
 
         mainStage.setMinWidth(580);
         mainStage.setMinHeight(330);
+        mainStage.setFullScreen(false);
 
         // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
         boolean windowMaximised = coreGuiPreferences.isWindowMaximised();
