@@ -48,6 +48,7 @@ import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.externalfiles.LinkedFileAutoRenamer;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
@@ -138,6 +139,8 @@ public class LibraryTab extends Tab {
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
 
+    private LinkedFileAutoRenamer linkedFileAutoRenamer;
+
     // Indicates whether the tab is loading data using a dataloading task
     // The constructors take care to the right true/false assignment during start.
     private final SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
@@ -224,6 +227,10 @@ public class LibraryTab extends Tab {
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
+
+        linkedFileAutoRenamer = new LinkedFileAutoRenamer(bibDatabaseContext, preferences);
+
+//        System.out.println("Namaste Mummy and Papa!!");
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, stateManager, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
@@ -818,6 +825,10 @@ public class LibraryTab extends Tab {
         }
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+
+        if (linkedFileAutoRenamer != null) {
+            linkedFileAutoRenamer.unregisterListener();
+        }
     }
 
     /**

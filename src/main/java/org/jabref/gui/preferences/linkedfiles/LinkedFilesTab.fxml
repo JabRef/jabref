@@ -77,6 +77,8 @@
                    prefWidth="300" minWidth="300" maxWidth="300"/>
     </GridPane>
 
+    <CheckBox fx:id="autoRenameLinkedFiles" text="%Auto rename files if entry changes" />
+
     <Label styleClass="sectionHeader" text="%Attached files"/>
     <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
     <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
