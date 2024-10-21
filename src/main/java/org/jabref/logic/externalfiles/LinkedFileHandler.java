@@ -111,7 +111,7 @@ public class LinkedFileHandler {
     /**
      * If exists: the path already exists and has the same content as the given sourcePath
      *
-     * @param renamed: The original/suggested filename was adapted to fit it
+     * @param renamed The original/suggested filename was adapted to fit it
      */
     private record GetTargetPathResult(boolean exists, boolean renamed, Path path) {
     }
