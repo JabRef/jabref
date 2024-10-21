@@ -7,14 +7,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
-
 /**
  * Represents an RFC identifier, which can be used to fetch bibliographic information about the RFC document.
  * This class supports both plain RFC IDs (e.g., "rfc7276") and full URLs (e.g., "https://www.rfc-editor.org/rfc/" + rfc****.html).
  */
-public class RfcId implements Identifier {
+public class RfcId extends EprintIdentifier {
     private static final String RFC_URL_REGEX = "(https?://)?(www\\.)?rfc-editor\\.org/rfc/rfc(?<id>\\d+)(\\.html)?.*";
     private static final Pattern RFC_URL_MATCH = Pattern.compile(RFC_URL_REGEX, Pattern.CASE_INSENSITIVE);
     private final String rfcString;
@@ -57,16 +54,6 @@ public class RfcId implements Identifier {
     @Override
     public String getNormalized() {
         return rfcString;
-    }
-
-    /**
-     * Gets the default field for this identifier, which is RFC.
-     *
-     * @return The StandardField representing RFC.
-     */
-    @Override
-    public Field getDefaultField() {
-        return StandardField.RFC;
     }
 
     /**

@@ -108,7 +108,6 @@ public enum StandardField implements Field {
     REPORTNO("reportno"),
     REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     REVISION("revision"),
-    RFC("rfc", "RFC", FieldProperty.IDENTIFIER),
     SCHOOL("school"),
     SERIES("series"),
     SHORTAUTHOR("shortauthor", FieldProperty.PERSON_NAMES),
