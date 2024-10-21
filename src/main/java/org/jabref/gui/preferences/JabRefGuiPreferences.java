@@ -394,7 +394,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
     }
 
-    @Deprecated
+    /**
+     * Never ever add a call to this method. There should be only one caller.
+     * All other usages should get the preferences passed (or injected).
+     */
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
             JabRefGuiPreferences.singleton = new JabRefGuiPreferences();
