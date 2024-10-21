@@ -13,11 +13,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -50,13 +50,13 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
-    private final CliPreferences cliPreferences;
+    private final GuiPreferences guiPreferences;
 
-    public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
+    public LinkedFilesTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.filePreferences = preferences.getFilePreferences();
         this.autoLinkPreferences = preferences.getAutoLinkPreferences();
-        this.cliPreferences = preferences;
+        this.guiPreferences = preferences;
 
         autoRenameLinkedFiles.set(preferences.shouldAutoRenameLinkedFiles());
 
@@ -92,7 +92,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
 
-        autoRenameLinkedFiles.set(cliPreferences.shouldAutoRenameLinkedFiles());
+        autoRenameLinkedFiles.set(guiPreferences.shouldAutoRenameLinkedFiles());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -113,7 +113,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
-        cliPreferences.setAutoRenameLinkedFiles(autoRenameLinkedFiles.get());
+        guiPreferences.setAutoRenameLinkedFiles(autoRenameLinkedFiles.get());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
