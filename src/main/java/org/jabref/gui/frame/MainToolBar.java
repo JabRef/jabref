@@ -1,18 +1,21 @@
 package org.jabref.gui.frame;
 
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
+
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -44,6 +47,11 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
@@ -114,14 +122,7 @@ public class MainToolBar extends ToolBar {
 
                 rightSpacer,
 
-
-                new HBox() {{
-                    setAlignment(Pos.CENTER); // center style
-                    getChildren().addAll(
-                            createNewEntryMenuButton(factory),
-                            factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))
-                    );
-                }},
+                createNewEntryHBox(factory),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -191,7 +192,8 @@ public class MainToolBar extends ToolBar {
     MenuItem createNewEntryFromIdMenuItem(ActionFactory factory, MenuButton menuButton) {
         MenuItem newEntryFromIdItem = new MenuItem();
         newEntryFromIdItem.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdItem.setText(Localization.lang("Import by ID")); // 设置菜单项文本
+        // 设置菜单项文本
+        newEntryFromIdItem.setText(Localization.lang("Import by ID"));
         newEntryFromIdItem.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
 
         newEntryFromIdItem.setOnAction(event -> {
@@ -202,18 +204,29 @@ public class MainToolBar extends ToolBar {
                 entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
                 entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(menuButton); // 使用 MenuButton 作为锚点
+                // 使用 MenuButton 作为锚点
+                entryFromIdPopOver.show(menuButton);
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             } else if (entryFromIdPopOver.isShowing()) {
                 entryFromIdPopOver.hide();
             } else {
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(menuButton); // 使用 MenuButton 作为锚点
+                entryFromIdPopOver.show(menuButton);
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             }
         });
 
         return newEntryFromIdItem;
+    }
+
+    HBox createNewEntryHBox(ActionFactory factory) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(
+                createNewEntryMenuButton(factory),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))
+        );
+        return hBox;
     }
 
     Group createTaskIndicator() {
@@ -273,19 +286,16 @@ public class MainToolBar extends ToolBar {
 
     private MenuButton createNewEntryMenuButton(ActionFactory factory) {
         MenuButton menuButton = new MenuButton();
-        menuButton.setGraphic(IconTheme.JabRefIcons.NEW_GROUP.getGraphicNode()); // 设置菜单按钮的图标
+        // create button of menue
+        menuButton.setGraphic(IconTheme.JabRefIcons.NEW_GROUP.getGraphicNode());
 
-        // create the menu
+        // create menu
         MenuItem newArticleItem = factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager));
         MenuItem newEntryItem = factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager));
-        MenuItem newEntryFromIdItem = createNewEntryFromIdMenuItem(factory, menuButton); // 传递 menuButton
+        MenuItem newEntryFromIdItem = createNewEntryFromIdMenuItem(factory, menuButton);
         MenuItem newEntryFromPlainTextItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager));
-
-        //add the button
         menuButton.getItems().addAll(newArticleItem, newEntryItem, newEntryFromIdItem, newEntryFromPlainTextItem);
-
 
         return menuButton;
     }
-
 }
