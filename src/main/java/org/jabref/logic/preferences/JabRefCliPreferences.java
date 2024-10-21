@@ -220,7 +220,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
-    public static final String GROBID_OPT_OUT = "grobidOptOut";
+    public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -451,7 +451,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // region: Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
-        defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
+        defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
 
@@ -2174,11 +2174,11 @@ public class JabRefCliPreferences implements CliPreferences {
 
         grobidPreferences = new GrobidPreferences(
                 getBoolean(GROBID_ENABLED),
-                getBoolean(GROBID_OPT_OUT),
+                getBoolean(GROBID_PREFERENCE),
                 get(GROBID_URL));
 
         EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(grobidPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(grobidPreferences.grobidPreferenceProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
         EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;
