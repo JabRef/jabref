@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -28,7 +29,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -44,6 +44,7 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
+@AllowedToUseAwt("Requires AWT to get a title from position")
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
@@ -507,7 +508,7 @@ public class PdfContentImporter extends PdfImporter {
         }
         if (title != null) {
 //            title = guessBetterTitleInMetaData(buildMetaData(author, editor, abstractT, keywords, title, conference, doi, series, volume, number, pages, year, publisher));
-            entry.setField(StandardField.TITLE, (StringUtils.isBlank(titleByPosition)) ? title : titleByPosition);
+            entry.setField(StandardField.TITLE, (titleByPosition == null || titleByPosition.isEmpty()) ? title : titleByPosition);
         }
         if (conference != null) {
             entry.setField(StandardField.BOOKTITLE, conference);
