@@ -52,7 +52,7 @@ public class LinkedFileHandler {
     /**
      * @return true if the file was copied/moved or the same file exists in the target directory
      */
-    private boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
+    public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);
         if (databaseFileDirectoryOpt.isEmpty()) {
             LOGGER.warn("No existing file directory found");

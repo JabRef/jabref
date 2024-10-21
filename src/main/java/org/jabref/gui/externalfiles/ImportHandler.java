@@ -22,6 +22,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -73,7 +74,7 @@ public class ImportHandler {
     private final BibDatabaseContext bibDatabaseContext;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final ExternalFilesEntryLinker linker;
+    private final ExternalFilesEntryLinker fileLinker;
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -98,13 +99,13 @@ public class ImportHandler {
         this.taskExecutor = taskExecutor;
         this.luceneManager = luceneManager;
 
-        this.linker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
-    public ExternalFilesEntryLinker getLinker() {
-        return linker;
+    public ExternalFilesEntryLinker getFileLinker() {
+        return fileLinker;
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
@@ -147,21 +148,9 @@ public class ImportHandler {
                                         LOGGER.warn("Entry's files: {}", entry.getFiles());
                                     }
                                     entry.clearField(StandardField.FILE);
-                                    switch (transferMode) {
-                                        case LINK -> {
-                                            LOGGER.debug("Mode LINK");
-                                            // FIXME:luceneManager.updateAfterDropFiles(entry) not called. Should be fixed after merge of Postgres PR.
-                                            linker.addFilesToEntry(entry, List.of(file));
-                                        }
-                                        case MOVE -> {
-                                            LOGGER.debug("Mode MOVE");
-                                            linker.moveFilesToFileDirRenameAndAddToEntry(entry, List.of(file), luceneManager);
-                                        }
-                                        case COPY -> {
-                                            LOGGER.debug("Mode COPY");
-                                            linker.copyFilesToFileDirAndAddToEntry(entry, List.of(file), luceneManager);
-                                        }
-                                    }
+                                    // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+                                    // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
+                                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 });
@@ -214,7 +203,7 @@ public class ImportHandler {
     private BibEntry createEmptyEntryWithLink(Path file) {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, file.getFileName().toString());
-        linker.addFilesToEntry(entry, Collections.singletonList(file));
+        fileLinker.linkFilesToEntry(entry, Collections.singletonList(file));
         return entry;
     }
 

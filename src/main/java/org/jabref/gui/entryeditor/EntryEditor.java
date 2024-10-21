@@ -47,6 +47,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
@@ -134,7 +135,7 @@ public class EntryEditor extends BorderPane {
                   .load();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), databaseContext, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), databaseContext);
 
         setupKeyBindings();
 
@@ -171,21 +172,11 @@ public class EntryEditor extends BorderPane {
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                switch (event.getTransferMode()) {
-                    case COPY -> {
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case MOVE -> {
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case LINK -> {
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, draggedFiles);
-                    }
-                }
+                TransferMode transferMode = event.getTransferMode();
+                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+                // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
+                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                 success = true;
             }
 
