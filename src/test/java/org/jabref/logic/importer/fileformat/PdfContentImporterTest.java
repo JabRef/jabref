@@ -66,7 +66,7 @@ class PdfContentImporterTest {
                 Corpus linguistics investigates human language by starting out from large
                 """;
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
     }
 
     @Test
@@ -89,7 +89,7 @@ class PdfContentImporterTest {
                 UNSPECIFIED
                 Master of Research (MRes) thesis, University of Kent,.""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
     }
 
     @Test
@@ -122,13 +122,14 @@ class PdfContentImporterTest {
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", ""));
     }
 
     @Test
     void se2Pdf() throws Exception {
         Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/se2paper.pdf")).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Optional.of("On How and We Can and Teach  and Exploring New and Ways in  and Professional Software and Development for Students"), result.getFirst().getTitle());
+        assertEquals(Optional.of("On How We Can Teach – Exploring New Ways in\n" +
+                "Professional Software Development for Students"), result.getFirst().getTitle());
     }
 }
