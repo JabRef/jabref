@@ -1,17 +1,19 @@
 package org.jabref.migrations;
 
+import java.io.IOException;
+
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 
 public class SearchToLuceneMigration {
-    public static String migrateToLuceneSyntax(String searchExpression, boolean isRegularExpression) {
+    public static String migrateToLuceneSyntax(String searchExpression, boolean isRegularExpression) throws IOException {
         SearchParser.StartContext context = getStartContext(searchExpression);
         SearchToLuceneVisitor searchToLuceneVisitor = new SearchToLuceneVisitor(isRegularExpression);
         QueryNode luceneQueryNode = searchToLuceneVisitor.visit(context);
@@ -19,7 +21,12 @@ public class SearchToLuceneMigration {
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
-        SearchLexer lexer = new SearchLexer(new ANTLRInputStream(searchExpression));
+        SearchLexer lexer;
+        try {
+            lexer = new SearchLexer(CharStreams.fromFileName(searchExpression));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         lexer.removeErrorListeners(); // no infos on file system
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
