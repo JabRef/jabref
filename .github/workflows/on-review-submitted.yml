@@ -8,6 +8,8 @@ on:
 jobs:
   add-label-changes-required:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - run: echo ${{ github.event.review.state }}
       - if: ${{ github.event.review.state == 'changes_requested' }}
