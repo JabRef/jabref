@@ -75,7 +75,7 @@ public class LinkedFileHandler {
         if (shouldRenameToFilenamePattern) {
             getTargetPathResult = getTargetPath(sourcePath, targetDirectory, true);
             if (getTargetPathResult.exists) {
-                if (shouldMove) {
+                if (shouldMove && !Files.isSameFile(sourcePath, getTargetPathResult.path)) {
                     Files.delete(sourcePath);
                 }
                 linkedFile.setLink(FileUtil.relativize(getTargetPathResult.path(), databaseContext, filePreferences).toString());
@@ -88,7 +88,7 @@ public class LinkedFileHandler {
             //             JabRef should keep the original file name
             getTargetPathResult = getTargetPath(sourcePath, targetDirectory, false);
             if (getTargetPathResult.exists) {
-                if (shouldMove) {
+                if (shouldMove && !Files.isSameFile(sourcePath, getTargetPathResult.path)) {
                     Files.delete(sourcePath);
                 }
                 linkedFile.setLink(FileUtil.relativize(getTargetPathResult.path(), databaseContext, filePreferences).toString());
