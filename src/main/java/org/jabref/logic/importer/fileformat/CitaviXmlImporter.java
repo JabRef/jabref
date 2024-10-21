@@ -462,10 +462,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
         // Solution inspired by https://stackoverflow.com/a/37445972/873282
         return new BufferedReader(
                 new InputStreamReader(
-                        new BOMInputStream(
-                                Files.newInputStream(newFile, StandardOpenOption.READ),
-                                false,
-                                ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)));
+                        new BOMInputStream.Builder()
+                            .setInputStream(Files.newInputStream(newFile, StandardOpenOption.READ))
+                            .setInclude(false)
+                            .setByteOrderMarks(ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)
+                            .get()));
     }
 
     private String clean(String input) {
