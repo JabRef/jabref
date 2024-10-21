@@ -41,14 +41,6 @@ public class LinkedFileHandler {
         return copyOrMoveToDefaultDirectory(true, false);
     }
 
-    public boolean moveToDefaultDirectoryAndRenameFile() throws IOException {
-        return copyOrMoveToDefaultDirectory(true, true);
-    }
-
-    public boolean copyToDefaultDirectoryAndRenameFile() throws IOException {
-        return copyOrMoveToDefaultDirectory(false, true);
-    }
-
     /**
      * @return true if the file was copied/moved or the same file exists in the target directory
      */
