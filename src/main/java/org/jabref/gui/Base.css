@@ -1732,5 +1732,25 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
 }
 
+/* Welcome Page Styles */
+.welcome-label {
+    -fx-font-size: 40px;
+    -fx-text-fill: -jr-theme-text;
+    -fx-font-family: "Arial";
+}
+
+.welcome-text {
+    -fx-font-size: 22px;
+    -fx-text-fill: -jr-gray-3;
+}
+
+.welcome-hyperlink {
+    -fx-font-size: 22px;
+    -fx-text-fill: -jr-theme;
+}
+
+.welcome-hyperlink:visited {
+    -fx-text-fill: -jr-theme;
+}
 
 /* endregion */
