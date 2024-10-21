@@ -1,6 +1,5 @@
 package org.jabref.logic.quality.consistency;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,9 +10,7 @@ import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 
@@ -32,9 +29,9 @@ public class BibliographyConsistencyCheck {
      * Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
      * <p>
      * This class <em>does not</em> check whether all required fields are present or if the fields are valid for the entry type.
-     * That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindingsAsCsv(Result, Path, BibEntryTypesManager, BibDatabaseMode)}
+     * That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
      *
-     * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine grained.
+     * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
     public Result check(List<BibEntry> entries) {
         // collects fields existing in any entry, scoped by entry type

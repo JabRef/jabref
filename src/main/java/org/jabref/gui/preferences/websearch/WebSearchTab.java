@@ -1,9 +1,11 @@
 package org.jabref.gui.preferences.websearch;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -16,7 +18,9 @@ import javafx.scene.input.MouseButton;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.slr.StudyCatalogItem;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
 
@@ -30,6 +34,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
+    @FXML private ComboBox<PlainCitationParserChoice> defaultPlainCitationParser;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -49,7 +54,11 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
 
-    public WebSearchTab() {
+    private final ReadOnlyBooleanProperty refAiEnabled;
+
+    public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {
+        this.refAiEnabled = refAiEnabled;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -61,13 +70,19 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     public void initialize() {
-        this.viewModel = new WebSearchTabViewModel(preferences, dialogService);
+        this.viewModel = new WebSearchTabViewModel(preferences, dialogService, refAiEnabled);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
         keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
+
+        new ViewModelListCellFactory<PlainCitationParserChoice>()
+                .withText(PlainCitationParserChoice::getLocalizedName)
+                .install(defaultPlainCitationParser);
+        defaultPlainCitationParser.itemsProperty().bind(viewModel.plainCitationParsers());
+        defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());
 
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());

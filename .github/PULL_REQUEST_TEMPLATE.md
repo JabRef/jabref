@@ -1,10 +1,5 @@
-<!-- 
-Describe the changes you have made here: what, why, ... 
-Link the issue that will be closed, e.g., "Closes #333".
-If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47".
-"Closes" is a keyword GitHub uses to link PRs with issues; do not change it.
-Don't reference an issue in the PR title because GitHub does not support auto-linking there.
--->
+Describe the changes you have made here: what, why, ...
+Link the issue that will be closed, e.g., "Closes #333". If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47".
 
 ### Mandatory checks
 
@@ -13,6 +8,7 @@ Don't reference an issue in the PR title because GitHub does not support auto-li
 - [x] done; [ ] not done / not applicable
 -->
 
+- [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)

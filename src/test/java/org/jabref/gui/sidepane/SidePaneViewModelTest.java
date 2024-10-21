@@ -13,11 +13,11 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -38,11 +38,11 @@ class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     GuiPreferences preferences = mock(GuiPreferences.class);
-    ChatHistoryService chatHistoryService = mock(ChatHistoryService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
     DialogService dialogService = mock(DialogService.class);
+    AiService aiService = mock(AiService.class);
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
@@ -67,11 +67,11 @@ class SidePaneViewModelTest {
         sidePaneViewModel = new SidePaneViewModel(
                 tabContainer,
                 preferences,
-                chatHistoryService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
                 dialogService,
+                aiService,
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,

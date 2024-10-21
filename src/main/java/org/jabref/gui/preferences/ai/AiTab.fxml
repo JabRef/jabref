@@ -42,6 +42,21 @@
                 HBox.hgrow="ALWAYS"
                 maxWidth="Infinity"/>
 
+        <CheckBox fx:id="autoGenerateEmbeddings"
+                  mnemonicParsing="false"
+                  text="%Automatically generate embeddings for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <CheckBox fx:id="autoGenerateSummaries"
+                  mnemonicParsing="false"
+                  text="%Automatically generate summaries for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <Label styleClass="sectionHeader"
+               text="%Connection"/>
+
         <HBox alignment="CENTER_LEFT"
               spacing="10.0">
             <children>

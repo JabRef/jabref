@@ -14,7 +14,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -25,6 +24,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
@@ -61,7 +61,6 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
-    private static ChatHistoryService chatHistoryService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -102,7 +101,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor,
                 preferences,
                 aiService,
-                chatHistoryService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -137,6 +135,9 @@ public class JabRefGUI extends Application {
     public void initialize() {
         WebViewStore.init();
 
+        DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+        Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
+
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
 
@@ -168,14 +169,10 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
-
-        JabRefGUI.chatHistoryService = new ChatHistoryService(
-                preferences.getCitationKeyPatternPreferences(),
-                dialogService);
-        Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);
     }
 
     private void setupProxy() {
@@ -375,8 +372,6 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
-        LOGGER.trace("Closing chat history service");
-        chatHistoryService.close();
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
         LOGGER.trace("Stopping background tasks");
