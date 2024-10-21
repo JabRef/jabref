@@ -75,7 +75,7 @@ public class ExternalFilesEntryLinker {
             LinkedFile linkedFile = new LinkedFile("", file, typeName);
             LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContext, filePreferences);
             try {
-                linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, false);
+                linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
             } catch (IOException exception) {
                 LOGGER.error("Error while copying/moving file {}", file, exception);
             }
