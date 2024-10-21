@@ -17,6 +17,9 @@ import org.jabref.model.util.OptionalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Moves the file into the default file directory. Does <em>not</em> rename the file.
+ */
 public class MoveFilesCleanup implements CleanupJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
