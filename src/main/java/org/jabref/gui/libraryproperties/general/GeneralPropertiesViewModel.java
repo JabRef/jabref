@@ -59,7 +59,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
         selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
-        generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
+        generalFileDirectoryProperty.setValue(metaData.getLibraryFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
     }
@@ -73,9 +73,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         String generalFileDirectory = generalFileDirectoryProperty.getValue().trim();
         if (generalFileDirectory.isEmpty()) {
-            newMetaData.clearDefaultFileDirectory();
+            newMetaData.clearLibraryFileDirectory();
         } else {
-            newMetaData.setDefaultFileDirectory(generalFileDirectory);
+            newMetaData.setLibraryFileDirectory(generalFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
