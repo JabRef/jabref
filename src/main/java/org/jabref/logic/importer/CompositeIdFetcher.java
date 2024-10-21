@@ -12,7 +12,7 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.SSRN;
-import org.jabref.model.entry.identifier.RfcId;
+import org.jabref.model.entry.identifier.RFC;
 
 public class CompositeIdFetcher {
 
@@ -51,7 +51,7 @@ public class CompositeIdFetcher {
             return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().getNormalized());
         }
 
-        Optional<RfcId> rfcId = RfcId.parse(identifier);
+        Optional<RFC> rfcId = RFC.parse(identifier);
         if (rfcId.isPresent()) {
             return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().getNormalized());
         }
@@ -68,7 +68,7 @@ public class CompositeIdFetcher {
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         Optional<ISBN> isbn = ISBN.parse(identifier);
         Optional<SSRN> ssrn = SSRN.parse(identifier);
-        Optional<RfcId> rfcId = RfcId.parse(identifier);
+        Optional<RFC> rfcId = RFC.parse(identifier);
 
         return Stream.of(doi, arXivIdentifier, isbn, ssrn, rfcId).anyMatch(Optional::isPresent);
     }
