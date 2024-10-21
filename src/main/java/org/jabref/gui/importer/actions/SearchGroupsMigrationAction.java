@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.actions;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -67,8 +66,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
             try {
                 String luceneSearchExpression = SearchToLuceneMigration.migrateToLuceneSyntax(searchGroup.getSearchExpression(), searchGroup.getSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
                 searchGroup.setSearchExpression(luceneSearchExpression);
-            } catch (
-                    ParseCancellationException | IOException e) {
+            } catch (ParseCancellationException e) {
                 Optional<String> luceneSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
                         Localization.lang("Search group migration failed"),
                         Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.", searchGroup.getName()),

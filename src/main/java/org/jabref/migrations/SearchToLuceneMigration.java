@@ -1,7 +1,5 @@
 package org.jabref.migrations;
 
-import java.io.IOException;
-
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -13,7 +11,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 
 public class SearchToLuceneMigration {
-    public static String migrateToLuceneSyntax(String searchExpression, boolean isRegularExpression) throws IOException {
+    public static String migrateToLuceneSyntax(String searchExpression, boolean isRegularExpression) {
         SearchParser.StartContext context = getStartContext(searchExpression);
         SearchToLuceneVisitor searchToLuceneVisitor = new SearchToLuceneVisitor(isRegularExpression);
         QueryNode luceneQueryNode = searchToLuceneVisitor.visit(context);
@@ -22,11 +20,7 @@ public class SearchToLuceneMigration {
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
         SearchLexer lexer;
-        try {
-            lexer = new SearchLexer(CharStreams.fromFileName(searchExpression));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        lexer = new SearchLexer(CharStreams.fromString(searchExpression));
         lexer.removeErrorListeners(); // no infos on file system
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
