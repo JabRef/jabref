@@ -45,6 +45,7 @@ public class ExternalFilesEntryLinker {
                                       .orElse("");
             Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
             LinkedFile linkedFile = new LinkedFile("", relativePath, typeName);
+
             String link = linkedFile.getLink();
             boolean alreadyLinked = existingFiles.stream().anyMatch(existingFile -> existingFile.getLink().equals(link));
             if (alreadyLinked) {
@@ -66,6 +67,7 @@ public class ExternalFilesEntryLinker {
      * </ul>
      */
     public void coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
+        List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = new ArrayList<>(files.size());
         // "old school" loop to enable logging properly
         for (Path file : files) {
@@ -79,7 +81,14 @@ public class ExternalFilesEntryLinker {
             } catch (IOException exception) {
                 LOGGER.error("Error while copying/moving file {}", file, exception);
             }
-            linkedFiles.add(linkedFile);
+
+            String link = linkedFile.getLink();
+            boolean alreadyLinked = existingFiles.stream().anyMatch(existingFile -> existingFile.getLink().equals(link));
+            if (alreadyLinked) {
+                notificationService.notify(Localization.lang("File '%0' already linked", link));
+            } else {
+                linkedFiles.add(linkedFile);
+            }
         }
         entry.addFiles(linkedFiles);
     }
