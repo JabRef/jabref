@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -28,7 +30,9 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -40,6 +44,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
+@AllowedToUseAwt("Requires AWT to get a title from position")
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
@@ -196,7 +201,8 @@ public class PdfContentImporter extends PdfImporter {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
+            String title = getTitleByArea(document);
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, title);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
@@ -208,8 +214,72 @@ public class PdfContentImporter extends PdfImporter {
         return new ParserResult(result);
     }
 
+//    private String guessBetterTitleInMetaData(List<String> metadata) {
+//        String probableTitle = null;
+//        int maxScore = 0;
+//
+//        for (String str : metadata) {
+//            if (str == null) {
+//                continue;
+//            }
+//            // Rule 1: Check for file type paths, ignore them
+//            if (str.contains(".pdf") || str.contains(".docx") || str.contains(".doc")) {
+//                continue;
+//            }
+//            // Rule 2: Abstract detection (too long for a title)
+//            if (str.length() > 300) {
+//                continue;
+//            }
+//            // Rule 3: Title length and academic keywords (heuristic)
+//            int score = 0;
+//            score += str.length(); // Titles tend to be longer
+//            score += countAcademicKeywords(str); // Bonus for academic terms
+//
+//            if (score > maxScore) {
+//                maxScore = score;
+//                probableTitle = str;
+//            }
+//        }
+//
+//        return probableTitle;
+//    }
+
+    // Count common academic keywords
+//    private int countAcademicKeywords(String str) {
+//        List<String> keywords = Arrays.asList("study", "exploring", "research", "development", "design", "learning");
+//        int count = 0;
+//        for (String keyword : keywords) {
+//            if (str.toLowerCase().contains(keyword)) {
+//                count++;
+//            }
+//        }
+//        return count;
+//    }
+
+//    private List<String> buildMetaData(
+//            String author, String editor, String abstractT, String keywords, String title,
+//            String conference, String doi, String series, String volume, String number,
+//            String pages, String year, String publisher) {
+//        List<String> metadataList = new ArrayList<>();
+//        metadataList.add(author);
+//        metadataList.add(editor);
+//        metadataList.add(abstractT);
+//        metadataList.add(keywords);
+//        metadataList.add(title);
+//        metadataList.add(conference);
+//        metadataList.add(doi);
+//        metadataList.add(series);
+//        metadataList.add(volume);
+//        metadataList.add(number);
+//        metadataList.add(pages);
+//        metadataList.add(year);
+//        metadataList.add(publisher);
+//
+//        return metadataList;
+//    }
+
     // make this method package visible so we can test it
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByPosition) {
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
         // treat each block
@@ -437,7 +507,8 @@ public class PdfContentImporter extends PdfImporter {
             entry.setField(StandardField.KEYWORDS, keywords);
         }
         if (title != null) {
-            entry.setField(StandardField.TITLE, title);
+//            title = guessBetterTitleInMetaData(buildMetaData(author, editor, abstractT, keywords, title, conference, doi, series, volume, number, pages, year, publisher));
+            entry.setField(StandardField.TITLE, (titleByPosition == null || titleByPosition.isEmpty()) ? title : titleByPosition);
         }
         if (conference != null) {
             entry.setField(StandardField.BOOKTITLE, conference);
@@ -491,6 +562,16 @@ public class PdfContentImporter extends PdfImporter {
         stripper.writeText(document, writer);
 
         return writer.toString();
+    }
+
+    private String getTitleByArea(PDDocument document) throws IOException {
+        PDPage firstPage = document.getPage(0);
+        PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+        stripper.setSortByPosition(true);
+        Rectangle titleArea = new Rectangle(50, 50, 500, 100);
+        stripper.addRegion("title", titleArea);
+        stripper.extractRegions(firstPage);
+        return stripper.getTextForRegion("title").trim();
     }
 
     /**
