@@ -34,6 +34,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
+import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -44,6 +45,7 @@ import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
@@ -433,28 +435,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
-            // Different actions depending on where the user releases the drop in the target row
-            // Bottom + top -> import entries
-            // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
+            // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+            TransferMode transferMode = event.getTransferMode();
+
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences).executeWith(taskExecutor);
+                // Different actions depending on where the user releases the drop in the target row
+                // - Bottom + top -> import entries
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);
+                // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
-                    switch (event.getTransferMode()) {
-                        case LINK -> {
-                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
-                            importHandler.getLinker().addFilesToEntry(entry, files);
-                        }
-                        case MOVE -> {
-                            LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
-                        }
-                        case COPY -> {
-                            LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
-                        }
-                    }
+                    ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
+                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                 }
             }
 
@@ -470,7 +463,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
-            importHandler.importFilesInBackground(files, this.database, filePreferences).executeWith(taskExecutor);
+            importHandler
+                    .importFilesInBackground(files, this.database, filePreferences, event.getTransferMode())
+                    .executeWith(taskExecutor);
             success = true;
         }
 

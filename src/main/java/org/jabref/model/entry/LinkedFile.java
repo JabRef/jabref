@@ -225,10 +225,11 @@ public class LinkedFile implements Serializable {
         return findIn(dirs);
     }
 
-    /**
-     * Tries to find the file in the given directories and returns the path to the file (if found). Returns an empty
-     * optional if the file cannot be found.
-     */
+    /// Tries to locate the file.
+    /// In case the path is absolute, the path is checked.
+    /// In case the path is relative, the given directories are used as base directories.
+    ///
+    /// @return absolute path if found.
     public Optional<Path> findIn(List<Path> directories) {
         try {
             if (link.get().isEmpty()) {

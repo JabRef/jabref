@@ -67,7 +67,8 @@ public class PlainCitationParserViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                stateManager.getLuceneManager(bibdatabaseContext).get());
 
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
             plainCitationParsers.add(PlainCitationParserChoice.GROBID);
