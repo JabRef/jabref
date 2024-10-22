@@ -24,7 +24,8 @@ public class SearchQueryExtractorConversionTest {
                 Arguments.of(Set.of("a", "b"), "author = a AND title = b"),
                 Arguments.of(Set.of(), "NOT a"),
                 Arguments.of(Set.of("a", "b", "c"), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
-                Arguments.of(Set.of("b", "c"), "title != a OR b OR c")
+                Arguments.of(Set.of("b", "c"), "title != a OR b OR c"),
+                Arguments.of(Set.of("a", "b"), "a b")
         );
     }
 

@@ -19,7 +19,7 @@ public enum PostgreConstants {
                 AS
                 $$
                 BEGIN
-                    RETURN regexp_replace(string, pattern, '<mark style="background: orange">\\1</mark>', 'gi');
+                    RETURN regexp_replace(string, format('(%s)', pattern), '<mark style="background: orange">\\1</mark>', 'gi');
                 END
                 $$;
             """,
@@ -39,7 +39,7 @@ public enum PostgreConstants {
                     pos integer;
                 BEGIN
                     end_pos := 0;
-                    FOR match IN SELECT (regexp_matches(string, pattern, 'gi'))[1] LOOP
+                    FOR match IN SELECT (regexp_matches(string, format('(%s)', pattern), 'gi'))[1] LOOP
                             len := length(match);
                             pos := position(match in remainder);
                             start_pos := pos + end_pos;

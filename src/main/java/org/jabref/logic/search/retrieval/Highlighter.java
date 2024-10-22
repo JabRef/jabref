@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
@@ -37,14 +36,14 @@ public class Highlighter {
     private static Connection connection;
 
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
-        Optional<String> searchTerms = getSearchTermsPattern(searchQuery);
-        if (searchTerms.isEmpty()) {
+        Optional<String> searchTermsPattern = getSearchTermsPattern(searchQuery);
+        if (searchTermsPattern.isEmpty()) {
             return htmlText;
         }
 
         Document document = Jsoup.parse(htmlText);
         try {
-            highlightTextNodes(document.body(), searchTerms.get());
+            highlightTextNodes(document.body(), searchTermsPattern.get());
             return document.outerHtml();
         } catch (InvalidTokenOffsetsException e) {
             LOGGER.debug("Error highlighting search terms in HTML", e);
@@ -74,26 +73,26 @@ public class Highlighter {
         return List.of();
     }
 
-    private static void highlightTextNodes(Element element, String searchTerms) throws InvalidTokenOffsetsException {
+    private static void highlightTextNodes(Element element, String searchPattern) throws InvalidTokenOffsetsException {
         for (Node node : element.childNodes()) {
             if (node instanceof TextNode textNode) {
-                String highlightedText = highlightNode(textNode.text(), searchTerms);
+                String highlightedText = highlightNode(textNode.text(), searchPattern);
                 textNode.text("");
                 textNode.after(highlightedText);
             } else if (node instanceof Element element1) {
-                highlightTextNodes(element1, searchTerms);
+                highlightTextNodes(element1, searchPattern);
             }
         }
     }
 
-    private static String highlightNode(String text, String searchTerms) {
+    private static String highlightNode(String text, String searchPattern) {
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGEXP_MARK)) {
             preparedStatement.setString(1, text);
-            preparedStatement.setString(2, searchTerms);
+            preparedStatement.setString(2, searchPattern);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -116,7 +115,6 @@ public class Highlighter {
             return Optional.empty();
         }
 
-        return Optional.of(terms.stream()
-                                .collect(Collectors.joining(")|(", "(", ")")));
+        return Optional.of(String.join("|", terms));
     }
 }

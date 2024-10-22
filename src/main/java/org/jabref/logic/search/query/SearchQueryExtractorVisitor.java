@@ -1,9 +1,11 @@
 package org.jabref.logic.search.query;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
@@ -12,7 +14,12 @@ import org.jabref.search.SearchParser;
  */
 public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> {
 
+    private final boolean searchBarRegex;
     private boolean isNegated = false;
+
+    public SearchQueryExtractorVisitor(EnumSet<SearchFlags> searchFlags) {
+        searchBarRegex = searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);
+    }
 
     @Override
     public Set<String> visitStart(SearchParser.StartContext ctx) {
@@ -75,7 +82,19 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> 
                 return Set.of();
             }
         }
+        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
 
-        return Set.of(SearchQueryConversion.unescapeSearchValue(ctx.searchValue()));
+        // if not regex, escape the backslashes, because the highlighter uses regex
+
+        // unfielded terms, check the search bar flags
+        if (ctx.FIELD() == null && !searchBarRegex) {
+            return Set.of(term.replace("\\", "\\\\"));
+        } else if (ctx.operator() != null) {
+            int operator = ctx.operator().getStart().getType();
+            if (operator != SearchParser.REQUAL && operator != SearchParser.CREEQUAL) {
+                return Set.of(term.replace("\\", "\\\\"));
+            }
+        }
+        return Set.of(term);
     }
 }

@@ -212,8 +212,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
         String sqlOperator = getSqlOperator(searchFlags);
-        term = escapeTermForSql(term, searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
+
+        if (!searchFlags.contains(REGULAR_EXPRESSION)) {
+            term = escapeTermForSql(term);
+        }
 
         // Pseudo-fields
         field = switch (field) {
@@ -543,11 +546,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
      * <p>
      * - Escapes {@code \}, {@code _}, and {@code %} for SQL LIKE queries.
      */
-    private static String escapeTermForSql(String term, EnumSet<SearchFlags> searchFlags) {
-        if (searchFlags.contains(REGULAR_EXPRESSION)) {
-            return term;
-        } else {
-            return term.replaceAll("[\\\\_%]", "\\\\$0");
-        }
+    private static String escapeTermForSql(String term) {
+        return term.replaceAll("[\\\\_%]", "\\\\$0");
     }
 }

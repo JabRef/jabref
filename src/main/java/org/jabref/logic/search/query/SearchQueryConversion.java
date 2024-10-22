@@ -30,7 +30,7 @@ public class SearchQueryConversion {
 
     public static Set<String> extractSearchTerms(SearchQuery searchQuery) {
         LOGGER.debug("Extracting search terms from search expression: {}", searchQuery.getSearchExpression());
-        return new SearchQueryExtractorVisitor().visit(searchQuery.getContext());
+        return new SearchQueryExtractorVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
     /**
