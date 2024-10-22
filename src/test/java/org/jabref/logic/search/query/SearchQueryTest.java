@@ -53,10 +53,9 @@ public class SearchQueryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "!term", // =!~()" should be escaped with a backslash
+            "!term", // =!~() should be escaped with a backslash
             "t~erm",
             "t(erm",
-            "t\"erm",
             "term AND",
             "field CONTAINS NOT value",
     })

@@ -165,13 +165,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     @Override
     public SqlQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
-        String term = ctx.searchValue().getText();
-
-        // remove possible enclosing " symbols
-        if (ctx.searchValue().STRING_LITERAL() != null) {
-            term = term.substring(1, term.length() - 1);
-            // TODO: should be a string literal, search in the filed_value column only
-        }
+        String term = unescapeSearchValue(ctx.searchValue());
 
         // unfielded expression
         if (ctx.operator() == null) {
@@ -186,33 +180,31 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // fielded expression
         String field = ctx.FIELD().getText();
-        SearchParser.OperatorContext operator = ctx.operator();
+        int operator = ctx.operator().getStart().getType();
 
-        // Direct comparison does not work
-        // context.CONTAINS() and others are null if absent (thus, we cannot check for getText())
-        if (operator.EQUAL() != null || operator.CONTAINS() != null) {
+        if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS) {
             setFlags(searchFlags, INEXACT_MATCH, false, false);
-        } else if (operator.CEQUAL() != null) {
+        } else if (operator == SearchParser.CEQUAL) {
             setFlags(searchFlags, INEXACT_MATCH, true, false);
-        } else if (operator.EEQUAL() != null || operator.MATCHES() != null) {
+        } else if (operator == SearchParser.EEQUAL || operator == SearchParser.MATCHES) {
             setFlags(searchFlags, EXACT_MATCH, false, false);
-        } else if (operator.CEEQUAL() != null) {
+        } else if (operator == SearchParser.CEEQUAL) {
             setFlags(searchFlags, EXACT_MATCH, true, false);
-        } else if (operator.REQUAL() != null) {
+        } else if (operator == SearchParser.REQUAL) {
             setFlags(searchFlags, REGULAR_EXPRESSION, false, false);
-        } else if (operator.CREEQUAL() != null) {
+        } else if (operator == SearchParser.CREEQUAL) {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, false);
-        } else if (operator.NEQUAL() != null) {
+        } else if (operator == SearchParser.NEQUAL) {
             setFlags(searchFlags, INEXACT_MATCH, false, true);
-        } else if (operator.NCEQUAL() != null) {
+        } else if (operator == SearchParser.NCEQUAL) {
             setFlags(searchFlags, INEXACT_MATCH, true, true);
-        } else if (operator.NEEQUAL() != null) {
+        } else if (operator == SearchParser.NEEQUAL) {
             setFlags(searchFlags, EXACT_MATCH, false, true);
-        } else if (operator.NCEEQUAL() != null) {
+        } else if (operator == SearchParser.NCEEQUAL) {
             setFlags(searchFlags, EXACT_MATCH, true, true);
-        } else if (operator.NREQUAL() != null) {
+        } else if (operator == SearchParser.NREQUAL) {
             setFlags(searchFlags, REGULAR_EXPRESSION, false, true);
-        } else if (operator.NCREEQUAL() != null) {
+        } else if (operator == SearchParser.NCREEQUAL) {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
         }
 
@@ -220,7 +212,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     }
 
     private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
-        String operator = getOperator(searchFlags);
+        String operator = getSqlOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
         // Pseudo-fields
@@ -539,9 +531,35 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
     }
 
-    private static String getOperator(EnumSet<SearchFlags> searchFlags) {
+    private static String getSqlOperator(EnumSet<SearchFlags> searchFlags) {
         return searchFlags.contains(REGULAR_EXPRESSION)
                 ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*")
                 : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
+    }
+
+    /**
+     * Unescapes search value based on the Search grammar rules.
+     * <p>
+     * - STRING_LITERAL: Removes enclosing quotes and unescapes {@code \"}
+     * <p>
+     * - TERM: Unescapes {@code \=, \!, \~, \(, \)}
+     */
+    private static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
+        if (ctx == null) {
+            return "";
+        }
+
+        String term = ctx.getText();
+
+        if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
+            return term.substring(1, term.length() - 1)
+                       .replace("\\\"", "\"");
+        }
+
+        if (ctx.getStart().getType() == SearchParser.TERM) {
+            return term.replaceAll("\\\\([=!~()])", "$1");
+        }
+
+        return term;
     }
 }

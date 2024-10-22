@@ -36,8 +36,8 @@ MATCHES: 'MATCHES';
 NOT: 'NOT';
 
 FIELD: [A-Z]+;
-TERM: ('\\' [=!~()"] | ~[ \t\n\r=!~()"])+;     // =!~()" should be escaped with a backslash
-STRING_LITERAL: '"' ( '\\"' | ~["] )* '"';
+STRING_LITERAL: '"' ('\\"' | ~["])* '"';    // " should be escaped with a backslash
+TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a backslash
 
 start
     : EOF
