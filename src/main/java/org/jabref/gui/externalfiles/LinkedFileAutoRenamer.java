@@ -1,21 +1,19 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -39,6 +37,7 @@ public class LinkedFileAutoRenamer {
         LOGGER.debug("FieldChangedEvent triggered for field: {}", event.getField());
 
         if (!preferences.shouldAutoRenameLinkedFiles()) {
+            LOGGER.debug("Auto rename is disabled in preferences.");
             return;
         }
 
@@ -47,87 +46,56 @@ public class LinkedFileAutoRenamer {
 
         String fileNamePattern = preferences.getFilePreferences().getFileNamePattern();
         if (fileNamePattern == null || fileNamePattern.trim().isEmpty()) {
-            return; // Do nothing if the pattern is empty
-        }
-
-        Set<String> patternFields = FileNameParser.parseFields(fileNamePattern);
-
-        System.out.println("Namaste Mummy and Papa!! From LinkedFileAutoRenamer " + patternFields);
-
-        boolean relevantFieldChanged = false;
-        if (patternFields.contains("bibtexkey")) {
-            changedField.getName();
-        }
-        if (patternFields.contains(changedField.getName())) {
-            relevantFieldChanged = true;
-        }
-
-        if (!relevantFieldChanged) {
+            LOGGER.debug("File name pattern is empty. Skipping renaming.");
             return;
         }
 
-        handleEntryChange(entry);
+        Set<String> patternFields = FileNameParser.parseFields(fileNamePattern);
+        LOGGER.debug("Parsed pattern fields: {}", patternFields);
+
+        boolean relevantFieldChanged = false;
+
+        // Check if the changed field is 'bibtexkey' and it's part of the pattern
+        if (patternFields.contains("bibtexkey") && changedField.getName().equals(InternalField.KEY_FIELD.getName())) {
+            relevantFieldChanged = true;
+            LOGGER.debug("Changed field '{}' is part of the pattern.", changedField.getName());
+        }
+
+        // Check if the changed field is one of the pattern fields
+        if (patternFields.contains(changedField.getName())) {
+            relevantFieldChanged = true;
+            LOGGER.debug("Changed field '{}' is part of the pattern.", changedField.getName());
+        }
+
+        if (!relevantFieldChanged) {
+            LOGGER.debug("Changed field '{}' is not relevant for renaming.", changedField.getName());
+            return; // Changed field is not relevant
+        }
+
+        handleEntryChange(entry, fileNamePattern);
     }
 
-    private void handleEntryChange(BibEntry entry) {
+    private void handleEntryChange(BibEntry entry, String fileNamePattern) {
         List<Path> fileDirectories = bibDatabaseContext.getFileDirectories(preferences.getFilePreferences());
 
-        System.out.println("Namaste Mummy and Papa!! Entered handleEntryChange");
+        LOGGER.debug("Handling entry change for entry: {}", entry.getCitationKey().orElse("unknown"));
 
         List<LinkedFile> linkedFiles = entry.getFiles();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            Optional<Path> oldFilePathOptional = linkedFile.findIn(fileDirectories);
-
-            if (oldFilePathOptional.isEmpty()) {
-                continue;
-            }
-
-            Path oldFilePath = oldFilePathOptional.get();
-
-            String extension = FileUtil.getFileExtension(oldFilePath).get();
-            if (extension.isEmpty()) {
-                LOGGER.warn("File '{}' has no extension. Skipping renaming.", oldFilePath);
-                continue; // skip files without an extension
-            }
-
-            String newFileName = FileUtil.createFileNameFromPattern(
-                    bibDatabaseContext.getDatabase(),
-                    entry,
-                    preferences.getFilePreferences().getFileNamePattern()
-            );
-
-            System.out.println("Namaste Mummy and Papa!! New File name: " + newFileName);
-
-            newFileName = newFileName + "." + extension;
-
-            newFileName = FileNameCleaner.cleanFileName(newFileName);
-
-            if (newFileName.isEmpty()) {
-                continue; // Invalid new file name
-            }
-
-            // check if file name has changed
-            if (oldFilePath.getFileName().toString().equals(newFileName)) {
-                continue;
-            }
-
-            Path newFilePath = oldFilePath.getParent().resolve(newFileName);
-
             try {
-                Files.move(oldFilePath, newFilePath);
+                // Attempt to rename the file based on the pattern using LinkedFileRenamer
+                boolean renamed = FileUtil.renameFile(linkedFile, entry, fileNamePattern, fileDirectories, preferences.getFilePreferences());
 
-                linkedFile.setLink(newFilePath.toAbsolutePath().toString());
-
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                    entry.setFiles(linkedFiles);
-                });
-
-                LOGGER.info("Renamed file '{}' to '{}'", oldFilePath, newFilePath);
-                System.out.println("Namaste Mummy and Papa!! Renamed file '" + oldFilePath + "' to '" + newFilePath + "'");
+                if (renamed) {
+                    // Notify that the linked file has changed by updating the entry's files
+                    UiTaskExecutor.runInJavaFXThread(() -> {
+                        entry.setFiles(linkedFiles);
+                        LOGGER.debug("Updated entry files after renaming.");
+                    });
+                }
             } catch (IOException e) {
-                LOGGER.error("Failed to rename file '{}' to '{}'", oldFilePath, newFilePath, e);
-                System.out.println("Namaste Mummy and Papa!! Error renaming file '" + oldFilePath + "' to '" + newFilePath + "': " + e.getMessage());
+                LOGGER.error("Failed to rename file '{}' to pattern '{}'", linkedFile.getLink(), fileNamePattern, e);
             }
         }
     }

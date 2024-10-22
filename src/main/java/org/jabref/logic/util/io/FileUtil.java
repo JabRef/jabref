@@ -524,4 +524,100 @@ public class FileUtil {
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
+
+    public static boolean renameFile(LinkedFile linkedFile, BibEntry entry, String newFileName, List<Path> fileDirectories, FilePreferences filePreferences) throws IOException {
+        Optional<Path> oldFilePathOptional = linkedFile.findIn(fileDirectories);
+        if (oldFilePathOptional.isEmpty()) {
+            LOGGER.warn("File '{}' does not exist in specified directories. Skipping renaming.", linkedFile.getLink());
+            return false;
+        }
+        Path oldFilePath = oldFilePathOptional.get();
+
+        // Retrieve original extension
+        Optional<String> extensionOptional = FileUtil.getFileExtension(oldFilePath);
+        if (extensionOptional.isEmpty()) {
+            LOGGER.warn("File '{}' has no extension. Skipping renaming.", oldFilePath);
+            return false; // No extension
+        }
+        String extension = extensionOptional.get();
+        if (extension.isEmpty()) {
+            LOGGER.warn("File '{}' has an empty extension. Skipping renaming.", oldFilePath);
+            return false; // Empty extension
+        }
+
+        // Generate new file name by replacing placeholders
+        String generatedFileName = createFileNameFromPattern(entry, newFileName);
+        LOGGER.debug("Generated new file name: '{}'", generatedFileName);
+
+        // Append extension if not present
+        if (!generatedFileName.toLowerCase().endsWith("." + extension.toLowerCase())) {
+            generatedFileName = generatedFileName + "." + extension;
+            LOGGER.debug("Appended extension. New file name: '{}'", generatedFileName);
+        }
+
+        // Clean the new file name
+        generatedFileName = FileNameCleaner.cleanFileName(generatedFileName);
+        if (generatedFileName.isEmpty()) {
+            LOGGER.warn("Generated new file name is empty after cleaning. Skipping renaming.");
+            return false; // Invalid new file name
+        }
+
+        // Check if the new file name is different from the current name
+        if (oldFilePath.getFileName().toString().equals(generatedFileName)) {
+            LOGGER.info("File '{}' is already named '{}'. Skipping renaming.", oldFilePath, generatedFileName);
+            return false; // No change needed
+        }
+
+        Path newFilePath = oldFilePath.getParent().resolve(generatedFileName);
+
+        // Check if the target file already exists to prevent overwriting
+        if (Files.exists(newFilePath)) {
+            LOGGER.warn("Target file '{}' already exists. Skipping renaming to prevent overwrite.", newFilePath);
+            // Optionally, prompt the user or implement overwrite logic here
+            return false;
+        }
+
+        // Perform the renaming
+        Files.move(oldFilePath, newFilePath);
+        LOGGER.info("Renamed file '{}' to '{}'", oldFilePath, newFilePath);
+
+        // Update the linked file's path
+        linkedFile.setLink(newFilePath.toAbsolutePath().toString());
+        LOGGER.debug("Updated linked file path to '{}'", newFilePath.toAbsolutePath());
+
+        return true;
+    }
+
+    /**
+     * Generates a new file name by replacing placeholders in the pattern with actual entry values.
+     *
+     * @param entry   The bibliographic entry containing field values.
+     * @param pattern The filename pattern with placeholders.
+     * @return The generated file name with placeholders replaced.
+     */
+    private static String createFileNameFromPattern(BibEntry entry, String pattern) {
+        String fileName = pattern;
+
+        // Replace [bibtexkey]
+        if (entry.getCitationKey().isPresent()) {
+            fileName = fileName.replace("[bibtexkey]", entry.getCitationKey().get());
+        } else {
+            fileName = fileName.replace("[bibtexkey]", "unknown");
+        }
+
+        // Replace [title]
+        if (pattern.contains("[title]")) {
+            String title = entry.getField(StandardField.TITLE).orElse("untitled");
+            fileName = fileName.replace("[title]", title);
+        }
+
+        // Add more placeholders as needed
+        // Example:
+        // if (pattern.contains("[author]")) {
+        //     String author = entry.getField(StandardField.AUTHOR).orElse("unknown");
+        //     fileName = fileName.replace("[author]", author);
+        // }
+
+        return fileName;
+    }
 }
