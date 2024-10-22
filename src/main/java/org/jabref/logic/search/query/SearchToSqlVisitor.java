@@ -158,7 +158,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         return new SqlQueryNode("cte" + cteCounter++);
     }
 
-    @Override public SqlQueryNode visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
+    @Override
+    public SqlQueryNode visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
         return visit(ctx.comparison());
     }
 
@@ -259,6 +260,140 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                 )
                 """.formatted(cteCounter, ENTRY_ID, mainTableName, ENTRY_ID);
         SqlQueryNode node = new SqlQueryNode(cte, List.of(entryId));
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
+    }
+
+    private SqlQueryNode buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
+        String cte = """
+                cte%d AS (
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE (
+                        (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                MAIN_TABLE, FIELD_VALUE_LITERAL,
+                operator,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
+                operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQueryNode node = new SqlQueryNode(cte, params);
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
+    }
+
+    private SqlQueryNode buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
+        String cte = """
+                cte%d AS (
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        WHERE (
+                            (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
+                        )
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                INNER_TABLE, FIELD_VALUE_LITERAL,
+                operator,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
+                operator);
+
+        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
+        SqlQueryNode node = new SqlQueryNode(cte, params);
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
+    }
+
+    private SqlQueryNode buildExactAnyFieldQuery(String operator, String term) {
+        String cte = """
+                cte%d AS (
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    LEFT JOIN %s AS %s
+                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                    WHERE (
+                        (%s.%s != '%s')
+                        AND (
+                            ((%s.%s %s ?) OR (%s.%s %s ?))
+                            OR
+                            ((%s.%s %s ?) OR (%s.%s %s ?))
+                        )
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQueryNode node = new SqlQueryNode(cte, params);
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
+    }
+
+    private SqlQueryNode buildExactNegationAnyFieldQuery(String operator, String term) {
+        String cte = """
+                cte%d AS (
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE %s.%s NOT IN (
+                        SELECT %s.%s
+                        FROM %s AS %s
+                        LEFT JOIN %s AS %s
+                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+                        WHERE (
+                            (%s.%s != '%s')
+                            AND (
+                                ((%s.%s %s ?) OR (%s.%s %s ?))
+                                OR
+                                ((%s.%s %s ?) OR (%s.%s %s ?))
+                            )
+                        )
+                    )
+                )
+                """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, ENTRY_ID,
+                INNER_TABLE, ENTRY_ID,
+                mainTableName, INNER_TABLE,
+                splitValuesTableName, SPLIT_TABLE,
+                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
+                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+
+        List<String> params = Collections.nCopies(4, term);
+        SqlQueryNode node = new SqlQueryNode(cte, params);
         nodes.add(node);
         return new SqlQueryNode("cte" + cteCounter++);
     }
@@ -386,140 +521,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                 SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(4, term);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
-    }
-
-    private SqlQueryNode buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
-        String cte = """
-                cte%d AS (
-                    SELECT %s.%s
-                    FROM %s AS %s
-                    WHERE (
-                        (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
-                    )
-                )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                MAIN_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator);
-
-        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
-    }
-
-    private SqlQueryNode buildExactAnyFieldQuery(String operator, String term) {
-        String cte = """
-                cte%d AS (
-                    SELECT %s.%s
-                    FROM %s AS %s
-                    LEFT JOIN %s AS %s
-                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                    WHERE (
-                        (%s.%s != '%s')
-                        AND (
-                            ((%s.%s %s ?) OR (%s.%s %s ?))
-                            OR
-                            ((%s.%s %s ?) OR (%s.%s %s ?))
-                        )
-                    )
-                )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
-
-        List<String> params = Collections.nCopies(4, term);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
-    }
-
-    private SqlQueryNode buildExactNegationAnyFieldQuery(String operator, String term) {
-        String cte = """
-                cte%d AS (
-                    SELECT %s.%s
-                    FROM %s AS %s
-                    WHERE %s.%s NOT IN (
-                        SELECT %s.%s
-                        FROM %s AS %s
-                        LEFT JOIN %s AS %s
-                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
-                        WHERE (
-                            (%s.%s != '%s')
-                            AND (
-                                ((%s.%s %s ?) OR (%s.%s %s ?))
-                                OR
-                                ((%s.%s %s ?) OR (%s.%s %s ?))
-                            )
-                        )
-                    )
-                )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
-
-        List<String> params = Collections.nCopies(4, term);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
-    }
-
-    private SqlQueryNode buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
-        String cte = """
-                cte%d AS (
-                    SELECT %s.%s
-                    FROM %s AS %s
-                    WHERE %s.%s NOT IN (
-                        SELECT %s.%s
-                        FROM %s AS %s
-                        WHERE (
-                            (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
-                        )
-                    )
-                )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                INNER_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator);
-
-        List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
         SqlQueryNode node = new SqlQueryNode(cte, params);
         nodes.add(node);
         return new SqlQueryNode("cte" + cteCounter++);
