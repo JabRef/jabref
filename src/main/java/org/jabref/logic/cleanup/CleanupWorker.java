@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.application.Platform;
-
-import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,15 +16,13 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
-    private final DialogService dialogService;
-    private final List<JabRefException> fileMoveExceptions;
+    private final List<JabRefException> failures;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, DialogService dialogService) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
-        this.dialogService = dialogService;
-        this.fileMoveExceptions = new ArrayList<>();
+        this.failures = new ArrayList<>();
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
@@ -36,18 +30,12 @@ public class CleanupWorker {
         Objects.requireNonNull(entry);
 
         List<CleanupJob> jobs = determineCleanupActions(preset);
-
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
-
             if (job instanceof MoveFilesCleanup cleanup) {
-                fileMoveExceptions.addAll(cleanup.getIoExceptions());
+                failures.addAll(cleanup.getIoExceptions());
             }
-        }
-
-        if (!fileMoveExceptions.isEmpty()) {
-            showFileMoveExceptions(entry);
         }
 
         return changes;
@@ -104,16 +92,7 @@ public class CleanupWorker {
         };
     }
 
-    private void showFileMoveExceptions(BibEntry entry) {
-        StringBuilder sb = new StringBuilder();
-        String title = entry.getTitle().orElse(Localization.lang("Unknown Title"));
-
-        sb.append(Localization.lang("The following errors occurred while moving files associated with the entry '%0':", title)).append("\n\n");
-        for (JabRefException exception : fileMoveExceptions) {
-            sb.append("- ").append(exception.getLocalizedMessage()).append("\n");
-        }
-        Platform.runLater(() ->
-                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), sb.toString())
-        );
+    public List<JabRefException> getFailures() {
+        return failures;
     }
 }

@@ -9,7 +9,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -70,7 +69,7 @@ class CleanupWorkerTest {
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class), mock(DialogService.class));
+        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
     }
 
     @Test

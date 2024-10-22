@@ -1,10 +1,13 @@
 package org.jabref.gui.cleanup;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
+
+import javafx.application.Platform;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -13,6 +16,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -31,6 +35,7 @@ public class CleanupAction extends SimpleCommand {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    private final List<JabRefException> failures;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
@@ -47,6 +52,7 @@ public class CleanupAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
+        this.failures = new ArrayList<>();
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -105,7 +111,8 @@ public class CleanupAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences(), dialogService);
+                preferences.getTimestampPreferences()
+        );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
@@ -113,6 +120,8 @@ public class CleanupAction extends SimpleCommand {
         for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
         }
+
+        failures.addAll(cleaner.getFailures());
     }
 
     private void showResults() {
@@ -135,17 +144,41 @@ public class CleanupAction extends SimpleCommand {
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
+        this.resetCleanUpFailures();
+        NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entries"));
+
         for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level
-            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
-
             doCleanup(databaseContext, cleanupPreferences, entry, ce);
 
-            ce.end();
             if (ce.hasEdits()) {
                 modifiedEntriesCount++;
-                undoManager.addEdit(ce);
             }
         }
+
+        ce.end();
+
+        if (ce.hasEdits()) {
+            undoManager.addEdit(ce);
+        }
+
+        if (!failures.isEmpty()) {
+            // Show errors to user through dialog service
+            showFailures(failures);
+        }
+    }
+
+    private void showFailures(List<JabRefException> failures) {
+        StringBuilder sb = new StringBuilder();
+        for (JabRefException exception : failures) {
+            sb.append("- ").append(exception.getLocalizedMessage()).append("\n");
+        }
+        Platform.runLater(() ->
+                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), sb.toString())
+        );
+    }
+
+    public void resetCleanUpFailures() {
+        this.failures.clear();
     }
 }
