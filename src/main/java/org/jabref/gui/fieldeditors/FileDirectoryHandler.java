@@ -62,7 +62,7 @@ public class FileDirectoryHandler {
         MetaData metaData = databaseContext.getMetaData();
 
         filePreferences.getMainFileDirectory().ifPresent(mainFilePath -> directories.add(new DirectoryInfo(Localization.lang("main file directory"), Path.of(mainFilePath.toUri()), DirectoryType.MAIN)));
-
+        // For library specific dir
         metaData.getDefaultFileDirectory().ifPresent(path ->
                 directories.add(new DirectoryInfo(
                         Localization.lang("library-specific file directory"),
@@ -71,6 +71,7 @@ public class FileDirectoryHandler {
                 ))
         );
 
+        // For user-specific dir
         metaData.getUserFileDirectory(filePreferences.getUserAndHost()).ifPresent(path ->
                 directories.add(new DirectoryInfo(
                         Localization.lang("user-specific file directory"),
