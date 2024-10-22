@@ -10,6 +10,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
@@ -27,6 +29,12 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
 
     public EditorTextArea() {
         this("");
+        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.TAB && this.getText().isEmpty()) {
+                this.getParent().requestFocus();
+                event.consume();
+            }
+        });
     }
 
     public EditorTextArea(final String text) {
