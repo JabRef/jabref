@@ -25,7 +25,8 @@ public class FileFieldParser {
         if (value == null) {
             this.value = null;
         } else {
-            this.value = value.replace("$\\backslash$", "\\");
+            String valueFormat = value.replace("|", "%7C");
+            this.value = valueFormat.replace("$\\backslash$", "\\");
         }
     }
 
