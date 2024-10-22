@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,7 +100,7 @@ public class FieldEditorTextAreaTest {
 
             // locate getForField method in FieldEditors.java
             MethodDeclaration getForFieldCall = cu.findAll(MethodDeclaration.class).stream()
-                    .filter(methodDeclaration -> methodDeclaration.getNameAsString().equals("getForField"))
+                    .filter(methodDeclaration -> "getForField".equals(methodDeclaration.getNameAsString()))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Failed to find getForField method in FieldEditors.java"));
 
@@ -189,7 +190,7 @@ public class FieldEditorTextAreaTest {
     private static boolean implementedFieldEditorFX(CompilationUnit cu) {
         return cu.findAll(ClassOrInterfaceDeclaration.class).stream()
                 .anyMatch(classDecl -> classDecl.getImplementedTypes().stream()
-                        .anyMatch(type -> type.getNameAsString().equals("FieldEditorFX")));
+                        .anyMatch(type -> Objects.equals("FieldEditorFX", type.getNameAsString())));
     }
 
     /**
@@ -200,7 +201,7 @@ public class FieldEditorTextAreaTest {
      */
     private static boolean hasEditorTextAreaCreationExisted(CompilationUnit cu) {
         return cu.findAll(ObjectCreationExpr.class).stream()
-                .anyMatch(creation -> creation.getType().toString().equals("EditorTextArea"));
+                .anyMatch(creation -> Objects.equals("EditorTextArea", creation.getType().toString()));
     }
 
     /**
@@ -215,7 +216,7 @@ public class FieldEditorTextAreaTest {
         AtomicBoolean hasTextInputControlField = new AtomicBoolean(false);
         cu.findAll(MethodCallExpr.class)
                 .stream()
-                .filter(methodCallExpr -> methodCallExpr.getNameAsString().equals("establishBinding"))
+                .filter(methodCallExpr -> "establishBinding".equals(methodCallExpr.getNameAsString()))
                 .findFirst()
                 .ifPresent(methodCallExpr -> {
                     if (!methodCallExpr.getArguments().isEmpty()) {
@@ -227,7 +228,7 @@ public class FieldEditorTextAreaTest {
                                 .findFirst()
                                 .ifPresent(fieldDeclaration -> {
                                     String classType = fieldDeclaration.getElementType().asString();
-                                    if (classType.equals("TextInputControl")) {
+                                    if ("TextInputControl".equals(classType)) {
                                         hasTextInputControlField.set(true);
                                     }
                                 });
@@ -239,7 +240,7 @@ public class FieldEditorTextAreaTest {
     private static boolean holdEditorTextField(CompilationUnit compilationUnit) {
         AtomicBoolean hasEditorTextField = new AtomicBoolean(false);
         compilationUnit.findAll(MethodCallExpr.class).stream()
-                .filter(methodCallExpr -> methodCallExpr.getNameAsString().equals("establishBinding"))
+                .filter(methodCallExpr -> "establishBinding".equals(methodCallExpr.getNameAsString()))
                 .findFirst()
                 .ifPresent(establishBindingCall -> {
                     String firstArg = establishBindingCall.getArgument(0).toString();
@@ -248,11 +249,11 @@ public class FieldEditorTextAreaTest {
                             .findFirst()
                             .ifPresent(fieldDeclaration -> {
                                 String fieldType = fieldDeclaration.getElementType().asString();
-                                if (fieldType.equals("EditorTextField")) {
+                                if ("EditorTextField".equals(fieldType)) {
                                     hasEditorTextField.set(true);
                                 }
                             });
                 });
         return hasEditorTextField.get();
     }
-}
+    }
