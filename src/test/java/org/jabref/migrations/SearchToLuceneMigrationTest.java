@@ -50,7 +50,7 @@ class SearchToLuceneMigrationTest {
 
     @ParameterizedTest
     @MethodSource
-    void transformationNormal(String expected, String query) throws IOException {
+    void transformationNormal(String expected, String query) {
         String result = SearchToLuceneMigration.migrateToLuceneSyntax(query, false);
         assertEquals(expected, result);
     }

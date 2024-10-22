@@ -19,8 +19,7 @@ public class SearchToLuceneMigration {
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
-        SearchLexer lexer;
-        lexer = new SearchLexer(CharStreams.fromString(searchExpression));
+        SearchLexer lexer = new SearchLexer(CharStreams.fromString(searchExpression));
         lexer.removeErrorListeners(); // no infos on file system
         lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
