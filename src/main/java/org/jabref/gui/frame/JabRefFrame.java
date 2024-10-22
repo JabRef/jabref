@@ -348,6 +348,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
+                // Use Platform.runLater to ensure the auto-completer is set in the next event cycle
+                Platform.runLater(() -> {
+                    globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
+                });
             } else if (selectedTab == null) {
                 // All databases are closed
                 stateManager.setActiveDatabase(null);
@@ -378,9 +382,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(libraryTab.searchQueryProperty().get());
             }
             stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
-
-            // Update search autocompleter with information for the correct database:
-            globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
             libraryTab.getMainTable().requestFocus();
 

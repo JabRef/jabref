@@ -126,6 +126,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed usage when using running on Snapcraft. [#11465](https://github.com/JabRef/jabref/issues/11465)
 - We fixed detection for `soffice.exe` on Windows. [#11478](https://github.com/JabRef/jabref/pull/11478)
 - We fixed an issue where saving preferences when importing preferences on first run in a snap did not work [forum#4399](https://discourse.jabref.org/t/how-to-report-problems-in-the-distributed-version-5-14-ensuring-that-one-can-no-longer-work-with-jabref/4399/5)
+- We fixed an issue where auto-completion in the search bar was not working until switching tabs. [#11428](https://github.com/JabRef/jabref/issues/11428)
 
 ## [5.14] – 2024-07-08
 
