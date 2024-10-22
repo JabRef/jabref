@@ -132,4 +132,27 @@ class PdfContentImporterTest {
         assertEquals(Optional.of("On How We Can Teach – Exploring New Ways in\n" +
                 "Professional Software Development for Students"), result.getFirst().getTitle());
     }
+
+    // ToDo: not done yet
+    @Test
+    void IEEEPdf() throws Exception {
+        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/IEEE/ieee-paper.pdf")).toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        assertEquals(Optional.of("JabRef Example for Reference Parsing"), result.getFirst().getTitle());
+    }
+
+    @Test
+    void LNCSPdf() throws Exception {
+        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/org/jabref/logic/importer/util/LNCS-minimal.pdf")).toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        assertEquals(Optional.of("Paper Title"), result.getFirst().getTitle());
+    }
+
+    // ToDo: get a minimal scientificThesisTemplatePdf
+    void scientificThesisTemplatePdf() throws Exception {
+    }
+
+    // ToDo: get a minimal uniStuttgartDissertationTemplate
+    void uniStuttgartDissertationTemplatePdf() throws Exception {
+    }
 }
