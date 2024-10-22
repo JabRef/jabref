@@ -76,10 +76,10 @@ public class DatabaseSearcherTest {
                 Arguments.of(List.of(), new SearchQuery("whatever"), List.of(emptyEntry, articleEntry, inCollectionEntry)),
 
                 // invalid search syntax
-                Arguments.of(List.of(), new SearchQuery("author:"), List.of(articleEntry)),
+                Arguments.of(List.of(), new SearchQuery("author="), List.of(articleEntry)),
 
                 Arguments.of(List.of(articleEntry), new SearchQuery("harrer"), List.of(articleEntry)),
-                Arguments.of(List.of(), new SearchQuery("title: harrer"), List.of(articleEntry)),
+                Arguments.of(List.of(), new SearchQuery("title= harrer"), List.of(articleEntry)),
 
                 Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(inCollectionEntry)),
                 Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(articleEntry, inCollectionEntry))
