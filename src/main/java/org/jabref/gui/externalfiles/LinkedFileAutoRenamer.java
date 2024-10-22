@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -34,10 +33,7 @@ public class LinkedFileAutoRenamer {
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        LOGGER.debug("FieldChangedEvent triggered for field: {}", event.getField());
-
         if (!preferences.shouldAutoRenameLinkedFiles()) {
-            LOGGER.debug("Auto rename is disabled in preferences.");
             return;
         }
 
@@ -46,7 +42,6 @@ public class LinkedFileAutoRenamer {
 
         String fileNamePattern = preferences.getFilePreferences().getFileNamePattern();
         if (fileNamePattern == null || fileNamePattern.trim().isEmpty()) {
-            LOGGER.debug("File name pattern is empty. Skipping renaming.");
             return;
         }
 
@@ -55,13 +50,11 @@ public class LinkedFileAutoRenamer {
 
         boolean relevantFieldChanged = false;
 
-        // Check if the changed field is 'bibtexkey' and it's part of the pattern
         if (patternFields.contains("bibtexkey") && changedField.getName().equals(InternalField.KEY_FIELD.getName())) {
             relevantFieldChanged = true;
             LOGGER.debug("Changed field '{}' is part of the pattern.", changedField.getName());
         }
 
-        // Check if the changed field is one of the pattern fields
         if (patternFields.contains(changedField.getName())) {
             relevantFieldChanged = true;
             LOGGER.debug("Changed field '{}' is part of the pattern.", changedField.getName());
@@ -69,7 +62,7 @@ public class LinkedFileAutoRenamer {
 
         if (!relevantFieldChanged) {
             LOGGER.debug("Changed field '{}' is not relevant for renaming.", changedField.getName());
-            return; // Changed field is not relevant
+            return;
         }
 
         handleEntryChange(entry, fileNamePattern);
@@ -83,19 +76,13 @@ public class LinkedFileAutoRenamer {
         List<LinkedFile> linkedFiles = entry.getFiles();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            try {
-                // Attempt to rename the file based on the pattern using LinkedFileRenamer
-                boolean renamed = FileUtil.renameFile(linkedFile, entry, fileNamePattern, fileDirectories, preferences.getFilePreferences());
+            boolean renamed = FileUtil.renameLinkedFile(linkedFile, entry, fileNamePattern, fileDirectories, preferences.getFilePreferences(), bibDatabaseContext);
 
-                if (renamed) {
-                    // Notify that the linked file has changed by updating the entry's files
-                    UiTaskExecutor.runInJavaFXThread(() -> {
-                        entry.setFiles(linkedFiles);
-                        LOGGER.debug("Updated entry files after renaming.");
-                    });
-                }
-            } catch (IOException e) {
-                LOGGER.error("Failed to rename file '{}' to pattern '{}'", linkedFile.getLink(), fileNamePattern, e);
+            if (renamed) {
+                UiTaskExecutor.runInJavaFXThread(() -> {
+                    entry.setFiles(linkedFiles);
+                    LOGGER.debug("Updated entry files after renaming.");
+                });
             }
         }
     }
