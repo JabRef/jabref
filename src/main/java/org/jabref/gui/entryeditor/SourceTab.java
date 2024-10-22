@@ -63,6 +63,8 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
+    private static final String TEXT_STYLE = "text";
+    private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
@@ -103,28 +105,45 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void highlightSearchPattern() {
-        if (codeArea != null) {
-            codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            if (searchQueryProperty.get().isPresent()) {
-                Optional<String> searchPattern = Highlighter.getSearchTermsPattern(searchQueryProperty.get().get());
-                if (searchPattern.isPresent()) {
-                    LOGGER.debug("Highlighting search pattern {}", searchPattern.get());
-                    for (Range fieldPosition : fieldPositions.values()) {
-                        int start = fieldPosition.start();
-                        int end = fieldPosition.end();
-                        List<Range> matchedPositions = Highlighter.getMatchPositions(codeArea.getText(start, end), searchPattern.get());
-                        for (Range range: matchedPositions) {
-                            codeArea.setStyleClass(start + range.start() - 1, start + range.end(), "search");
-                        }
-                    }
-                }
+        if (codeArea == null || searchQueryProperty.get().isEmpty()) {
+            return;
+        }
+
+        codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
+        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
+
+        searchTermsMap.forEach((optionalField, terms) -> {
+            Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
+            if (searchPattern.isEmpty()) {
+                return;
             }
+
+            if (optionalField.isPresent()) {
+                highlightField(optionalField.get(), searchPattern.get());
+            } else {
+                fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern.get()));
+            }
+        });
+    }
+
+    private void highlightField(Field field, String searchPattern) {
+        Range fieldPosition = fieldPositions.get(field);
+        if (fieldPosition == null) {
+            return;
+        }
+
+        int start = fieldPosition.start();
+        int end = fieldPosition.end();
+        List<Range> matchedPositions = Highlighter.findMatchPositions(codeArea.getText(start, end), searchPattern);
+
+        for (Range range : matchedPositions) {
+            codeArea.setStyleClass(start + range.start() - 1, start + range.end(), SEARCH_STYLE);
         }
     }
 
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, "\n");
+        BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
         bibEntryWriter.write(entry, bibWriter, type, true);

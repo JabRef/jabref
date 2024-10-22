@@ -1,8 +1,9 @@
 package org.jabref.logic.search.query;
 
-import java.util.Set;
+import java.util.List;
 
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.search.query.SqlQueryNode;
 import org.jabref.search.SearchParser;
 
@@ -28,7 +29,7 @@ public class SearchQueryConversion {
         return new SearchToLuceneVisitor().visit(searchQuery.getContext());
     }
 
-    public static Set<String> extractSearchTerms(SearchQuery searchQuery) {
+    public static List<SearchQueryNode> extractSearchTerms(SearchQuery searchQuery) {
         LOGGER.debug("Extracting search terms from search expression: {}", searchQuery.getSearchExpression());
         return new SearchQueryExtractorVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }

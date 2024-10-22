@@ -1,18 +1,23 @@
 package org.jabref.logic.search.query;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
+import java.util.Optional;
 
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
 /**
  * Tests are located in {@link org.jabref.logic.search.query.SearchQueryExtractorConversionTest}.
  */
-public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> {
+public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQueryNode>> {
 
     private final boolean searchBarRegex;
     private boolean isNegated = false;
@@ -22,18 +27,18 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> 
     }
 
     @Override
-    public Set<String> visitStart(SearchParser.StartContext ctx) {
+    public List<SearchQueryNode> visitStart(SearchParser.StartContext ctx) {
         return visit(ctx.orExpression());
     }
 
     @Override
-    public Set<String> visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
-        List<Set<String>> children = ctx.expression().stream().map(this::visit).toList();
+    public List<SearchQueryNode> visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
+        List<List<SearchQueryNode>> children = ctx.expression().stream().map(this::visit).toList();
         if (children.size() == 1) {
             return children.getFirst();
         } else {
-            Set<String> terms = new HashSet<>();
-            for (Set<String> child : children) {
+            List<SearchQueryNode> terms = new ArrayList<>();
+            for (List<SearchQueryNode> child : children) {
                 terms.addAll(child);
             }
             return terms;
@@ -41,45 +46,46 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> 
     }
 
     @Override
-    public Set<String> visitNegatedExpression(SearchParser.NegatedExpressionContext ctx) {
+    public List<SearchQueryNode> visitNegatedExpression(SearchParser.NegatedExpressionContext ctx) {
         isNegated = !isNegated;
-        Set<String> terms = visit(ctx.expression());
+        List<SearchQueryNode> terms = visit(ctx.expression());
         isNegated = !isNegated;
         return terms;
     }
 
     @Override
-    public Set<String> visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-        Set<String> terms = new HashSet<>();
+    public List<SearchQueryNode> visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+        List<SearchQueryNode> terms = new ArrayList<>();
         terms.addAll(visit(ctx.left));
         terms.addAll(visit(ctx.right));
         return terms;
     }
 
     @Override
-    public Set<String> visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+    public List<SearchQueryNode> visitParenExpression(SearchParser.ParenExpressionContext ctx) {
         return visit(ctx.orExpression());
     }
 
     @Override
-    public Set<String> visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
+    public List<SearchQueryNode> visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
         return visit(ctx.comparison());
     }
 
     @Override
-    public Set<String> visitComparison(SearchParser.ComparisonContext ctx) {
+    public List<SearchQueryNode> visitComparison(SearchParser.ComparisonContext ctx) {
+        // ignore negated comparisons
         if (isNegated) {
-            return Set.of();
+            return List.of();
         }
         if (ctx.operator() != null) {
             int operator = ctx.operator().getStart().getType();
             if (operator == SearchParser.NEQUAL
-                || operator == SearchParser.NCEQUAL
-                || operator == SearchParser.NEEQUAL
-                || operator == SearchParser.NCEEQUAL
-                || operator == SearchParser.NREQUAL
-                || operator == SearchParser.NCREEQUAL) {
-                return Set.of();
+                    || operator == SearchParser.NCEQUAL
+                    || operator == SearchParser.NEEQUAL
+                    || operator == SearchParser.NCEEQUAL
+                    || operator == SearchParser.NREQUAL
+                    || operator == SearchParser.NCREEQUAL) {
+                return List.of();
             }
         }
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
@@ -87,14 +93,33 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<Set<String>> 
         // if not regex, escape the backslashes, because the highlighter uses regex
 
         // unfielded terms, check the search bar flags
-        if (ctx.FIELD() == null && !searchBarRegex) {
-            return Set.of(term.replace("\\", "\\\\"));
-        } else if (ctx.operator() != null) {
+        if (ctx.FIELD() == null) {
+            if (!searchBarRegex) {
+                term = term.replace("\\", "\\\\");
+            }
+            return List.of(new SearchQueryNode(Optional.empty(), term));
+        }
+
+        String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
+
+        // Pseudo-fields
+        field = switch (field) {
+            case "key" -> InternalField.KEY_FIELD.getName();
+            case "anykeyword" -> StandardField.KEYWORDS.getName();
+            case "anyfield" -> "any";
+            default -> field;
+        };
+
+        if (ctx.operator() != null) {
             int operator = ctx.operator().getStart().getType();
             if (operator != SearchParser.REQUAL && operator != SearchParser.CREEQUAL) {
-                return Set.of(term.replace("\\", "\\\\"));
+                term = term.replace("\\", "\\\\");
             }
         }
-        return Set.of(term);
+
+        if ("any".equals(field)) {
+            return List.of(new SearchQueryNode(Optional.empty(), term));
+        }
+        return List.of(new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term));
     }
 }
