@@ -181,4 +181,81 @@ public class FieldEditorTextAreaTest {
         return result;
     }
 
+
+    /**
+     * Check if the class implements FieldEditorFX interface
+     *
+     * @param cu CompilationUnit
+     * @return true if the class implements FieldEditorFX interface
+     */
+    private static boolean implementedFieldEditorFX(CompilationUnit cu) {
+        return cu.findAll(ClassOrInterfaceDeclaration.class).stream()
+                .anyMatch(classDecl -> classDecl.getImplementedTypes().stream()
+                        .anyMatch(type -> type.getNameAsString().equals("FieldEditorFX")));
+    }
+
+    /**
+     * Check if the class has an new EditorTextArea creation
+     *
+     * @param cu CompilationUnit
+     * @return true if the class has an new EditorTextArea creation
+     */
+    private static boolean hasEditorTextAreaCreationExisted(CompilationUnit cu) {
+        return cu.findAll(ObjectCreationExpr.class).stream()
+                .anyMatch(creation -> creation.getType().toString().equals("EditorTextArea"));
+    }
+
+    /**
+     * Check if the class holds a TextInputControl field
+     *
+     * @param cu CompilationUnit
+     * @return true if the class holds a TextInputControl field
+     */
+    private static boolean holdTextInputControlField(CompilationUnit cu) {
+        // since the class implements FieldEditorFX, we are going to check the first parameter when call
+        // establishBinding method, which should be a TextInputControl
+        AtomicBoolean hasTextInputControlField = new AtomicBoolean(false);
+        cu.findAll(MethodCallExpr.class)
+                .stream()
+                .filter(methodCallExpr -> methodCallExpr.getNameAsString().equals("establishBinding"))
+                .findFirst()
+                .ifPresent(methodCallExpr -> {
+                    if (!methodCallExpr.getArguments().isEmpty()) {
+                        String firstArgument = methodCallExpr.getArgument(0).toString();
+                        cu.findAll(FieldDeclaration.class)
+                                .stream()
+                                .filter(fieldDeclaration -> fieldDeclaration.getVariables().stream()
+                                        .anyMatch(variableDeclarator -> variableDeclarator.getNameAsString().equals(firstArgument)))
+                                .findFirst()
+                                .ifPresent(fieldDeclaration -> {
+                                    String classType = fieldDeclaration.getElementType().asString();
+                                    if (classType.equals("TextInputControl")) {
+                                        hasTextInputControlField.set(true);
+                                    }
+                                });
+                    }
+                });
+        return hasTextInputControlField.get();
+    }
+
+    private static boolean holdEditorTextField(CompilationUnit compilationUnit){
+        AtomicBoolean hasEditorTextField = new AtomicBoolean(false);
+        compilationUnit.findAll(MethodCallExpr.class).stream()
+                .filter(methodCallExpr -> methodCallExpr.getNameAsString().equals("establishBinding"))
+                .findFirst()
+                .ifPresent(establishBindingCall -> {
+                    String firstArg = establishBindingCall.getArgument(0).toString();
+                    compilationUnit.findAll(FieldDeclaration.class).stream()
+                            .filter(field -> field.getVariable(0).getNameAsString().equals(firstArg))
+                            .findFirst()
+                            .ifPresent(fieldDeclaration -> {
+                                String fieldType = fieldDeclaration.getElementType().asString();
+                                if (fieldType.equals("EditorTextField")) {
+                                    hasEditorTextField.set(true);
+                                }
+                            });
+                });
+        return hasEditorTextField.get();
+    }
+
 }
