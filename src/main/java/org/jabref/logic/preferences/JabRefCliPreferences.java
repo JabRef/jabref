@@ -669,8 +669,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @return Instance of JaRefPreferences
-     * @deprecated Use {@link CliPreferences} instead
+     * @deprecated Never ever add a call to this method. There should be only one caller.
+     *             All other usages should get the preferences passed (or injected).
+     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
