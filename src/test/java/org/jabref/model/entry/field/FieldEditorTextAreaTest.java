@@ -33,6 +33,9 @@ public class FieldEditorTextAreaTest {
 
     private static JavaParser parser;
     private static final Logger logger = Logger.getLogger(FieldEditorTextAreaTest.class.getName());
+    private static final Pattern FIELD_PROPERTY_PATTERN = Pattern.compile("fieldProperties\\.contains\\s*\\(\\s*FieldProperty\\.(\\w+)\\s*\\)");
+    private static final Pattern STANDARD_FIELD_PATTERN = Pattern.compile("==\\s*StandardField\\.(\\w+)");
+    private static final Pattern INTERNAL_FIELD_PATTERN = Pattern.compile("==\\s*InternalField\\.(\\w+)");
 
     @BeforeAll
     public static void setUp() {
@@ -41,17 +44,16 @@ public class FieldEditorTextAreaTest {
         parser = new JavaParser(configuration);
     }
 
-
     /**
      * This test performs the following steps:
      * 1. Use Java parser to parse FieldEditors.java and check all if statements in the getForField method.
      * 2. Match the conditions of if statements to extract the field properties.
      * 3. Match the created FieldEditor class name with field properties extracted from step 2. This creates a map where:
-     *    - The key is the file path of the FieldEditor class (for example: ....UrlEditor.java)
-     *    - The value is the list of properties of the FieldEditor class (for example: [FieldProperty.EXTERNAL])
+     * - The key is the file path of the FieldEditor class (for example: ....UrlEditor.java)
+     * - The value is the list of properties of the FieldEditor class (for example: [FieldProperty.EXTERNAL])
      * 4. For every class in the map, when its properties contain MULTILINE_TEXT, check whether it:
-     *    a) Holds a TextInputControl field
-     *    b) Has an EditorTextArea object creation
+     * a) Holds a TextInputControl field
+     * b) Has an EditorTextArea object creation
      */
     @Test
     public void fieldEditorTextAreaTest() throws IOException {
@@ -61,24 +63,24 @@ public class FieldEditorTextAreaTest {
             // now we have the file path and its properties, going to analyze the target Editor class
             Path filePath = entry.getKey();
             List<FieldProperty> properties = entry.getValue();
+
+            CompilationUnit cu = parser.parse(filePath).getResult().orElse(null);
+            if (cu == null) {
+                throw new RuntimeException("Failed to analyze " + filePath);
+            }
+
+            if (!implementedFieldEditorFX(cu)) {
+                continue; // make sure the class implements FieldEditorFX interface
+            }
+
             if (properties.contains(FieldProperty.MULTILINE_TEXT)) {
                 // if the editor has MULTILINE_TEXT property, we are going to check if the class hold a `TextInputControl` field
                 // and have performed Text Area creation
-                    CompilationUnit cu = parser.parse(filePath).getResult().orElse(null);
-                    if (cu == null) {
-                        throw new RuntimeException("Failed to analyze " + filePath);
-                    }
-                    if (implementedFieldEditorFX(cu)) { // make sure the class implements FieldEditorFX interface
-                        assertTrue(holdTextInputControlField(cu) && hasEditorTextAreaCreationExisted(cu),
-                                "Class " + filePath + " should hold a TextInputControl field and have EditorTextArea creation");
-                    }
+                assertTrue(holdTextInputControlField(cu) && hasEditorTextAreaCreationExisted(cu),
+                        "Class " + filePath + " should hold a TextInputControl field and have EditorTextArea creation");
             }
         }
     }
-
-    private static final Pattern FIELD_PROPERTY_PATTERN = Pattern.compile("fieldProperties\\.contains\\s*\\(\\s*FieldProperty\\.(\\w+)\\s*\\)");
-    private static final Pattern STANDARD_FIELD_PATTERN = Pattern.compile("==\\s*StandardField\\.(\\w+)");
-    private static final Pattern INTERNAL_FIELD_PATTERN = Pattern.compile("==\\s*InternalField\\.(\\w+)");
 
 
     /**
@@ -238,7 +240,7 @@ public class FieldEditorTextAreaTest {
         return hasTextInputControlField.get();
     }
 
-    private static boolean holdEditorTextField(CompilationUnit compilationUnit){
+    private static boolean holdEditorTextField(CompilationUnit compilationUnit) {
         AtomicBoolean hasEditorTextField = new AtomicBoolean(false);
         compilationUnit.findAll(MethodCallExpr.class).stream()
                 .filter(methodCallExpr -> methodCallExpr.getNameAsString().equals("establishBinding"))
