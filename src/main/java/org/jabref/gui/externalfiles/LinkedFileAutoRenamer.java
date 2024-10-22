@@ -41,7 +41,7 @@ public class LinkedFileAutoRenamer {
         Field changedField = event.getField();
 
         String fileNamePattern = preferences.getFilePreferences().getFileNamePattern();
-        if (fileNamePattern == null || fileNamePattern.trim().isEmpty()) {
+        if (fileNamePattern == null || fileNamePattern.isBlank()) {
             return;
         }
 
