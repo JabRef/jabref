@@ -169,6 +169,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // unfielded expression
         if (ctx.operator() == null) {
+            // apply search bar flags to unfielded expressions
             boolean isCaseSensitive = searchBarFlags.contains(CASE_SENSITIVE);
             if (searchBarFlags.contains(REGULAR_EXPRESSION)) {
                 setFlags(searchFlags, REGULAR_EXPRESSION, isCaseSensitive, false);
@@ -212,37 +213,39 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     }
 
     private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
-        String operator = getSqlOperator(searchFlags);
+        String sqlOperator = getSqlOperator(searchFlags);
+        term = escapeTermForSql(term, searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
         // Pseudo-fields
         field = switch (field) {
             case "key" -> InternalField.KEY_FIELD.getName();
             case "anykeyword" -> StandardField.KEYWORDS.getName();
+            case "anyfield" -> "any";
             default -> field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
             return buildEntryIdQuery(term);
-        } else if ("anyfield".equals(field) || "any".equals(field)) {
-            if (searchFlags.contains(EXACT_MATCH)) {
+        } else if ("any".equals(field)) {
+            if (searchFlags.contains(INEXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                        ? buildExactNegationAnyFieldQuery(operator, term)
-                        : buildExactAnyFieldQuery(operator, term);
+                        ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
+                        : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
             } else {
                 return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationAnyFieldQuery(operator, prefixSuffix, term)
-                        : buildContainsAnyFieldQuery(operator, prefixSuffix, term);
+                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)
+                        : buildExactAnyFieldQuery(sqlOperator, term);
             }
         } else {
-            if (searchFlags.contains(EXACT_MATCH)) {
+            if (searchFlags.contains(INEXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                        ? buildExactNegationFieldQuery(field, operator, term)
-                        : buildExactFieldQuery(field, operator, term);
+                        ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
+                        : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             } else {
                 return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationFieldQuery(field, operator, prefixSuffix, term)
-                        : buildContainsFieldQuery(field, operator, prefixSuffix, term);
+                        ? buildExactNegationFieldQuery(field, sqlOperator, term)
+                        : buildExactFieldQuery(field, sqlOperator, term);
             }
         }
     }
@@ -561,5 +564,18 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
 
         return term;
+    }
+
+    /**
+     * Escapes wildcard characters in the search term for SQL queries.
+     * <p>
+     * - Escapes {@code \}, {@code _}, and {@code %} for SQL LIKE queries.
+     */
+    private static String escapeTermForSql(String term, EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(REGULAR_EXPRESSION)) {
+            return term;
+        } else {
+            return term.replaceAll("[\\\\_%]", "\\\\$0");
+        }
     }
 }
