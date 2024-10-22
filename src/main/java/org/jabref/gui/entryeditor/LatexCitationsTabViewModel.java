@@ -176,7 +176,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                                                       preferences)
                                                               .orElse(new PushToEmacs(dialogService, preferences));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
-            application.publicJumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
+            application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }
     }
 

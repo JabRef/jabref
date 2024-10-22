@@ -104,7 +104,6 @@ public class PushToApplicationCommand extends SimpleCommand {
         for (BibEntry bes : entries) {
             citeKey = bes.getCitationKey();
             if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
-                // Should never occur, because we made sure that all entries have keys
                 continue;
             }
             if (first) {
@@ -142,8 +141,4 @@ public class PushToApplicationCommand extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
     }
-//    private void jump(Path fileName, int line, int column) {
-//        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-//        application.publicJumpToLine(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
-//    }
 }

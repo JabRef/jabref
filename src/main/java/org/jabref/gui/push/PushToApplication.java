@@ -58,5 +58,5 @@ public interface PushToApplication {
 
     String getDelimiter();
 
-    void publicJumpToLine(Path fileName, int line, int column);
+    void jumpToLine(Path fileName, int line, int column);
 }
