@@ -177,25 +177,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        fieldTypeMultilineColumn.setCellValueFactory(item -> {
-            BooleanProperty property = item.getValue().multilineProperty();
-            property.addListener((obs, wasSelected, isSelected) -> {
-                if (isSelected) {
-                    viewModel.entryTypes().forEach(typeViewModel -> {
-                        typeViewModel.fields().stream()
-                                     .filter(f -> f.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
-                                     .forEach(f -> f.multilineProperty().set(true));
-                    });
-                } else {
-                    viewModel.entryTypes().forEach(typeViewModel -> {
-                        typeViewModel.fields().stream()
-                                     .filter(f -> f.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
-                                     .forEach(f -> f.multilineProperty().set(false));
-                    });
-                }
-            });
-            return property;
-        });
+        fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
@@ -223,6 +205,18 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
         EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)));
+    }
+
+    private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
+        BooleanProperty property = item.getValue().multilineProperty();
+        property.addListener((obs, wasSelected, isSelected) -> {
+            viewModel.entryTypes().forEach(typeViewModel -> {
+                typeViewModel.fields().stream()
+                             .filter(field -> field.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                             .forEach(field -> field.multilineProperty().set(isSelected));
+            });
+        });
+        return property;
     }
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
