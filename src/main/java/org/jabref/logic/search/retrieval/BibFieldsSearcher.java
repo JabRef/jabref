@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
-import org.jabref.model.search.query.SqlQuery;
+import org.jabref.model.search.query.SqlQueryNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +42,11 @@ public class BibFieldsSearcher {
         if (!searchQuery.isValid()) {
             return new SearchResults();
         }
-        SqlQuery sqlQuery = SearchQueryConversion.searchToSql(tableName, searchQuery);
+        SqlQueryNode sqlQueryNode = SearchQueryConversion.searchToSql(tableName, searchQuery);
         SearchResults searchResults = new SearchResults();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery.cte())) {
-            for (int i = 0; i < sqlQuery.params().size(); i++) {
-                preparedStatement.setString(i + 1, sqlQuery.params().get(i));
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQueryNode.cte())) {
+            for (int i = 0; i < sqlQueryNode.params().size(); i++) {
+                preparedStatement.setString(i + 1, sqlQueryNode.params().get(i));
             }
             LOGGER.debug("Executing search query: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();

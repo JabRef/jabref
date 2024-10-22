@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.search.query.SqlQuery;
+import org.jabref.model.search.query.SqlQueryNode;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.AfterAll;
@@ -345,6 +345,44 @@ class SearchQuerySQLConversionTest {
                 ),
 
                 Arguments.of(
+                        "term1 term2 term3",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term1%')) OR (main_table.field_value_transformed ILIKE ('%term1%')))
+                            )
+                        )
+                        ,
+                        cte1 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term2%')) OR (main_table.field_value_transformed ILIKE ('%term2%')))
+                            )
+                        )
+                        ,
+                        cte2 AS (
+                            SELECT main_table.entry_id
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term3%')) OR (main_table.field_value_transformed ILIKE ('%term3%')))
+                            )
+                        )
+                        ,
+                        cte3 AS (
+                            SELECT entry_id FROM cte0
+                            UNION
+                            SELECT entry_id FROM cte1
+                            UNION
+                            SELECT entry_id FROM cte2
+                        )
+                        SELECT * FROM cte3 GROUP BY entry_id"""
+                ),
+
+                Arguments.of(
                     "a OR b AND c",
                     """
                     WITH
@@ -658,8 +696,6 @@ class SearchQuerySQLConversionTest {
                         )
                         SELECT * FROM cte0 GROUP BY entry_id"""
                 )
-                // Throws exceptions
-                // computer science, !computer, R\"ock, Breitenb{\"{u}}cher
         );
     }
 
@@ -667,10 +703,10 @@ class SearchQuerySQLConversionTest {
     @MethodSource
     void testSearchConversion(String searchExpression, String expected) throws SQLException {
         try (Connection connection = pg.getPostgresDatabase().getConnection()) {
-            SqlQuery sqlQuery = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression));
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery.cte())) {
-                for (int i = 0; i < sqlQuery.params().size(); i++) {
-                    preparedStatement.setString(i + 1, sqlQuery.params().get(i));
+            SqlQueryNode sqlQueryNode = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression));
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQueryNode.cte())) {
+                for (int i = 0; i < sqlQueryNode.params().size(); i++) {
+                    preparedStatement.setString(i + 1, sqlQueryNode.params().get(i));
                 }
                 String sql = preparedStatement.toString();
                 assertEquals(expected, sql);
@@ -839,10 +875,10 @@ class SearchQuerySQLConversionTest {
     @MethodSource
     void testUnFieldedTermsWithSearchBarFlags(String searchExpression, EnumSet<SearchFlags> searchFlags, String expected) throws SQLException {
         try (Connection connection = pg.getPostgresDatabase().getConnection()) {
-            SqlQuery sqlQuery = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression, searchFlags));
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery.cte())) {
-                for (int i = 0; i < sqlQuery.params().size(); i++) {
-                    preparedStatement.setString(i + 1, sqlQuery.params().get(i));
+            SqlQueryNode sqlQueryNode = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression, searchFlags));
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQueryNode.cte())) {
+                for (int i = 0; i < sqlQueryNode.params().size(); i++) {
+                    preparedStatement.setString(i + 1, sqlQueryNode.params().get(i));
                 }
                 String sql = preparedStatement.toString();
                 assertEquals(expected, sql);
