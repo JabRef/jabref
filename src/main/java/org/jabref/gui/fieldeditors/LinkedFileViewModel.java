@@ -1,12 +1,15 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
@@ -365,7 +368,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
         var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
         Optional<Path> currentFilePath = linkedFile.findIn(dir);
-
         if (currentFilePath.isPresent()) {
             Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
                     directoryHandler.determineTargetDirectory(currentFilePath.get());
@@ -374,12 +376,40 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
                 try {
                     Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
-                    System.out.println("Current File Path");
-                    System.out.println(currentFilePath.get());
-                    System.out.println("Target Path");
-                    System.out.println(target);
-                    Files.move(currentFilePath.get(), target);
-                    linkedFile.setLink(target.toString());
+                    Path originalPath = currentFilePath.get().getParent();
+                    // Get file name
+                    String fileName = currentFilePath.get().getFileName().toString();
+
+                    // Extract the subdirectory structure from the current path
+                    List<String> subDirs = new ArrayList<>();
+                    Path parent = currentFilePath.get().getParent();
+
+                    // Find last directory containing the target filename
+                    while (parent != null && parent.getFileName() != null) {
+                        String dirName = parent.getFileName().toString();
+                        if (!isRootLikeDirectory(dirName)) {
+                            subDirs.addFirst(dirName);
+                        }
+                        parent = parent.getParent();
+                    }
+
+                    Path targetPath = target.getParent();
+
+                    for (String subDir: subDirs) {
+                        targetPath = targetPath.resolve(subDir);
+                    }
+                    targetPath = targetPath.resolve(fileName);
+
+                    // Create necessaries directories
+                    Files.createDirectories(targetPath.getParent());
+
+                    Files.move(currentFilePath.get(), targetPath);
+                    System.out.println("File moved successfully to: " + targetPath);
+                    linkedFile.setLink(targetPath.toString());
+
+                    // Clean up empty directories after moving the file
+                    cleanupEmptyDirectories(originalPath);
+
                     // Update the menu item text after moving the file
                     if (moveFileItem != null) {
                         Platform.runLater(() -> updateMoveFileItemText(moveFileItem, target));
@@ -401,6 +431,66 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
             }
         }
+    }
+
+    /**
+     * Checks if a directory name appears to be a root-level directory that should be excluded
+     * from the subdirectory structure preservation.
+     */
+    private boolean isRootLikeDirectory(String dirName) {
+        // Get the username
+        String user = preferences.getFilePreferences().getUserAndHost().split("-")[0];
+
+        // Create a set of root-like directories and include the user dynamically
+        Set<String> rootLikeDirs = new HashSet<>(Set.of(
+                "home", "Users", "Desktop", "Documents", "Workspace",
+                "C:", "D:", "E:", // Windows drives
+                "Program Files", "Program Files (x86)", // Windows system dirs
+                "usr", "var", "opt", "etc" // Common Unix dirs
+        ));
+
+        // Add the user's name to the set
+        rootLikeDirs.add(user);
+
+        // Check if the given directory name is in the root-like directories
+        return rootLikeDirs.contains(dirName);
+    }
+
+    /**
+     * Recursively deletes empty directories starting from the given path.
+     * Stops when it encounters a non-empty directory or reaches a root-like directory.
+     *
+     * @param directory The starting directory path to check and potentially delete
+     * @return true if the directory was deleted, false otherwise
+     */
+    private boolean cleanupEmptyDirectories(Path directory) {
+        if (directory == null || isRootLikeDirectory(directory.getFileName().toString())) {
+            return false;
+        }
+
+        try {
+            // Check if directory is empty
+            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
+                if (dirStream.iterator().hasNext()) {
+                    return false; // Directory is not empty
+                }
+            }
+
+            // Delete the empty directory
+            Files.delete(directory);
+            System.out.println("Deleted empty directory: " + directory);
+
+            // Recursively check and delete parent directory if it's empty
+            Path parent = directory.getParent();
+            if (parent != null) {
+                return cleanupEmptyDirectories(parent);
+            }
+        } catch (IOException e) {
+            System.err.println("Error while cleaning up empty directory: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     /**
