@@ -145,17 +145,19 @@ public class BibEntryWriter {
     private void writeEntryType(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
         int start = out.getCurrentPosition();
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
-        out.write('@' + typedEntry.getTypeForDisplay() + '{');
-        int end = out.getCurrentPosition() - 1; // exclude the '{'
+        out.write('@' + typedEntry.getTypeForDisplay());
+        int end = out.getCurrentPosition();
         fieldPositions.put(InternalField.TYPE_HEADER, new Range(start, end));
+        out.write("{");
     }
 
     private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
         int start = out.getCurrentPosition();
         String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
-        out.writeLine(keyField + ',');
-        int end = out.getCurrentPosition() - 1; // exclude the ','
+        out.write(keyField);
+        int end = out.getCurrentPosition();
         fieldPositions.put(InternalField.KEY_FIELD, new Range(start, end));
+        out.writeLine(",");
     }
 
     /**

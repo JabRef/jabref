@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SearchQueryLuceneConversionTest {
 
-    public static Stream<Arguments> testSearchConversion() {
+    public static Stream<Arguments> searchConversion() {
         return Stream.of(
                 Arguments.of("content:term annotations:term", "term"),
                 Arguments.of("content:term annotations:term", "any = term"),
@@ -59,7 +59,7 @@ class SearchQueryLuceneConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(String expected, String searchExpression) {
+    void searchConversion(String expected, String searchExpression) {
         String result = SearchQueryConversion.searchToLucene(new SearchQuery(searchExpression)).toString();
         assertEquals(expected, result);
     }

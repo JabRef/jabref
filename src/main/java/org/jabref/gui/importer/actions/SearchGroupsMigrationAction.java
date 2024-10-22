@@ -30,6 +30,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
         Optional<Version> currentVersion = parserResult.getMetaData().getGroupSearchSyntaxVersion();
         if (currentVersion.isPresent()) {
             if (currentVersion.get().equals(VERSION_6_0_ALPHA)) {
+                // TODO: This text will only be shown after releasing 6.0-alpha and then removed
                 dialogService.showErrorDialogAndWait("Search groups migration of " + parserResult.getPath().map(Path::toString).orElse(""),
                         "The search groups syntax has been reverted to the old one. Please use the backup you made before migrating to 6.0-alpha.");
             }
