@@ -8,10 +8,14 @@ on:
 jobs:
   add-label-changes-required:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      - run: |
+      - run: echo ${{ github.event.review.state }}
+      - if: ${{ github.event.review.state == 'changes_requested' }}
+        run: |
           gh pr edit "$PR_URL" --remove-label "status: ready-for-review"
           gh pr edit "$PR_URL" --add-label "status: changes required"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
+          GH_TOKEN: ${{ github.token }}
