@@ -19,7 +19,7 @@ public class SearchQueryConversion {
 
     public static String flagsToSearchExpression(SearchQuery searchQuery) {
         LOGGER.debug("Converting search flags to search expression: {}, flags {}", searchQuery.getSearchExpression(), searchQuery.getSearchFlags());
-        return null;
+        return new SearchFlagsToExpressionVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
     public static Query searchToLucene(SearchQuery searchQuery) {
