@@ -14,6 +14,7 @@ Detailed instructions about this step can be found in our [guidelines for settin
 * [Getting a task assigned](#getting-a-task-assigned)
 * [Pull Request Process](#pull-request-process)
   * [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
+  * [After submission of a pull request](#after-submission-of-a-pull-request)
   * [Development hints](#development-hints)
 
 ## Choosing a task [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref)
@@ -126,6 +127,26 @@ More reading on that is available at <https://roe.dev/blog/using-ai-in-open-sour
 
 We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
 
+### After submission of a pull request
+
+After you submitted a pull request, automated checks will run.
+You may see "Some checks were not successful".
+You can click on failing checks to see more information about why they failed.
+Then, please look into them and handle accordingly.
+
+Afterwards, you will receive comments on your pull request.
+The pull request may be approved immediatly, or a reviewer may request changes.
+In that case, please implement the requested changes.
+
+After implementing changes, commit to the branch your pull request is *from* and push.
+The pull request will automatically be updated with your changes.
+Your commits will also be automatically squashed upon the pull request being accepted.
+
+Please – **Never ever close a pull request and open a new one** -
+This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
+You can push any changes you need to make to the branch your pull request is *from*.
+These changes will be automatically added to your pull request.
+
 ### Development hints
 
 #### When adding an external dependency
@@ -162,7 +183,7 @@ Add the above snippet to the English translation file located at `src/main/resou
 
 You can also directly run the specific test in your IDE.
 The test "`LocalizationConsistencyTest`" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`.
-Find more information in the [JabRef developer docs](code-howtos/localization.md).
+Find more information in the [JabRef developer docs](https://devdocs.jabref.org/code-howtos/localization.html).
 
 #### **Format of keyboard shortcuts**
 
