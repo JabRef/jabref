@@ -1,5 +1,18 @@
 package org.jabref.model.entry.field;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
@@ -13,19 +26,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,7 +81,6 @@ public class FieldEditorTextAreaTest {
             }
         }
     }
-
 
     /**
      * Parse FieldEditors.java to get all field editors and their properties in function getForField
@@ -171,10 +170,8 @@ public class FieldEditorTextAreaTest {
                                     Path classFilePath = Paths.get("src/main/java/org/jabref/gui/fieldeditors/" + createdClassName + ".java");
                                     result.put(classFilePath, properties);
                                 });
-
                     }
                 }
-
             });
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error parsing file: " + filePath, e);
@@ -182,7 +179,6 @@ public class FieldEditorTextAreaTest {
 
         return result;
     }
-
 
     /**
      * Check if the class implements FieldEditorFX interface
@@ -259,5 +255,4 @@ public class FieldEditorTextAreaTest {
                 });
         return hasEditorTextField.get();
     }
-
 }
