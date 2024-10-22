@@ -335,7 +335,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveFileItem, moveAndRenameFileItem);
         moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
 
-        // Bind moveFileItem enabling condition based on current file path availability
+        // Bind moveFileItem enabling condition (depend on current file path availability)
         var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
         Optional<Path> currentFilePath = linkedFile.findIn(dir);
 
@@ -347,7 +347,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             moveFileItem.setText(Localization.lang("Move file"));
         }
 
-        // Bind moveFileItem enabling condition based on current file path availability
+        // Bind moveFileItem enabling condition (depend on current file path availability)
         if (currentFilePath.isPresent()) {
             isMoveAndRenameFileDisabled.set(false);
             linkedFile.updateMoveAndRenameFileItemText(moveAndRenameFileItem, currentFilePath.get());

@@ -11,6 +11,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
+/*
+    Responsible for handling file movement across directories
+ */
 public class FileDirectoryHandler {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
@@ -29,9 +32,9 @@ public class FileDirectoryHandler {
     }
 
     public enum DirectoryType {
-        MAIN,          // Main file directory
-        GENERAL,       // General (library) specific directory
-        USER_SPECIFIC  // User specific directory
+        MAIN,
+        GENERAL,
+        USER_SPECIFIC
     }
 
     public Optional<DirectoryInfo> determineTargetDirectory(Path currentFilePath) {
@@ -42,7 +45,6 @@ public class FileDirectoryHandler {
 
         Optional<DirectoryType> currentDirectory = determineCurrentDirectory(currentFilePath);
         if (availableDirectories.size() == 1) {
-            // If only one directory exists and file is outside, return that directory
             if (currentDirectory.isEmpty()) {
                 return Optional.of(availableDirectories.getFirst());
             }
@@ -59,10 +61,8 @@ public class FileDirectoryHandler {
         List<DirectoryInfo> directories = new ArrayList<>();
         MetaData metaData = databaseContext.getMetaData();
 
-        // Main file directory
         filePreferences.getMainFileDirectory().ifPresent(mainFilePath -> directories.add(new DirectoryInfo(Localization.lang("main file directory"), Path.of(mainFilePath.toUri()), DirectoryType.MAIN)));
 
-        // General (library) specific directory from MetaData
         metaData.getDefaultFileDirectory().ifPresent(path ->
                 directories.add(new DirectoryInfo(
                         Localization.lang("library-specific file directory"),
@@ -71,7 +71,6 @@ public class FileDirectoryHandler {
                 ))
         );
 
-        // User-specific directory from MetaData
         metaData.getUserFileDirectory(filePreferences.getUserAndHost()).ifPresent(path ->
                 directories.add(new DirectoryInfo(
                         Localization.lang("user-specific file directory"),
@@ -85,20 +84,20 @@ public class FileDirectoryHandler {
 
     private Optional<DirectoryType> determineCurrentDirectory(Path filePath) {
         MetaData metaData = databaseContext.getMetaData();
-        // Check main directory
+        // Check main directory - If file is in MAIN
         Optional<Path> mainFilePath = filePreferences.getMainFileDirectory();
         if (mainFilePath.isPresent() && filePath.startsWith(mainFilePath.get())) {
             return Optional.of(DirectoryType.MAIN);
         }
 
-        // Check general directory
+        // Check general directory - If file is in Library
         if (metaData.getDefaultFileDirectory()
                     .map(dir -> filePath.startsWith(Path.of(dir)))
                     .orElse(false)) {
             return Optional.of(DirectoryType.GENERAL);
         }
 
-        // Check user specific directory
+        // Check user specific directory - If file is in user
         if (metaData.getUserFileDirectory(filePreferences.getUserAndHost())
                     .map(dir -> filePath.startsWith(Path.of(dir)))
                     .orElse(false)) {
@@ -125,17 +124,14 @@ public class FileDirectoryHandler {
 
         DirectoryType current = currentDirectory.get();
         if (current == DirectoryType.MAIN) {
-            // If file is in main directory, prefer general, then user-specific
             return availableDirectories.stream()
                                        .filter(dir -> dir.type == DirectoryType.GENERAL || dir.type == DirectoryType.USER_SPECIFIC)
                                        .findFirst();
         } else if (current == DirectoryType.GENERAL) {
-            // If file is in general directory, prefer main (user-specific cannot exist in this case)
             return availableDirectories.stream()
                                        .filter(dir -> dir.type == DirectoryType.MAIN)
                                        .findFirst();
         } else {
-            // If file is in user-specific directory, prefer main (general cannot exist in this case)
             return availableDirectories.stream()
                                        .filter(dir -> dir.type == DirectoryType.MAIN)
                                        .findFirst();
@@ -146,7 +142,6 @@ public class FileDirectoryHandler {
         String mainFilePath = String.valueOf(filePreferences.getMainFileDirectory());
 
         if (currentDirectory.isEmpty()) {
-            // File outside all directories - show general
             return availableDirectories.stream()
                                        .filter(dir -> dir.type == DirectoryType.GENERAL)
                                        .findFirst();
