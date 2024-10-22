@@ -226,24 +226,24 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         if (ENTRY_ID.toString().equals(field)) {
             return buildEntryIdQuery(term);
         } else if ("any".equals(field)) {
-            if (searchFlags.contains(INEXACT_MATCH)) {
-                return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
-                        : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
-            } else {
+            if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
                         ? buildExactNegationAnyFieldQuery(sqlOperator, term)
                         : buildExactAnyFieldQuery(sqlOperator, term);
+            } else {
+                return searchFlags.contains(NEGATION)
+                        ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
+                        : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
             }
         } else {
-            if (searchFlags.contains(INEXACT_MATCH)) {
-                return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
-                        : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
-            } else {
+            if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
                         ? buildExactNegationFieldQuery(field, sqlOperator, term)
                         : buildExactFieldQuery(field, sqlOperator, term);
+            } else {
+                return searchFlags.contains(NEGATION)
+                        ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
+                        : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
     }
