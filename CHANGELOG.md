@@ -38,6 +38,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
+- Introduced a new preference under Linked files- "Auto rename files if entry changes". When enabled, this feature automatically renames linked files to match the defined filename pattern whenever the associated entry data is modified. [#12024](https://github.com/JabRef/jabref/pull/12024)
+
 
 ### Changed
 
