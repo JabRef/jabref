@@ -31,17 +31,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldEditorTextAreaTest {
 
-    private static JavaParser parser;
-    private static final Logger logger = Logger.getLogger(FieldEditorTextAreaTest.class.getName());
     private static final Pattern FIELD_PROPERTY_PATTERN = Pattern.compile("fieldProperties\\.contains\\s*\\(\\s*FieldProperty\\.(\\w+)\\s*\\)");
     private static final Pattern STANDARD_FIELD_PATTERN = Pattern.compile("==\\s*StandardField\\.(\\w+)");
     private static final Pattern INTERNAL_FIELD_PATTERN = Pattern.compile("==\\s*InternalField\\.(\\w+)");
+    private static JavaParser PARSER;
+    private static final Logger LOGGER = Logger.getLogger(FieldEditorTextAreaTest.class.getName());
 
     @BeforeAll
     public static void setUp() {
         ParserConfiguration configuration = new ParserConfiguration();
         configuration.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
-        parser = new JavaParser(configuration);
+        PARSER = new JavaParser(configuration);
     }
 
     /**
@@ -64,7 +64,7 @@ public class FieldEditorTextAreaTest {
             Path filePath = entry.getKey();
             List<FieldProperty> properties = entry.getValue();
 
-            CompilationUnit cu = parser.parse(filePath).getResult().orElse(null);
+            CompilationUnit cu = PARSER.parse(filePath).getResult().orElse(null);
             if (cu == null) {
                 throw new RuntimeException("Failed to analyze " + filePath);
             }
@@ -93,7 +93,7 @@ public class FieldEditorTextAreaTest {
         Map<Path, List<FieldProperty>> result = new HashMap<>();
 
         try {
-            CompilationUnit cu = parser.parse(Paths.get(filePath)).getResult().orElse(null);
+            CompilationUnit cu = PARSER.parse(Paths.get(filePath)).getResult().orElse(null);
             if (cu == null) {
                 throw new RuntimeException("Failed to analyze FieldEditors.java");
             }
@@ -116,7 +116,7 @@ public class FieldEditorTextAreaTest {
                         FieldProperty property = FieldProperty.valueOf(propertyName);
                         properties.add(property);
                     } catch (IllegalArgumentException e) {
-                        logger.warning("Unknown FieldProperty: " + propertyName);
+                        LOGGER.warning("Unknown FieldProperty: " + propertyName);
                     }
                 }
                 // match `== StandardField.XXX`
@@ -127,7 +127,7 @@ public class FieldEditorTextAreaTest {
                         StandardField standardField = StandardField.valueOf(fieldName);
                         properties.addAll(standardField.getProperties());
                     } catch (IllegalArgumentException e) {
-                        logger.warning("Unknown StandardField: " + fieldName);
+                        LOGGER.warning("Unknown StandardField: " + fieldName);
                     }
                 }
                 // match `== InternalField.XXX`
@@ -138,7 +138,7 @@ public class FieldEditorTextAreaTest {
                         InternalField internalField = InternalField.valueOf(fieldName);
                         properties.addAll(internalField.getProperties());
                     } catch (IllegalArgumentException e) {
-                        logger.warning("Unknown InternalField: " + fieldName);
+                        LOGGER.warning("Unknown InternalField: " + fieldName);
                     }
                 }
 
@@ -177,7 +177,7 @@ public class FieldEditorTextAreaTest {
 
             });
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error parsing file: " + filePath, e);
+            LOGGER.log(Level.SEVERE, "Error parsing file: " + filePath, e);
         }
 
         return result;
@@ -197,10 +197,10 @@ public class FieldEditorTextAreaTest {
     }
 
     /**
-     * Check if the class has an new EditorTextArea creation
+     * Check if the class has a new EditorTextArea creation
      *
      * @param cu CompilationUnit
-     * @return true if the class has an new EditorTextArea creation
+     * @return true if the class has a new EditorTextArea creation
      */
     private static boolean hasEditorTextAreaCreationExisted(CompilationUnit cu) {
         return cu.findAll(ObjectCreationExpr.class).stream()
