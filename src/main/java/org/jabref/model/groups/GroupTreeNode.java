@@ -55,17 +55,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Associates the specified group with this node.
-     *
-     * @param newGroup the new group (has to be non-null)
-     * @deprecated use {@link #setGroup(AbstractGroup, boolean, boolean, List)}} instead
-     */
-    @Deprecated
-    public void setGroup(AbstractGroup newGroup) {
-        this.groupProperty.set(Objects.requireNonNull(newGroup));
-    }
-
-    /**
      * Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
      *
      * @param newGroup                        the new group (has to be non-null)

@@ -119,7 +119,8 @@ public class DatabaseMerger {
                             "Imported " + newGroupName,
                             GroupHierarchyType.INDEPENDENT,
                             keywordDelimiter);
-                    newGroups.setGroup(group);
+                    newGroups.setGroup(group, false, false,
+                            null);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {
                     LOGGER.error("Problem appending entries to group", e);
