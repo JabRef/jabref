@@ -1,13 +1,14 @@
 package org.jabref.model.entry.identifier;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.net.URI;
 import java.util.Optional;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RFCTest {
 
