@@ -1,6 +1,5 @@
 package org.jabref.migrations;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,7 +66,7 @@ class SearchToLuceneMigrationTest {
 
     @ParameterizedTest
     @MethodSource
-    void transformationRegularExpression(String expected, String query) throws IOException {
+    void transformationRegularExpression(String expected, String query) {
         String result = SearchToLuceneMigration.migrateToLuceneSyntax(query, true);
         assertEquals(expected, result);
     }
