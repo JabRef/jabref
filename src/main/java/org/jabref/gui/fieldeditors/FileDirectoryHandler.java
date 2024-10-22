@@ -36,7 +36,6 @@ public class FileDirectoryHandler {
 
     public Optional<DirectoryInfo> determineTargetDirectory(Path currentFilePath) {
         List<DirectoryInfo> availableDirectories = getAvailableDirectories();
-        System.out.println(availableDirectories.size());
         if (availableDirectories.isEmpty()) {
             return Optional.empty();
         }
@@ -80,10 +79,6 @@ public class FileDirectoryHandler {
                         DirectoryType.USER_SPECIFIC
                 ))
         );
-
-        for (DirectoryInfo directory : directories) {
-            System.out.println(directory);
-        }
 
         return directories;
     }

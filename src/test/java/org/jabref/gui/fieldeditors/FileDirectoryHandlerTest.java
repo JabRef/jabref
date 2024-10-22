@@ -13,11 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FileDirectoryHandlerTest {
 
+    private static final Path MAIN_DIR = Path.of("/main/dir");
+    private static final Path GENERAL_DIR = Path.of("/general/dir");
+    private static final Path USER_DIR = Path.of("/user/dir");
     private FileDirectoryHandler fileDirectoryHandler;
     private FilePreferences filePreferences;
     private MetaData metaData;
@@ -30,6 +34,7 @@ public class FileDirectoryHandlerTest {
         metaData = mock(MetaData.class);
 
         when(databaseContext.getMetaData()).thenReturn(metaData);
+        when(filePreferences.getUserAndHost()).thenReturn("testUser");
 
         fileDirectoryHandler = new FileDirectoryHandler(databaseContext, filePreferences, dialogService);
     }
@@ -57,14 +62,104 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories() {
-        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(Path.of("main/dir")));
-        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("general/dir"));
+    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileInMain() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
         when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.empty());
 
-        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(Path.of("some/path"));
+        // Test file in main directory
+        Path filePath = MAIN_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
 
         assertEquals("library-specific file directory", result.get().label());
+        assertEquals(GENERAL_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileInGeneral() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.empty());
+
+        // Test file in general directory
+        Path filePath = GENERAL_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("main file directory", result.get().label());
+        assertEquals(MAIN_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileOutside() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.empty());
+
+        // Test file outside both directories
+        Path filePath = Path.of("/other/dir/test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("library-specific file directory", result.get().label());
+        assertEquals(GENERAL_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_MainAndUser_FileInMain() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in main directory
+        Path filePath = MAIN_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("user-specific file directory", result.get().label());
+        assertEquals(USER_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_MainAndUser_FileInUser() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in user directory
+        Path filePath = USER_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("main file directory", result.get().label());
+        assertEquals(MAIN_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_GeneralAndUser_FileInGeneral() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in general directory
+        Path filePath = GENERAL_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_TwoDirectories_GeneralAndUser_FileInUser() {
+        // Setup directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in user directory
+        Path filePath = USER_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -76,5 +171,50 @@ public class FileDirectoryHandlerTest {
         Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(Path.of("some/path"));
 
         assertEquals("library-specific file directory", result.get().label());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_ThreeDirectories_FileInGeneral() {
+        // Setup all three directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in general directory
+        Path filePath = GENERAL_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("user-specific file directory", result.get().label());
+        assertEquals(USER_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_ThreeDirectories_FileInUser() {
+        // Setup all three directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file in user directory
+        Path filePath = USER_DIR.resolve("test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("library-specific file directory", result.get().label());
+        assertEquals(GENERAL_DIR, result.get().path());
+    }
+
+    @Test
+    public void testDetermineTargetDirectory_ThreeDirectories_FileOutside() {
+        // Setup all three directories
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
+        when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
+        when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of(USER_DIR.toString()));
+
+        // Test file outside all directories
+        Path filePath = Path.of("/other/dir/test.pdf");
+        Optional<FileDirectoryHandler.DirectoryInfo> result = fileDirectoryHandler.determineTargetDirectory(filePath);
+
+        assertEquals("library-specific file directory", result.get().label());
+        assertEquals(GENERAL_DIR, result.get().path());
     }
 }
