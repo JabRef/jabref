@@ -75,10 +75,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     @Override
     public SqlQueryNode visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
-        List<SqlQueryNode> children = new ArrayList<>();
-        for (SearchParser.ExpressionContext exprCtx : ctx.expression()) {
-            children.add(visit(exprCtx));
-        }
+        List<SqlQueryNode> children = ctx.expression().stream().map(this::visit).toList();
 
         if (children.size() == 1) {
             return children.getFirst();
@@ -169,7 +166,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         String term = unescapeSearchValue(ctx.searchValue());
 
         // unfielded expression
-        if (ctx.operator() == null) {
+        if (ctx.FIELD() == null) {
             // apply search bar flags to unfielded expressions
             boolean isCaseSensitive = searchBarFlags.contains(CASE_SENSITIVE);
             if (searchBarFlags.contains(REGULAR_EXPRESSION)) {

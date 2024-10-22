@@ -41,6 +41,9 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
     @Override
     public String visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
         List<String> children = ctx.expression().stream().map(this::visit).toList();
+        if (children.size() == 1) {
+            return children.getFirst();
+        }
         return String.join(" ", children);
     }
 
@@ -68,7 +71,7 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         String term = ctx.searchValue().getText();
 
         // unfielded expression
-        if (ctx.operator() == null) {
+        if (ctx.FIELD() == null) {
             return term;
         }
 

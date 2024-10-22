@@ -35,7 +35,7 @@ class SearchQuerySQLConversionTest {
         pg.close();
     }
 
-    public static Stream<Arguments> testSearchConversion() {
+    public static Stream<Arguments> searchConversion() {
         return Stream.of(
                 Arguments.of(
                         "author CONTAINS smith",
@@ -701,7 +701,7 @@ class SearchQuerySQLConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(String searchExpression, String expected) throws SQLException {
+    void searchConversion(String searchExpression, String expected) throws SQLException {
         try (Connection connection = pg.getPostgresDatabase().getConnection()) {
             SqlQueryNode sqlQueryNode = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression));
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQueryNode.cte())) {
@@ -714,7 +714,7 @@ class SearchQuerySQLConversionTest {
         }
     }
 
-    public static Stream<Arguments> testUnFieldedTermsWithSearchBarFlags() {
+    public static Stream<Arguments> unFieldedTermsWithSearchBarFlags() {
         return Stream.of(
                 Arguments.of(
                         "Test",
@@ -873,7 +873,7 @@ class SearchQuerySQLConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testUnFieldedTermsWithSearchBarFlags(String searchExpression, EnumSet<SearchFlags> searchFlags, String expected) throws SQLException {
+    void unFieldedTermsWithSearchBarFlags(String searchExpression, EnumSet<SearchFlags> searchFlags, String expected) throws SQLException {
         try (Connection connection = pg.getPostgresDatabase().getConnection()) {
             SqlQueryNode sqlQueryNode = SearchQueryConversion.searchToSql("tableName", new SearchQuery(searchExpression, searchFlags));
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQueryNode.cte())) {

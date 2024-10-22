@@ -53,7 +53,7 @@ public class DatabaseSearcherTest {
 
     @ParameterizedTest
     @MethodSource
-    void testDatabaseSearcher(List<BibEntry> expectedMatches, SearchQuery query, List<BibEntry> entries) throws IOException {
+    void databaseSearcher(List<BibEntry> expectedMatches, SearchQuery query, List<BibEntry> entries) throws IOException {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
@@ -61,7 +61,7 @@ public class DatabaseSearcherTest {
         assertEquals(expectedMatches, matches);
     }
 
-    private static Stream<Arguments> testDatabaseSearcher() {
+    private static Stream<Arguments> databaseSearcher() {
         BibEntry emptyEntry = new BibEntry();
 
         BibEntry articleEntry = new BibEntry(StandardEntryType.Article);

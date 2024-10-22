@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SearchQueryFlagsConversionTest {
 
-    private static Stream<Arguments> testSearchConversion() {
+    private static Stream<Arguments> searchConversion() {
         return Stream.of(
                 createTestCases(
                         "Term",
@@ -84,7 +84,7 @@ class SearchQueryFlagsConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(String expected, String searchExpression, EnumSet<SearchFlags> flags) {
+    void searchConversion(String expected, String searchExpression, EnumSet<SearchFlags> flags) {
         String result = SearchQueryConversion.flagsToSearchExpression(new SearchQuery(searchExpression, flags));
         assertEquals(expected, result);
     }

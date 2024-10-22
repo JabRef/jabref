@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchQueryExtractorConversionTest {
-    public static Stream<Arguments> testSearchConversion() {
+    public static Stream<Arguments> searchConversion() {
         return Stream.of(
                 Arguments.of(Set.of("term"), "term"),
                 Arguments.of(Set.of("regex.*term"), "regex.*term"),
@@ -30,7 +30,7 @@ public class SearchQueryExtractorConversionTest {
 
     @ParameterizedTest
     @MethodSource
-    void testSearchConversion(Set<String> expected, String searchExpression) {
+    void searchConversion(Set<String> expected, String searchExpression) {
         Set<String> result = SearchQueryConversion.extractSearchTerms(new SearchQuery(searchExpression));
         assertEquals(expected, result);
     }

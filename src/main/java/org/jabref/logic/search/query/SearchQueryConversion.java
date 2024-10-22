@@ -24,7 +24,7 @@ public class SearchQueryConversion {
 
     public static Query searchToLucene(SearchQuery searchQuery) {
         LOGGER.debug("Converting search expression to Lucene: {}", searchQuery.getSearchExpression());
-        return null;
+        return new SearchToLuceneVisitor().visit(searchQuery.getContext());
     }
 
     public static Set<String> extractSearchTerms(SearchQuery searchQuery) {
