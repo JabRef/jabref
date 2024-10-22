@@ -130,18 +130,22 @@ We reserve the right to reject pull requests that contain little or no genuine a
 ### After submission of a pull request
 
 After you submitted a pull request, automated checks will run.
-You will maybe see "Some checks were not successful".
+You may see "Some checks were not successful".
+You can click on failing checks to see more information about why they failed.
 Then, please look into them and handle accordingly.
 
-Afterwards, you will receive comments on it.
-Maybe, the pull request is approved immediatly, maybe changes are requested.
-In case changes are requested, please implement them.
+Afterwards, you will receive comments on your pull request.
+The pull request may be approved immediatly, or a reviewer may request changes.
+In that case, please implement the requested changes.
 
-After changing your code, commit on the branch and push.
-The pull request will update automatically.
+After implementing changes, commit to the branch your pull request is *from* and push.
+The pull request will automatically be updated with your changes.
+Your commits will also be automatically squashed upon the pull request being accepted.
 
-Never ever close the pull request and open a new one.
-This causes much load on our side and is not the style of the GitHub open source community.
+Please – **Never ever close a pull request and open a new one** -
+This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
+You can push any changes you need to make to the branch your pull request is *from*.
+These changes will be automatically added to your pull request.
 
 ### Development hints
 
