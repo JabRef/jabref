@@ -95,7 +95,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<Query> {
     @Override
     public Query visitComparison(SearchParser.ComparisonContext ctx) {
         String field = ctx.FIELD() == null ? null : ctx.FIELD().getText();
-        String term = unescapeSearchValue(ctx.searchValue());
+        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
 
         // unfielded expression
         if (field == null || "anyfield".equals(field) || "any".equals(field)) {
@@ -148,31 +148,5 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<Query> {
             return new TermQuery(new Term(field, value));
         }
         return queryBuilder.createPhraseQuery(field, value);
-    }
-
-    /**
-     * Unescapes search value based on the Search grammar rules.
-     * <p>
-     * - STRING_LITERAL: Removes enclosing quotes and unescapes {@code \"}
-     * <p>
-     * - TERM: Unescapes {@code \=, \!, \~, \(, \)}
-     */
-    private static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
-        if (ctx == null) {
-            return "";
-        }
-
-        String term = ctx.getText();
-
-        if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
-            return term.substring(1, term.length() - 1)
-                       .replace("\\\"", "\"");
-        }
-
-        if (ctx.getStart().getType() == SearchParser.TERM) {
-            return term.replaceAll("\\\\([=!~()])", "$1");
-        }
-
-        return term;
     }
 }

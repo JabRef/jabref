@@ -67,6 +67,7 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         return visit(ctx.comparison());
     }
 
+    @Override
     public String visitComparison(SearchParser.ComparisonContext ctx) {
         String term = ctx.searchValue().getText();
 

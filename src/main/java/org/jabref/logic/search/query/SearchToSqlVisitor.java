@@ -163,7 +163,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     @Override
     public SqlQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
-        String term = unescapeSearchValue(ctx.searchValue());
+        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
 
         // unfielded expression
         if (ctx.FIELD() == null) {
@@ -536,32 +536,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         return searchFlags.contains(REGULAR_EXPRESSION)
                 ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*")
                 : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
-    }
-
-    /**
-     * Unescapes search value based on the Search grammar rules.
-     * <p>
-     * - STRING_LITERAL: Removes enclosing quotes and unescapes {@code \"}
-     * <p>
-     * - TERM: Unescapes {@code \=, \!, \~, \(, \)}
-     */
-    private static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
-        if (ctx == null) {
-            return "";
-        }
-
-        String term = ctx.getText();
-
-        if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
-            return term.substring(1, term.length() - 1)
-                       .replace("\\\"", "\"");
-        }
-
-        if (ctx.getStart().getType() == SearchParser.TERM) {
-            return term.replaceAll("\\\\([=!~()])", "$1");
-        }
-
-        return term;
     }
 
     /**
