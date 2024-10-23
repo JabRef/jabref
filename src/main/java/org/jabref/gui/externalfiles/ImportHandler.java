@@ -123,7 +123,7 @@ public class ImportHandler {
                     UiTaskExecutor.runInJavaFXThread(() -> {
                         setTitle(Localization.lang("Processing %0 file(s) for %1 | %2 of %0 file(s) processed.",
                                 files.size(),
-                                bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("untitled"),
+                                bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
                                 counter));
                         updateMessage(Localization.lang("Processing %0", StringUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
