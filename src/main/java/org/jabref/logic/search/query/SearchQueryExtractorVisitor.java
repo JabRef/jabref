@@ -28,11 +28,11 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
 
     @Override
     public List<SearchQueryNode> visitStart(SearchParser.StartContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override
-    public List<SearchQueryNode> visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
+    public List<SearchQueryNode> visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<List<SearchQueryNode>> children = ctx.expression().stream().map(this::visit).toList();
         if (children.size() == 1) {
             return children.getFirst();
@@ -63,7 +63,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
 
     @Override
     public List<SearchQueryNode> visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override

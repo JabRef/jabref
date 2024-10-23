@@ -52,7 +52,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     @Override
     public SqlQueryNode visitStart(SearchParser.StartContext ctx) {
-        SqlQueryNode finalNode = visit(ctx.orExpression());
+        SqlQueryNode finalNode = visit(ctx.andExpression());
 
         StringBuilder sql = new StringBuilder("WITH\n");
         List<String> params = new ArrayList<>();
@@ -74,7 +74,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     }
 
     @Override
-    public SqlQueryNode visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
+    public SqlQueryNode visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<SqlQueryNode> children = ctx.expression().stream().map(this::visit).toList();
 
         if (children.size() == 1) {
@@ -86,7 +86,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                     )
                     """.formatted(
                     cteCounter,
-                    children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    UNION\n")));
+                    children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    INTERSECT\n")));
 
             List<String> params = children.stream().flatMap(node -> node.params().stream()).toList();
             SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -97,7 +97,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     @Override
     public SqlQueryNode visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override

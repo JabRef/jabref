@@ -35,11 +35,11 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitStart(SearchParser.StartContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override
-    public String visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
+    public String visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<String> children = ctx.expression().stream().map(this::visit).toList();
         if (children.size() == 1) {
             return children.getFirst();
@@ -49,7 +49,7 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
 
     @Override
     public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return "(" + visit(ctx.orExpression()) + ")";
+        return "(" + visit(ctx.andExpression()) + ")";
     }
 
     @Override

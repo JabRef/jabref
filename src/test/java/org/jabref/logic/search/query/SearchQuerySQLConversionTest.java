@@ -374,9 +374,9 @@ class SearchQuerySQLConversionTest {
                         ,
                         cte3 AS (
                             SELECT entry_id FROM cte0
-                            UNION
+                            INTERSECT
                             SELECT entry_id FROM cte1
-                            UNION
+                            INTERSECT
                             SELECT entry_id FROM cte2
                         )
                         SELECT * FROM cte3 GROUP BY entry_id"""

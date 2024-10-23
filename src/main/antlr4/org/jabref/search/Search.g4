@@ -41,15 +41,15 @@ TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a ba
 
 start
     : EOF
-    | orExpression EOF
+    | andExpression EOF
     ;
 
-orExpression
-    : expression+                                         #implicitOrExpression   // example: author = miller OR year = 2010
+andExpression
+    : expression+                                         #implicitAndExpression   // example: author = miller year = 2010 --> equivalent to: author = miller AND year = 2010
     ;
 
 expression
-    : LPAREN orExpression RPAREN                          #parenExpression        // example: (author = miller)
+    : LPAREN andExpression RPAREN                         #parenExpression        // example: (author = miller)
     | NOT expression                                      #negatedExpression      // example: NOT author = miller
     | left = expression bin_op = AND right = expression   #binaryExpression       // example: author = miller AND year = 2010
     | left = expression bin_op = OR right = expression    #binaryExpression       // example: author = miller OR year = 2010

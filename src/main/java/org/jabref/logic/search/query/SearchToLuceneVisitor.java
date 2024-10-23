@@ -30,25 +30,25 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<Query> {
 
     @Override
     public Query visitStart(SearchParser.StartContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override
-    public Query visitImplicitOrExpression(SearchParser.ImplicitOrExpressionContext ctx) {
+    public Query visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<Query> children = ctx.expression().stream().map(this::visit).toList();
         if (children.size() == 1) {
             return children.getFirst();
         }
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
         for (Query child : children) {
-            builder.add(child, BooleanClause.Occur.SHOULD);
+            builder.add(child, BooleanClause.Occur.MUST);
         }
         return builder.build();
     }
 
     @Override
     public Query visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-        return visit(ctx.orExpression());
+        return visit(ctx.andExpression());
     }
 
     @Override
