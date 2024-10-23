@@ -46,14 +46,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
-        couldNotPush = false;
-        couldNotCall = false;
-        notDefined = false;
-
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
-
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
-            notDefined = true;
+        if (!determineCommandPath()) {
             return;
         }
 
@@ -110,14 +103,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     @Override
     public void jumpToLine(Path fileName, int line, int column) {
-        couldNotPush = false;
-        couldNotCall = false;
-        notDefined = false;
-
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
-
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
-            notDefined = true;
+        if (!determineCommandPath()) {
             return;
         }
 
@@ -155,6 +141,20 @@ public class PushToVim extends AbstractPushToApplication {
             LOGGER.warn("Problem pushing to Vim.", e);
             couldNotCall = true;
         }
+    }
+
+    private boolean determineCommandPath() {
+        couldNotPush = false;
+        couldNotCall = false;
+        notDefined = false;
+
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+
+        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+            notDefined = true;
+            return false;
+        }
+        return true;
     }
 
     @Override
