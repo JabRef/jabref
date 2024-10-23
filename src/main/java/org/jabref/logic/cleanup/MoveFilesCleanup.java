@@ -40,10 +40,7 @@ public class MoveFilesCleanup implements CleanupJob {
         for (LinkedFile file : files) {
             LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext, filePreferences);
             try {
-                boolean fileChanged = fileHandler.moveToDefaultDirectory();
-                if (fileChanged) {
-                    changed = true;
-                }
+                changed = fileHandler.moveToDefaultDirectory() || changed;
             } catch (IOException exception) {
                 LOGGER.error("Error while moving file {}", file.getLink(), exception);
             }
