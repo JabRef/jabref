@@ -28,18 +28,12 @@ import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class PreviewPanel extends VBox {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -54,7 +48,6 @@ public class PreviewPanel extends VBox {
                         GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
-                        IndexManager indexManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
