@@ -23,7 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplications;
-import org.jabref.gui.push.PushToEmacs;
+import org.jabref.gui.push.PushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -170,7 +170,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                                                       applicationName,
                                                                       dialogService,
                                                                       preferences)
-                                                              .orElse(new PushToEmacs(dialogService, preferences));
+                                                              .orElse(new PushToTeXstudio(dialogService, preferences));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }
