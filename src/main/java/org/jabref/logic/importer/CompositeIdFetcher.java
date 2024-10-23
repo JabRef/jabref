@@ -46,7 +46,7 @@ public class CompositeIdFetcher {
 
         Optional<SSRN> ssrn = SSRN.parse(identifier);
         if (ssrn.isPresent()) {
-            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().getNormalized());
+            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().asString());
         }
 
         return Optional.empty();
