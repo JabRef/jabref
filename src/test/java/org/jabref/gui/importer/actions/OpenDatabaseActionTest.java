@@ -9,12 +9,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
-
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -23,13 +21,11 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
-
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -38,7 +34,6 @@ public class OpenDatabaseActionTest {
     DialogService dialogService;
     GuiPreferences guiPreferences;
     OpenDatabaseAction openDatabaseAction;
-
 
     @BeforeEach
     void initializeOpenDatabaseAction() {
