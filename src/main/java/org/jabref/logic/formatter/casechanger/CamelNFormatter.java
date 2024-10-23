@@ -38,7 +38,7 @@ public class CamelNFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "RETURNS CAPITALIZED AND CONCATENATED TITLE.");
+                "Returns capitalized and concatenated title to N length.");
     }
 
     @Override

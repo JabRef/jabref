@@ -27,13 +27,16 @@ public class VeryShortTitleFormatter extends Formatter {
                                                   Word::isSmallerWord))
                                           .findFirst();
 
+        if (resultTitle.isEmpty()) {
+            return "";
+        }
         return resultTitle.toString();
     }
 
     @Override
     public String getDescription() {
         return Localization.lang(
-                "RETURNS FIRST WORD OF THE TITLE IGNORING ANY FUNCTION WORDS.");
+                "Returns first word of the title ignoring any function words.");
     }
 
     @Override

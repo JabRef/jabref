@@ -33,7 +33,7 @@ public class ShortTitleFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "RETURNS FIRST 3 WORDS OF THE TITLE IGNORING ANY FUNCTION WORDS.");
+                "Returns first 3 words of the title ignoring any function words.");
     }
 
     @Override
