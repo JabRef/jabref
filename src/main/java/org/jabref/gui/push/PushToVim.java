@@ -150,15 +150,15 @@ public class PushToVim extends AbstractPushToApplication {
                         command[2],
                         command[3]);
             }
-            Process process = processBuilder.start();
-        } catch (IOException excep) {
-            LOGGER.warn("Problem pushing to Vim.", excep);
+            processBuilder.start();
+        } catch (IOException e) {
+            LOGGER.warn("Problem pushing to Vim.", e);
             couldNotCall = true;
         }
     }
 
     @Override
     protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
-        return new String[] {commandPath, "+%s".formatted(Integer.toString(line)), fileName.toString(), "+\"normal %s|\"".formatted(Integer.toString(column))};
+        return new String[] {commandPath, "+%s".formatted(line), fileName.toString(), "+\"normal %s|\"".formatted(column)};
     }
 }
