@@ -30,9 +30,6 @@ public class PushToTeXstudio extends AbstractPushToApplication {
         return new String[] {commandPath, "--insert-cite", "%s%s%s".formatted(getCitePrefix(), keyString, getCiteSuffix())};
     }
 
-    /**
-     * Method to open TeXstudio at the given line number in the specified LaTeX file.
-     */
     @Override
     public String[] jumpString(Path fileName, int line, int column) {
         // Construct the TeXstudio command

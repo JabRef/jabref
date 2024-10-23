@@ -183,11 +183,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
     }
 
-    /**
-     * This function is to jump to a specific line due to different editor.
-     *
-     */
-    protected void jumpToLine(Path fileName, int line, int column, ProcessBuilder processBuilder) {
+    public void jumpToLine(Path fileName, int line, int column) {
         commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -196,7 +192,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
 
         String[] command = jumpString(fileName, line, column);
-
+        ProcessBuilder processBuilder = new ProcessBuilder();
         try {
             processBuilder.command(command);
             processBuilder.start();
@@ -207,10 +203,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String[] jumpString(Path fileName, int line, int column) {
+        LOGGER.error("Not yet implemented");
         return new String[0];
-    }
-
-    public void jumpToLine(Path fileName, int line, int column) {
-        jumpToLine(fileName, line, column, new ProcessBuilder());
     }
 }

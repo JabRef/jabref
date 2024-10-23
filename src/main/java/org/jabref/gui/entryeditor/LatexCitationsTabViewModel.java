@@ -160,14 +160,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         };
     }
 
-    // Handle mouse click event
     public void handleMouseClick(MouseEvent event, CitationsDisplay citationsDisplay) {
-        // Get the currently selected item
         Citation selectedItem = citationsDisplay.getSelectionModel().getSelectedItem();
 
-        // Check if the left mouse button was double-clicked
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
-            // Perform a jump or other actions
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
             PushToApplication application = PushToApplications.getApplicationByName(
