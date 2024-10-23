@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.preferences.CliPreferences;
@@ -42,7 +41,6 @@ public class IndexManager {
     private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
     private final BooleanProperty shouldIndexLinkedFiles;
-    private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
     private final BibFieldsIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
@@ -119,7 +117,7 @@ public class IndexManager {
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
          .executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
+        if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
@@ -161,32 +159,11 @@ public class IndexManager {
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
          .executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE) && !isLinkedFilesIndexerBlocked.get()) {
+        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
                     linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
-        }
-    }
-
-    public void updateAfterDropFiles(BibEntry entry) {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.updateEntry(entry, StandardField.FILE);
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
-         .executeWith(taskExecutor);
-
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Object call() {
-                    linkedFilesIndexer.addToIndex(List.of(entry), this);
                     return null;
                 }
             }.executeWith(taskExecutor);
@@ -217,12 +194,6 @@ public class IndexManager {
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
-    }
-
-    public AutoCloseable blockLinkedFileIndexer() {
-        LOGGER.debug("Blocking linked files indexer");
-        isLinkedFilesIndexerBlocked.set(true);
-        return () -> isLinkedFilesIndexerBlocked.set(false);
     }
 
     public SearchResults search(SearchQuery query) {

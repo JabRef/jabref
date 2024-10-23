@@ -36,7 +36,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -64,7 +63,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
-    private final IndexManager indexManager;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private Collection<Field> fields = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
@@ -81,7 +79,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
-                           IndexManager indexManager,
                            OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -94,7 +91,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.themeManager = themeManager;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.indexManager = indexManager;
         this.searchQueryProperty = searchQueryProperty;
     }
 
@@ -265,7 +261,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                     preferences,
                     themeManager,
                     taskExecutor,
-                    indexManager,
                     searchQueryProperty);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
