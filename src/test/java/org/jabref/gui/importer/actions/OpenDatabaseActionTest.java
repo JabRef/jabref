@@ -53,7 +53,7 @@ public class OpenDatabaseActionTest {
     }
 
     @Test
-    void testGetFilesToOpenFailsToOpenPath() {
+    void getFilesToOpenFailsToOpenPath() {
         FileSystem fs = Jimfs.newFileSystem();
         Path path = fs.getPath("test-dir");
 
