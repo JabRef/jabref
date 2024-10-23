@@ -177,13 +177,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:       com.google.jimfs:jimfs:1.3.0
-Project:  Jimfs
-URL:      https://github.com/google/jimfs
-Licence:  Apache-2.0
-```
-
-```yaml
 Id:      com.googlecode.plist
 Project: com.dd.plist
 URL:     https://github.com/3breadt/dd-plist
@@ -756,7 +749,6 @@ com.google.guava:failureaccess:1.0.2
 com.google.guava:guava:33.1.0-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:3.0.0
-com.google.jimfs:jimfs:1.3.0
 com.googlecode.javaewah:JavaEWAH:1.2.3
 com.googlecode.plist:dd-plist:1.28
 com.h2database:h2-mvstore:2.3.232
