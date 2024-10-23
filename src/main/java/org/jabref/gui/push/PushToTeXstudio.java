@@ -31,7 +31,7 @@ public class PushToTeXstudio extends AbstractPushToApplication {
     }
 
     @Override
-    public String[] jumpString(Path fileName, int line, int column) {
+    public String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
         // Construct the TeXstudio command
         return new String[] {commandPath, "--line", Integer.toString(line), fileName.toString()};
     }

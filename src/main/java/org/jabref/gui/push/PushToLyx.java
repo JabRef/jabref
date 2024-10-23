@@ -98,7 +98,7 @@ public class PushToLyx extends AbstractPushToApplication {
     }
 
     @Override
-    protected String[] jumpString(Path fileName, int line, int column) {
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
         LOGGER.warn("not implemented");
         return new String[0];
     }

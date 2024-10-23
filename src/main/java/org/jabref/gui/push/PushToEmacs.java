@@ -150,7 +150,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     }
 
     @Override
-    protected String[] jumpString(Path fileName, int line, int column) {
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
         return new String[] {commandPath, "+%s".formatted(line), fileName.toString()};
     }
 }

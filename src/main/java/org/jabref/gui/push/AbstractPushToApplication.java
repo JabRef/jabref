@@ -191,7 +191,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             return;
         }
 
-        String[] command = jumpString(fileName, line, column);
+        String[] command = jumpToLineCommandlineArguments(fileName, line, column);
         ProcessBuilder processBuilder = new ProcessBuilder();
         try {
             processBuilder.command(command);
@@ -202,7 +202,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
     }
 
-    protected String[] jumpString(Path fileName, int line, int column) {
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
         LOGGER.error("Not yet implemented");
         return new String[0];
     }
