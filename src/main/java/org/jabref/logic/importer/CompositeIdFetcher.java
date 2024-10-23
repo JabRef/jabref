@@ -5,11 +5,13 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
 
 public class CompositeIdFetcher {
@@ -49,6 +51,11 @@ public class CompositeIdFetcher {
             return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().asString());
         }
 
+        Optional<RFC> rfcId = RFC.parse(identifier);
+        if (rfcId.isPresent()) {
+            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().getNormalized());
+        }
+
         return Optional.empty();
     }
 
@@ -61,7 +68,8 @@ public class CompositeIdFetcher {
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         Optional<ISBN> isbn = ISBN.parse(identifier);
         Optional<SSRN> ssrn = SSRN.parse(identifier);
+        Optional<RFC> rfcId = RFC.parse(identifier);
 
-        return Stream.of(doi, arXivIdentifier, isbn, ssrn).anyMatch(Optional::isPresent);
+        return Stream.of(doi, arXivIdentifier, isbn, ssrn, rfcId).anyMatch(Optional::isPresent);
     }
 }
