@@ -14,7 +14,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -74,8 +73,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                mock(LuceneManager.class));
+                new CurrentThreadTaskExecutor());
 
         testEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")
@@ -97,8 +95,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                mock(LuceneManager.class));
+                new CurrentThreadTaskExecutor());
 
         List<BibEntry> bibEntries = importHandler.handleBibTeXData("""
                 @InProceedings{Wen2013,
@@ -144,8 +141,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                mock(LuceneManager.class)));
+                new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
@@ -176,8 +172,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                mock(LuceneManager.class)));
+                new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
@@ -211,8 +206,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor(),
-                mock(LuceneManager.class)));
+                new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 

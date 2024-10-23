@@ -21,7 +21,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,7 +82,6 @@ class CitationsRelationsTabViewModelTest {
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
         StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
-        when(stateManager.getLuceneManager(Mockito.any(BibDatabaseContext.class))).thenReturn(Optional.ofNullable(mock(LuceneManager.class)));
 
         viewModel = new CitationsRelationsTabViewModel(
                 bibDatabaseContext,

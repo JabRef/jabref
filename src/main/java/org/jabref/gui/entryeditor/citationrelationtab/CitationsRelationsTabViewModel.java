@@ -49,8 +49,7 @@ public class CitationsRelationsTabViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor,
-                stateManager.getLuceneManager(databaseContext).get());
+                taskExecutor);
 
         switch (searchType) {
             case CITES -> importCites(entries, existingEntry, importHandler);

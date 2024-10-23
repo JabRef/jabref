@@ -39,7 +39,6 @@ import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -89,8 +88,7 @@ public class UnlinkedFilesDialogViewModel {
                                         FileUpdateMonitor fileUpdateMonitor,
                                         GuiPreferences preferences,
                                         StateManager stateManager,
-                                        TaskExecutor taskExecutor,
-                                        LuceneManager luceneManager) {
+                                        TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -102,8 +100,7 @@ public class UnlinkedFilesDialogViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor,
-                luceneManager);
+                taskExecutor);
 
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),

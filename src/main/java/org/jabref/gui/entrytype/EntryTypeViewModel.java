@@ -180,8 +180,7 @@ public class EntryTypeViewModel {
                         libraryTab.getUndoManager(),
                         stateManager,
                         dialogService,
-                        taskExecutor,
-                        libraryTab.getLuceneManager());
+                        taskExecutor);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);

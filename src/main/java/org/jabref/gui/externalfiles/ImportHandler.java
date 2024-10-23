@@ -37,7 +37,6 @@ import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
@@ -74,7 +73,6 @@ public class ImportHandler {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final LuceneManager luceneManager;
 
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
@@ -82,8 +80,7 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         TaskExecutor taskExecutor,
-                         LuceneManager luceneManager) {
+                         TaskExecutor taskExecutor) {
 
         this.bibDatabaseContext = database;
         this.preferences = preferences;
@@ -91,7 +88,6 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.luceneManager = luceneManager;
 
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
