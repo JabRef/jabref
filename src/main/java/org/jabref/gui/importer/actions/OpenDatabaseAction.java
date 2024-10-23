@@ -125,6 +125,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * Builds a new FileDialogConfiguration using the given path as the initial directory for use in
      * dialogService.showFileOpenDialogAndGetMultipleFiles().
+     *
      * @param initialDirectory Path to use as the initial directory
      * @return new FileDialogConfig with given initial directory
      */

@@ -1,27 +1,38 @@
 package org.jabref.gui.importer.actions;
 
 import com.google.common.jimfs.Jimfs;
-import org.jabref.gui.*;
 
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
+
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
+
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class OpenDatabaseActionTest {
     DialogService dialogService;
@@ -62,7 +73,9 @@ public class OpenDatabaseActionTest {
         // Make it so that showFileOpenDialogAndGetMultipleFiles will throw an error when called with the bad path, but
         // not for the good path as in issue #10548
         when(dialogService.showFileOpenDialogAndGetMultipleFiles(badConfig))
-                .thenAnswer(x -> { throw new IllegalArgumentException(); });
+                .thenAnswer(x -> {
+                    throw new IllegalArgumentException();
+                });
         when(dialogService.showFileOpenDialogAndGetMultipleFiles(goodConfig))
                 .thenAnswer(x -> List.of());
 
