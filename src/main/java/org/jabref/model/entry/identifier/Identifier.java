@@ -9,8 +9,8 @@ import org.jabref.model.entry.field.Field;
  * All implementing classes should additionally offer
  *
  * <ul>
- *     <li>public static Optional<Class> parse(String value)</li>
- *     <li>public static boolean isValid(String value)</li>
+ *     <li><code>public static Optional&lt;Class> parse(String value)</code></li>
+ *     <li><code>public static boolean isValid(String value)</code></li>
  * </ul>
  */
 public interface Identifier {
