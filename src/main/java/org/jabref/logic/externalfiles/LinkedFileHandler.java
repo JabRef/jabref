@@ -68,8 +68,8 @@ public class LinkedFileHandler {
         }
 
         Path targetDirectory = databaseFileDirectory.resolve(targetDirectoryName);
-        // Ensure that subdirectories exist
-        Files.createDirectories(targetDirectory.getParent());
+        // Ensure that this directory exists
+        Files.createDirectories(targetDirectory);
 
         GetTargetPathResult getTargetPathResult = null;
         if (shouldRenameToFilenamePattern) {
