@@ -1,7 +1,6 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -14,7 +13,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,40 +84,6 @@ public class PushToTexShop extends AbstractPushToApplication {
         } else {
             dialogService.showInformationDialogAndWait(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
             return new String[] {};
-        }
-    }
-
-    @Override
-    public void jumpToLine(Path fileName, int line, int column) {
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
-
-        if (StringUtil.isNullOrEmpty(commandPath)) {
-            notDefined = true;
-            return;
-        }
-
-        String appleScriptCommand = String.format(
-                    "tell application \"TeXShop\"\n" +
-                            "    open POSIX file \"%s\"\n" +
-                            "    tell front document\n" +
-                            "        go to line %s\n" +
-                            "    end tell\n" +
-                            "end tell", fileName.toString(), Integer.toString(line));
-
-        String[] command = {"osascript", "-e", appleScriptCommand};
-
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-
-        try {
-            Process process = processBuilder.start();
-            int exitCode = process.waitFor();
-
-            if (exitCode != 0) {
-                LOGGER.warn("Failed to execute AppleScript. Exit code: '{}'", exitCode);
-            }
-        } catch (IOException | InterruptedException excep) {
-            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
-            couldNotCall = true;
         }
     }
 }
