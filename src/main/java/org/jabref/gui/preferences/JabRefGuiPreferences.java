@@ -373,8 +373,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region: Main table, main table column, and search dialog column preferences
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        defaults.put(COLUMN_NAMES, "search_score;groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "50;28;40;28;28;75;300;470;60;130;50;50;50");
+        defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "28;40;28;28;75;300;470;60;130;50;50;50");
 
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
@@ -394,6 +394,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
     }
 
+    /**
+     * @deprecated Never ever add a call to this method. There should be only one caller.
+     *             All other usages should get the preferences passed (or injected).
+     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
+     */
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
