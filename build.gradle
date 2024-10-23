@@ -389,8 +389,6 @@ dependencies {
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
 
-    testImplementation "com.google.jimfs:jimfs:1.3.0"
-
     checkstyle 'com.puppycrawl.tools:checkstyle:10.18.2'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'

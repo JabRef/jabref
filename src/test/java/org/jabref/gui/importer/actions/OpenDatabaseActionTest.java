@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.actions;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -18,9 +17,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.common.jimfs.Jimfs;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,9 +52,8 @@ public class OpenDatabaseActionTest {
     }
 
     @Test
-    void getFilesToOpenFailsToOpenPath() {
-        FileSystem fs = Jimfs.newFileSystem();
-        Path path = fs.getPath("test-dir");
+    void getFilesToOpenFailsToOpenPath(@TempDir Path tempDir) {
+        Path path = tempDir.resolve("test-dir");
 
         FilePreferences filePreferences = mock(FilePreferences.class);
         FileDialogConfiguration badConfig = mock(FileDialogConfiguration.class);
