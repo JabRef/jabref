@@ -56,7 +56,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
-            // Migrate search groups from Search.g4 to Lucene syntax
+            // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
             new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
@@ -94,7 +94,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result, preferences)) {
+            if (action.isActionNecessary(result, dialogService, preferences)) {
                 action.performAction(result, dialogService, preferences);
             }
         }

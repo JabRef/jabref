@@ -12,7 +12,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
-- We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
@@ -34,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- We added support for modifier keys when dropping a file on an entry in the main table. [#12001](https://github.com/JabRef/jabref/pull/12001)
 - We added an importer for SSRN URLs. [#12021](https://github.com/JabRef/jabref/pull/12021)
 - We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
@@ -42,8 +42,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- The search syntax is changed to [Apache Lucene syntax](https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Overview) (also to be similar to the [online search syntax](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax)). [#11542](https://github.com/JabRef/jabref/pull/11542/)
-- When searching using a regular expression, one needs to enclose the search string in `/`. [#11542](https://github.com/JabRef/jabref/pull/11542/)
 - A search in "any" fields ignores the [groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups). [#7996](https://github.com/JabRef/jabref/issues/7996)
 - When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
@@ -51,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
 - JabRef does not show finished background tasks in the status bar popup. [#11821](https://github.com/JabRef/jabref/pull/11821)
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
+- When dropping a file into the main table, after copy or move, the file is now put in the [configured directory and renamed according to the configured patterns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#filename-format-and-file-directory-pattern). [#12001](https://github.com/JabRef/jabref/pull/12001)
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
 - The browse button for a Custom exporter now opens in the directory of the current used exporter file. [#11717](https://github.com/JabRef/jabref/pull/11717)
@@ -103,7 +102,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-- We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 - We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
