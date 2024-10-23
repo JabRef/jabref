@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -95,11 +94,5 @@ public class PushToLyx extends AbstractPushToApplication {
                 LOGGER.warn("Problem pushing to LyX/Kile.", excep);
             }
         });
-    }
-
-    @Override
-    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
-        LOGGER.warn("not implemented");
-        return new String[0];
     }
 }
