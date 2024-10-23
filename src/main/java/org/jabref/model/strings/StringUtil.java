@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.util.io.FileUtil;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -177,7 +178,9 @@ public class StringUtil {
      * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
      */
     public static String shortenFileName(String fileName, int maxLength) {
-        if (fileName == null || maxLength < 3) {
+        final int ELLIPSIS_LENGTH = ELLIPSIS.length();
+
+        if (fileName == null || maxLength < ELLIPSIS_LENGTH) {
             return "";
         }
 
@@ -185,26 +188,19 @@ public class StringUtil {
             return fileName;
         }
 
-        // Reference the ellipsis' length for future usage
-        final int ELLIPSIS_LENGTH = ELLIPSIS.length();
-
-        // Find the index of the extension dot
         int extensionIndex = fileName.lastIndexOf('.');
 
-        // Extract the name and extension part of a file name
         String name;
         String extension;
 
         // Check if file has an extension or not
-        if (0 < extensionIndex && extensionIndex < fileName.length() - 1) {
-            name = fileName.substring(0, extensionIndex);
-            extension = fileName.substring(extensionIndex);
-        } else {
+        extension = FileUtil.getFileExtension(fileName).map(fileExtension -> '.' + fileExtension).orElse("");
+        if (extension.isEmpty()) {
             name = fileName;
-            extension = "";
+        } else {
+            name = fileName.substring(0, extensionIndex);
         }
 
-        // Calculate the necessary length for the ELLIPSIS and extension
         int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
 
         // If maxLength could not accommodate only the ELLIPSIS and extension, return the ELLIPSIS
