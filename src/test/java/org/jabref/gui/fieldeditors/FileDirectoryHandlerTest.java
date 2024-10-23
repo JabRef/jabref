@@ -40,7 +40,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_NoDirectories() {
+    public void determineTargetDirectoryNoDirectories() {
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
         when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.empty());
@@ -51,7 +51,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_OneDirectory() {
+    public void determineTargetDirectoryOneDirectory() {
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(Path.of("main/dir")));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
         when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.empty());
@@ -62,7 +62,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileInMain() {
+    public void determineTargetDirectoryTwoDirectoriesMainAndGeneralFileInMain() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -77,7 +77,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileInGeneral() {
+    public void determineTargetDirectoryTwoDirectoriesMainAndGeneralFileInGeneral() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -92,7 +92,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_MainAndGeneral_FileOutside() {
+    public void determineTargetDirectoryTwoDirectoriesMainAndGeneralFileOutside() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -107,7 +107,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_MainAndUser_FileInMain() {
+    public void determineTargetDirectoryTwoDirectoriesMainAndUserFileInMain() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
@@ -122,7 +122,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_MainAndUser_FileInUser() {
+    public void determineTargetDirectoryTwoDirectoriesMainAndUserFileInUser() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
@@ -137,7 +137,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_GeneralAndUser_FileInGeneral() {
+    public void determineTargetDirectoryTwoDirectoriesGeneralAndUserFileInGeneral() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -150,7 +150,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_TwoDirectories_GeneralAndUser_FileInUser() {
+    public void determineTargetDirectoryTwoDirectoriesGeneralAndUserFileInUser() {
         // Setup directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -163,7 +163,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_ThreeDirectories() {
+    public void determineTargetDirectoryThreeDirectories() {
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(Path.of("main/dir")));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("general/dir"));
         when(metaData.getUserFileDirectory(Mockito.anyString())).thenReturn(Optional.of("user/dir"));
@@ -174,7 +174,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_ThreeDirectories_FileInGeneral() {
+    public void determineTargetDirectoryThreeDirectoriesFileInGeneral() {
         // Setup all three directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -189,7 +189,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_ThreeDirectories_FileInUser() {
+    public void determineTargetDirectoryThreeDirectoriesFileInUser() {
         // Setup all three directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
@@ -204,7 +204,7 @@ public class FileDirectoryHandlerTest {
     }
 
     @Test
-    public void testDetermineTargetDirectory_ThreeDirectories_FileOutside() {
+    public void determineTargetDirectoryThreeDirectoriesFileOutside() {
         // Setup all three directories
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(MAIN_DIR));
         when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of(GENERAL_DIR.toString()));
