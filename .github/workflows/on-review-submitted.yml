@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      # See https://github.com/cli/cli/issues/6274
+      repository-projects: read
     steps:
       - run: echo ${{ github.event.review.state }}
       - if: ${{ github.event.review.state == 'changes_requested' }}
