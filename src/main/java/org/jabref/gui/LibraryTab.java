@@ -230,8 +230,6 @@ public class LibraryTab extends Tab {
 
         linkedFileAutoRenamer = new LinkedFileAutoRenamer(bibDatabaseContext, preferences);
 
-//        System.out.println("Namaste Mummy and Papa!!");
-
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, stateManager, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
