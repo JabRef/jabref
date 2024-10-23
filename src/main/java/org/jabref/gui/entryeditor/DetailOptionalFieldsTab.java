@@ -11,7 +11,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -32,7 +31,6 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                                    BibEntryTypesManager entryTypesManager,
                                    TaskExecutor taskExecutor,
                                    JournalAbbreviationRepository journalAbbreviationRepository,
-                                   IndexManager indexManager,
                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 Localization.lang("Optional fields 2"),
@@ -48,7 +46,6 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                 entryTypesManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexManager,
                 searchQueryProperty
         );
     }

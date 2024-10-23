@@ -24,21 +24,16 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class PreviewPanel extends VBox {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -53,7 +48,6 @@ public class PreviewPanel extends VBox {
                         GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
-                        IndexManager indexManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
@@ -85,20 +79,9 @@ public class PreviewPanel extends VBox {
         previewView.setOnDragDropped(event -> {
             boolean success = false;
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
+                TransferMode transferMode = event.getTransferMode();
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-
-                if (event.getTransferMode() == TransferMode.MOVE) {
-                    LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                    fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, indexManager);
-                }
-                if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); // alt on win
-                    fileLinker.addFilesToEntry(entry, files);
-                }
-                if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, indexManager);
-                }
+                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                 success = true;
             }
 
