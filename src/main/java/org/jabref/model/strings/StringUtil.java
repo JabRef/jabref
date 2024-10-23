@@ -170,14 +170,14 @@ public class StringUtil {
 
     /**
      * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
-     * is shortened into verylong...isthis.pdf
+     * with maxLength = 20 is shortened into verylo...isthis.pdf
      *
      * @param fileName  the given file name to be shortened
      * @param maxLength the maximum number of characters in the string after shortening (including the extension)
      * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
      */
     public static String shortenFileName(String fileName, int maxLength) {
-        if (fileName == null || maxLength <= 0) {
+        if (fileName == null || maxLength < 3) {
             return "";
         }
 
@@ -207,27 +207,42 @@ public class StringUtil {
         // Calculate the necessary length for the ELLIPSIS and extension
         int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
 
-        // If maxLength could not accommodate only the ELLIPSIS and extension, return the minimum string with ELLIPSIS
-        if (maxLength < totalNeededLength) {
-            return fileName.substring(0, maxLength - 3) + ELLIPSIS;
+        // If maxLength could not accommodate only the ELLIPSIS and extension, return the ELLIPSIS
+        if (maxLength <= totalNeededLength) {
+            return ELLIPSIS;
         }
 
         StringBuilder result = new StringBuilder();
 
         // Calculate the number of characters that the name could account for
         int charsForName = maxLength - totalNeededLength;
+        if (charsForName <= 0) {
+            return ELLIPSIS + extension;
+        }
 
-        // Distribute available characters to the start and end of the namePart
-        int frontChars = (charsForName + 1) / 2;
-        int backChars = charsForName / 2;
+        // Calculate number of characters before and after ELLIPSIS
+        int frontChars;
+        int backChars;
+        if (charsForName == 1) {
+            frontChars = 1;
+            backChars = 0;
+        } else {
+            // Distribute available characters to the start and end of the namePart
+            frontChars = (charsForName + 1) / 2;
+            backChars = charsForName / 2;
+        }
+
+        frontChars = Math.min(frontChars, name.length());
+        backChars = Math.min(backChars, name.length() - frontChars);
 
         // Appending everything together for the final file name
         result.append(name, 0, frontChars)
-              .append(ELLIPSIS)
-              .append(name.substring(name.length() - backChars))
-              .append(extension);
+              .append(ELLIPSIS);
+        if (backChars > 0) {
+            result.append(name.substring(name.length() - backChars));
+        }
 
-        return result.toString();
+        return result.append(extension).toString();
     }
 
     /**
