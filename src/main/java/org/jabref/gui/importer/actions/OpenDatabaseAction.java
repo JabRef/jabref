@@ -41,6 +41,7 @@ import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +108,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         openFiles(new ArrayList<>(filesToOpen));
     }
 
-    public List<Path> getFilesToOpen() {
+    @VisibleForTesting
+    List<Path> getFilesToOpen() {
         List<Path> filesToOpen;
 
         try {
@@ -141,7 +143,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * @return Path of current panel database directory or the working directory
      */
-    public Path getInitialDirectory() {
+    @VisibleForTesting
+    Path getInitialDirectory() {
         if (tabContainer.getLibraryTabs().isEmpty()) {
             return preferences.getFilePreferences().getWorkingDirectory();
         } else {
