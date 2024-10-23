@@ -27,7 +27,9 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Outcome
 
-Chosen option: "", because
+Chosen option: "Apache Velocity", because "Velocity's goal is to keep templates as simple as possible" ([source](https://stackoverflow.com/a/1984458/873282)). It is sufficient for our use case.
+
+Also, Apache Velocity is lightweight, and it allows to generate text output. This is a good fit for the AI feature.
 
 ## Pros and Cons of the Options
 
