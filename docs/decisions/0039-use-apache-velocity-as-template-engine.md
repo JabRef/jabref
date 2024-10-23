@@ -3,7 +3,7 @@ nav_order: 39
 parent: Decision Records
 ---
 
-# Template engine
+# Use Apache Velocity as template engine
 
 ## Context and Problem Statement
 
