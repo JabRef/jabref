@@ -22,7 +22,7 @@ JabRef has translation files `JabRef_it.properties`, ... There are translated an
 
 ## Decision Outcome
 
-Chosen option: "Only translated strings in language file", because comes out best \(see below.
+Chosen option: "Only translated strings in language file", because comes out best (see below).
 
 ## Pros and Cons of the Options
 

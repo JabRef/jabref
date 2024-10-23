@@ -13,20 +13,22 @@ jobs:
       issues: write
     steps:
     - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@v1.1.1
+      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
       with:
-       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-       project-url: "https://github.com/orgs/JabRef/projects/3"
-       target-labels: "📍 Assigned"
-       target-column: "Assigned"
-       ignored-columns: ""
-       default-column: "Free to take"
+        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+        project-url: "https://github.com/orgs/JabRef/projects/3"
+        target-labels: "📍 Assigned"
+        target-column: "Assigned"
+        ignored-columns: ""
+        default-column: "Free to take"
+        skip-if-not-in-project: true
     - name: Move Issue to "Free to take" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@v1.1.1
+      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
       with:
-       github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-       project-url: "https://github.com/orgs/JabRef/projects/5"
-       target-labels: "📍 Assigned"
-       target-column: "Assigned"
-       ignored-columns: ""
-       default-column: "Free to take"
+        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+        project-url: "https://github.com/orgs/JabRef/projects/5"
+        target-labels: "📍 Assigned"
+        target-column: "Assigned"
+        ignored-columns: ""
+        default-column: "Free to take"
+        skip-if-not-in-project: true
