@@ -90,16 +90,7 @@ public class BackUpManagerJGit {
      */
     public static boolean backupGitDiffers(Path originalPath, Path backupDir) {
         //à implementer
-        Path discardedFile = determineDiscardedFile(originalPath, backupDir);
-        if (Files.exists(discardedFile)) {
-            try {
-                Files.delete(discardedFile);
-            } catch (
-                    IOException e) {
-                LOGGER.error("Could not remove discarded file {}", discardedFile, e);
-                return true;
-            }
-            return false;
+
         }
         return getLatestBackupPath(originalPath, backupDir).map(latestBackupPath -> {
             FileTime latestBackupFileLastModifiedTime;
