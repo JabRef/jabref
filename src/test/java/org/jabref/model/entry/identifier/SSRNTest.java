@@ -35,12 +35,12 @@ public class SSRNTest {
     @ParameterizedTest
     @MethodSource("provideTestData")
     public void acceptCorrectSSRNAbstracts(boolean findInText, String input) {
-        assertEquals("4904445", new SSRN(input).getNormalized());
+        assertEquals("4904445", new SSRN(input).asString());
         Optional<SSRN> parsed = SSRN.parse(input);
 
         if (findInText) {
             assertTrue(parsed.isPresent());
-            assertEquals("4904445", parsed.get().getNormalized());
+            assertEquals("4904445", parsed.get().asString());
         } else {
             assertTrue(parsed.isEmpty());
         }
@@ -50,12 +50,12 @@ public class SSRNTest {
     public void findInText() {
         Optional<SSRN> parsed = SSRN.parse("The example paper (https://ssrn.com/abstract=4904445) should be found within this text");
         assertTrue(parsed.isPresent());
-        assertEquals("4904445", parsed.get().getNormalized());
+        assertEquals("4904445", parsed.get().asString());
     }
 
     @Test
     public void identifierNormalisation() {
-        assertEquals("123456", new SSRN(123456).getNormalized());
+        assertEquals("123456", new SSRN(123456).asString());
     }
 
     @Test
