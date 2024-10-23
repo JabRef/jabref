@@ -11,8 +11,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.identifier.RFC;
+import org.jabref.model.entry.identifier.SSRN;
 
 public class CompositeIdFetcher {
 
