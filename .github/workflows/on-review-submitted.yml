@@ -14,7 +14,7 @@ jobs:
       - run: echo ${{ github.event.review.state }}
       - if: ${{ github.event.review.state == 'changes_requested' }}
         run: |
-          gh pr edit "$PR_URL" --remove-label "status: ready-for-review"
+          # gh pr edit "$PR_URL" --remove-label "status: ready-for-review"
           gh pr edit "$PR_URL" --add-label "status: changes required"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
