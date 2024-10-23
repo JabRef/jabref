@@ -157,7 +157,6 @@ public class AiChatLogic {
 
     public AiMessage execute(UserMessage message) {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
-
         LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
                 aiPreferences.getAiProvider().getApiUrl(),
                 name.get(),

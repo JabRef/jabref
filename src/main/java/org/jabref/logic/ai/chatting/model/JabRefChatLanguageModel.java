@@ -63,15 +63,11 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
-//                langchainChatModel = Optional.of(Chat4AllModel
-//                        .builder()
-//                        .modelName(aiPreferences.getSelectedChatModel())
-//                        .baseUrl(aiPreferences.getSelectedApiBaseUrl())
-//                        .httpClient(httpClient)
-//                        .temperature(aiPreferences.getTemperature())
-//                        .build()
-//                );
-
+            }
+            case CHAT4ALL-> {
+//                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+//                System.out.println("a");
+                langchainChatModel = Optional.of(new Chat4AllModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {

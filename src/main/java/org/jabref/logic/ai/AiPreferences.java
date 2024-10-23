@@ -40,6 +40,7 @@ public class AiPreferences {
     private final StringProperty mistralAiChatModel;
     private final StringProperty geminiChatModel;
     private final StringProperty huggingFaceChatModel;
+    private final StringProperty chat4AllChatModel;
 
     private final BooleanProperty customizeExpertSettings;
 
@@ -47,6 +48,7 @@ public class AiPreferences {
     private final StringProperty mistralAiApiBaseUrl;
     private final StringProperty geminiApiBaseUrl;
     private final StringProperty huggingFaceApiBaseUrl;
+    private final StringProperty chat4AllApiBaseUrl;
 
     private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final StringProperty instruction;
@@ -67,11 +69,13 @@ public class AiPreferences {
                          String mistralAiChatModel,
                          String geminiChatModel,
                          String huggingFaceChatModel,
+                         String chat4AllModel,
                          boolean customizeExpertSettings,
                          String openAiApiBaseUrl,
                          String mistralAiApiBaseUrl,
                          String geminiApiBaseUrl,
                          String huggingFaceApiBaseUrl,
+                         String chat4AllApiBaseUrl,
                          EmbeddingModel embeddingModel,
                          String instruction,
                          double temperature,
@@ -91,6 +95,7 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
+        this.chat4AllChatModel = new SimpleStringProperty(chat4AllModel);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -98,6 +103,7 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
         this.geminiApiBaseUrl = new SimpleStringProperty(geminiApiBaseUrl);
         this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
+        this.chat4AllApiBaseUrl = new SimpleStringProperty(chat4AllApiBaseUrl);
 
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.instruction = new SimpleStringProperty(instruction);
@@ -233,6 +239,18 @@ public class AiPreferences {
         this.huggingFaceChatModel.set(huggingFaceChatModel);
     }
 
+    public StringProperty chat4AllChatModelProperty() {
+        return chat4AllChatModel;
+    }
+
+    public String getChat4AllChatModel() {
+        return huggingFaceChatModel.get();
+    }
+
+    public void setChat4AllChatModel(String chat4AllChatModel) {
+        this.chat4AllChatModel.set(chat4AllChatModel);
+    }
+
     public BooleanProperty customizeExpertSettingsProperty() {
         return customizeExpertSettings;
     }
@@ -308,6 +326,17 @@ public class AiPreferences {
     public void setHuggingFaceApiBaseUrl(String huggingFaceApiBaseUrl) {
         this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
+    public StringProperty chat4AllApiBaseUrlProperty() {
+        return chat4AllApiBaseUrl;
+    }
+
+    public String getChat4AllApiBaseUrl() {
+        return chat4AllApiBaseUrl.get();
+    }
+
+    public void setChat4AllApiBaseUrl(String chat4AllApiBaseUrl) {
+        this.chat4AllApiBaseUrl.set(chat4AllApiBaseUrl);
+    }
 
     public StringProperty instructionProperty() {
         return instruction;
@@ -354,6 +383,7 @@ public class AiPreferences {
                 case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
                 case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
                 case GEMINI -> AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+                case CHAT4ALL -> AiDefaultPreferences.getContextWindowSize(AiProvider.CHAT4ALL, chat4AllChatModel.get());
             };
         }
     }
@@ -481,6 +511,8 @@ public class AiPreferences {
                     huggingFaceChatModel.get();
             case GEMINI ->
                     geminiChatModel.get();
+            case CHAT4ALL ->
+                    chat4AllChatModel.get();
         };
     }
 
@@ -495,6 +527,8 @@ public class AiPreferences {
                         huggingFaceApiBaseUrl.get();
                 case GEMINI ->
                         geminiApiBaseUrl.get();
+                case CHAT4ALL ->
+                        chat4AllApiBaseUrl.get();
             };
         } else {
             return aiProvider.get().getApiUrl();
