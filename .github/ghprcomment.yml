@@ -34,3 +34,8 @@
   message: |
     While the PR was in progress, a new version of JabRef has been released.
     You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: 'Unit tests'
+  message: |
+    JUnit tests are failing. In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details". This brings you to the test output.
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally. We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
