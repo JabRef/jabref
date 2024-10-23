@@ -133,16 +133,9 @@ public class BackUpManagerJGit {
      * @param originalPath Path to the file which should be equalized to the backup file.
      */
     public static void restoreBackup(Path originalPath, Path backupDir) {
-        Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
-        if (backupPath.isEmpty()) {
-            LOGGER.error("There is no backup file");
-            return;
-        }
-        try {
-            Files.copy(backupPath.get(), originalPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            LOGGER.error("Error while restoring the backup file.", e);
-        }
+        /**
+         * à implementer
+         * */
     }
 
 }
