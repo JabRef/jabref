@@ -17,20 +17,20 @@ class RFCTest {
             "rfc7276, rfc7276",
             "rfc7276, https://www.rfc-editor.org/rfc/rfc7276.html"
     })
-    void testParseValidRfcIdAndUrl(String expected, String input) {
+    void parseValidRfcIdAndUrl(String expected, String input) {
         Optional<RFC> rfc = RFC.parse(input);
         assertTrue(rfc.isPresent());
         assertEquals(expected, rfc.get().getNormalized());  // Use asString() method
     }
 
     @Test
-    void testInvalidRfc() {
+    void invalidRfc() {
         Optional<RFC> rfc = RFC.parse("invalidRfc");
         assertEquals(Optional.empty(), rfc);  // Replace assertFalse with assertEquals
     }
 
     @Test
-    void testGetExternalUri() {
+    void getExternalUri() {
         RFC rfc = new RFC("rfc7276");
         assertEquals(Optional.of(URI.create("https://www.rfc-editor.org/rfc/rfc7276")), rfc.getExternalURI());  // Use Optional.of for expected value
     }
