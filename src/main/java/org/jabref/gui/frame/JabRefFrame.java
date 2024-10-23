@@ -260,17 +260,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Toggle visibility between welcome page and tabbed pane
         welcomePage.setVisible(!hasOpenDatabases);
         splitPane.setVisible(hasOpenDatabases);
-
-//        if (hasOpenDatabases) {
-//            if (!splitPane.getItems().contains(sidePane)) {
-//                sidePane.setPrefWidth(260);
-//                splitPane.getItems().addFirst(sidePane);
-//
-//                splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-//            }
-//        } else {
-//            splitPane.getItems().remove(sidePane);
-//        }
     }
 
     private void bindDatabaseChanges() {
@@ -499,24 +488,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
-
-//        // Ensure layout is updated
-//        updateContent();
-//        updateSidePane();
-//
-//        // Set the preferred width and divider position explicitly
-//        sidePane.setPrefWidth(260);
-//        Platform.runLater(() -> {
-//            if (!sidePane.getChildren().isEmpty() && !splitPane.getItems().contains(sidePane)) {
-//                splitPane.getItems().addFirst(sidePane);
-//
-//                // Force divider to a known position (e.g., 0.2 of the total width)
-//                LOGGER.info("Forcing divider position after adding tab.");
-//                splitPane.setDividerPositions(0.2);
-//
-//                updateDividerPosition();  // Ensure any further updates are applied
-//            }
-//        });
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
