@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -367,23 +368,26 @@ class StringUtilTest {
         assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
 
-    @Test
-    void shortenFileName() {
-        assertEquals("", StringUtil.shortenFileName(null, 10));
-        assertEquals("", StringUtil.shortenFileName("thisisatestfile.pdf", 0));
-        assertEquals("", StringUtil.shortenFileName("example.txt", -5));
-        assertEquals("COMP101.pdf", StringUtil.shortenFileName("COMP101.pdf", 20));
-        assertEquals("COMP10101.pdf", StringUtil.shortenFileName("COMP10101.pdf", 13));
-        assertEquals("long...name.txt", StringUtil.shortenFileName("longfilename.txt", 15));
-        assertEquals("veryl...name", StringUtil.shortenFileName("verylongfilename", 12));
-        assertEquals("...", StringUtil.shortenFileName("COMP20202020.fbx", 3));
-        assertEquals("", StringUtil.shortenFileName("COMP20202020.txt", 2));
-        assertEquals("...", StringUtil.shortenFileName("COMP20202020.txt", 4));
-        assertEquals("long...ame.txt", StringUtil.shortenFileName("longfilename.txt", 14));
-        assertEquals("lo...me.txt", StringUtil.shortenFileName("long.file.name.txt", 11));
-        assertEquals("lo...me.extremelylongextension", StringUtil.shortenFileName("longfilename.extremelylongextension", 30));
-        assertEquals("fi...e.txt", StringUtil.shortenFileName("filename.txt", 10));
-        assertEquals("filename.txt", StringUtil.shortenFileName("filename.txt", 20));
+    @ParameterizedTest
+    @CsvSource ({
+            "'', , 10",
+            "'', thisisatestfile.pdf, 0",
+            "'', example.txt, -5",
+            "COMP101.pdf, COMP101.pdf, 20",
+            "COMP10101.pdf, COMP10101.pdf, 13",
+            "long...name.txt, longfilename.txt, 15",
+            "veryl...name, verylongfilename, 12",
+            "..., COMP20202020.fbx, 3",
+            "'', COMP20202020.txt, 2",
+            "..., COMP20202020.txt, 4",
+            "long...ame.txt, longfilename.txt, 14",
+            "lo...me.txt, long.file.name.txt, 11",
+            "lo...me.extremelylongextension, longfilename.extremelylongextension, 30",
+            "fi...e.txt, filename.txt, 10",
+            "filename.txt, filename.txt, 20"
+    })
+    void shortenFileName(String expected, String fileName, int maxLength) {
+        assertEquals(expected, StringUtil.shortenFileName(fileName, maxLength));
     }
 
     private static Stream<Arguments> getQuoteStringIfSpaceIsContainedData() {
