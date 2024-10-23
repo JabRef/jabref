@@ -33,6 +33,6 @@ public class PushToWinEdt extends AbstractPushToApplication {
 
     @Override
     protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
-        return new String[] {commandPath, "\"[Open(|%s|);SelLine(%s,%s);]\"".formatted(fileName.toString(), Integer.toString(line), Integer.toString(0))};
+        return new String[] {commandPath, "\"[Open(|%s|);SelLine(%s,%s);]\"".formatted(fileName.toString(), line, column)};
     }
 }
