@@ -3,9 +3,9 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,9 +15,9 @@ class RFCTest {
     @ParameterizedTest
     @CsvSource({
             "rfc7276, rfc7276",
-            "https://www.rfc-editor.org/rfc/rfc7276.html, rfc7276"
+            "rfc7276, https://www.rfc-editor.org/rfc/rfc7276.html"
     })
-    void testParseValidRfcIdAndUrl(String input, String expected) {
+    void testParseValidRfcIdAndUrl(String expected, String input) {
         Optional<RFC> rfc = RFC.parse(input);
         assertTrue(rfc.isPresent());
         assertEquals(expected, rfc.get().getNormalized());  // Use asString() method
