@@ -53,7 +53,7 @@ public class CompositeIdFetcher {
 
         Optional<RFC> rfcId = RFC.parse(identifier);
         if (rfcId.isPresent()) {
-            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().getNormalized());
+            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().asString());
         }
 
         return Optional.empty();
