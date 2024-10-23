@@ -95,7 +95,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result, preferences)) {
+            if (action.isActionNecessary(result, dialogService, preferences)) {
                 action.performAction(result, dialogService, preferences);
             }
         }

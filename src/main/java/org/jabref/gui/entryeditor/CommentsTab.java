@@ -20,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.fieldeditors.MarkdownEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
@@ -28,14 +29,14 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
@@ -55,7 +56,7 @@ public class CommentsTab extends FieldsEditorTab {
                        ThemeManager themeManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       LuceneManager luceneManager,
+                       IndexManager indexManager,
                        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 false,
@@ -69,7 +70,7 @@ public class CommentsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                luceneManager,
+                indexManager,
                 searchQueryProperty
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
@@ -135,12 +136,12 @@ public class CommentsTab extends FieldsEditorTab {
         Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
-            FieldEditorFX editor = fieldEditorEntry.getValue();
+            MarkdownEditor editor = (MarkdownEditor) fieldEditorEntry.getValue().getNode();
 
             boolean isStandardBibtexComment = field == StandardField.COMMENT;
             boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
-            editor.getNode().setDisable(!shouldBeEnabled);
+            editor.setEditable(shouldBeEnabled);
         }
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
