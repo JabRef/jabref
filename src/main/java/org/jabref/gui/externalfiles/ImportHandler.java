@@ -57,6 +57,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -125,8 +126,11 @@ public class ImportHandler {
                     }
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
-                        setTitle(Localization.lang("Processing %0 file(s) for adding to %1.", files.size(), bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled")));
-                        updateMessage(Localization.lang("Processing file %0 | %1 of %2 file(s) processed.", file.getFileName(), counter, files.size()));
+                        setTitle(Localization.lang("Processing %0 file(s) for %1 | %2 of %0 file(s) processed.",
+                                files.size(),
+                                bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("untitled"),
+                                counter));
+                        updateMessage(Localization.lang("Processing %0", StringUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
                         showToUser(true);
                     });

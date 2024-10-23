@@ -26,6 +26,7 @@ public class StringUtil {
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final String ELLIPSIS = "...";
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -165,6 +166,68 @@ public class StringUtil {
         }
 
         return orgName;
+    }
+
+    /**
+     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+     * is shortened into verylong...isthis.pdf
+     *
+     * @param fileName  the given file name to be shortened
+     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
+     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+     */
+    public static String shortenFileName(String fileName, int maxLength) {
+        if (fileName == null || maxLength <= 0) {
+            return "";
+        }
+
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+
+        // Reference the ellipsis' length for future usage
+        final int ELLIPSIS_LENGTH = ELLIPSIS.length();
+
+        // Find the index of the extension dot
+        int extensionIndex = fileName.lastIndexOf('.');
+
+        // Extract the name and extension part of a file name
+        String name;
+        String extension;
+
+        // Check if file has an extension or not
+        if (0 < extensionIndex && extensionIndex < fileName.length() - 1) {
+            name = fileName.substring(0, extensionIndex);
+            extension = fileName.substring(extensionIndex);
+        } else {
+            name = fileName;
+            extension = "";
+        }
+
+        // Calculate the necessary length for the ELLIPSIS and extension
+        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
+
+        // If maxLength could not accommodate only the ELLIPSIS and extension, return the minimum string with ELLIPSIS
+        if (maxLength < totalNeededLength) {
+            return fileName.substring(0, maxLength - 3) + ELLIPSIS;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        // Calculate the number of characters that the name could account for
+        int charsForName = maxLength - totalNeededLength;
+
+        // Distribute available characters to the start and end of the namePart
+        int frontChars = (charsForName + 1) / 2;
+        int backChars = charsForName / 2;
+
+        // Appending everything together for the final file name
+        result.append(name, 0, frontChars)
+              .append(ELLIPSIS)
+              .append(name.substring(name.length() - backChars))
+              .append(extension);
+
+        return result.toString();
     }
 
     /**
