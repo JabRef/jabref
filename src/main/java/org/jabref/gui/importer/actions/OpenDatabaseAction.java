@@ -103,29 +103,43 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FileDialogConfiguration.Builder builder = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB);
+        List<Path> filesToOpen = getFilesToOpen();
+        openFiles(new ArrayList<>(filesToOpen));
+    }
 
-        FileDialogConfiguration fileDialogConfiguration;
+    public List<Path> getFilesToOpen() {
+        List<Path> filesToOpen;
+
         try {
-            fileDialogConfiguration = builder
-                    .withInitialDirectory(getInitialDirectory())
-                    .build();
-        } catch (IllegalArgumentException e) { // something went wrong with the directory, fallback to user directory
-            fileDialogConfiguration = builder
-                    .withInitialDirectory(Directories.getUserDirectory())
-                    .build();
+            FileDialogConfiguration initialDirectoryConfig = getFileDialogConfiguration(getInitialDirectory());
+            filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(initialDirectoryConfig);
+        } catch (IllegalArgumentException e) {
+            // Rebuild a new config with the home directory
+            FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());
+            filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(homeDirectoryConfig);
         }
 
-        List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        openFiles(new ArrayList<>(filesToOpen));
+        return filesToOpen;
+    }
+
+    /**
+     * Builds a new FileDialogConfiguration using the given path as the initial directory for use in
+     * dialogService.showFileOpenDialogAndGetMultipleFiles().
+     * @param initialDirectory Path to use as the initial directory
+     * @return new FileDialogConfig with given initial directory
+     */
+    public FileDialogConfiguration getFileDialogConfiguration(Path initialDirectory) {
+        return new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                .withInitialDirectory(initialDirectory)
+                .build();
     }
 
     /**
      * @return Path of current panel database directory or the working directory
      */
-    private Path getInitialDirectory() {
+    public Path getInitialDirectory() {
         if (tabContainer.getLibraryTabs().isEmpty()) {
             return preferences.getFilePreferences().getWorkingDirectory();
         } else {
