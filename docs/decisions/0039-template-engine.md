@@ -16,8 +16,8 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 ## Decision Drivers
 
 * It should be fast.
-* It should be possible to provide templates out of Strings (required by the AI feature).
-* It should have short and understandable syntax. Especially. Work with unset fields and empty Optionals should be easy.
+* It should be possible to provide templates out of `String`s (required by the AI feature).
+* It should have short and understandable syntax. Especially, it should work well with unset fields and empty `Optional`s.
 
 ## Considered Options
 
@@ -27,8 +27,7 @@ A discussion was raised on StackOverflow ["Velocity vs. FreeMarker vs. Thymeleaf
 
 ## Decision Outcome
 
-Chosen option: "{title of option 1}", because
-{justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
+Chosen option: "", because
 
 ## Pros and Cons of the Options
 
@@ -51,7 +50,7 @@ ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
 
 * Good, because supports plain text templating.
 * Good, because it is possible to use `String` as a template.
-* Good, because it has simple syntax and it is designed for simple template workflows.
+* Good, because it has simple syntax, and it is designed for simple template workflows.
 * Good, because it has a stable syntax ([source](https://stackoverflow.com/a/1984458/10037342)).
 * Bad, because it is in maintenance mode.
 
