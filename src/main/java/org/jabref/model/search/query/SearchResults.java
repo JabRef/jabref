@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.model.search.query;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.model.entry.BibEntry;
 
 public class SearchResults {
 
-    private final Map<String, List<SearchResult>> searchResults = new HashMap<>();
+    private final Map<String, List<SearchResult>> searchResults = new ConcurrentHashMap<>();
 
     public void mergeSearchResults(SearchResults additionalResults) {
         this.searchResults.putAll(additionalResults.searchResults);
@@ -25,14 +26,8 @@ public class SearchResults {
         entries.forEach(entry -> addSearchResult(entry, result));
     }
 
-    public float getSearchScoreForEntry(BibEntry entry) {
-        if (searchResults.containsKey(entry.getId())) {
-            return searchResults.get(entry.getId())
-                                .stream()
-                                .map(SearchResult::getSearchScore)
-                                .reduce(0f, Float::max);
-        }
-        return 0f;
+    public boolean isMatched(BibEntry entry) {
+        return searchResults.containsKey(entry.getId());
     }
 
     public boolean hasFulltextResults(BibEntry entry) {

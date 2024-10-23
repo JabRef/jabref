@@ -12,16 +12,18 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.hamcrest.Matchers;
@@ -67,7 +69,9 @@ class DatabaseSearcherWithBibFilesTest {
             .withCitationKey("minimal-note-mixed-case")
             .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @TempDir
     private Path indexDir;
@@ -79,62 +83,58 @@ class DatabaseSearcherWithBibFilesTest {
     private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws Exception {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = spy(result.getDatabaseContext());
-        when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
+        when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
+
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         return databaseContext;
     }
 
     private static Stream<Arguments> searchLibrary() {
         return Stream.of(
                 // empty library
-                Arguments.of(List.of(), "empty.bib", "Test", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of(List.of(), "empty.bib", "Test", false),
 
                 // test-library-title-casing
-                Arguments.of(List.of(), "test-library-title-casing.bib", "NotExisting", EnumSet.noneOf(SearchFlags.class)),
-                Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "Title", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "NotExisting", false),
+                Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "Title", false),
 
-                Arguments.of(List.of(), "test-library-title-casing.bib", "title:NotExisting", EnumSet.noneOf(SearchFlags.class)),
-                Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "title:Title", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title = NotExisting", false),
+                Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "title = Title", false),
 
-                // Arguments.of(List.of(), "test-library-title-casing.bib", "title:TiTLE", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(titleSentenceCased), "test-library-title-casing.bib", "title:Title", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
+                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! TiTLE", false),
+                 Arguments.of(List.of(TITLE_SENTENCE_CASED), "test-library-title-casing.bib", "title =! Title", false),
 
-                // Arguments.of(List.of(), "test-library-title-casing.bib", "TiTLE", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(titleMixedCased), "test-library-title-casing.bib", "TiTle", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
+                 Arguments.of(List.of(), "test-library-title-casing.bib", "any =! TiTLE", false),
+                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "any =! TiTle", false),
 
-                // Arguments.of(List.of(), "test-library-title-casing.bib", "title:NotExisting", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(titleMixedCased), "test-library-title-casing.bib", "title:TiTle", EnumSet.of(SearchFlags.CASE_SENSITIVE)),
+                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! NotExisting", false),
+                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "title =! TiTle", false),
 
-                Arguments.of(List.of(), "test-library-title-casing.bib", "/[Y]/", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "any =~ [Y]", false),
 
                 // test-library-with-attached-files
-                Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting.", EnumSet.of(SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "This is a short sentence, comma included.", EnumSet.of(SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "comma", EnumSet.of(SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting.", true),
+                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "\"This is a short sentence, comma included.\"", true),
+                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_ALL_UPPER_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "comma", true),
 
-                // TODO: PDF search does not support case sensitive search (yet)
-                // Arguments.of(List.of(minimalAllUpperCase, minimalMixedCase), "test-library-with-attached-files.bib", "THIS", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(minimalAllUpperCase), "test-library-with-attached-files.bib", "THIS is a short sentence, comma included.", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(minimalSentenceCase, minimalAllUpperCase, minimalMixedCase), "test-library-with-attached-files.bib", "comma", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(minimalNoteAllUpperCase), "test-library-with-attached-files.bib", "THIS IS A SHORT SENTENCE, COMMA INCLUDED.", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE)),
-
-                Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting", EnumSet.of(SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "world", EnumSet.of(SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "Hello World", EnumSet.of(SearchFlags.FULLTEXT))
-
-                // TODO: PDF search does not support case sensitive search (yet)
-                // Arguments.of(List.of(minimalNoteAllUpperCase), "test-library-with-attached-files.bib", "HELLO WORLD", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE)),
-                // Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.CASE_SENSITIVE))
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting", true),
+                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "world", true),
+                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "\"Hello World\"", true)
         );
     }
 
     @ParameterizedTest
     @MethodSource
-    void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
+    void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, filePreferences).getMatches();
+        EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences).getMatches();
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
