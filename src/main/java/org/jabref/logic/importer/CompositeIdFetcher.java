@@ -27,18 +27,18 @@ public class CompositeIdFetcher {
 
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
-            return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
+            return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());
         }
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         if (arXivIdentifier.isPresent()) {
-            return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().getNormalized());
+            return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().asString());
         }
         Optional<ISBN> isbn = ISBN.parse(identifier);
         if (isbn.isPresent()) {
             return new IsbnFetcher(importFormatPreferences)
                     // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                     // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
-                    .performSearchById(isbn.get().getNormalized());
+                    .performSearchById(isbn.get().asString());
         }
         /* TODO: IACR is currently disabled, because it needs to be reworked: https://github.com/JabRef/jabref/issues/8876
         Optional<IacrEprint> iacrEprint = IacrEprint.parse(identifier);
@@ -48,12 +48,12 @@ public class CompositeIdFetcher {
 
         Optional<SSRN> ssrn = SSRN.parse(identifier);
         if (ssrn.isPresent()) {
-            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().getNormalized());
+            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().asString());
         }
 
         Optional<RFC> rfcId = RFC.parse(identifier);
         if (rfcId.isPresent()) {
-            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().getNormalized());
+            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().asString());
         }
 
         return Optional.empty();

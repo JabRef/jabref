@@ -15,26 +15,26 @@ public class BibEntryRelationsCache {
     private static final Map<String, List<BibEntry>> REFERENCES_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
 
     public List<BibEntry> getCitations(BibEntry entry) {
-        return CITATIONS_MAP.getOrDefault(entry.getDOI().map(DOI::getDOI).orElse(""), Collections.emptyList());
+        return CITATIONS_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), Collections.emptyList());
     }
 
     public List<BibEntry> getReferences(BibEntry entry) {
-        return REFERENCES_MAP.getOrDefault(entry.getDOI().map(DOI::getDOI).orElse(""), Collections.emptyList());
+        return REFERENCES_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), Collections.emptyList());
     }
 
     public void cacheOrMergeCitations(BibEntry entry, List<BibEntry> citations) {
-        entry.getDOI().ifPresent(doi -> CITATIONS_MAP.put(doi.getDOI(), citations));
+        entry.getDOI().ifPresent(doi -> CITATIONS_MAP.put(doi.asString(), citations));
     }
 
     public void cacheOrMergeReferences(BibEntry entry, List<BibEntry> references) {
-        entry.getDOI().ifPresent(doi -> REFERENCES_MAP.putIfAbsent(doi.getDOI(), references));
+        entry.getDOI().ifPresent(doi -> REFERENCES_MAP.putIfAbsent(doi.asString(), references));
     }
 
     public boolean citationsCached(BibEntry entry) {
-        return CITATIONS_MAP.containsKey(entry.getDOI().map(DOI::getDOI).orElse(""));
+        return CITATIONS_MAP.containsKey(entry.getDOI().map(DOI::asString).orElse(""));
     }
 
     public boolean referencesCached(BibEntry entry) {
-        return REFERENCES_MAP.containsKey(entry.getDOI().map(DOI::getDOI).orElse(""));
+        return REFERENCES_MAP.containsKey(entry.getDOI().map(DOI::asString).orElse(""));
     }
 }

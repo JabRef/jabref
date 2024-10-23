@@ -38,7 +38,7 @@ public class ACS implements FulltextFetcher {
             return Optional.empty();
         }
 
-        String source = SOURCE.formatted(doi.get().getDOI());
+        String source = SOURCE.formatted(doi.get().asString());
         // Retrieve PDF link
         Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
         Element link = html.select("a.button_primary").first();

@@ -48,7 +48,7 @@ public class RFC extends EprintIdentifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         return rfcString;
     }
 
