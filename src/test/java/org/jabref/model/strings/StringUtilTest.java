@@ -370,21 +370,21 @@ class StringUtilTest {
 
     @ParameterizedTest
     @CsvSource ({
-            "'', , 10",
-            "'', thisisatestfile.pdf, 0",
-            "'', example.txt, -5",
-            "COMP101.pdf, COMP101.pdf, 20",
-            "COMP10101.pdf, COMP10101.pdf, 13",
-            "long...name.txt, longfilename.txt, 15",
-            "veryl...name, verylongfilename, 12",
-            "..., COMP20202020.fbx, 3",
-            "'', COMP20202020.txt, 2",
-            "..., COMP20202020.txt, 4",
-            "long...ame.txt, longfilename.txt, 14",
-            "lo...me.txt, long.file.name.txt, 11",
-            "lo...me.extremelylongextension, longfilename.extremelylongextension, 30",
-            "fi...e.txt, filename.txt, 10",
-            "filename.txt, filename.txt, 20"
+            "''                             ,                                     , -5",
+            "''                             ,                                     ,  0",
+            "''                             ,                                     ,  3",
+            "''                             ,                                     ,  5",
+            "''                             ,                                     , 10",
+            "''                             , thisisatestfile.pdf                 , -5",
+            "''                             , thisisatestfile.pdf                 ,  0",
+            "...                            , thisisatestfile.pdf                 ,  3",
+            "...                            , thisisatestfile.pdf                 ,  5",
+            "th...e.pdf                     , thisisatestfile.pdf                 , 10",
+            "thisisatestfile.pdf            , thisisatestfile.pdf                 , 20",
+            "...                            , longfilename.extremelylongextension ,  5",
+            "...                            , longfilename.extremelylongextension , 10",
+            "...                            , longfilename.extremelylongextension , 20",
+            "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
     })
     void shortenFileName(String expected, String fileName, int maxLength) {
         assertEquals(expected, StringUtil.shortenFileName(fileName, maxLength));
