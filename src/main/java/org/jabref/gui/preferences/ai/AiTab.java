@@ -90,6 +90,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         });
 
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
+
+        apiKeyTextField.disableProperty().bind(
+                Bindings.or(
+                        viewModel.disableBasicSettingsProperty(),
+                        aiProviderComboBox.valueProperty().isEqualTo(AiProvider.CHAT4ALL) // Disable if GPT4ALL is selected
+                )
+        );
+        
         apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
