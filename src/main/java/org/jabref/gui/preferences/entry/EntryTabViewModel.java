@@ -27,6 +27,10 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
+    // TODO: Change these from static variables 18/10/2024
+    private static final BooleanProperty analysisProperty = new SimpleBooleanProperty();
+    private static final BooleanProperty trackViewsProperty = new SimpleBooleanProperty();
+
     private final FieldPreferences fieldPreferences;
     private final BibEntryPreferences bibEntryPreferences;
     private final OwnerPreferences ownerPreferences;
@@ -68,8 +72,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());
 
         timestampPreferences.setAddCreationDate(addCreationDateProperty.getValue());
-        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());
-    }
+        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue()); }
 
     public StringProperty keywordSeparatorProperty() {
         return keywordSeparatorProperty;
@@ -109,5 +112,23 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty addModificationDateProperty() {
         return addModificationDateProperty;
+    }
+
+    // View analysis
+
+    public static BooleanProperty trackViewsProperty() {
+        return trackViewsProperty;
+    }
+
+    public void setTrackViewsEnabled(boolean enabled) {
+        trackViewsProperty.set(enabled);
+    }
+
+    public void setAnalysisEnabled(boolean enabled) {
+        analysisProperty.set(enabled);
+    }
+
+    public static BooleanProperty analysisProperty() {
+        return analysisProperty;
     }
 }

@@ -81,6 +81,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton popularityButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
@@ -100,6 +101,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField autoGroupPersonsField;
 
     @FXML private TextField texGroupFilePath;
+
+    @FXML private ComboBox<String> timePeriodCombo;
+    @FXML private ComboBox<Integer> maxEntriesCombo;
 
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
@@ -201,6 +205,15 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        popularityButton.selectedProperty().bindBidirectional(viewModel.typePopularityProperty());
+        popularityButton.disableProperty().bind(viewModel.trackViewsEnabledProperty().not());
+
+        timePeriodCombo.visibleProperty().bind(popularityButton.selectedProperty());
+        maxEntriesCombo.visibleProperty().bind(popularityButton.selectedProperty());
+        timePeriodCombo.valueProperty().bindBidirectional(viewModel.timePeriodProperty());
+        maxEntriesCombo.valueProperty().bindBidirectional(viewModel.maxEntriesProperty());
+        timePeriodCombo.setItems(FXCollections.observableArrayList("Last week", "Last month", "Last year", "All time"));
+        maxEntriesCombo.setItems(FXCollections.observableArrayList(10, 20, 50, 100, 999));
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());

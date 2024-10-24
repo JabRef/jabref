@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -55,6 +57,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.entry.EntryTabViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.RedoAction;
@@ -94,6 +97,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.PopularityGroup;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
@@ -105,6 +109,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,6 +156,10 @@ public class LibraryTab extends Tab {
     private BibEntry showing;
 
     private SuggestionProviders suggestionProviders;
+
+    // Used to track how many views each attachment has.
+    private final Path viewStorePath = NativeDesktop.getOtherDataDir().resolve("tracking.mv");
+    private final ReentrantLock fileLock = new ReentrantLock();
 
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
@@ -572,6 +582,8 @@ public class LibraryTab extends Tab {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
+        incrementViewCount(entry);
+
         if (!splitPane.getItems().contains(entryEditor)) {
             splitPane.getItems().addLast(entryEditor);
             mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
@@ -1196,5 +1208,27 @@ public class LibraryTab extends Tab {
 
     public LibraryTabContainer getLibraryTabContainer() {
         return tabContainer;
+    }
+
+    /**
+     * Takes an entry and increments the number of times it has been viewed by 1.
+     */
+    private void incrementViewCount(BibEntry entry) {
+        MVStore mvStore = PopularityGroup.getMVStore();
+        synchronized (mvStore) {
+            MVMap<String, Integer> viewCounts = mvStore.openMap("entryViewCounts");
+            MVMap<String, Long> lastViewTimestamps = mvStore.openMap("lastViewTimestamps");
+
+            long currentTime = System.currentTimeMillis();
+            String uniqueKey = PopularityGroup.getUniqueKeyForEntry(entry);
+            long lastViewTime = lastViewTimestamps.getOrDefault(uniqueKey, 0L);
+
+            if (currentTime - lastViewTime >= 3600000 && EntryTabViewModel.trackViewsProperty().get()) { // 3600000 milliseconds in one hour
+                int currentCount = viewCounts.getOrDefault(uniqueKey, 0);
+                viewCounts.put(uniqueKey, currentCount + 1);
+                lastViewTimestamps.put(uniqueKey, currentTime);
+                mvStore.commit(); // Save changes
+            }
+        }
     }
 }
