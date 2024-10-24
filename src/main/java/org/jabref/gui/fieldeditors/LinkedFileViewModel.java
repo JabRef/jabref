@@ -336,7 +336,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void updateMoveFileItemText(MenuItem moveFileItem, Path currentFilePath) {
-        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
         Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
 
         if (targetDirectory.isPresent()) {
@@ -349,7 +349,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void updateMoveAndRenameFileItemText(MenuItem moveAndRenameFileItem, Path currentFilePath) {
-        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
         Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
 
         if (targetDirectory.isPresent()) {
@@ -367,7 +367,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return;
         }
 
-        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences(), dialogService);
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
         var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
         Optional<Path> currentFilePath = linkedFile.findIn(dir);
         if (currentFilePath.isPresent()) {

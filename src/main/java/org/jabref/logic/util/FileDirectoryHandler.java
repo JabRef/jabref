@@ -3,7 +3,6 @@ package org.jabref.logic.util;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -13,12 +12,10 @@ import org.jabref.model.database.BibDatabaseContext;
 public class FileDirectoryHandler {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
-    private final DialogService dialogService;
 
-    public FileDirectoryHandler(BibDatabaseContext databaseContext, FilePreferences filePreferences, DialogService dialogService) {
+    public FileDirectoryHandler(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
-        this.dialogService = dialogService;
     }
 
     public record DirectoryInfo(

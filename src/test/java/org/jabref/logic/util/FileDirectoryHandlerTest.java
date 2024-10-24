@@ -35,7 +35,7 @@ public class FileDirectoryHandlerTest {
         when(databaseContext.getFileDirectoriesInfo(filePreferences)).thenReturn(directoriesInfo);
         when(filePreferences.getUserAndHost()).thenReturn("testUser");
 
-        fileDirectoryHandler = new FileDirectoryHandler(databaseContext, filePreferences, dialogService);
+        fileDirectoryHandler = new FileDirectoryHandler(databaseContext, filePreferences);
     }
 
     @Test
