@@ -7,8 +7,11 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,8 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -82,6 +87,8 @@ public class UnlinkedFilesDialogViewModel {
     private final TaskExecutor taskExecutor;
 
     private final FunctionBasedValidator<String> scanDirectoryValidator;
+
+    private List<BibEntry> entriesToImportWithoutDuplicates;
 
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
@@ -155,6 +162,24 @@ public class UnlinkedFilesDialogViewModel {
         }
         resultList.clear();
 
+
+        List<BibEntry> entriesToImport = importHandler.getEntriesToImport(fileList);
+
+        entriesToImportWithoutDuplicates = new ArrayList<>();
+
+        for (BibEntry entry : entriesToImport) {
+            Optional<BibEntry> existingDuplicate = importHandler.findDuplicate(bibDatabase, entry);
+            if (existingDuplicate.isPresent()) {
+                LOGGER.info("Skipping duplicate entry: {}", entry);
+            } else {
+                entriesToImportWithoutDuplicates.add(entry);
+            }
+        }
+
+        if (entriesToImportWithoutDuplicates.isEmpty()) {
+            LOGGER.warn("No unique entries to import, skipping background task.");
+            return;
+        }
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
                                                  .onRunning(() -> {
                                                      progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
@@ -166,8 +191,48 @@ public class UnlinkedFilesDialogViewModel {
                                                      progressTextProperty.unbind();
                                                      taskActiveProperty.setValue(false);
                                                  })
-                                                 .onSuccess(resultList::addAll);
+                                                 .onSuccess(new Consumer<List<ImportFilesResultItemViewModel>>() {
+                                                     @Override
+                                                     public void accept(List<ImportFilesResultItemViewModel> importFilesResultItemViewModels) {
+                                                         if (entriesToImportWithoutDuplicates != null && !entriesToImportWithoutDuplicates.isEmpty()) {
+                                                             List<ImportFilesResultItemViewModel> convertedEntries = entriesToImportWithoutDuplicates.stream()
+                                                                                                                                                     .map(entry -> new ImportFilesResultItemViewModel(
+                                                                                                                                                             Objects.requireNonNull(UnlinkedFilesDialogViewModel.this.getFilePathFromEntry(entry)),
+                                                                                                                                                             true,
+                                                                                                                                                             "Imported successfully"))
+                                                                                                                                                     .toList();
+                                                             resultList.addAll(convertedEntries);
+                                                         } else {
+                                                             LOGGER.warn("No entries to import or list is not initialized properly.");
+                                                         }
+                                                     }
+                                                 });
+
         importFilesBackgroundTask.executeWith(taskExecutor);
+    }
+
+    /**
+     * Extracts the file path from the given BibEntry.
+     *
+     * @param entry The BibEntry instance from which to extract the file path
+     * @return The file path if a valid file field exists in the BibEntry; otherwise, returns an empty path.
+     *
+     */
+    private Path getFilePathFromEntry(BibEntry entry) {
+        Optional<String> fileField = entry.getField(StandardField.FILE);
+        if (fileField.isPresent()) {
+            String fileFieldValue = fileField.get();
+            String[] fileParts = fileFieldValue.split(":");
+
+            if (fileParts.length > 1) {
+                return Path.of(fileParts[1]);
+            } else {
+                LOGGER.warn("File field is not in the expected format: {}", fileFieldValue);
+            }
+        } else {
+            LOGGER.warn("No file associated with the entry: {}", entry);
+        }
+        return Path.of("");
     }
 
     /**
@@ -202,7 +267,7 @@ public class UnlinkedFilesDialogViewModel {
         } catch (IOException e) {
             LOGGER.error("Error exporting", e);
         }
-     }
+    }
 
     public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;
