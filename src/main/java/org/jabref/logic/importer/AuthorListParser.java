@@ -1,6 +1,14 @@
 package org.jabref.logic.importer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,6 +40,11 @@ public class AuthorListParser {
 
     private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile("^[A-Z](\\.[ -]| ?-)");
 
+    private static final Pattern EXTENDED_NAME_FORMAT_PATTERN = Pattern.compile("(\\w+)\\s*=\\s*([^,]+)(?:,\\s*|$)");
+
+    private static final int AUTHOR_SEPARATOR_LENGTH = 5; // Length of " and "
+
+    private static final int NAME_SPLIT_INCREMENT = 4; // Increment after processing " and "
     /**
      * the raw bibtex author/editor field
      */
@@ -190,7 +203,7 @@ public class AuthorListParser {
      */
     private Optional<Author> parseExtendedNameFormat(String authorString) {
         Map<String, String> nameParts = new HashMap<>();
-        Matcher matcher = Pattern.compile("(\\w+)\\s*=\\s*([^,]+)(?:,\\s*|$)").matcher(authorString);
+        Matcher matcher = EXTENDED_NAME_FORMAT_PATTERN.matcher(authorString);
         while (matcher.find()) {
             nameParts.put(matcher.group(1).trim(), matcher.group(2).trim());
         }
@@ -212,11 +225,8 @@ public class AuthorListParser {
 
         // abbreviate given name
         String givenNameAbbreviated = abbreviateGivenName(givenName);
-
-        // create Author object
         return Optional.of(new Author(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix));
     }
-
 
     /**
      * Abbreviates the given name by taking the first letter of each word and appending a dot.
@@ -263,16 +273,15 @@ public class AuthorListParser {
                 bracesLevel++;
             } else if (c == '}') {
                 bracesLevel--;
-            } else if (i <= authorList.length() - 5 && authorList.substring(i, i + 5).equals(" and ") && bracesLevel == 0) {
+            } else if (i <= authorList.length() - AUTHOR_SEPARATOR_LENGTH && authorList.substring(i, i + AUTHOR_SEPARATOR_LENGTH).equals(" and ") && bracesLevel == 0) {
                 authors.add(authorList.substring(start, i));
-                i += 4;
+                i += NAME_SPLIT_INCREMENT;
                 start = i + 1;
             }
         }
         authors.add(authorList.substring(start));
         return authors;
     }
-
 
     /**
      * Handle cases names in order Firstname Lastname, separated by <code>","</code> and a final <code>", and "</code>
