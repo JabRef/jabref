@@ -299,6 +299,15 @@ class LatexIntegrityCheckerTest {
                 // TFEM03: \right had no preceding \left
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM03), StandardField.TITLE, "$\\right)$"),
 
+                // TTEM03: Test _
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.TITLE, "Test_hello"),
+
+                // TTEM03: Test ^
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM03), StandardField.TITLE, "Test^Hello"),
+
+                // TTEM03 Test _^
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM03), StandardField.TITLE, "Test_^hello"),
+
                 // TFEM04: \left had no following \right
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM04), StandardField.TITLE, "$\\left($")
 
