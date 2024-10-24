@@ -19,7 +19,7 @@ public class MetaDataDiff {
         CONTENT_SELECTOR,
         DEFAULT_KEY_PATTERN,
         ENCODING,
-        LIBRARY_FILE_DIRECTORY,
+        LIBRARY_SPECIFIC_FILE_DIRECTORY,
         GROUPS,
         KEY_PATTERNS,
         LATEX_FILE_DIRECTORY,
@@ -114,7 +114,7 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
         addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
-        addToListIfDiff(changes, DifferenceType.LIBRARY_FILE_DIRECTORY, originalMetaData.getLibraryFileDirectory(), newMetaData.getLibraryFileDirectory());
+        addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
         return changes;
     }
