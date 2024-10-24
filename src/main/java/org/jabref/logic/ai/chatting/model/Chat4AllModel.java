@@ -70,11 +70,11 @@ public class Chat4AllModel implements ChatLanguageModel {
             LOGGER.info("Chat4All response: {}", response.body());
 
             TextGenerationResponse textGenerationResponse = gson.fromJson(response.body(), TextGenerationResponse.class);
-            if (textGenerationResponse.getChoices() == null || textGenerationResponse.getChoices().isEmpty()) {
+            if (textGenerationResponse.choices() == null || textGenerationResponse.choices().isEmpty()) {
                 throw new IllegalArgumentException("No choices returned in the response");
             }
 
-            String generatedText = textGenerationResponse.getChoices().getFirst().getMessage().getContent();
+            String generatedText = textGenerationResponse.choices().getFirst().message().content();
             if (generatedText == null || generatedText.isEmpty()) {
                 throw new IllegalArgumentException("Generated text is null or empty");
             }
@@ -133,55 +133,61 @@ public class Chat4AllModel implements ChatLanguageModel {
             }
         }
     }
+    private record TextGenerationResponse(List<Choice> choices) {}
 
-    private static class TextGenerationResponse {
-        protected List<Choice> choices;
+    private record Choice(Message message) {}
 
-        public List<Choice> getChoices() {
-            return choices;
-        }
+    private record Message(String role, String content) {}
 
-        public static class Choice {
-            private Message message;
 
-            public Message getMessage() {
-                return message;
-            }
-
-            public void setMessage(Message message) {
-                this.message = message;
-            }
-        }
-
-        public static class Message {
-            private String role;
-            private String content;
-
-            public String getRole() {
-                return role;
-            }
-
-            public void setRole(String role) {
-                this.role = role;
-            }
-
-            public String getContent() {
-                return content;
-            }
-
-            public void setContent(String content) {
-                this.content = content;
-            }
-        }
-    }
-
-    private static class Message {
-        protected String role;
-        protected String content;
-
-        public Message(String role, String content) {
-            this.role = role;
-            this.content = content;
-        }
-    }
+//    private static class TextGenerationResponse {
+//        protected List<Choice> choices;
+//
+//        public List<Choice> getChoices() {
+//            return choices;
+//        }
+//
+//        public static class Choice {
+//            private Message message;
+//
+//            public Message getMessage() {
+//                return message;
+//            }
+//
+//            public void setMessage(Message message) {
+//                this.message = message;
+//            }
+//        }
+//
+//        public static class Message {
+//            private String role;
+//            private String content;
+//
+//            public String getRole() {
+//                return role;
+//            }
+//
+//            public void setRole(String role) {
+//                this.role = role;
+//            }
+//
+//            public String getContent() {
+//                return content;
+//            }
+//
+//            public void setContent(String content) {
+//                this.content = content;
+//            }
+//        }
+//    }
+//
+//    private static class Message {
+//        protected String role;
+//        protected String content;
+//
+//        public Message(String role, String content) {
+//            this.role = role;
+//            this.content = content;
+//        }
+//    }
 }
