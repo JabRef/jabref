@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -415,8 +414,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         Platform.runLater(() -> updateMoveFileItemText(moveFileItem, target));
                         Platform.runLater(() -> updateMoveAndRenameFileItemText(moveAndRenameFileItem, target));
                     }
-                    // Clean up empty directories after moving the file
-                    cleanupEmptyDirectories(originalPath);
                 } catch (
                         IOException e) {
                     if (toRename) {
@@ -445,43 +442,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         // Check if the given directory name is in the root-like directories or matches the user
         return ROOT_LIKE_DIRS.contains(dirName) || dirName.equals(user);
-    }
-
-    /**
-     * Recursively deletes empty directories starting from the given path.
-     * Stops when it encounters a non-empty directory or reaches a root-like directory.
-     *
-     * @param directory The starting directory path to check and potentially delete
-     * @return true if the directory was deleted, false otherwise
-     */
-    private boolean cleanupEmptyDirectories(Path directory) {
-        if (directory == null || isRootLikeDirectory(directory.getFileName().toString())) {
-            return false;
-        }
-
-        try {
-            // Check if directory is empty
-            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
-                if (dirStream.iterator().hasNext()) {
-                    return false; // Directory is not empty
-                }
-            }
-
-            // Delete the empty directory
-            Files.delete(directory);
-            System.out.println("Deleted empty directory: " + directory);
-
-            // Recursively check and delete parent directory if it's empty
-            Path parent = directory.getParent();
-            if (parent != null) {
-                return cleanupEmptyDirectories(parent);
-            }
-        } catch (IOException e) {
-            System.err.println("Error while cleaning up empty directory: " + e.getMessage());
-            return false;
-        }
-
-        return true;
     }
 
     /**
