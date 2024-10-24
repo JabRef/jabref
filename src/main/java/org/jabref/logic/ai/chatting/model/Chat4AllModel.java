@@ -75,7 +75,7 @@ public class Chat4AllModel implements ChatLanguageModel {
                 throw new IllegalArgumentException("No choices returned in the response");
             }
 
-            String generatedText = textGenerationResponse.getChoices().get(0).getMessage().getContent();
+            String generatedText = textGenerationResponse.getChoices().getFirst().getMessage().getContent();
             if (generatedText == null || generatedText.isEmpty()) {
                 throw new IllegalArgumentException("Generated text is null or empty");
             }
@@ -89,10 +89,10 @@ public class Chat4AllModel implements ChatLanguageModel {
     }
 
     private static class TextGenerationRequest {
-        private final String model;
-        private final List<Message> messages;
-        private final Double temperature;
-        private final Integer max_tokens;
+        protected final String model;
+        protected final List<Message> messages;
+        protected final Double temperature;
+        protected final Integer max_tokens;
 
         private TextGenerationRequest(Builder builder) {
             this.model = builder.model;
@@ -138,14 +138,10 @@ public class Chat4AllModel implements ChatLanguageModel {
     }
 
     private static class TextGenerationResponse {
-        private List<Choice> choices;
+        protected List<Choice> choices;
 
         public List<Choice> getChoices() {
             return choices;
-        }
-
-        public void setChoices(List<Choice> choices) {
-            this.choices = choices;
         }
 
         public static class Choice {
@@ -183,20 +179,12 @@ public class Chat4AllModel implements ChatLanguageModel {
     }
 
     private static class Message {
-        private final String role;
-        private final String content;
+        protected String role;
+        protected String content;
 
         public Message(String role, String content) {
             this.role = role;
             this.content = content;
-        }
-
-        public String getRole() {
-            return role;
-        }
-
-        public String getContent() {
-            return content;
         }
     }
 }
