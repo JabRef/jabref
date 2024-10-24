@@ -74,7 +74,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -94,9 +94,8 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -171,7 +170,7 @@ public class LibraryTab extends Tab {
     private final DirectoryMonitorManager directoryMonitorManager;
 
     private ImportHandler importHandler;
-    private LuceneManager luceneManager;
+    private IndexManager indexManager;
 
     private final AiService aiService;
 
@@ -218,7 +217,7 @@ public class LibraryTab extends Tab {
 
     private void initializeComponentsAndListeners(boolean isDummyContext) {
         if (!isDummyContext) {
-            createLuceneManager();
+            createIndexManager();
         }
 
         if (tableModel != null) {
@@ -231,7 +230,7 @@ public class LibraryTab extends Tab {
         linkedFileAutoRenamer = new LinkedFileAutoRenamer(bibDatabaseContext, preferences);
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, stateManager, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());
@@ -327,17 +326,17 @@ public class LibraryTab extends Tab {
         dataLoadingTask = null;
     }
 
-    public void createLuceneManager() {
-        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferences.getFilePreferences());
-        stateManager.setLuceneManager(bibDatabaseContext, luceneManager);
+    public void createIndexManager() {
+        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences);
+        stateManager.setIndexManager(bibDatabaseContext, indexManager);
     }
 
-    public LuceneManager getLuceneManager() {
-        return luceneManager;
+    public IndexManager getIndexManager() {
+        return indexManager;
     }
 
-    public void closeLuceneManger() {
-        luceneManager.close();
+    public void closeIndexManger() {
+        indexManager.close();
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
@@ -799,11 +798,11 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            if (luceneManager != null) {
-                luceneManager.close();
+            if (indexManager != null) {
+                indexManager.close();
             }
         } catch (RuntimeException e) {
-            LOGGER.error("Problem when closing lucene indexer", e);
+            LOGGER.error("Problem when closing index manager", e);
         }
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
@@ -1160,17 +1159,17 @@ public class LibraryTab extends Tab {
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
-            luceneManager.addToIndex(addedEntryEvent.getBibEntries());
+            indexManager.addToIndex(addedEntryEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            luceneManager.removeFromIndex(removedEntriesEvent.getBibEntries());
+            indexManager.removeFromIndex(removedEntriesEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            luceneManager.updateEntry(fieldChangedEvent.getBibEntry(), fieldChangedEvent.getOldValue(), fieldChangedEvent.getNewValue(), fieldChangedEvent.getField().equals(StandardField.FILE));
+            indexManager.updateEntry(fieldChangedEvent);
         }
     }
 
