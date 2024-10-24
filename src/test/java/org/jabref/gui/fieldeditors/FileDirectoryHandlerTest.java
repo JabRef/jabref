@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.FileDirectoryHandler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 

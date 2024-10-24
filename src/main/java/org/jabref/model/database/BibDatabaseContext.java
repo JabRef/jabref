@@ -88,6 +88,12 @@ public class BibDatabaseContext {
         }
     }
 
+    public record FileDirectoriesInfo(
+            Path mainFileDirectory,
+            Optional<Path> librarySpecificDirectory,
+            Optional<Path> userFileDirectory) {
+    }
+
     public BibDatabaseMode getMode() {
         return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
@@ -191,6 +197,24 @@ public class BibDatabaseContext {
         }
 
         return new ArrayList<>(fileDirs);
+    }
+
+    public FileDirectoriesInfo getFileDirectoriesInfo(FilePreferences preferences) {
+        // Get main file directory
+        Path mainFileDirectory = preferences.getMainFileDirectory()
+                                                .map(mainFilePath -> Path.of(mainFilePath.toUri()))
+                                                .orElseThrow(() -> new IllegalStateException("main file directory is missing"));
+
+        // Get library-specific file directory (Optional)
+        Optional<Path> librarySpecificDirectory = metaData.getDefaultFileDirectory()
+                                                          .map(Path::of);
+
+        // Get user-specific file directory (Optional)
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost())
+                                                   .map(Path::of);
+
+        // Return the record with the three directories
+        return new FileDirectoriesInfo(mainFileDirectory, librarySpecificDirectory, userFileDirectory);
     }
 
     /**

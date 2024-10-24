@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +47,7 @@ import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileDirectoryHandler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -66,7 +66,12 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
-
+    private static final Set<String> ROOT_LIKE_DIRS = Set.of(
+            "home", "Users", "Desktop", "Documents", "Workspace",
+            "C:", "D:", "E:", // Windows drives
+            "Program Files", "Program Files (x86)", // Windows system dirs
+            "usr", "var", "opt", "etc" // Common Unix dirs
+    );
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
@@ -339,8 +344,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
             moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
         } else {
-            BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
-            moveFileItem.disableProperty().bind(isMoveFileDisabled);
+            moveFileItem.setDisable(true);
             moveFileItem.setText(Localization.lang("Move file"));
         }
     }
@@ -353,8 +357,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
             moveAndRenameFileItem.setText(Localization.lang("Move file to %0 and Rename", dirInfo.label()));
         } else {
-            BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
-            moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
+            moveAndRenameFileItem.setDisable(true);
             moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
         }
     }
@@ -441,19 +444,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         // Get the username
         String user = preferences.getFilePreferences().getUserAndHost().split("-")[0];
 
-        // Create a set of root-like directories and include the user dynamically
-        Set<String> rootLikeDirs = new HashSet<>(Set.of(
-                "home", "Users", "Desktop", "Documents", "Workspace",
-                "C:", "D:", "E:", // Windows drives
-                "Program Files", "Program Files (x86)", // Windows system dirs
-                "usr", "var", "opt", "etc" // Common Unix dirs
-        ));
-
-        // Add the user's name to the set
-        rootLikeDirs.add(user);
-
-        // Check if the given directory name is in the root-like directories
-        return rootLikeDirs.contains(dirName);
+        // Check if the given directory name is in the root-like directories or matches the user
+        return ROOT_LIKE_DIRS.contains(dirName) || dirName.equals(user);
     }
 
     /**
