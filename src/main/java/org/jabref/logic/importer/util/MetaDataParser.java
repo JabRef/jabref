@@ -170,7 +170,7 @@ public class MetaDataParser {
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
      *
-     * No normalization is done - the library file directory could be passed as Mac OS X path, but the user could sit on Windows.
+     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
      */
