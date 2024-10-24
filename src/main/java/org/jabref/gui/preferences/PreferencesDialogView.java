@@ -141,6 +141,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML
     void importPreferences() {
         viewModel.importPreferences();
+        preferenceTabList.refresh();
     }
 
     @FXML
