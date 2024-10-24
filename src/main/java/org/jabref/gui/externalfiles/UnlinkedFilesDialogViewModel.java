@@ -161,6 +161,7 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
         resultList.clear();
+        
         List<BibEntry> entriesToImport = importHandler.getEntriesToImport(fileList);
         entriesToImportWithoutDuplicates = new ArrayList<>();
         
