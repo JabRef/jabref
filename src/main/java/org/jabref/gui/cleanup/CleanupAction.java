@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -144,7 +145,7 @@ public class CleanupAction extends SimpleCommand {
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
-        this.resetCleanUpFailures();
+        this.failures.clear();
         NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entries"));
 
         for (BibEntry entry : stateManager.getSelectedEntries()) {
@@ -163,22 +164,17 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (!failures.isEmpty()) {
-            // Show errors to user through dialog service
             showFailures(failures);
         }
     }
 
     private void showFailures(List<JabRefException> failures) {
-        StringBuilder sb = new StringBuilder();
-        for (JabRefException exception : failures) {
-            sb.append("- ").append(exception.getLocalizedMessage()).append("\n");
-        }
-        Platform.runLater(() ->
-                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), sb.toString())
-        );
-    }
+        String message = failures.stream()
+                                 .map(exception -> "- " + exception.getLocalizedMessage())
+                                 .collect(Collectors.joining("\n"));
 
-    public void resetCleanUpFailures() {
-        this.failures.clear();
+        Platform.runLater(() ->
+                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), message)
+        );
     }
 }
