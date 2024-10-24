@@ -88,4 +88,103 @@ class AuthorListParserTest {
     void parseMultipleCorrectly(AuthorList expected, String authorsString) {
         assertEquals(expected, parser.parse(authorsString));
     }
+
+    // tests for biblatex extended name format
+    // test parsing of multiple authors with various fields using BibLaTeX extended name format
+    private static Stream<Arguments> parseExtendedFormatAuthors() {
+        return Stream.of(
+                Arguments.of(
+                        "family=Hasselt, given=Hado P., prefix=van, useprefix=false and family=Guez, given=Arthur and family=Hessel, given=Matteo and family=Mnih, given=Volodymyr and family=Silver, given=David",
+                        AuthorList.of(
+                                new Author("Hado P.", "H. P.", null, "Hasselt", null),
+                                new Author("Arthur", "A.", null, "Guez", null),
+                                new Author("Matteo", "M.", null, "Hessel", null),
+                                new Author("Volodymyr", "V.", null, "Mnih", null),
+                                new Author("David", "D.", null, "Silver", null)
+                        )
+                ),
+                Arguments.of(
+                        "family=Hasselt, given=Hado P., prefix=van, useprefix=true and family=Smith, given=John",
+                        AuthorList.of(
+                                new Author("Hado P.", "H. P.", "van", "Hasselt", null),
+                                new Author("John", "J.", null, "Smith", null)
+                        )
+                ),
+                Arguments.of(
+                        "family=Ree, given=Michiel, prefix=van der and family=Wiering, given=Marco",
+                        AuthorList.of(
+                                new Author("Michiel", "M.", "van der", "Ree", null),
+                                new Author("Marco", "M.", null, "Wiering", null)
+                        )
+                ),
+                Arguments.of(
+                        "family=al-Ṣāliḥ, given=Abdallāh",
+                        AuthorList.of(
+                                new Author("Abdallāh", "A.", null, "al-Ṣāliḥ", null)
+                        )
+                )
+        );
+    }
+
+    // Test the parsing of BibLaTeX extended format authors with various fields
+    @ParameterizedTest
+    @MethodSource
+    void parseExtendedFormatAuthors(String authorsString, AuthorList expected) {
+        assertEquals(expected, parser.parse(authorsString));
+    }
+
+    // Test parsing of a mixed format author string combining BibLaTeX format and regular format
+    @Test
+    void parseMixedFormatAuthors() {
+        String authorsString = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and Guez, Arthur";
+        AuthorList expected = AuthorList.of(
+                new Author("Hado P.", "H. P.", null, "Hasselt", null),
+                new Author("Arthur", "A.", null, "Guez", null)
+        );
+        assertEquals(expected, parser.parse(authorsString));
+    }
+
+    // Test handling of an "useprefix=false" attribute ensuring that the prefix is ignored
+    @Test
+    void parseAuthorWithUsePrefixFalse() {
+        String authorsString = "family=Hasselt, given=Hado P., prefix=van, useprefix=false";
+        AuthorList expected = AuthorList.of(
+                new Author("Hado P.", "H. P.", null, "Hasselt", null)
+        );
+        assertEquals(expected, parser.parse(authorsString));
+    }
+
+    // Test handling of a "useprefix=true" attribute, ensuring that the prefix is included
+    @Test
+    void parseAuthorWithUsePrefixTrue() {
+        String authorsString = "family=Hasselt, given=Hado P., prefix=van, useprefix=true";
+        AuthorList expected = AuthorList.of(
+                new Author("Hado P.", "H. P.", "van", "Hasselt", null)
+        );
+        assertEquals(expected, parser.parse(authorsString));
+    }
+
+    // Test case where there is a missing comma between 'prefix' and 'useprefix'
+    @Test
+    void parseAuthorWithMissingComma() {
+        String authorsString = "family=Hasselt, given=Hado P., prefix=van useprefix=false";
+        // Since there is a missing comma between 'prefix=van' and 'useprefix=false', the parser should handle this
+        // In this test the parser will parse 'prefix=van useprefix=false' as one field
+        AuthorList expected = AuthorList.of(
+                new Author("Hado P.", "H. P.", "van useprefix=false", "Hasselt", null)
+        );
+        assertEquals(expected, parser.parse(authorsString));
+    }
+
+    // Test for handling incomplete BibLaTeX extended format with missing given name for one author
+    @Test
+    void parseExtendedFormatWithIncompleteData() {
+        String authorsString = "family=Smith, given=John and family=Doe";
+        AuthorList expected = AuthorList.of(
+                new Author("John", "J.", null, "Smith", null),
+                new Author(null, null, null, "Doe", null)
+        );
+        assertEquals(expected, parser.parse(authorsString));
+    }
 }
+
