@@ -87,6 +87,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                   .load()
                   .setAsDialogPane(this);
 
+        this.setWidth(1000);
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
         setOnCloseRequest(e -> viewModel.cancelFetcherWorker());
 
@@ -138,6 +139,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 stateManager,
                 (UiTaskExecutor) taskExecutor,
                 fileUpdateMonitor);
+        // Set the width of the dialog to 1000px
+        //this.getDialogPane().setPrefWidth(5000);
+
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
