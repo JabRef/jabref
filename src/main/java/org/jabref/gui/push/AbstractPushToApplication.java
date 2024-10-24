@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -180,5 +181,29 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         public Optional<KeyBinding> getKeyBinding() {
             return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
         }
+    }
+
+    public void jumpToLine(Path fileName, int line, int column) {
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+
+        if (StringUtil.isNullOrEmpty(commandPath)) {
+            notDefined = true;
+            return;
+        }
+
+        String[] command = jumpToLineCommandlineArguments(fileName, line, column);
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        try {
+            processBuilder.command(command);
+            processBuilder.start();
+        } catch (IOException excep) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
+            couldNotCall = true;
+        }
+    }
+
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        LOGGER.error("Not yet implemented");
+        return new String[0];
     }
 }

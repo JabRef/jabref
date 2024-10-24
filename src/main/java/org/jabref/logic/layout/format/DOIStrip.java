@@ -13,6 +13,6 @@ public class DOIStrip implements LayoutFormatter {
             return null;
         }
 
-        return DOI.parse(fieldText).map(DOI::getDOI).orElse(fieldText);
+        return DOI.parse(fieldText).map(DOI::asString).orElse(fieldText);
     }
 }
