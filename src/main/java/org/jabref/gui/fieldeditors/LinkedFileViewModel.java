@@ -410,14 +410,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     System.out.println("File moved successfully to: " + targetPath);
                     linkedFile.setLink(targetPath.toString());
 
-                    // Clean up empty directories after moving the file
-                    cleanupEmptyDirectories(originalPath);
-
                     // Update the menu item text after moving the file
                     if (moveFileItem != null) {
                         Platform.runLater(() -> updateMoveFileItemText(moveFileItem, target));
                         Platform.runLater(() -> updateMoveAndRenameFileItemText(moveAndRenameFileItem, target));
                     }
+                    // Clean up empty directories after moving the file
+                    cleanupEmptyDirectories(originalPath);
                 } catch (
                         IOException e) {
                     if (toRename) {
