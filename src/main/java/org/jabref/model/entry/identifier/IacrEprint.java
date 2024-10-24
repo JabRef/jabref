@@ -50,7 +50,7 @@ public class IacrEprint implements Identifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         return iacrEprint;
     }
 

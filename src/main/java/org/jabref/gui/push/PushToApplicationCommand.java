@@ -104,7 +104,7 @@ public class PushToApplicationCommand extends SimpleCommand {
         for (BibEntry bes : entries) {
             citeKey = bes.getCitationKey();
             if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
-                // Should never occur, because we made sure that all entries have keys
+                LOGGER.warn("Should never occur, because we made sure that all entries have keys");
                 continue;
             }
             if (first) {
