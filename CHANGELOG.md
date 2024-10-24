@@ -34,7 +34,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
-
+- We added a 'language id' (langid) field for biblatex entry types. [#10868](https://github.com/JabRef/jabref/issues/10868)
+- 
 ### Changed
 
 - The search syntax is changed to [Apache Lucene syntax](https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Overview) (also to be similar to the [online search syntax](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax)). [#11542](https://github.com/JabRef/jabref/pull/11542/)
@@ -57,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When fulltext search is selected but indexing is deactivated, a dialog is now shown asking if the user wants to enable indexing now [#9491](https://github.com/JabRef/jabref/issues/9491)
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
+- We changed BibTex and BibLatex entries to include `langid` as an optional field. [#10868](https://github.com/JabRef/jabref/issues/10868)
 
 ### Fixed
 
