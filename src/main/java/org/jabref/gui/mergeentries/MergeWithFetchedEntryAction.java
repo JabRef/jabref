@@ -33,7 +33,7 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager)
-                                         .and(ActionHelper.isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS, stateManager)));
+                                         .and(ActionHelper.isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_IDENTIFIER_FIELDS, stateManager)));
     }
 
     @Override
@@ -49,6 +49,14 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(originalEntry);
+        FetchAndMergeEntry fetchAndMergeEntry = new FetchAndMergeEntry(
+                stateManager.getActiveDatabase().get(),
+                taskExecutor,
+                preferences,
+                dialogService,
+                undoManager
+        );
+
+        fetchAndMergeEntry.fetchAndMerge(originalEntry);
     }
 }
