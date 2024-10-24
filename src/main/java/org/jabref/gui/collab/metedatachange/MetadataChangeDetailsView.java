@@ -51,8 +51,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                     Localization.lang("Save actions");
             case MODE ->
                     Localization.lang("Library mode");
-            case GENERAL_FILE_DIRECTORY ->
-                    Localization.lang("General file directory");
+            case LIBRARY_SPECIFIC_FILE_DIRECTORY ->
+                    Localization.lang("Library-specific file directory");
             case CONTENT_SELECTOR ->
                     Localization.lang("Content selectors");
         };
