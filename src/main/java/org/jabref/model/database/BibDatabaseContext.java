@@ -144,7 +144,7 @@ public class BibDatabaseContext {
      * <ol>
      * <li>next to the .bib file.</li>
      * <li>the preferences can specify a default one.</li>
-     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a library-specific directory.</li>
      * <li>the database's metadata can specify a user-specific directory.</li>
      * </ol>
      * <p>
@@ -165,8 +165,8 @@ public class BibDatabaseContext {
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> generalFileDirectory = metaData.getLibraryFileDirectory().map(dir -> getFileDirectoryPath(dir));
-        generalFileDirectory.ifPresent(fileDirs::add);
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibraryFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
