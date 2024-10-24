@@ -69,6 +69,7 @@ public class FieldFactory {
         // These fields are not marked as verbatim, because they could include LaTeX code
         result.add(StandardField.MONTH);
         result.add(StandardField.DATE);
+        result.add(StandardField.LANGUAGEID);
         return result;
     }
 

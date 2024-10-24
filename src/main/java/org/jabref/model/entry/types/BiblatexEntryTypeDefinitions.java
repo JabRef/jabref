@@ -55,7 +55,7 @@ public class BiblatexEntryTypeDefinitions {
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
             .withImportantFields(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION,
                     StandardField.PUBLISHER, StandardField.ISBN, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
-                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
             .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
                     StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
                     StandardField.FOREWORD, StandardField.AFTERWORD,
@@ -72,7 +72,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
                     StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
                     StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
-                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
             .withDetailFields(StandardField.EDITORA, StandardField.EDITORB,
                     StandardField.EDITORC, StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
                     StandardField.INTRODUCTION, StandardField.FOREWORD, StandardField.AFTERWORD,
@@ -101,7 +101,7 @@ public class BiblatexEntryTypeDefinitions {
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
-                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
             .withDetailFields(StandardField.LANGUAGE,
                     StandardField.TYPE, StandardField.NOTE, StandardField.LOCATION,
                     StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE)

@@ -170,6 +170,10 @@ public class BibEntry implements Cloneable {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
     }
 
+    public Optional<FieldChange> setLangid(Langid parsedLangid) {
+        return setField(StandardField.LANGUAGEID, parsedLangid.getJabRefFormat());
+    }
+
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
         for (Field field : fields.getFields()) {
             Optional<String> value = getResolvedFieldOrAlias(field, database);
