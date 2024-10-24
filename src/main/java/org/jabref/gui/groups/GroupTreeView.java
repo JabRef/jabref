@@ -117,7 +117,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
 
         createNodes();
-        this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("/org/jabref/gui/Base.css")).toExternalForm());
         initialize();
     }
 
