@@ -214,11 +214,13 @@
 
 @Comment{jabref-meta: grouping:
 0 AllEntriesGroup:;
-1 SearchGroup:Entries without a group\;0\;groups != .+\;0\;1\;1\;\;\;\;;
-1 SearchGroup:Entries without a linked file\;0\;file != .+\;0\;1\;1\;\;\;\;;
+1 SearchGroup:Entries without a group\;0\;groups !=~ .+\;0\;1\;1\;\;\;\;;
+1 SearchGroup:Entries without a linked file\;0\;file !=~ .+\;0\;1\;1\;\;\;\;;
 1 StaticGroup:Paywalled\;0\;1\;\;\;\;;
-1 SearchGroup:To read\;0\;groups != .+ and readstatus != .+\;0\;1\;1\;0x008080ff\;\;\;;
+1 SearchGroup:To read\;0\;groups !=~ .+ and readstatus !=~ .+\;0\;1\;1\;0x008080ff\;\;\;;
 1 KeywordGroup:Skimmed\;0\;readstatus\;skimmed\;0\;0\;1\;0xffff00ff\;\;\;;
 1 KeywordGroup:Read\;0\;readstatus\;read\;0\;0\;0\;0x00ff00ff\;\;\;;
 1 StaticGroup:Used\;0\;1\;0x0000ffff\;\;\;;
 }
+
+@Comment{jabref-meta: groups-search-syntax-version:6.0-alpha_1}
