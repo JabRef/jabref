@@ -406,7 +406,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Files.createDirectories(targetPath.getParent());
 
                     Files.move(currentFilePath.get(), targetPath);
-                    System.out.println("File moved successfully to: " + targetPath);
                     linkedFile.setLink(targetPath.toString());
 
                     // Update the menu item text after moving the file
