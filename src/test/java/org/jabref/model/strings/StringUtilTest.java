@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -365,6 +366,28 @@ class StringUtilTest {
         assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
         assertEquals("A", StringUtil.capitalizeFirst("a"));
         assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "''                             ,                                     , -5",
+            "''                             ,                                     ,  0",
+            "''                             ,                                     ,  3",
+            "''                             ,                                     ,  5",
+            "''                             ,                                     , 10",
+            "''                             , thisisatestfile.pdf                 , -5",
+            "''                             , thisisatestfile.pdf                 ,  0",
+            "...                            , thisisatestfile.pdf                 ,  3",
+            "...                            , thisisatestfile.pdf                 ,  5",
+            "th...e.pdf                     , thisisatestfile.pdf                 , 10",
+            "thisisatestfile.pdf            , thisisatestfile.pdf                 , 20",
+            "...                            , longfilename.extremelylongextension ,  5",
+            "...                            , longfilename.extremelylongextension , 10",
+            "...                            , longfilename.extremelylongextension , 20",
+            "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
+    })
+    void shortenFileName(String expected, String fileName, int maxLength) {
+        assertEquals(expected, StringUtil.shortenFileName(fileName, maxLength));
     }
 
     private static Stream<Arguments> getQuoteStringIfSpaceIsContainedData() {

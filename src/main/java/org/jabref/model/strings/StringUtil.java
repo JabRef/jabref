@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.util.io.FileUtil;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,8 @@ public class StringUtil {
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final String ELLIPSIS = "...";
+    private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -165,6 +168,66 @@ public class StringUtil {
         }
 
         return orgName;
+    }
+
+    /**
+     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+     * with maxLength = 20 is shortened into verylo...isthis.pdf
+     *
+     * @param fileName  the given file name to be shortened
+     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
+     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+     */
+    public static String shortenFileName(String fileName, int maxLength) {
+        if (fileName == null || maxLength < ELLIPSIS_LENGTH) {
+            return "";
+        }
+
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+
+        String name;
+        String extension;
+
+        extension = FileUtil.getFileExtension(fileName).map(fileExtension -> '.' + fileExtension).orElse("");
+        if (extension.isEmpty()) {
+            name = fileName;
+        } else {
+            name = fileName.substring(0, fileName.length() - extension.length());
+        }
+
+        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
+        if (maxLength <= totalNeededLength) {
+            return ELLIPSIS;
+        }
+
+        int charsForName = maxLength - totalNeededLength;
+        if (charsForName <= 0) {
+            return ELLIPSIS + extension;
+        }
+
+        int numCharsBeforeEllipsis;
+        int numCharsAfterEllipsis;
+        if (charsForName == 1) {
+            numCharsBeforeEllipsis = 1;
+            numCharsAfterEllipsis = 0;
+        } else {
+            // Allow the front part to have the extra in odd cases
+            numCharsBeforeEllipsis = (charsForName + 1) / 2;
+            numCharsAfterEllipsis = charsForName / 2;
+        }
+
+        numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());
+        numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
+
+        StringBuilder result = new StringBuilder();
+        result.append(name, 0, numCharsBeforeEllipsis)
+              .append(ELLIPSIS)
+              .append(name.substring(name.length() - numCharsAfterEllipsis))
+              .append(extension);
+
+        return result.toString();
     }
 
     /**

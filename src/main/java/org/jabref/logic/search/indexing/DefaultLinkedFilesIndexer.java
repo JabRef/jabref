@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.LinkedFilesConstants;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -133,8 +134,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             return;
         }
 
-        task.setTitle(Localization.lang("Indexing PDF files for %0", libraryName));
-        task.showToUser(true);
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
         for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
@@ -143,8 +142,10 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 return;
             }
             addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
+            task.setTitle(Localization.lang("Indexing PDF %0 file(s) for %1 | %2 of %0 file(s) indexed.", linkedFiles.size(), libraryName, i));
             task.updateProgress(i, linkedFiles.size());
-            task.updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
+            task.updateMessage(Localization.lang("Indexing %0", StringUtil.shortenFileName(entry.getValue().getValue().getFileName().toString(), 68)));
+            task.showToUser(true);
             i++;
         }
         LOGGER.debug("Added {} files to index", linkedFiles.size());
