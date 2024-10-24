@@ -121,8 +121,7 @@ public class DatabaseMerger {
                             keywordDelimiter);
                     // The "if" block in `setGroup` is never executed because all input Booleans are false.
                     // Since no conditions are met, there is no need to pass `entriesInDatabase`.
-                    newGroups.setGroup(group, false, false,
-                            List.of());
+                    newGroups.setGroup(group);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {
                     LOGGER.error("Problem appending entries to group", e);

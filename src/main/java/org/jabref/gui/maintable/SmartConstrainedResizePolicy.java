@@ -14,9 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This resize policy is almost the same as {@link TableView#CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN}
+ * This resize policy is almost the same as {@link TableView#CONSTRAINED_RESIZE_POLICY}
  * We make sure that the width of all columns sums up to the total width of the table.
- * However, in contrast to {@link TableView#CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN} we size the columns initially by their preferred width.
+ * However, in contrast to {@link TableView#CONSTRAINED_RESIZE_POLICY} we size the columns initially by their preferred width.
+ * Although {@link TableView#CONSTRAINED_RESIZE_POLICY} is deprecated, this policy maintains a similar resizing behavior.
  */
 public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFeatures, Boolean> {
 
