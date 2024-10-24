@@ -161,11 +161,9 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
         resultList.clear();
-
         List<BibEntry> entriesToImport = importHandler.getEntriesToImport(fileList);
-
         entriesToImportWithoutDuplicates = new ArrayList<>();
-
+        
         for (BibEntry entry : entriesToImport) {
             Optional<BibEntry> existingDuplicate = importHandler.findDuplicate(bibDatabase, entry);
             if (existingDuplicate.isPresent()) {
@@ -174,7 +172,6 @@ public class UnlinkedFilesDialogViewModel {
                 entriesToImportWithoutDuplicates.add(entry);
             }
         }
-
         if (entriesToImportWithoutDuplicates.isEmpty()) {
             LOGGER.warn("No unique entries to import, skipping background task.");
             return;
@@ -206,7 +203,6 @@ public class UnlinkedFilesDialogViewModel {
                                                          }
                                                      }
                                                  });
-
         importFilesBackgroundTask.executeWith(taskExecutor);
     }
 
