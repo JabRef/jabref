@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -19,6 +21,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -43,6 +46,7 @@ import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileDirectoryHandler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -61,7 +65,12 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
-
+    private static final Set<String> ROOT_LIKE_DIRS = Set.of(
+            "home", "Users", "Desktop", "Documents", "Workspace",
+            "C:", "D:", "E:", // Windows drives
+            "Program Files", "Program Files (x86)", // Windows system dirs
+            "usr", "var", "opt", "etc" // Common Unix dirs
+    );
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
@@ -172,7 +181,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
                     ControlHelper.EllipsisPosition.CENTER) + " (" +
                     ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
-                    ControlHelper.EllipsisPosition.CENTER) + ")";
+                            ControlHelper.EllipsisPosition.CENTER) + ")";
         }
     }
 
@@ -217,7 +226,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
         }
     }
@@ -237,7 +247,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
-        } catch (IOException ex) {
+        } catch (
+                IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
         }
     }
@@ -287,7 +298,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         try {
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
     }
@@ -310,7 +322,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
+            } catch (
+                    IOException exception) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Move file"),
                         Localization.lang("Could not move file '%0'.", file.get().toString()),
@@ -320,6 +333,114 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // File doesn't exist, so we can't move it.
             dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
+    }
+
+    public void updateMoveFileItemText(MenuItem moveFileItem, Path currentFilePath) {
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
+        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
+
+        if (targetDirectory.isPresent()) {
+            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
+        } else {
+            moveFileItem.setDisable(true);
+            moveFileItem.setText(Localization.lang("Move file"));
+        }
+    }
+
+    public void updateMoveAndRenameFileItemText(MenuItem moveAndRenameFileItem, Path currentFilePath) {
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
+        Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory = directoryHandler.determineTargetDirectory(currentFilePath);
+
+        if (targetDirectory.isPresent()) {
+            FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            moveAndRenameFileItem.setText(Localization.lang("Move file to %0 and Rename", dirInfo.label()));
+        } else {
+            moveAndRenameFileItem.setDisable(true);
+            moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
+        }
+    }
+
+    public void moveToDirectory(MenuItem moveFileItem, MenuItem moveAndRenameFileItem, boolean toRename) {
+        if (linkedFile.isOnlineLink()) {
+            // Cannot move remote links
+            return;
+        }
+
+        FileDirectoryHandler directoryHandler = new FileDirectoryHandler(databaseContext, preferences.getFilePreferences());
+        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+        if (currentFilePath.isPresent()) {
+            Optional<FileDirectoryHandler.DirectoryInfo> targetDirectory =
+                    directoryHandler.determineTargetDirectory(currentFilePath.get());
+
+            if (targetDirectory.isPresent()) {
+                FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+                try {
+                    Path target = dirInfo.path().resolve(currentFilePath.get().getFileName());
+                    Path originalPath = currentFilePath.get().getParent();
+                    // Get file name
+                    String fileName = currentFilePath.get().getFileName().toString();
+
+                    // Extract the subdirectory structure from the current path
+                    List<String> subDirs = new ArrayList<>();
+                    Path parent = currentFilePath.get().getParent();
+
+                    // Find last directory containing the target filename
+                    while (parent != null && parent.getFileName() != null) {
+                        String dirName = parent.getFileName().toString();
+                        if (!isRootLikeDirectory(dirName)) {
+                            subDirs.addFirst(dirName);
+                        }
+                        parent = parent.getParent();
+                    }
+
+                    Path targetPath = target.getParent();
+
+                    for (String subDir: subDirs) {
+                        targetPath = targetPath.resolve(subDir);
+                    }
+                    targetPath = targetPath.resolve(fileName);
+
+                    // Create necessaries directories
+                    Files.createDirectories(targetPath.getParent());
+
+                    Files.move(currentFilePath.get(), targetPath);
+                    linkedFile.setLink(targetPath.toString());
+
+                    // Update the menu item text after moving the file
+                    if (moveFileItem != null) {
+                        Platform.runLater(() -> updateMoveFileItemText(moveFileItem, target));
+                        Platform.runLater(() -> updateMoveAndRenameFileItemText(moveAndRenameFileItem, target));
+                    }
+                } catch (
+                        IOException e) {
+                    if (toRename) {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Move file to directory and Rename"),
+                                Localization.lang("Could not move file '%0'. and Rename", currentFilePath.get().toString()),
+                                e);
+                    } else {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Move file"),
+                                Localization.lang("Could not move file '%0'.", currentFilePath.get().toString()),
+                                e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if a directory name appears to be a root-level directory that should be excluded
+     * from the subdirectory structure preservation.
+     */
+    private boolean isRootLikeDirectory(String dirName) {
+        // Get the username
+        String user = preferences.getFilePreferences().getUserAndHost().split("-")[0];
+
+        // Check if the given directory name is in the root-like directories or matches the user
+        return ROOT_LIKE_DIRS.contains(dirName) || dirName.equals(user);
     }
 
     /**
@@ -362,6 +483,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return false;
         }
 
+        // Ensure both directories exist before comparing
+        if (Files.notExists(targetDir.orElseThrow()) || Files.notExists(currentDir.orElseThrow())) {
+            // One of the directories does not exist, skip comparison
+            return false;
+        }
+
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
@@ -374,6 +501,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void moveToDefaultDirectoryAndRename() {
         moveToDefaultDirectory();
+        renameToSuggestion();
+    }
+
+    public void moveToDirectoryAndRename(MenuItem moveFileItem, MenuItem moveAndRenameFileItem) {
+        moveToDirectory(moveFileItem, moveAndRenameFileItem, true);
         renameToSuggestion();
     }
 
