@@ -175,6 +175,18 @@ public class CliOptions {
         return commandLine.hasOption("jumpToKey");
     }
 
+    public boolean isCheckConsistency() {
+        return commandLine.hasOption("check-consistency");
+    }
+
+    public String getCheckConsistency() {
+        return commandLine.getOptionValue("check-consistency");
+    }
+
+    public String getCheckConsistencyOutputFormat() {
+        return commandLine.getOptionValue("check-consistency-output-format", "TXT");
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -296,6 +308,23 @@ public class CliOptions {
                 .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
                 .hasArg()
                 .argName("CITATIONKEY")
+                .build());
+
+
+        options.addOption(Option
+                .builder("cc")
+                .longOpt("check-consistency")
+                .desc(Localization.lang("Check consistency of BibTeX file"))
+                .hasArg()
+                .argName("FILE")
+                .build());
+
+        options.addOption(Option
+                .builder()
+                .longOpt("check-consistency-output-format")
+                .desc(Localization.lang("Output format for consistency check (TXT/CSV)"))
+                .hasArg()
+                .argName("FORMAT")
                 .build());
 
         return options;
