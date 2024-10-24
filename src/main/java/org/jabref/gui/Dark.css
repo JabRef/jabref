@@ -56,7 +56,7 @@
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
 
-    -jr-drag-target: -jr-accent;
+    -jr-drag-target: derive(-jr-accent, 80%);
     -jr-drag-target-hover: -jr-accent;
 
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
