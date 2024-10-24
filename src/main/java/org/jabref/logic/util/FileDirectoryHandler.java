@@ -29,7 +29,7 @@ public class FileDirectoryHandler {
 
     public enum DirectoryType {
         MAIN,
-        GENERAL,
+        LIBRARY_SPECIFIC,
         USER_SPECIFIC
     }
 
@@ -37,22 +37,69 @@ public class FileDirectoryHandler {
         BibDatabaseContext.FileDirectoriesInfo directoriesInfo = databaseContext.getFileDirectoriesInfo(filePreferences);
         Optional<DirectoryType> currentDirectory = determineCurrentDirectory(currentFilePath);
 
+        // Check if any directory exists
+        boolean hasMain = directoriesInfo.mainFileDirectory() != null && !directoriesInfo.mainFileDirectory().toString().isEmpty();
+        boolean hasLibrary = directoriesInfo.librarySpecificDirectory().isPresent();
+        boolean hasUser = directoriesInfo.userFileDirectory().isPresent();
+
+        // If no directory exists, return empty
+        if (!hasMain && !hasLibrary && !hasUser) {
+            return Optional.empty();
+        }
         // Handle based on available directories
-        // If file is not in any known directory, prefer library-specific, then user-specific, then main
-        return currentDirectory.map(directoryType -> switch (directoryType) {
-            case MAIN,
-                 USER_SPECIFIC ->
-                    directoriesInfo.librarySpecificDirectory()
-                                   .map(path -> new DirectoryInfo("library-specific file directory", path, DirectoryType.GENERAL));
-            case GENERAL ->
-                    directoriesInfo.userFileDirectory()
-                                   .map(path -> new DirectoryInfo("user-specific file directory", path, DirectoryType.USER_SPECIFIC))
-                                   .or(() -> Optional.of(new DirectoryInfo("main file directory", directoriesInfo.mainFileDirectory(), DirectoryType.MAIN)));
-        }).orElseGet(() -> directoriesInfo.librarySpecificDirectory()
-                                          .map(path -> new DirectoryInfo("library-specific file directory", path, DirectoryType.GENERAL))
-                                          .or(() -> directoriesInfo.userFileDirectory()
-                                                                   .map(path -> new DirectoryInfo("user-specific file directory", path, DirectoryType.USER_SPECIFIC)))
-                                          .or(() -> Optional.of(new DirectoryInfo("main file directory", directoriesInfo.mainFileDirectory(), DirectoryType.MAIN))));
+        return currentDirectory.map(directoryType -> {
+            Optional<DirectoryInfo> result = switch (directoryType) {
+                case MAIN -> {
+                    // File is in main directory, prefer library specific, then user specific
+                    if (hasLibrary) {
+                        yield Optional.of(new DirectoryInfo("library-specific file directory",
+                                directoriesInfo.librarySpecificDirectory().get(), DirectoryType.LIBRARY_SPECIFIC));
+                    } else if (hasUser) {
+                        yield Optional.of(new DirectoryInfo("user-specific file directory",
+                                directoriesInfo.userFileDirectory().get(), DirectoryType.USER_SPECIFIC));
+                    } else {
+                        yield Optional.empty();
+                    }
+                }
+                case LIBRARY_SPECIFIC -> {
+                    // File is in library directory, prefer user specific, then main
+                    if (hasUser) {
+                        yield Optional.of(new DirectoryInfo("user-specific file directory",
+                                directoriesInfo.userFileDirectory().get(), DirectoryType.USER_SPECIFIC));
+                    } else if (hasMain) {
+                        yield Optional.of(new DirectoryInfo("main file directory",
+                                directoriesInfo.mainFileDirectory(), DirectoryType.MAIN));
+                    } else {
+                        yield Optional.empty();
+                    }
+                }
+                case USER_SPECIFIC -> {
+                    // File is in user directory, prefer library specific
+                    if (hasLibrary) {
+                        yield Optional.of(new DirectoryInfo("library-specific file directory",
+                                directoriesInfo.librarySpecificDirectory().get(), DirectoryType.LIBRARY_SPECIFIC));
+                    } else if (hasMain) {
+                        yield Optional.of(new DirectoryInfo("main file directory",
+                                directoriesInfo.mainFileDirectory(), DirectoryType.MAIN));
+                    } else {
+                        yield Optional.empty();
+                    }
+                }
+            };
+            return result;
+        }).orElseGet(() -> {
+            // File is outside all directories, follow priority: library > user > main
+            if (hasLibrary) {
+                return Optional.of(new DirectoryInfo("library-specific file directory",
+                        directoriesInfo.librarySpecificDirectory().get(), DirectoryType.LIBRARY_SPECIFIC));
+            } else if (hasUser) {
+                return Optional.of(new DirectoryInfo("user-specific file directory",
+                        directoriesInfo.userFileDirectory().get(), DirectoryType.USER_SPECIFIC));
+            } else {
+                return Optional.of(new DirectoryInfo("main file directory",
+                        directoriesInfo.mainFileDirectory(), DirectoryType.MAIN));
+            }
+        });
     }
 
     private Optional<DirectoryType> determineCurrentDirectory(Path filePath) {
@@ -67,7 +114,7 @@ public class FileDirectoryHandler {
         if (directoriesInfo.librarySpecificDirectory()
                            .map(filePath::startsWith)
                            .orElse(false)) {
-            return Optional.of(DirectoryType.GENERAL);
+            return Optional.of(DirectoryType.LIBRARY_SPECIFIC);
         }
 
         // Check user-specific directory
