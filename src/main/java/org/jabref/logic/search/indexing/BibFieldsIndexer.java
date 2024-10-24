@@ -53,7 +53,7 @@ public class BibFieldsIndexer {
         this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
 
-        this.mainTable = databaseContext.getUniqueName();
+        this.mainTable = String.valueOf(databaseContext.getUniqueName().hashCode());
         this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;
 
         this.schemaMainTableReference = PostgreConstants.getMainTableSchemaReference(mainTable);
