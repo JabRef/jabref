@@ -526,4 +526,66 @@ public class FileUtil {
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
+
+    public static boolean renameLinkedFile(LinkedFile linkedFile, BibEntry entry, String fileNamePattern, List<Path> fileDirectories, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext) {
+        Objects.requireNonNull(linkedFile, "linkedFile cannot be null");
+        Objects.requireNonNull(entry, "entry cannot be null");
+        Objects.requireNonNull(fileNamePattern, "fileNamePattern cannot be null");
+        Objects.requireNonNull(fileDirectories, "fileDirectories cannot be null");
+        Objects.requireNonNull(filePreferences, "filePreferences cannot be null");
+
+        try {
+            String newFileName = createFileNameFromPattern(bibDatabaseContext.getDatabase(), entry, fileNamePattern);
+            LOGGER.debug("Generated new file name: '{}'", newFileName);
+
+            Optional<Path> oldFilePathOptional = linkedFile.findIn(fileDirectories);
+            if (oldFilePathOptional.isEmpty()) {
+                LOGGER.warn("File '{}' does not exist in specified directories. Skipping renaming.", linkedFile.getLink());
+                return false; // file does not exist
+            }
+            Path oldFilePath = oldFilePathOptional.get();
+
+            Optional<String> extensionOptional = getFileExtension(oldFilePath);
+            if (extensionOptional.isEmpty()) {
+                return false;
+            }
+            String extension = extensionOptional.get();
+            if (extension.isEmpty()) {
+                return false; // Empty extension
+            }
+
+            if (!newFileName.toLowerCase().endsWith("." + extension.toLowerCase(Locale.ROOT))) {
+                newFileName = newFileName + "." + extension;
+            }
+
+            newFileName = FileNameCleaner.cleanFileName(newFileName);
+            if (newFileName.isEmpty()) {
+                LOGGER.warn("Generated new file name is empty after cleaning. Skipping renaming.");
+                return false; // invalid new file name
+            }
+
+            if (oldFilePath.getFileName().toString().equals(newFileName)) {
+                LOGGER.info("File '{}' is already named '{}'. Skipping renaming.", oldFilePath, newFileName);
+                return false;
+            }
+
+            Path newFilePath = oldFilePath.getParent().resolve(newFileName);
+
+            if (Files.exists(newFilePath)) {
+                LOGGER.warn("Target file '{}' already exists. Skipping renaming to prevent overwrite.", newFilePath);
+                return false;
+            }
+
+            Files.move(oldFilePath, newFilePath);
+            LOGGER.info("Renamed file '{}' to '{}'", oldFilePath, newFilePath);
+
+            linkedFile.setLink(newFilePath.toAbsolutePath().toString());
+            LOGGER.debug("Updated linked file path to '{}'", newFilePath.toAbsolutePath());
+
+            return true;
+        } catch (IOException e) {
+            LOGGER.error("Failed to rename file '{}' to pattern '{}'", linkedFile.getLink(), fileNamePattern, e);
+            return false;
+        }
+    }
 }

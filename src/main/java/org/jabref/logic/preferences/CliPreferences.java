@@ -116,4 +116,8 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+
+    boolean shouldAutoRenameLinkedFiles();
+
+    void setAutoRenameLinkedFiles(boolean value);
 }
