@@ -27,6 +27,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
@@ -960,6 +961,32 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
+            citationKeyPatternPreferences = null;
+            libraryPreferences = null;
+            doiPreferences = null;
+            ownerPreferences = null;
+            timestampPreferences = null;
+            openOfficePreferences = null;
+            importerPreferences = null;
+            grobidPreferences = null;
+            protectedTermsPreferences = null;
+            mrDlibPreferences = null;
+            filePreferences = null;
+            remotePreferences = null;
+            proxyPreferences = null;
+            sslPreferences = null;
+            searchPreferences = null;
+            autoLinkPreferences = null;
+            exportPreferences = null;
+            nameFormatterPreferences = null;
+            bibEntryPreferences = null;
+            internalPreferences = null;
+            xmpPreferences = null;
+            cleanupPreferences = null;
+            journalAbbreviationPreferences = null;
+            fieldPreferences = null;
+            aiPreferences = null;
+            lastFilesOpenedPreferences = null;
         } catch (InvalidPreferencesFormatException
                  | IOException ex) {
             throw new JabRefException(
