@@ -1,14 +1,6 @@
 package org.jabref.logic.ai.chatting.model;
 
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.jabref.logic.ai.AiPreferences;
+import com.google.gson.Gson;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -18,7 +10,14 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.FinishReason;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
-import com.google.gson.Gson;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.jabref.logic.ai.AiPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +78,7 @@ public class Chat4AllModel implements ChatLanguageModel {
             if (generatedText == null || generatedText.isEmpty()) {
                 throw new IllegalArgumentException("Generated text is null or empty");
             }
-
             return new Response<>(new AiMessage(generatedText), new TokenUsage(0, 0), FinishReason.OTHER);
-
         } catch (Exception e) {
             LOGGER.error("Error generating message from Chat4All", e);
             throw new RuntimeException("Failed to generate AI message", e);

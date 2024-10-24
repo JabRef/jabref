@@ -326,6 +326,7 @@ public class AiPreferences {
     public void setHuggingFaceApiBaseUrl(String huggingFaceApiBaseUrl) {
         this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
+
     public StringProperty chat4AllApiBaseUrlProperty() {
         return chat4AllApiBaseUrl;
     }
