@@ -63,7 +63,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             Optional<ISBN> isbn = ISBN.parse(identifier);
             if (isbn.isPresent()) {
-                bibEntry = gvkIsbnFetcher.performSearchById(isbn.get().getNormalized());
+                bibEntry = gvkIsbnFetcher.performSearchById(isbn.get().asString());
             }
         } catch (FetcherException ex) {
             LOGGER.debug("Got a fetcher exception for IBSN search", ex);

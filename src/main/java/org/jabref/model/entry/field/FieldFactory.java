@@ -55,7 +55,7 @@ public class FieldFactory {
      * Checks whether the given field contains LaTeX code or something else
      */
     public static boolean isLatexField(Field field) {
-        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN));
+        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.SINGLE_ENTRY_LINK, FieldProperty.MULTIPLE_ENTRY_LINK));
     }
 
     /**
@@ -222,7 +222,11 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
-    // TODO: This should ideally be user configurable! (https://github.com/JabRef/jabref/issues/9840)
+    /**
+     * Note: User configurability is discussed at <a href="https://github.com/JabRef/jabref/issues/9840">#9840</a>.
+     *
+     * @param nonWrappableFields This comes from the preferences - and introduces user configuration.
+     */
     // TODO: Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         return field.getProperties().contains(FieldProperty.MULTILINE_TEXT) || nonWrappableFields.contains(field);
