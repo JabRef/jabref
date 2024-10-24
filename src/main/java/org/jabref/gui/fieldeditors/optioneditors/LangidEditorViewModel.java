@@ -66,6 +66,6 @@ public class LangidEditorViewModel extends OptionEditorViewModel<Langid> {
 
     @Override
     public String convertToDisplayText(Langid object) {
-        return object.getLangid();  // Langid and display text are the same
+        return object.getName();  // Langid and display text are the same
     }
 }

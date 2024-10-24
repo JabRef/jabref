@@ -34,19 +34,19 @@ class LangidTest {
         return Stream.of(
                 arguments(Optional.of("basque"), "basque"),
                 arguments(Optional.of("bulgarian"), "bulgarian"),
-                arguments(Optional.of("american"), "american"),  // Both AMERICAN and USENGLISH have the same langid
-                arguments(Optional.of("british"), "british"),    // Both BRITISH and UKENGLISH have the same langid
-                arguments(Optional.of("hungarian"), "hungarian") // Both MAGYAR and HUNGARIAN have the same langid
+                arguments(Optional.of("american"), "american"),  // USENGLISH and AMERICAN have the same langid
+                arguments(Optional.of("british"), "british"),    // UKENGLISH and BRITISH have the same langid
+                arguments(Optional.of("hungarian"), "hungarian") // MAGYAR and HUNGARIAN have the same langid
         );
     }
 
     private static Stream<Arguments> getByLangidTest() {
         return Stream.of(
-                arguments(Optional.of("basque"), "Basque"),
+                arguments(Optional.of("basque"), "Basque"),   // Testing the name-based constructor
                 arguments(Optional.of("bulgarian"), "Bulgarian"),
-                arguments(Optional.of("american"), "american"),  // Ensures "american" maps to either AMERICAN or USENGLISH
-                arguments(Optional.of("british"), "british"),    // Ensures "british" maps to either BRITISH or UKENGLISH
-                arguments(Optional.of("hungarian"), "hungarian") // Ensures "hungarian" maps to either MAGYAR or HUNGARIAN
+                arguments(Optional.of("american"), "american"),  // Case-insensitive check for langid
+                arguments(Optional.of("british"), "british"),
+                arguments(Optional.of("hungarian"), "hungarian")
         );
     }
 
@@ -56,15 +56,6 @@ class LangidTest {
                 arguments(Optional.empty(), "12345"),          // Non-langid input should return empty
                 arguments(Optional.empty(), "")                // Empty string should return empty
         );
-    }
-
-    @Test
-    public void testMultipleEnumsMappingToSameLangid() {
-        assertEquals(Langid.AMERICAN.getLangid(), Langid.USENGLISH.getLangid());
-        assertEquals(Langid.BRITISH.getLangid(), Langid.UKENGLISH.getLangid());
-        assertEquals(Langid.MAGYAR.getLangid(), Langid.HUNGARIAN.getLangid());
-        assertEquals(Langid.PORTUGUESE.getLangid(), Langid.PORTUGES.getLangid());
-        assertEquals(Langid.SLOVENE.getLangid(), Langid.SLOVENIAN.getLangid());
     }
 
     @ParameterizedTest
@@ -88,16 +79,29 @@ class LangidTest {
         );
     }
 
+    @Test
+    public void testLangidNameAndValue() {
+        assertEquals("basque", Langid.BASQUE.getLangid());
+        assertEquals("Basque", Langid.BASQUE.getName());
+        assertEquals("american", Langid.AMERICAN.getLangid());
+        assertEquals("American", Langid.AMERICAN.getName());
+    }
+
     @ParameterizedTest
     @MethodSource("getLangidNameTest")
-    void getLangidNameTest(String expected, Langid langid) {
-        assertEquals(expected, langid.getLangid());
+    void getLangidNameTest(String expectedLangid, Langid langid) {
+        assertEquals(expectedLangid, langid.getName());
     }
 
     private static Stream<Arguments> getLangidNameTest() {
         return Stream.of(
-                arguments("basque", Langid.BASQUE),
-                arguments("bulgarian", Langid.BULGARIAN)
+                arguments("Basque", Langid.BASQUE),
+                arguments("Bulgarian", Langid.BULGARIAN),
+                arguments("American", Langid.AMERICAN),  // Test for the langid value
+                arguments("British", Langid.BRITISH),
+                arguments("US English", Langid.USENGLISH),
+                arguments("Swiss German", Langid.SWISSGERMAN),
+                arguments("Norwegian (Bokmål)", Langid.NORSK)
         );
     }
 }

@@ -51,28 +51,33 @@ public class LangidEditorViewModelTest {
     void getItemsShouldReturnAllLangidValues() {
         Collection<Langid> items = langidEditorViewModel.getItems();
         assertEquals(Langid.values().length, items.size());
-        assertTrue(items.contains(Langid.BASQUE)); // Check if it contains a specific Langid (e.g., "en" for English)
+        assertTrue(items.contains(Langid.BASQUE)); // Check if it contains a specific Langid
+        assertTrue(items.contains(Langid.AMERICAN)); // Additional check for another Langid
     }
 
     @Test
     void testStringConversion() {
+        // Test conversion from string to Langid
         String langidString = "bulgarian";
         Langid langid = langidEditorViewModel.getStringConverter().fromString(langidString);
         assertEquals(Langid.BULGARIAN, langid, "String should convert to the corresponding Langid");
 
+        // Test conversion from Langid to string
         String convertedString = langidEditorViewModel.getStringConverter().toString(Langid.BULGARIAN);
         assertEquals(langidString, convertedString, "Langid should convert back to its string representation");
     }
 
-//    @Test
-//    void testSelectedItem() {
-//        // Set the selected Langid using the correct method
-//        langidEditorViewModel.setValue(Langid.BASQUE);
-//
-//        // Verify that the selected value is now correct
-//        Langid selectedLangid = langidEditorViewModel.getValue();
-//        assertEquals(Langid.BASQUE, selectedLangid, "Selected value should reflect in the view model");
-//    }
+    @Test
+    void testStringConversionWithHumanReadableName() {
+        // Test conversion from human-readable name to Langid
+        String langidString = "Basque";
+        Langid langid = langidEditorViewModel.getStringConverter().fromString(langidString);
+        assertEquals(Langid.BASQUE, langid, "Human-readable name should convert to the corresponding Langid");
+
+        // Test conversion from Langid to human-readable name
+        String convertedString = langidEditorViewModel.getStringConverter().toString(Langid.BASQUE);
+        assertEquals("basque", convertedString, "Langid should convert back to its lowercase string representation");
+    }
 
     @Test
     void testHandlingNullValue() {
@@ -88,3 +93,4 @@ public class LangidEditorViewModelTest {
         assertEquals(null, result, "Blank input should return null Langid");
     }
 }
+
