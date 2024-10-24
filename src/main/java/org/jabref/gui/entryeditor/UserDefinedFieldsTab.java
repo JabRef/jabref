@@ -15,12 +15,11 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
     private final LinkedHashSet<Field> fields;
@@ -37,9 +36,8 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 ThemeManager themeManager,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository journalAbbreviationRepository,
-                                LuceneManager luceneManager,
                                 OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, luceneManager, searchQueryProperty);
+        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, searchQueryProperty);
 
         this.fields = new LinkedHashSet<>(fields);
 

@@ -474,7 +474,7 @@ public class PdfContentImporter extends PdfImporter {
                 pos = curString.indexOf(StandardField.DOI.getName());
             }
             if (pos >= 0) {
-                return DOI.findInText(curString).map(DOI::getDOI).orElse(null);
+                return DOI.findInText(curString).map(DOI::asString).orElse(null);
             }
         }
         return doi;

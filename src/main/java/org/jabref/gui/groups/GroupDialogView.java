@@ -46,6 +46,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -89,6 +90,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private CheckBox keywordGroupRegex;
 
     @FXML private TextField searchGroupSearchTerm;
+    @FXML private CheckBox searchGroupCaseSensitive;
+    @FXML private CheckBox searchGroupRegex;
 
     @FXML private RadioButton autoGroupKeywordsOption;
     @FXML private TextField autoGroupKeywordsField;
@@ -218,6 +221,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
+        searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
+        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
+        searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
+        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());

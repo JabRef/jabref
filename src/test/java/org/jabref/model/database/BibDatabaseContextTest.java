@@ -64,7 +64,7 @@ class BibDatabaseContextTest {
         Path file = Path.of("biblio.bib");
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(currentWorkingDir.resolve(file));
-        database.getMetaData().setDefaultFileDirectory(".");
+        database.getMetaData().setLibrarySpecificFileDirectory(".");
         assertEquals(List.of(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
     }
 
@@ -83,7 +83,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        database.getMetaData().setDefaultFileDirectory("../Literature");
+        database.getMetaData().setLibrarySpecificFileDirectory("../Literature");
         assertEquals(List.of(
                         // first directory originates from the metadata
                         Path.of("/absolute/Literature").toAbsolutePath(),
@@ -98,7 +98,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        database.getMetaData().setDefaultFileDirectory("Literature");
+        database.getMetaData().setLibrarySpecificFileDirectory("Literature");
         assertEquals(List.of(
                         // first directory originates from the metadata
                         Path.of("/absolute/subdir/Literature").toAbsolutePath(),
