@@ -34,15 +34,24 @@ jobs:
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      - name: Checkout
+      - name: Determine owner
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        id: owner
+        run: |
+          owner=$(gh pr view $pr_number --json headRepositoryOwner --jq '.headRepositoryOwner')
+          echo "Got owner $owner"
+          echo owner=$owner >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Checkout
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.owner.owner != 'JabRef') }}
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
-        if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.owner.owner != 'JabRef') }}
         uses: jbangdev/jbang-action@v0.119.0
         with:
           script: ghprcomment@koppor/ghprcomment

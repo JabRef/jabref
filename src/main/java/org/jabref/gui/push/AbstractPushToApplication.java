@@ -183,35 +183,27 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
     }
 
-    /**
-     * This function is to jump to a specific line due to different editor.
-     *
-     */
-    protected void jumpToLine(Path fileName, int line, int column) {
+    public void jumpToLine(Path fileName, int line, int column) {
         commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
-        // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
             return;
         }
-        // Execute the command
-        String command = jumpString(fileName, line, column);
+
+        String[] command = jumpToLineCommandlineArguments(fileName, line, column);
+        ProcessBuilder processBuilder = new ProcessBuilder();
         try {
-            Runtime.getRuntime().exec(command);
-        } catch (
-                IOException e) {
-            // Handle exceptions (log or show error message)
-            e.printStackTrace();
-            dialogService.showErrorDialogAndWait("Error", "Could not open TeXstudio at the specified location.");
+            processBuilder.command(command);
+            processBuilder.start();
+        } catch (IOException excep) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
+            couldNotCall = true;
         }
     }
 
-    protected String jumpString(Path fileName, int line, int column) {
-        return "";
-    }
-
-    public void publicJumpToLine(Path fileName, int line, int column) {
-        jumpToLine(fileName, line, column);
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        LOGGER.error("Not yet implemented");
+        return new String[0];
     }
 }

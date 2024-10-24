@@ -35,7 +35,7 @@ public class CopyDoiUrlAction extends SimpleCommand {
         if (action == StandardActions.COPY_DOI_URL) {
             copy(DOI.parse(identifier).map(DOI::getURIAsASCIIString), identifier);
         } else {
-            copy(DOI.parse(identifier).map(DOI::getDOI), identifier);
+            copy(DOI.parse(identifier).map(DOI::asString), identifier);
         }
     }
 

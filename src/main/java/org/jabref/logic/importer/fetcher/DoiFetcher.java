@@ -219,7 +219,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
-            URLDownload download = getUrlDownload(URI.create(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()).toURL());
+            URLDownload download = getUrlDownload(URI.create(DOI.AGENCY_RESOLVER + "/" + doi.asString()).toURL());
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));

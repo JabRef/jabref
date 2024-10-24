@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -154,7 +155,7 @@ public class UnlinkedFilesDialogViewModel {
         }
         resultList.clear();
 
-        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences())
+        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
                                                  .onRunning(() -> {
                                                      progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                                                      progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
