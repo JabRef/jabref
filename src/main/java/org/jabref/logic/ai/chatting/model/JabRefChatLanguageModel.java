@@ -1,6 +1,14 @@
 package org.jabref.logic.ai.chatting.model;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
@@ -9,12 +17,7 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
-import java.net.http.HttpClient;
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
