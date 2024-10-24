@@ -57,6 +57,7 @@ public class LatexIntegrityChecker implements EntryChecker {
 
         // '#' only allowed inside and command/environment definitions.
         EXCLUDED_ERRORS.add(CoreErrorCode.TTEG04);
+        EXCLUDED_ERRORS.add(CoreErrorCode.TTEM03);
     }
 
     @Override
