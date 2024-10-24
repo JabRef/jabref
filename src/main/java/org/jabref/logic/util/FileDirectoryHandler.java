@@ -53,8 +53,6 @@ public class FileDirectoryHandler {
                                           .or(() -> directoriesInfo.userFileDirectory()
                                                                    .map(path -> new DirectoryInfo("user-specific file directory", path, DirectoryType.USER_SPECIFIC)))
                                           .or(() -> Optional.of(new DirectoryInfo("main file directory", directoriesInfo.mainFileDirectory(), DirectoryType.MAIN))));
-
-        // If file is in a known directory, determine where to move it
     }
 
     private Optional<DirectoryType> determineCurrentDirectory(Path filePath) {
