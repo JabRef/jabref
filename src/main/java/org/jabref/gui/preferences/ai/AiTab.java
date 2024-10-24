@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -90,15 +91,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         });
 
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
-
         apiKeyTextField.disableProperty().bind(
                 Bindings.or(
                         viewModel.disableBasicSettingsProperty(),
                         aiProviderComboBox.valueProperty().isEqualTo(AiProvider.CHAT4ALL) // Disable if GPT4ALL is selected
                 )
         );
-        
-        apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
         customizeExpertSettingsCheckbox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
