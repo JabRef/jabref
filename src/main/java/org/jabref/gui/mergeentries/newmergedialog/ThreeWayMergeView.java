@@ -47,7 +47,7 @@ public class ThreeWayMergeView extends VBox {
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, GuiPreferences preferences) {
         this.preferences = preferences;
 
-        getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
+        getStylesheets().add(ThreeWayMergeView.class.getResource("/org/jabref/gui/Base.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
         this.fieldMergerFactory = new FieldMergerFactory(preferences.getBibEntryPreferences());
         this.keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator().toString();

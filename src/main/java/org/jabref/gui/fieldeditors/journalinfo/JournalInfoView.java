@@ -35,7 +35,7 @@ public class JournalInfoView extends VBox {
                   .root(this)
                   .load();
 
-        this.getStylesheets().add(Objects.requireNonNull(JournalInfoView.class.getResource("JournalInfo.css")).toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(JournalInfoView.class.getResource("/org/jabref/gui/Base.css")).toExternalForm());
 
         title.textProperty().bind(viewModel.titleProperty());
         categories.textProperty().bind(viewModel.categoriesProperty());
