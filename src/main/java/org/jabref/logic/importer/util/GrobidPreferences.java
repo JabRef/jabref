@@ -7,14 +7,14 @@ import javafx.beans.property.StringProperty;
 
 public class GrobidPreferences {
     private final BooleanProperty grobidEnabled;
-    private final BooleanProperty grobidOptOut;
+    private final BooleanProperty grobidPreference;
     private final StringProperty grobidURL;
 
     public GrobidPreferences(boolean grobidEnabled,
-                             boolean grobidOptOut,
+                             boolean grobidPreference,
                              String grobidURL) {
         this.grobidEnabled = new SimpleBooleanProperty(grobidEnabled);
-        this.grobidOptOut = new SimpleBooleanProperty(grobidOptOut);
+        this.grobidPreference = new SimpleBooleanProperty(grobidPreference);
         this.grobidURL = new SimpleStringProperty(grobidURL);
     }
 
@@ -30,17 +30,17 @@ public class GrobidPreferences {
         this.grobidEnabled.set(grobidEnabled);
     }
 
-    // region: optout; models "Do not ask again" option
-    public boolean isGrobidOptOut() {
-        return grobidOptOut.get();
+    // region: preference; models "Save Preference" option
+    public boolean isGrobidPreference() {
+        return grobidPreference.get();
     }
 
-    public BooleanProperty grobidOptOutProperty() {
-        return grobidOptOut;
+    public BooleanProperty grobidPreferenceProperty() {
+        return grobidPreference;
     }
 
-    public void setGrobidOptOut(boolean grobidOptOut) {
-        this.grobidOptOut.set(grobidOptOut);
+    public void setGrobidPreference(boolean grobidPreference) {
+        this.grobidPreference.set(grobidPreference);
     }
     // endregion: optout
 
