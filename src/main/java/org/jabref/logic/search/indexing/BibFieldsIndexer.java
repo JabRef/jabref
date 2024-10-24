@@ -23,6 +23,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
 
+import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class BibFieldsIndexer {
         this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
 
-        this.mainTable = String.valueOf(databaseContext.getUniqueName().hashCode());
+        this.mainTable = CUID.randomCUID2(12).toString();
         this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;
 
         this.schemaMainTableReference = PostgreConstants.getMainTableSchemaReference(mainTable);
