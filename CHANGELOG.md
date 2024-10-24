@@ -88,7 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Undo/Redo buttons were active even when all libraries are closed. [#11837](https://github.com/JabRef/jabref/issues/11837)
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
-
+- We fixed an issue where the response from the local ai model is cuttoff.[#11870](https://github.com/JabRef/jabref/issues/11870)
 ### Removed
 
 - We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
