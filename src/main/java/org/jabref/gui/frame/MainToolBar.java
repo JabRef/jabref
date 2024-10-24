@@ -192,7 +192,6 @@ public class MainToolBar extends ToolBar {
     MenuItem createNewEntryFromIdMenuItem(ActionFactory factory, MenuButton menuButton) {
         MenuItem newEntryFromIdItem = new MenuItem();
         newEntryFromIdItem.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        // 设置菜单项文本
         newEntryFromIdItem.setText(Localization.lang("Import by ID"));
         newEntryFromIdItem.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
 
@@ -204,7 +203,6 @@ public class MainToolBar extends ToolBar {
                 entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
                 entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                // 使用 MenuButton 作为锚点
                 entryFromIdPopOver.show(menuButton);
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             } else if (entryFromIdPopOver.isShowing()) {
@@ -286,10 +284,7 @@ public class MainToolBar extends ToolBar {
 
     private MenuButton createNewEntryMenuButton(ActionFactory factory) {
         MenuButton menuButton = new MenuButton();
-        // create button of menue
         menuButton.setGraphic(IconTheme.JabRefIcons.NEW_GROUP.getGraphicNode());
-
-        // create menu
         MenuItem newArticleItem = factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager));
         MenuItem newEntryItem = factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager));
         MenuItem newEntryFromIdItem = createNewEntryFromIdMenuItem(factory, menuButton);
