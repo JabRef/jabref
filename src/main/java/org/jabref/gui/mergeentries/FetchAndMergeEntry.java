@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchAndMergeEntry {
 
+    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.CompositeIdFetcher#performSearchById}
     public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);

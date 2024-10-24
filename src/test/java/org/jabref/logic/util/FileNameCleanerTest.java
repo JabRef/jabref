@@ -2,35 +2,42 @@ package org.jabref.logic.util;
 
 import org.jabref.logic.util.io.FileNameCleaner;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileNameCleanerTest {
 
-    @Test
-    void cleanFileName() {
-        assertEquals("legalFilename.txt", FileNameCleaner.cleanFileName("legalFilename.txt"));
-        assertEquals("illegalFilename______.txt", FileNameCleaner.cleanFileName("illegalFilename/?*<>|.txt"));
-        assertEquals("illegalFileName_.txt", FileNameCleaner.cleanFileName("illegalFileName{.txt"));
+    @ParameterizedTest
+    @CsvSource({
+        "legalFilename.txt, legalFilename.txt",
+        "illegalFilename______.txt, illegalFilename/?*<>|.txt",
+        "illegalFileName_.txt, illegalFileName{.txt",
+        "_The Evolution of Sentiment_ Analysis_.PDF, ?The Evolution of Sentiment} Analysis}.PDF",
+        "'The Evolution of Sentiment_ Analysis_A Review of Research Topics, Venues, and Top Cited Papers.PDF', 'The Evolution of Sentiment} Analysis}A Review of Research Topics, Venues, and Top Cited Papers.PDF'"
+    })
+    void cleanFileName(String expected, String input) {
+        assertEquals(expected, FileNameCleaner.cleanFileName(input));
     }
 
-    @Test
-    void cleanDirectoryName() {
-        assertEquals("legalFilename.txt", FileNameCleaner.cleanDirectoryName("legalFilename.txt"));
-        assertEquals("subdir/legalFilename.txt", FileNameCleaner.cleanDirectoryName("subdir/legalFilename.txt"));
-        assertEquals("illegalFilename/_____.txt", FileNameCleaner.cleanDirectoryName("illegalFilename/?*<>|.txt"));
+    @ParameterizedTest
+    @CsvSource({
+        "legalFilename.txt, legalFilename.txt",
+        "subdir/legalFilename.txt, subdir/legalFilename.txt",
+        "illegalFilename/_____.txt, illegalFilename/?*<>|.txt"
+    })
+    void cleanDirectoryName(String expected, String input) {
+        assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
     }
 
-    @Test
-    void cleanDirectoryNameForWindows() {
-        assertEquals("legalFilename.txt", FileNameCleaner.cleanDirectoryName("legalFilename.txt"));
-        assertEquals("subdir\\legalFilename.txt", FileNameCleaner.cleanDirectoryName("subdir\\legalFilename.txt"));
-        assertEquals("illegalFilename\\_____.txt", FileNameCleaner.cleanDirectoryName("illegalFilename\\?*<>|.txt"));
-    }
-
-    @Test
-    void cleanCurlyBracesAsWell() {
-        assertEquals("The Evolution of Sentiment_ Analysis_A Review of Research Topics, Venues, and Top Cited Papers.PDF", FileNameCleaner.cleanFileName("The Evolution of Sentiment} Analysis}A Review of Research Topics, Venues, and Top Cited Papers.PDF"));
+    @ParameterizedTest
+    @CsvSource({
+        "legalFilename.txt, legalFilename.txt",
+        "subdir\\legalFilename.txt, subdir\\legalFilename.txt",
+        "illegalFilename\\_____.txt, illegalFilename\\?*<>|.txt"
+    })
+    void cleanDirectoryNameForWindows(String expected, String input) {
+        assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
     }
 }

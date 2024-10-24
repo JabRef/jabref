@@ -31,7 +31,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(Encodings.getCharsets().getFirst());
     private final ListProperty<BibDatabaseMode> databaseModesProperty = new SimpleListProperty<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
     private final SimpleObjectProperty<BibDatabaseMode> selectedDatabaseModeProperty = new SimpleObjectProperty<>(BibDatabaseMode.BIBLATEX);
-    private final StringProperty generalFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
 
@@ -59,7 +59,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
         selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
-        generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
+        librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
     }
@@ -71,11 +71,11 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         newMetaData.setEncoding(selectedEncodingProperty.getValue());
         newMetaData.setMode(selectedDatabaseModeProperty.getValue());
 
-        String generalFileDirectory = generalFileDirectoryProperty.getValue().trim();
-        if (generalFileDirectory.isEmpty()) {
-            newMetaData.clearDefaultFileDirectory();
+        String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
+        if (librarySpecificFileDirectory.isEmpty()) {
+            newMetaData.clearLibrarySpecificFileDirectory();
         } else {
-            newMetaData.setDefaultFileDirectory(generalFileDirectory);
+            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
@@ -95,9 +95,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         databaseContext.setMetaData(newMetaData);
     }
 
-    public void browseGeneralDir() {
+    public void browseLibrarySpecificDir() {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> generalFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseUserDir() {
@@ -130,8 +130,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return selectedDatabaseModeProperty;
     }
 
-    public StringProperty generalFileDirectoryPropertyProperty() {
-        return this.generalFileDirectoryProperty;
+    public StringProperty librarySpecificDirectoryPropertyProperty() {
+        return this.librarySpecificDirectoryProperty;
     }
 
     public StringProperty userSpecificFileDirectoryProperty() {
