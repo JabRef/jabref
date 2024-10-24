@@ -206,7 +206,7 @@ public class BibDatabaseContext {
                                                 .orElseThrow(() -> new IllegalStateException("main file directory is missing"));
 
         // Get library-specific file directory (Optional)
-        Optional<Path> librarySpecificDirectory = metaData.getDefaultFileDirectory()
+        Optional<Path> librarySpecificDirectory = metaData.getLibrarySpecificFileDirectory()
                                                           .map(Path::of);
 
         // Get user-specific file directory (Optional)
