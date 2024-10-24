@@ -44,7 +44,6 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         });
     }
 
-
     public EditorTextArea(final String text) {
         super(text);
 
