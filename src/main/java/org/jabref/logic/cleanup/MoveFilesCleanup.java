@@ -20,6 +20,9 @@ import org.jabref.model.util.OptionalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Moves the file into the default file directory. Does <em>not</em> rename the file.
+ */
 public class MoveFilesCleanup implements CleanupJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
@@ -42,10 +45,7 @@ public class MoveFilesCleanup implements CleanupJob {
         for (LinkedFile file : files) {
             LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext, filePreferences);
             try {
-                boolean fileChanged = fileHandler.moveToDefaultDirectory();
-                if (fileChanged) {
-                    changed = true;
-                }
+                changed = fileHandler.moveToDefaultDirectory() || changed;
             } catch (IOException exception) {
                 LOGGER.error("Error while moving file {}", file.getLink(), exception);
                 ioExceptions.add(new JabRefException(Localization.lang("Could not move file %0. Please close this file and retry.", file.getLink()), exception));
