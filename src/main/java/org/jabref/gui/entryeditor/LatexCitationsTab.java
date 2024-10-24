@@ -61,8 +61,6 @@ public class LatexCitationsTab extends EntryEditorTab {
         citationsDisplay.setItems(viewModel.getCitationList());
         citationsDisplay.setOnMouseClicked(event -> viewModel.handleMouseClick(event, citationsDisplay));
 
-        citationsDisplay.setOnMouseClicked(event -> viewModel.handleMouseClick(event, citationsDisplay));
-
         RowConstraints mainRow = new RowConstraints();
         mainRow.setVgrow(Priority.ALWAYS);
 
