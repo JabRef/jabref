@@ -140,8 +140,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 (UiTaskExecutor) taskExecutor,
                 fileUpdateMonitor);
         // Set the width of the dialog to 1000px
-        //this.getDialogPane().setPrefWidth(5000);
-
+        // this.getDialogPane().setPrefWidth(5000);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
