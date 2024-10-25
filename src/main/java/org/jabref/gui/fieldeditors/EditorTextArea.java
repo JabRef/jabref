@@ -28,7 +28,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     };
 
     public EditorTextArea() {
-        // Call the constructor with an empty string
+        // Call the constructor with an empty string.
         this("");
 
         // Add an event filter to handle key press events
