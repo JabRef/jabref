@@ -4,9 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -43,28 +40,16 @@ public class WelcomePage extends VBox {
         Label welcomeLabel = new Label("Welcome to JabRef!");
         welcomeLabel.getStyleClass().add("welcome-label");
 
-        Text openNewLibraryText = new Text("Open a ");
-        openNewLibraryText.getStyleClass().add("welcome-text");
+        Hyperlink newLibrary = new Hyperlink("Open a New Library");
+        newLibrary.getStyleClass().add("welcome-hyperlink");
+        newLibrary.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
 
-        Hyperlink newLibraryLink = new Hyperlink("New Library");
-        newLibraryLink.getStyleClass().add("welcome-hyperlink");
-        newLibraryLink.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
-
-        Hyperlink openLibraryLink = new Hyperlink("Existing Library");
-        openLibraryLink.getStyleClass().add("welcome-hyperlink");
-        openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
+        Hyperlink openLibrary = new Hyperlink("or open an Existing Library");
+        openLibrary.getStyleClass().add("welcome-hyperlink");
+        openLibrary.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
-        Text orExistingDatabaseText = new Text(" or open an ");
-        orExistingDatabaseText.getStyleClass().add("welcome-text");
-
-        TextFlow newLibraryFlow = new TextFlow(openNewLibraryText, newLibraryLink);
-        newLibraryFlow.setTextAlignment(TextAlignment.CENTER);
-
-        TextFlow openLibraryFlow = new TextFlow(orExistingDatabaseText, openLibraryLink);
-        openLibraryFlow.setTextAlignment(TextAlignment.CENTER);
-
-        getChildren().addAll(welcomeLabel, newLibraryFlow, openLibraryFlow);
+        getChildren().addAll(welcomeLabel, newLibrary, openLibrary);
     }
 }
