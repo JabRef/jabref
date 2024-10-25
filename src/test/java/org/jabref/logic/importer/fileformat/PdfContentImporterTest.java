@@ -144,7 +144,7 @@ class PdfContentImporterTest {
                 Arguments.of("/org/jabref/logic/importer/util/LNCS-minimal.pdf", "Paper Title"),
                 Arguments.of("/pdfs/example-scientificThesisTemplate.pdf", "Is Oil the future?"),
                 Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title"),
-                Arguments.of("/pdfs/minimal.pdf", "Hello World")
+                Arguments.of("/pdfs/minimal.pdf", "Hello World 1")
         );
     }
 }

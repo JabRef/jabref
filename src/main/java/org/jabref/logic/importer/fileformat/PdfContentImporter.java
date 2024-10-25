@@ -259,7 +259,7 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isThereSpace(TextPosition previous, TextPosition current) {
-            float spaceThreshold = 0.5f;
+            float spaceThreshold = 0.5F;
             float gap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
             return gap > spaceThreshold;
         }
@@ -558,7 +558,7 @@ public class PdfContentImporter extends PdfImporter {
         }
         if (title != null) {
 //            title = guessBetterTitleInMetaData(buildMetaData(author, editor, abstractT, keywords, title, conference, doi, series, volume, number, pages, year, publisher));
-            entry.setField(StandardField.TITLE, (titleByPosition == null || titleByPosition.isEmpty()) ? title : titleByPosition);
+            entry.setField(StandardField.TITLE, titleByPosition == null || titleByPosition.isEmpty() ? title : titleByPosition);
         }
         if (conference != null) {
             entry.setField(StandardField.BOOKTITLE, conference);
