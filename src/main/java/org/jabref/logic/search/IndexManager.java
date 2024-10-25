@@ -1,62 +1,73 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
-import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.logic.search.retrieval.BibFieldsSearcher;
+import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchQuery;
-import org.jabref.model.search.SearchResults;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LuceneManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
+public class IndexManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexManager.class);
 
     private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
     private final BooleanProperty shouldIndexLinkedFiles;
-    private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
-    private final LuceneIndexer bibFieldsIndexer;
+    private final BibFieldsIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
-    private final LuceneSearcher luceneSearcher;
+    private final BibFieldsSearcher bibFieldsSearcher;
+    private final LinkedFilesSearcher linkedFilesSearcher;
 
-    public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
+    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
-        this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
+        this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
-        this.bibFieldsIndexer = new BibFieldsIndexer(databaseContext);
+        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+        bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
 
         LuceneIndexer indexer;
         try {
-            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences);
+            indexer = new DefaultLinkedFilesIndexer(databaseContext, preferences.getFilePreferences());
         } catch (IOException e) {
             LOGGER.debug("Error initializing linked files index - using read only index");
             indexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
         }
         linkedFilesIndexer = indexer;
 
-        this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer, preferences);
+        this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
+        this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
         updateOnStart();
     }
 
@@ -106,7 +117,7 @@ public class LuceneManager {
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
          .executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
+        if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
@@ -138,58 +149,28 @@ public class LuceneManager {
         }
     }
 
-    public void updateEntry(BibEntry entry, String oldValue, String newValue, boolean isLinkedFile) {
+    public void updateEntry(FieldChangedEvent event) {
         new BackgroundTask<>() {
             @Override
             public Object call() {
-                bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
+                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
                 return null;
             }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
          .executeWith(taskExecutor);
 
-        if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
+        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
-                    linkedFilesIndexer.updateEntry(entry, oldValue, newValue, this);
+                    linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
                     return null;
                 }
             }.executeWith(taskExecutor);
         }
     }
 
-    public void updateAfterDropFiles(BibEntry entry) {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.updateEntry(entry, "", "", this);
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
-         .executeWith(taskExecutor);
-
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Object call() {
-                    linkedFilesIndexer.addToIndex(List.of(entry), this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
-        }
-    }
-
-    public void rebuildIndex() {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.rebuildIndex(this);
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
-         .executeWith(taskExecutor);
-
+    public void rebuildFullTextIndex() {
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
                 @Override
@@ -215,22 +196,32 @@ public class LuceneManager {
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
-    public AutoCloseable blockLinkedFileIndexer() {
-        LOGGER.debug("Blocking linked files indexer");
-        isLinkedFilesIndexerBlocked.set(true);
-        return () -> isLinkedFilesIndexerBlocked.set(false);
-    }
-
     public SearchResults search(SearchQuery query) {
-        if (query.isValid()) {
-            query.setSearchResults(luceneSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
-        } else {
-            query.setSearchResults(new SearchResults());
+        List<Callable<SearchResults>> tasks = new ArrayList<>();
+        tasks.add(() -> bibFieldsSearcher.search(query));
+
+        if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {
+            tasks.add(() -> linkedFilesSearcher.search(query));
         }
-        return query.getSearchResults();
+
+        List<Future<SearchResults>> futures = HeadlessExecutorService.INSTANCE.executeAll(tasks);
+
+        SearchResults searchResults = new SearchResults();
+        for (Future<SearchResults> future : futures) {
+            try {
+                searchResults.mergeSearchResults(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("Error while searching", e);
+            }
+        }
+        query.setSearchResults(searchResults);
+        return searchResults;
     }
 
+    /**
+     * @implNote No need to check for full-text searches as this method only used by the search groups
+     */
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
-        return luceneSearcher.isEntryMatched(entry, query);
+        return bibFieldsSearcher.isMatched(entry, query);
     }
 }

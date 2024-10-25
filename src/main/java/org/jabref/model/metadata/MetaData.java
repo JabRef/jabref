@@ -75,7 +75,7 @@ public class MetaData {
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
     private boolean isProtected;
-    private String defaultFileDirectory;
+    private String librarySpecificFileDirectory;
     private final ContentSelectors contentSelectors = new ContentSelectors();
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
@@ -221,12 +221,12 @@ public class MetaData {
         return contentSelectors.getSelectorValuesForField(field);
     }
 
-    public Optional<String> getDefaultFileDirectory() {
-        return Optional.ofNullable(defaultFileDirectory);
+    public Optional<String> getLibrarySpecificFileDirectory() {
+        return Optional.ofNullable(librarySpecificFileDirectory);
     }
 
-    public void setDefaultFileDirectory(String path) {
-        defaultFileDirectory = Objects.requireNonNull(path).trim();
+    public void setLibrarySpecificFileDirectory(String path) {
+        librarySpecificFileDirectory = Objects.requireNonNull(path).trim();
         postChange();
     }
 
@@ -248,8 +248,8 @@ public class MetaData {
         postChange();
     }
 
-    public void clearDefaultFileDirectory() {
-        defaultFileDirectory = null;
+    public void clearLibrarySpecificFileDirectory() {
+        librarySpecificFileDirectory = null;
         postChange();
     }
 
@@ -398,7 +398,7 @@ public class MetaData {
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
-                && Objects.equals(defaultFileDirectory, that.defaultFileDirectory)
+                && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
                 && Objects.equals(versionDBStructure, that.versionDBStructure);
     }
@@ -406,11 +406,11 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, versionDBStructure);
+                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 }
