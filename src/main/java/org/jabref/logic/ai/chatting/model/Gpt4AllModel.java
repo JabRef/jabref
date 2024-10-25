@@ -23,22 +23,22 @@ import dev.langchain4j.model.output.TokenUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Chat4AllModel implements ChatLanguageModel {
+public class Gpt4AllModel implements ChatLanguageModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Chat4AllModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Gpt4AllModel.class);
 
     private final AiPreferences aiPreferences;
     private final HttpClient httpClient;
     private final Gson gson = new Gson();
 
-    public Chat4AllModel(AiPreferences aiPreferences, HttpClient httpClient) {
+    public Gpt4AllModel(AiPreferences aiPreferences, HttpClient httpClient) {
         this.aiPreferences = aiPreferences;
         this.httpClient = httpClient;
     }
 
     @Override
     public Response<AiMessage> generate(List<ChatMessage> list) {
-        LOGGER.debug("Generating response from Chat4All model with {} messages: {}", list.size(), list);
+        LOGGER.debug("Generating response from Gpt4All model with {} messages: {}", list.size(), list);
 
         List<Message> messages = list.stream()
                 .map(chatMessage -> switch (chatMessage) {
@@ -69,7 +69,7 @@ public class Chat4AllModel implements ChatLanguageModel {
                     .build();
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            LOGGER.info("Chat4All response: {}", response.body());
+            LOGGER.info("Gpt4All response: {}", response.body());
 
             TextGenerationResponse textGenerationResponse = gson.fromJson(response.body(), TextGenerationResponse.class);
             if (textGenerationResponse.choices() == null || textGenerationResponse.choices().isEmpty()) {
@@ -82,7 +82,7 @@ public class Chat4AllModel implements ChatLanguageModel {
             }
             return new Response<>(new AiMessage(generatedText), new TokenUsage(0, 0), FinishReason.OTHER);
         } catch (Exception e) {
-            LOGGER.error("Error generating message from Chat4All", e);
+            LOGGER.error("Error generating message from Gpt4All", e);
             throw new RuntimeException("Failed to generate AI message", e);
         }
     }

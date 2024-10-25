@@ -64,8 +64,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
 
-            case CHAT4ALL-> {
-                langchainChatModel = Optional.of(new Chat4AllModel(aiPreferences, httpClient));
+            case GPT4ALL-> {
+                langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {

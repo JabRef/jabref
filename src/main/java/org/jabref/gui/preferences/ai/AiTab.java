@@ -95,7 +95,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         apiKeyTextField.disableProperty().bind(
                 Bindings.or(
                         viewModel.disableBasicSettingsProperty(),
-                        aiProviderComboBox.valueProperty().isEqualTo(AiProvider.CHAT4ALL)
+                        aiProviderComboBox.valueProperty().isEqualTo(AiProvider.GPT4ALL)
                 )
         );
 

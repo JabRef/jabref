@@ -10,7 +10,7 @@ import org.jabref.model.ai.EmbeddingModel;
 public class AiDefaultPreferences {
     public enum PredefinedChatModel {
         GPT_4O_MINI(AiProvider.OPEN_AI, "gpt-4o-mini", 128000),
-        GPT_LOCAL(AiProvider.CHAT4ALL, "Phi-3.1-mini-128k-instruct-Q4_0-precise-output-tensor.gguf", 128000),
+        GPT_LOCAL(AiProvider.GPT4ALL, "Phi-3.1-mini-128k-instruct-Q4_0-precise-output-tensor.gguf", 128000),
         GPT_4O(AiProvider.OPEN_AI, "gpt-4o", 128000),
         GPT_4(AiProvider.OPEN_AI, "gpt-4", 8192),
         GPT_4_TURBO(AiProvider.OPEN_AI, "gpt-4-turbo", 128000),
@@ -64,7 +64,7 @@ public class AiDefaultPreferences {
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
             AiProvider.HUGGING_FACE, PredefinedChatModel.HUGGING_FACE,
-            AiProvider.CHAT4ALL, PredefinedChatModel.GPT_LOCAL
+            AiProvider.GPT4ALL, PredefinedChatModel.GPT_LOCAL
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
