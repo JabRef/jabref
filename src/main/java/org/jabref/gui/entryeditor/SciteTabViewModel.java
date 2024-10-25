@@ -98,7 +98,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
         URL url;
         try {
-            url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
+            url = new URI(BASE_URL + "tallies/" + doi.asString()).toURL();
         } catch (MalformedURLException | URISyntaxException ex) {
             throw new FetcherException("Malformed URL for DOI", ex);
         }
