@@ -5,12 +5,15 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -81,13 +84,18 @@ public class CleanupSingleAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences());
+                preferences.getTimestampPreferences()
+        );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         // Register undo action
         for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
+        }
+
+        if (!cleaner.getFailures().isEmpty()) {
+            this.showFailures(cleaner.getFailures());
         }
     }
 
@@ -101,5 +109,15 @@ public class CleanupSingleAction extends SimpleCommand {
             if (ce.hasEdits()) {
                 undoManager.addEdit(ce);
             }
+    }
+
+    private void showFailures(List<JabRefException> failures) {
+        StringBuilder sb = new StringBuilder();
+        for (JabRefException exception : failures) {
+            sb.append("- ").append(exception.getLocalizedMessage()).append("\n");
+        }
+        Platform.runLater(() ->
+                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), sb.toString())
+        );
     }
 }
