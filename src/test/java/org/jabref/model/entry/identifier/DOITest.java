@@ -229,7 +229,13 @@ class DOITest {
 
                 // findDoiWithSpecialCharactersInText
                 Arguments.of("10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2",
-                        DOI.findInText("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").get().getDOI())
+                        DOI.findInText("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").get().getDOI()),
+
+                // Test with Unicode replacement character
+                Arguments.of("10.1006/jmbi.1998.2354", DOI.findInText("other stuff �10.1006/jmbi.1998.2354").get().getDOI()),
+                Arguments.of("10.1006/jmbi.1998.2354", DOI.findInText("other stuff 10.1006/jmbi.1998.2354�").get().getDOI()),
+                Arguments.of("10/gf4gqc", DOI.findInText("other stuff �doi�:10�/gf4����gqc�").get().getDOI())
+
         );
     }
 
