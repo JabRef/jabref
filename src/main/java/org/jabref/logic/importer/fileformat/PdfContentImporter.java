@@ -499,7 +499,7 @@ public class PdfContentImporter extends PdfImporter {
             }
             if (pos >= 0) {
                 String arxivText = curString.substring(pos);
-                return ArXivIdentifier.parse(arxivText).map(ArXivIdentifier::getNormalized).orElse(null);
+                return ArXivIdentifier.parse(arxivText).map(ArXivIdentifier::asString).orElse(null);
             }
         }
         return arxivId;
