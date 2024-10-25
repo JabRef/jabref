@@ -380,7 +380,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read https://devdocs.jabref.org/contributing again carefully. 👈')
+              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
 
   upload-pr-number:
     runs-on: ubuntu-latest

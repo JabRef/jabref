@@ -1,5 +1,7 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -29,5 +31,10 @@ public class PushToTexmaker extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "-insert", getCitePrefix() + keyString + getCiteSuffix()};
+    }
+
+    @Override
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        return new String[] {commandPath, "-line", Integer.toString(line), fileName.toString()};
     }
 }

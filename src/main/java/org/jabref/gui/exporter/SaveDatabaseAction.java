@@ -139,10 +139,10 @@ public class SaveDatabaseAction {
 
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            // Close AutosaveManager, BackupManager, and LuceneManager for original library
+            // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
-            libraryTab.closeLuceneManger();
+            libraryTab.closeIndexManger();
         }
 
         // Set new location
@@ -160,10 +160,10 @@ public class SaveDatabaseAction {
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
-            // Reset (here: uninstall and install again) AutosaveManager, BackupManager and LuceneManager for the new file name
+            // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            libraryTab.createLuceneManager();
+            libraryTab.createIndexManager();
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }
