@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -30,9 +29,8 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.apache.pdfbox.text.TextPosition;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -201,7 +199,7 @@ public class PdfContentImporter extends PdfImporter {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            String title = getTitleByArea(document);
+            String title = extractTitleFromDocument(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, title);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
@@ -214,6 +212,60 @@ public class PdfContentImporter extends PdfImporter {
         return new ParserResult(result);
     }
 
+    private static String extractTitleFromDocument(PDDocument document) throws IOException {
+        TitleExtractorByFontSize stripper = new TitleExtractorByFontSize();
+        return stripper.getTitleFromFirstPage(document);
+    }
+
+    private static class TitleExtractorByFontSize extends PDFTextStripper {
+
+        private final List<TextPosition> textPositionsList;
+
+        public TitleExtractorByFontSize() {
+            super();
+            this.textPositionsList = new ArrayList<>();
+        }
+
+        public String getTitleFromFirstPage(PDDocument document) throws IOException {
+            this.setStartPage(1);
+            this.setEndPage(1);
+            this.writeText(document, new StringWriter());
+            return findLargestFontText(textPositionsList);
+        }
+
+        @Override
+        protected void writeString(String text, List<TextPosition> textPositions) {
+            textPositionsList.addAll(textPositions);
+        }
+
+        private String findLargestFontText(List<TextPosition> textPositions) {
+            float maxFontSize = 0;
+            StringBuilder largestFontText = new StringBuilder();
+            TextPosition previousTextPosition = null;
+            for (TextPosition textPosition : textPositions) {
+                float fontSize = textPosition.getFontSizeInPt();
+                if (fontSize > maxFontSize) {
+                    maxFontSize = fontSize;
+                    largestFontText.setLength(0);
+                    largestFontText.append(textPosition.getUnicode());
+                    previousTextPosition = textPosition;
+                } else if (fontSize == maxFontSize) {
+                    if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
+                        largestFontText.append(" ");
+                    }
+                    largestFontText.append(textPosition.getUnicode());
+                    previousTextPosition = textPosition;
+                }
+            }
+            return largestFontText.toString().trim();
+        }
+
+        private boolean isThereSpace(TextPosition previous, TextPosition current) {
+            float spaceThreshold = 0.5f;
+            float gap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
+            return gap > spaceThreshold;
+        }
+    }
 //    private String guessBetterTitleInMetaData(List<String> metadata) {
 //        String probableTitle = null;
 //        int maxScore = 0;
@@ -562,16 +614,6 @@ public class PdfContentImporter extends PdfImporter {
         stripper.writeText(document, writer);
 
         return writer.toString();
-    }
-
-    private String getTitleByArea(PDDocument document) throws IOException {
-        PDPage firstPage = document.getPage(0);
-        PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-        stripper.setSortByPosition(true);
-        Rectangle titleArea = new Rectangle(50, 50, 500, 100);
-        stripper.addRegion("title", titleArea);
-        stripper.extractRegions(firstPage);
-        return stripper.getTextForRegion("title").trim();
     }
 
     /**

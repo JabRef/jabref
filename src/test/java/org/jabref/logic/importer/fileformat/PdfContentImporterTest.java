@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -11,6 +12,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -125,34 +129,21 @@ class PdfContentImporterTest {
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", ""));
     }
 
-    @Test
-    void se2Pdf() throws Exception {
-        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/se2paper.pdf")).toURI());
+    @ParameterizedTest
+    @MethodSource("providePdfData")
+    void testPdfImports(String filePath, String expectedTitle) throws Exception {
+        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Optional.of("On How We Can Teach – Exploring New Ways in\n" +
-                "Professional Software Development for Students"), result.getFirst().getTitle());
+        assertEquals(Optional.of(expectedTitle), result.get(0).getTitle());
     }
 
-    // ToDo: not done yet
-    @Test
-    void IEEEPdf() throws Exception {
-        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/pdfs/IEEE/ieee-paper.pdf")).toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Optional.of("JabRef Example for Reference Parsing"), result.getFirst().getTitle());
-    }
-
-    @Test
-    void LNCSPdf() throws Exception {
-        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource("/org/jabref/logic/importer/util/LNCS-minimal.pdf")).toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Optional.of("Paper Title"), result.getFirst().getTitle());
-    }
-
-    // ToDo: get a minimal scientificThesisTemplatePdf
-    void scientificThesisTemplatePdf() throws Exception {
-    }
-
-    // ToDo: get a minimal uniStuttgartDissertationTemplate
-    void uniStuttgartDissertationTemplatePdf() throws Exception {
+    private static Stream<Arguments> providePdfData() {
+        return Stream.of(
+                Arguments.of("/pdfs/se2paper.pdf", "On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
+                Arguments.of("/pdfs/IEEE/ieee-paper.pdf", "JabRef Example for Reference Parsing"),
+                Arguments.of("/org/jabref/logic/importer/util/LNCS-minimal.pdf", "Paper Title"),
+                Arguments.of("/pdfs/example-scientificThesisTemplate.pdf", "Is Oil the future?"),
+                Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title")
+        );
     }
 }
