@@ -140,7 +140,7 @@ public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
 
     private void updateProgress(int currentIndex, int totalEntries, BackgroundTask<?> task) {
         Platform.runLater(() -> {
-            task.updateMessage(Localization.lang("Fetching entry %d of %d", currentIndex + 1, totalEntries));
+            task.updateMessage(Localization.lang("Fetching entry %0 of %1", currentIndex + 1, totalEntries));
             task.updateProgress(currentIndex, totalEntries);
         });
     }
