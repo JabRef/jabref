@@ -86,8 +86,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
-        this.setWidth(1000);
+        this.setWidth(500);
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
         setOnCloseRequest(e -> viewModel.cancelFetcherWorker());
 
