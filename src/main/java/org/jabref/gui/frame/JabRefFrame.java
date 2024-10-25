@@ -244,7 +244,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().add(tabbedPane);
+        splitPane.getItems().addAll(tabbedPane);
         contentPane.getChildren().addAll(welcomePage, splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
@@ -481,7 +481,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void addTab(@NonNull LibraryTab libraryTab, boolean raisePanel) {
         tabbedPane.getTabs().add(libraryTab);
-
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
             tabbedPane.requestFocus();
