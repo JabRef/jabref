@@ -23,11 +23,11 @@ import org.jabref.logic.search.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.LinkedFilesConstants;
-import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -144,7 +144,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
             task.setTitle(Localization.lang("Indexing PDF %0 file(s) for %1 | %2 of %0 file(s) indexed.", linkedFiles.size(), libraryName, i));
             task.updateProgress(i, linkedFiles.size());
-            task.updateMessage(Localization.lang("Indexing %0", StringUtil.shortenFileName(entry.getValue().getValue().getFileName().toString(), 68)));
+            task.updateMessage(Localization.lang("Indexing %0", FileUtil.shortenFileName(entry.getValue().getValue().getFileName().toString(), 68)));
             task.showToUser(true);
             i++;
         }
