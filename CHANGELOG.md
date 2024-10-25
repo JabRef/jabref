@@ -67,6 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
 - We changed the name of the library-based file directory from 'General File Directory' to 'Library-specific File Directory' per issue [#571](https://github.com/koppor/jabref/issues/571)
+- The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 
 ### Fixed
 
