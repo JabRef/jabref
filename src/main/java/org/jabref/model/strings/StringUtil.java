@@ -178,8 +178,8 @@ public class StringUtil {
      * @param maxLength the maximum number of characters in the string after shortening (including the extension)
      * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
      */
-    public static String shortenFileName(String fileName, int maxLength) {
-        if (fileName == null || maxLength < ELLIPSIS_LENGTH) {
+    public static String shortenFileName(String fileName, Integer maxLength) {
+        if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
             return "";
         }
 

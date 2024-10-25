@@ -370,11 +370,13 @@ class StringUtilTest {
 
     @ParameterizedTest
     @CsvSource({
-            "''                             ,                                     , -5",
+            "''                             ,                                     ,   ",
+            "''                             ,                                     , -3",
             "''                             ,                                     ,  0",
             "''                             ,                                     ,  3",
             "''                             ,                                     ,  5",
             "''                             ,                                     , 10",
+            "''                             , thisisatestfile.pdf                 ,   ",
             "''                             , thisisatestfile.pdf                 , -5",
             "''                             , thisisatestfile.pdf                 ,  0",
             "...                            , thisisatestfile.pdf                 ,  3",
@@ -386,7 +388,7 @@ class StringUtilTest {
             "...                            , longfilename.extremelylongextension , 20",
             "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
     })
-    void shortenFileName(String expected, String fileName, int maxLength) {
+    void shortenFileName(String expected, String fileName, Integer maxLength) {
         assertEquals(expected, StringUtil.shortenFileName(fileName, maxLength));
     }
 
