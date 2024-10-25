@@ -276,10 +276,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (!splitPane.getItems().contains(sidePane)) {
                 splitPane.getItems().addFirst(sidePane);
                 updateDividerPosition();
-
-                // Rebind the dividerSubscription when sidePane is re-added
-                dividerSubscription = EasyBind.listen(sidePane.widthProperty(),
-                        (obs, old, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
             }
         }
     }
