@@ -123,4 +123,38 @@ class PdfContentImporterTest {
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
     }
+
+    @Test
+    void extractArxivIdFromPage1() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.DOI, "10.1017/S0007114507795296")
+                .withField(StandardField.AUTHOR, "Review Article")
+                .withField(StandardField.TITLE, "British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 arXiv:2408.06224v1 q The Authors")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.ARXIVID, "2408.06224v1");
+
+        String firstPageContent = """
+                British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 arXiv:2408.06224v1
+                q The Authors 2024
+
+                Review Article
+
+                Cocoa and health: a decade of research
+
+                Karen A. Cooper1, Jennifer L. Donovan2, Andrew L. Waterhouse3 and Gary Williamson1*
+                1Nestlé Research Center, Vers-Chez-les-Blanc, PO Box 44, CH-1000 Lausanne 26, Switzerland
+                2Department of Psychiatry and Behavioural Sciences, Medical University of South Carolina, Charleston, SC 29425, USA
+                3Department of Viticulture & Enology, University of California, Davis, CA 95616, USA
+
+                (Received 5 December 2006 – Revised 29 May 2007 – Accepted 31 May 2007)
+
+                Abbreviations: FMD, flow-mediated dilation; NO, nitirc oxide.
+
+                *Corresponding author: Dr Gary Williamson, fax þ41 21 785 8544, email gary.williamson@rdls.nestle.com
+
+                British Journal of Nutrition
+                https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n"));
+    }
 }
