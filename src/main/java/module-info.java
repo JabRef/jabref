@@ -1,8 +1,6 @@
 open module org.jabref {
     // Swing
     requires java.desktop;
-    // JabRef codes
-    // review the code
     // SQL
     requires java.sql;
     requires java.sql.rowset;
