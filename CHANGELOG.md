@@ -63,8 +63,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
-- We improved the UI by merging four buttons to one button for entry and changed the size of dialog box to 500px. [#8808](https://github.com/JabRef/jabref/issues/8808)
-- We improved the input with keybinding Ctrl+Shift+N for New entry from text. [#8808](https://github.com/JabRef/jabref/issues/8808)
 
 ### Fixed
 
