@@ -131,7 +131,7 @@ class PdfContentImporterTest {
                 .withField(StandardField.AUTHOR, "Review Article")
                 .withField(StandardField.TITLE, "British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 arXiv:2408.06224v1 q The Authors")
                 .withField(StandardField.YEAR, "2024")
-                .withField(StandardField.ARXIVID, "2408.06224v1");
+                .withField(StandardField.EPRINT, "2408.06224v1");
 
         String firstPageContent = """
                 British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296 arXiv:2408.06224v1

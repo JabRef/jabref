@@ -450,7 +450,7 @@ public class PdfContentImporter extends PdfImporter {
             entry.setField(StandardField.DOI, doi);
         }
         if (arxivId != null) {
-            entry.setField(StandardField.ARXIVID, arxivId);
+            entry.setField(StandardField.EPRINT, arxivId);
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
