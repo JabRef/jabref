@@ -38,6 +38,7 @@ public class EditorTextField extends TextField implements Initializable, Context
             }
         });
     }
+
     public EditorTextField(final String text) {
         super(text);
 
@@ -48,7 +49,7 @@ public class EditorTextField extends TextField implements Initializable, Context
         ClipBoardManager.addX11Support(this);
     }
 
-    public static void entryContext(TabPane tab){
+    public static void entryContext(TabPane tab) {
         tabs = tab;
     }
 
