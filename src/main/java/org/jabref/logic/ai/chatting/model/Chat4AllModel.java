@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.ai.AiPreferences;
+
 import com.google.gson.Gson;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -18,9 +20,6 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.FinishReason;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
-
-import org.jabref.logic.ai.AiPreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,61 +135,10 @@ public class Chat4AllModel implements ChatLanguageModel {
             }
         }
     }
-    private record TextGenerationResponse(List<Choice> choices) {}
 
-    private record Choice(Message message) {}
+    private record TextGenerationResponse(List<Choice> choices) { }
 
-    private record Message(String role, String content) {}
+    private record Choice(Message message) { }
 
-
-//    private static class TextGenerationResponse {
-//        protected List<Choice> choices;
-//
-//        public List<Choice> getChoices() {
-//            return choices;
-//        }
-//
-//        public static class Choice {
-//            private Message message;
-//
-//            public Message getMessage() {
-//                return message;
-//            }
-//
-//            public void setMessage(Message message) {
-//                this.message = message;
-//            }
-//        }
-//
-//        public static class Message {
-//            private String role;
-//            private String content;
-//
-//            public String getRole() {
-//                return role;
-//            }
-//
-//            public void setRole(String role) {
-//                this.role = role;
-//            }
-//
-//            public String getContent() {
-//                return content;
-//            }
-//
-//            public void setContent(String content) {
-//                this.content = content;
-//            }
-//        }
-//    }
-//
-//    private static class Message {
-//        protected String role;
-//        protected String content;
-//
-//        public Message(String role, String content) {
-//            this.role = role;
-//            this.content = content;
-//        }
-//    }
+    private record Message(String role, String content) { }
 }
