@@ -36,7 +36,7 @@ class PdfContentImporterTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
-                .withField(StandardField.TITLE, "Hello World")
+                .withField(StandardField.TITLE, "Hello World 1")
                 .withFiles(List.of(new LinkedFile("", file.toAbsolutePath(), "PDF")));
         assertEquals(List.of(expected), result);
 
@@ -134,7 +134,7 @@ class PdfContentImporterTest {
     void pdfTitleExtraction(String filePath, String expectedTitle) throws Exception {
         Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Optional.of(expectedTitle), result.get(0).getTitle());
+        assertEquals(Optional.of(expectedTitle), result.getFirst().getTitle());
     }
 
     private static Stream<Arguments> providePdfData() {
@@ -143,7 +143,8 @@ class PdfContentImporterTest {
                 Arguments.of("/pdfs/IEEE/ieee-paper.pdf", "JabRef Example for Reference Parsing"),
                 Arguments.of("/org/jabref/logic/importer/util/LNCS-minimal.pdf", "Paper Title"),
                 Arguments.of("/pdfs/example-scientificThesisTemplate.pdf", "Is Oil the future?"),
-                Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title")
+                Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title"),
+                Arguments.of("/pdfs/minimal.pdf", "Hello World")
         );
     }
 }
