@@ -16,12 +16,7 @@ import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -36,6 +31,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -100,24 +96,40 @@ public class EntryEditor extends BorderPane {
 
     private SourceTab sourceTab;
 
-    @FXML private TabPane tabbed;
+    @FXML
+    private TabPane tabbed;
 
-    @FXML private Button typeChangeButton;
-    @FXML private Button fetcherButton;
-    @FXML private Label typeLabel;
+    @FXML
+    private Button typeChangeButton;
+    @FXML
+    private Button fetcherButton;
+    @FXML
+    private Label typeLabel;
 
-    @Inject private BuildInfo buildInfo;
-    @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private GuiPreferences preferences;
-    @Inject private StateManager stateManager;
-    @Inject private ThemeManager themeManager;
-    @Inject private FileUpdateMonitor fileMonitor;
-    @Inject private CountingUndoManager undoManager;
-    @Inject private BibEntryTypesManager bibEntryTypesManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
-    @Inject private AiService aiService;
+    @Inject
+    private BuildInfo buildInfo;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private StateManager stateManager;
+    @Inject
+    private ThemeManager themeManager;
+    @Inject
+    private FileUpdateMonitor fileMonitor;
+    @Inject
+    private CountingUndoManager undoManager;
+    @Inject
+    private BibEntryTypesManager bibEntryTypesManager;
+    @Inject
+    private KeyBindingRepository keyBindingRepository;
+    @Inject
+    private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject
+    private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -130,8 +142,8 @@ public class EntryEditor extends BorderPane {
         this.redoAction = redoAction;
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), databaseContext, dialogService);
@@ -142,6 +154,7 @@ public class EntryEditor extends BorderPane {
         this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList();
 
         setupDragAndDrop(libraryTab);
+        EditorTextField.entryContext(tabbed);
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -471,5 +484,21 @@ public class EntryEditor extends BorderPane {
 
     public void previousPreviewStyle() {
         this.previewTabs.forEach(OffersPreview::previousPreviewStyle);
+    }
+
+    public static boolean checkLastTextField(TabPane tabs, TextField textField) {
+        FieldsEditorTab currentTab = (FieldsEditorTab) tabs.getSelectionModel().getSelectedItem();
+        Collection<Field> shownFields = currentTab.getShownFields();
+        Field lastField = null;
+        for (Field field : shownFields) {
+            lastField = field;
+        }
+            if (textField != null && lastField != null) {
+                if (textField.getId() == null) {
+                    return false;
+                }
+                return lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+            }
+        return false;
     }
 }
