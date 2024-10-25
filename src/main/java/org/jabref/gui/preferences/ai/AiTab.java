@@ -29,7 +29,7 @@ import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
-    private static final String GPT_CHAT_MODEL_PROMPT = "Phi-3.1-mini(or any other local model name from Gpt4All)";
+    private static final String GPT_4_ALL_CHAT_MODEL_PROMPT = "Phi-3.1-mini(or any other local model name from Gpt4All)";
 
     @FXML private CheckBox enableAi;
     @FXML private CheckBox autoGenerateEmbeddings;
@@ -90,7 +90,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
                 chatModelComboBox.setPromptText(HUGGING_FACE_CHAT_MODEL_PROMPT);
             }
             if (newValue == AiProvider.GPT4ALL) {
-                chatModelComboBox.setPromptText(GPT_CHAT_MODEL_PROMPT);
+                chatModelComboBox.setPromptText(GPT_4_ALL_CHAT_MODEL_PROMPT);
             }
         });
 
