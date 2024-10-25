@@ -14,6 +14,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -37,14 +38,14 @@ public class WelcomePage extends VBox {
         setAlignment(Pos.CENTER);
         setSpacing(10);
 
-        Label welcomeLabel = new Label("Welcome to JabRef!");
+        Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef!"));
         welcomeLabel.getStyleClass().add("welcome-label");
 
-        Hyperlink newLibrary = new Hyperlink("Open a New Library");
+        Hyperlink newLibrary = new Hyperlink(Localization.lang("Open a New Library"));
         newLibrary.getStyleClass().add("welcome-hyperlink");
         newLibrary.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
 
-        Hyperlink openLibrary = new Hyperlink("or open an Existing Library");
+        Hyperlink openLibrary = new Hyperlink(Localization.lang("or open an Existing Library"));
         openLibrary.getStyleClass().add("welcome-hyperlink");
         openLibrary.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
