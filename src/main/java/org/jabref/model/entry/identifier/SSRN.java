@@ -57,7 +57,7 @@ public class SSRN extends EprintIdentifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         return String.valueOf(abstractId);
     }
 

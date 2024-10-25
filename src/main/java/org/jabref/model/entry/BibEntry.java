@@ -483,6 +483,7 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
+                // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
                 String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
                 latexFreeFields.put(field, latexFreeValue);
                 return Optional.of(latexFreeValue);
@@ -1064,6 +1065,7 @@ public class BibEntry implements Cloneable {
         }
     }
 
+    // region files
     public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(StandardField.FILE);
         String newValue = FileFieldWriter.getStringRepresentation(files);
@@ -1097,6 +1099,31 @@ public class BibEntry implements Cloneable {
         return FileFieldParser.parse(oldValue.get());
     }
 
+    public Optional<FieldChange> addFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFile(int index, LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(index, file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFiles(List<LinkedFile> filesToAdd) {
+        if (filesToAdd.isEmpty()) {
+            return Optional.empty();
+        }
+        if (this.getField(StandardField.FILE).isEmpty()) {
+            return setFiles(filesToAdd);
+        }
+        List<LinkedFile> currentFiles = getFiles();
+        currentFiles.addAll(filesToAdd);
+        return setFiles(currentFiles);
+    }
+    // endregion
+
     public void setDate(Date date) {
         date.getYear().ifPresent(year -> setField(StandardField.YEAR, year.toString()));
         date.getMonth().ifPresent(this::setMonth);
@@ -1116,18 +1143,6 @@ public class BibEntry implements Cloneable {
 
     public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
-    }
-
-    public Optional<FieldChange> addFile(LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(file);
-        return setFiles(linkedFiles);
-    }
-
-    public Optional<FieldChange> addFile(int index, LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(index, file);
-        return setFiles(linkedFiles);
     }
 
     public ObservableMap<Field, String> getFieldsObservable() {
