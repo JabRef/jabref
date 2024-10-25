@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.actions.Action;
@@ -56,4 +57,6 @@ public interface PushToApplication {
     PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
 
     String getDelimiter();
+
+    void jumpToLine(Path fileName, int line, int column);
 }
