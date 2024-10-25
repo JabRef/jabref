@@ -87,7 +87,9 @@ public class MergingIdBasedFetcher {
     private void logEntryIdentifiers(BibEntry entry) {
         List<String> availableIds = Stream.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT)
                                           .flatMap(field -> entry.getField(field)
-                                                                 .map(value -> String.format("%s: %s", field, value))
+                                                                 .map(value -> field +
+                                                                         ": " +
+                                                                         value)
                                                                  .stream())
                                           .collect(Collectors.toList());
 
