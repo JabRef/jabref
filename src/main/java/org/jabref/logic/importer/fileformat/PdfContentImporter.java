@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -42,7 +41,6 @@ import org.apache.pdfbox.text.TextPosition;
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
-@AllowedToUseAwt("Requires AWT to get a title from position")
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");

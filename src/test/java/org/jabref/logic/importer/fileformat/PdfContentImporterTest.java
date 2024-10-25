@@ -131,7 +131,7 @@ class PdfContentImporterTest {
 
     @ParameterizedTest
     @MethodSource("providePdfData")
-    void testPdfImports(String filePath, String expectedTitle) throws Exception {
+    void pdfTitleExtraction(String filePath, String expectedTitle) throws Exception {
         Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Optional.of(expectedTitle), result.get(0).getTitle());
