@@ -73,7 +73,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         if (doi.isPresent()) {
             try {
                 // Retrieve PDF link
-                String source = SOURCE_ID_SEARCH + doi.get().getDOI();
+                String source = SOURCE_ID_SEARCH + doi.get().asString();
                 var jsoupRequest = Jsoup.connect(getURLBySource(source))
                                         .userAgent(URLDownload.USER_AGENT)
                                         .header("Accept", "text/html; charset=utf-8")

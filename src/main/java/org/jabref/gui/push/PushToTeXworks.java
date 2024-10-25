@@ -1,5 +1,7 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -32,5 +34,11 @@ public class PushToTeXworks extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-text", "%s%s%s".formatted(getCitePrefix(), keyString, getCiteSuffix())};
+    }
+
+    @Override
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        // No command known to jump to a specific line
+        return new String[] {commandPath, fileName.toString()};
     }
 }
