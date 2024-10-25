@@ -143,6 +143,16 @@ public class MainTableColumnModel {
         return qualifierProperty.getValue();
     }
 
+    public MainTableColumnModel setQualifier(String qualifier) {
+        if (qualifier == null || qualifier.isBlank()) {
+            LOGGER.warn("Attempted to set a blank or null qualifier.");
+            this.qualifierProperty.setValue("");
+        } else {
+            this.qualifierProperty.setValue(qualifier);
+        }
+        return this;
+    }
+
     public String getName() {
         if (qualifierProperty.getValue().isBlank()) {
             return typeProperty.getValue().getName();

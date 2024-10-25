@@ -84,6 +84,7 @@ public class MainTableColumnFactory {
         this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
     }
 
+    @SuppressWarnings("checkstyle:WhitespaceAround")
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
@@ -109,10 +110,17 @@ public class MainTableColumnFactory {
                 returnColumn = createLibraryColumn(column);
                 break;
             case EXTRAFILE:
-                if (!column.getQualifier().isBlank()) {
-                    returnColumn = createExtraFileColumn(column);
+                String qualifier = column.getQualifier();
+                if (qualifier.isBlank()) {
+                    column.setQualifier("default-file-type");
+                } else {
+                    column.setQualifier(qualifier);
                 }
+                LOGGER.info("EXTRAFILE column assigned with qualifier: {}", qualifier);
+
+                returnColumn = createExtraFileColumn(column);
                 break;
+
             case SPECIALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     Field field = FieldFactory.parseField(column.getQualifier());
