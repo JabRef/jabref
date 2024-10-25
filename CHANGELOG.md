@@ -139,6 +139,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
 - We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
 - We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
+- We Added functionality to copy associated PDF files when moving entries between `.bib` files, ensuring linked PDFs are also transferred to the destination's designated file directory. [#520](https://github.com/koppor/jabref/issues/520)
+
 
 ### Changed
 
