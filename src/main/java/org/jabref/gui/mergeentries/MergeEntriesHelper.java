@@ -72,15 +72,20 @@ public final class MergeEntriesHelper {
 
     private static void updateFieldIfNecessaryWithUndo(final BibEntry originalEntry,
                                                        final BibEntry fetchedEntry,
-                                                       final Field field, final NamedCompound undoManager) {
-        fetchedEntry.getField(field).ifPresent(fetchedValue -> originalEntry.getField(field).ifPresentOrElse(
-                originalValue -> {
-                    if (fetchedValue.length() > originalValue.length()) {
-                        updateField(originalEntry, field, originalValue, fetchedValue, undoManager);
-                    }
-                },
-                () -> updateField(originalEntry, field, null, fetchedValue, undoManager)
-        ));
+                                                       final Field field,
+                                                       final NamedCompound undoManager) {
+        fetchedEntry.getField(field)
+                    .ifPresent(fetchedValue ->
+                            originalEntry.getField(field)
+                                         .map(originalValue -> fetchedValue.length() > originalValue.length())
+                                         .filter(shouldUpdate -> shouldUpdate)
+                                         .or(() -> {
+                                             updateField(originalEntry, field,
+                                                     originalEntry.getField(field).orElse(null),
+                                                     fetchedValue,
+                                                     undoManager);
+                                             return Optional.empty();
+                                         }));
     }
 
     private static void updateField(final BibEntry entry, final Field field,
