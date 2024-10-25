@@ -1052,10 +1052,6 @@ public class BibEntry implements Cloneable {
         return keywords;
     }
 
-    public Optional<String> getCiteKey() {
-        return getField(InternalField.KEY_FIELD);
-    }
-
     public Optional<FieldChange> clearCiteKey() {
         return clearField(InternalField.KEY_FIELD);
     }

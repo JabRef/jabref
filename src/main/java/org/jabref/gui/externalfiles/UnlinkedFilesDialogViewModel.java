@@ -161,10 +161,10 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
         resultList.clear();
-        
+
         List<BibEntry> entriesToImport = importHandler.getEntriesToImport(fileList);
         entriesToImportWithoutDuplicates = new ArrayList<>();
-        
+
         for (BibEntry entry : entriesToImport) {
             Optional<BibEntry> existingDuplicate = importHandler.findDuplicate(bibDatabase, entry);
             if (existingDuplicate.isPresent()) {
@@ -188,20 +188,17 @@ public class UnlinkedFilesDialogViewModel {
                                                      progressTextProperty.unbind();
                                                      taskActiveProperty.setValue(false);
                                                  })
-                                                 .onSuccess(new Consumer<List<ImportFilesResultItemViewModel>>() {
-                                                     @Override
-                                                     public void accept(List<ImportFilesResultItemViewModel> importFilesResultItemViewModels) {
-                                                         if (entriesToImportWithoutDuplicates != null && !entriesToImportWithoutDuplicates.isEmpty()) {
-                                                             List<ImportFilesResultItemViewModel> convertedEntries = entriesToImportWithoutDuplicates.stream()
-                                                                                                                                                     .map(entry -> new ImportFilesResultItemViewModel(
-                                                                                                                                                             Objects.requireNonNull(UnlinkedFilesDialogViewModel.this.getFilePathFromEntry(entry)),
-                                                                                                                                                             true,
-                                                                                                                                                             "Imported successfully"))
-                                                                                                                                                     .toList();
-                                                             resultList.addAll(convertedEntries);
-                                                         } else {
-                                                             LOGGER.warn("No entries to import or list is not initialized properly.");
-                                                         }
+                                                 .onSuccess(importFilesResultItemViewModels -> {
+                                                     if (entriesToImportWithoutDuplicates != null && !entriesToImportWithoutDuplicates.isEmpty()) {
+                                                         List<ImportFilesResultItemViewModel> convertedEntries = entriesToImportWithoutDuplicates.stream()
+                                                                                                                                                 .map(entry -> new ImportFilesResultItemViewModel(
+                                                                                                                                                         Objects.requireNonNull(UnlinkedFilesDialogViewModel.this.getFilePathFromEntry(entry)),
+                                                                                                                                                         true,
+                                                                                                                                                         "Imported successfully"))
+                                                                                                                                                 .toList();
+                                                         resultList.addAll(convertedEntries);
+                                                     } else {
+                                                         LOGGER.warn("No entries to import or list is not initialized properly.");
                                                      }
                                                  });
         importFilesBackgroundTask.executeWith(taskExecutor);
