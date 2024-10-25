@@ -55,7 +55,6 @@ public class CopyFilesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        System.out.println("开始执行 execute 方法");
 
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         List<BibEntry> entries = stateManager.getSelectedEntries();
