@@ -59,3 +59,4 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         tvResult.setColumnResizePolicy(param -> true);
     }
 }
+

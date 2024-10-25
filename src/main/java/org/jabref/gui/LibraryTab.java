@@ -1,7 +1,10 @@
 package org.jabref.gui;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -109,6 +112,8 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.ibm.icu.text.PluralRules.Operand.e;
+
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
@@ -171,6 +176,8 @@ public class LibraryTab extends Tab {
     private LuceneManager luceneManager;
 
     private final AiService aiService;
+
+    private static BibDatabaseContext copiedBibDatabaseContext;
 
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
@@ -905,6 +912,7 @@ public class LibraryTab extends Tab {
     }
 
     public void copyEntry() {
+        copiedBibDatabaseContext = this.bibDatabaseContext;
         int entriesCopied = doCopyEntry(getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(ies)", entriesCopied));
@@ -933,6 +941,7 @@ public class LibraryTab extends Tab {
     }
 
     public void pasteEntry() {
+
         List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
         entriesToAdd = importHandler.handleBibTeXData(content);
@@ -943,6 +952,34 @@ public class LibraryTab extends Tab {
             return;
         }
 
+        Optional<String> optionalBibFolderPath = copiedBibDatabaseContext.getMetaData().getDefaultFileDirectory();
+        if(optionalBibFolderPath.isEmpty()){
+            LOGGER.warn("can not find the file path");
+            return;
+        }
+
+        Path sourceBibFolder = Paths.get(optionalBibFolderPath.get());
+
+        for(BibEntry entry:entriesToAdd){
+            List<LinkedFile> linkedFiles = entry.getFiles();
+            for(LinkedFile linkedFile: linkedFiles){
+                if("pdf".equalsIgnoreCase(linkedFile.getFileType())){
+                    List<Path> folderList = List.of(sourceBibFolder);
+                    Optional<Path> sourcePath = linkedFile.findIn(folderList);
+                    if(sourcePath.isPresent() && Files.exists(sourcePath.get())){
+                        Path targetFolder = bibDatabaseContext.getMetaData().getDefaultFileDirectory().map(Paths::get).orElseThrow();
+                        Path targetPath = targetFolder.resolve(sourcePath.get().getFileName());
+                        try{
+                            Files.copy(sourcePath.get(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            LOGGER.error("failed to copy PDF file: {}", sourcePath.get(),e);
+                        }
+                    }else{
+                        LOGGER.warn("did not find PDF: {}", linkedFile.getLink());
+                    }
+                }
+            }
+        }
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
     }
 

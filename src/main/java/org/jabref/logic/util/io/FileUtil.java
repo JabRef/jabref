@@ -228,7 +228,9 @@ public class FileUtil {
         }
         try {
             // This should also preserve Hard Links
+            LOGGER.info("Attempting to copy file from " + pathToSourceFile + " to " + pathToDestinationFile);
             Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("File copied successfully.");
             return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);

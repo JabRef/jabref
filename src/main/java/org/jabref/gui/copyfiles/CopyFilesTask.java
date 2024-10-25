@@ -85,6 +85,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
                     if (newPath.isPresent()) {
                         Path newFile = newPath.get();
+                        LOGGER.info("Calling copyFile method...");
                         boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
                         updateProgress(totalFilesCounter++, totalFilesCount);
                         try {
@@ -97,6 +98,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                         }
                         if (success) {
                             updateMessage(localizedSuccessMessage);
+                            fileName.setLink(newFile.toString());
                             numberSuccessful++;
                             writeLogMessage(newFile, bw, localizedSuccessMessage);
                             addResultToList(newFile, success, localizedSuccessMessage);
