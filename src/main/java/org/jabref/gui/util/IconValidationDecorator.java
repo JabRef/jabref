@@ -32,18 +32,10 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
     }
 
     @Override
-    protected Node createErrorNode() {
-        return IconTheme.JabRefIcons.ERROR.getGraphicNode();
-    }
-
-    @Override
-    protected Node createWarningNode() {
-        return IconTheme.JabRefIcons.WARNING.getGraphicNode();
-    }
-
-    @Override
     public Node createDecorationNode(ValidationMessage message) {
-        Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
+        Node graphic = Severity.ERROR == message.getSeverity()
+                ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
+                : IconTheme.JabRefIcons.WARNING.getGraphicNode();
         graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
         Label label = new Label();
         label.setGraphic(graphic);
