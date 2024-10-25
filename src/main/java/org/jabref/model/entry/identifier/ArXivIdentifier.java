@@ -45,13 +45,13 @@ public class ArXivIdentifier extends EprintIdentifier {
             return getArXivIdentifier(identifierMatcher);
         }
 
-       Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
-       Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
-       if (oldIdentifierMatcher.matches()) {
-           return getArXivIdentifier(oldIdentifierMatcher);
-       }
+        Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
+        Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
+        if (oldIdentifierMatcher.matches()) {
+            return getArXivIdentifier(oldIdentifierMatcher);
+        }
 
-       return Optional.empty();
+        return Optional.empty();
     }
 
     private static Optional<ArXivIdentifier> getArXivIdentifier(Matcher matcher) {
