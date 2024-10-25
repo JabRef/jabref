@@ -34,6 +34,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.entry.field.StandardField.PDF;
@@ -385,5 +386,20 @@ public abstract class NativeDesktop {
 
     public boolean moveToTrashSupported() {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+    }
+
+    public static Path getOtherDataDir() {
+        Path userDataDir = Path.of(AppDirsFactory.getInstance().getUserDataDir(
+                OS.APP_DIR_APP_NAME,
+                "views",
+                OS.APP_DIR_APP_AUTHOR));
+
+        try {
+            Files.createDirectories(userDataDir);
+        } catch (IOException exception) {
+            LoggerFactory.getLogger(NativeDesktop.class).error("Failed to create Directories in getOtherDataDir()", exception);
+        }
+
+        return userDataDir;
     }
 }

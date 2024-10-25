@@ -13,6 +13,7 @@ import java.util.regex.PatternSyntaxException;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -28,6 +29,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.entry.EntryTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -46,6 +48,7 @@ import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.PopularityGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
@@ -79,6 +82,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty typePopularityProperty = new SimpleBooleanProperty();
 
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
@@ -97,6 +101,9 @@ public class GroupDialogViewModel {
     private final StringProperty autoGroupPersonsFieldProperty = new SimpleStringProperty("");
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
+
+    private final Property<Integer> maxEntriesProperty = new SimpleObjectProperty<>();
+    private final StringProperty timePeriodProperty = new SimpleStringProperty();
 
     private Validator nameValidator;
     private Validator nameContainsDelimiterValidator;
@@ -373,6 +380,13 @@ public class GroupDialogViewModel {
                         new DefaultAuxParser(new BibDatabase()),
                         fileUpdateMonitor,
                         currentDatabase.getMetaData());
+            } else if (typePopularityProperty.getValue()) {
+                resultingGroup = new PopularityGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        currentDatabase.getEntries(),
+                        maxEntriesProperty,
+                        timePeriodProperty);
             }
 
             if (resultingGroup != null) {
@@ -585,6 +599,10 @@ public class GroupDialogViewModel {
         return typeTexProperty;
     }
 
+    public BooleanProperty typePopularityProperty() {
+        return typePopularityProperty;
+    }
+
     public StringProperty keywordGroupSearchTermProperty() {
         return keywordGroupSearchTermProperty;
     }
@@ -655,5 +673,17 @@ public class GroupDialogViewModel {
             }
         }
         return false;
+    }
+
+    public BooleanProperty trackViewsEnabledProperty() {
+        return EntryTabViewModel.trackViewsProperty();
+    }
+
+    public StringProperty timePeriodProperty() {
+        return timePeriodProperty;
+    }
+
+    public Property<Integer> maxEntriesProperty() {
+        return maxEntriesProperty;
     }
 }
