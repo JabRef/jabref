@@ -1739,11 +1739,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: "Arial";
 }
 
-.welcome-text {
-    -fx-font-size: 22px;
-    -fx-text-fill: -jr-gray-3;
-}
-
 .welcome-hyperlink {
     -fx-font-size: 22px;
     -fx-text-fill: -jr-theme;
