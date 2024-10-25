@@ -27,10 +27,7 @@ public class VeryShortTitleFormatter extends Formatter {
                                                   Word::isSmallerWord))
                                           .findFirst();
 
-        if (resultTitle.isEmpty()) {
-            return "";
-        }
-        return resultTitle.toString();
+        return resultTitle.map(Word::toString).orElse("");
     }
 
     @Override
@@ -41,6 +38,6 @@ public class VeryShortTitleFormatter extends Formatter {
 
     @Override
     public String getExampleInput() {
-        return "N";
+        return "A very short title";
     }
 }

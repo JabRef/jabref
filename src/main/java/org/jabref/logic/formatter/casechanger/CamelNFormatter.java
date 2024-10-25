@@ -43,6 +43,6 @@ public class CamelNFormatter extends Formatter {
 
     @Override
     public String getExampleInput() {
-        return "N";
+        return "this is camel formatter";
     }
 }

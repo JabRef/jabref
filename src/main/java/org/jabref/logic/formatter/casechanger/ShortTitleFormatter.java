@@ -38,6 +38,6 @@ public class ShortTitleFormatter extends Formatter {
 
     @Override
     public String getExampleInput() {
-        return "N";
+        return "This is a short title";
     }
 }
