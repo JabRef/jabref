@@ -13,7 +13,6 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
-import org.jabref.logic.importer.MergeEntriesHelper;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -33,10 +32,6 @@ public class FetchAndMergeEntry {
     public static final List<Field> SUPPORTED_IDENTIFIER_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
-    private static final String ERROR_FETCHING = "Error while fetching from %0";
-    private static final String MERGE_ENTRY_WITH = "Merge entry with %0 information";
-    private static final String UPDATED_ENTRY = "Updated entry with info from %0";
-    private static final String CANCELED_MERGING = "Canceled merging entries";
 
     private final DialogService dialogService;
     private final UndoManager undoManager;
@@ -103,7 +98,7 @@ public class FetchAndMergeEntry {
     private void handleFetchException(Exception exception, WebFetcher fetcher) {
         LOGGER.error("Error while fetching bibliographic information", exception);
         dialogService.showErrorDialogAndWait(
-                Localization.lang(ERROR_FETCHING, fetcher.getName()),
+                Localization.lang("Error while fetching from %0", fetcher.getName()),
                 exception
         );
     }
@@ -121,14 +116,14 @@ public class FetchAndMergeEntry {
 
     private MergeEntriesDialog createMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences);
-        dialog.setTitle(Localization.lang(MERGE_ENTRY_WITH, fetcher.getName()));
+        dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
         return dialog;
     }
 
     private void processMergedEntry(BibEntry originalEntry, BibEntry mergedEntry, WebFetcher fetcher) {
-        NamedCompound ce = new NamedCompound(Localization.lang(MERGE_ENTRY_WITH, fetcher.getName()));
+        NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         MergeEntriesHelper.mergeEntries(originalEntry, mergedEntry, ce);
 
         if (ce.hasEdits()) {
@@ -136,12 +131,12 @@ public class FetchAndMergeEntry {
             undoManager.addEdit(ce);
         }
 
-        dialogService.notify(Localization.lang(UPDATED_ENTRY, fetcher.getName()));
+        dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
     }
 
     private void notifyCanceledMerge(BibEntry entry) {
         String citationKey = entry.getCitationKey().orElse(entry.getAuthorTitleYear(40));
-        dialogService.notify(Localization.lang(CANCELED_MERGING) + " [" + citationKey + "]");
+        dialogService.notify(Localization.lang("Canceled merging entries") + " [" + citationKey + "]");
     }
 
     public void fetchAndMerge(BibEntry entry, EntryBasedFetcher fetcher) {
