@@ -96,40 +96,24 @@ public class EntryEditor extends BorderPane {
 
     private SourceTab sourceTab;
 
-    @FXML
-    private TabPane tabbed;
+    @FXML private TabPane tabbed;
 
-    @FXML
-    private Button typeChangeButton;
-    @FXML
-    private Button fetcherButton;
-    @FXML
-    private Label typeLabel;
+    @FXML private Button typeChangeButton;
+    @FXML private Button fetcherButton;
+    @FXML private Label typeLabel;
 
-    @Inject
-    private BuildInfo buildInfo;
-    @Inject
-    private DialogService dialogService;
-    @Inject
-    private TaskExecutor taskExecutor;
-    @Inject
-    private GuiPreferences preferences;
-    @Inject
-    private StateManager stateManager;
-    @Inject
-    private ThemeManager themeManager;
-    @Inject
-    private FileUpdateMonitor fileMonitor;
-    @Inject
-    private CountingUndoManager undoManager;
-    @Inject
-    private BibEntryTypesManager bibEntryTypesManager;
-    @Inject
-    private KeyBindingRepository keyBindingRepository;
-    @Inject
-    private JournalAbbreviationRepository journalAbbreviationRepository;
-    @Inject
-    private AiService aiService;
+    @Inject private BuildInfo buildInfo;
+    @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private GuiPreferences preferences;
+    @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
+    @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private CountingUndoManager undoManager;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -493,12 +477,12 @@ public class EntryEditor extends BorderPane {
         for (Field field : shownFields) {
             lastField = field;
         }
-            if (textField != null && lastField != null) {
-                if (textField.getId() == null) {
-                    return false;
-                }
-                return lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+        if (textField != null && lastField != null) {
+            if (textField.getId() == null) {
+                return false;
             }
-        return false;
-    }
+            return lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+        }
+    return false;
+}
 }

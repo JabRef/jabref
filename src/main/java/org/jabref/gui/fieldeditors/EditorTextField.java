@@ -22,8 +22,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
-    private final ContextMenu contextMenu = new ContextMenu();
     public static TabPane tabs;
+    private final ContextMenu contextMenu = new ContextMenu();
     private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };
@@ -60,8 +60,6 @@ public class EditorTextField extends TextField implements Initializable, Context
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
-
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
