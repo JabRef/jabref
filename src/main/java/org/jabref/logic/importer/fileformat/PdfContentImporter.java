@@ -264,69 +264,6 @@ public class PdfContentImporter extends PdfImporter {
             return gap > spaceThreshold;
         }
     }
-//    private String guessBetterTitleInMetaData(List<String> metadata) {
-//        String probableTitle = null;
-//        int maxScore = 0;
-//
-//        for (String str : metadata) {
-//            if (str == null) {
-//                continue;
-//            }
-//            // Rule 1: Check for file type paths, ignore them
-//            if (str.contains(".pdf") || str.contains(".docx") || str.contains(".doc")) {
-//                continue;
-//            }
-//            // Rule 2: Abstract detection (too long for a title)
-//            if (str.length() > 300) {
-//                continue;
-//            }
-//            // Rule 3: Title length and academic keywords (heuristic)
-//            int score = 0;
-//            score += str.length(); // Titles tend to be longer
-//            score += countAcademicKeywords(str); // Bonus for academic terms
-//
-//            if (score > maxScore) {
-//                maxScore = score;
-//                probableTitle = str;
-//            }
-//        }
-//
-//        return probableTitle;
-//    }
-
-    // Count common academic keywords
-//    private int countAcademicKeywords(String str) {
-//        List<String> keywords = Arrays.asList("study", "exploring", "research", "development", "design", "learning");
-//        int count = 0;
-//        for (String keyword : keywords) {
-//            if (str.toLowerCase().contains(keyword)) {
-//                count++;
-//            }
-//        }
-//        return count;
-//    }
-
-//    private List<String> buildMetaData(
-//            String author, String editor, String abstractT, String keywords, String title,
-//            String conference, String doi, String series, String volume, String number,
-//            String pages, String year, String publisher) {
-//        List<String> metadataList = new ArrayList<>();
-//        metadataList.add(author);
-//        metadataList.add(editor);
-//        metadataList.add(abstractT);
-//        metadataList.add(keywords);
-//        metadataList.add(title);
-//        metadataList.add(conference);
-//        metadataList.add(doi);
-//        metadataList.add(series);
-//        metadataList.add(volume);
-//        metadataList.add(number);
-//        metadataList.add(pages);
-//        metadataList.add(year);
-//        metadataList.add(publisher);
-//
-//        return metadataList;
-//    }
 
     // make this method package visible so we can test it
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByPosition) {
