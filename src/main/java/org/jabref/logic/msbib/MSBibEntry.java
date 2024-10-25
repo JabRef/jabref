@@ -58,8 +58,7 @@ class MSBibEntry {
     public String albumTitle;
     public String broadcastTitle;
     public String year;
-    public String
-            month;
+    public String month;
     public String day;
     public String number;
     public String patentNumber;

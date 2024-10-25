@@ -17,24 +17,10 @@ import org.jabref.model.strings.StringUtil;
 public class LangidEditorViewModel extends OptionEditorViewModel<Langid> {
     private BibDatabaseMode databaseMode;
 
-//    private final ObjectProperty<Langid> selectedLangidProperty = new SimpleObjectProperty<>();
     public LangidEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.databaseMode = databaseMode;
     }
-//
-//    public Langid getValue() {
-//        return selectedLangidProperty.get();
-//    }
-//
-//    public void setValue(Langid langid) {
-//        selectedLangidProperty.set(langid);
-//    }
-//
-//    // Optionally add a property getter
-//    public ObjectProperty<Langid> selectedLangidProperty() {
-//        return selectedLangidProperty;
-//    }
 
     @Override
     public StringConverter<Langid> getStringConverter() {

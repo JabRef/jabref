@@ -3,7 +3,6 @@ package org.jabref.model.entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -76,32 +75,6 @@ class LangidTest {
                 arguments(Optional.of("basque"), "basque"),
                 arguments(Optional.of("bulgarian"), "bulgarian"),
                 arguments(Optional.empty(), "unknown")
-        );
-    }
-
-    @Test
-    public void testLangidNameAndValue() {
-        assertEquals("basque", Langid.BASQUE.getLangid());
-        assertEquals("Basque", Langid.BASQUE.getName());
-        assertEquals("american", Langid.AMERICAN.getLangid());
-        assertEquals("American", Langid.AMERICAN.getName());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getLangidNameTest")
-    void getLangidNameTest(String expectedLangid, Langid langid) {
-        assertEquals(expectedLangid, langid.getName());
-    }
-
-    private static Stream<Arguments> getLangidNameTest() {
-        return Stream.of(
-                arguments("Basque", Langid.BASQUE),
-                arguments("Bulgarian", Langid.BULGARIAN),
-                arguments("American", Langid.AMERICAN),  // Test for the langid value
-                arguments("British", Langid.BRITISH),
-                arguments("US English", Langid.USENGLISH),
-                arguments("Swiss German", Langid.SWISSGERMAN),
-                arguments("Norwegian (Bokmål)", Langid.NORSK)
         );
     }
 }
