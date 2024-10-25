@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -38,8 +37,10 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * <p>
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
  * please see {@link BibliographyFromPdfImporter}.
+ * <p>
+ * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
-public class PdfContentImporter extends Importer {
+public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 
@@ -473,7 +474,7 @@ public class PdfContentImporter extends Importer {
                 pos = curString.indexOf(StandardField.DOI.getName());
             }
             if (pos >= 0) {
-                return DOI.findInText(curString).map(DOI::getDOI).orElse(null);
+                return DOI.findInText(curString).map(DOI::asString).orElse(null);
             }
         }
         return doi;

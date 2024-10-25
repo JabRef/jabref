@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 
 public class ISSNEditor extends HBox implements FieldEditorFX {
     @FXML private ISSNEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
     @FXML private Button journalInfoButton;
     @FXML private Button fetchInformationByIdentifierButton;
 
@@ -60,9 +60,9 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 stateManager,
                 preferences);
 
-        establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
-        textArea.initContextMenu(new DefaultMenu(textArea), keyBindingRepository);
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(new DefaultMenu(textField), keyBindingRepository);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public ISSNEditorViewModel getViewModel() {
@@ -82,7 +82,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void requestFocus() {
-        textArea.requestFocus();
+        textField.requestFocus();
     }
 
     @FXML

@@ -41,7 +41,6 @@ public class CLIMessageHandler implements RemoteMessageHandler {
                     message,
                     ArgumentProcessor.Mode.REMOTE_START,
                     preferences,
-                    preferences,
                     fileUpdateMonitor,
                     entryTypesManager);
             argumentProcessor.processArguments();

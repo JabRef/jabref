@@ -56,8 +56,10 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private void setSearchPane() {
         progressIndicator.setMaxSize(100, 100);
+
         citationsDisplay.basePathProperty().bindBidirectional(viewModel.directoryProperty());
         citationsDisplay.setItems(viewModel.getCitationList());
+        citationsDisplay.setOnMouseClicked(event -> viewModel.handleMouseClick(event, citationsDisplay));
 
         RowConstraints mainRow = new RowConstraints();
         mainRow.setVgrow(Priority.ALWAYS);
