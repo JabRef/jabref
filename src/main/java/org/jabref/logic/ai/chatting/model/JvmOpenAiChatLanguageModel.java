@@ -57,7 +57,6 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
                 .model(aiPreferences.getSelectedChatModel())
                 .temperature(aiPreferences.getTemperature())
                 .n(1)
-                .maxTokens(2048)
                 .messages(messages)
                 .build();
 

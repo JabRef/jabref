@@ -76,7 +76,9 @@ public class AiChatLogic {
         this.entries = entries;
         this.name = name;
         this.bibDatabaseContext = bibDatabaseContext;
+
         this.entries.addListener((ListChangeListener<BibEntry>) change -> rebuildChain());
+
         setupListeningToPreferencesChanges();
         rebuildFull(chatHistory);
     }
@@ -155,13 +157,18 @@ public class AiChatLogic {
 
     public AiMessage execute(UserMessage message) {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
+
         LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
                 aiPreferences.getAiProvider().getApiUrl(),
                 name.get(),
                 message.singleText());
+
         chatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         chatHistory.add(result);
+
+        LOGGER.debug("Message was answered by the AI provider for {}: {}", name.get(), result.text());
+
         return result;
     }
 

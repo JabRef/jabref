@@ -210,6 +210,7 @@ public class AiChatComponent extends VBox {
                         .onFailure(e -> {
                             LOGGER.error("Got an error while sending a message to AI", e);
                             setLoading(false);
+
                             // Typically, if user has entered an invalid API base URL, we get either "401 - null" or "404 - null" strings.
                             // Since there might be other strings returned from other API endpoints, we use startsWith() here.
                             if (e.getMessage().startsWith("404") || e.getMessage().startsWith("401")) {

@@ -40,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
+- We fixed an issue where the response from the local ai model is cuttoff. [#11870](https://github.com/JabRef/jabref/issues/11870)
 
 ### Changed
 
@@ -102,7 +103,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was not possible to select selecting content of other user's comments.[#11106](https://github.com/JabRef/jabref/issues/11106)
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
-- We fixed an issue where the response from the local ai model is cuttoff.[#11870](https://github.com/JabRef/jabref/issues/11870)
 
 ### Removed
 
