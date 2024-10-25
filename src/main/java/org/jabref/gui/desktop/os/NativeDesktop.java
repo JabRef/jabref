@@ -396,8 +396,8 @@ public abstract class NativeDesktop {
 
         try {
             Files.createDirectories(userDataDir);
-        } catch (IOException e) {
-            // Update this for more elegant error handling
+        } catch (IOException exception) {
+            LoggerFactory.getLogger(NativeDesktop.class).error("Failed to create Directories in getOtherDataDir()", exception);
         }
 
         return userDataDir;

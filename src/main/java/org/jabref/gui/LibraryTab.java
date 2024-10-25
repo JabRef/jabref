@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -45,7 +44,6 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -157,10 +155,6 @@ public class LibraryTab extends Tab {
 
     private SuggestionProviders suggestionProviders;
 
-    // Used to track how many views each attachment has.
-    private final Path viewStorePath = NativeDesktop.getOtherDataDir().resolve("tracking.mv");
-    private final ReentrantLock fileLock = new ReentrantLock();
-
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
@@ -180,6 +174,8 @@ public class LibraryTab extends Tab {
     private IndexManager indexManager;
 
     private final AiService aiService;
+
+    private final long ONE_HOUR_IN_MILLISECONDS = 3600000;
 
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
@@ -1223,11 +1219,11 @@ public class LibraryTab extends Tab {
             String uniqueKey = PopularityGroup.getUniqueKeyForEntry(entry);
             long lastViewTime = lastViewTimestamps.getOrDefault(uniqueKey, 0L);
 
-            if (currentTime - lastViewTime >= 3600000 && EntryTabViewModel.trackViewsProperty().get()) { // 3600000 milliseconds in one hour
+            if (currentTime - lastViewTime >= ONE_HOUR_IN_MILLISECONDS && EntryTabViewModel.trackViewsProperty().get()) {
                 int currentCount = viewCounts.getOrDefault(uniqueKey, 0);
                 viewCounts.put(uniqueKey, currentCount + 1);
                 lastViewTimestamps.put(uniqueKey, currentTime);
-                mvStore.commit(); // Save changes
+                mvStore.commit();
             }
         }
     }
