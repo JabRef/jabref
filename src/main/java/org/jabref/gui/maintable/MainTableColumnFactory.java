@@ -110,15 +110,9 @@ public class MainTableColumnFactory {
                 returnColumn = createLibraryColumn(column);
                 break;
             case EXTRAFILE:
-                String qualifier = column.getQualifier();
-                if (qualifier.isBlank()) {
-                    column.setQualifier("default-file-type");
-                } else {
-                    column.setQualifier(qualifier);
+                if (!column.getQualifier().isBlank()) {
+                    returnColumn = createExtraFileColumn(column);
                 }
-                LOGGER.info("EXTRAFILE column assigned with qualifier: {}", qualifier);
-
-                returnColumn = createExtraFileColumn(column);
                 break;
 
             case SPECIALFIELD:
