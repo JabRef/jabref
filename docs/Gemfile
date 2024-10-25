@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 
-gem "jekyll", "~> 4.3" # installed by `gem jekyll`
+gem "jekyll", "~> 4.3.4" # installed by `gem jekyll`
 
 # Homepage: https://github.com/paulrobertlloyd/jekyll-figure#jekyll-figure
 gem 'jekyll-figure'
 
-gem "just-the-docs", "0.5.0"
+gem "just-the-docs", "0.10.0"
 
 gem "jekyll-remote-theme"
 
