@@ -4,13 +4,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-//import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-//import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
 import org.jabref.gui.commonfxcontrols.FilenamePatternPanel;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
@@ -79,9 +77,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
         fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
 
-
-//        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
-//        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
@@ -98,7 +93,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     public void mainFileDirBrowse() {
         viewModel.mainFileDirBrowse();
     }
-
 
     @Override
     public void setValues() {

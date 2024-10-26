@@ -60,8 +60,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<FilenamePatternItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new FilenamePatternItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
-
-
     public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.filePreferences = preferences.getFilePreferences();
@@ -94,9 +92,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
-
-//        fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
-        //sure do not need any setvalue stuffs???
 
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
@@ -134,8 +129,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
-
-
 
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());

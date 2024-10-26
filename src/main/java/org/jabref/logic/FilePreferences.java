@@ -18,20 +18,12 @@ import org.jabref.model.strings.StringUtil;
  */
 public class FilePreferences {
 
-//    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
-
     private final StringProperty userAndHost = new SimpleStringProperty();
     private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
 
-
-
-//    private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final ObjectProperty<GlobalFilenamePattern> keyPatterns = new SimpleObjectProperty<>();
     private final String defaultPattern;
-
-
-
 
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
@@ -62,7 +54,6 @@ public class FilePreferences {
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
 
-//        this.fileNamePattern.setValue(fileNamePattern);
         this.keyPatterns.set(keyPatterns);
         this.defaultPattern = defaultPattern;
 
@@ -113,24 +104,9 @@ public class FilePreferences {
         this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
     }
 
-
-//    public String getFileNamePattern() {
-//        return fileNamePattern.get();
-//    }
-
     public GlobalFilenamePattern getFileNamePattern() {
         return keyPatterns.get();
     }
-
-
-//    public StringProperty fileNamePatternProperty() {
-//        return fileNamePattern;
-//    }
-//
-//    public void setFileNamePattern(String fileNamePattern) {
-//        this.fileNamePattern.set(fileNamePattern);
-//    }
-
 
     public GlobalFilenamePattern getFileNamePatternObj() {
         return keyPatterns.get();
