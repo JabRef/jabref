@@ -81,7 +81,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
@@ -105,6 +104,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 
@@ -209,6 +209,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
+    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
+    public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
@@ -434,6 +436,8 @@ public class JabRefCliPreferences implements CliPreferences {
         Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
+        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
@@ -665,8 +669,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @return Instance of JaRefPreferences
-     * @deprecated Use {@link CliPreferences} instead
+     * @deprecated Never ever add a call to this method. There should be only one caller.
+     *             All other usages should get the preferences passed (or injected).
+     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -1882,6 +1887,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         searchPreferences = new SearchPreferences(
                 getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
+                getBoolean(SEARCH_REG_EXP),
+                getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),

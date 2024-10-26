@@ -47,6 +47,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
@@ -171,21 +172,11 @@ public class EntryEditor extends BorderPane {
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                switch (event.getTransferMode()) {
-                    case COPY -> {
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case MOVE -> {
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case LINK -> {
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, draggedFiles);
-                    }
-                }
+                TransferMode transferMode = event.getTransferMode();
+                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+                // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
+                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                 success = true;
             }
 
@@ -276,21 +267,21 @@ public class EntryEditor extends BorderPane {
     private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        tabs.add(new PreviewTab(databaseContext, dialogService, preferences, themeManager, taskExecutor, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new PreviewTab(databaseContext, dialogService, preferences, themeManager, taskExecutor, libraryTab.searchQueryProperty()));
 
         // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferences, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new CommentsTab(preferences, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
         }
 
         tabs.add(new MathSciNetTab());

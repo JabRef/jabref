@@ -233,7 +233,8 @@ public class DOI implements Identifier {
      *
      * @return the plain DOI/Short DOI value.
      */
-    public String getDOI() {
+    @Override
+    public String asString() {
         return doi;
     }
 
@@ -285,11 +286,6 @@ public class DOI implements Identifier {
     @Override
     public Field getDefaultField() {
         return StandardField.DOI;
-    }
-
-    @Override
-    public String getNormalized() {
-        return doi;
     }
 
     /**
