@@ -143,8 +143,6 @@ public class PdfMergeMetadataImporter extends PdfImporter {
      * (Otherwise no path modification happens).
      *
      * @param filePath    The unrelativized {@code filePath}.
-     * @param context     Everything related to the BIB file
-     * @param preferences Preferences for linked files
      */
     public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences preferences) throws IOException {
         Objects.requireNonNull(context);
