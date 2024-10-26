@@ -310,6 +310,6 @@ public class RisImporter extends Importer {
 
   private void addDoi(Map<Field, String> hm, String val) {
       Optional<DOI> parsedDoi = DOI.parse(val);
-      parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.getDOI()));
+      parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.asString()));
   }
 }

@@ -1,5 +1,7 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -27,5 +29,10 @@ public class PushToWinEdt extends AbstractPushToApplication {
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath,
                 "\"[InsText('" + getCitePrefix() + keyString.replace("'", "''") + getCiteSuffix() + "');]\""};
+    }
+
+    @Override
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        return new String[] {commandPath, "\"[Open(|%s|);SelLine(%s,%s);]\"".formatted(fileName.toString(), line, column)};
     }
 }
