@@ -70,7 +70,7 @@ public class CleanupPresetPanel extends VBox {
 
         String currentPattern = Localization.lang("Filename format pattern")
                                             .concat(": ")
-                                            .concat(filePreferences.getFileNamePattern());
+                                            .concat(filePreferences.getFileNamePattern().toString());
         cleanupRenamePDFLabel.setText(currentPattern);
 
         cleanUpBibtex.selectedProperty().addListener(

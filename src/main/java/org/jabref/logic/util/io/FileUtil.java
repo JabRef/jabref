@@ -24,12 +24,14 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.filenameformatpatterns.GlobalFilenamePattern;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,14 +323,21 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, GlobalFilenamePattern fileNamePattern) {
+        EntryType entryType = entry.getType();
+
+        String pattern = fileNamePattern.getValue(entryType).stringRepresentation();
+
+        if (pattern == null || pattern.isEmpty()) {
+            pattern = fileNamePattern.getDefaultValue().stringRepresentation();
+        }
+
+        String targetName = BracketedPattern.expandBrackets(pattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
             targetName = entry.getCitationKey().orElse("default");
         }
 
-        // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
