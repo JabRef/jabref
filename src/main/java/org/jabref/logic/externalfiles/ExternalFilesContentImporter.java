@@ -19,9 +19,9 @@ public class ExternalFilesContentImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public ParserResult importPDFContent(Path file, BibDatabaseContext context, FilePreferences preferences) {
+    public ParserResult importPDFContent(Path file, BibDatabaseContext context, FilePreferences filePreferences) {
         try {
-            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, context, preferences);
+            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, context, filePreferences);
         } catch (IOException e) {
            return ParserResult.fromError(e);
         }

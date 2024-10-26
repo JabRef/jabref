@@ -144,11 +144,11 @@ public class PdfMergeMetadataImporter extends PdfImporter {
      *
      * @param filePath    The unrelativized {@code filePath}.
      */
-    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences preferences) throws IOException {
+    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
         Objects.requireNonNull(context);
-        Objects.requireNonNull(preferences);
+        Objects.requireNonNull(filePreferences);
 
-        List<Path> directories = context.getFileDirectories(preferences);
+        List<Path> directories = context.getFileDirectories(filePreferences);
 
         if (!directories.isEmpty()) {
             filePath = FileUtil.relativize(filePath, directories);
