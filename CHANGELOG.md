@@ -65,6 +65,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
+- When importing a file using "Find Unlinked Files", when one or more file directories are available, the file path will be relativized where possible [koppor#549](https://github.com/koppor/jabref/issues/549)
 
 ### Fixed
 
