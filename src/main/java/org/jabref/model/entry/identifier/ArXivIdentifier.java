@@ -119,7 +119,7 @@ public class ArXivIdentifier extends EprintIdentifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         if (StringUtil.isNotBlank(version)) {
             return identifier + "v" + version;
         } else {
@@ -127,14 +127,14 @@ public class ArXivIdentifier extends EprintIdentifier {
         }
     }
 
-    public String getNormalizedWithoutVersion() {
+    public String asStringWithoutVersion() {
         return identifier;
     }
 
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("https://arxiv.org/abs/" + getNormalized()));
+            return Optional.of(new URI("https://arxiv.org/abs/" + asString()));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
