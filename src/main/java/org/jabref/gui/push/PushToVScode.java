@@ -27,7 +27,7 @@ public class PushToVScode extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        // No idea to insert the citation to the open tex file in vscode
+        // TODO - Implementing this will fix https://github.com/JabRef/jabref/issues/6775
         return new String[] {commandPath};
     }
 
