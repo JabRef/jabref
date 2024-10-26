@@ -214,9 +214,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return defaultKeyPatternProperty;
     }
 
-
-
-
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPatternProperty;
     }
