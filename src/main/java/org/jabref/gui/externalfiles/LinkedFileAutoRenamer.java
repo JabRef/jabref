@@ -2,11 +2,13 @@ package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -46,12 +48,20 @@ public class LinkedFileAutoRenamer {
             return;
         }
 
-        Set<String> patternFields = FileNameParser.parseFields(fileNamePattern);
+        Set<String> patternFields = new HashSet<>();
+
+        BracketedPattern.expandBrackets(fileNamePattern, bracket -> {
+            List<String> fieldParts = BracketedPattern.parseFieldAndModifiers(bracket);
+            String fieldName = fieldParts.getFirst();
+            patternFields.add(fieldName);
+            return "";
+        });
+
         LOGGER.debug("Parsed pattern fields: {}", patternFields);
 
         boolean relevantFieldChanged = false;
 
-        if (patternFields.contains("bibtexkey") && changedField.getName().equals(InternalField.KEY_FIELD.getName())) {
+        if (patternFields.contains("bibtexkey") && changedField.equals(InternalField.KEY_FIELD)) {
             relevantFieldChanged = true;
             LOGGER.debug("Changed field '{}' is part of the pattern.", changedField.getName());
         }
@@ -89,8 +99,7 @@ public class LinkedFileAutoRenamer {
                         LOGGER.debug("Updated entry files after renaming.");
                     });
                 }
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 LOGGER.error("Failed to rename file '{}' to '{}'", linkedFile.getLink(), fileNamePattern, e);
             }
         }
