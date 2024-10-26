@@ -491,12 +491,12 @@ class FileUtilTest {
             "''                             , thisisatestfile.pdf                 , -5",
             "''                             , thisisatestfile.pdf                 ,  0",
             "...                            , thisisatestfile.pdf                 ,  3",
-            "...                            , thisisatestfile.pdf                 ,  5",
+            "th...                          , thisisatestfile.pdf                 ,  5",
             "th...e.pdf                     , thisisatestfile.pdf                 , 10",
             "thisisatestfile.pdf            , thisisatestfile.pdf                 , 20",
-            "...                            , longfilename.extremelylongextension ,  5",
-            "...                            , longfilename.extremelylongextension , 10",
-            "...                            , longfilename.extremelylongextension , 20",
+            "lo...                          , longfilename.extremelylongextension ,  5",
+            "longfil...                     , longfilename.extremelylongextension , 10",
+            "longfilename.extr...           , longfilename.extremelylongextension , 20",
             "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
     })
     void shortenFileName(String expected, String fileName, Integer maxLength) {

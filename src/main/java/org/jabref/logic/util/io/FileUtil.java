@@ -554,7 +554,7 @@ public class FileUtil {
 
         int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
         if (maxLength <= totalNeededLength) {
-            return ELLIPSIS;
+            return fileName.substring(0, maxLength - ELLIPSIS_LENGTH) + ELLIPSIS;
         }
 
         int charsForName = maxLength - totalNeededLength;
