@@ -22,6 +22,7 @@ public class ImporterPreferences {
     private final BooleanProperty importerEnabled;
     private final BooleanProperty generateNewKeyOnImport;
     private final BooleanProperty warnAboutDuplicatesOnImport;
+    private final BooleanProperty autoAbbreviateJournals;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final Map<String, String> defaultApiKeys;
@@ -34,6 +35,7 @@ public class ImporterPreferences {
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
+                               boolean autoAbbreviateJournals,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
                                Map<String, String> defaultApiKeys,
@@ -45,6 +47,7 @@ public class ImporterPreferences {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+        this.autoAbbreviateJournals = new SimpleBooleanProperty(autoAbbreviateJournals);
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.defaultApiKeys = defaultApiKeys;
@@ -99,6 +102,18 @@ public class ImporterPreferences {
 
     public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
         this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
+    }
+
+    public boolean shouldAutoAbbreviateJournals() {
+        return autoAbbreviateJournals.get();
+    }
+
+    public BooleanProperty autoAbbreviateJournalsProperty() {
+        return autoAbbreviateJournals;
+    }
+
+    public void setAutoAbbreviateJournals(boolean autoAbbreviateJournals) {
+        this.autoAbbreviateJournals.set(autoAbbreviateJournals);
     }
 
     public ObservableSet<FetcherApiKey> getApiKeys() {

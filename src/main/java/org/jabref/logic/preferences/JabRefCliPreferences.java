@@ -219,6 +219,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
+    public static final String AUTO_ABBREVIATE_JOURNALS = "autoAbbreviateJournals";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
     public static final String GROBID_URL = "grobidURL";
@@ -448,6 +449,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+        defaults.put(AUTO_ABBREVIATE_JOURNALS, Boolean.FALSE);
 
         // region: Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
@@ -2001,6 +2003,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(AUTO_ABBREVIATE_JOURNALS),
                 getCustomImportFormats(),
                 getFetcherKeys(),
                 getDefaultFetcherKeys(),
@@ -2013,6 +2016,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(importerPreferences.autoAbbreviateJournalsProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ABBREVIATE_JOURNALS, newValue));
         EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));

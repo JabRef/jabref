@@ -39,6 +39,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBibtex;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private CheckBox cleanUpAbbreviateJournal;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -97,6 +98,12 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
                     }
                 });
+        cleanUpAbbreviateJournal.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpAbbreviateJournal.selectedProperty().setValue(false);
+                    }
+                });
         updateDisplay(cleanupPreferences);
     }
 
@@ -118,6 +125,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
+        cleanUpAbbreviateJournal.setSelected(preset.isActive(CleanupPreferences.CleanupStep.ABBREVIATE_JOURNAL));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
@@ -167,6 +175,9 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpTimestampToModificationDate.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
+        }
+        if (cleanUpAbbreviateJournal.isSelected()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_JOURNAL);
         }
 
         activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);

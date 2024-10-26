@@ -44,6 +44,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldkeepDownloadUrl = new SimpleBooleanProperty();
+    private final BooleanProperty autoAbbreviateJournalsProperty = new SimpleBooleanProperty();
 
     private final ListProperty<PlainCitationParserChoice> plainCitationParsers =
             new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
@@ -130,6 +131,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
+        autoAbbreviateJournalsProperty.setValue(importerPreferences.shouldAutoAbbreviateJournals());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
@@ -162,6 +164,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
+        importerPreferences.setAutoAbbreviateJournals(autoAbbreviateJournalsProperty.getValue());
         importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
@@ -226,6 +229,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty warnAboutDuplicatesOnImportProperty() {
         return warnAboutDuplicatesOnImportProperty;
+    }
+
+    public BooleanProperty autoAbbreviateJournalsProperty() {
+        return autoAbbreviateJournalsProperty;
     }
 
     public BooleanProperty shouldDownloadLinkedOnlineFiles() {

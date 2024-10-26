@@ -34,6 +34,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
+    @FXML private CheckBox autoAbbreviateJournals;
     @FXML private ComboBox<PlainCitationParserChoice> defaultPlainCitationParser;
 
     @FXML private CheckBox useCustomDOI;
@@ -77,6 +78,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
         keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
+        autoAbbreviateJournals.selectedProperty().bindBidirectional(viewModel.autoAbbreviateJournalsProperty());
 
         new ViewModelListCellFactory<PlainCitationParserChoice>()
                 .withText(PlainCitationParserChoice::getLocalizedName)

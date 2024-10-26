@@ -1,5 +1,7 @@
 package org.jabref.logic.importer;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
@@ -21,5 +23,7 @@ public interface ParserFetcher {
      */
     default void doPostCleanup(BibEntry entry) {
         // Do nothing by default
+        new DoiCleanup().cleanup(entry);
+        new AbbreviateJournalCleanup().cleanup(entry);
     }
 }

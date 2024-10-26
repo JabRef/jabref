@@ -100,6 +100,7 @@ public class CleanupPreferences {
         DO_NOT_CONVERT_TIMESTAMP,
         MOVE_PDF,
         FIX_FILE_LINKS,
-        CLEAN_UP_ISSN
+        CLEAN_UP_ISSN,
+        ABBREVIATE_JOURNAL
     }
 }

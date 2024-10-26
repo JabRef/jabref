@@ -25,6 +25,7 @@
          <CheckBox fx:id="cleanUpBibtex" text="%Convert to BibTeX format (e.g., store publication date in year and month fields)" />
          <CheckBox fx:id="cleanUpTimestampToCreationDate" text="%Convert timestamp field to field 'creationdate'" />
          <CheckBox fx:id="cleanUpTimestampToModificationDate" text="%Convert timestamp field to field 'modificationdate'" />
+          <CheckBox fx:id="cleanUpAbbreviateJournal" text="%Automatically abbreviate journal names" />
       </VBox>
 
       <Label text="%File-related" />
