@@ -151,10 +151,6 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         Objects.requireNonNull(preferences);
 
         List<Path> directories = context.getFileDirectories(preferences);
-        // DEBUG
-        System.out.println(directories);
-        System.out.println(context.getDatabase().getEntries());
-        System.out.println(preferences.getWorkingDirectory());
 
         if (!directories.isEmpty()) {
             filePath = FileUtil.relativize(filePath, directories);
