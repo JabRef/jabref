@@ -1,6 +1,5 @@
 package org.jabref.model.entry.field;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,13 +27,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FieldEditorTextAreaTest {
+public class FieldEditorsMultilinePropertyTest {
 
     private static final Pattern FIELD_PROPERTY_PATTERN = Pattern.compile("fieldProperties\\.contains\\s*\\(\\s*FieldProperty\\.(\\w+)\\s*\\)");
     private static final Pattern STANDARD_FIELD_PATTERN = Pattern.compile("==\\s*StandardField\\.(\\w+)");
     private static final Pattern INTERNAL_FIELD_PATTERN = Pattern.compile("==\\s*InternalField\\.(\\w+)");
     private static JavaParser PARSER;
-    private static final Logger LOGGER = Logger.getLogger(FieldEditorTextAreaTest.class.getName());
 
     @BeforeAll
     public static void setUp() {
@@ -46,6 +42,7 @@ public class FieldEditorTextAreaTest {
     }
 
     /**
+     *
      * This test performs the following steps:
      * 1. Use Java parser to parse FieldEditors.java and check all if statements in the getForField method.
      * 2. Match the conditions of if statements to extract the field properties.
@@ -55,20 +52,22 @@ public class FieldEditorTextAreaTest {
      * 4. For every class in the map, when its properties contain MULTILINE_TEXT, check whether it:
      * a) Holds a TextInputControl field
      * b) Has an EditorTextArea object creation
+     *
      */
     @Test
-    public void fieldEditorTextAreaTest() throws IOException {
-        // get all field editors and their properties in FieldEditors.java
+    public void fieldEditorsMatchMultilineProperty() throws Exception {
         Map<Path, List<FieldProperty>> result = getEditorsWithPropertiesInFieldEditors();
         for (Map.Entry<Path, List<FieldProperty>> entry : result.entrySet()) {
             // now we have the file path and its properties, going to analyze the target Editor class
             Path filePath = entry.getKey();
             List<FieldProperty> properties = entry.getValue();
-
-            CompilationUnit cu = PARSER.parse(filePath).getResult().orElse(null);
-            if (cu == null) {
-                throw new RuntimeException("Failed to analyze " + filePath);
-            }
+            CompilationUnit cu = PARSER.parse(filePath)
+                                       .getResult()
+                                       .orElseThrow(() ->
+                                               new NullPointerException("Failed to parse "
+                                                       + filePath
+                                                       + ", java parser returned null CompilationUnit"
+                                                       + ", please check if the file exists"));
 
             if (!implementedFieldEditorFX(cu)) {
                 continue; // make sure the class implements FieldEditorFX interface
@@ -88,95 +87,73 @@ public class FieldEditorTextAreaTest {
      *
      * @return a map of field editor file path and its properties
      */
-    private static Map<Path, List<FieldProperty>> getEditorsWithPropertiesInFieldEditors() {
+    private static Map<Path, List<FieldProperty>> getEditorsWithPropertiesInFieldEditors() throws Exception {
         final String filePath = "src/main/java/org/jabref/gui/fieldeditors/FieldEditors.java";
         Map<Path, List<FieldProperty>> result = new HashMap<>();
+        CompilationUnit cu = PARSER.parse(Paths.get(filePath))
+                                   .getResult()
+                                   .orElseThrow(() ->
+                                           new NullPointerException("Failed to parse FieldEditors.java"));
 
-        try {
-            CompilationUnit cu = PARSER.parse(Paths.get(filePath)).getResult().orElse(null);
-            if (cu == null) {
-                throw new RuntimeException("Failed to analyze FieldEditors.java");
+        // locate getForField method in FieldEditors.java
+        MethodDeclaration getForFieldCall = cu.findAll(MethodDeclaration.class).stream()
+                .filter(methodDeclaration -> "getForField".equals(methodDeclaration.getNameAsString()))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Failed to find getForField method in FieldEditors.java"));
+
+        // analyze all if statements in getForField method
+        getForFieldCall.findAll(IfStmt.class).forEach(ifStmt -> {
+            String condition = ifStmt.getCondition().toString();
+            List<FieldProperty> properties = new ArrayList<>();
+            // match `fieldProperties.contains(FieldProperty.XXX)`
+            Matcher propertyMatcher = FIELD_PROPERTY_PATTERN.matcher(condition);
+            while (propertyMatcher.find()) {
+                String propertyName = propertyMatcher.group(1);
+                FieldProperty property = FieldProperty.valueOf(propertyName);
+                properties.add(property);
+            }
+            // match `== StandardField.XXX`
+            Matcher standardFieldMatcher = STANDARD_FIELD_PATTERN.matcher(condition);
+            if (standardFieldMatcher.find()) {
+                String fieldName = standardFieldMatcher.group(1);
+                StandardField standardField = StandardField.valueOf(fieldName);
+                properties.addAll(standardField.getProperties());
+            }
+            // match `== InternalField.XXX`
+            Matcher internalFieldMatcher = INTERNAL_FIELD_PATTERN.matcher(condition);
+            if (internalFieldMatcher.find()) {
+                String fieldName = internalFieldMatcher.group(1);
+                InternalField internalField = InternalField.valueOf(fieldName);
+                properties.addAll(internalField.getProperties());
             }
 
-            // locate getForField method in FieldEditors.java
-            MethodDeclaration getForFieldCall = cu.findAll(MethodDeclaration.class).stream()
-                    .filter(methodDeclaration -> "getForField".equals(methodDeclaration.getNameAsString()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Failed to find getForField method in FieldEditors.java"));
-
-            // analyze all if statements in getForField method
-            getForFieldCall.findAll(IfStmt.class).forEach(ifStmt -> {
-                String condition = ifStmt.getCondition().toString();
-                List<FieldProperty> properties = new ArrayList<>();
-                // match `fieldProperties.contains(FieldProperty.XXX)`
-                Matcher propertyMatcher = FIELD_PROPERTY_PATTERN.matcher(condition);
-                while (propertyMatcher.find()) {
-                    String propertyName = propertyMatcher.group(1);
-                    try {
-                        FieldProperty property = FieldProperty.valueOf(propertyName);
-                        properties.add(property);
-                    } catch (IllegalArgumentException e) {
-                        LOGGER.warning("Unknown FieldProperty: " + propertyName);
-                    }
-                }
-                // match `== StandardField.XXX`
-                Matcher standardFieldMatcher = STANDARD_FIELD_PATTERN.matcher(condition);
-                if (standardFieldMatcher.find()) {
-                    String fieldName = standardFieldMatcher.group(1);
-                    try {
-                        StandardField standardField = StandardField.valueOf(fieldName);
-                        properties.addAll(standardField.getProperties());
-                    } catch (IllegalArgumentException e) {
-                        LOGGER.warning("Unknown StandardField: " + fieldName);
-                    }
-                }
-                // match `== InternalField.XXX`
-                Matcher internalFieldMatcher = INTERNAL_FIELD_PATTERN.matcher(condition);
-                if (internalFieldMatcher.find()) {
-                    String fieldName = internalFieldMatcher.group(1);
-                    try {
-                        InternalField internalField = InternalField.valueOf(fieldName);
-                        properties.addAll(internalField.getProperties());
-                    } catch (IllegalArgumentException e) {
-                        LOGGER.warning("Unknown InternalField: " + fieldName);
-                    }
-                }
-
-                // get this if statement's return statement
-                ReturnStmt returnStatement = ifStmt.getThenStmt().stream()
-                        .filter(ReturnStmt.class::isInstance)
-                        .map(ReturnStmt.class::cast)
-                        .findFirst()
-                        .orElse(null);
-                if (returnStatement != null) {
-                    // get the creation expression in the return statement
-                    ObjectCreationExpr creationExpr = returnStatement.stream()
+            // check if the return statement contains an object creation
+            // if so, extract the created class name and its path
+            ifStmt.getThenStmt().stream()
+                  .filter(ReturnStmt.class::isInstance)
+                  .map(ReturnStmt.class::cast)
+                  .findFirst()
+                  .flatMap(returnStmt ->
+                        // try to find the object creation in the return statement
+                        returnStmt.stream()
                             .filter(ObjectCreationExpr.class::isInstance)
                             .map(ObjectCreationExpr.class::cast)
-                            .findFirst()
-                            .orElse(null);
-                    if (creationExpr != null) {
-                        // get the created class name
-                        String createdClassName = creationExpr.getTypeAsString().replace("<>", "");
-                        // get the exact java file path from import statement
-                        cu.findAll(ImportDeclaration.class)
-                                .stream()
-                                .filter(importDeclaration -> importDeclaration.getNameAsString().endsWith(createdClassName))
-                                .findFirst()
-                                .ifPresentOrElse(importDeclaration -> {
-                                    String classPath = importDeclaration.getNameAsString();
-                                    Path classFilePath = Paths.get("src/main/java/" + classPath.replace(".", "/") + ".java");
-                                    result.put(classFilePath, properties);
-                                }, () -> {
-                                    Path classFilePath = Paths.get("src/main/java/org/jabref/gui/fieldeditors/" + createdClassName + ".java");
-                                    result.put(classFilePath, properties);
-                                });
-                    }
-                }
-            });
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error parsing file: " + filePath, e);
-        }
+                            .findFirst()).ifPresent(creationExpr -> {
+                                String createdClassName = creationExpr.getTypeAsString().replace("<>", "");
+                                cu.findAll(ImportDeclaration.class)
+                                    .stream()
+                                    .filter(importDeclaration -> importDeclaration.getNameAsString().endsWith(createdClassName))
+                                    .findFirst()
+                                    .ifPresentOrElse(importDeclaration -> {
+                                        String classPath = importDeclaration.getNameAsString();
+                                        Path classFilePath = Paths.get("src/main/java/" + classPath.replace(".", "/") + ".java");
+                                        result.put(classFilePath, properties);
+                                    }, () -> {
+                                        Path classFilePath = Paths.get("src/main/java/org/jabref/gui/fieldeditors/" + createdClassName + ".java");
+                                        result.put(classFilePath, properties);
+                                    });
+                            });
+        });
 
         return result;
     }
