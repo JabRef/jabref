@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.filenameformatpatterns.FilenameFormatPattern;
+import org.jabref.logic.filenameformatpatterns.GlobalFilenamePattern;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -74,81 +76,89 @@ class FileUtilTest {
     @Test
     void getLinkedFileNameDefaultFullTitle() {
         String fileNamePattern = "[citationkey] - [fulltitle]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameDefaultWithLowercaseTitle() {
         String fileNamePattern = "[citationkey] - [title:lower]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameBibTeXKey() {
         String fileNamePattern = "[citationkey]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameNoPattern() {
         String fileNamePattern = "";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getDefaultFileNameNoPatternNoBibTeXKey() {
         String fileNamePattern = "";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameGetKeyIfEmptyField() {
         String fileNamePattern = "[title]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
         String fileNamePattern = "[title]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
 
-        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
     void getLinkedFileNameByYearAuthorFirstpage() {
         String fileNamePattern = "[year]_[auth]_[firstpage]";
+        GlobalFilenamePattern fileNamePatternobj = new GlobalFilenamePattern(new FilenameFormatPattern(fileNamePattern));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "O. Kitsune");
         entry.setField(StandardField.YEAR, "1868");
         entry.setField(StandardField.PAGES, "567-579");
 
-        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
     }
 
     @Test
@@ -477,4 +487,31 @@ class FileUtilTest {
     void illegalPaths(String fileName) {
         assertTrue(FileUtil.detectBadFileName(fileName));
     }
+
+//    @Test
+//    void getLinkedFileNameForArticle() {
+//        String articlePattern = "[auth][title]";
+//        EntryType articleType = EntryTypeFactory.parse("article");
+//        EntryType bookType = EntryTypeFactory.parse("book");
+//
+//        GlobalFilenamePattern fileNamePatternobj = GlobalFilenamePattern.fromPattern(articlePattern);
+//
+//        BibEntry entry = new BibEntry(articleType);
+//        entry.setCitationKey("Doe2023");
+//        entry.setField(StandardField.AUTHOR, "John Doe");
+//        entry.setField(StandardField.YEAR, "2023");
+//        entry.setField(StandardField.TITLE, "Understanding AI");
+//
+//        BibEntry entry2 = new BibEntry(bookType);
+//        entry2.setCitationKey("LI2024");
+//        entry2.setField(StandardField.AUTHOR, "Nathan Li");
+//        entry2.setField(StandardField.YEAR, "2024");
+//        entry2.setField(StandardField.TITLE, "Understanding ML");
+//
+//        assertEquals("DoeUnderstanding AI",
+//                FileUtil.createFileNameFromPattern(null, entry, fileNamePatternobj));
+//
+//        assertEquals("Li2024Understanding ML",
+//                FileUtil.createFileNameFromPattern(null, entry2, fileNamePatternobj));
+//    }
 }

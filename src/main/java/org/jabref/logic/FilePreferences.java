@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.filenameformatpatterns.GlobalFilenamePattern;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -17,12 +18,13 @@ import org.jabref.model.strings.StringUtil;
  */
 public class FilePreferences {
 
-    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
-
     private final StringProperty userAndHost = new SimpleStringProperty();
     private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
-    private final StringProperty fileNamePattern = new SimpleStringProperty();
+
+    private final ObjectProperty<GlobalFilenamePattern> keyPatterns = new SimpleObjectProperty<>();
+    private final String defaultPattern;
+
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
@@ -36,7 +38,7 @@ public class FilePreferences {
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
-                           String fileNamePattern,
+//                           String fileNamePattern,
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
@@ -45,11 +47,16 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean shouldKeepDownloadUrl) {
+                           boolean shouldKeepDownloadUrl,
+                           GlobalFilenamePattern keyPatterns,
+                           String defaultPattern) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
-        this.fileNamePattern.setValue(fileNamePattern);
+
+        this.keyPatterns.set(keyPatterns);
+        this.defaultPattern = defaultPattern;
+
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
@@ -97,16 +104,20 @@ public class FilePreferences {
         this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
     }
 
-    public String getFileNamePattern() {
-        return fileNamePattern.get();
+    public GlobalFilenamePattern getFileNamePattern() {
+        return keyPatterns.get();
     }
 
-    public StringProperty fileNamePatternProperty() {
-        return fileNamePattern;
+    public GlobalFilenamePattern getFileNamePatternObj() {
+        return keyPatterns.get();
     }
 
-    public void setFileNamePattern(String fileNamePattern) {
-        this.fileNamePattern.set(fileNamePattern);
+    public ObjectProperty<GlobalFilenamePattern> fileNamePatternProperty() {
+        return keyPatterns;
+    }
+
+    public void setFileNamePattern(GlobalFilenamePattern fileNamePattern) {
+        this.keyPatterns.set(fileNamePattern);
     }
 
     public String getFileDirectoryPattern() {
@@ -215,5 +226,9 @@ public class FilePreferences {
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
+    }
+
+    public String getDefaultPattern() {
+        return defaultPattern;
     }
 }
