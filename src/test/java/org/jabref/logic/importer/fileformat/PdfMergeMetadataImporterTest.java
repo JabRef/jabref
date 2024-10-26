@@ -98,10 +98,8 @@ class PdfMergeMetadataImporterTest {
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
         preferences.setWorkingDirectory(directory);
 
-        // Set up results
         List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
 
-        // Set up expected value
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
                 .withField(StandardField.TITLE, "Hello World")
