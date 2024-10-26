@@ -20,6 +20,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,25 @@ public class AutoSetFileLinksUtil {
         this.filePreferences = filePreferences;
     }
 
+    private void relinkFiles(List<LinkedFile> linkedFiles, BibEntry entry) {
+        if (linkedFiles.size() != 2) {
+            return;
+        }
+        if (linkedFiles.get(0).isOnlineLink() || linkedFiles.get(1).isOnlineLink()) {
+            return;
+        }
+        List<Optional<Path>> absolutePath = new ArrayList<>();
+        for (LinkedFile file : linkedFiles) {
+            Optional<Path> path = file.findIn(directories);
+            if (path.isPresent()) {
+                absolutePath.add(path);
+            }
+        }
+        if (absolutePath.size() == 1) {
+            entry.setField(StandardField.FILE, String.valueOf(absolutePath.get(0)));
+        }
+    }
+
     public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<LinkedFile, BibEntry> onAddLinkedFile) {
         LinkFilesResult result = new LinkFilesResult();
 
@@ -85,6 +105,8 @@ public class AutoSetFileLinksUtil {
                 // store undo information
                 onAddLinkedFile.accept(linkedFile, entry);
             }
+
+            relinkFiles(linkedFiles, entry);
 
             result.addBibEntry(entry);
         }
