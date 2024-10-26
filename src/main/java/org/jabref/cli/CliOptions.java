@@ -187,7 +187,6 @@ public class CliOptions {
         return commandLine.getOptionValue("check-consistency-output-format", "TXT");
     }
 
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     private static Options getOptions() {
         Options options = new Options();
 
