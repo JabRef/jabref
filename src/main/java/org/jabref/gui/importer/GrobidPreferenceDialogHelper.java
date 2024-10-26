@@ -25,8 +25,8 @@ public class GrobidPreferenceDialogHelper {
         boolean grobidEnabled = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remote services"),
                 Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."),
-                Localization.lang("Yes"),
-                Localization.lang("No"));
+                Localization.lang("Send to Grobid"),
+                Localization.lang("Do not send"));
         preferences.setGrobidPreference(true);
         preferences.setGrobidEnabled(grobidEnabled);
         return grobidEnabled;
