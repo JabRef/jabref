@@ -136,6 +136,33 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return new ParserResult(List.of(entry));
     }
 
+    /**
+     * A modified version of {@link PdfMergeMetadataImporter#importDatabase(Path)}, but it
+     * relativizes the {@code filePath} if there are working directories before parsing it
+     * into {@link PdfMergeMetadataImporter#importDatabase}
+     * (Otherwise no path modification happens).
+     *
+     * @param filePath    The unrelativized {@code filePath}.
+     * @param context     Everything related to the BIB file
+     * @param preferences Preferences for linked files
+     */
+    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences preferences) throws IOException {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(preferences);
+
+        List<Path> directories = context.getFileDirectories(preferences);
+        // DEBUG
+        System.out.println(directories);
+        System.out.println(context.getDatabase().getEntries());
+        System.out.println(preferences.getWorkingDirectory());
+
+        if (!directories.isEmpty()) {
+            filePath = FileUtil.relativize(filePath, directories);
+        }
+
+        return importDatabase(filePath);
+    }
+
     @Override
     public String getName() {
         return "PDF meta data merger";

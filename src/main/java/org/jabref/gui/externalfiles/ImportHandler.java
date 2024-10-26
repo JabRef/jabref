@@ -118,7 +118,7 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            var pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {

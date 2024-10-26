@@ -6,9 +6,11 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -83,5 +85,29 @@ class PdfMergeMetadataImporterTest {
         expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
         assertEquals(Collections.singletonList(expected), result);
+    }
+
+    @Test
+    void importRelativizesFilePath() throws Exception {
+        // Initialize database and preferences
+        FilePreferences preferences = mock(FilePreferences.class);
+        BibDatabaseContext database = new BibDatabaseContext();
+
+        // Initialize file and working directory
+        Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
+        preferences.setWorkingDirectory(directory);
+
+        // Set up results
+        List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
+
+        // Set up expected value
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "1 ")
+                .withField(StandardField.TITLE, "Hello World")
+                // Expecting relative path
+                .withField(StandardField.FILE, ":minimal.pdf:PDF");
+
+        assertEquals(List.of(expected), result);
     }
 }
