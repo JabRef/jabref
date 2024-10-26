@@ -132,8 +132,8 @@ public class EntryEditor extends BorderPane {
         this.redoAction = redoAction;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                       .root(this)
+                       .load();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), databaseContext, dialogService);
