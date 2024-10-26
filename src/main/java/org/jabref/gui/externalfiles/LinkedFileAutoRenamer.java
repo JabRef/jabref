@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -76,13 +77,21 @@ public class LinkedFileAutoRenamer {
         List<LinkedFile> linkedFiles = entry.getFiles();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            boolean renamed = FileUtil.renameLinkedFile(linkedFile, entry, fileNamePattern, fileDirectories, preferences.getFilePreferences(), bibDatabaseContext);
+            try {
+                String newFileName = FileUtil.createFileNameFromPattern(bibDatabaseContext.getDatabase(), entry, fileNamePattern);
+                LOGGER.debug("Generated new file name: '{}'", newFileName);
 
-            if (renamed) {
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                    entry.setFiles(linkedFiles);
-                    LOGGER.debug("Updated entry files after renaming.");
-                });
+                boolean renamed = FileUtil.renameLinkedFileToName(linkedFile, entry, newFileName, false, bibDatabaseContext, fileDirectories, preferences.getFilePreferences());
+
+                if (renamed) {
+                    UiTaskExecutor.runInJavaFXThread(() -> {
+                        entry.setFiles(linkedFiles);
+                        LOGGER.debug("Updated entry files after renaming.");
+                    });
+                }
+            } catch (
+                    IOException e) {
+                LOGGER.error("Failed to rename file '{}' to '{}'", linkedFile.getLink(), fileNamePattern, e);
             }
         }
     }

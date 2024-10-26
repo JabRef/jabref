@@ -3,7 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -155,47 +155,8 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
-        Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
-        if (oldFile.isEmpty()) {
-            return false;
-        }
-
-        final Path oldPath = oldFile.get();
-        Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
-        Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
-
-        Path newPath;
-        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
-            newPath = oldPath.resolveSibling(targetFileName);
-        } else {
-            assert oldExtension.isPresent() && newExtension.isEmpty();
-            newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
-        }
-
-        String expandedOldFilePath = oldPath.toString();
-        boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                && !newPath.toString().equals(expandedOldFilePath);
-
-        // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
-        // nonetheless rename files to a new name which just differs by case.
-        if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
-            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
-            return false;
-        }
-
-        if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
-            Files.createDirectories(newPath.getParent());
-            LOGGER.debug("Overwriting existing file {}", newPath);
-            Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
-        } else {
-            Files.createDirectories(newPath.getParent());
-            Files.move(oldPath, newPath);
-        }
-
-        // Update path
-        linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
-
-        return true;
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+        return FileUtil.renameLinkedFileToName(linkedFile, entry, targetFileName, overwriteExistingFile, databaseContext, fileDirectories, filePreferences);
     }
 
     public String getSuggestedFileName() {
