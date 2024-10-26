@@ -177,6 +177,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
+        // The listener createMultilinePropertyListener updates all fields with the same name in all entry types otherwise multiline property is not updated
         fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
