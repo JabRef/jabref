@@ -20,6 +20,7 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
+import org.jabref.model.ai.AiProvider;
 
 /**
  * Wrapper around langchain4j chat language model.
@@ -54,7 +55,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      */
     private void rebuild() {
         String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());
-        if (!aiPreferences.getEnableAi() || apiKey.isEmpty()) {
+        if (!aiPreferences.getEnableAi() || (apiKey.isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL)) {
             langchainChatModel = Optional.empty();
             return;
         }
@@ -133,7 +134,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
+            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set an API key inside JabRef preferences (AI tab)."));
             } else {
                 rebuild();
