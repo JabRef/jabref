@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
@@ -20,7 +21,6 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
-import org.jabref.model.ai.AiProvider;
 
 /**
  * Wrapper around langchain4j chat language model.
