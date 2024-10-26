@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public class BibDatabaseContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseContext.class);
+    private static int NUMBER_OF_UNSAVED_LIBRARIES = 0;
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -144,7 +145,7 @@ public class BibDatabaseContext {
      * <ol>
      * <li>next to the .bib file.</li>
      * <li>the preferences can specify a default one.</li>
-     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a library-specific directory.</li>
      * <li>the database's metadata can specify a user-specific directory.</li>
      * </ol>
      * <p>
@@ -165,12 +166,12 @@ public class BibDatabaseContext {
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
-        generalFileDirectory.ifPresent(fileDirs::add);
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
-        //   2) no general file directory is set (in the metadata of the bib file)
+        //   2) no library-specific file directory is set (in the metadata of the bib file)
 
         // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -272,6 +273,14 @@ public class BibDatabaseContext {
         indexPath = appData.resolve("unsaved");
         LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
+    }
+
+    public String getUniqueName() {
+        if (getDatabasePath().isPresent()) {
+            Path databasePath = getDatabasePath().get();
+            return BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+        }
+        return "unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++;
     }
 
     @Override

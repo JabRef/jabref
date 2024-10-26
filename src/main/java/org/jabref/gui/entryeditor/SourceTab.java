@@ -3,11 +3,10 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -42,15 +41,16 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
+import org.jabref.logic.search.retrieval.Highlighter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.Range;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -63,6 +63,8 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
+    private static final String TEXT_STYLE = "text";
+    private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
@@ -73,29 +75,10 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
-
-    private class EditAction extends SimpleCommand {
-
-        private final StandardActions command;
-
-        public EditAction(StandardActions command) {
-            this.command = command;
-        }
-
-        @Override
-        public void execute() {
-            switch (command) {
-                case COPY -> codeArea.copy();
-                case CUT -> codeArea.cut();
-                case PASTE -> codeArea.paste();
-                case SELECT_ALL -> codeArea.selectAll();
-            }
-            codeArea.requestFocus();
-        }
-    }
 
     public SourceTab(BibDatabaseContext bibDatabaseContext,
                      CountingUndoManager undoManager,
@@ -117,33 +100,57 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
-
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            highlightSearchPattern();
-        });
+        this.searchQueryProperty = searchQueryProperty;
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
     }
 
     private void highlightSearchPattern() {
-        if (codeArea != null) {
-            codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            if (searchHighlightPattern.isPresent()) {
-                Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
-                while (matcher.find()) {
-                    for (int i = 0; i <= matcher.groupCount(); i++) {
-                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
-                    }
-                }
+        if (codeArea == null || searchQueryProperty.get().isEmpty()) {
+            return;
+        }
+
+        codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
+        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
+
+        searchTermsMap.forEach((optionalField, terms) -> {
+            Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
+            if (searchPattern.isEmpty()) {
+                return;
             }
+
+            if (optionalField.isPresent()) {
+                highlightField(optionalField.get(), searchPattern.get());
+            } else {
+                fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern.get()));
+            }
+        });
+    }
+
+    private void highlightField(Field field, String searchPattern) {
+        Range fieldPosition = fieldPositions.get(field);
+        if (fieldPosition == null) {
+            return;
+        }
+
+        int start = fieldPosition.start();
+        int end = fieldPosition.end();
+        List<Range> matchedPositions = Highlighter.findMatchPositions(codeArea.getText(start, end), searchPattern);
+
+        for (Range range : matchedPositions) {
+            codeArea.setStyleClass(start + range.start() - 1, start + range.end(), SEARCH_STYLE);
         }
     }
 
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
-        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
-        return writer.toString();
+        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+        bibEntryWriter.write(entry, bibWriter, type, true);
+        fieldPositions = bibEntryWriter.getFieldPositions();
+        String sourceString = writer.toString();
+        writer.close();
+        return sourceString;
     }
 
     /* Work around for different input methods.
@@ -338,12 +345,30 @@ public class SourceTab extends EntryEditorTab {
 
     private void listenForSaveKeybinding(KeyEvent event) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
-
             switch (binding) {
-                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS -> {
-                    storeSource(currentEntry, codeArea.textProperty().getValue());
-                }
+                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS ->
+                        storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
+    }
+
+    private class EditAction extends SimpleCommand {
+
+        private final StandardActions command;
+
+        public EditAction(StandardActions command) {
+            this.command = command;
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case COPY -> codeArea.copy();
+                case CUT -> codeArea.cut();
+                case PASTE -> codeArea.paste();
+                case SELECT_ALL -> codeArea.selectAll();
+            }
+            codeArea.requestFocus();
+        }
     }
 }
