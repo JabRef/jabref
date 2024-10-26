@@ -50,7 +50,7 @@ class MoveFilesCleanupTest {
         Files.createFile(fileBefore);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
+        metaData.setLibrarySpecificFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));

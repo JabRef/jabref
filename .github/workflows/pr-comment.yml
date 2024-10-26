@@ -34,6 +34,7 @@ jobs:
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v4
       - name: Determine owner
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
         id: owner
@@ -41,6 +42,8 @@ jobs:
           owner=$(gh pr view $pr_number --json headRepositoryOwner --jq '.headRepositoryOwner')
           echo "Got owner $owner"
           echo owner=$owner >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Checkout
         if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.owner.owner != 'JabRef') }}
         uses: actions/checkout@v4
