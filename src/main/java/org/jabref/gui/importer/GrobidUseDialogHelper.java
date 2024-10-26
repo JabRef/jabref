@@ -7,9 +7,9 @@ import org.jabref.logic.l10n.Localization;
 /**
  * Metadata extraction from PDFs and plaintext works very well using Grobid, but we do not want to enable it by default
  * due to data privacy concerns.
- * To make users aware of the feature, we ask before querying Grobid, saving the users' preference for the future.
+ * To make users aware of the feature, we ask before querying for the first time Grobid, saving the users' preference
  */
-public class GrobidPreferenceDialogHelper {
+public class GrobidUseDialogHelper {
 
     /**
      * If the user has not explicitly opted-in/out of Grobid, we ask for permission to send data to Grobid by using
@@ -19,7 +19,7 @@ public class GrobidPreferenceDialogHelper {
      * @return if the user enabled Grobid, either in the past or after being asked by the dialog.
      */
     public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {
-        if (preferences.isGrobidPreference()) {
+        if (preferences.isGrobidUseAsked()) {
             return preferences.isGrobidEnabled();
         }
         boolean grobidEnabled = dialogService.showConfirmationDialogAndWait(
@@ -27,7 +27,7 @@ public class GrobidPreferenceDialogHelper {
                 Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."),
                 Localization.lang("Send to Grobid"),
                 Localization.lang("Do not send"));
-        preferences.setGrobidPreference(true);
+        preferences.setGrobidUseAsked(true);
         preferences.setGrobidEnabled(grobidEnabled);
         return grobidEnabled;
     }

@@ -2178,7 +2178,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(GROBID_URL));
 
         EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(grobidPreferences.grobidPreferenceProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
+        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
         EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;
