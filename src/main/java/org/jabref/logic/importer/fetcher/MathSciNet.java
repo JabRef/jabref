@@ -183,7 +183,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             String doi = item.optString("articleUrl");
             if (!doi.isEmpty()) {
                 try {
-                    DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.getNormalized()));
+                    DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.asString()));
                 } catch (IllegalArgumentException e) {
                     // If DOI parsing fails, use the original DOI string
                     entry.setField(StandardField.DOI, doi);

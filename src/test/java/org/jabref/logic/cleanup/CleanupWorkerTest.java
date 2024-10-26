@@ -60,7 +60,7 @@ class CleanupWorkerTest {
         Files.createDirectory(pdfPath);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(pdfPath.toAbsolutePath().toString());
+        metaData.setLibrarySpecificFileDirectory(pdfPath.toAbsolutePath().toString());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabasePath(bibFolder.resolve("test.bib"));
