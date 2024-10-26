@@ -80,6 +80,10 @@ public class Gpt4AllModel implements ChatLanguageModel {
             if (generatedText == null || generatedText.isEmpty()) {
                 throw new IllegalArgumentException("Generated text is null or empty");
             }
+
+            // Note: We do not check the token usage and finish reason here.
+            // This class is not a complete implementation of langchain4j's ChatLanguageModel.
+            // We only implemented the functionality we specifically need.
             return new Response<>(new AiMessage(generatedText), new TokenUsage(0, 0), FinishReason.OTHER);
         } catch (Exception e) {
             LOGGER.error("Error generating message from Gpt4All", e);
