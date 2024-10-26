@@ -122,6 +122,7 @@ public class FilePreferences {
         return keyPatterns.get();
     }
 
+
 //    public StringProperty fileNamePatternProperty() {
 //        return fileNamePattern;
 //    }

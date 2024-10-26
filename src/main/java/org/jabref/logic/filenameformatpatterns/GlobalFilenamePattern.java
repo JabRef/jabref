@@ -1,6 +1,5 @@
 package org.jabref.logic.filenameformatpatterns;
 
-
 import org.jabref.model.entry.types.EntryType;
 
 public class GlobalFilenamePattern extends AbstractFilenameFormatPatterns {

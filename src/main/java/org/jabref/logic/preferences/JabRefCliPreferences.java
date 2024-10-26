@@ -613,11 +613,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
         defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
-
         defaults.put(DEFAULT_FILENAME_PATTERN, "[bibtexkey]");
-
-        // use citation key appended with filename as default pattern
-        defaults.put(IMPORT_FILENAMEPATTERN, "[bibtexkey]");
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
@@ -832,6 +828,7 @@ public class JabRefCliPreferences implements CliPreferences {
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
+        clearFileNamePatterns();
         prefs.clear();
         new SharedDatabasePreferences().clear();
     }
@@ -1519,6 +1516,54 @@ public class JabRefCliPreferences implements CliPreferences {
     // Linked files preferences
     //*************************************************************************************************************
 
+    private GlobalFilenamePattern getGlobalFileNamePattern() {
+        GlobalFilenamePattern filenamePattern = GlobalFilenamePattern.fromPattern(get(DEFAULT_FILENAME_PATTERN));
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        try {
+            String[] keys = preferences.keys();
+            for (String key : keys) {
+                filenamePattern.addFilenameFormatPattern(
+                        EntryTypeFactory.parse(key),
+                        preferences.get(key, null));
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences.getFilenamePattern", ex);
+        }
+
+        return filenamePattern;
+    }
+
+    // public for use in PreferenceMigrations
+    public void storeGlobalFilenamePattern(GlobalFilenamePattern pattern) {
+        if ((pattern.getDefaultValue() == null)
+                || pattern.getDefaultValue().equals(FilenameFormatPattern.NULL_FileName_PATTERN)) {
+            put(DEFAULT_FILENAME_PATTERN, "");
+        } else {
+            put(DEFAULT_FILENAME_PATTERN, pattern.getDefaultValue().stringRepresentation());
+        }
+
+        // Store overridden definitions to Preferences.
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        try {
+            preferences.clear(); // We remove all old entries.
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences::putFilenamePattern", ex);
+        }
+
+        for (EntryType entryType : pattern.getAllKeys()) {
+            if (!pattern.isDefaultValue(entryType)) {
+                // first entry in the map is the full pattern
+                preferences.put(entryType.getName(), pattern.getValue(entryType).stringRepresentation());
+            }
+        }
+    }
+
+    private void clearFileNamePatterns() throws BackingStoreException {
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        preferences.clear();
+        getFilePreferences().setFileNamePattern(getGlobalFileNamePattern());
+    }
+
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1544,21 +1589,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL),
-                GlobalFilenamePattern.fromPattern(get(IMPORT_FILENAMEPATTERN)),
-                get(DEFAULT_FILENAME_PATTERN));
+                getGlobalFileNamePattern(),
+                (String) defaults.get(DEFAULT_FILENAME_PATTERN));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
-//        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
-
-        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> {
-            // 存储每个条目类型的模式
-            for (Map.Entry<EntryType, FilenameFormatPattern> entry : newValue.getPatterns().entrySet()) {
-                put(IMPORT_FILENAMEPATTERN + "_" + entry.getKey().getName(), entry.getValue().toString());
-            }
-        });
-
+        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> storeGlobalFilenamePattern(newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
