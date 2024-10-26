@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.Field;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 public class MarkdownEditor extends SimpleEditor {
-
     private final FlexmarkHtmlConverter flexmarkHtmlConverter = FlexmarkHtmlConverter.builder().build();
 
     public MarkdownEditor(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, GuiPreferences preferences, UndoManager undoManager, UndoAction undoAction, RedoAction redoAction) {
@@ -36,5 +35,9 @@ public class MarkdownEditor extends SimpleEditor {
                 }
             }
         };
+    }
+
+    public void setEditable(boolean isEditable) {
+        getTextInput().setEditable(isEditable);
     }
 }

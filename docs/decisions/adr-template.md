@@ -10,11 +10,11 @@ nav_order: 100
 parent: Decision Records
 
 # These are optional metadata elements. Feel free to remove any of them.
-status: "{proposed | rejected | accepted | deprecated | … | superseded by ADR-0123"
-date: {YYYY-MM-DD when the decision was last updated}
-decision-makers: {list everyone involved in the decision}
-consulted: {list everyone whose opinions are sought (typically subject-matter experts); and with whom there is a two-way communication}
-informed: {list everyone who is kept up-to-date on progress; and with whom there is a one-way communication}
+# status: "{proposed | rejected | accepted | deprecated | … | superseded by ADR-0123"
+# date: {YYYY-MM-DD when the decision was last updated}
+# decision-makers: {list everyone involved in the decision}
+# consulted: {list everyone whose opinions are sought (typically subject-matter experts); and with whom there is a two-way communication}
+# informed: {list everyone who is kept up-to-date on progress; and with whom there is a one-way communication}
 ---
 <!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
 <!-- markdownlint-disable-next-line MD025 -->
