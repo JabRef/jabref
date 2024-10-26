@@ -37,7 +37,7 @@ public enum StandardActions implements Action {
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
     MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0", "DOI/ISBN/...")),
-    MASS_GET_BIBLIOGRAPHIC_DATA(Localization.lang("Get bibliographic data from %0 (fully automated)", "DOI/ISBN/...")),
+    BATCH_MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0 (fully automated)", "DOI/ISBN/...")),
     ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     ATTACH_FILE_FROM_URL(Localization.lang("Attach file from URL"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),

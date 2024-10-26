@@ -3,9 +3,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -23,7 +21,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,126 +65,121 @@ public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
             return;
         }
 
-        MergeContext context = new MergeContext(libraryTab, entries, createMergingFetcher());
-        BackgroundTask<List<String>> backgroundTask = createBackgroundTask(context);
-        taskExecutor.execute(backgroundTask);
+        MergeContext context = new MergeContext(
+                libraryTab,
+                entries,
+                new MergingIdBasedFetcher(preferences.getImportFormatPreferences()),
+                notificationService
+        );
+
+        taskExecutor.execute(createBackgroundTask(context));
     }
 
-    private MergingIdBasedFetcher createMergingFetcher() {
-        return new MergingIdBasedFetcher(preferences.getImportFormatPreferences());
-    }
-
-    private BackgroundTask<List<String>> createBackgroundTask(MergeContext context) {
+    private static BackgroundTask<List<String>> createBackgroundTask(MergeContext context) {
         BackgroundTask<List<String>> task = new BackgroundTask<>() {
             @Override
-            public List<String> call() {
+             public List<String> call() {
                 return processMergeEntries(context, this);
             }
         };
-        configureBackgroundTask(task);
+
+        task.setTitle(Localization.lang("Fetching and merging entries"));
+        task.showToUser(true);
+
+        task.onSuccess(updatedEntries ->
+                handleSuccess(updatedEntries, context));
+
+        task.onFailure(ex ->
+                handleFailure(ex, context.notificationService));
+
         return task;
     }
 
-    private List<String> processMergeEntries(MergeContext context, BackgroundTask<?> task) {
-        if (task.isCancelled()) {
-            return List.of();
-        }
+    private static List<String> processMergeEntries(MergeContext context, BackgroundTask<?> task) {
+        int totalEntries = context.entries().size();
 
-        int totalEntries = context.entries.size();
         for (int i = 0; i < totalEntries && !task.isCancelled(); i++) {
-            processEntry(context, context.entries.get(i), i, totalEntries, task);
+            BibEntry entry = context.entries().get(i);
+            updateProgress(i, totalEntries, entry, task);
+            processEntry(context, entry);
         }
 
         finalizeCompoundEdit(context);
-        return context.updatedEntries;
+        return context.updatedEntries();
     }
 
-    private void processEntry(MergeContext context, BibEntry entry, int currentIndex,
-                              int totalEntries, BackgroundTask<?> task) {
-        updateProgress(currentIndex, totalEntries, task);
-        logEntryDetails(entry);
+    private static void processEntry(MergeContext context, BibEntry entry) {
+        LOGGER.debug("Processing entry: {}", entry);
 
-        Optional<MergingIdBasedFetcher.FetcherResult> fetchResult = context.fetcher.fetchEntry(entry);
+        Optional<MergingIdBasedFetcher.FetcherResult> fetchResult = context.fetcher().fetchEntry(entry);
         fetchResult.ifPresent(result -> {
             if (result.hasChanges()) {
                 Platform.runLater(() -> {
-                    // UI operations must be done on the FX thread
-                    MergeEntriesHelper.mergeEntries(entry, result.mergedEntry(), context.compoundEdit);
-                    entry.getCitationKey().ifPresent(context.updatedEntries::add);
+                    MergeEntriesHelper.mergeEntries(entry, result.mergedEntry(), context.compoundEdit());
+                    entry.getCitationKey().ifPresent(context.updatedEntries()::add);
                 });
             }
         });
     }
 
-    private void finalizeCompoundEdit(MergeContext context) {
-        if (!context.updatedEntries.isEmpty()) {
+    private static void finalizeCompoundEdit(MergeContext context) {
+        if (!context.updatedEntries().isEmpty()) {
             Platform.runLater(() -> {
-                context.compoundEdit.end();
-                context.libraryTab.getUndoManager().addEdit(context.compoundEdit);
+                context.compoundEdit().end();
+                context.libraryTab().getUndoManager().addEdit(context.compoundEdit());
             });
         }
     }
 
-    private void logEntryDetails(BibEntry entry) {
-        Map<String, String> details = new HashMap<>();
-        entry.getCitationKey().ifPresent(key -> details.put("key", key));
-        entry.getField(StandardField.ISBN).ifPresent(isbn -> details.put("isbn", isbn));
-        entry.getField(StandardField.DOI).ifPresent(doi -> details.put("doi", doi));
-        details.put("type", entry.getType().getName());
-
-        LOGGER.info("Processing BibEntry: {}", details);
-    }
-
-    private void updateProgress(int currentIndex, int totalEntries, BackgroundTask<?> task) {
+    private static void updateProgress(int currentIndex, int totalEntries, BibEntry entry, BackgroundTask<?> task) {
+        LOGGER.debug("Processing entry {}", entry);
         Platform.runLater(() -> {
             task.updateMessage(Localization.lang("Fetching entry %0 of %1", currentIndex + 1, totalEntries));
             task.updateProgress(currentIndex, totalEntries);
         });
     }
 
-    private void configureBackgroundTask(BackgroundTask<List<String>> task) {
-        task.setTitle(Localization.lang("Fetching and merging entries"));
-        task.showToUser(true);
-        configureSuccessHandler(task);
-        configureFailureHandler(task);
-    }
-
-    private void configureSuccessHandler(BackgroundTask<List<String>> task) {
-        task.onSuccess(updatedEntries -> Platform.runLater(() -> {
+    private static void handleSuccess(List<String> updatedEntries, MergeContext context) {
+        Platform.runLater(() -> {
             if (updatedEntries.isEmpty()) {
-                LOGGER.info("Batch update completed. No entries were updated.");
-                notificationService.notify(Localization.lang("No updates found."));
+                LOGGER.debug("Batch update completed. No entries were updated.");
+                context.notificationService().notify(Localization.lang("No updates found."));
             } else {
-                String message = Localization.lang("Batch update successful. %0 entries updated: %1.",
-                        updatedEntries.size(), String.join(", ", updatedEntries));
-                notificationService.notify(message);
-            }
-        }));
-    }
+                LOGGER.debug("Updated entries: {}", String.join(", ", updatedEntries));
 
-    private void configureFailureHandler(BackgroundTask<List<String>> task) {
-        task.onFailure(ex -> {
-            String errorType = ex.getClass().getSimpleName();
-            LOGGER.error("{}: {}", errorType, ex.getMessage(), ex);
-            Platform.runLater(() ->
-                    notificationService.notify(Localization.lang("Error while fetching and merging entries: %0", ex.getMessage()))
-            );
+                String message = Localization.lang("Batch update successful. %0 entries updated.",
+                        String.valueOf(updatedEntries.size()));
+                context.notificationService().notify(message);
+            }
         });
     }
 
-    private static class MergeContext {
-        final LibraryTab libraryTab;
-        final List<BibEntry> entries;
-        final MergingIdBasedFetcher fetcher;
-        final NamedCompound compoundEdit;
-        final List<String> updatedEntries;
+    private static void handleFailure(Exception ex, NotificationService notificationService) {
+        LOGGER.error("Error during fetch and merge", ex);
+        Platform.runLater(() ->
+                notificationService.notify(
+                        Localization.lang("Error while fetching and merging entries: %0", ex.getMessage())
+                )
+        );
+    }
 
-        MergeContext(LibraryTab libraryTab, List<BibEntry> entries, MergingIdBasedFetcher fetcher) {
-            this.libraryTab = libraryTab;
-            this.entries = entries;
-            this.fetcher = fetcher;
-            this.compoundEdit = new NamedCompound(Localization.lang("Merge entries"));
-            this.updatedEntries = Collections.synchronizedList(new ArrayList<>());
+    private record MergeContext(
+            LibraryTab libraryTab,
+            List<BibEntry> entries,
+            MergingIdBasedFetcher fetcher,
+            NamedCompound compoundEdit,
+            List<String> updatedEntries,
+            NotificationService notificationService
+    ) {
+        MergeContext(LibraryTab libraryTab, List<BibEntry> entries, MergingIdBasedFetcher fetcher, NotificationService notificationService) {
+            this(
+                    libraryTab,
+                    entries,
+                    fetcher,
+                    new NamedCompound(Localization.lang("Merge entries")),
+                    Collections.synchronizedList(new ArrayList<>()),
+                    notificationService
+            );
         }
     }
 }

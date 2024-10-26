@@ -3,8 +3,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -16,6 +14,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class fetches bibliographic information from external sources based on the identifiers
+ * (e.g. DOI, ISBN, arXiv ID) of a {@link BibEntry} and merges the fetched information into the entry.
+ */
 public class MergingIdBasedFetcher {
     private static final List<StandardField> SUPPORTED_FIELDS =
             List.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT);
@@ -28,7 +30,7 @@ public class MergingIdBasedFetcher {
     }
 
     public Optional<FetcherResult> fetchEntry(BibEntry entry) {
-        logEntryIdentifiers(entry);
+        LOGGER.debug("Entry {}", entry);
 
         return SUPPORTED_FIELDS.stream()
                                .map(field -> tryFetch(entry, field))
@@ -44,16 +46,16 @@ public class MergingIdBasedFetcher {
     }
 
     private Optional<FetcherResult> fetchEntry(IdBasedFetcher fetcher, Field field,
-                                               String identifier, BibEntry originalEntry) {
+                                               String identifier, BibEntry entryFromLibrary) {
         try {
-            LOGGER.debug("Attempting to fetch entry using {} fetcher", field);
-            logEntryDetails(originalEntry, field, identifier);
+            LOGGER.debug("Entry {}",
+                    entryFromLibrary);
 
             return fetcher.performSearchById(identifier)
                           .map(fetchedEntry -> {
-                              BibEntry mergedEntry = (BibEntry) originalEntry.clone();
-                              boolean hasChanges = mergeBibEntry(mergedEntry, fetchedEntry);
-                              return new FetcherResult(originalEntry, mergedEntry, hasChanges);
+                              BibEntry mergedEntry = (BibEntry) entryFromLibrary.clone();
+                              boolean hasChanges = mergeBibEntry(fetchedEntry, mergedEntry);
+                              return new FetcherResult(entryFromLibrary, mergedEntry, hasChanges);
                           });
         } catch (Exception exception) {
             LOGGER.error("Error fetching entry with {} identifier: {}",
@@ -62,12 +64,13 @@ public class MergingIdBasedFetcher {
         }
     }
 
-    private boolean mergeBibEntry(BibEntry target, BibEntry source) {
+    private boolean mergeBibEntry(BibEntry source, BibEntry target) {
         boolean hasChanges = false;
         for (Field field : source.getFields()) {
             Optional<String> sourceValue = source.getField(field);
             Optional<String> targetValue = target.getField(field);
-            if (sourceValue.isPresent() && !sourceValue.equals(targetValue)) {
+
+            if (sourceValue.isPresent() && targetValue.isEmpty()) {
                 target.setField(field, sourceValue.get());
                 hasChanges = true;
             }
@@ -84,38 +87,6 @@ public class MergingIdBasedFetcher {
         };
     }
 
-    private void logEntryIdentifiers(BibEntry entry) {
-        List<String> availableIds = Stream.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT)
-                                          .flatMap(field -> entry.getField(field)
-                                                                 .map(value -> field +
-                                                                         ": " +
-                                                                         value)
-                                                                 .stream())
-                                          .collect(Collectors.toList());
-
-        String citationKey = entry.getCitationKey()
-                                  .map(key -> "citation key: " + key)
-                                  .orElse("no citation key");
-
-        LOGGER.debug("Processing entry with {} and identifiers: {}",
-                citationKey,
-                availableIds.isEmpty() ? "none" : String.join(", ", availableIds));
-    }
-
-    private void logEntryDetails(BibEntry entry, Field field, String identifier) {
-        StringBuilder details = new StringBuilder();
-        details.append(field).append(" identifier: ").append(identifier);
-
-        entry.getCitationKey().ifPresent(key -> details.append(", citation key: ").append(key));
-        entry.getField(StandardField.TITLE).ifPresent(title -> details.append(", title: ").append(title));
-        entry.getField(StandardField.AUTHOR).ifPresent(author -> details.append(", author: ").append(author));
-
-        LOGGER.debug("Entry details - {}", details);
-    }
-
-    public record FetcherResult(BibEntry originalEntry, BibEntry mergedEntry, boolean hasChanges) {
-        public BibEntry getMergedEntry() {
-            return mergedEntry;
-        }
+    public record FetcherResult(BibEntry entryFromLibrary, BibEntry mergedEntry, boolean hasChanges) {
     }
 }

@@ -279,7 +279,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(
-                        StandardActions.MASS_GET_BIBLIOGRAPHIC_DATA,
+                        StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
                         new MultiEntryMergeWithFetchedDataAction(
                                 frame::getCurrentLibraryTab,
                                 preferences,
