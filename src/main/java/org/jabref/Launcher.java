@@ -20,7 +20,6 @@ import com.airhacks.afterburner.injection.Injector;
 ///
 /// - Handle the command line arguments
 /// - Start the JavaFX application (if not in CLI mode)
-
 public class Launcher {
 
     public static void main(String[] args) {
