@@ -19,9 +19,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-/**
- * A simple Welcome Page for the JabRef application.
- */
 public class WelcomePage extends VBox {
 
     public WelcomePage(JabRefFrame frame,
