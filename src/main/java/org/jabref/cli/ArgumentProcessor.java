@@ -300,7 +300,6 @@ public class ArgumentProcessor {
         }
     }
 
-
     private void checkConsistency() {
         String fileName = cli.getCheckConsistency();
         String outputFormat = cli.getCheckConsistencyOutputFormat().toUpperCase();
@@ -320,7 +319,7 @@ public class ArgumentProcessor {
             BibliographyConsistencyCheck.Result result = checker.check(databaseContext.getDatabase().getEntries());
 
             String outputFileName = fileName + "_consistency_check." + outputFormat.toLowerCase();
-            try (Writer writer = new FileWriter(outputFileName)) {
+            try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
                 if ("CSV".equals(outputFormat)) {
                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
                     csvWriter.writeFindings();

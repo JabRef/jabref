@@ -187,6 +187,7 @@ public class CliOptions {
         return commandLine.getOptionValue("check-consistency-output-format", "TXT");
     }
 
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     private static Options getOptions() {
         Options options = new Options();
 
@@ -309,7 +310,6 @@ public class CliOptions {
                 .hasArg()
                 .argName("CITATIONKEY")
                 .build());
-
 
         options.addOption(Option
                 .builder("cc")
