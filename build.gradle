@@ -385,6 +385,7 @@ dependencies {
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:3.0"
+    testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.2"
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
