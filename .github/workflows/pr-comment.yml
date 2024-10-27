@@ -44,6 +44,7 @@ jobs:
           echo isCrossRepository=$isCrossRepository >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
+          pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: Checkout
         if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.isCrossRepository.isCrossRepository == 'true') }}
         uses: actions/checkout@v4
