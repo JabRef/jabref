@@ -1,3 +1,4 @@
+
 package org.jabref.gui.mergeentries;
 
 import javax.swing.undo.UndoManager;
@@ -33,7 +34,7 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager)
-                                         .and(ActionHelper.isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_IDENTIFIER_FIELDS, stateManager)));
+                                         .and(ActionHelper.isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS, stateManager)));
     }
 
     @Override
@@ -49,14 +50,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        FetchAndMergeEntry fetchAndMergeEntry = new FetchAndMergeEntry(
-                stateManager.getActiveDatabase().get(),
-                taskExecutor,
-                preferences,
-                dialogService,
-                undoManager
-        );
-
-        fetchAndMergeEntry.fetchAndMerge(originalEntry);
+        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(originalEntry);
     }
 }
