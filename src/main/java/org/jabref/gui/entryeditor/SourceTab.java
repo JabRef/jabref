@@ -105,13 +105,16 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void highlightSearchPattern() {
-        if (codeArea == null || searchQueryProperty.get().isEmpty()) {
+        if (codeArea == null) {
             return;
         }
 
         codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
-        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
+        if (searchQueryProperty.get().isEmpty()) {
+            return;
+        }
 
+        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
         searchTermsMap.forEach((optionalField, terms) -> {
             Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
             if (searchPattern.isEmpty()) {
