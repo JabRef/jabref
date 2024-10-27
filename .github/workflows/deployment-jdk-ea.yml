@@ -32,6 +32,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_owner == 'JabRef'
     strategy:
       fail-fast: false
       matrix:
