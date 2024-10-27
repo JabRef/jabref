@@ -45,6 +45,8 @@ public class FileUtil {
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+    private static final String ELLIPSIS = "...";
+    private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -521,6 +523,66 @@ public class FileUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+     * with maxLength = 20 is shortened into verylo...isthis.pdf
+     *
+     * @param fileName  the given file name to be shortened
+     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
+     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+     */
+    public static String shortenFileName(String fileName, Integer maxLength) {
+        if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
+            return "";
+        }
+
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+
+        String name;
+        String extension;
+
+        extension = FileUtil.getFileExtension(fileName).map(fileExtension -> '.' + fileExtension).orElse("");
+        if (extension.isEmpty()) {
+            name = fileName;
+        } else {
+            name = fileName.substring(0, fileName.length() - extension.length());
+        }
+
+        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
+        if (maxLength <= totalNeededLength) {
+            return fileName.substring(0, maxLength - ELLIPSIS_LENGTH) + ELLIPSIS;
+        }
+
+        int charsForName = maxLength - totalNeededLength;
+        if (charsForName <= 0) {
+            return ELLIPSIS + extension;
+        }
+
+        int numCharsBeforeEllipsis;
+        int numCharsAfterEllipsis;
+        if (charsForName == 1) {
+            numCharsBeforeEllipsis = 1;
+            numCharsAfterEllipsis = 0;
+        } else {
+            // Allow the front part to have the extra in odd cases
+            numCharsBeforeEllipsis = (charsForName + 1) / 2;
+            numCharsAfterEllipsis = charsForName / 2;
+        }
+
+        numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());
+        numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
+
+        StringBuilder result = new StringBuilder();
+        result.append(name, 0, numCharsBeforeEllipsis)
+              .append(ELLIPSIS)
+              .append(name.substring(name.length() - numCharsAfterEllipsis))
+              .append(extension);
+
+        return result.toString();
     }
 
     public static boolean isCharLegal(char c) {
