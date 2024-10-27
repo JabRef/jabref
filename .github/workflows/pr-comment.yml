@@ -14,7 +14,7 @@ on:
 jobs:
   comment:
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && (github.repository_owner == 'JabRef') }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -35,24 +35,25 @@ jobs:
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
-      - name: Determine owner
+      - name: Is PR from forked?
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
-        id: owner
+        id: isCrossRepository
         run: |
-          owner=$(gh pr view $pr_number --json headRepositoryOwner --jq '.headRepositoryOwner')
-          echo "Got owner $owner"
-          echo owner=$owner >> $GITHUB_OUTPUT
+          isCrossRepository=$(gh pr view $pr_number --json isCrossRepository --jq '.isCrossRepository')
+          echo "Got isCrossRepository $isCrossRepository"
+          echo isCrossRepository=$isCrossRepository >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
+          pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: Checkout
-        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.owner.owner != 'JabRef') }}
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
-        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.owner.owner != 'JabRef') }}
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: jbangdev/jbang-action@v0.119.0
         with:
           script: ghprcomment@koppor/ghprcomment
