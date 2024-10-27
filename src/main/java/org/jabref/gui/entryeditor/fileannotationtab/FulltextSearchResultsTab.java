@@ -90,9 +90,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         if (entry == null || !shouldShow(entry)) {
             return;
         }
-        if (documentViewerView == null) {
-            documentViewerView = new DocumentViewerView();
-        }
         this.entry = entry;
         content.getChildren().clear();
 
@@ -159,6 +156,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
+                if (documentViewerView == null) {
+                    documentViewerView = new DocumentViewerView();
+                }
                 documentViewerView.switchToFile(linkedFile);
                 documentViewerView.gotoPage(pageNumber);
                 documentViewerView.disableLiveMode();
