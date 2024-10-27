@@ -34,9 +34,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchQuery;
-import org.jabref.model.search.SearchResult;
-import org.jabref.model.search.SearchResults;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResult;
+import org.jabref.model.search.query.SearchResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,9 +89,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (entry == null || !shouldShow(entry)) {
             return;
-        }
-        if (documentViewerView == null) {
-            documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
         content.getChildren().clear();
@@ -159,6 +156,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
+                if (documentViewerView == null) {
+                    documentViewerView = new DocumentViewerView();
+                }
                 documentViewerView.switchToFile(linkedFile);
                 documentViewerView.gotoPage(pageNumber);
                 documentViewerView.disableLiveMode();

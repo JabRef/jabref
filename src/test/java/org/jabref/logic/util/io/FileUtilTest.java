@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -440,7 +441,7 @@ class FileUtilTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(bibPath);
-        database.getMetaData().setDefaultFileDirectory(filesPath.toString());
+        database.getMetaData().setLibrarySpecificFileDirectory(filesPath.toString());
 
         FilePreferences fileDirPrefs = mock(FilePreferences.class);
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
@@ -476,5 +477,29 @@ class FileUtilTest {
     @ValueSource(strings = {"te{}mp.pdf"})
     void illegalPaths(String fileName) {
         assertTrue(FileUtil.detectBadFileName(fileName));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "''                             ,                                     ,   ",
+            "''                             ,                                     , -3",
+            "''                             ,                                     ,  0",
+            "''                             ,                                     ,  3",
+            "''                             ,                                     ,  5",
+            "''                             ,                                     , 10",
+            "''                             , thisisatestfile.pdf                 ,   ",
+            "''                             , thisisatestfile.pdf                 , -5",
+            "''                             , thisisatestfile.pdf                 ,  0",
+            "...                            , thisisatestfile.pdf                 ,  3",
+            "th...                          , thisisatestfile.pdf                 ,  5",
+            "th...e.pdf                     , thisisatestfile.pdf                 , 10",
+            "thisisatestfile.pdf            , thisisatestfile.pdf                 , 20",
+            "lo...                          , longfilename.extremelylongextension ,  5",
+            "longfil...                     , longfilename.extremelylongextension , 10",
+            "longfilename.extr...           , longfilename.extremelylongextension , 20",
+            "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
+    })
+    void shortenFileName(String expected, String fileName, Integer maxLength) {
+        assertEquals(expected, FileUtil.shortenFileName(fileName, maxLength));
     }
 }

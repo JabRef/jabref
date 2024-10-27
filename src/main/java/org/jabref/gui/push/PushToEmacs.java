@@ -2,6 +2,7 @@ package org.jabref.gui.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -146,5 +147,10 @@ public class PushToEmacs extends AbstractPushToApplication {
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToEmacsSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
+    }
+
+    @Override
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        return new String[] {commandPath, "+%s".formatted(line), fileName.toString()};
     }
 }

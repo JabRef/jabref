@@ -42,7 +42,7 @@ public class DoiCleanup implements CleanupJob {
             Optional<DOI> doi = DOI.parse(doiFieldValue);
 
             if (doi.isPresent()) {
-                String newValue = doi.get().getDOI();
+                String newValue = doi.get().asString();
                 if (!doiFieldValue.equals(newValue)) {
                     entry.setField(StandardField.DOI, newValue);
 
@@ -65,7 +65,7 @@ public class DoiCleanup implements CleanupJob {
 
                 if (doi.isPresent()) {
                     // Update Doi
-                    Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.get().getDOI());
+                    Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.get().asString());
                     change.ifPresent(changes::add);
                     removeFieldValue(entry, field, changes);
                 }
@@ -74,7 +74,7 @@ public class DoiCleanup implements CleanupJob {
                     fieldContentOpt.flatMap(ArXivIdentifier::parse)
                                    .flatMap(ArXivIdentifier::inferDOI)
                                    .ifPresent(inferredDoi -> {
-                                       Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.getDOI());
+                                       Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.asString());
                                        change.ifPresent(changes::add);
                                    });
                 }
