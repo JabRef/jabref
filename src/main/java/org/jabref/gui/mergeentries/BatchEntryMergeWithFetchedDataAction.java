@@ -1,4 +1,3 @@
-
 package org.jabref.gui.mergeentries;
 
 import java.util.ArrayList;
@@ -58,15 +57,15 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
             return;
         }
 
-        List<BibEntry> entries = libraryTab.getDatabase().getEntries();
-        if (entries.isEmpty()) {
+        List<BibEntry> libraryEntries = libraryTab.getDatabase().getEntries();
+        if (libraryEntries.isEmpty()) {
             notificationService.notify(Localization.lang("empty library"));
             return;
         }
 
         MergeContext context = new MergeContext(
                 libraryTab,
-                entries,
+                libraryEntries,
                 new MergingIdBasedFetcher(preferences.getImportFormatPreferences()),
                 notificationService
         );
@@ -77,7 +76,7 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
     private static BackgroundTask<List<String>> createBackgroundTask(MergeContext context) {
         BackgroundTask<List<String>> task = new BackgroundTask<>() {
             @Override
-             public List<String> call() {
+            public List<String> call() {
                 return processMergeEntries(context, this);
             }
         };
@@ -89,7 +88,7 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
                 handleSuccess(updatedEntries, context));
 
         task.onFailure(ex ->
-                handleFailure(ex, context.notificationService));
+                handleFailure(ex, context.notificationService()));
 
         return task;
     }
@@ -98,23 +97,23 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
         int totalEntries = context.entries().size();
 
         for (int i = 0; i < totalEntries && !task.isCancelled(); i++) {
-            BibEntry entry = context.entries().get(i);
+            BibEntry libraryEntry = context.entries().get(i);
             updateProgress(i, totalEntries, task);
-            fetchAndMergeEntry(context, entry);
+            fetchAndMergeEntry(context, libraryEntry);
         }
 
         finalizeCompoundEdit(context);
         return context.updatedEntries();
     }
 
-    private static void fetchAndMergeEntry(MergeContext context, BibEntry entry) {
-        LOGGER.debug("Processing entry: {}", entry);
+    private static void fetchAndMergeEntry(MergeContext context, BibEntry libraryEntry) {
+        LOGGER.debug("Processing library entry: {}", libraryEntry);
 
-        context.fetcher().fetchEntry(entry)
+        context.fetcher().fetchEntry(libraryEntry)
                .filter(MergingIdBasedFetcher.FetcherResult::hasChanges)
                .ifPresent(result -> Platform.runLater(() -> {
-                   MergeEntriesHelper.mergeEntries(entry, result.mergedEntry(), context.compoundEdit());
-                   entry.getCitationKey().ifPresent(context.updatedEntries()::add);
+                   MergeEntriesHelper.mergeEntries(result.mergedEntry(), libraryEntry, context.compoundEdit());
+                   libraryEntry.getCitationKey().ifPresent(context.updatedEntries()::add);
                }));
     }
 

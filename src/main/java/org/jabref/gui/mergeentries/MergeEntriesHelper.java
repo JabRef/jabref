@@ -31,22 +31,22 @@ public final class MergeEntriesHelper {
     /**
      * Merges two BibEntry objects with undo support.
      *
-     * @param entryFromLibrary The entry to be updated (target, from the library)
      * @param entryFromFetcher The entry containing new information (source, from the fetcher)
+     * @param entryFromLibrary The entry to be updated (target, from the library)
      * @param undoManager Compound edit to collect undo information
      */
-    public static void mergeEntries(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
-        LOGGER.debug("Entry from library: {}", entryFromLibrary);
+    public static void mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
+        LOGGER.debug("Entry from library: {}", entryFromLibrary);
 
-        mergeEntryType(entryFromLibrary, entryFromFetcher, undoManager);
-        mergeFields(entryFromLibrary, entryFromFetcher, undoManager);
-        removeFieldsNotPresentInFetcher(entryFromLibrary, entryFromFetcher, undoManager);
+        mergeEntryType(entryFromFetcher, entryFromLibrary, undoManager);
+        mergeFields(entryFromFetcher, entryFromLibrary, undoManager);
+        removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, undoManager);
     }
 
-    private static void mergeEntryType(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
-        EntryType libraryType = entryFromLibrary.getType();
+    private static void mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
         EntryType fetcherType = entryFromFetcher.getType();
+        EntryType libraryType = entryFromLibrary.getType();
 
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
@@ -55,7 +55,7 @@ public final class MergeEntriesHelper {
         }
     }
 
-    private static void mergeFields(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
+    private static void mergeFields(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
         Set<Field> allFields = new LinkedHashSet<>();
         allFields.addAll(entryFromFetcher.getFields());
         allFields.addAll(entryFromLibrary.getFields());
@@ -65,7 +65,7 @@ public final class MergeEntriesHelper {
             Optional<String> libraryValue = entryFromLibrary.getField(field);
 
             fetcherValue.ifPresent(newValue -> {
-                if (shouldUpdateField(libraryValue, newValue)) {
+                if (shouldUpdateField(newValue, libraryValue)) {
                     LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), newValue);
                     entryFromLibrary.setField(field, newValue);
                     undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), newValue));
@@ -74,7 +74,7 @@ public final class MergeEntriesHelper {
         }
     }
 
-    private static boolean shouldUpdateField(Optional<String> libraryValue, String fetcherValue) {
+    private static boolean shouldUpdateField(String fetcherValue, Optional<String> libraryValue) {
         return libraryValue.map(value -> fetcherValue.length() > value.length())
                            .orElse(true);
     }
@@ -84,7 +84,7 @@ public final class MergeEntriesHelper {
      * This ensures the merged entry only contains fields that are considered current
      * according to the fetched data.
      */
-    private static void removeFieldsNotPresentInFetcher(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
+    private static void removeFieldsNotPresentInFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
         Set<Field> obsoleteFields = new LinkedHashSet<>(entryFromLibrary.getFields());
         obsoleteFields.removeAll(entryFromFetcher.getFields());
 
