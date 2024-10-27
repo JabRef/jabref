@@ -35,7 +35,7 @@ jobs:
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
-      - name: Determine owner
+      - name: Is PR from forked?
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
         id: isCrossRepository
         run: |
