@@ -176,7 +176,7 @@ class AutoSetFileLinksUtilTest {
         Files.copy(fileA, folder.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
         util.linkAssociatedFiles(entries, onLinkedFile);
         List<LinkedFile> actual = entryA.getFiles();
-        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"),new LinkedFile("", Path.of("A.pdf"), "PDF"));
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"), new LinkedFile("", Path.of("A.pdf"), "PDF"));
         assertEquals(actual, expect);
     }
 
