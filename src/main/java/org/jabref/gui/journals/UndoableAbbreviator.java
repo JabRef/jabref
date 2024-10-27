@@ -38,32 +38,32 @@ public class UndoableAbbreviator {
             return false;
         }
 
-        String text = entry.getField(fieldName).get();
-        String origText = text;
-        if (database != null) {
-            text = database.resolveForStrings(text);
-        }
-
-        if (!journalAbbreviationRepository.isKnownName(text)) {
-            return false; // Unknown, cannot abbreviate anything.
-        }
-
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
-        String newText = getAbbreviatedName(abbreviation);
-
-        if (newText.equals(origText)) {
+        String originalName = getOriginalName(entry, fieldName, database);
+        if (!journalAbbreviationRepository.isKnownName(originalName)) {
             return false;
         }
 
-        // Store full name into fjournal but only if it exists
-        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
-            entry.setField(AMSField.FJOURNAL, abbreviation.getName());
-            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
+        String abbreviatedName = getAbbreviatedName(journalAbbreviationRepository.get(originalName).get());
+        if (abbreviatedName.equals(originalName)) {
+            return false;
         }
 
-        entry.setField(fieldName, newText);
-        ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
+        updateFields(entry, fieldName, originalName, abbreviatedName, compoundEdit);
         return true;
+    }
+    
+    private String getOriginalName(BibEntry entry, Field fieldName, BibDatabase database) {
+        String name = entry.getField(fieldName).get();
+        return (database != null) ? database.resolveForStrings(name) : name;
+    }
+
+    private void updateFields(BibEntry entry, Field fieldName, String originalName, String newName, CompoundEdit compoundEdit) {
+        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+            entry.setField(AMSField.FJOURNAL, journalAbbreviationRepository.get(originalName).get().getName());
+            compoundEdit.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, journalAbbreviationRepository.get(originalName).get().getName()));
+        }
+        entry.setField(fieldName, newName);
+        compoundEdit.addEdit(new UndoableFieldChange(entry, fieldName, originalName, newName));
     }
 
     private String getAbbreviatedName(Abbreviation text) {
