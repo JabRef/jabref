@@ -16,8 +16,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added an AI section in JabRef's [preferences](https://docs.jabref.org/ai/preferences). [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added AI providers: OpenAI, Mistral AI, Hugging Face and Google. [#11430](https://github.com/JabRef/jabref/pull/11430), [#11736](https://github.com/JabRef/jabref/pull/11736)
+- We added AI providers: [Ollama](https://docs.jabref.org/ai/local-llm#step-by-step-guide-for-ollama) and GPT4All, which add the possibility to use local LLMs privately on your own device. [#11430](https://github.com/JabRef/jabref/pull/11430), [#11870](https://github.com/JabRef/jabref/issues/11870)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
-- We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- We added "Tools > New library based on references in PDF file" ... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - Added the functionality to invoke offline reference parsing explicitly. [#11565](https://github.com/JabRef/jabref/pull/11565)
 - The dialog for [adding an entry using reference text](https://docs.jabref.org/collect/newentryfromplaintext) is now filled with the clipboard contents as default. [#11565](https://github.com/JabRef/jabref/pull/11565)
@@ -40,7 +43,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
-- We fixed an issue that when we use the local model from GPT4All, the response from the model is cuttoff. [#11870](https://github.com/JabRef/jabref/issues/11870)
 - We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
 
 ### Changed
