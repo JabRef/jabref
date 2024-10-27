@@ -360,7 +360,9 @@ public class IconTheme {
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
         MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
-        ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY);
+        ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY),
+        PERSON_PDF(JabRefMaterialDesignIcon.PERSON_PDF),
+        WORLD_PDF(JabRefMaterialDesignIcon.WORLD_PDF);
 
         private final JabRefIcon icon;
 

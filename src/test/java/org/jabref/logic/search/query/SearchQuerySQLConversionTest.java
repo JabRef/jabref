@@ -42,13 +42,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE ('%smith%')) OR (main_table.field_value_transformed ILIKE ('%smith%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -56,13 +56,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE ('%smith%')) OR (main_table.field_value_transformed ILIKE ('%smith%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -70,13 +70,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%smith%')) OR (main_table.field_value_transformed LIKE ('%smith%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -84,17 +84,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 WHERE (
                                     (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ILIKE ('%smith%')) OR (inner_table.field_value_transformed ILIKE ('%smith%')))
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -102,17 +102,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 WHERE (
                                     (inner_table.field_name = 'author') AND ((inner_table.field_value_literal LIKE ('%smith%')) OR (inner_table.field_value_transformed LIKE ('%smith%')))
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -120,17 +120,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            ON (main_table.entryid = split_table.entryid AND main_table.field_name = split_table.field_name)
                             WHERE (
                                 ((main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE ('smith')) OR (main_table.field_value_transformed ILIKE ('smith'))))
                                 OR
                                 ((split_table.field_name = 'author') AND ((split_table.field_value_literal ILIKE ('smith')) OR (split_table.field_value_transformed ILIKE ('smith'))))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -138,17 +138,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            ON (main_table.entryid = split_table.entryid AND main_table.field_name = split_table.field_name)
                             WHERE (
                                 ((main_table.field_name = 'author') AND ((main_table.field_value_literal ILIKE ('smith')) OR (main_table.field_value_transformed ILIKE ('smith'))))
                                 OR
                                 ((split_table.field_name = 'author') AND ((split_table.field_value_literal ILIKE ('smith')) OR (split_table.field_value_transformed ILIKE ('smith'))))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -156,17 +156,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            ON (main_table.entryid = split_table.entryid AND main_table.field_name = split_table.field_name)
                             WHERE (
                                 ((main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('smith')) OR (main_table.field_value_transformed LIKE ('smith'))))
                                 OR
                                 ((split_table.field_name = 'author') AND ((split_table.field_value_literal LIKE ('smith')) OR (split_table.field_value_transformed LIKE ('smith'))))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -174,13 +174,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                                ON (inner_table.entry_id = split_table.entry_id AND inner_table.field_name = split_table.field_name)
+                                ON (inner_table.entryid = split_table.entryid AND inner_table.field_name = split_table.field_name)
                                 WHERE (
                                     ((inner_table.field_name = 'author') AND ((inner_table.field_value_literal ILIKE ('smith')) OR (inner_table.field_value_transformed ILIKE ('smith'))))
                                     OR
@@ -188,7 +188,7 @@ class SearchQuerySQLConversionTest {
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -196,13 +196,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                                ON (inner_table.entry_id = split_table.entry_id AND inner_table.field_name = split_table.field_name)
+                                ON (inner_table.entryid = split_table.entryid AND inner_table.field_name = split_table.field_name)
                                 WHERE (
                                     ((inner_table.field_name = 'author') AND ((inner_table.field_value_literal LIKE ('smith')) OR (inner_table.field_value_transformed LIKE ('smith'))))
                                     OR
@@ -210,7 +210,7 @@ class SearchQuerySQLConversionTest {
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -218,13 +218,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal ~* ('smith')) OR (main_table.field_value_transformed ~* ('smith')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -232,13 +232,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal ~ ('smith')) OR (main_table.field_value_transformed ~ ('smith')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -246,17 +246,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 WHERE (
                                     (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ~* ('smith')) OR (inner_table.field_value_transformed ~* ('smith')))
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -264,17 +264,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 WHERE (
                                     (inner_table.field_name = 'author') AND ((inner_table.field_value_literal ~ ('smith')) OR (inner_table.field_value_transformed ~ ('smith')))
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -282,13 +282,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%smith%')) OR (main_table.field_value_transformed ILIKE ('%smith%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -296,10 +296,10 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             LEFT JOIN bib_fields."tableName_split_values" AS split_table
-                            ON (main_table.entry_id = split_table.entry_id AND main_table.field_name = split_table.field_name)
+                            ON (main_table.entryid = split_table.entryid AND main_table.field_name = split_table.field_name)
                             WHERE (
                                 (main_table.field_name != 'groups')
                                 AND (
@@ -309,7 +309,7 @@ class SearchQuerySQLConversionTest {
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -317,17 +317,17 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                                SELECT inner_table.entry_id
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
                                 FROM bib_fields."tableName" AS inner_table
                                 WHERE (
                                     (inner_table.field_name != 'groups') AND ((inner_table.field_value_literal ILIKE ('%smith%')) OR (inner_table.field_value_transformed ILIKE ('%smith%')))
                                 )
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -335,13 +335,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'title') AND ((main_table.field_value_literal ILIKE ('%computer science%')) OR (main_table.field_value_transformed ILIKE ('%computer science%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -349,7 +349,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term1%')) OR (main_table.field_value_transformed ILIKE ('%term1%')))
@@ -357,7 +357,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term2%')) OR (main_table.field_value_transformed ILIKE ('%term2%')))
@@ -365,7 +365,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%term3%')) OR (main_table.field_value_transformed ILIKE ('%term3%')))
@@ -373,13 +373,13 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte3 AS (
-                            SELECT entry_id FROM cte0
+                            SELECT entryid FROM cte0
                             INTERSECT
-                            SELECT entry_id FROM cte1
+                            SELECT entryid FROM cte1
                             INTERSECT
-                            SELECT entry_id FROM cte2
+                            SELECT entryid FROM cte2
                         )
-                        SELECT * FROM cte3 GROUP BY entry_id"""
+                        SELECT * FROM cte3 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -387,7 +387,7 @@ class SearchQuerySQLConversionTest {
                     """
                     WITH
                     cte0 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -395,7 +395,7 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte1 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -403,7 +403,7 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte2 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -411,21 +411,21 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte3 AS (
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte1
                         INTERSECT
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte2
                     )
                     ,
                     cte4 AS (
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte0
                         UNION
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte3
                     )
-                    SELECT * FROM cte4 GROUP BY entry_id"""
+                    SELECT * FROM cte4 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -433,7 +433,7 @@ class SearchQuerySQLConversionTest {
                     """
                     WITH
                     cte0 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -441,7 +441,7 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte1 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -449,15 +449,15 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte2 AS (
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte0
                         INTERSECT
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte1
                     )
                     ,
                     cte3 AS (
-                        SELECT main_table.entry_id
+                        SELECT main_table.entryid
                         FROM bib_fields."tableName" AS main_table
                         WHERE (
                             (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -465,13 +465,13 @@ class SearchQuerySQLConversionTest {
                     )
                     ,
                     cte4 AS (
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte2
                         UNION
-                        SELECT entry_id
+                        SELECT entryid
                         FROM cte3
                     )
-                    SELECT * FROM cte4 GROUP BY entry_id"""
+                    SELECT * FROM cte4 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -479,7 +479,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -487,7 +487,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -495,15 +495,15 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             UNION
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                         )
                         ,
                         cte3 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -511,13 +511,13 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte4 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte2
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte3
                         )
-                        SELECT * FROM cte4 GROUP BY entry_id"""
+                        SELECT * FROM cte4 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -525,7 +525,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -533,7 +533,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -541,7 +541,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -549,21 +549,21 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte3 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte2
                         )
                         ,
                         cte4 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             UNION
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte3
                         )
-                        SELECT * FROM cte4 GROUP BY entry_id"""
+                        SELECT * FROM cte4 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -571,7 +571,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -579,7 +579,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -587,15 +587,15 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             UNION
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                         )
                         ,
                         cte3 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -603,7 +603,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte4 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%d%')) OR (main_table.field_value_transformed ILIKE ('%d%')))
@@ -611,21 +611,21 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte5 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte3
                             UNION
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte4
                         )
                         ,
                         cte6 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte2
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte5
                         )
-                        SELECT * FROM cte6 GROUP BY entry_id"""
+                        SELECT * FROM cte6 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -633,7 +633,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a%')) OR (main_table.field_value_transformed ILIKE ('%a%')))
@@ -641,7 +641,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%b%')) OR (main_table.field_value_transformed ILIKE ('%b%')))
@@ -649,7 +649,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%c%')) OR (main_table.field_value_transformed ILIKE ('%c%')))
@@ -657,30 +657,30 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte3 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                             UNION
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte2
                         )
                         ,
                         cte4 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
-                            WHERE main_table.entry_id NOT IN (
-                               SELECT entry_id
+                            WHERE main_table.entryid NOT IN (
+                               SELECT entryid
                                FROM cte3
                             )
                         )
                         ,
                         cte5 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte4
                         )
-                        SELECT * FROM cte5 GROUP BY entry_id"""
+                        SELECT * FROM cte5 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -688,13 +688,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%a''b%')) OR (main_table.field_value_transformed ILIKE ('%a''b%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 )
         );
     }
@@ -722,13 +722,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%Test%')) OR (main_table.field_value_transformed ILIKE ('%Test%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -737,13 +737,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal LIKE ('%Test%')) OR (main_table.field_value_transformed LIKE ('%Test%')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -752,13 +752,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~* ('Test')) OR (main_table.field_value_transformed ~* ('Test')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -767,13 +767,13 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~ ('Test')) OR (main_table.field_value_transformed ~ ('Test')))
                             )
                         )
-                        SELECT * FROM cte0 GROUP BY entry_id"""
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -782,7 +782,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ILIKE ('%Test%')) OR (main_table.field_value_transformed ILIKE ('%Test%')))
@@ -790,7 +790,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
@@ -798,13 +798,13 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                         )
-                        SELECT * FROM cte2 GROUP BY entry_id"""
+                        SELECT * FROM cte2 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -813,7 +813,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal LIKE ('%Test%')) OR (main_table.field_value_transformed LIKE ('%Test%')))
@@ -821,7 +821,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
@@ -829,13 +829,13 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                         )
-                        SELECT * FROM cte2 GROUP BY entry_id"""
+                        SELECT * FROM cte2 GROUP BY entryid"""
                 ),
 
                 Arguments.of(
@@ -844,7 +844,7 @@ class SearchQuerySQLConversionTest {
                         """
                         WITH
                         cte0 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name != 'groups') AND ((main_table.field_value_literal ~* ('Test')) OR (main_table.field_value_transformed ~* ('Test')))
@@ -852,7 +852,7 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte1 AS (
-                            SELECT main_table.entry_id
+                            SELECT main_table.entryid
                             FROM bib_fields."tableName" AS main_table
                             WHERE (
                                 (main_table.field_name = 'author') AND ((main_table.field_value_literal LIKE ('%Smith%')) OR (main_table.field_value_transformed LIKE ('%Smith%')))
@@ -860,13 +860,13 @@ class SearchQuerySQLConversionTest {
                         )
                         ,
                         cte2 AS (
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte0
                             INTERSECT
-                            SELECT entry_id
+                            SELECT entryid
                             FROM cte1
                         )
-                        SELECT * FROM cte2 GROUP BY entry_id"""
+                        SELECT * FROM cte2 GROUP BY entryid"""
                 )
         );
     }
