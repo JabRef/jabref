@@ -39,7 +39,6 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBibtex;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
-    @FXML private CheckBox cleanUpAbbreviateJournal;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -96,12 +95,6 @@ public class CleanupPresetPanel extends VBox {
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
                         cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
-                    }
-                });
-        cleanUpAbbreviateJournal.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanUpAbbreviateJournal.selectedProperty().setValue(false);
                     }
                 });
         updateDisplay(cleanupPreferences);

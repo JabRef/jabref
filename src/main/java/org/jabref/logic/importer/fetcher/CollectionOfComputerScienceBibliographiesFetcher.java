@@ -12,7 +12,6 @@ import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CollectionOfComputerScienceBibliographiesQueryTransformer;
@@ -30,11 +29,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     private static final String BASIC_SEARCH_URL = "http://liinwww.ira.uka.de/bibliography/rss?";
 
     private final CollectionOfComputerScienceBibliographiesParser parser;
-    private final ImporterPreferences importerPreferences;
 
-    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences) {
         this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
-        this.importerPreferences = importerPreferences;
     }
 
     @Override
