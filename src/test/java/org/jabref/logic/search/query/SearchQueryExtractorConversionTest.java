@@ -26,7 +26,8 @@ public class SearchQueryExtractorConversionTest {
                 Arguments.of(List.of(), "NOT a"),
                 Arguments.of(List.of("a", "b", "c"), "(any = a OR any = b) AND NOT (NOT c AND title = d)"),
                 Arguments.of(List.of("b", "c"), "title != a OR b OR c"),
-                Arguments.of(List.of("a", "b"), "a b")
+                Arguments.of(List.of("a", "b"), "a b"),
+                Arguments.of(List.of("term1 term2"), "\"term1 term2\"")
         );
     }
 
