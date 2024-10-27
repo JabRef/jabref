@@ -24,7 +24,7 @@ public class GrobidUseDialogHelper {
         }
         if (preferences.isGrobidEnabled()) {
             preferences.setGrobidUseAsked(true);
-            return preferences.isGrobidEnabled();
+            return true;
         }
         boolean grobidEnabled = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remote services"),
