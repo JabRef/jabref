@@ -350,16 +350,23 @@ License: MIT
 ```
 
 ```yaml
-Id:io.github.adr:e-adr
-Project:EmbeddedArchitecturalDecisionRecords
-URL:https://github.com/adr/e-adr/
-License:EPL-2.0
+Id:      io.github.adr:e-adr
+Project: EmbeddedArchitecturalDecisionRecords
+URL:     https://github.com/adr/e-adr/
+License: EPL-2.0
 ```
 
 ```yaml
 Id:      io.github.java-diff-utils:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
+License: Apache-2.0
+```
+
+```yaml
+Id:      io.zonky.test:embedded-postgres
+Project: embedded-postgres
+URL:     https://github.com/zonkyio/embedded-postgres
 License: Apache-2.0
 ```
 
@@ -798,6 +805,7 @@ de.undercouch:citeproc-java:3.1.0
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.12
+io.zonky.test:embedded-postgres:2.0.7
 jakarta.activation:jakarta.activation-api:2.1.3
 jakarta.annotation:jakarta.annotation-api:2.1.1
 jakarta.inject:jakarta.inject-api:2.0.1
@@ -813,6 +821,7 @@ net.jodah:typetools:0.6.1
 net.synedra:validatorfx:0.5.0
 one.jpro.jproutils:tree-showing:0.2.2
 org.antlr:antlr4-runtime:4.13.2
+org.apache.commons:commons-compress:1.27.1
 org.apache.commons:commons-csv:1.11.0
 org.apache.commons:commons-lang3:3.17.0
 org.apache.commons:commons-text:1.12.0
@@ -889,6 +898,7 @@ org.slf4j:slf4j-api:2.0.16
 org.tinylog:slf4j-tinylog:2.7.0
 org.tinylog:tinylog-api:2.7.0
 org.tinylog:tinylog-impl:2.7.0
+org.tukaani:xz:1.9
 org.yaml:snakeyaml:2.3
 pt.davidafsilva.apple:jkeychain:1.1.0
 tech.units:indriya:2.2
