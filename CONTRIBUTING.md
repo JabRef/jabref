@@ -14,6 +14,7 @@ Detailed instructions about this step can be found in our [guidelines for settin
 * [Getting a task assigned](#getting-a-task-assigned)
 * [Pull Request Process](#pull-request-process)
   * [Requirements on the pull request and code](#requirements-on-the-pull-request-and-code)
+  * [After submission of a pull request](#after-submission-of-a-pull-request)
   * [Development hints](#development-hints)
 
 ## Choosing a task [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref)
@@ -53,7 +54,6 @@ Check out the [documentation for developers](https://devdocs.jabref.org/contribu
 
 For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/main/docs) and edit the file.
 GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
-
 One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/components/callouts/).
 
 ## Getting a task assigned
@@ -63,20 +63,23 @@ GitHub will then automatically assign you.
 
 ## Pull Request Process
 
-1. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-2. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
-3. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
+1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.html) to a) create a fork and b) have the fork checked out on your local machine
+2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
+3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
+4. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
+5. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
+   For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
    1. Ensure that you followed the requirements listed below. They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious.
    2. For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
    3. In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
-4. Wait for feedback of the developers
-5. Address the feedback of the developers
-6. After two developers gave their green flag, the pull request will be merged.
+6. Wait for feedback of the developers
+7. Address the feedback of the developers
+8. After two developers gave their green flag, the pull request will be merged.
 
 In case you have any questions, please
 
 1. comment on the issue,
-2. show up in our [gitter chat](https://gitter.im/JabRef/jabref), or
+2. show up in our [Gitter chat](https://gitter.im/JabRef/jabref), or
 3. show your current code using a draft pull request and ask questions.
 
 We favor looking into your code using a draft pull request, because we can then also load the code into our IDE.
@@ -124,6 +127,26 @@ More reading on that is available at <https://roe.dev/blog/using-ai-in-open-sour
 
 We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
 
+### After submission of a pull request
+
+After you submitted a pull request, automated checks will run.
+You may see "Some checks were not successful".
+You can click on failing checks to see more information about why they failed.
+Then, please look into them and handle accordingly.
+
+Afterwards, you will receive comments on your pull request.
+The pull request may be approved immediatly, or a reviewer may request changes.
+In that case, please implement the requested changes.
+
+After implementing changes, commit to the branch your pull request is *from* and push.
+The pull request will automatically be updated with your changes.
+Your commits will also be automatically squashed upon the pull request being accepted.
+
+Please – **Never ever close a pull request and open a new one** -
+This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
+You can push any changes you need to make to the branch your pull request is *from*.
+These changes will be automatically added to your pull request.
+
 ### Development hints
 
 #### When adding an external dependency
@@ -160,7 +183,7 @@ Add the above snippet to the English translation file located at `src/main/resou
 
 You can also directly run the specific test in your IDE.
 The test "`LocalizationConsistencyTest`" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`.
-Find more information in the [JabRef developer docs](code-howtos/localization.md).
+Find more information in the [JabRef developer docs](https://devdocs.jabref.org/code-howtos/localization.html).
 
 #### **Format of keyboard shortcuts**
 

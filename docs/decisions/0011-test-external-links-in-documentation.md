@@ -22,7 +22,7 @@ For high-quality documentation, external links should be working.
 
 ## Decision Outcome
 
-Chosen option: "\[option 1\]", because \[justification. e.g., only option, which meets k.o. criterion decision driver \| which resolves force force \| … \| comes out best \(see below\)\].
+Chosen option: "Check external links once a month", because it provides a basic quality baseline.
 
 ### Positive Consequences
 
@@ -30,7 +30,8 @@ Chosen option: "\[option 1\]", because \[justification. e.g., only option, which
 
 ### Negative Consequences
 
-* Some external sites need to [be disabled](https://github.com/JabRef/jabref/pull/6542/files). For instance, GitHub.com always returns "forbidden". A [filter for status is future work of the used tool](https://github.com/tcort/markdown-link-check/issues/94#issuecomment-634947466).
+* Some external sites need to [be disabled](https://github.com/JabRef/jabref/pull/6542/files). For instance, GitHub.com always returns "forbidden".
+* Contributors find it strange if external links are broken (example: [user-documentation#526](https://github.com/JabRef/user-documentation/pull/526#issuecomment-2416462977))
 
 ## Pros and Cons of the Options
 
