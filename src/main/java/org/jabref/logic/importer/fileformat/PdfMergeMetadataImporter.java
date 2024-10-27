@@ -139,7 +139,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /**
      * A modified version of {@link PdfMergeMetadataImporter#importDatabase(Path)}, but it
      * relativizes the {@code filePath} if there are working directories before parsing it
-     * into {@link PdfMergeMetadataImporter#importDatabase}
+     * into {@link PdfMergeMetadataImporter#importDatabase(Path)}
      * (Otherwise no path modification happens).
      *
      * @param filePath    The unrelativized {@code filePath}.
