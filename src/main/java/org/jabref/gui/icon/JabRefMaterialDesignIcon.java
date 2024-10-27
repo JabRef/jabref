@@ -33,7 +33,9 @@ public enum JabRefMaterialDesignIcon implements Ikon {
     SUBLIME_TEXT("jab-sublime-text", '\ue90f'),
     TEXSHOP("jab-texshop", '\ue910'),
     TEXWORKS("jab-texworks", '\ue911'),
-    BIBLIOGRAPHY("jab-bibliography", '\ue912');
+    BIBLIOGRAPHY("jab-bibliography", '\ue912'),
+    PERSON_PDF("jab-personpdf", '\ue916'),
+    WORLD_PDF("jab-worldpdf", '\ue913');
 
     private String description;
     private int code;
