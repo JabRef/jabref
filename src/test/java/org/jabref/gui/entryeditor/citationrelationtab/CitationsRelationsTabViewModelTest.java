@@ -81,11 +81,13 @@ class CitationsRelationsTabViewModelTest {
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
+        StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+
         viewModel = new CitationsRelationsTabViewModel(
                 bibDatabaseContext,
                 preferences,
                 mock(UndoManager.class),
-                mock(StateManager.class, Answers.RETURNS_DEEP_STUBS),
+                stateManager,
                 mock(DialogService.class),
                 new DummyFileUpdateMonitor(),
                 new CurrentThreadTaskExecutor());

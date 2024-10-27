@@ -100,7 +100,7 @@ class MainArchitectureTest {
                              .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
                              .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
 
-                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI, Migrations)
+                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(Migrations)
                              .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations)
                              .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
 

@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
 public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, CliPreferences preferences) {
+    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         return MergeReviewIntoCommentMigration.needsMigration(parserResult);
     }
 

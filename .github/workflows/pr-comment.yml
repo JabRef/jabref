@@ -34,15 +34,25 @@ jobs:
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      - name: Checkout
+      - uses: actions/checkout@v4
+      - name: Determine owner
         if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        id: isCrossRepository
+        run: |
+          isCrossRepository=$(gh pr view $pr_number --json isCrossRepository --jq '.isCrossRepository')
+          echo "Got isCrossRepository $isCrossRepository"
+          echo isCrossRepository=$isCrossRepository >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Checkout
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.isCrossRepository.isCrossRepository == 'true') }}
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
-        if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.isCrossRepository.isCrossRepository == 'true') }}
         uses: jbangdev/jbang-action@v0.119.0
         with:
           script: ghprcomment@koppor/ghprcomment

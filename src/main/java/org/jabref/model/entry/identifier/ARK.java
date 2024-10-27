@@ -28,13 +28,13 @@ public class ARK extends EprintIdentifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         String cleanARK = ark.strip();
         return cleanARK.replaceFirst("^ark:/", "");
     }
 
     @Override
     public Optional<URI> getExternalURI() {
-        return Optional.of(URI.create("https://n2t.net/ark:/" + getNormalized()));
+        return Optional.of(URI.create("https://n2t.net/ark:/" + asString()));
     }
 }
