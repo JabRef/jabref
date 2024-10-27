@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -105,6 +104,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                          try {
                              preferences.importPreferences(file);
                              setValues();
+
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
                          } catch (JabRefException ex) {
@@ -199,6 +199,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
     public void setValues() {
         memoryStickProperty.setValue(preferences.getInternalPreferences().isMemoryStickMode());
+
         for (PreferencesTab preferencesTab : preferenceTabs) {
             preferencesTab.setValues();
         }
