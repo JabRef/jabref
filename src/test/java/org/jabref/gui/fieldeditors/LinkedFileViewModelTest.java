@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -71,15 +72,20 @@ class LinkedFileViewModelTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private CookieManager cookieManager;
+    private MenuItem moveFileItem;
+    private MenuItem moveAndRenameFileItem;
+    private Path tempFolderPath;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
         entry = new BibEntry()
                 .withCitationKey("asdf");
-
+        tempFolderPath = tempFolder;
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
+        moveFileItem = mock(MenuItem.class);
+        moveAndRenameFileItem = mock(MenuItem.class);
 
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);

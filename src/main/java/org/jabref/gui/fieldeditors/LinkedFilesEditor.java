@@ -1,10 +1,13 @@
 package org.jabref.gui.fieldeditors;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -15,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
@@ -314,9 +318,51 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return 3;
     }
 
+    private MenuItem[] createMenuItem(LinkedFileViewModel linkedFile) {
+        MenuItem moveFileItem = new MenuItem(Localization.lang("Move file"));
+        BooleanProperty isMoveFileDisabled = new SimpleBooleanProperty(true);
+        moveFileItem.disableProperty().bind(isMoveFileDisabled);
+
+        MenuItem moveAndRenameFileItem = new MenuItem(Localization.lang("Move file to directory and Rename"));
+        BooleanProperty isMoveAndRenameFileDisabled = new SimpleBooleanProperty(true);
+        moveAndRenameFileItem.disableProperty().bind(isMoveAndRenameFileDisabled);
+
+        // Context action for MOVE_FILE_TO_FOLDER standard action
+        ContextAction moveFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences, moveFileItem, moveAndRenameFileItem);
+        moveFileItem.setOnAction(event -> moveFileAction.execute());
+
+        // Context action for MOVE_FILE_TO_FOLDER_AND_RENAME standard action
+        ContextAction moveAndRenameFileAction = new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences, moveFileItem, moveAndRenameFileItem);
+        moveAndRenameFileItem.setOnAction(event -> moveAndRenameFileAction.execute());
+
+        // Bind moveFileItem enabling condition (depend on current file path availability)
+        var dir = databaseContext.getFileDirectories(preferences.getFilePreferences());
+        Optional<Path> currentFilePath = linkedFile.findIn(dir);
+
+        if (currentFilePath.isPresent()) {
+            isMoveFileDisabled.set(false);
+            linkedFile.updateMoveFileItemText(moveFileItem, currentFilePath.get());
+        } else {
+            isMoveFileDisabled.set(true);
+            moveFileItem.setText(Localization.lang("Move file"));
+        }
+
+        // Bind moveFileItem enabling condition (depend on current file path availability)
+        if (currentFilePath.isPresent()) {
+            isMoveAndRenameFileDisabled.set(false);
+            linkedFile.updateMoveAndRenameFileItemText(moveAndRenameFileItem, currentFilePath.get());
+        } else {
+            isMoveAndRenameFileDisabled.set(true);
+            moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
+        }
+
+        return new MenuItem[] {moveFileItem, moveAndRenameFileItem};
+    }
+
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
+        MenuItem[] moveFileItems = createMenuItem(linkedFile);
 
         menu.getItems().addAll(
                 factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferences)),
@@ -325,16 +371,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferences)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
+                moveFileItems[0],
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
+                moveFileItems[1],
                 factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
                 factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferences)),
                 factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferences))
         );
-
         return menu;
     }
 
@@ -342,51 +387,80 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         private final StandardActions command;
         private final LinkedFileViewModel linkedFile;
+        private final MenuItem moveFileItem;
+        private final MenuItem moveAndRenameFileItem;
 
         public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
+            this(command, linkedFile, preferences, null, null);
+        }
+
+        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences, MenuItem moveFileItem, MenuItem moveAndRenameFileItem) {
             this.command = command;
             this.linkedFile = linkedFile;
+            this.moveFileItem = moveFileItem;
+            this.moveAndRenameFileItem = moveAndRenameFileItem;
 
             this.executable.bind(
                     switch (command) {
-                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case MOVE_FILE_TO_FOLDER, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> linkedFile.getFile().isOnlineLink(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
-                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        default -> BindingsHelper.constantOf(true);
+                        case RENAME_FILE_TO_PATTERN ->
+                                Bindings.createBooleanBinding(
+                                        () -> !linkedFile.getFile().isOnlineLink()
+                                                && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+                                                && !linkedFile.isGeneratedNameSameAsOriginal(),
+                                        linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case MOVE_FILE_TO_FOLDER,
+                             MOVE_FILE_TO_FOLDER_AND_RENAME ->
+                                Bindings.createBooleanBinding(
+                                        () -> !linkedFile.getFile().isOnlineLink()
+                                                && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+                                                && !linkedFile.isGeneratedPathSameAsOriginal(),
+                                        linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case DOWNLOAD_FILE ->
+                                Bindings.createBooleanBinding(
+                                        () -> linkedFile.getFile().isOnlineLink(),
+                                        linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case REDOWNLOAD_FILE ->
+                                Bindings.createBooleanBinding(
+                                        () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
+                                        linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case OPEN_FILE,
+                             OPEN_FOLDER,
+                             RENAME_FILE_TO_NAME,
+                             DELETE_FILE ->
+                                Bindings.createBooleanBinding(
+                                        () -> !linkedFile.getFile().isOnlineLink()
+                                                && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
+                                        linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        default ->
+                                BindingsHelper.constantOf(true);
                     });
         }
 
         @Override
         public void execute() {
             switch (command) {
-                case EDIT_FILE_LINK -> linkedFile.edit();
-                case OPEN_FILE -> linkedFile.open();
-                case OPEN_FOLDER -> linkedFile.openFolder();
-                case DOWNLOAD_FILE -> linkedFile.download(true);
-                case REDOWNLOAD_FILE -> linkedFile.redownload();
-                case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
-                case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
-                case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
-                case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
-                case DELETE_FILE -> viewModel.deleteFile(linkedFile);
-                case REMOVE_LINK -> viewModel.removeFileLink(linkedFile);
+                case EDIT_FILE_LINK ->
+                        linkedFile.edit();
+                case OPEN_FILE ->
+                        linkedFile.open();
+                case OPEN_FOLDER ->
+                        linkedFile.openFolder();
+                case DOWNLOAD_FILE ->
+                        linkedFile.download(true);
+                case REDOWNLOAD_FILE ->
+                        linkedFile.redownload();
+                case RENAME_FILE_TO_PATTERN ->
+                        linkedFile.renameToSuggestion();
+                case RENAME_FILE_TO_NAME ->
+                        linkedFile.askForNameAndRename();
+                case MOVE_FILE_TO_FOLDER ->
+                        linkedFile.moveToDirectory(moveFileItem, moveAndRenameFileItem, false);
+                case MOVE_FILE_TO_FOLDER_AND_RENAME ->
+                        linkedFile.moveToDirectoryAndRename(moveFileItem, moveAndRenameFileItem);
+                case DELETE_FILE ->
+                        viewModel.deleteFile(linkedFile);
+                case REMOVE_LINK ->
+                        viewModel.removeFileLink(linkedFile);
             }
         }
     }
