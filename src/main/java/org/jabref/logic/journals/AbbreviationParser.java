@@ -75,11 +75,22 @@ public class AbbreviationParser {
                     position = LwtaAbbreviation.Position.FULL_WORD;
                 }
 
+                boolean allowsPrefix = false;
+                boolean allowsSuffix = false;
+
+                if (abbreviation.startsWith("-")) {
+                    allowsPrefix = true;
+                }
+
+                if (abbreviation.endsWith("-")) {
+                    allowsSuffix = true;
+                }
+
                 if (abbreviation == "n.a.") {
                     abbreviation = name;
                 }
 
-                LwtaAbbreviation abbreviationToAdd = new LwtaAbbreviation(removeHyphens(name), removeHyphens(abbreviation), position);
+                LwtaAbbreviation abbreviationToAdd = new LwtaAbbreviation(removeHyphens(name), removeHyphens(abbreviation), position, allowsPrefix, allowsSuffix);
                 lwtaAbbreviations.add(abbreviationToAdd);
             }
         }
