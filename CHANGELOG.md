@@ -34,7 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
-- We added a 'language id' (langid) field for biblatex entry types. [#10868](https://github.com/JabRef/jabref/issues/10868)
+- We added support for `langid` field for biblatex libraries. [#10868](https://github.com/JabRef/jabref/issues/10868)
 - We added support for modifier keys when dropping a file on an entry in the main table. [#12001](https://github.com/JabRef/jabref/pull/12001)
 - We added an importer for SSRN URLs. [#12021](https://github.com/JabRef/jabref/pull/12021)
 - We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
