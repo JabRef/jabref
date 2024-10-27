@@ -9,7 +9,7 @@ jobs:
   Assigned:
     # Triggered when manually assigned the label "📍 Assigned" to trigger the automatic unassignment after 30 days
     name: "📍 Assigned"
-    if: ${{ github.event.label.name == '📍 Assigned' }}
+    if: ${{ github.event.label.name == '📍 Assigned' && github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -35,7 +35,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
   FirstTimeCodeContribution:
-    if: ${{ github.event.label.name == 'FirstTimeCodeContribution' }}
+    if: ${{ github.event.label.name == 'FirstTimeCodeContribution' && github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -80,7 +80,7 @@ jobs:
         skip-if-not-in-project: true
   good-first-issue:
     name: "good first issue"
-    if: "${{ github.event.label.name == 'good first issue' }}"
+    if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-latest
     steps:
       - name: "good first issue"
@@ -90,7 +90,7 @@ jobs:
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
           gh project item-add 5 --owner JabRef --url $ISSUE_URL
   needs-refinement:
-    if: github.event.label.name == 'needs-refinement'
+    if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     steps:
       - name: needs-refinement
@@ -101,7 +101,7 @@ jobs:
           gh project item-add 15 --owner JabRef --url $ISSUE_URL
   status-freeze:
     name: "status: freeze"
-    if: "${{ github.event.label.name == 'status: freeze' }}"
+    if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-latest
     steps:
       - name: "status: freeze"
@@ -111,7 +111,7 @@ jobs:
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
           gh project item-add 9 --owner JabRef --url $ISSUE_URL
   ui:
-    if: "${{ github.event.label.name == 'ui' }}"
+    if: "${{ github.event.label.name == 'ui' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-latest
     steps:
       - name: ui

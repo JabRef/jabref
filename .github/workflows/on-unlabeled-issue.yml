@@ -7,7 +7,7 @@ on:
 
 jobs:
   FirstTimeCodeContribution_or_Assigned:
-    if: ${{ (github.event.label.name == 'FirstTimeCodeContribution') || (github.event.label.name == '📍 Assigned') }}
+    if: ${{ ((github.event.label.name == 'FirstTimeCodeContribution') || (github.event.label.name == '📍 Assigned')) && github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
