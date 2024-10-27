@@ -42,23 +42,23 @@ public class FieldEditorsMultilinePropertyTest {
     }
 
     /**
-     *
+     * This test is somewhat fragile, as it depends on the structure of FieldEditors.java.
+     * If the structure of FieldEditors.java is changed, this test might fail.
      * This test performs the following steps:
      * 1. Use Java parser to parse FieldEditors.java and check all if statements in the getForField method.
      * 2. Match the conditions of if statements to extract the field properties.
      * 3. Match the created FieldEditor class name with field properties extracted from step 2. This creates a map where:
-     * - The key is the file path of the FieldEditor class (for example: ....UrlEditor.java)
-     * - The value is the list of properties of the FieldEditor class (for example: [FieldProperty.EXTERNAL])
+     *    - The key is the file path of the FieldEditor class (for example: ....UrlEditor.java)
+     *    - The value is the list of properties of the FieldEditor class (for example: [FieldProperty.EXTERNAL])
      * 4. For every class in the map, when its properties contain MULTILINE_TEXT, check whether it:
-     * a) Holds a TextInputControl field
-     * b) Has an EditorTextArea object creation
-     *
+     *    a) Holds a TextInputControl field
+     *    b) Has an EditorTextArea object creation
      */
     @Test
     public void fieldEditorsMatchMultilineProperty() throws Exception {
         Map<Path, List<FieldProperty>> result = getEditorsWithPropertiesInFieldEditors();
         for (Map.Entry<Path, List<FieldProperty>> entry : result.entrySet()) {
-            // now we have the file path and its properties, going to analyze the target Editor class
+            // Now we have the file path and its properties, going to analyze the target Editor class
             Path filePath = entry.getKey();
             List<FieldProperty> properties = entry.getValue();
             CompilationUnit cu = PARSER.parse(filePath)
@@ -70,11 +70,11 @@ public class FieldEditorsMultilinePropertyTest {
                                                        + ", please check if the file exists"));
 
             if (!implementedFieldEditorFX(cu)) {
-                continue; // make sure the class implements FieldEditorFX interface
+                continue; // Make sure the class implements FieldEditorFX interface
             }
 
             if (properties.contains(FieldProperty.MULTILINE_TEXT)) {
-                // if the editor has MULTILINE_TEXT property, we are going to check if the class hold a `TextInputControl` field
+                // If the editor has MULTILINE_TEXT property, we are going to check if the class holds a `TextInputControl` field
                 // and have performed Text Area creation
                 assertTrue(holdTextInputControlField(cu) && hasEditorTextAreaCreationExisted(cu),
                         "Class " + filePath + " should hold a TextInputControl field and have EditorTextArea creation");
@@ -95,31 +95,31 @@ public class FieldEditorsMultilinePropertyTest {
                                    .orElseThrow(() ->
                                            new NullPointerException("Failed to parse FieldEditors.java"));
 
-        // locate getForField method in FieldEditors.java
+        // Locate getForField method in FieldEditors.java
         MethodDeclaration getForFieldCall = cu.findAll(MethodDeclaration.class).stream()
                 .filter(methodDeclaration -> "getForField".equals(methodDeclaration.getNameAsString()))
                 .findFirst()
                 .orElseThrow(() -> new Exception("Failed to find getForField method in FieldEditors.java"));
 
-        // analyze all if statements in getForField method
+        // Analyze all if statements in getForField method
         getForFieldCall.findAll(IfStmt.class).forEach(ifStmt -> {
             String condition = ifStmt.getCondition().toString();
             List<FieldProperty> properties = new ArrayList<>();
-            // match `fieldProperties.contains(FieldProperty.XXX)`
+            // Match `fieldProperties.contains(FieldProperty.XXX)`
             Matcher propertyMatcher = FIELD_PROPERTY_PATTERN.matcher(condition);
             while (propertyMatcher.find()) {
                 String propertyName = propertyMatcher.group(1);
                 FieldProperty property = FieldProperty.valueOf(propertyName);
                 properties.add(property);
             }
-            // match `== StandardField.XXX`
+            // Match `== StandardField.XXX`
             Matcher standardFieldMatcher = STANDARD_FIELD_PATTERN.matcher(condition);
             if (standardFieldMatcher.find()) {
                 String fieldName = standardFieldMatcher.group(1);
                 StandardField standardField = StandardField.valueOf(fieldName);
                 properties.addAll(standardField.getProperties());
             }
-            // match `== InternalField.XXX`
+            // Match `== InternalField.XXX`
             Matcher internalFieldMatcher = INTERNAL_FIELD_PATTERN.matcher(condition);
             if (internalFieldMatcher.find()) {
                 String fieldName = internalFieldMatcher.group(1);
@@ -127,14 +127,14 @@ public class FieldEditorsMultilinePropertyTest {
                 properties.addAll(internalField.getProperties());
             }
 
-            // check if the return statement contains an object creation
-            // if so, extract the created class name and its path
+            // Check if the return statement contains an object creation
+            // If so, extract the created class name and its path
             ifStmt.getThenStmt().stream()
                   .filter(ReturnStmt.class::isInstance)
                   .map(ReturnStmt.class::cast)
                   .findFirst()
                   .flatMap(returnStmt ->
-                        // try to find the object creation in the return statement
+                        // Try to find the object creation in the return statement
                         returnStmt.stream()
                             .filter(ObjectCreationExpr.class::isInstance)
                             .map(ObjectCreationExpr.class::cast)
@@ -188,7 +188,7 @@ public class FieldEditorsMultilinePropertyTest {
      * @return true if the class holds a TextInputControl field
      */
     private static boolean holdTextInputControlField(CompilationUnit cu) {
-        // since the class implements FieldEditorFX, we are going to check the first parameter when call
+        // Since the class implements FieldEditorFX, we are going to check the first parameter when call
         // establishBinding method, which should be a TextInputControl
         AtomicBoolean hasTextInputControlField = new AtomicBoolean(false);
         cu.findAll(MethodCallExpr.class)
@@ -233,4 +233,4 @@ public class FieldEditorsMultilinePropertyTest {
                 });
         return hasEditorTextField.get();
     }
-    }
+}
