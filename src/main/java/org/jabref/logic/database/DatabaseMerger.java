@@ -119,8 +119,6 @@ public class DatabaseMerger {
                             "Imported " + newGroupName,
                             GroupHierarchyType.INDEPENDENT,
                             keywordDelimiter);
-                    // The "if" block in `setGroup` is never executed because all input Booleans are false.
-                    // Since no conditions are met, there is no need to pass `entriesInDatabase`.
                     newGroups.setGroup(group);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {
