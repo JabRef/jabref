@@ -70,4 +70,10 @@ class LocalizationTest {
     void unsetLanguageTranslation() {
         assertEquals("Groups", Localization.lang("Groups"));
     }
+
+    @Test
+    void placeholderIsKeptWhenNoParameter() {
+        // This behavior is required when %0 should be transformed to a hyperlink in the UI.
+        assertEquals("Groups %0", Localization.lang("Groups %0"));
+    }
 }

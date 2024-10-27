@@ -15,7 +15,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -98,7 +97,6 @@ class CommentsTabTest {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                mock(LuceneManager.class),
                 OptionalObjectProperty.empty()
         );
     }
