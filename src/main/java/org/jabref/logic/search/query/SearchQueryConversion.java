@@ -7,7 +7,6 @@ import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.search.query.SqlQueryNode;
 import org.jabref.search.SearchParser;
 
-import org.apache.lucene.search.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +23,9 @@ public class SearchQueryConversion {
         return new SearchFlagsToExpressionVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
-    public static Query searchToLucene(SearchQuery searchQuery) {
+    public static String searchToLucene(SearchQuery searchQuery) {
         LOGGER.debug("Converting search expression to Lucene: {}", searchQuery.getSearchExpression());
-        return new SearchToLuceneVisitor().visit(searchQuery.getContext());
+        return new SearchToLuceneVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
     public static List<SearchQueryNode> extractSearchTerms(SearchQuery searchQuery) {
