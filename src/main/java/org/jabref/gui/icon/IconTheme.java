@@ -283,6 +283,7 @@ public class IconTheme {
         APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
         APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
         APPLICATION_TEXWORS(JabRefMaterialDesignIcon.TEXWORKS),
+        APPLICATION_VSCODE(JabRefMaterialDesignIcon.VSCODE),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
         CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),
