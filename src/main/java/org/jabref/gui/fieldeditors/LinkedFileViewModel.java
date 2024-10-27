@@ -351,7 +351,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 moveFileItem.setGraphic(IconTheme.JabRefIcons.MOVE_TO_FOLDER.getGraphicNode());
             }
         } else {
-            moveFileItem.setDisable(true);
+            //moveFileItem.setDisable(true);
             moveFileItem.setText(Localization.lang("Move file"));
         }
     }
@@ -364,7 +364,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
             moveAndRenameFileItem.setText(Localization.lang("Move file to %0 and Rename", dirInfo.label()));
         } else {
-            moveAndRenameFileItem.setDisable(true);
+            //moveAndRenameFileItem.setDisable(true);
             moveAndRenameFileItem.setText(Localization.lang("Move file to directory and Rename"));
         }
     }
