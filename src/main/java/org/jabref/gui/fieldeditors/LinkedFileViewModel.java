@@ -341,11 +341,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         if (targetDirectory.isPresent()) {
             FileDirectoryHandler.DirectoryInfo dirInfo = targetDirectory.get();
+            System.out.println("Target directory:" + dirInfo.label());
             moveFileItem.setText(Localization.lang("Move file to %0", dirInfo.label()));
 
-            if (dirInfo.label() == "main file directory") {
+            if (dirInfo.label().equals("main file directory")) {
                 moveFileItem.setGraphic(IconTheme.JabRefIcons.WORLD_PDF.getGraphicNode());
-            } else if (dirInfo.label() == "user-specific file directory") {
+            } else if (dirInfo.label().equals("user-specific file directory")) {
                 moveFileItem.setGraphic(IconTheme.JabRefIcons.PERSON_PDF.getGraphicNode());
             } else {
                 moveFileItem.setGraphic(IconTheme.JabRefIcons.MOVE_TO_FOLDER.getGraphicNode());
