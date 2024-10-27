@@ -82,8 +82,6 @@ public class CleanupWorker {
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
                     new ISSNCleanup();
-            case ABBREVIATE_JOURNAL ->
-                    new AbbreviateJournalCleanup();
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

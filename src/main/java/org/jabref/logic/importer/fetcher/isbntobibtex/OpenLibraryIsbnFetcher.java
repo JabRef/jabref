@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -80,6 +81,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
     @Override
     public void doPostCleanup(BibEntry entry) {
+        new AbbreviateJournalCleanup().cleanup(entry);
     }
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {

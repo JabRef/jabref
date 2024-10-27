@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
@@ -129,6 +130,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public void doPostCleanup(BibEntry entry) {
+        new AbbreviateJournalCleanup().cleanup(entry);
         new MoveFieldCleanup(new UnknownField("msc2010"), StandardField.KEYWORDS).cleanup(entry);
         new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);
         new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveEnclosingBracesFormatter()).cleanup(entry);

@@ -16,15 +16,10 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
  */
 public class DoiCleanup implements CleanupJob {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DoiCleanup.class);
 
     /**
      * Fields to check for DOIs.
@@ -35,9 +30,6 @@ public class DoiCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
-
-        String example = "example";
-        LOGGER.debug("Some state {}", example);
 
         // First check if the Doi Field is empty
         if (entry.hasField(StandardField.DOI)) {

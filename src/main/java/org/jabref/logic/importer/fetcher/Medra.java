@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -110,5 +111,6 @@ public class Medra implements IdBasedParserFetcher {
     @Override
     public void doPostCleanup(BibEntry entry) {
         new DoiCleanup().cleanup(entry);
+        new AbbreviateJournalCleanup().cleanup(entry);
     }
 }

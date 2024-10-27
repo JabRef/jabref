@@ -5,12 +5,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CollectionOfComputerScienceBibliographiesQueryTransformer;
@@ -28,9 +30,11 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     private static final String BASIC_SEARCH_URL = "http://liinwww.ira.uka.de/bibliography/rss?";
 
     private final CollectionOfComputerScienceBibliographiesParser parser;
+    private final ImporterPreferences importerPreferences;
 
-    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences) {
+    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
+        this.importerPreferences = importerPreferences;
     }
 
     @Override
@@ -58,6 +62,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
         new FieldFormatterCleanup(StandardField.ABSTRACT, new ReplaceTabsBySpaceFormater()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveRedundantSpacesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
+
+        new AbbreviateJournalCleanup().cleanup(entry);
+
         // identifier fields is a key-value field
         // example: "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000505046100032; Scopus 2-s2.0-85037741580"
         // thus, key can contain multiple ":"; sometimes value separated by " " instead of ":"
