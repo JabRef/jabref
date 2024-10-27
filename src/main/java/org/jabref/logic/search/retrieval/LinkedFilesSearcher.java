@@ -22,6 +22,9 @@ import org.jabref.model.search.query.SearchResults;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -39,11 +42,14 @@ public final class LinkedFilesSearcher {
     private final FilePreferences filePreferences;
     private final BibDatabaseContext databaseContext;
     private final SearcherManager searcherManager;
+    private final MultiFieldQueryParser parser;
 
     public LinkedFilesSearcher(BibDatabaseContext databaseContext, LuceneIndexer linkedFilesIndexer, FilePreferences filePreferences) {
         this.searcherManager = linkedFilesIndexer.getSearcherManager();
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
+        this.parser = new MultiFieldQueryParser(LinkedFilesConstants.PDF_FIELDS.toArray(new String[0]), LinkedFilesConstants.LINKED_FILES_ANALYZER);
+        parser.setDefaultOperator(QueryParser.Operator.AND);
     }
 
     public SearchResults search(SearchQuery searchQuery) {
@@ -51,23 +57,37 @@ public final class LinkedFilesSearcher {
             return new SearchResults();
         }
 
-        Query luceneQuery = SearchQueryConversion.searchToLucene(searchQuery);
+        Optional<Query> luceneQuery = getLuceneQuery(searchQuery);
+        if (luceneQuery.isEmpty()) {
+            return new SearchResults();
+        }
+
         EnumSet<SearchFlags> searchFlags = searchQuery.getSearchFlags();
         boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) && filePreferences.shouldFulltextIndexLinkedFiles();
         if (!shouldSearchInLinkedFiles) {
             return new SearchResults();
         }
 
-        LOGGER.debug("Searching in linked files with query: {}", luceneQuery);
+        LOGGER.debug("Searching in linked files with query: {}", luceneQuery.get());
         try {
             IndexSearcher linkedFilesIndexSearcher = acquireIndexSearcher(searcherManager);
-            SearchResults searchResults = search(linkedFilesIndexSearcher, luceneQuery);
+            SearchResults searchResults = search(linkedFilesIndexSearcher, luceneQuery.get());
             releaseIndexSearcher(searcherManager, linkedFilesIndexSearcher);
             return searchResults;
         } catch (IOException | IndexSearcher.TooManyClauses e) {
             LOGGER.error("Error during linked files search execution", e);
         }
         return new SearchResults();
+    }
+
+    private Optional<Query> getLuceneQuery(SearchQuery searchQuery) {
+        String query = SearchQueryConversion.searchToLucene(searchQuery);
+        try {
+            return Optional.of(parser.parse(query));
+        } catch (ParseException e) {
+            LOGGER.error("Error during query parsing", e);
+            return Optional.empty();
+        }
     }
 
     private SearchResults search(IndexSearcher indexSearcher, Query searchQuery) throws IOException {
