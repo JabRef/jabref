@@ -22,6 +22,8 @@ public class AbbreviationParser {
     // Ensures ordering while preventing duplicates
     private final LinkedHashSet<Abbreviation> abbreviations = new LinkedHashSet<>();
 
+    private final LinkedHashSet<LwtaAbbreviation> lwtaAbbreviations = new LinkedHashSet<>();
+
     /*
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
      * formatted as: "Full Journal Name,Abbr. Journal Name[,Shortest Unique Abbreviation]"
@@ -49,6 +51,40 @@ public class AbbreviationParser {
         }
     }
 
+    void readLwtaAbbreviations(Path file) throws IOException {
+        char delimiter = detectDelimiter(file);
+
+        try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {
+            for (CSVRecord csvRecord : csvParser) {
+                String name = csvRecord.size() > 0 ? csvRecord.get(0) : "";
+                String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : "";
+
+                // Check name and abbreviation
+                if (name.isEmpty() || abbreviation.isEmpty()) {
+                    return;
+                }
+                LwtaAbbreviation.Position position;
+
+                if (name.endsWith("-") && name.startsWith("-")) {
+                    position = LwtaAbbreviation.Position.IN_WORD;
+                } else if (name.endsWith("-")) {
+                    position = LwtaAbbreviation.Position.STARTS_WORD;
+                } else if (name.startsWith("-")) {
+                    position = LwtaAbbreviation.Position.ENDS_WORD;
+                } else {
+                    position = LwtaAbbreviation.Position.FULL_WORD;
+                }
+
+                if (abbreviation == "n.a.") {
+                    abbreviation = name;
+                }
+
+                LwtaAbbreviation abbreviationToAdd = new LwtaAbbreviation(removeHyphens(name), removeHyphens(abbreviation), position);
+                lwtaAbbreviations.add(abbreviationToAdd);
+            }
+        }
+    }
+
     private char detectDelimiter(Path file) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             String line = reader.readLine();
@@ -63,7 +99,21 @@ public class AbbreviationParser {
         }
     }
 
+    private static String removeHyphens(String string) {
+        if (string.startsWith("-")) {
+            string = string.substring(1);
+        }
+        if (string.endsWith("-")) {
+            string = string.substring(0, string.length() - 1);
+        }
+        return string;
+    }
+
     public Collection<Abbreviation> getAbbreviations() {
         return abbreviations;
+    }
+
+    public Collection<LwtaAbbreviation> getLwtaAbbreviations() {
+        return lwtaAbbreviations;
     }
 }
