@@ -1,11 +1,11 @@
 package org.jabref.logic.journals;
 
 public class LwtaAbbreviation {
-    private String unAbbreviated;
-    private String abbreviation;
-    private Position position;
-    private boolean allowsSuffix;
-    private boolean allowsPrefix;
+    private final String unAbbreviated;
+    private final String abbreviation;
+    private final Position position;
+    private final boolean allowsSuffix;
+    private final boolean allowsPrefix;
 
     enum Position {
         ENDS_WORD, STARTS_WORD, IN_WORD, FULL_WORD

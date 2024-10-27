@@ -17,6 +17,9 @@ public class LwtaAbbreviationRepository {
     // incomplete list
     private final String[] WORDS_TO_REMOVE = new String[]{"the", "and", "&", "of", "but", "sans", "section", "series", "part"};
 
+    /**
+     * instantiates this class with a csv file
+     */
     public LwtaAbbreviationRepository(Path file) throws IOException {
         AbbreviationParser parser = new AbbreviationParser();
         lwtaToAbbreviationObject = new HashMap<>();
@@ -29,25 +32,31 @@ public class LwtaAbbreviationRepository {
         }
     }
 
+    /**
+     * returns true if the abbreviation can be applied to the word given
+     */
     private boolean canAbbreviate(String word, LwtaAbbreviation lwtaAbbreviation) {
-        switch (lwtaAbbreviation.getPosition()) {
-            case IN_WORD:
-                return word.contains(lwtaAbbreviation.getUnAbbreviated());
-            case STARTS_WORD:
-                return word.startsWith(lwtaAbbreviation.getUnAbbreviated());
-            case ENDS_WORD:
-                return word.endsWith(lwtaAbbreviation.getUnAbbreviated());
-            default:
-                return false;
-        }
+        return switch (lwtaAbbreviation.getPosition()) {
+            case IN_WORD ->
+                    word.contains(lwtaAbbreviation.getUnAbbreviated());
+            case STARTS_WORD ->
+                    word.startsWith(lwtaAbbreviation.getUnAbbreviated());
+            case ENDS_WORD ->
+                    word.endsWith(lwtaAbbreviation.getUnAbbreviated());
+            default ->
+                    false;
+        };
     }
 
+    /**
+     * abbreviates the word with the set of abbreviations. Recursive, prefers abbreviating the longest chunks first.
+     */
     private String abbreviateWord(String word, Set<String> abbreviations) {
         List<String> possibleAbbreviations = new ArrayList<>();
 
         // We need to keep capitalisation for our final result, but lower case allows us to compare
         boolean capitalised = Character.isUpperCase(word.charAt(0));
-        String wordLowerCase = new String(word).toLowerCase();
+        String wordLowerCase = word.toLowerCase();
 
         for (String abbreviation : abbreviations) {
             LwtaAbbreviation lwtaAbbreviation = lwtaToAbbreviationObject.get(abbreviation);
@@ -69,10 +78,10 @@ public class LwtaAbbreviationRepository {
         String wordAbb = "";
 
         switch (abbreviationUsed.getPosition()) {
-            case ENDS_WORD:
+            case ENDS_WORD -> {
                 for (int i = 0; i < word.length(); i++) {
                     String head = word.substring(0, i);
-                    String tail = word.substring(i, word.length());
+                    String tail = word.substring(i);
                     if (tail.equalsIgnoreCase(abbreviationUsed.getUnAbbreviated())) {
                         String prefix = "";
                         if (abbreviationUsed.getAllowsPrefix()) {
@@ -82,12 +91,11 @@ public class LwtaAbbreviationRepository {
                         wordAbb = prefix + abbreviationUsed.getAbbreviation();
                     }
                 }
-                break;
-
-            case STARTS_WORD:
+            }
+            case STARTS_WORD -> {
                 for (int i = 0; i < word.length(); i++) {
                     String head = word.substring(0, i);
-                    String tail = word.substring(i, word.length());
+                    String tail = word.substring(i);
                     if (head.equalsIgnoreCase(abbreviationUsed.getUnAbbreviated())) {
                         String suffix = "";
                         if (abbreviationUsed.getAllowsSuffix()) {
@@ -97,30 +105,26 @@ public class LwtaAbbreviationRepository {
                         wordAbb = abbreviationUsed.getAbbreviation() + suffix;
                     }
                 }
-                break;
-
-            case IN_WORD:
+            }
+            case IN_WORD -> {
                 String[] unAbbreviatedPieces = word.split(abbreviationUsed.getAbbreviation(), 2);
                 if (unAbbreviatedPieces.length == 0) {
                     return abbreviationUsed.getAbbreviation();
                 }
                 String head = unAbbreviatedPieces[0];
                 String tail = unAbbreviatedPieces[1];
-
                 String prefix = "";
                 if (abbreviationUsed.getAllowsPrefix()) {
                     prefix = abbreviateWord(head, possibleAbbSet);
                 }
-
                 String suffix = "";
                 if (abbreviationUsed.getAllowsSuffix()) {
                     suffix = abbreviateWord(tail, possibleAbbSet);
                 }
                 wordAbb = prefix + abbreviationUsed.getAbbreviation() + suffix;
-                break;
-
-            default:
-                wordAbb = word;
+            }
+            default ->
+                    wordAbb = word;
         }
 
         // Now capitalise the abbreviation correctly:
@@ -131,10 +135,13 @@ public class LwtaAbbreviationRepository {
         return wordAbb;
     }
 
+    /**
+     * turns a journal name into its lwta abbreviation
+     */
     String abbreviateJournalName(String name) {
         // Remove commas and replace full stops with commas
-        name.replaceAll(",", "");
-        name.replaceAll(".", ",");
+        name = name.replaceAll(",", "");
+        name = name.replaceAll("\\.", ",");
 
         // Split into words:
         String[] words = name.split(" ");
@@ -145,8 +152,8 @@ public class LwtaAbbreviationRepository {
         for (String word : words) {
             boolean removeWord = false;
 
-            for (int i = 0; i < WORDS_TO_REMOVE.length; i++) {
-                if (word.equalsIgnoreCase(WORDS_TO_REMOVE[i])) {
+            for (String wordToRemove : WORDS_TO_REMOVE) {
+                if (word.equalsIgnoreCase(wordToRemove)) {
                     removeWord = true;
                     break;
                 }
@@ -157,7 +164,7 @@ public class LwtaAbbreviationRepository {
             }
         }
 
-        // Single word titles not abbreviated:
+        // Single word titles should not be abbreviated:
         if (wordsToBeAbbreviated.size() == 1) {
             return wordsToBeAbbreviated.get(0);
         }
@@ -168,12 +175,12 @@ public class LwtaAbbreviationRepository {
             boolean abbreviatedAlready = false;
             for (String unAbbreviated : lwtaToAbbreviationObject.keySet()) {
                 // If the word is just punctuation and an abbreviation, just use that:
-                String lowerWord = new String(word).toLowerCase();
+                String lowerWord = word.toLowerCase();
                 if (lowerWord.contains(unAbbreviated.toLowerCase()) && lowerWord.replaceAll("[^\\sa-zA-Z0-9]", "").equalsIgnoreCase(unAbbreviated)) {
                     abbreviated = lwtaToAbbreviationObject.get(unAbbreviated).getAbbreviation();
                     // Fix capitalisation:
                     if (Character.isUpperCase(word.charAt(0))) {
-                        abbreviated = abbreviated.substring(0, 1).toUpperCase() + abbreviated.substring(1, abbreviated.length());
+                        abbreviated = abbreviated.substring(0, 1).toUpperCase() + abbreviated.substring(1);
                     }
 
                     abbreviatedAlready = true;
@@ -188,9 +195,11 @@ public class LwtaAbbreviationRepository {
             abbreviatedWords.add(abbreviated);
         }
 
+        // put the abbreviated words back together
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < abbreviatedWords.size() - 1; i++) {
-            sb.append(abbreviatedWords.get(i) + " ");
+            sb.append(abbreviatedWords.get(i));
+            sb.append(" ");
         }
         sb.append(abbreviatedWords.get(abbreviatedWords.size() - 1));
 
