@@ -46,14 +46,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: Checkout
-        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.isCrossRepository.isCrossRepository == 'true') }}
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
-        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.isCrossRepository.isCrossRepository == 'true') }}
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: jbangdev/jbang-action@v0.119.0
         with:
           script: ghprcomment@koppor/ghprcomment
