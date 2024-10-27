@@ -18,7 +18,7 @@ public enum FieldProperty {
     IDENTIFIER,
 
     LANGUAGE,
-    LANGUAGEID,
+
     // Field content is text, but should be interpreted as markdown
     // AKA: Field content is not LaTeX
     MARKDOWN,

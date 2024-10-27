@@ -20,9 +20,9 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LangidEditorViewModelTest {
+public class LanguageEditorViewModelTest {
 
-    private LangidEditorViewModel langidEditorViewModel;
+    private LanguageEditorViewModel languageEditorViewModel;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +38,7 @@ public class LangidEditorViewModelTest {
         SuggestionProvider<?> suggestionProvider = Mockito.mock(SuggestionProvider.class);
 
         // Initialize the LangidEditorViewModel
-        langidEditorViewModel = new LangidEditorViewModel(
+        languageEditorViewModel = new LanguageEditorViewModel(
                 StandardField.LANGUAGEID,  // Use the correct field
                 suggestionProvider,  // Mocked SuggestionProvider
                 BibDatabaseMode.BIBLATEX,  // Use the correct BibDatabaseMode
@@ -49,7 +49,7 @@ public class LangidEditorViewModelTest {
 
     @Test
     void getItemsShouldReturnAllLangidValues() {
-        Collection<Langid> items = langidEditorViewModel.getItems();
+        Collection<Langid> items = languageEditorViewModel.getItems();
         assertEquals(Langid.values().length, items.size());
         assertTrue(items.contains(Langid.BASQUE)); // Check if it contains a specific Langid
         assertTrue(items.contains(Langid.AMERICAN)); // Additional check for another Langid
@@ -57,13 +57,11 @@ public class LangidEditorViewModelTest {
 
     @Test
     void testStringConversion() {
-        // Test conversion from string to Langid
         String langidString = "bulgarian";
-        Langid langid = langidEditorViewModel.getStringConverter().fromString(langidString);
+        Langid langid = languageEditorViewModel.getStringConverter().fromString(langidString);
         assertEquals(Langid.BULGARIAN, langid, "String should convert to the corresponding Langid");
 
-        // Test conversion from Langid to string
-        String convertedString = langidEditorViewModel.getStringConverter().toString(Langid.BULGARIAN);
+        String convertedString = languageEditorViewModel.getStringConverter().toString(Langid.BULGARIAN);
         assertEquals(langidString, convertedString, "Langid should convert back to its string representation");
     }
 
@@ -71,25 +69,25 @@ public class LangidEditorViewModelTest {
     void testStringConversionWithHumanReadableName() {
         // Test conversion from human-readable name to Langid
         String langidString = "Basque";
-        Langid langid = langidEditorViewModel.getStringConverter().fromString(langidString);
+        Langid langid = languageEditorViewModel.getStringConverter().fromString(langidString);
         assertEquals(Langid.BASQUE, langid, "Human-readable name should convert to the corresponding Langid");
 
         // Test conversion from Langid to human-readable name
-        String convertedString = langidEditorViewModel.getStringConverter().toString(Langid.BASQUE);
+        String convertedString = languageEditorViewModel.getStringConverter().toString(Langid.BASQUE);
         assertEquals("basque", convertedString, "Langid should convert back to its lowercase string representation");
     }
 
     @Test
     void testHandlingNullValue() {
         // Test the handling of a null value
-        Langid result = langidEditorViewModel.getStringConverter().fromString(null);
+        Langid result = languageEditorViewModel.getStringConverter().fromString(null);
         assertEquals(null, result, "Null input should return null Langid");
     }
 
     @Test
     void testHandlingBlankValue() {
         // Test the handling of a blank string
-        Langid result = langidEditorViewModel.getStringConverter().fromString(" ");
+        Langid result = languageEditorViewModel.getStringConverter().fromString(" ");
         assertEquals(null, result, "Blank input should return null Langid");
     }
 }

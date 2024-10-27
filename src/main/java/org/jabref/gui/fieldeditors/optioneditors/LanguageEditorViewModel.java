@@ -14,10 +14,10 @@ import org.jabref.model.entry.Langid;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
-public class LangidEditorViewModel extends OptionEditorViewModel<Langid> {
+public class LanguageEditorViewModel extends OptionEditorViewModel<Langid> {
     private BibDatabaseMode databaseMode;
 
-    public LangidEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public LanguageEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.databaseMode = databaseMode;
     }
