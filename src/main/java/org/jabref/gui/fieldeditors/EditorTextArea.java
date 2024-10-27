@@ -30,7 +30,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     public EditorTextArea() {
         this("");
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.TAB && this.getText().isEmpty()) {
+            if (event.getCode() == KeyCode.TAB && this.getText() != null && this.getText().isEmpty()) {
                 this.getParent().requestFocus();
                 event.consume();
             }
