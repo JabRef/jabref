@@ -1,8 +1,8 @@
 package org.jabref.logic.journals;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,13 +15,8 @@ public class LwtaAbbreviationRepositoryTest {
 
     @Test
     void abbreviateJournalNameTest() throws IOException {
-        String filePath = new File("").getAbsolutePath();
-        filePath += "\\src\\main\\resources\\ltwa_abb.csv";
-
-        File file = new File(filePath);
-        Path path = file.toPath();
-
-        LwtaAbbreviationRepository lwtaAbbreviationRepository = new LwtaAbbreviationRepository(path);
+        Path path1 = Paths.get("src", "main", "resources", "ltwa_abb.csv");
+        LwtaAbbreviationRepository lwtaAbbreviationRepository = new LwtaAbbreviationRepository(path1);
             for (int i = 0; i < JOURNAL_NAMES.length; i++) {
                 assertEquals(lwtaAbbreviationRepository.abbreviateJournalName(JOURNAL_NAMES[i]), ABBREVIATED_NAMES[i]);
             }
