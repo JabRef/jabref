@@ -103,6 +103,7 @@ public class ImportHandler {
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
+            private final List<BibEntry> allEntriesToAdd = new ArrayList<>();
 
             @Override
             public List<ImportFilesResultItemViewModel> call() {
@@ -116,8 +117,13 @@ public class ImportHandler {
                     }
 
                     UiTaskExecutor.runInJavaFXThread(() -> {
-                        updateMessage(Localization.lang("Processing file %0", file.getFileName()));
-                        updateProgress(counter, files.size() - 1d);
+                        setTitle(Localization.lang("Importing files into %1 | %2 of %0 file(s) processed.",
+                                files.size(),
+                                bibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
+                                counter));
+                        updateMessage(Localization.lang("Processing %0", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
+                        updateProgress(counter, files.size());
+                        showToUser(true);
                     });
 
                     try {
@@ -169,10 +175,7 @@ public class ImportHandler {
 
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
-
-                    // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                    // That method does a clone() on each entry
-                    UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
+                    allEntriesToAdd.addAll(entriesToAdd);
 
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
@@ -181,6 +184,9 @@ public class ImportHandler {
 
                     counter++;
                 }
+                // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                // That method does a clone() on each entry
+                UiTaskExecutor.runInJavaFXThread(() -> importEntries(allEntriesToAdd));
                 return results;
             }
 
