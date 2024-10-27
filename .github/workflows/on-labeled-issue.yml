@@ -6,6 +6,34 @@ on:
        - labeled
 
 jobs:
+  Assigned:
+    # Triggered when manually assigned the label "📍 Assigned" to trigger the automatic unassignment after 30 days
+    name: "📍 Assigned"
+    if: ${{ github.event.label.name == '📍 Assigned' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+      - name: Move Issue to "Free to take" Column in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
   FirstTimeCodeContribution:
     if: ${{ github.event.label.name == 'FirstTimeCodeContribution' }}
     runs-on: ubuntu-latest
@@ -35,7 +63,7 @@ jobs:
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/3"
-        target-labels: "📍 Assigned"
+        target-labels: "FirstTimeCodeContribution"
         target-column: "Assigned"
         ignored-columns: ""
         default-column: "Free to take"
@@ -45,7 +73,7 @@ jobs:
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/5"
-        target-labels: "📍 Assigned"
+        target-labels: "FirstTimeCodeContribution"
         target-column: "Assigned"
         ignored-columns: ""
         default-column: "Free to take"

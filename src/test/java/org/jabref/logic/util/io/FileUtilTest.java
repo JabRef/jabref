@@ -440,7 +440,7 @@ class FileUtilTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(bibPath);
-        database.getMetaData().setDefaultFileDirectory(filesPath.toString());
+        database.getMetaData().setLibrarySpecificFileDirectory(filesPath.toString());
 
         FilePreferences fileDirPrefs = mock(FilePreferences.class);
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);

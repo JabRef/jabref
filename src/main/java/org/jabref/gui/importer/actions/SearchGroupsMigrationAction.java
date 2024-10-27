@@ -7,11 +7,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.logic.util.Version;
-import org.jabref.migrations.SearchToLuceneMigration;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.search.SearchFlags;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
@@ -24,11 +23,17 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     // We cannot have this constant in `Version.java` because of recursion errors
     // Thus, we keep it here, because it is (currently) used only in the context of groups migration.
     public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
+    public static final Version VERSION_6_0_ALPHA_1 = Version.parse("6.0-alpha_1");
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, CliPreferences preferences) {
-        if (parserResult.getMetaData().getGroupSearchSyntaxVersion().isPresent()) {
-            // Currently the presence of any version is enough to know that no migration is necessary
+    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        Optional<Version> currentVersion = parserResult.getMetaData().getGroupSearchSyntaxVersion();
+        if (currentVersion.isPresent()) {
+            if (currentVersion.get().equals(VERSION_6_0_ALPHA)) {
+                // TODO: This text will only be shown after releasing 6.0-alpha and then removed
+                dialogService.showErrorDialogAndWait("Search groups migration of " + parserResult.getPath().map(Path::toString).orElse(""),
+                        "The search groups syntax has been reverted to the old one. Please use the backup you made before using 6.0-alpha.");
+            }
             return false;
         }
 
@@ -57,21 +62,22 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
         }
 
         parserResult.getMetaData().getGroups().ifPresent(groupTreeNode -> migrateGroups(groupTreeNode, dialogService));
-        parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA);
+        parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA_1);
         parserResult.setChangedOnMigration(true);
     }
 
     private void migrateGroups(GroupTreeNode node, DialogService dialogService) {
         if (node.getGroup() instanceof SearchGroup searchGroup) {
             try {
-                String luceneSearchExpression = SearchToLuceneMigration.migrateToLuceneSyntax(searchGroup.getSearchExpression(), searchGroup.getSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
-                searchGroup.setSearchExpression(luceneSearchExpression);
+                String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchQuery());
+                searchGroup.setSearchExpression(newSearchExpression);
             } catch (ParseCancellationException e) {
-                Optional<String> luceneSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
+                Optional<String> newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
                         Localization.lang("Search group migration failed"),
-                        Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.", searchGroup.getName()),
+                        Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.",
+                        searchGroup.getName()),
                         searchGroup.getSearchExpression());
-                luceneSearchExpression.ifPresent(searchGroup::setSearchExpression);
+                newSearchExpression.ifPresent(searchGroup::setSearchExpression);
             }
         }
         for (GroupTreeNode child : node.getChildren()) {
