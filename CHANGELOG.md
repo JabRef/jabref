@@ -40,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
+- We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
 
 ### Changed
 
@@ -66,6 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
 - We changed the name of the library-based file directory from 'General File Directory' to 'Library-specific File Directory' per issue [#571](https://github.com/koppor/jabref/issues/571)
+- The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 
 ### Fixed
 
@@ -99,10 +101,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
 - We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
+- We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
 - We fixed an issue where it was not possible to select selecting content of other user's comments.[#11106](https://github.com/JabRef/jabref/issues/11106)
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 - We fixed an issue where user has an ability to move between global and user-specific folders. [koppor#571](https://github.com/koppor/jabref/issues/571)
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
+- We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
 
 ### Removed
 
