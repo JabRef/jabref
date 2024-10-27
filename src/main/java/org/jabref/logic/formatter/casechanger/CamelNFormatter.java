@@ -14,12 +14,12 @@ public class CamelNFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Cameln");
+        return Localization.lang("Camel case - n letters max");
     }
 
     @Override
     public String getKey() {
-        return "cameln";
+        return "camel_case_n";
     }
 
     @Override

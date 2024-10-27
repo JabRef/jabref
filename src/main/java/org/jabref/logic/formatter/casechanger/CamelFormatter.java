@@ -9,12 +9,12 @@ public class CamelFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Camel");
+        return Localization.lang("Camel case");
     }
 
     @Override
     public String getKey() {
-        return "camel";
+        return "camel_case";
     }
 
     @Override
