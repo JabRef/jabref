@@ -2,8 +2,11 @@ package org.jabref.gui.frame;
 
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
@@ -119,12 +122,7 @@ public class MainToolBar extends ToolBar {
 
                 rightSpacer,
 
-                new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+                createNewEntryHBox(factory),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -191,6 +189,44 @@ public class MainToolBar extends ToolBar {
         return newEntryFromIdButton;
     }
 
+    MenuItem createNewEntryFromIdMenuItem(ActionFactory factory, MenuButton menuButton) {
+        MenuItem newEntryFromIdItem = new MenuItem();
+        newEntryFromIdItem.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdItem.setText(Localization.lang("Import by ID"));
+        newEntryFromIdItem.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
+
+        newEntryFromIdItem.setOnAction(event -> {
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferences, taskExecutor, stateManager);
+
+            if (entryFromIdPopOver == null) {
+                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
+                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(menuButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            } else if (entryFromIdPopOver.isShowing()) {
+                entryFromIdPopOver.hide();
+            } else {
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(menuButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            }
+        });
+
+        return newEntryFromIdItem;
+    }
+
+    HBox createNewEntryHBox(ActionFactory factory) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(
+                createNewEntryMenuButton(factory),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))
+        );
+        return hBox;
+    }
+
     Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().add("progress-indicatorToolbar");
@@ -244,5 +280,17 @@ public class MainToolBar extends ToolBar {
         });
 
         return new Group(indicator);
+    }
+
+    private MenuButton createNewEntryMenuButton(ActionFactory factory) {
+        MenuButton menuButton = new MenuButton();
+        menuButton.setGraphic(IconTheme.JabRefIcons.NEW_GROUP.getGraphicNode());
+        MenuItem newArticleItem = factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager));
+        MenuItem newEntryItem = factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager));
+        MenuItem newEntryFromIdItem = createNewEntryFromIdMenuItem(factory, menuButton);
+        MenuItem newEntryFromPlainTextItem = factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager));
+        menuButton.getItems().addAll(newArticleItem, newEntryItem, newEntryFromIdItem, newEntryFromPlainTextItem);
+
+        return menuButton;
     }
 }
