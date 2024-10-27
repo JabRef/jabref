@@ -4,7 +4,6 @@ package org.jabref.gui.mergeentries;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
@@ -30,16 +29,16 @@ import org.slf4j.LoggerFactory;
  * This action performs background fetching and merging of entries while
  * providing progress updates to the user.
  */
-public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
+public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiEntryMergeWithFetchedDataAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchEntryMergeWithFetchedDataAction.class);
 
     private final Supplier<LibraryTab> tabSupplier;
     private final GuiPreferences preferences;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
-    public MultiEntryMergeWithFetchedDataAction(Supplier<LibraryTab> tabSupplier,
+    public BatchEntryMergeWithFetchedDataAction(Supplier<LibraryTab> tabSupplier,
                                                 GuiPreferences preferences,
                                                 NotificationService notificationService,
                                                 StateManager stateManager,
@@ -55,13 +54,13 @@ public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
     public void execute() {
         LibraryTab libraryTab = tabSupplier.get();
         if (libraryTab == null) {
-            LOGGER.error("Action 'Multi Entry Merge' must be disabled when no database is open.");
+            LOGGER.error("Cannot perform batch merge: no library is open.");
             return;
         }
 
         List<BibEntry> entries = libraryTab.getDatabase().getEntries();
         if (entries.isEmpty()) {
-            notificationService.notify(Localization.lang("No entries exist."));
+            notificationService.notify(Localization.lang("empty library"));
             return;
         }
 
@@ -100,26 +99,23 @@ public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
 
         for (int i = 0; i < totalEntries && !task.isCancelled(); i++) {
             BibEntry entry = context.entries().get(i);
-            updateProgress(i, totalEntries, entry, task);
-            processEntry(context, entry);
+            updateProgress(i, totalEntries, task);
+            fetchAndMergeEntry(context, entry);
         }
 
         finalizeCompoundEdit(context);
         return context.updatedEntries();
     }
 
-    private static void processEntry(MergeContext context, BibEntry entry) {
+    private static void fetchAndMergeEntry(MergeContext context, BibEntry entry) {
         LOGGER.debug("Processing entry: {}", entry);
 
-        Optional<MergingIdBasedFetcher.FetcherResult> fetchResult = context.fetcher().fetchEntry(entry);
-        fetchResult.ifPresent(result -> {
-            if (result.hasChanges()) {
-                Platform.runLater(() -> {
-                    MergeEntriesHelper.mergeEntries(entry, result.mergedEntry(), context.compoundEdit());
-                    entry.getCitationKey().ifPresent(context.updatedEntries()::add);
-                });
-            }
-        });
+        context.fetcher().fetchEntry(entry)
+               .filter(MergingIdBasedFetcher.FetcherResult::hasChanges)
+               .ifPresent(result -> Platform.runLater(() -> {
+                   MergeEntriesHelper.mergeEntries(entry, result.mergedEntry(), context.compoundEdit());
+                   entry.getCitationKey().ifPresent(context.updatedEntries()::add);
+               }));
     }
 
     private static void finalizeCompoundEdit(MergeContext context) {
@@ -131,26 +127,22 @@ public class MultiEntryMergeWithFetchedDataAction extends SimpleCommand {
         }
     }
 
-    private static void updateProgress(int currentIndex, int totalEntries, BibEntry entry, BackgroundTask<?> task) {
-        LOGGER.debug("Processing entry {}", entry);
+    private static void updateProgress(int currentIndex, int totalEntries, BackgroundTask<?> task) {
         Platform.runLater(() -> {
-            task.updateMessage(Localization.lang("Fetching entry %0 of %1", currentIndex + 1, totalEntries));
+            task.updateMessage(Localization.lang("Processing entry %0 of %1", currentIndex + 1, totalEntries));
             task.updateProgress(currentIndex, totalEntries);
         });
     }
 
     private static void handleSuccess(List<String> updatedEntries, MergeContext context) {
         Platform.runLater(() -> {
-            if (updatedEntries.isEmpty()) {
-                LOGGER.debug("Batch update completed. No entries were updated.");
-                context.notificationService().notify(Localization.lang("No updates found."));
-            } else {
-                LOGGER.debug("Updated entries: {}", String.join(", ", updatedEntries));
+            String message = updatedEntries.isEmpty()
+                    ? Localization.lang("No updates found.")
+                    : Localization.lang("Batch update successful. %0 entries updated.",
+                    updatedEntries.size());
 
-                String message = Localization.lang("Batch update successful. %0 entries updated.",
-                        String.valueOf(updatedEntries.size()));
-                context.notificationService().notify(message);
-            }
+            LOGGER.debug("Batch update completed. {}", message);
+            context.notificationService().notify(message);
         });
     }
 

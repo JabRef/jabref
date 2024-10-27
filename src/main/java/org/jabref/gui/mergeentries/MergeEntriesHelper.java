@@ -2,6 +2,7 @@
 package org.jabref.gui.mergeentries;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.undo.NamedCompound;
@@ -25,77 +26,78 @@ public final class MergeEntriesHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntriesHelper.class);
 
     private MergeEntriesHelper() {
-        // Private constructor to prevent instantiation
     }
 
     /**
      * Merges two BibEntry objects with undo support.
-     * Following the typical source -> target pattern, but with domain-specific naming.
      *
      * @param entryFromLibrary The entry to be updated (target, from the library)
-     * @param source The entry containing new information (source, from the fetcher)
+     * @param entryFromFetcher The entry containing new information (source, from the fetcher)
      * @param undoManager Compound edit to collect undo information
      */
-    public static void mergeEntries(BibEntry entryFromLibrary, BibEntry source, NamedCompound undoManager) {
+    public static void mergeEntries(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
         LOGGER.debug("Entry from library: {}", entryFromLibrary);
-        LOGGER.debug("Source entry: {}", source);
+        LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
 
-        mergeEntryType(source, entryFromLibrary, undoManager);
-        mergeFields(source, entryFromLibrary, undoManager);
-        removeObsoleteFields(source, entryFromLibrary, undoManager);
+        mergeEntryType(entryFromLibrary, entryFromFetcher, undoManager);
+        mergeFields(entryFromLibrary, entryFromFetcher, undoManager);
+        removeFieldsNotPresentInFetcher(entryFromLibrary, entryFromFetcher, undoManager);
     }
 
-    private static void mergeEntryType(BibEntry source, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    private static void mergeEntryType(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
         EntryType libraryType = entryFromLibrary.getType();
-        EntryType sourceType = source.getType();
+        EntryType fetcherType = entryFromFetcher.getType();
 
-        if (!libraryType.equals(sourceType)) {
-            LOGGER.debug("Updating type {} -> {}", libraryType, sourceType);
-            entryFromLibrary.setType(sourceType);
-            undoManager.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, sourceType));
+        if (!libraryType.equals(fetcherType)) {
+            LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
+            entryFromLibrary.setType(fetcherType);
+            undoManager.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
         }
     }
 
-    private static void mergeFields(BibEntry source, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    private static void mergeFields(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
         Set<Field> allFields = new LinkedHashSet<>();
-        allFields.addAll(source.getFields());
+        allFields.addAll(entryFromFetcher.getFields());
         allFields.addAll(entryFromLibrary.getFields());
 
         for (Field field : allFields) {
-            String sourceValue = source.getField(field).orElse(null);
-            if (sourceValue == null) {
-                continue;
-            }
+            Optional<String> fetcherValue = entryFromFetcher.getField(field);
+            Optional<String> libraryValue = entryFromLibrary.getField(field);
 
-            String libraryValue = entryFromLibrary.getField(field).orElse(null);
-            if (shouldUpdateField(libraryValue, sourceValue)) {
-                LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue, sourceValue);
-                entryFromLibrary.setField(field, sourceValue);
-                undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue, sourceValue));
-            }
+            fetcherValue.ifPresent(newValue -> {
+                if (shouldUpdateField(libraryValue, newValue)) {
+                    LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), newValue);
+                    entryFromLibrary.setField(field, newValue);
+                    undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), newValue));
+                }
+            });
         }
     }
 
-    private static boolean shouldUpdateField(String libraryValue, String sourceValue) {
-        if (libraryValue == null) {
-            return true;
-        }
-        return sourceValue.length() > libraryValue.length();
+    private static boolean shouldUpdateField(Optional<String> libraryValue, String fetcherValue) {
+        return libraryValue.map(value -> fetcherValue.length() > value.length())
+                           .orElse(true);
     }
 
-    private static void removeObsoleteFields(BibEntry source, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    /**
+     * Removes fields from the library entry that are not present in the fetcher entry.
+     * This ensures the merged entry only contains fields that are considered current
+     * according to the fetched data.
+     */
+    private static void removeFieldsNotPresentInFetcher(BibEntry entryFromLibrary, BibEntry entryFromFetcher, NamedCompound undoManager) {
         Set<Field> obsoleteFields = new LinkedHashSet<>(entryFromLibrary.getFields());
-        obsoleteFields.removeAll(source.getFields());
+        obsoleteFields.removeAll(entryFromFetcher.getFields());
 
         for (Field field : obsoleteFields) {
             if (FieldFactory.isInternalField(field)) {
                 continue;
             }
 
-            String value = entryFromLibrary.getField(field).orElse(null);
-            LOGGER.debug("Removing obsolete field {} with value {}", field, value);
-            entryFromLibrary.clearField(field);
-            undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, value, null));
+            entryFromLibrary.getField(field).ifPresent(value -> {
+                LOGGER.debug("Removing obsolete field {} with value {}", field, value);
+                entryFromLibrary.clearField(field);
+                undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, value, null));
+            });
         }
     }
 }

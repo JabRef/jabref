@@ -52,7 +52,7 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.mergeentries.MultiEntryMergeWithFetchedDataAction;
+import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
@@ -280,7 +280,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
-                        new MultiEntryMergeWithFetchedDataAction(
+                        new BatchEntryMergeWithFetchedDataAction(
                                 frame::getCurrentLibraryTab,
                                 preferences,
                                 dialogService,
