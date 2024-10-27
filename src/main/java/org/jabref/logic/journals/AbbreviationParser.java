@@ -86,7 +86,7 @@ public class AbbreviationParser {
                     allowsSuffix = true;
                 }
 
-                if (abbreviation.equals("n.a.")) {
+                if ("n.a.".equals(abbreviation)) {
                     abbreviation = name;
                 }
 

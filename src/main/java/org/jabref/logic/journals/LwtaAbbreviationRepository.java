@@ -72,7 +72,7 @@ public class LwtaAbbreviationRepository {
 
         // Now we have to decide conflicts -- for example, maybe both "balti-" and "baltimore" are matched. We'll go by the longer abbreviation first
         possibleAbbreviations.sort((String string1, String string2) -> string2.length() - string1.length());
-        LwtaAbbreviation abbreviationUsed = lwtaToAbbreviationObject.get(possibleAbbreviations.get(0));
+        LwtaAbbreviation abbreviationUsed = lwtaToAbbreviationObject.get(possibleAbbreviations.getFirst());
 
         Set<String> possibleAbbSet = new HashSet<>(possibleAbbreviations);
         String wordAbb = "";
@@ -140,8 +140,8 @@ public class LwtaAbbreviationRepository {
      */
     String abbreviateJournalName(String name) {
         // Remove commas and replace full stops with commas
-        name = name.replaceAll(",", "");
-        name = name.replaceAll("\\.", ",");
+        name = name.replace(",", "");
+        name = name.replace(".", ",");
 
         // Split into words:
         String[] words = name.split(" ");
@@ -166,7 +166,7 @@ public class LwtaAbbreviationRepository {
 
         // Single word titles should not be abbreviated:
         if (wordsToBeAbbreviated.size() == 1) {
-            return wordsToBeAbbreviated.get(0);
+            return wordsToBeAbbreviated.getFirst();
         }
 
         // Abbreviate each word:
@@ -201,7 +201,7 @@ public class LwtaAbbreviationRepository {
             sb.append(abbreviatedWords.get(i));
             sb.append(" ");
         }
-        sb.append(abbreviatedWords.get(abbreviatedWords.size() - 1));
+        sb.append(abbreviatedWords.getLast());
 
         return sb.toString();
     }
