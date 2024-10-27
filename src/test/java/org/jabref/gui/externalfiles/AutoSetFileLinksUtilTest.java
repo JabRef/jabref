@@ -2,9 +2,12 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 
 import javafx.collections.FXCollections;
 
@@ -63,5 +66,141 @@ class AutoSetFileLinksUtilTest {
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(Collections.emptyList(), actual);
+    }
+
+    @Test
+    void relinkMoveFileFromRootFolderToSubfolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folder.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.move(fileA, folderA.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"));
+        assertEquals(actual, expect);
+    }
+
+    @Test
+    void relinkMoveFileFromSubfolderToRootFolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.move(fileA, folder.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A.pdf"), "PDF"));
+        assertEquals(actual, expect);
+    }
+
+    @Test
+    void relinkMoveFileFromSubfolderToSubfolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Path folderB = folder.resolve("B");
+        Files.createDirectory(folderA);
+        Files.createDirectory(folderB);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.move(fileA, folderB.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("B/A.pdf"), "PDF"));
+        assertEquals(actual, expect);
+    }
+
+    @Test
+    void noRelinkCopyFileFromRootFolderToSubfolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folder.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.copy(fileA, folderA.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A.pdf"), "PDF"), new LinkedFile("", Path.of("A/A.pdf"), "PDF"));
+        assertEquals(actual, expect);
+    }
+
+    @Test
+    void noRelinkCopyFileFromSubfolderToRootFolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.copy(fileA, folder.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"), new LinkedFile("", Path.of("A.pdf"), "PDF"));
+        assertEquals(actual, expect);
+    }
+
+    @Test
+    void noRelinkCopyFileFromSubfolderToSubfolder(@TempDir Path folder) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(folder));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        List<BibEntry> entries = new ArrayList<>();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Path folderA = folder.resolve("A");
+        Path folderB = folder.resolve("B");
+        Files.createDirectory(folderA);
+        Files.createDirectory(folderB);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("A");
+        entries.add(entryA);
+        final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> entry.addFile(linkedFile);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        Files.copy(fileA, folderB.resolve("A.pdf"), StandardCopyOption.REPLACE_EXISTING);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+        List<LinkedFile> actual = entryA.getFiles();
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"), new LinkedFile("", Path.of("B/A.pdf"), "PDF"));
+        assertEquals(actual, expect);
     }
 }
