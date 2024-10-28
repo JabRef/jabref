@@ -83,6 +83,7 @@ public enum StandardActions implements Action {
     UNDO(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
     REDO(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
+    JUMP_SEARCH(Localization.lang("Search for entry field"), KeyBinding.JUMP_SEARCH),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
 

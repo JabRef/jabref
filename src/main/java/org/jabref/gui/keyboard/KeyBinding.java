@@ -100,6 +100,7 @@ public enum KeyBinding {
     REDO("Redo", Localization.lang("Redo"), "ctrl+Y", KeyBindingCategory.EDIT),
     REFRESH_OO("Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl+alt+O", KeyBindingCategory.TOOLS),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl+R", KeyBindingCategory.SEARCH),
+    JUMP_SEARCH("Jump Search", Localization.lang("Search for entry field"), "ctrl+J", KeyBindingCategory.SEARCH),
     RESOLVE_DUPLICATE_CITATION_KEYS("Resolve duplicate citation keys", Localization.lang("Resolve duplicate citation keys"), "ctrl+shift+D", KeyBindingCategory.BIBTEX),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl+alt+S", KeyBindingCategory.FILE),
     SAVE_DATABASE("Save library", Localization.lang("Save library"), "ctrl+S", KeyBindingCategory.FILE),
