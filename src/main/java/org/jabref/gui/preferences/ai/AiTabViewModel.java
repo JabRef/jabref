@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.ai;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -394,8 +395,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void resetExpertSettings() {
         String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();
         currentApiBaseUrl.set(resetApiBaseUrl);
-
-        instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
         contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
