@@ -236,11 +236,21 @@ public class PdfContentImporter extends PdfImporter {
             textPositionsList.addAll(textPositions);
         }
 
+        private boolean isUnwantedText(TextPosition previousTextPosition) {
+            return previousTextPosition != null
+                    && (previousTextPosition.getPageHeight() - previousTextPosition.getYDirAdj())
+                    < (previousTextPosition.getPageHeight() * 0.1);
+        }
+
         private String findLargestFontText(List<TextPosition> textPositions) {
             float maxFontSize = 0;
             StringBuilder largestFontText = new StringBuilder();
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
+                // Exclude unwanted text based on heuristics
+                if (isUnwantedText(textPosition)) {
+                    continue;
+                }
                 float fontSize = textPosition.getFontSizeInPt();
                 if (fontSize > maxFontSize) {
                     maxFontSize = fontSize;
@@ -248,8 +258,10 @@ public class PdfContentImporter extends PdfImporter {
                     largestFontText.append(textPosition.getUnicode());
                     previousTextPosition = textPosition;
                 } else if (fontSize == maxFontSize) {
-                    if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
-                        largestFontText.append(" ");
+                    if (previousTextPosition != null) {
+                        if (isThereSpace(previousTextPosition, textPosition)) {
+                            largestFontText.append(" ");
+                        }
                     }
                     largestFontText.append(textPosition.getUnicode());
                     previousTextPosition = textPosition;
@@ -259,10 +271,18 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isThereSpace(TextPosition previous, TextPosition current) {
-            float spaceThreshold = 0.5F;
-            float gap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
-            return gap > spaceThreshold;
+            float XspaceThreshold = 0.5F;
+            float YspaceThreshold = previous.getFontSizeInPt();
+            float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
+            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
+            return Xgap > XspaceThreshold || Ygap > YspaceThreshold;
         }
+
+//        private boolean isNewLine(TextPosition previous, TextPosition current) {
+//            float verticalThreshold = previous.getFontSizeInPt() * 1f; // Adjust threshold as needed
+//            float gap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
+//            return gap < verticalThreshold && gap > -verticalThreshold;
+//        }
     }
 
     // make this method package visible so we can test it
@@ -543,7 +563,7 @@ public class PdfContentImporter extends PdfImporter {
 
         stripper.setStartPage(1);
         stripper.setEndPage(1);
-        stripper.setSortByPosition(true);
+//        stripper.setSortByPosition(true);
         stripper.setParagraphEnd(System.lineSeparator());
         StringWriter writer = new StringWriter();
         stripper.writeText(document, writer);

@@ -144,7 +144,11 @@ class PdfContentImporterTest {
                 Arguments.of("/org/jabref/logic/importer/util/LNCS-minimal.pdf", "Paper Title"),
                 Arguments.of("/pdfs/example-scientificThesisTemplate.pdf", "Is Oil the future?"),
                 Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title"),
-                Arguments.of("/pdfs/minimal.pdf", "Hello World 1")
+                Arguments.of("/pdfs/3597503.3639130.pdf", "Recovering Trace Links Between Software Documentation And Code"),
+                Arguments.of("/pdfs/peerj-cs-213.pdf", "On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis"),
+                Arguments.of("/pdfs/s10664-020-09875-y.pdf", "Pandemic programming"),
+                Arguments.of("/pdfs/s10664-023-10367-y.pdf", "Do RESTful API design rules have an impact on the understandability of Web APIs?"),
+                Arguments.of("/pdfs/Softw Pract Exp - 2022 - Fritzsch - Adopting microservices and DevOps in the cyber‐physical systems domain  A rapid review.pdf", "Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study")
         );
     }
 }
