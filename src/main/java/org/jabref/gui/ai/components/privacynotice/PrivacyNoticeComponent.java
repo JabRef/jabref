@@ -11,7 +11,6 @@ import javafx.scene.text.TextFlow;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.model.ai.AiProvider;
 
@@ -26,6 +25,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private TextFlow mistralAiPrivacyTextFlow;
     @FXML private TextFlow geminiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
+    @FXML private TextFlow gpt4AllTextFlow;
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
@@ -50,6 +50,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
         initPrivacyHyperlink(mistralAiPrivacyTextFlow, AiProvider.MISTRAL_AI);
         initPrivacyHyperlink(geminiPrivacyTextFlow, AiProvider.GEMINI);
         initPrivacyHyperlink(huggingFacePrivacyTextFlow, AiProvider.HUGGING_FACE);
+        initPrivacyHyperlink(gpt4AllTextFlow, AiProvider.GPT4ALL);
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);
@@ -72,12 +73,11 @@ public class PrivacyNoticeComponent extends ScrollPane {
         text.setText(replacedText);
         text.wrappingWidthProperty().bind(this.widthProperty());
 
-        String link = AiDefaultPreferences.PROVIDERS_PRIVACY_POLICIES.get(aiProvider);
-        Hyperlink hyperlink = new Hyperlink(link);
+        Hyperlink hyperlink = new Hyperlink(aiProvider.getApiUrl());
         hyperlink.setWrapText(true);
         hyperlink.setFont(text.getFont());
         hyperlink.setOnAction(event -> {
-            openBrowser(link);
+            openBrowser(aiProvider.getApiUrl());
         });
 
         textFlow.getChildren().add(hyperlink);

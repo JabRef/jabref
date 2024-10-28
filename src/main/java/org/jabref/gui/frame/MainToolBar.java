@@ -123,7 +123,7 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
@@ -196,8 +196,8 @@ public class MainToolBar extends ToolBar {
         indicator.getStyleClass().add("progress-indicatorToolbar");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background tasks are finished"));
         indicator.setTooltip(noTasksRunning);
         stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -235,7 +235,7 @@ public class MainToolBar extends ToolBar {
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setTitle(Localization.lang("Background tasks"));
                 progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
             }
 

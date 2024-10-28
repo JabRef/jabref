@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.templates.AiTemplate;
@@ -133,7 +132,7 @@ public class AiChatLogic {
         chatHistory.add(message);
 
         LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
-                AiDefaultPreferences.PROVIDERS_API_URLS.get(aiPreferences.getAiProvider()),
+                aiPreferences.getAiProvider().getApiUrl(),
                 name.get(),
                 message.singleText());
 

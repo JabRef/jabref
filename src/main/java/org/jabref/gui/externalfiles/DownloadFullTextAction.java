@@ -68,11 +68,9 @@ public class DownloadFullTextAction extends SimpleCommand {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Download full text documents"),
                     Localization.lang(
-                            "You are about to download full text documents for %0 entries.",
-                            String.valueOf(stateManager.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
+                            "You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.",
+                            String.valueOf(stateManager.getSelectedEntries().size())),
+                    // [impl->req~ui.dialogs.confirmation.naming~1]
                     Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
 

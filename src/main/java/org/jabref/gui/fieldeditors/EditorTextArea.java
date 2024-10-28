@@ -21,7 +21,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     /**
      * Variable that contains user-defined behavior for paste action.
      */
-    private PasteActionHandler pasteActionHandler = () -> {
+    private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
     };
 
@@ -57,7 +57,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
      *
      * @param handler an instance of PasteActionHandler that describes paste behavior
      */
-    public void setPasteActionHandler(PasteActionHandler handler) {
+    public void setPasteActionHandler(Runnable handler) {
         Objects.requireNonNull(handler);
         this.pasteActionHandler = handler;
     }
@@ -68,14 +68,6 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     @Override
     public void paste() {
         super.paste();
-        pasteActionHandler.handle();
-    }
-
-    /**
-     * Interface presents user-described paste behaviour applying to paste method
-     */
-    @FunctionalInterface
-    public interface PasteActionHandler {
-        void handle();
+        pasteActionHandler.run();
     }
 }

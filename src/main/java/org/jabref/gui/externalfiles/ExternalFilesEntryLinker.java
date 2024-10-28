@@ -1,24 +1,18 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.cleanup.MoveFilesCleanup;
-import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
-import org.jabref.logic.util.io.FileNameCleaner;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,100 +28,68 @@ public class ExternalFilesEntryLinker {
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final BibDatabaseContext bibDatabaseContext;
-    private final MoveFilesCleanup moveFilesCleanup;
-    private final RenamePdfCleanup renameFilesCleanup;
-    private final DialogService dialogService;
+    private final NotificationService notificationService;
 
-    public ExternalFilesEntryLinker(ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
+    public ExternalFilesEntryLinker(ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, NotificationService notificationService) {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
-        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
-        this.dialogService = dialogService;
+        this.notificationService = notificationService;
     }
 
-    public Optional<Path> copyFileToFileDir(Path file) {
-        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
-        if (firstExistingFileDir.isPresent()) {
-            Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
-            if (FileUtil.copyFile(file, targetFile, false)) {
-                return Optional.of(targetFile);
-            }
-        }
-        return Optional.empty();
-    }
+    public void linkFilesToEntry(BibEntry entry, List<Path> files) {
+        List<LinkedFile> existingFiles = entry.getFiles();
+        List<LinkedFile> linkedFiles = files.stream().flatMap(file -> {
+            String typeName = FileUtil.getFileExtension(file)
+                                      .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
+                                      .orElse("");
+            Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
+            LinkedFile linkedFile = new LinkedFile("", relativePath, typeName);
 
-    public void renameLinkedFilesToPattern(BibEntry entry) {
-        renameFilesCleanup.cleanup(entry);
-    }
-
-    public void moveLinkedFilesToFileDir(BibEntry entry) {
-        moveFilesCleanup.cleanup(entry);
-    }
-
-    public void addFilesToEntry(BibEntry entry, List<Path> files) {
-        List<Path> validFiles = getValidFileNames(files);
-        for (Path file : validFiles) {
-            FileUtil.getFileExtension(file).ifPresent(ext -> {
-                ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences)
-                                                         .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
-                LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
-                entry.addFile(linkedfile);
-            });
-        }
-    }
-
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, LuceneManager luceneManager) {
-        try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
-            addFilesToEntry(entry, files);
-            moveLinkedFilesToFileDir(entry);
-            renameLinkedFilesToPattern(entry);
-        } catch (Exception e) {
-            LOGGER.error("Could not block LinkedFilesIndexer", e);
-        }
-        luceneManager.updateAfterDropFiles(entry);
-    }
-
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, LuceneManager luceneManager) {
-        try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
-            for (Path file : files) {
-                copyFileToFileDir(file)
-                        .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
-            }
-            renameLinkedFilesToPattern(entry);
-        } catch (Exception e) {
-            LOGGER.error("Could not block LinkedFilesIndexer", e);
-        }
-        luceneManager.updateAfterDropFiles(entry);
-    }
-
-    private List<Path> getValidFileNames(List<Path> filesToAdd) {
-        List<Path> validFileNames = new ArrayList<>();
-
-        for (Path fileToAdd : filesToAdd) {
-            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
-                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
-
-                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
-                        Localization.lang("Rename and add"));
-
-                if (correctButtonPressed) {
-                    Path correctPath = fileToAdd.resolveSibling(newFilename);
-                    try {
-                        Files.move(fileToAdd, correctPath);
-                        validFileNames.add(correctPath);
-                    } catch (IOException ex) {
-                        LOGGER.error("Error moving file", ex);
-                        dialogService.showErrorDialogAndWait(ex);
-                    }
-                }
+            String link = linkedFile.getLink();
+            boolean alreadyLinked = existingFiles.stream().anyMatch(existingFile -> existingFile.getLink().equals(link));
+            if (alreadyLinked) {
+                notificationService.notify(Localization.lang("File '%0' already linked", link));
+                return Stream.empty();
             } else {
-                validFileNames.add(fileToAdd);
+                return Stream.of(linkedFile);
+            }
+        }).toList();
+        entry.addFiles(linkedFiles);
+    }
+
+    /**
+     * <ul>
+     *     <li>Move files to file directory</li>
+     *     <li>Use configured file directory pattern</li>
+     *     <li>Rename file to configured pattern (and skip renaming if file already exists)</li>
+     *     <li>Avoid overwriting files - by adding " {number}" after the file name</li>
+     * </ul>
+     */
+    public void coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
+        List<LinkedFile> existingFiles = entry.getFiles();
+        List<LinkedFile> linkedFiles = new ArrayList<>(files.size());
+        // "old school" loop to enable logging properly
+        for (Path file : files) {
+            String typeName = FileUtil.getFileExtension(file)
+                                      .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
+                                      .orElse("");
+            LinkedFile linkedFile = new LinkedFile("", file, typeName);
+            LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContext, filePreferences);
+            try {
+                linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
+            } catch (IOException exception) {
+                LOGGER.error("Error while copying/moving file {}", file, exception);
+            }
+
+            String link = linkedFile.getLink();
+            boolean alreadyLinked = existingFiles.stream().anyMatch(existingFile -> existingFile.getLink().equals(link));
+            if (alreadyLinked) {
+                notificationService.notify(Localization.lang("File '%0' already linked", link));
+            } else {
+                linkedFiles.add(linkedFile);
             }
         }
-        return validFileNames;
+        entry.addFiles(linkedFiles);
     }
 }

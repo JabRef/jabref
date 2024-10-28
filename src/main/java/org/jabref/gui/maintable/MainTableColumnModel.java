@@ -36,7 +36,6 @@ public class MainTableColumnModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
     public enum Type {
         MATCH_CATEGORY("match_category"), // Not localized, because this column is always hidden
-        MATCH_SCORE("match_score", Localization.lang("Match score")),
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),
@@ -153,7 +152,7 @@ public class MainTableColumnModel {
 
     public String getDisplayName() {
         if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
-                || (typeProperty.getValue() == Type.INDEX) || typeProperty.getValue() == Type.MATCH_SCORE) {
+                || (typeProperty.getValue() == Type.INDEX)) {
             return typeProperty.getValue().getDisplayName();
         } else {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
