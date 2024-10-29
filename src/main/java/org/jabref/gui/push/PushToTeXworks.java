@@ -38,7 +38,6 @@ public class PushToTeXworks extends AbstractPushToApplication {
 
     @Override
     protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
-        // No command known to jump to a specific line
-        return new String[] {commandPath, fileName.toString()};
+        return new String[] {commandPath, "--position=\"%s\"".formatted(line), fileName.toString()};
     }
 }
