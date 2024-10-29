@@ -889,18 +889,17 @@ public class LibraryTab extends Tab {
     }
 
     public void insertEntries(final List<BibEntry> entries) {
-        if (!entries.isEmpty()) {
-            importHandler.importCleanedEntries(entries);
-
-            // Create an UndoableInsertEntries object.
-            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-            markBaseChanged();
-            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.getFirst());
-            }
-            clearAndSelect(entries.getFirst());
+        if (entries.isEmpty()) {
+            return;
         }
+
+        importHandler.importCleanedEntries(entries);
+        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        markBaseChanged();
+        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+            showAndEdit(entries.getFirst());
+        }
+        clearAndSelect(entries.getFirst());
     }
 
     public void copyEntry() {
