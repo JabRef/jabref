@@ -139,16 +139,16 @@ class PdfContentImporterTest {
 
     private static Stream<Arguments> providePdfData() {
         return Stream.of(
-                Arguments.of("/pdfs/se2paper.pdf", "On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
+                Arguments.of("/pdfs/PdfContentImporter/se2paper - On How We Can Teach – Exploring New Ways in Professional Software Development for Students.pdf", "On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
                 Arguments.of("/pdfs/IEEE/ieee-paper.pdf", "JabRef Example for Reference Parsing"),
                 Arguments.of("/org/jabref/logic/importer/util/LNCS-minimal.pdf", "Paper Title"),
                 Arguments.of("/pdfs/example-scientificThesisTemplate.pdf", "Is Oil the future?"),
                 Arguments.of("/pdfs/thesis-example.pdf", "Thesis Title"),
-                Arguments.of("/pdfs/3597503.3639130.pdf", "Recovering Trace Links Between Software Documentation And Code"),
-                Arguments.of("/pdfs/peerj-cs-213.pdf", "On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis"),
-                Arguments.of("/pdfs/s10664-020-09875-y.pdf", "Pandemic programming"),
-                Arguments.of("/pdfs/s10664-023-10367-y.pdf", "Do RESTful API design rules have an impact on the understandability of Web APIs?"),
-                Arguments.of("/pdfs/Softw Pract Exp - 2022 - Fritzsch - Adopting microservices and DevOps in the cyber‐physical systems domain  A rapid review.pdf", "Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study")
+                Arguments.of("/pdfs/PdfContentImporter/3597503.3639130 - Recovering Trace Links Between Software Documentation And Code.pdf", "Recovering Trace Links Between Software Documentation And Code"),
+                Arguments.of("/pdfs/PdfContentImporter/peerj-cs-213 - On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis.pdf", "On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis"),
+                Arguments.of("/pdfs/PdfContentImporter/s10664-020-09875-y - Pandemic programming.pdf", "Pandemic programming"),
+                Arguments.of("/pdfs/PdfContentImporter/s10664-023-10367-y - Do RESTful API design rules have an impact on the understandability of Web APIs?.pdf", "Do RESTful API design rules have an impact on the understandability of Web APIs?"),
+                Arguments.of("/pdfs/PdfContentImporter/spe.3169 - Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study.pdf", "Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study")
         );
     }
 }
