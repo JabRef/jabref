@@ -327,7 +327,6 @@ public class PdfContentImporter extends PdfImporter {
      */
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByFontSize) {
-
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
