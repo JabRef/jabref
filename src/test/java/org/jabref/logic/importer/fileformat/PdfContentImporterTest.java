@@ -36,7 +36,7 @@ class PdfContentImporterTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
-                .withField(StandardField.TITLE, "Hello World 1")
+                .withField(StandardField.TITLE, "Hello World")
                 .withFiles(List.of(new LinkedFile("", file.toAbsolutePath(), "PDF")));
         assertEquals(List.of(expected), result);
 
