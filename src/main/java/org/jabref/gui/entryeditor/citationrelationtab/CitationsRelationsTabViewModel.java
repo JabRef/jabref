@@ -11,7 +11,6 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFe
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,18 +52,16 @@ public class CitationsRelationsTabViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
+        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         switch (searchType) {
-            case CITES -> importCites(entries, existingEntry, importHandler);
-            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler);
+            case CITES -> importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
         }
     }
 
-    private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
-
+    private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler, CitationKeyGenerator generator, boolean generateNewKeyOnImport) {
         SequencedSet<String> citeKeys = existingEntry.getCites();
 
         for (BibEntry entryToCite : entries) {
@@ -84,11 +81,8 @@ public class CitationsRelationsTabViewModel {
      * <p>
      * Therefore, some special handling is needed
      */
-    private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
+    private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler, CitationKeyGenerator generator, boolean generateNewKeyOnImport) {
         if (existingEntry.getCitationKey().isEmpty()) {
-            CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-            CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-            boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
             if (!generateNewKeyOnImport) {
                 dialogService.notify(Localization.lang("No citation key for %0", existingEntry.getAuthorTitleYear()));
                 return;
