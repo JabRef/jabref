@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -131,7 +130,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private final Map<EntryType, Layout> bibLayout = new HashMap<>();
     private final Map<String, Object> properties = new HashMap<>();
     private final Map<String, Object> citProperties = new HashMap<>();
-    private final boolean fromResource;
+    private boolean fromResource;
     private final String path;
     private final LayoutFormatterPreferences layoutPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -159,17 +158,15 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
         Objects.requireNonNull(resourcePath);
         setDefaultProperties();
-        // we need to distinguish if it's a style from the local resources or
-        URL url = JStyle.class.getResource(resourcePath);
+        // we need to distinguish if it's a style from the local resources or a file on disk
+        InputStream stream = JStyle.class.getResourceAsStream(resourcePath);
         styleFile = Path.of(resourcePath);
-        InputStream stream;
-        if (url != null) {
-            stream = url.openStream();
-        } else {
+        fromResource = true;
+        if (stream == null) {
             stream = Files.newInputStream(styleFile);
+            fromResource = false;
         }
         initialize(stream);
-        fromResource = true;
         path = resourcePath;
     }
 
