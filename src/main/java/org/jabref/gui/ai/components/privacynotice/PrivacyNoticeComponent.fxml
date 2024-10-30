@@ -66,6 +66,15 @@
                   </Text>
                </children>
             </TextFlow>
+             <TextFlow fx:id="gpt4AllTextFlow">
+                 <children>
+                     <Text text="%If you have chosen %0 as an AI provider, the privacy policy of %0 applies. You find it at %1.">
+                         <font>
+                             <Font size="14.0" />
+                         </font>
+                     </Text>
+                 </children>
+             </TextFlow>
              <TextFlow>
                 <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously.">
                    <font>

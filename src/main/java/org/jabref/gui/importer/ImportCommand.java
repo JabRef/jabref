@@ -144,7 +144,7 @@ public class ImportCommand extends SimpleCommand {
                 if (importer.isEmpty()) {
                     // Unknown format
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
+                        if (FileUtil.isPDFFile(filename) && GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
@@ -155,7 +155,7 @@ public class ImportCommand extends SimpleCommand {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter)
                                 || (importer.get() instanceof PdfMergeMetadataImporter))
-                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
+                                && GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
                         dialogService.notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");

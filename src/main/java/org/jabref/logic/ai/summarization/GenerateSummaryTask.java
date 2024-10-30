@@ -3,7 +3,6 @@ package org.jabref.logic.ai.summarization;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +13,8 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileToDocument;
+import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -27,8 +28,6 @@ import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.input.Prompt;
-import dev.langchain4j.model.input.PromptTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,32 +41,6 @@ import org.slf4j.LoggerFactory;
 public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);
 
-    // Be careful when constructing prompt.
-    // 1. It should contain variables `bullets` and `chunk`.
-    // 2. Variables should be wrapped in `{{` and `}}` and only with them. No whitespace inside.
-    private static final PromptTemplate CHUNK_PROMPT_TEMPLATE = PromptTemplate.from(
-            """
-                Please provide an overview of the following text. It's a part of a scientific paper.
-                The summary should include the main objectives, methodologies used, key findings, and conclusions.
-                Mention any significant experiments, data, or discussions presented in the paper.
-
-                DOCUMENT:
-                {{document}}
-
-                OVERVIEW:"""
-    );
-
-    private static final PromptTemplate COMBINE_PROMPT_TEMPLATE = PromptTemplate.from(
-            """
-                You have written an overview of a scientific paper. You have been collecting notes from various parts
-                of the paper. Now your task is to combine all of the notes in one structured message.
-
-                SUMMARIES:
-                {{summaries}}
-
-                FINAL OVERVIEW:"""
-    );
-
     private static final int MAX_OVERLAP_SIZE_IN_CHARS = 100;
     private static final int CHAR_TOKEN_FACTOR = 4; // Means, every token is roughly 4 characters.
 
@@ -76,6 +49,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private final String citationKey;
     private final ChatLanguageModel chatLanguageModel;
     private final SummariesStorage summariesStorage;
+    private final TemplatesService templatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -86,6 +60,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
                                BibDatabaseContext bibDatabaseContext,
                                SummariesStorage summariesStorage,
                                ChatLanguageModel chatLanguageModel,
+                               TemplatesService templatesService,
                                ReadOnlyBooleanProperty shutdownSignal,
                                AiPreferences aiPreferences,
                                FilePreferences filePreferences
@@ -95,6 +70,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
         this.citationKey = entry.getCitationKey().orElse("<no citation key>");
         this.chatLanguageModel = chatLanguageModel;
         this.summariesStorage = summariesStorage;
+        this.templatesService = templatesService;
         this.shutdownSignal = shutdownSignal;
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
@@ -222,7 +198,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     public String summarizeOneDocument(String filePath, String document) throws InterruptedException {
         addMoreWork(1); // For the combination of summary chunks.
 
-        DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(CHUNK_PROMPT_TEMPLATE), MAX_OVERLAP_SIZE_IN_CHARS);
+        DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_CHUNK)), MAX_OVERLAP_SIZE_IN_CHARS);
 
         List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
 
@@ -243,10 +219,10 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
                     throw new InterruptedException();
                 }
 
-                Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", chunkSummary));
+                String prompt = templatesService.makeSummarizationChunk(chunkSummary);
 
                 LOGGER.debug("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
-                String chunk = chatLanguageModel.generate(prompt.toString());
+                String chunk = chatLanguageModel.generate(prompt);
                 LOGGER.debug("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
                 list.add(chunk);
@@ -254,7 +230,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
             }
 
             chunkSummaries = list;
-        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(COMBINE_PROMPT_TEMPLATE));
+        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_COMBINE)));
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.
@@ -262,14 +238,14 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
             return chunkSummaries.getFirst();
         }
 
-        Prompt prompt = COMBINE_PROMPT_TEMPLATE.apply(Collections.singletonMap("summaries", String.join("\n\n", chunkSummaries)));
+        String prompt = templatesService.makeSummarizationCombine(chunkSummaries);
 
         if (shutdownSignal.get()) {
             throw new InterruptedException();
         }
 
         LOGGER.debug("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
-        String result = chatLanguageModel.generate(prompt.toString());
+        String result = chatLanguageModel.generate(prompt);
         LOGGER.debug("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
         doneOneWork();
@@ -282,10 +258,6 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
     private static int estimateTokenCount(List<String> chunkSummaries) {
         return chunkSummaries.stream().mapToInt(GenerateSummaryTask::estimateTokenCount).sum();
-    }
-
-    private static int estimateTokenCount(PromptTemplate promptTemplate) {
-        return estimateTokenCount(promptTemplate.template());
     }
 
     private static int estimateTokenCount(String string) {
