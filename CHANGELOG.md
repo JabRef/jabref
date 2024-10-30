@@ -61,6 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - ⚠️ We relaxed the escaping requirements for [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns), which are used for the [citaton key generator](https://docs.jabref.org/advanced/entryeditor#autogenerate-citation-key) and [filename and directory patterns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#auto-linking-files). One only needs to write `\"` if a quote sign should be escaped. All other escapings are not necessary (and working) any more. [#11967](https://github.com/JabRef/jabref/pull/11967)
 - When importing BibTeX data starging from on a PDF, the XMP metadata takes precedence over Grobid data. [#11992](https://github.com/JabRef/jabref/pull/11992)
 - JabRef now uses TLS 1.2 for all HTTPS connections. [#11852](https://github.com/JabRef/jabref/pull/11852)
+- We improved the functionality of getting BibTeX data out of PDF files. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 - We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
 - We improved the DOI detection in PDF imports. [#11782](https://github.com/JabRef/jabref/pull/11782)
