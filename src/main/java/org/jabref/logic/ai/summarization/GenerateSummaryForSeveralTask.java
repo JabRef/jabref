@@ -12,6 +12,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
@@ -36,6 +37,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private final BibDatabaseContext bibDatabaseContext;
     private final SummariesStorage summariesStorage;
     private final ChatLanguageModel chatLanguageModel;
+    private final TemplatesService templatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -51,6 +53,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
             BibDatabaseContext bibDatabaseContext,
             SummariesStorage summariesStorage,
             ChatLanguageModel chatLanguageModel,
+            TemplatesService templatesService,
             ReadOnlyBooleanProperty shutdownSignal,
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
@@ -61,6 +64,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
+        this.templatesService = templatesService;
         this.shutdownSignal = shutdownSignal;
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
@@ -95,6 +99,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
                                     bibDatabaseContext,
                                     summariesStorage,
                                     chatLanguageModel,
+                                    templatesService,
                                     shutdownSignal,
                                     aiPreferences,
                                     filePreferences

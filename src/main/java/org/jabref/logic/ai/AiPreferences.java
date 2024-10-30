@@ -1,6 +1,7 @@
 package org.jabref.logic.ai;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -15,6 +16,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 import org.jabref.model.strings.StringUtil;
@@ -59,6 +61,8 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
+    private final Map<AiTemplate, StringProperty> templates;
+
     private Runnable apiKeyChangeListener;
 
     public AiPreferences(boolean enableAi,
@@ -83,7 +87,8 @@ public class AiPreferences {
                          int documentSplitterChunkSize,
                          int documentSplitterOverlapSize,
                          int ragMaxResultsCount,
-                         double ragMinScore
+                         double ragMinScore,
+                         Map<AiTemplate, String> templates
     ) {
         this.enableAi = new SimpleBooleanProperty(enableAi);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
@@ -113,6 +118,13 @@ public class AiPreferences {
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
+
+        this.templates = Map.of(
+                AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
+                AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
+                AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_CHUNK)),
+                AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE))
+        );
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
@@ -545,5 +557,17 @@ public class AiPreferences {
      */
     public void apiKeyUpdated() {
         apiKeyChangeListener.run();
+    }
+
+    public void setTemplate(AiTemplate aiTemplate, String template) {
+        templates.get(aiTemplate).set(template);
+    }
+
+    public String getTemplate(AiTemplate aiTemplate) {
+        return templates.get(aiTemplate).get();
+    }
+
+    public StringProperty templateProperty(AiTemplate aiTemplate) {
+        return templates.get(aiTemplate);
     }
 }
