@@ -628,13 +628,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void updateEntryEditorIfShowing() {
-        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            BibEntry currentEntry = entryEditor.getCurrentlyEditedEntry();
-            showAndEdit(currentEntry);
-        }
-    }
-
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
