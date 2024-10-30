@@ -131,7 +131,6 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (modifiedEntriesCount > 0) {
-            tabSupplier.get().updateEntryEditorIfShowing();
             tabSupplier.get().markBaseChanged();
         }
 
