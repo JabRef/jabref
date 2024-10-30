@@ -637,7 +637,11 @@ public class BibDatabase {
      */
     public int indexOf(BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
-        return index >= 0 ? index : -1;
+        if (index >= 0) {
+            return index;
+        }
+        LOGGER.warn("Could not find entry with ID {} in the database", bibEntry.getId());
+        return -1;
     }
 
     public BibEntry getEntryById(String id) {
