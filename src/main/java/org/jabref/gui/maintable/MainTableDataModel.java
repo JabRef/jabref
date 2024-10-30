@@ -38,10 +38,13 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
 
 public class MainTableDataModel {
+    private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
 
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
@@ -193,6 +196,14 @@ public class MainTableDataModel {
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesFilteredAndSorted;
+    }
+
+    public Optional<BibEntryTableViewModel> getViewModelByIndex(int index) {
+        if (index < 0 || index >= entriesViewModel.size()) {
+            LOGGER.warn("Tried to access out of bounds index {} in entriesViewModel", index);
+            return Optional.empty();
+        }
+        return Optional.of(entriesViewModel.get(index));
     }
 
     public void resetFieldFormatter() {
