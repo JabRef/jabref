@@ -139,16 +139,16 @@ class PdfContentImporterTest {
 
     private static Stream<Arguments> providePdfData() {
         return Stream.of(
-                Arguments.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students", "/pdfs/PdfContentImporter/se2paper - On How We Can Teach – Exploring New Ways in Professional Software Development for Students.pdf"),
+                Arguments.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students", "/pdfs/PdfContentImporter/Kriha2018.pdf"),
                 Arguments.of("JabRef Example for Reference Parsing", "/pdfs/IEEE/ieee-paper.pdf"),
                 Arguments.of("Paper Title", "/org/jabref/logic/importer/util/LNCS-minimal.pdf"),
                 Arguments.of("Is Oil the future?", "/pdfs/example-scientificThesisTemplate.pdf"),
                 Arguments.of("Thesis Title", "/pdfs/thesis-example.pdf"),
-                Arguments.of("Recovering Trace Links Between Software Documentation And Code", "/pdfs/PdfContentImporter/3597503.3639130 - Recovering Trace Links Between Software Documentation And Code.pdf"),
-                Arguments.of("On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis", "/pdfs/PdfContentImporter/peerj-cs-213 - On the impact of service-oriented patterns on software evolvability a controlled experiment and metric-based analysis.pdf"),
-                Arguments.of("Pandemic programming", "/pdfs/PdfContentImporter/s10664-020-09875-y - Pandemic programming.pdf"),
-                Arguments.of("Do RESTful API design rules have an impact on the understandability of Web APIs?", "/pdfs/PdfContentImporter/s10664-023-10367-y - Do RESTful API design rules have an impact on the understandability of Web APIs?.pdf"),
-                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/spe.3169 - Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study.pdf")
+                Arguments.of("Recovering Trace Links Between Software Documentation And Code", "/pdfs/PdfContentImporter/Keim2024.pdf"),
+                Arguments.of("On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis", "/pdfs/PdfContentImporter/Bogner2019.pdf"),
+                Arguments.of("Pandemic programming", "/pdfs/PdfContentImporter/Ralph2020.pdf"),
+                Arguments.of("Do RESTful API design rules have an impact on the understandability of Web APIs?", "/pdfs/PdfContentImporter/Bogner2023.pdf"),
+                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf")
         );
     }
 }
