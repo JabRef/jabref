@@ -482,7 +482,6 @@ public class LibraryTab extends Tab {
         Platform.runLater(() -> {
             // Focus field and entry in main table (async to give entry editor time to load)
             entryEditor.setFocusToField(field);
-            clearAndSelect(entry);
         });
     }
 
@@ -567,11 +566,15 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure that the divider doesn't move. Updates the mode to SHOWING_EDITOR. Then shows the given entry.
+     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure that the divider doesn't move. Updates the mode to {@link PanelMode#MAIN_TABLE_AND_ENTRY_EDITOR}.
+     * Then shows the given entry.
+     *
+     * Additionally, selects the entry in the main table - so that the selected entry in the main table always corresponds to the edited entry.
      *
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
+        this.clearAndSelect(entry);
         if (!splitPane.getItems().contains(entryEditor)) {
             splitPane.getItems().addLast(entryEditor);
             mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
@@ -889,16 +892,16 @@ public class LibraryTab extends Tab {
     }
 
     public void insertEntries(final List<BibEntry> entries) {
-        if (!entries.isEmpty()) {
-            importHandler.importCleanedEntries(entries);
+        if (entries.isEmpty()) {
+            return;
+        }
 
-            // Create an UndoableInsertEntries object.
-            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-            markBaseChanged();
-            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.getFirst());
-            }
+        importHandler.importCleanedEntries(entries);
+        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        markBaseChanged();
+        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+            showAndEdit(entries.getFirst());
+        } else {
             clearAndSelect(entries.getFirst());
         }
     }
