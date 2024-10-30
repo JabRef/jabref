@@ -48,7 +48,12 @@ Example:
 - `Imported 1 entry(s)`
 - `Imported 12 entry(s)`
 
-The alternative form would be `entry(ies)`.
+There are sub alternatives here:
+
+* `Imported %0 entry(ies)`.
+* `Number of entries imported: %0` (always use "other" plural form)
+
+These arguments are for the general case of using a single text for all kinds of numbers:
 
 * Good, because easy to handle in the code
 * Bad, because reads strange in English UI
