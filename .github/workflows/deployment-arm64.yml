@@ -78,7 +78,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.2
+          java-version: 23.0.2
           distribution: 'temurin'
       - name: Clean up keychain
         run: |
