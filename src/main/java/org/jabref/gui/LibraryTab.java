@@ -916,22 +916,22 @@ public class LibraryTab extends Tab {
     }
 
     private int doCopyEntry(List<BibEntry> selectedEntries) {
-        if (!selectedEntries.isEmpty()) {
-            List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
-            try {
-                if (stringConstants.isEmpty()) {
-                    clipBoardManager.setContent(selectedEntries, entryTypesManager);
-                } else {
-                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
-                }
-                return selectedEntries.size();
-            } catch (IOException e) {
-                LOGGER.error("Error while copying selected entries to clipboard.", e);
-                return -1;
-            }
+        if (selectedEntries.isEmpty()) {
+            return 0;
         }
 
-        return 0;
+        List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
+        try {
+            if (stringConstants.isEmpty()) {
+                clipBoardManager.setContent(selectedEntries, entryTypesManager);
+            } else {
+                clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
+            }
+            return selectedEntries.size();
+        } catch (IOException e) {
+            LOGGER.error("Error while copying selected entries to clipboard.", e);
+            return -1;
+        }
     }
 
     public void pasteEntry() {
