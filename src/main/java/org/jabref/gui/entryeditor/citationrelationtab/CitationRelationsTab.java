@@ -527,7 +527,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
 
-        dialogService.notify(Localization.lang("%0 entry(ies) imported", entriesToImport.size()));
+        dialogService.notify(Localization.lang("%0 entry(s) imported", entriesToImport.size()));
     }
 
     /**
