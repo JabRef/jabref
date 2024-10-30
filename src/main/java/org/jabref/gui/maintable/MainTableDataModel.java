@@ -195,6 +195,13 @@ public class MainTableDataModel {
         return entriesFilteredAndSorted;
     }
 
+    public Optional<BibEntryTableViewModel> getViewModelByIndex(int index) {
+        if (index < 0 || index >= entriesViewModel.size()) {
+            return Optional.empty();
+        }
+        return Optional.of(entriesViewModel.get(index));
+    }
+
     public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }

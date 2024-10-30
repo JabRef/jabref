@@ -259,7 +259,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entry
             getSelectionModel().clearSelection();
-            findEntry(bibEntry).ifPresent(entry -> {
+            model.getViewModelByIndex(database.getDatabase().indexOf(bibEntry)).ifPresent(entry -> {
                 getSelectionModel().select(entry);
                 scrollTo(entry);
             });
@@ -487,13 +487,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .stream()
                 .map(BibEntryTableViewModel::getEntry)
                 .collect(Collectors.toList());
-    }
-
-    private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFilteredAndSorted()
-                    .stream()
-                    .filter(viewModel -> viewModel.getEntry().equals(entry))
-                    .findFirst();
     }
 
     public void setCitationMergeMode(boolean citationMerge) {
