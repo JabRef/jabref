@@ -37,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
@@ -65,7 +65,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -87,7 +87,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -175,7 +175,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -218,7 +218,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -259,7 +259,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -309,7 +309,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -342,7 +342,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
