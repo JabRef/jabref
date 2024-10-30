@@ -15,7 +15,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 22.0.2
           distribution: 'temurin'
 
       - name: Update Gradle Wrapper
