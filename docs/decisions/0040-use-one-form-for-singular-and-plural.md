@@ -48,7 +48,7 @@ Example:
 - `Imported 1 entry(s)`
 - `Imported 12 entry(s)`
 
-The alternative form would by `entry(ies)`.
+The alternative form would be `entry(ies)`.
 
 * Good, because easy to handle in the code
 * Bad, because reads strange in English UI
