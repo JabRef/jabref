@@ -129,8 +129,13 @@ class CitationsRelationsTabViewModelTest {
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
 
-        assertEquals(Optional.of("Test2023"), firstEntryToImport.getField(StandardField.CITES));
-        assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
+        // The entries are cloned during the import. Thus, we need to get the actual entries from the database.
+        // In the test, the citation key is not changed during the import, thus we can just look up the entries by their citation key.
+        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().get()).get();
+        BibEntry secondEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(secondEntryToImport.getCitationKey().get()).get();
+
+        assertEquals(Optional.of("Test2023"), firstEntryInLibrary.getField(StandardField.CITES));
+        assertEquals(List.of(existingEntry, firstEntryInLibrary, secondEntryInLibrary), bibDatabaseContext.getEntries());
     }
 
     @Test
