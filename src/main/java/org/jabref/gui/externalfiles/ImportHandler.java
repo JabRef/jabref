@@ -241,6 +241,8 @@ public class ImportHandler {
                           }
                           importCleanedEntries(List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
+                          BibEntry entryToFocus = finalEntry;
+                          stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
                       }).executeWith(taskExecutor);
     }
 
