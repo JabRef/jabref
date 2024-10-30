@@ -111,20 +111,24 @@ class CitationsRelationsTabViewModelTest {
 
     @Test
     void existingEntryCitesOtherPaperWithCitationKeys() {
-        var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
+        var citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
         assertEquals(Optional.of("FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
     }
 
     @Test
     void importedEntriesWithExistingCitationKeysCiteExistingEntry() {
-        var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
+        var citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
+
         assertEquals(Optional.of("Test2023"), firstEntryToImport.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
     }
@@ -132,10 +136,12 @@ class CitationsRelationsTabViewModelTest {
     @Test
     void existingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
         existingEntry.setField(StandardField.CITES, "Asdf1222");
-        var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
+        var citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
         assertEquals(Optional.of("Asdf1222,FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
     }
