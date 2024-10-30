@@ -109,7 +109,7 @@ public class ImportCommand extends SimpleCommand {
         if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
-                    dialogService.notify(Localization.lang("%0 entry(ies) imported", parserResult.getDatabase().getEntries().size()));
+                    dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
                 })
                 .onFailure(ex -> {
                     LOGGER.error("Error importing", ex);
