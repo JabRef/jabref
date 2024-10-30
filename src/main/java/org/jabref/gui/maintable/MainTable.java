@@ -482,10 +482,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFilteredAndSorted()
-                    .stream()
-                    .filter(viewModel -> viewModel.getEntry().equals(entry))
-                    .findFirst();
+        return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

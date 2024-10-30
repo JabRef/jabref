@@ -26,9 +26,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
+
+import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -196,7 +200,8 @@ public class PdfContentImporter extends PdfImporter {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
+            String titleByFontSize = extractTitleFromDocument(document);
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
@@ -208,17 +213,120 @@ public class PdfContentImporter extends PdfImporter {
         return new ParserResult(result);
     }
 
-    // make this method package visible so we can test it
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
-        // idea: split[] contains the different lines
-        // blocks are separated by empty lines
-        // treat each block
-        //   or do special treatment at authors (which are not broken)
-        //   therefore, we do a line-based and not a block-based splitting
-        // i points to the current line
-        // curString (mostly) contains the current block
-        //   the different lines are joined into one and thereby separated by " "
+    private static String extractTitleFromDocument(PDDocument document) throws IOException {
+        TitleExtractorByFontSize stripper = new TitleExtractorByFontSize();
+        return stripper.getTitleFromFirstPage(document);
+    }
 
+    private static class TitleExtractorByFontSize extends PDFTextStripper {
+
+        private final List<TextPosition> textPositionsList;
+
+        public TitleExtractorByFontSize() {
+            super();
+            this.textPositionsList = new ArrayList<>();
+        }
+
+        public String getTitleFromFirstPage(PDDocument document) throws IOException {
+            this.setStartPage(1);
+            this.setEndPage(1);
+            this.writeText(document, new StringWriter());
+            return findLargestFontText(textPositionsList);
+        }
+
+        @Override
+        protected void writeString(String text, List<TextPosition> textPositions) {
+            textPositionsList.addAll(textPositions);
+        }
+
+        private boolean isFarAway(TextPosition previous, TextPosition current) {
+            float XspaceThreshold = 3.0F;
+            float YspaceThreshold = previous.getFontSizeInPt() * 1.5F;
+            float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
+            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
+            return Xgap > XspaceThreshold && Ygap > YspaceThreshold;
+        }
+
+        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition) {
+            if (textPosition == null || previousTextPosition == null) {
+                return false;
+            }
+            // The title usually don't in the bottom 10% of a page.
+            if ((textPosition.getPageHeight() - textPosition.getYDirAdj())
+                    < (textPosition.getPageHeight() * 0.1)) {
+                return true;
+            }
+            // The title character usually stay together.
+            return isFarAway(previousTextPosition, textPosition);
+        }
+
+        private String findLargestFontText(List<TextPosition> textPositions) {
+            float maxFontSize = 0;
+            StringBuilder largestFontText = new StringBuilder();
+            TextPosition previousTextPosition = null;
+            for (TextPosition textPosition : textPositions) {
+                // Exclude unwanted text based on heuristics
+                if (isUnwantedText(previousTextPosition, textPosition)) {
+                    continue;
+                }
+                float fontSize = textPosition.getFontSizeInPt();
+                if (fontSize > maxFontSize) {
+                    maxFontSize = fontSize;
+                    largestFontText.setLength(0);
+                    largestFontText.append(textPosition.getUnicode());
+                    previousTextPosition = textPosition;
+                } else if (fontSize == maxFontSize) {
+                    if (previousTextPosition != null) {
+                        if (isThereSpace(previousTextPosition, textPosition)) {
+                            largestFontText.append(" ");
+                        }
+                    }
+                    largestFontText.append(textPosition.getUnicode());
+                    previousTextPosition = textPosition;
+                }
+            }
+            return largestFontText.toString().trim();
+        }
+
+        private boolean isThereSpace(TextPosition previous, TextPosition current) {
+            float XspaceThreshold = 0.5F;
+            float YspaceThreshold = previous.getFontSizeInPt();
+            float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
+            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
+            return Xgap > XspaceThreshold || Ygap > YspaceThreshold;
+        }
+    }
+
+    /**
+     * Parses the first page content of a PDF document and extracts bibliographic information such as title, author,
+     * abstract, keywords, and other relevant metadata. This method processes the content line-by-line and uses
+     * custom parsing logic to identify and assemble information blocks from academic papers.
+     *
+     * idea: split[] contains the different lines, blocks are separated by empty lines, treat each block
+     *       or do special treatment at authors (which are not broken).
+     *       Therefore, we do a line-based and not a block-based splitting i points to the current line
+     *       curString (mostly) contains the current block,
+     *       the different lines are joined into one and thereby separated by " "
+     *
+     * <p> This method follows the structure typically found in academic paper PDFs:
+     * - First, it attempts to detect the title by font size, if available, or by text position.
+     * - Authors are then processed line-by-line until reaching the next section.
+     * - Abstract and keywords, if found, are extracted as they appear on the page.
+     * - Finally, conference details, DOI, and publication information are parsed from the lower blocks.
+     *
+     * <p> The parsing logic also identifies and categorizes entries based on keywords such as "Abstract" or "Keywords"
+     * and specific terms that denote sections. Additionally, this method can handle
+     * publisher-specific formats like Springer or IEEE, extracting data like series, volume, and conference titles.
+     *
+     * @param firstpageContents The raw content of the PDF's first page, which may contain metadata and main content.
+     * @param lineSeparator     The line separator used to format and unify line breaks in the text content.
+     * @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the
+     *                          default title parsing.
+     * @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
+     *         is successful. Otherwise, an empty {@link Optional}.
+     */
+    @VisibleForTesting
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByFontSize) {
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
@@ -275,8 +383,11 @@ public class PdfContentImporter extends PdfImporter {
         // start: title
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
-        curString = "";
         // i points to the next non-empty line
+        curString = "";
+        if (!isNullOrEmpty(titleByFontSize)) {
+            title = titleByFontSize;
+        }
 
         // after title: authors
         author = null;
@@ -392,13 +503,6 @@ public class PdfContentImporter extends PdfImporter {
                 if ((publisher == null) && curString.contains("IEEE")) {
                     // IEEE has the conference things at the end
                     publisher = "IEEE";
-
-                    // year is extracted by extractYear
-                    // otherwise, we could it determine as follows:
-                    // String yearStr = curString.substring(curString.length()-4);
-                    // if (isYear(yearStr)) {
-                    //  year = yearStr;
-                    // }
 
                     if (conference == null) {
                         pos = curString.indexOf('$');
