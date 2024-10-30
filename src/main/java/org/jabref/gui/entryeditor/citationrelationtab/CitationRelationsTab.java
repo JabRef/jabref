@@ -317,7 +317,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingTask.cancel();
         citedByTask.cancel();
         libraryTab.showAndEdit(entry.localEntry());
-        libraryTab.clearAndSelect(entry.localEntry());
     }
 
     /**

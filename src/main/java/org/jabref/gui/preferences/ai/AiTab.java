@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -15,13 +16,13 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
@@ -43,7 +44,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<EmbeddingModel> embeddingModelComboBox;
-    @FXML private ResizableTextArea instructionTextArea;
     @FXML private TextField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
@@ -51,8 +51,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private TextField ragMinScoreTextField;
 
+    @FXML private TextArea systemMessageTextArea;
+    @FXML private TextArea userMessageTextArea;
+    @FXML private TextArea summarizationChunkTextArea;
+    @FXML private TextArea summarizationCombineTextArea;
+
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
+    @FXML private Button templatesHelp;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -74,14 +80,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         new ViewModelListCellFactory<AiProvider>()
                 .withText(AiProvider::toString)
                 .install(aiProviderComboBox);
-        aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
+        aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
         aiProviderComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         new ViewModelListCellFactory<String>()
                 .withText(text -> text)
                 .install(chatModelComboBox);
-        chatModelComboBox.setItems(viewModel.chatModelsProperty());
+        chatModelComboBox.itemsProperty().bind(viewModel.chatModelsProperty());
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
         chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
@@ -122,9 +128,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         viewModel.disableApiBaseUrlProperty().addListener((observable, oldValue, newValue) ->
             apiBaseUrlTextField.setDisable(newValue || viewModel.disableExpertSettingsProperty().get())
         );
-
-        instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
-        instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         // bindBidirectional doesn't work well with number input fields ({@link IntegerInputField}, {@link DoubleInputField}),
         // so they are expanded into `addListener` calls.
@@ -180,7 +183,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
             visualizer.initVisualization(viewModel.getEmbeddingModelValidationStatus(), embeddingModelComboBox);
-            visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
             visualizer.initVisualization(viewModel.getTemperatureTypeValidationStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getTemperatureRangeValidationStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
@@ -191,9 +193,15 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScoreTextField);
         });
 
+        systemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
+        userMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_USER_MESSAGE));
+        summarizationChunkTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_CHUNK));
+        summarizationCombineTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE));
+
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_GENERAL_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), generalSettingsHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EXPERT_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), expertSettingsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_TEMPLATES, dialogService, preferences.getExternalApplicationsPreferences()), templatesHelp);
     }
 
     @Override
@@ -204,6 +212,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML
     private void onResetExpertSettingsButtonClick() {
         viewModel.resetExpertSettings();
+    }
+
+    @FXML
+    private void onResetTemplatesButtonClick() {
+        viewModel.resetTemplates();
     }
 
     public ReadOnlyBooleanProperty aiEnabledProperty() {
