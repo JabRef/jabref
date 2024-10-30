@@ -75,6 +75,9 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
+    // list is filled as each entry is passed to importCleanedEntries
+    private final List<BibEntry> addedEntries = new ArrayList<>();
+
     public ImportHandler(BibDatabaseContext database,
                          GuiPreferences preferences,
                          FileUpdateMonitor fileupdateMonitor,
@@ -216,9 +219,10 @@ public class ImportHandler {
 
     public void importCleanedEntries(List<BibEntry> entries) {
         bibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
+        addedEntries.addAll(entries);
+        generateKeys(addedEntries);
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -229,19 +233,19 @@ public class ImportHandler {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
-                      .onFailure(e -> LOGGER.error("Error in duplicate search"))
-                      .onSuccess(existingDuplicateInLibrary -> {
-                          BibEntry finalEntry = entryToInsert;
-                          if (existingDuplicateInLibrary.isPresent()) {
-                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
-                              if (duplicateHandledEntry.isEmpty()) {
-                                  return;
-                              }
-                              finalEntry = duplicateHandledEntry.get();
-                          }
-                          importCleanedEntries(List.of(finalEntry));
-                          downloadLinkedFiles(finalEntry);
-                      }).executeWith(taskExecutor);
+                .onFailure(e -> LOGGER.error("Error in duplicate search"))
+                .onSuccess(existingDuplicateInLibrary -> {
+                    BibEntry finalEntry = entryToInsert;
+                    if (existingDuplicateInLibrary.isPresent()) {
+                        Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
+                        if (duplicateHandledEntry.isEmpty()) {
+                            return;
+                        }
+                        finalEntry = duplicateHandledEntry.get();
+                    }
+                    importCleanedEntries(List.of(finalEntry));
+                    downloadLinkedFiles(finalEntry);
+                }).executeWith(taskExecutor);
     }
 
     @VisibleForTesting
@@ -406,6 +410,7 @@ public class ImportHandler {
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
         boolean firstEntry = true;
+        generateKeys(entriesToAdd);
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
