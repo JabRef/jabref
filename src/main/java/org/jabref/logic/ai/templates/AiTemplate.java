@@ -22,9 +22,9 @@ public enum AiTemplate {
             case CHATTING_USER_MESSAGE ->
                     Localization.lang("User message for chatting");
             case SUMMARIZATION_CHUNK ->
-                    Localization.lang("Summarization chunk");
+                    Localization.lang("Completion text for summarization of a chunk");
             case SUMMARIZATION_COMBINE ->
-                    Localization.lang("Summarization combine");
+                    Localization.lang("Completion text for summarization of several chunks");
         };
     }
 }

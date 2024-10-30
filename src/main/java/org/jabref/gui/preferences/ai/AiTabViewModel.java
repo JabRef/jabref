@@ -82,17 +82,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();
     private final StringProperty gpt4AllApiBaseUrl = new SimpleStringProperty();
 
-    private final ListProperty<AiTemplate> templatesList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AiTemplate.values()));
-    private final ObjectProperty<AiTemplate> currentEditingTemplate = new SimpleObjectProperty<>(AiTemplate.CHATTING_SYSTEM_MESSAGE);
-
     private final Map<AiTemplate, StringProperty> templateSources = Map.of(
             AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
             AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
             AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(),
             AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty()
     );
-    private final StringProperty currentEditingTemplateSource = new SimpleStringProperty();
 
     private final StringProperty temperature = new SimpleStringProperty();
     private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
@@ -235,14 +230,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.currentEditingTemplateSource.addListener((observable, oldValue, newValue) -> {
-            templateSources.get(currentEditingTemplate.get()).set(newValue);
-        });
-
-        this.currentEditingTemplate.addListener((observable, oldValue, newValue) -> {
-            currentEditingTemplateSource.set(templateSources.get(newValue).get());
-        });
-
         this.apiKeyValidator = new FunctionBasedValidator<>(
                 currentApiKey,
                 token -> !StringUtil.isBlank(token),
@@ -338,8 +325,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         Arrays.stream(AiTemplate.values()).forEach(template ->
                 templateSources.get(template).set(aiPreferences.getTemplate(template)));
 
-        currentEditingTemplateSource.set(templateSources.get(currentEditingTemplate.get()).get());
-
         temperature.setValue(LocalizedNumbers.doubleToString(aiPreferences.getTemperature()));
         contextWindowSize.setValue(aiPreferences.getContextWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
@@ -408,8 +393,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void resetTemplates() {
         Arrays.stream(AiTemplate.values()).forEach(template ->
                 templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
-
-        currentEditingTemplateSource.set(templateSources.get(currentEditingTemplate.get()).get());
     }
 
     @Override
@@ -511,16 +494,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return disableApiBaseUrl;
     }
 
-    public ListProperty<AiTemplate> templatesProperty() {
-        return templatesList;
-    }
-
-    public ObjectProperty<AiTemplate> currentEditingTemplate() {
-        return currentEditingTemplate;
-    }
-
-    public StringProperty currentEditingTemplateSource() {
-        return currentEditingTemplateSource;
+    public Map<AiTemplate, StringProperty> getTemplateSources() {
+        return templateSources;
     }
 
     public StringProperty temperatureProperty() {

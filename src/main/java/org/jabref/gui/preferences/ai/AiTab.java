@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -22,7 +23,6 @@ import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
@@ -51,8 +51,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private TextField ragMinScoreTextField;
 
-    @FXML private ComboBox<AiTemplate> currentEditingTemplateComboBox;
-    @FXML private ResizableTextArea currentEditingTemplateSourceTextArea;
+    @FXML private TextArea systemMessageTextArea;
+    @FXML private TextArea userMessageTextArea;
+    @FXML private TextArea summarizationChunkTextArea;
+    @FXML private TextArea summarizationCombineTextArea;
 
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
@@ -191,13 +193,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScoreTextField);
         });
 
-        new ViewModelListCellFactory<AiTemplate>()
-                .withText(AiTemplate::getLocalizedName)
-                .install(currentEditingTemplateComboBox);
-        currentEditingTemplateComboBox.itemsProperty().bind(viewModel.templatesProperty());
-        currentEditingTemplateComboBox.valueProperty().bindBidirectional(viewModel.currentEditingTemplate());
-
-        currentEditingTemplateSourceTextArea.textProperty().bindBidirectional(viewModel.currentEditingTemplateSource());
+        systemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
+        userMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_USER_MESSAGE));
+        summarizationChunkTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_CHUNK));
+        summarizationCombineTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE));
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_GENERAL_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), generalSettingsHelp);
