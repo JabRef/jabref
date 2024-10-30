@@ -90,7 +90,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 22.0.2
+          java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4

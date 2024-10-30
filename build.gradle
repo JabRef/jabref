@@ -45,8 +45,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_22
-    targetCompatibility = JavaVersion.VERSION_22
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -60,7 +60,7 @@ java {
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        languageVersion = JavaLanguageVersion.of(22)
+        languageVersion = JavaLanguageVersion.of(21)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // vendor = JvmVendorSpec.AMAZON
     }
