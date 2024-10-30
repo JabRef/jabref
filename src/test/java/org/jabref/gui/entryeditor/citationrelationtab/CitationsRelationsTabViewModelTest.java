@@ -24,6 +24,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -79,6 +80,7 @@ class CitationsRelationsTabViewModelTest {
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
 
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
         StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
