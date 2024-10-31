@@ -7,19 +7,9 @@ import org.jabref.model.entry.BibEntry;
 /**
  * This event is fired when the user tries to push changes of one or more obsolete
  * {@link BibEntry} to the server.
+ *
+ * @param bibEntries Affected {@link BibEntry}
  */
-public class SharedEntriesNotPresentEvent {
-
-    private final List<BibEntry> bibEntries;
-
-    /**
-     * @param bibEntries Affected {@link BibEntry}
-     */
-    public SharedEntriesNotPresentEvent(List<BibEntry> bibEntries) {
-        this.bibEntries = bibEntries;
-    }
-
-    public List<BibEntry> getBibEntries() {
-        return this.bibEntries;
-    }
+public record SharedEntriesNotPresentEvent(
+        List<BibEntry> bibEntries) {
 }

@@ -29,7 +29,7 @@ public class EprintCleanup implements CleanupJob {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
-                String normalizedEprint = arXivIdentifier.get().getNormalized();
+                String normalizedEprint = arXivIdentifier.get().asString();
 
                 if (version.isPresent() && !normalizedEprint.contains("v" + version.get())) {
                     normalizedEprint += "v" + version.get();

@@ -54,7 +54,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
                                                          .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(""))
-                                                         .queryString("q", "doi:%s".formatted(doi.get().getDOI()))
+                                                         .queryString("q", "doi:%s".formatted(doi.get().asString()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {
                 JSONObject json = jsonResponse.getBody().getObject();
@@ -62,7 +62,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
 
                 if (results > 0) {
                     LOGGER.info("Fulltext PDF found @ Springer.");
-                    return Optional.of(new URI("http", null, CONTENT_HOST, -1, "/content/pdf/%s.pdf".formatted(doi.get().getDOI()), null, null).toURL());
+                    return Optional.of(new URI("http", null, CONTENT_HOST, -1, "/content/pdf/%s.pdf".formatted(doi.get().asString()), null, null).toURL());
                 }
             }
         } catch (UnirestException | URISyntaxException e) {

@@ -7,11 +7,10 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";
@@ -20,7 +19,6 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     private final GuiPreferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
-    private final LuceneManager luceneManager;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private PreviewPanel previewPanel;
 
@@ -29,14 +27,12 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
                       GuiPreferences preferences,
                       ThemeManager themeManager,
                       TaskExecutor taskExecutor,
-                      LuceneManager luceneManager,
                       OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.themeManager = themeManager;
         this.taskExecutor = taskExecutor;
-        this.luceneManager = luceneManager;
         this.searchQueryProperty = searchQueryProperty;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
@@ -65,7 +61,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, themeManager, taskExecutor, luceneManager, searchQueryProperty);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, themeManager, taskExecutor, searchQueryProperty);
             setContent(previewPanel);
         }
 
