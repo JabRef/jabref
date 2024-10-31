@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
-        jdk: [22]
+        jdk: [21]
         javafx: [24]
         include:
           - os: ubuntu-latest
