@@ -297,7 +297,7 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isThereSpace(TextPosition previous, TextPosition current) {
-            float XspaceThreshold = 0.5F;
+            float XspaceThreshold = 1F;
             float YspaceThreshold = previous.getFontSizeInPt();
             float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
             float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
