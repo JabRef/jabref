@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -261,8 +264,7 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private String findLargestFontText(List<TextPosition> textPositions) {
-            float maxFontSize = 0;
-            StringBuilder largestFontText = new StringBuilder();
+            Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
                 // Exclude unwanted text based on heuristics
@@ -270,22 +272,25 @@ public class PdfContentImporter extends PdfImporter {
                     continue;
                 }
                 float fontSize = textPosition.getFontSizeInPt();
-                if (fontSize > maxFontSize) {
-                    maxFontSize = fontSize;
-                    largestFontText.setLength(0);
-                    largestFontText.append(textPosition.getUnicode());
-                    previousTextPosition = textPosition;
-                } else if (fontSize == maxFontSize) {
-                    if (previousTextPosition != null) {
-                        if (isThereSpace(previousTextPosition, textPosition)) {
-                            largestFontText.append(" ");
-                        }
-                    }
-                    largestFontText.append(textPosition.getUnicode());
-                    previousTextPosition = textPosition;
+                fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
+                if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
+                    fontSizeTextMap.get(fontSize).append(" ");
+                }
+                fontSizeTextMap.get(fontSize).append(textPosition.getUnicode());
+                previousTextPosition = textPosition;
+            }
+            for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
+                String candidateText = entry.getValue().toString().trim();
+                if (isLegalTitle(candidateText)) {
+                    return candidateText;
                 }
             }
-            return largestFontText.toString().trim();
+            return fontSizeTextMap.values().iterator().next().toString().trim();
+        }
+
+        private boolean isLegalTitle(String candidateText) {
+            // The minimum title length typically observed in academic research is 4 characters.
+            return candidateText.length() >= 4;
         }
 
         private boolean isThereSpace(TextPosition previous, TextPosition current) {
