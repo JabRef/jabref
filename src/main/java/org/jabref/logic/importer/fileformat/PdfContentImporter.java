@@ -254,6 +254,9 @@ public class PdfContentImporter extends PdfImporter {
             if (textPosition == null || previousTextPosition == null) {
                 return false;
             }
+            if (textPosition.getUnicode().equals(" ")) {
+                return true;
+            }
             // The title usually don't in the bottom 10% of a page.
             if ((textPosition.getPageHeight() - textPosition.getYDirAdj())
                     < (textPosition.getPageHeight() * 0.1)) {
@@ -298,7 +301,7 @@ public class PdfContentImporter extends PdfImporter {
             float YspaceThreshold = previous.getFontSizeInPt();
             float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
             float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
-            return Xgap > XspaceThreshold || Ygap > YspaceThreshold;
+            return Math.abs(Xgap) > XspaceThreshold || Math.abs(Ygap) > YspaceThreshold;
         }
     }
 
