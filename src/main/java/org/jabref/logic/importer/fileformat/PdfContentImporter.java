@@ -254,7 +254,7 @@ public class PdfContentImporter extends PdfImporter {
             if (textPosition == null || previousTextPosition == null) {
                 return false;
             }
-            if (" ".equals(textPosition.getUnicode())) {
+            if (StringUtil.isBlank(textPosition.getUnicode())) {
                 return true;
             }
             // The title usually don't in the bottom 10% of a page.
