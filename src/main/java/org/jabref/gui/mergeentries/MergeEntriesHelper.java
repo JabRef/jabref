@@ -1,4 +1,3 @@
-
 package org.jabref.gui.mergeentries;
 
 import java.util.LinkedHashSet;

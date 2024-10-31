@@ -1,4 +1,3 @@
-
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
