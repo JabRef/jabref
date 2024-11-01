@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -1123,6 +1125,26 @@ public class BibEntry implements Cloneable {
         return setFiles(currentFiles);
     }
     // endregion
+
+    /**
+     * Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+     * <p>
+     * Empty citation keys are not returned. There is no consistency check made.
+     *
+     * @return List of citation keys; empty list if field is empty or not available.
+     */
+    public SequencedSet<String> getCites() {
+        return this.getField(StandardField.CITES)
+                   .map(content -> Arrays.stream(content.split(",")))
+                   .orElseGet(Stream::empty)
+                   .map(String::trim)
+                   .filter(key -> !key.isEmpty())
+                   .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public Optional<FieldChange> setCites(SequencedSet<String> keys) {
+        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
+    }
 
     public void setDate(Date date) {
         date.getYear().ifPresent(year -> setField(StandardField.YEAR, year.toString()));

@@ -215,7 +215,6 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
-        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
@@ -242,6 +241,8 @@ public class ImportHandler {
                           }
                           importCleanedEntries(List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
+                          BibEntry entryToFocus = finalEntry;
+                          stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
                       }).executeWith(taskExecutor);
     }
 

@@ -45,8 +45,9 @@ To write a localized string in FXML file, prepend it with `%`, like in this code
 ## General hints
 
 * Use the String you want to localize directly, do not use members or local variables: `Localization.lang("Translate me");` instead of `Localization.lang(someVariable)` (possibly in the form `someVariable = Localization.lang("Translate me")`
-* Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");`
+* Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entry(s).", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entry(s).");`
 * Use a full stop/period (".") to end full sentences
+* For pluralization, use a combined form. E.g., `Localization.lang("checked %0 entry(s)")`.
 
 ## Checking for correctness
 

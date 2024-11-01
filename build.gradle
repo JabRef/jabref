@@ -56,7 +56,10 @@ java {
         // If this is updated, also update
         // - .gitpod.Dockerfile
         // - .devcontainer/devcontainer.json#L34 and
-        // - .github/workflows/deployment-jdk-ea.yml#L53
+        // - .github/workflows/deployment*.yml
+        // - .github/workflows/tests*.yml
+        // - .github/workflows/update-gradle-wrapper.yml
+        // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
         languageVersion = JavaLanguageVersion.of(21)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // vendor = JvmVendorSpec.AMAZON
@@ -351,7 +354,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
     }
 
-
+    implementation 'org.apache.velocity:velocity-engine-core:2.3'
     implementation platform('ai.djl:bom:0.30.0')
     implementation 'ai.djl:api'
     implementation 'ai.djl.huggingface:tokenizers'
