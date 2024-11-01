@@ -5,7 +5,7 @@ import java.util.List;
 public enum PostgreConstants {
     BIB_FIELDS_SCHEME("bib_fields"),
     SPLIT_TABLE_SUFFIX("_split_values"),
-    ENTRY_ID("entry_id"),
+    ENTRY_ID("entryid"),
     FIELD_NAME("field_name"),
     FIELD_VALUE_LITERAL("field_value_literal"), // contains the value as-is
     FIELD_VALUE_TRANSFORMED("field_value_transformed"); // contains the value transformed for better querying

@@ -128,7 +128,7 @@ After that a new entry called "jabref \[run]" appears in the run configurations.
 Now you can also select "jabref \[run]" and either run or debug the application from within IntelliJ.
 
 {: .note }
-You can run any other development task in a similar way.
+You can run any other development task similarly.
 
 ## Using IntelliJ's internal build system for tests
 
