@@ -49,7 +49,7 @@ Chosen option: "The PreviewPanel of the EntryEditor".
 ![Image: Placement in the Preview Panel](https://github.com/user-attachments/assets/68b9065b-bac6-412b-9815-7d27d2fbe0be)
 
 * Good, because it would not be obtrusive or distracting.
-* Bad, because users will have to click multiple times (enable preview tab, open entry editor) to see the book cover.
+* Bad, if the Entry Editor is closed, users will have to open the Entry Editor and navigate to the "Preview" or "Required fields" tab to see the cover.
 
 ### SplitPane next to the MainTable
 
