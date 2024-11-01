@@ -120,12 +120,12 @@ public class MainTableColumnFactory {
                     }
                 }
                 break;
-            default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
+            default:
         }
         return returnColumn;
     }
