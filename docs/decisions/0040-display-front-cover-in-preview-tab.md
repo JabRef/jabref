@@ -37,12 +37,12 @@ Chosen option: "The PreviewPanel of the EntryEditor".
 
 * Good, because it would be unobtrusive
 * Bad, because it would crowd other panels in the SidePane
-* Bad, because changing the size of the SidePane would [affect both the MainTable and the EntryEditor](https://github.com/user-attachments/assets/06a8d35b-1bbc-4066-b92b-44b908656cdf).
+* Bad, because changing the size of the SidePane would affect both the MainTable and the EntryEditor.
 
 ### New right-sided SidePane
 
-* Good, if integrated together with entry preview because it would make it [easier to view a citation's preview](https://github.com/JabRef/jabref/issues/10120#issuecomment-2422099269).
-* Bad, because an extra SidePane would [make the interface overly complex](https://github.com/JabRef/jabref/issues/10120#issuecomment-2422677378).
+* Good, if integrated together with entry preview because it would make it easier to view a citation's preview.
+* Bad, because an extra SidePane would make the interface overly complex.
 
 ### The PreviewPanel of the EntryEditor
 
