@@ -79,7 +79,7 @@ public class FulltextFetchers {
         try {
             WebFetchers.getIdFetcherForIdentifier(DOI.class)
                        .findIdentifier(clonedEntry)
-                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.getDOI()));
+                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }

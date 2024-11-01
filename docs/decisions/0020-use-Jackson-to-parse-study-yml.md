@@ -20,7 +20,7 @@ What parser should be used to parse YAML files?
 
 ## Decision Outcome
 
-Chosen option: Jackson, because as it is a dedicated library for parsing YAML. `yamlbeans` also seem to be viable. They all offer similar functionality.
+Chosen option: "Jackson", because as it is a dedicated library for parsing YAML. `yamlbeans` also seem to be viable. They all offer similar functionality.
 
 ## Pros and Cons of the Options
 
