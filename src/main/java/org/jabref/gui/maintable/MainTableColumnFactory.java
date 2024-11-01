@@ -83,7 +83,6 @@ public class MainTableColumnFactory {
         this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
     }
 
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
@@ -110,7 +109,6 @@ public class MainTableColumnFactory {
                     returnColumn = createExtraFileColumn(column);
                 }
                 break;
-
             case SPECIALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     Field field = FieldFactory.parseField(column.getQualifier());
@@ -122,12 +120,12 @@ public class MainTableColumnFactory {
                     }
                 }
                 break;
-            default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
+            default:
         }
         return returnColumn;
     }
