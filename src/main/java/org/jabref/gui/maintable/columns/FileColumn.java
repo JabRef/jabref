@@ -109,7 +109,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     if (event.getButton() == MouseButton.PRIMARY) {
                         if (filteredFiles.size() == 1) {
                             // Only one file - open directly
-                            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(filteredFiles.get(0),
+                            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(filteredFiles.getFirst(),
                                     entry.getEntry(), database, taskExecutor, dialogService, preferences);
                             linkedFileViewModel.open();
                         } else if (filteredFiles.size() > 1) {
