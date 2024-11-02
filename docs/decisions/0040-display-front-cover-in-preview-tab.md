@@ -33,7 +33,7 @@ Chosen option: "The PreviewPanel of the EntryEditor".
 
 ### Existing SidePane
 
-![Image: Placement in SidePane](https://github.com/user-attachments/assets/7f704b0c-6f0c-4501-8167-4dc6202ca8f6)
+![Image: Placement in SidePane](0040-placement-in-sidepane.png)
 
 * Good, because it would be unobtrusive
 * Bad, because it would crowd other panels in the SidePane
@@ -41,19 +41,21 @@ Chosen option: "The PreviewPanel of the EntryEditor".
 
 ### New right-sided SidePane
 
+![Image: Placement in the new right-sided SidePane](0040-placement-in-new-sidepane.png)
+
 * Good, if integrated together with entry preview because it would make it easier to view a citation's preview.
 * Bad, because an extra SidePane would make the interface overly complex.
 
 ### The PreviewPanel of the EntryEditor
 
-![Image: Placement in the Preview Panel](https://github.com/user-attachments/assets/68b9065b-bac6-412b-9815-7d27d2fbe0be)
+![Image: Placement in the Preview Panel](0040-placement-in-preview-panel.png)
 
 * Good, because it would not be obtrusive or distracting.
 * Bad, if the Entry Editor is closed, users will have to open the Entry Editor and navigate to the "Preview" or "Required fields" tab to see the cover.
 
 ### SplitPane next to the MainTable
 
-![Image: Placement next to the Main Table](https://github.com/user-attachments/assets/7b193c60-7903-42ff-ad99-29c0f2d8f482)
+![Image: Placement next to the Main Table](0040-placement-in-maintable.png)
 
 * Good, because changing the size of this SplitPane would [only affect the MainTable](https://github.com/user-attachments/assets/4e458099-ca5c-41bc-a33b-ce4240d7df82).
 * Bad, because it would obstruct some columns in the MainTable.
