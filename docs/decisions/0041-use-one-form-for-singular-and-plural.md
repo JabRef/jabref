@@ -1,5 +1,5 @@
 ---
-nav_order: 40
+nav_order: 41
 parent: Decision Records
 ---
 <!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
