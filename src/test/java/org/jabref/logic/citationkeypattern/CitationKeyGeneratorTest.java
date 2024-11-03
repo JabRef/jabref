@@ -191,14 +191,15 @@ class CitationKeyGeneratorTest {
             "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
 
             # Special cases
-            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "AlK",
+            # We keep "-" in citation keys, thus Al-Ketan with three letters is "Al-"
+            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
             "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
             "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
             """
     )
     void makeLabelAndCheckLegalKeys(String bibtexString, String expectedResult) throws ParseException {
-        Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
-        String citationKey = generateKey(bibEntry.orElse(null), "[auth3]", new BibDatabase());
+        BibEntry bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
+        String citationKey = generateKey(bibEntry, "[auth3]", new BibDatabase());
 
         String cleanedKey = CitationKeyGenerator.cleanKey(citationKey, DEFAULT_UNWANTED_CHARACTERS);
 
@@ -975,7 +976,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("Newton2019", generateKey(entry, "[auth]-[year]"));
+        assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
@@ -983,7 +984,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac")
                                        .withField(StandardField.YEAR, "2019");
 
-        assertEquals("newt2019", generateKey(entry, "[auth4:lower]-[year]"));
+        assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test

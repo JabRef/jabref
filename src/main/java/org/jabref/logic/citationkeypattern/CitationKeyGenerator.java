@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
+
     /**
      * All single characters that we can use for extending a key to make it unique.
      */
@@ -30,13 +31,14 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
     /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
     ///
-    /// Source: <https://tex.stackexchange.com/questions/408530/what-characters-are-allowed-to-use-as-delimiters-for-bibtex-keys
+    /// See also #DISALLOWED_CHARACTERS
     public static final String DEFAULT_UNWANTED_CHARACTERS = "`ʹ:!;?^";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
-
-    // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
+    /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
+    /// These characters are disallowed in BibTeX keys.
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 
     private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
