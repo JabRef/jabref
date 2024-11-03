@@ -26,12 +26,12 @@ public class CitationKeyGenerator extends BracketedPattern {
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
 
-    /**
-     * List of unwanted characters. These will be removed at the end.
-     * Note that <code>+</code> is a wanted character to indicate "et al." in authorsAlpha.
-     * Example: "ABC+". See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
-     */
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^";
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
+    ///
+    /// Source: <https://tex.stackexchange.com/questions/408530/what-characters-are-allowed-to-use-as-delimiters-for-bibtex-keys
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "`ʹ:!;?^";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 

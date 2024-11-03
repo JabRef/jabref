@@ -66,7 +66,6 @@ class CitationKeyGeneratorTest {
     private static final String AUTHNOFMTH = "[auth%d_%d]";
     private static final String AUTHFOREINI = "[authForeIni]";
     private static final String AUTHFIRSTFULL = "[authFirstFull]";
-    private static final String AUTHORS = "[authors]";
     private static final String AUTHORSALPHA = "[authorsAlpha]";
     private static final String AUTHORLAST = "[authorLast]";
     private static final String AUTHORLASTFOREINI = "[authorLastForeIni]";
@@ -493,14 +492,19 @@ class CitationKeyGeneratorTest {
         assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHFIRSTFULL));
     }
 
-    /**
-     * Tests [authors]
-     */
-    @Test
-    void allAuthors() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORS));
-        assertEquals("NewtonMaxwell", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORS));
-        assertEquals("NewtonMaxwellEinstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORS));
+    @ParameterizedTest
+    @MethodSource
+    void authors(String expectedKey, BibEntry entry, String pattern) {
+        assertEquals(expectedKey, generateKey(entry, pattern));
+    }
+
+    static Stream<Arguments> authors() {
+        return Stream.of(
+                Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authors]"),
+                Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authors]"),
+                Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors]"),
+                Arguments.of("Newton-Maxwell-Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
+        );
     }
 
     static Stream<Arguments> authorsAlpha() {
