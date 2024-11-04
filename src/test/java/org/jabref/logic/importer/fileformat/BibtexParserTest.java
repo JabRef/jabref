@@ -2238,4 +2238,26 @@ class BibtexParserTest {
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }
+
+    @Test
+    void parseJabRefSingleJsonComment() throws IOException {
+        String entries =
+        """
+            @Comment{jabref-meta-0.1.0
+                {
+                    "saveActions" :
+                    {
+                        "state": true,
+                        "date": ["normalize_date", "action2"],
+                        "pages" : ["normalize_page_numbers"],
+                        "month" : ["normalize_month"]
+                    }
+                }
+            }
+        """;
+        ParserResult result = parser.parse(new StringReader(entries));
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setField(StandardField.COMMENT, "{\"saveActions\":{\"state\":true,\"date\":[\"normalize_date\",\"action2\"],\"pages\":[\"normalize_page_numbers\"],\"month\":[\"normalize_month\"]}}");
+        assertEquals(expectedEntry, result.getDatabase().getEntries().getFirst());
+    }
 }
