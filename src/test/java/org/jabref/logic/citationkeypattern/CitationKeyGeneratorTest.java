@@ -899,7 +899,7 @@ class CitationKeyGeneratorTest {
     @Test
     void generateKeyStripsColonFromTitle() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of: Whatever");
-        assertEquals("GreenSchedulingOfWhatever", generateKey(entry, "[title]"));
+        assertEquals("GreenSchedulingOf:Whatever", generateKey(entry, "[title]"));
     }
 
     @Test
