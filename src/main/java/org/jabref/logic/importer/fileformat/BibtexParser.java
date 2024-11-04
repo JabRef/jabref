@@ -59,9 +59,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -391,8 +392,22 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(ex);
             }
-        } else if (Pattern.compile("\\{.*}", Pattern.DOTALL).matcher(comment).find()) {
+        } else if (isValidJson(comment)) {
             parseCommentToJson(comment);
+        }
+    }
+
+    public static boolean isValidJson(String jsonString) {
+        try {
+            String[] target = jsonString.split("\\{", 2);
+            if (target.length < 2) {
+                return false;
+            }
+            JsonParser.parseString("{" + target[1]);
+            return true;
+        } catch (
+                JsonSyntaxException e) {
+            return false;
         }
     }
 
