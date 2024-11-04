@@ -25,6 +25,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private TextFlow mistralAiPrivacyTextFlow;
     @FXML private TextFlow geminiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
+    @FXML private TextFlow gpt4AllTextFlow;
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
@@ -49,6 +50,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
         initPrivacyHyperlink(mistralAiPrivacyTextFlow, AiProvider.MISTRAL_AI);
         initPrivacyHyperlink(geminiPrivacyTextFlow, AiProvider.GEMINI);
         initPrivacyHyperlink(huggingFacePrivacyTextFlow, AiProvider.HUGGING_FACE);
+        initPrivacyHyperlink(gpt4AllTextFlow, AiProvider.GPT4ALL);
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);

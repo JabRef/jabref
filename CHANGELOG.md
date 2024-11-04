@@ -16,8 +16,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added an AI section in JabRef's [preferences](https://docs.jabref.org/ai/preferences). [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added AI providers: OpenAI, Mistral AI, Hugging Face and Google. [#11430](https://github.com/JabRef/jabref/pull/11430), [#11736](https://github.com/JabRef/jabref/pull/11736)
+- We added AI providers: [Ollama](https://docs.jabref.org/ai/local-llm#step-by-step-guide-for-ollama) and GPT4All, which add the possibility to use local LLMs privately on your own device. [#11430](https://github.com/JabRef/jabref/pull/11430), [#11870](https://github.com/JabRef/jabref/issues/11870)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
-- We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- We added "Tools > New library based on references in PDF file" ... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - Added the functionality to invoke offline reference parsing explicitly. [#11565](https://github.com/JabRef/jabref/pull/11565)
 - The dialog for [adding an entry using reference text](https://docs.jabref.org/collect/newentryfromplaintext) is now filled with the clipboard contents as default. [#11565](https://github.com/JabRef/jabref/pull/11565)
@@ -40,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
+- We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
 
 ### Changed
 
@@ -57,6 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - ⚠️ We relaxed the escaping requirements for [bracketed patterns](https://docs.jabref.org/setup/citationkeypatterns), which are used for the [citaton key generator](https://docs.jabref.org/advanced/entryeditor#autogenerate-citation-key) and [filename and directory patterns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#auto-linking-files). One only needs to write `\"` if a quote sign should be escaped. All other escapings are not necessary (and working) any more. [#11967](https://github.com/JabRef/jabref/pull/11967)
 - When importing BibTeX data starging from on a PDF, the XMP metadata takes precedence over Grobid data. [#11992](https://github.com/JabRef/jabref/pull/11992)
 - JabRef now uses TLS 1.2 for all HTTPS connections. [#11852](https://github.com/JabRef/jabref/pull/11852)
+- We improved the functionality of getting BibTeX data out of PDF files. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 - We improved the undo/redo buttons in the main toolbar and main menu to be disabled when there is nothing to undo/redo. [#8807](https://github.com/JabRef/jabref/issues/8807)
 - We improved the DOI detection in PDF imports. [#11782](https://github.com/JabRef/jabref/pull/11782)
@@ -65,7 +70,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed instances of 'Search Selected' to 'Search Pre-configured' in Web Search Preferences UI. [#11871](https://github.com/JabRef/jabref/pull/11871)
 - We added a new CSS style class `main-table` for the main table. [#11881](https://github.com/JabRef/jabref/pull/11881)
 - When renaming a file, the old extension is now used if there is none provided in the new name. [#11903](https://github.com/JabRef/jabref/issues/11903)
-- We changed the name of the library-based file directory from 'General File Directory' to 'Library-specific File Directory' per issue [#571](https://github.com/koppor/jabref/issues/571)
+- When importing a file using "Find Unlinked Files", when one or more file directories are available, the file path will be relativized where possible [koppor#549](https://github.com/koppor/jabref/issues/549)
+- We added minimum window sizing for windows dedicated to creating new entries [#11944](https://github.com/JabRef/jabref/issues/11944)
+- We changed the name of the library-based file directory from 'General File Directory' to 'Library-specific File Directory' per issue. [#571](https://github.com/koppor/jabref/issues/571)
 - The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 
 ### Fixed
@@ -100,11 +107,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where recently opened files were not displayed in the main menu properly. [#9042](https://github.com/JabRef/jabref/issues/9042)
 - We fixed an issue where the DOI lookup would show an error when a DOI was found for an entry. [#11850](https://github.com/JabRef/jabref/issues/11850)
 - We fixed an issue where <kbd>Tab</kbd> cannot be used to jump to next field in some single-line fields. [#11785](https://github.com/JabRef/jabref/issues/11785)
+- We fixed an issue where the "Do not ask again" checkbox was not working, when asking for permission to use Grobid [koppor#556](https://github.com/koppor/jabref/issues/566).
 - We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
 - We fixed an issue where it was not possible to select selecting content of other user's comments.[#11106](https://github.com/JabRef/jabref/issues/11106)
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 - We fixed an issue where multiline property from field was unable to be removed after adding it. [#11897](https://github.com/JabRef/jabref/issues/11897)
+- We fixed an issue when opening attached files in [extra file columns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#adding-additional-columns-to-entry-table-for-file-types). [#12005](https://github.com/JabRef/jabref/issues/12005)
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
+- We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
 
 ### Removed
 
