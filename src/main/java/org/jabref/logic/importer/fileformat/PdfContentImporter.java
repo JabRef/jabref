@@ -232,7 +232,7 @@ public class PdfContentImporter extends PdfImporter {
 
         public String getTitleFromFirstPage(PDDocument document) throws IOException {
             this.setStartPage(1);
-            this.setEndPage(1);
+            this.setEndPage(2);
             this.writeText(document, new StringWriter());
             return findLargestFontText(textPositionsList);
         }
