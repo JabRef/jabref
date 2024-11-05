@@ -55,6 +55,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -2256,8 +2257,8 @@ class BibtexParserTest {
             }
         """;
         ParserResult result = parser.parse(new StringReader(entries));
-        BibEntry expectedEntry = new BibEntry();
-        expectedEntry.setField(StandardField.COMMENT, "{\"saveActions\":{\"state\":true,\"date\":[\"normalize_date\",\"action2\"],\"pages\":[\"normalize_page_numbers\"],\"month\":[\"normalize_month\"]}}");
-        assertEquals(expectedEntry, result.getDatabase().getEntries().getFirst());
+        MetaData expectedMetaData = new MetaData();
+        expectedMetaData.putUnknownMetaDataItem("jabref-meta-0.1.0", List.of("{\"saveActions\":{\"state\":true,\"date\":[\"normalize_date\",\"action2\"],\"pages\":[\"normalize_page_numbers\"],\"month\":[\"normalize_month\"]}}"));
+        assertEquals(expectedMetaData, result.getMetaData());
     }
 }

@@ -61,8 +61,6 @@ import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -392,26 +390,12 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(ex);
             }
-        } else if (isValidJson(comment)) {
-            parseCommentToJson(comment);
+        } else if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG_010.length())).equals(MetaData.META_FLAG_010)) {
+            parseCommentToJson(comment, meta);
         }
     }
 
-    public static boolean isValidJson(String jsonString) {
-        try {
-            String[] target = jsonString.split("\\{", 2);
-            if (target.length < 2) {
-                return false;
-            }
-            JsonParser.parseString("{" + target[1]);
-            return true;
-        } catch (
-                JsonSyntaxException e) {
-            return false;
-        }
-    }
-
-    private void parseCommentToJson(String comment) {
+    private void parseCommentToJson(String comment, Map<String, String> meta) {
         Pattern pattern = Pattern.compile("\\{.*}", Pattern.DOTALL);
         Matcher matcher = pattern.matcher(comment);
         if (matcher.find()) {
@@ -419,9 +403,7 @@ public class BibtexParser implements Parser {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
             String jsonResult = gson.toJson(jsonObject);
-            BibEntry entry = new BibEntry();
-            entry.setField(StandardField.COMMENT, jsonResult);
-            database.insertEntry(entry);
+            meta.putIfAbsent(MetaData.META_FLAG_010, jsonResult);
         }
     }
 
