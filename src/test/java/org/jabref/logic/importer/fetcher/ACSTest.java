@@ -1,8 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.net.URI;
 import java.util.Optional;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,7 +23,7 @@ class ACSTest {
         // DOI randomly chosen from https://pubs.acs.org/toc/acscii/0/0
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1021/acscentsci.4c00971");
         assertEquals(
-                Optional.of(URI.create("https://pubs.acs.org/doi/pdf/10.1021/acscentsci.4c00971").toURL()),
+                Optional.of(URLUtil.create("https://pubs.acs.org/doi/pdf/10.1021/acscentsci.4c00971")),
                 fetcher.findFullText(entry)
         );
     }

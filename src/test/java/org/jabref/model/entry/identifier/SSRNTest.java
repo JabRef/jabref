@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.gui.fieldeditors.URLUtil;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -61,7 +63,7 @@ public class SSRNTest {
     @Test
     public void identifierExternalUrl() {
         SSRN ssrnIdentifier = new SSRN(123456);
-        URI uri = URI.create("https://ssrn.com/abstract=123456");
+        URI uri = URLUtil.createUri("https://ssrn.com/abstract=123456");
         assertEquals(Optional.of(uri), ssrnIdentifier.getExternalURI());
     }
 }

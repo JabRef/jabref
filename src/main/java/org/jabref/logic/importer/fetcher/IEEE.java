@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -202,7 +202,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             LOGGER.debug("Full text document found on IEEE Xplore");
             URL value;
             try {
-                value = URI.create(matcher.group(1)).toURL();
+                value = URLUtil.create(matcher.group(1));
             } catch (MalformedURLException e) {
                 throw new FetcherException("Malformed URL", e);
             }

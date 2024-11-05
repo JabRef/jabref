@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.fieldeditors.URLUtil;
+
 /**
  * Represents an SSRN article, identified by its abstract ID.
  */
@@ -63,7 +65,7 @@ public class SSRN extends EprintIdentifier {
 
     @Override
     public Optional<URI> getExternalURI() {
-        URI uri = URI.create("https://ssrn.com/abstract=" + abstractId);
+        URI uri = URLUtil.createUri("https://ssrn.com/abstract=" + abstractId);
         return Optional.of(uri);
     }
 

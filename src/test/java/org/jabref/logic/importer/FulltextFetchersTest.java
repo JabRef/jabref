@@ -2,11 +2,11 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -33,7 +33,7 @@ class FulltextFetchersTest {
 
     @Test
     void acceptPdfUrls() throws MalformedURLException {
-        URL pdfUrl = URI.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf").toURL();
+        URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()));
@@ -41,7 +41,7 @@ class FulltextFetchersTest {
 
     @Test
     void rejectNonPdfUrls() throws MalformedURLException {
-        URL pdfUrl = URI.create("https://github.com/JabRef/jabref/blob/master/README.md").toURL();
+        URL pdfUrl = URLUtil.create("https://github.com/JabRef/jabref/blob/master/README.md");
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
@@ -50,7 +50,7 @@ class FulltextFetchersTest {
 
     @Test
     void noTrustLevel() throws MalformedURLException {
-        URL pdfUrl = URI.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf").toURL();
+        URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
@@ -64,12 +64,12 @@ class FulltextFetchersTest {
 
         FulltextFetcher finderHigh = mock(FulltextFetcher.class);
         when(finderHigh.getTrustLevel()).thenReturn(TrustLevel.SOURCE);
-        final URL highUrl = URI.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf").toURL();
+        final URL highUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         when(finderHigh.findFullText(entry)).thenReturn(Optional.of(highUrl));
 
         FulltextFetcher finderLow = mock(FulltextFetcher.class);
         when(finderLow.getTrustLevel()).thenReturn(TrustLevel.UNKNOWN);
-        final URL lowUrl = URI.create("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf").toURL();
+        final URL lowUrl = URLUtil.create("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf");
         when(finderLow.findFullText(entry)).thenReturn(Optional.of(lowUrl));
 
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finderLow, finderHigh));

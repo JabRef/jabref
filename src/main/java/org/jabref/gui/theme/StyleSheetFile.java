@@ -2,7 +2,6 @@ package org.jabref.gui.theme;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -10,6 +9,8 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.jabref.gui.fieldeditors.URLUtil;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ final class StyleSheetFile extends StyleSheet {
 
     StyleSheetFile(URL url) {
         this.url = url;
-        this.path = Path.of(URI.create(url.toExternalForm()));
+        this.path = Path.of(URLUtil.createUri(url.toExternalForm()));
         reload();
     }
 

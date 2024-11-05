@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.net.URI;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.identifier.DOI;
@@ -31,7 +32,7 @@ public class DOICheck implements LayoutFormatter {
         }
 
         if (doiPreferences.isUseCustom()) {
-            var base = URI.create(doiPreferences.getDefaultBaseURI());
+            var base = URLUtil.createUri(doiPreferences.getDefaultBaseURI());
             return DOI.parse(result).flatMap(doi -> doi.getExternalURIFromBase(base))
                       .map(URI::toASCIIString)
                       .orElse(result);

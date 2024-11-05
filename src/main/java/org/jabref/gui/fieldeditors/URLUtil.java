@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -24,8 +25,8 @@ public class URLUtil {
      * Cleans URLs returned by Google search.
      *
      * <example>
-     *  If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
-     *  https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
+     * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
+     * https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
      * </example>
      *
      * @param url the Google search URL string
@@ -39,7 +40,7 @@ public class URLUtil {
         }
         // Extract destination URL
         try {
-            URL searchURL = URI.create(url).toURL();
+            URL searchURL = URLUtil.create(url);
             // URL parameters
             String query = searchURL.getQuery();
             // no parameters
@@ -62,7 +63,8 @@ public class URLUtil {
                 }
             }
             return url;
-        } catch (MalformedURLException e) {
+        } catch (
+                MalformedURLException e) {
             return url;
         }
     }
@@ -77,9 +79,11 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            URI.create(url).toURL();
+            URLUtil.create(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (
+                MalformedURLException |
+                IllegalArgumentException e) {
             return false;
         }
     }
@@ -96,11 +100,12 @@ public class URLUtil {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
-            URL url = URI.create(link).toURL();
+            URL url = URLUtil.create(link);
             if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
-        } catch (MalformedURLException e) {
+        } catch (
+                MalformedURLException e) {
             // Don't report this error, since this getting the suffix is a non-critical
             // operation, and this error will be triggered and reported elsewhere.
         }
@@ -136,6 +141,19 @@ public class URLUtil {
             }
         } else {
             return Optional.ofNullable(suffix);
+        }
+    }
+
+    public static URL create(String url) throws MalformedURLException {
+        return URLUtil.createUri(url).toURL();
+    }
+
+    public static URI createUri(String url) {
+        try {
+            String urlFormat = url.replace("|", "%7C");
+            return new URI(urlFormat);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 }

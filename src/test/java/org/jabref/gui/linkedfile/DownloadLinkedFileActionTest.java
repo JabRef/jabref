@@ -3,7 +3,6 @@ package org.jabref.gui.linkedfile;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -14,6 +13,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
@@ -93,7 +93,7 @@ class DownloadLinkedFileActionTest {
     void replacesLinkedFiles(@TempDir Path tempFolder) throws Exception {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URI.create(url).toURL(), "");
+        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -118,7 +118,7 @@ class DownloadLinkedFileActionTest {
     void doesntReplaceSourceURL(boolean keepHtml) throws Exception {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URI.create(url).toURL(), "");
+        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -173,7 +173,7 @@ class DownloadLinkedFileActionTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")));
 
-        LinkedFile linkedFile = new LinkedFile(URI.create("http://localhost:2331/html").toURL(), "");
+        LinkedFile linkedFile = new LinkedFile(URLUtil.create("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -209,7 +209,7 @@ class DownloadLinkedFileActionTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")));
 
-        LinkedFile linkedFile = new LinkedFile(URI.create("http://localhost:2331/html").toURL(), "");
+        LinkedFile linkedFile = new LinkedFile(URLUtil.create("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");

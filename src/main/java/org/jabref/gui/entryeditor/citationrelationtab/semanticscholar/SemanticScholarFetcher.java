@@ -1,10 +1,10 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
@@ -38,7 +38,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
         URL citationsUrl;
         try {
-            citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
+            citationsUrl = URLUtil.create(getAPIUrl("citations", entry));
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -62,7 +62,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
         URL referencesUrl;
         try {
-            referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
+            referencesUrl = URLUtil.create(getAPIUrl("references", entry));
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }

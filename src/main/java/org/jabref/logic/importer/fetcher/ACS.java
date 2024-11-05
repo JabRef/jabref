@@ -1,11 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -45,7 +45,7 @@ public class ACS implements FulltextFetcher {
 
         if (link != null) {
             LOGGER.info("Fulltext PDF found @ ACS.");
-            return Optional.of(URI.create(source.replaceFirst("/abs/", "/pdf/")).toURL());
+            return Optional.of(URLUtil.create(source.replaceFirst("/abs/", "/pdf/")));
         }
         return Optional.empty();
     }

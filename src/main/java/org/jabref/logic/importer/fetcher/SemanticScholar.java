@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -115,7 +115,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             return Optional.empty();
         }
         LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
-        return Optional.of(URI.create(link).toURL());
+        return Optional.of(URLUtil.create(link));
     }
 
     @Override

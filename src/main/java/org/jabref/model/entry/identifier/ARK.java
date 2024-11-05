@@ -3,6 +3,8 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
+import org.jabref.gui.fieldeditors.URLUtil;
+
 /**
  * Archival Resource Key (ARK) identifiers are URLs that support long-term access to information. They are similar to DOIs
  * only that we don't know of any service that can extract bibliography information from ARKs. For this reason, if an ARK
@@ -35,6 +37,6 @@ public class ARK extends EprintIdentifier {
 
     @Override
     public Optional<URI> getExternalURI() {
-        return Optional.of(URI.create("https://n2t.net/ark:/" + getNormalized()));
+        return Optional.of(URLUtil.createUri("https://n2t.net/ark:/" + getNormalized()));
     }
 }

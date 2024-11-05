@@ -1,12 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -103,13 +103,13 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {
             String source = PDF_URL.formatted(id.get());
-            return Optional.of(URI.create(source).toURL());
+            return Optional.of(URLUtil.create(source));
         }
 
         // if using id fails, we can try the source URL
         Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
-            return Optional.of(URI.create(urlString.get()).toURL());
+            return Optional.of(URLUtil.create(urlString.get()));
         }
 
         return Optional.empty();

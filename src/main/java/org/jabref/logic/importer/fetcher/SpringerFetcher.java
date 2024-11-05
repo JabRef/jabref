@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -130,7 +130,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
                     JSONObject url = (JSONObject) data;
                     if ("pdf".equalsIgnoreCase(url.optString("format"))) {
                         try {
-                            entry.addFile(new LinkedFile(URI.create(url.optString("value")).toURL(), "PDF"));
+                            entry.addFile(new LinkedFile(URLUtil.create(url.optString("value")), "PDF"));
                         } catch (MalformedURLException e) {
                             LOGGER.info("Malformed URL: {}", url.optString("value"));
                         }
