@@ -6,7 +6,8 @@ import org.jabref.logic.l10n.Localization;
  * @implNote Cannot be sorted alphabetically, as {@link KeyBindingRepository#getKeyCombination(KeyBinding)} iterates over the enum in order and returns the first match.
  */
 public enum KeyBinding {
-    EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
+    EDITOR_DELETE("Delete", Localization.lang("Delete text"), "",KeyBindingCategory.EDITOR ),
+    RENAME_GROUP("Rename Group",Localization.lang("Rename group"),"R", KeyBindingCategory.EDIT),
     // DELETE BACKWARDS = Rubout
     EDITOR_BACKWARD("Move caret left", Localization.lang("Move caret left"), "", KeyBindingCategory.EDITOR),
     EDITOR_FORWARD("Move caret right", Localization.lang("Move caret right"), "", KeyBindingCategory.EDITOR),

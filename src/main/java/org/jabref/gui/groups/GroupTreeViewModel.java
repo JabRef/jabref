@@ -261,8 +261,67 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
+     * Opens "Rename Group Dialog" and change name of group
+     */
+
+    public void renameGroup(GroupNodeViewModel oldGroup) {
+        currentDatabase.ifPresent(database -> {
+            AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
+            String oldGroupName = oldGroupDef.getName(); // Zachytenie starého názvu pred otvorením dialógu
+
+
+            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
+                    new RenameGroupView(database,
+                            oldGroup.getGroupNode().getGroup())
+            );
+
+            newGroup.ifPresent(group -> {
+
+                String newGroupName = group.getName();
+
+
+                //check if it´s empty new string
+                if (newGroupName.trim().isEmpty()) {
+                    dialogService.notify(Localization.lang("The new group name cannot be empty or consist only of spaces."));
+                    return;
+                }
+
+                // check if is not include ","
+                if (newGroupName.contains(",")) {
+                    dialogService.notify(Localization.lang("The new group name cannot contain commas."));
+                    return;
+                }
+
+                // chceck if old group name dont equels with new group name
+                if (oldGroupName.equals(newGroupName)) {
+                    dialogService.notify(Localization.lang("The new group name is the same as the old one. No changes made."));
+                    return;
+                }
+
+
+                // check if other groups name are not same
+                int groupsWithSameName = 0;
+                Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                if (databaseRootGroup.isPresent()) {
+                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(newGroupName)).size();
+                }
+
+                // then change name
+                if (groupsWithSameName < 2) {
+                    oldGroup.getGroupNode().setGroup(group, true, true, database.getEntries());
+                    dialogService.notify(Localization.lang("Renamed group from \"%0\" to \"%1\".", oldGroupName, newGroupName));
+                    writeGroupChangesToMetaData();
+                    refresh();
+                }
+            });
+        });
+    }
+
+
+    /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
+
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
