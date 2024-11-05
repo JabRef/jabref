@@ -125,19 +125,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
 
         this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
-                disableExpertSettings.set(!newValue || !enableAi.get())
+            disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
         this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
             List<String> models = AiDefaultPreferences.getAvailableModels(newValue);
 
+            disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
+
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
-            // It becomes null beause currentChatModel is binded to combobox, and this combobox becomes empty.
+            // It becomes null because currentChatModel is bound to combobox, and this combobox becomes empty.
             // For some reason, custom edited value in the combobox will be erased, so we need to store the old value.
             String oldChatModel = currentChatModel.get();
             chatModelsList.setAll(models);
-
-            disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
             if (oldValue != null) {
                 switch (oldValue) {
@@ -199,6 +199,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
 
         this.currentChatModel.addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            }
+
             switch (selectedAiProvider.get()) {
                 case OPEN_AI -> openAiChatModel.set(newValue);
                 case MISTRAL_AI -> mistralAiChatModel.set(newValue);

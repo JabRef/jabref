@@ -256,7 +256,7 @@ public class AiPreferences {
     }
 
     public String getGpt4AllChatModel() {
-        return huggingFaceChatModel.get();
+        return gpt4AllChatModel.get();
     }
 
     public void setGpt4AllChatModel(String gpt4AllChatModel) {
