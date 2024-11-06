@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.backup.BackupChoiceDialog;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
@@ -59,9 +60,15 @@ public class BackupUIManager {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
+            } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
+                var actions = showBackupChoiceDialog(
+                        dialogService,
+                        preferences.getExternalApplicationsPreferences(),
+                        originalPath,
+                        preferences.getFilePreferences().getBackupDirectory());
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
-            }
+        }
             return Optional.empty();
         });
     }
@@ -72,6 +79,14 @@ public class BackupUIManager {
                                                                  Path backupDir) {
         return UiTaskExecutor.runInJavaFXThread(
                 () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
+    }
+
+    private static Optional<ButtonType> showBackupChoiceDialog(DialogService dialogService,
+                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                                 Path originalPath,
+                                                                 Path backupDir) {
+        return UiTaskExecutor.runInJavaFXThread(
+                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(originalPath, backupDir, externalApplicationsPreferences)));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(

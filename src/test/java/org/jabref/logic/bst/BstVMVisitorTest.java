@@ -203,8 +203,8 @@ class BstVMVisitorTest {
                 FUNCTION { test } {
                     #1 'local.variable :=
                     #2 'variable :=
-                    "TEST" 'local.label :=
-                    "TEST-GLOBAL" 'label :=
+                    "COMPARE_OLDER_BACKUP" 'local.label :=
+                    "COMPARE_OLDER_BACKUP-GLOBAL" 'label :=
                     local.label local.variable
                     label variable
                 }
@@ -215,9 +215,9 @@ class BstVMVisitorTest {
         vm.render(testEntries);
 
         assertEquals(2, vm.getStack().pop());
-        assertEquals("TEST-GLOBAL", vm.getStack().pop());
+        assertEquals("COMPARE_OLDER_BACKUP-GLOBAL", vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
-        assertEquals("TEST", vm.getStack().pop());
+        assertEquals("COMPARE_OLDER_BACKUP", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
     }
 
