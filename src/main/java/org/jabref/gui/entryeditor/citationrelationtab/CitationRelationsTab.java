@@ -45,7 +45,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.repository.LRUBibEntryRelationsCache;
 import org.jabref.logic.citation.repository.LRUBibEntryRelationsRepository;
-import org.jabref.logic.citation.service.SearchCitationsRelationsService;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.CitationFetcher;
@@ -116,8 +116,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             new LRUBibEntryRelationsCache()
         );
         this.searchCitationsRelationsService = new SearchCitationsRelationsService(
-            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()),
-            bibEntryRelationsRepository
+            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()), bibEntryRelationsRepository
         );
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
             databaseContext,
@@ -415,6 +414,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         listView.setItems(observableList);
 
+        // TODO: It should not be possible to cancel a search task that is already running for same tab
         if (citingTask != null && !citingTask.isCancelled() && searchType == CitationFetcher.SearchType.CITES) {
             citingTask.cancel();
         } else if (citedByTask != null && !citedByTask.isCancelled() && searchType == CitationFetcher.SearchType.CITED_BY) {
@@ -439,17 +439,17 @@ public class CitationRelationsTab extends EntryEditorTab {
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching citing Articles", exception);
                 hideNodes(abortButton, progress, importButton);
-                listView.setPlaceholder(
-                    new Label(Localization.lang(
-                        "Error while fetching citing entries: %0", exception.getMessage())
-                    )
-                );
+                listView.setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
+                        exception.getMessage())));
                 refreshButton.setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
             .executeWith(taskExecutor);
     }
 
+    /**
+     * TODO: Make the method return a callable and let the calling method create the background task.
+     */
     private BackgroundTask<List<BibEntry>> createBackGroundTask(
         BibEntry entry, CitationFetcher.SearchType searchType, boolean shouldRefresh
     ) {

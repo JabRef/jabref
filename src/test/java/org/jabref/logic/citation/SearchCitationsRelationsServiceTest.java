@@ -3,6 +3,7 @@ package org.jabref.logic.citation.service;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryHelpersForTest;
 import org.jabref.logic.importer.fetcher.CitationFetcherHelpersForTest;
 import org.jabref.model.entry.BibEntry;

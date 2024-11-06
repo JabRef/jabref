@@ -1,8 +1,9 @@
-package org.jabref.logic.citation.service;
+package org.jabref.logic.citation;
 
 import java.util.List;
 
 import org.jabref.logic.citation.repository.BibEntryRelationsRepository;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.CitationFetcher;
 import org.jabref.model.entry.BibEntry;
 
@@ -31,11 +32,8 @@ public class SearchCitationsRelationsService {
                 if (!references.isEmpty()) {
                     this.relationsRepository.insertReferences(referencer, references);
                 }
-            } catch (Exception e) {
-                var errMsg = "Error while fetching references for entry %s".formatted(
-                    referencer.getTitle()
-                );
-                LOGGER.error(errMsg);
+            } catch (FetcherException e) {
+                LOGGER.error("Error while fetching references for entry {}", referencer.getTitle(), e);
             }
         }
         return this.relationsRepository.readReferences(referencer);
@@ -48,11 +46,8 @@ public class SearchCitationsRelationsService {
                 if (!citations.isEmpty()) {
                     this.relationsRepository.insertCitations(cited, citations);
                 }
-            } catch (Exception e) {
-                var errMsg = "Error while fetching citations for entry %s".formatted(
-                    cited.getTitle()
-                );
-                LOGGER.error(errMsg);
+            } catch (FetcherException e) {
+                LOGGER.error("Error while fetching citations for entry {}", cited.getTitle(), e);
             }
         }
         return this.relationsRepository.readCitations(cited);
