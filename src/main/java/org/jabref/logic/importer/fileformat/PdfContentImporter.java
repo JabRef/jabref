@@ -218,7 +218,7 @@ public class PdfContentImporter extends PdfImporter {
 
     private static String extractTitleFromDocument(PDDocument document) throws IOException {
         TitleExtractorByFontSize stripper = new TitleExtractorByFontSize();
-        return stripper.getTitleFromFirstPage(document);
+        return stripper.getTitle(document);
     }
 
     private static class TitleExtractorByFontSize extends PDFTextStripper {
@@ -230,7 +230,7 @@ public class PdfContentImporter extends PdfImporter {
             this.textPositionsList = new ArrayList<>();
         }
 
-        public String getTitleFromFirstPage(PDDocument document) throws IOException {
+        public String getTitle(PDDocument document) throws IOException {
             this.setStartPage(1);
             this.setEndPage(2);
             this.writeText(document, new StringWriter());
