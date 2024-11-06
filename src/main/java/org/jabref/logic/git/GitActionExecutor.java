@@ -1,15 +1,13 @@
 package org.jabref.logic.git;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GitActionExecutor {
 
@@ -108,5 +106,33 @@ public class GitActionExecutor {
 
     public Git getGit(){
         return git;
+    }
+
+    public void undoPull() {
+        try {
+
+            git.reset().setMode(org.eclipse.jgit.api.ResetCommand.ResetType.HARD).call();
+            LOGGER.info("Last pull undone (hard reset).");
+        } catch (GitAPIException e) {
+            LOGGER.error("Undo pull failed: " + e.getMessage());
+        }
+    }
+
+    public void stash() {
+        try {
+            git.stashCreate().call();
+            LOGGER.info("Current changes stashed.");
+        } catch (GitAPIException e) {
+            LOGGER.error("Stash failed: " + e.getMessage());
+        }
+    }
+
+    public void unstash() {
+        try {
+            git.stashApply().call();
+            LOGGER.info("Stash applied.");
+        } catch (GitAPIException e) {
+            LOGGER.error("Unstash failed: " + e.getMessage());
+        }
     }
 }

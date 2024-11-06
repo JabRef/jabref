@@ -20,6 +20,8 @@ public class GitManager {
 
     private GitActionExecutor gitActionExecutor;
 
+    private GitStatus gitStatus;
+
 
     public GitManager(Path pathToRepository){
         this.pathToRepository = pathToRepository;
@@ -28,7 +30,8 @@ public class GitManager {
         //create our GitActionExecutor
         initGitRepository();
         //here we have invariant: private Git git != null, so we can create the GitActionExecutor object
-        this.gitActionExecutor = new GitActionExecutor(git);
+        this.gitActionExecutor = new GitActionExecutor(this.git);
+        this.gitStatus = new GitStatus(this.git);
     }
 
     /**
