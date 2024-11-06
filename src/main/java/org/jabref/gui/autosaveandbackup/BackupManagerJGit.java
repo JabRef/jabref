@@ -1,6 +1,8 @@
 package org.jabref.gui.autosaveandbackup;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -18,6 +20,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -41,6 +44,7 @@ public class BackupManagerJGit {
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
     private final Git git;
+
 
     private boolean needsBackup = false;
 
@@ -112,10 +116,11 @@ public class BackupManagerJGit {
         this.needsBackup = false;
     }
 
-    public static void restoreBackup(Path originalPath, Path backupDir) {
+    public static void restoreBackup(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
+
             Git git = Git.open(backupDir.toFile());
-            git.checkout().setName("HEAD").call();
+            git.checkout().setName(objectId.getName()).call();
             LOGGER.info("Restored backup from Git repository");
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Error while restoring the backup", e);
@@ -146,6 +151,37 @@ public class BackupManagerJGit {
             return !diffs.isEmpty();
         }
     }
+
+    @SuppressWarnings("checkstyle:RegexpMultiline")
+    public void showDiffersJGit(Path originalPath, Path backupDir, String CommitId) throws IOException, GitAPIException {
+
+        File repoDir = backupDir.toFile();
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(new File(repoDir, ".git"))
+                .build();
+        /*
+        il faut une classe qui affiche les dix dernier backup avec les data: date/ size / number of entries
+         */
+
+        ObjectId oldCommit = repository.resolve(CommitId);
+        ObjectId newCommit = repository.resolve("HEAD");
+
+        FileOutputStream fos = new FileOutputStream(FileDescriptor.out);
+        DiffFormatter diffFr = new DiffFormatter(fos);
+        diffFr.setRepository(repository);
+        diffFr.scan(oldCommit, newCommit);
+    }
+
+
+
+    /*
+
+    faire une methode qui accepte commit id et retourne les diff differences avec la version actuelle
+    methode qui renvoie n derniers indice de commit
+    methode ayant idcommit retourne data
+
+     */
+
 
     private void shutdownJGit(Path backupDir, boolean createBackup) {
         changeFilter.unregisterListener(this);
