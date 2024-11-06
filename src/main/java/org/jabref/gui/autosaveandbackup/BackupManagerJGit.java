@@ -1,16 +1,10 @@
 package org.jabref.gui.autosaveandbackup;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -21,9 +15,20 @@ import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BackupManagerJGit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerJGit.class);
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
@@ -90,6 +95,10 @@ public class BackupManagerJGit {
     }
 
     private void performBackup(Path backupDir) throws IOException, GitAPIException {
+        /*
+
+        il faut initialiser needsBackup
+         */
         if (!needsBackup) {
             return;
         }
@@ -110,6 +119,31 @@ public class BackupManagerJGit {
             LOGGER.info("Restored backup from Git repository");
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Error while restoring the backup", e);
+        }
+    }
+
+    /*
+        compare what is in originalPath and last commit
+        */
+
+    public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
+
+        File repoDir = backupDir.toFile();
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(new File(repoDir, ".git"))
+                .build();
+        try (Git git = new Git(repository)) {
+            ObjectId headCommitId = repository.resolve("HEAD"); // to get the latest commit id
+            if (headCommitId == null) {
+                // No commits in the repository, so there's no previous backup
+                return true;
+            }
+            git.add().addFilepattern(originalPath.getFileName().toString()).call();
+            String relativePath = backupDir.relativize(originalPath).toString();
+            List<DiffEntry> diffs = git.diff()
+                                       .setPathFilter(PathFilter.create(relativePath)) // Utiliser PathFilter ici
+                                       .call();
+            return !diffs.isEmpty();
         }
     }
 
