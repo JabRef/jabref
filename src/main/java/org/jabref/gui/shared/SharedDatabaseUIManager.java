@@ -97,7 +97,7 @@ public class SharedDatabaseUIManager {
                 tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
                 dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
             } else if (answer.get().equals(workOffline)) {
-                connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
+                connectionLostEvent.bibDatabaseContext().convertToLocalDatabase();
                 tabContainer.getLibraryTabs().forEach(tab -> tab.updateTabTitle(tab.isModified()));
                 dialogService.notify(Localization.lang("Working offline."));
             }
@@ -110,8 +110,8 @@ public class SharedDatabaseUIManager {
     public void listen(UpdateRefusedEvent updateRefusedEvent) {
         dialogService.notify(Localization.lang("Update refused."));
 
-        BibEntry localBibEntry = updateRefusedEvent.getLocalBibEntry();
-        BibEntry sharedBibEntry = updateRefusedEvent.getSharedBibEntry();
+        BibEntry localBibEntry = updateRefusedEvent.localBibEntry();
+        BibEntry sharedBibEntry = updateRefusedEvent.sharedBibEntry();
 
         String message = Localization.lang("Update could not be performed due to existing change conflicts.") + "\r\n" +
                 Localization.lang("You are not working on the newest version of BibEntry.") + "\r\n" +
@@ -144,9 +144,9 @@ public class SharedDatabaseUIManager {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         EntryEditor entryEditor = libraryTab.getEntryEditor();
 
-        libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
+        libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
 
-        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getCurrentlyEditedEntry()))) {
+        if (entryEditor != null && (event.bibEntries().contains(entryEditor.getCurrentlyEditedEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"

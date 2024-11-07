@@ -94,7 +94,7 @@ class IntegrityCheckTest {
     @Test
     void fileChecks() throws Exception {
         MetaData metaData = mock(MetaData.class);
-        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getLibrarySpecificFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));

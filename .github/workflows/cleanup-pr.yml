@@ -6,6 +6,7 @@ on:
 
 jobs:
   cleanup:
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     steps:
       - name: Cancel deployment run
@@ -37,8 +38,8 @@ jobs:
           key: ${{ secrets.buildJabRefPrivateKey }}
       - name: Update PR comment
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
-          comment_tag: download-link
+          comment-tag: download-link
           message: The build for this PR is no longer available. Please visit <https://builds.jabref.org/main/> for the latest build.
           mode: upsert
