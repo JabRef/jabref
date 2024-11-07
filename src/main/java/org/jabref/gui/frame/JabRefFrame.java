@@ -15,7 +15,6 @@ import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -460,9 +459,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
-                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab::getBibDatabaseContext)),
-                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, preferences, dialogService)),
-                new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()));
