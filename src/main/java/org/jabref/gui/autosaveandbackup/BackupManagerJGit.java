@@ -5,6 +5,8 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,7 @@ import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
@@ -116,11 +119,34 @@ public class BackupManagerJGit {
         this.needsBackup = false;
     }
 
-    public static void restoreBackup(Path originalPath, Path backupDir, ObjectId objectId) {
+    public static void restoreBackupJGit(Path originalPath, Path backupDir, ObjectId objectId) {
+        try {
+            Git git = Git.open(backupDir.toFile());
+
+            // Extraire le contenu de l'objet spécifié (commit) dans le répertoire de travail
+            git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
+
+            // Ajouter les modifications au staging
+            git.add().addFilepattern(".").call();
+
+            // Faire un commit avec un message explicite
+            git.commit().setMessage("Restored content from commit: " + objectId.getName()).call();
+
+            LOGGER.info("Restored backup from Git repository and committed the changes");
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Error while restoring the backup", e);
+        }
+    }
+
+    public static void restoreBackupj(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
 
             Git git = Git.open(backupDir.toFile());
             git.checkout().setName(objectId.getName()).call();
+            /*
+            faut une methode pour evite le branch nouveau
+
+             */
             LOGGER.info("Restored backup from Git repository");
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Error while restoring the backup", e);
@@ -152,8 +178,7 @@ public class BackupManagerJGit {
         }
     }
 
-    @SuppressWarnings("checkstyle:RegexpMultiline")
-    public void showDiffersJGit(Path originalPath, Path backupDir, String CommitId) throws IOException, GitAPIException {
+    public List<DiffEntry> showDiffersJGit(Path originalPath, Path backupDir, String CommitId) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
@@ -169,14 +194,88 @@ public class BackupManagerJGit {
         FileOutputStream fos = new FileOutputStream(FileDescriptor.out);
         DiffFormatter diffFr = new DiffFormatter(fos);
         diffFr.setRepository(repository);
-        diffFr.scan(oldCommit, newCommit);
+        return diffFr.scan(oldCommit, newCommit);
     }
+
+
+// n sera un conteur qui incremente de 1 si l'utilisateur a demandé de voir d'autres versions plus anciens(paquet de 10)
+// et decremente de 1 si il veut voir le paquet de 10 versions les plus recentes
+// le scroll bas : n->n+1  ; le scroll en haut : n->n-1
+    public List<RevCommit> retreiveCommits(Path backupDir, int n) throws IOException, GitAPIException {
+        List<RevCommit> retrievedCommits = new ArrayList<>();
+        // Ouvrir le dépôt Git
+        try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
+            // Utiliser RevWalk pour parcourir l'historique des commits
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                // Commencer depuis HEAD
+                RevCommit startCommit = revWalk.parseCommit(repository.resolve("HEAD"));
+                revWalk.markStart(startCommit);
+
+                int count = 0;
+                int startIndex = n * 10;
+                int endIndex = startIndex + 10;
+
+                for (RevCommit commit : revWalk) {
+                    // Ignorer les commits jusqu'à l'index de départ
+                    if (count < startIndex) {
+                        count++;
+                        continue;
+                    }
+                    // Arrêter lorsque nous avons atteint l'index de fin
+                    if (count >= endIndex) {
+                        break;
+                    }
+                    // Ajouter les commits à la liste principale
+                    retrievedCommits.add(commit);
+                    count++;
+                }
+            }
+
+
+        return retrievedCommits;
+    }
+
+    public List<List<String>> retrieveCommitDetails(List<RevCommit> commits, Repository repository) throws IOException, GitAPIException {
+        List<List<String>> commitDetails = new ArrayList<>();
+
+        // Parcourir la liste des commits fournie en paramètre
+        for (RevCommit commit : commits) {
+            // Liste pour stocker les détails du commit
+            List<String> commitInfo = new ArrayList<>();
+            commitInfo.add(commit.getName()); // ID du commit
+
+            // Récupérer la taille des fichiers modifiés par le commit
+            try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                treeWalk.addTree(commit.getTree());
+                treeWalk.setRecursive(true);
+                long totalSize = 0;
+
+                while (treeWalk.next()) {
+                    ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
+                    totalSize += loader.getSize(); // Calculer la taille en octets
+                }
+
+                // Convertir la taille en Ko ou Mo
+                String sizeFormatted = (totalSize > 1024 * 1024)
+                        ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
+                        : String.format("%.2f Ko", totalSize / 1024.0);
+
+                commitInfo.add(sizeFormatted); // Ajouter la taille formatée
+            }
+
+            // Ajouter la liste des détails à la liste principale
+            commitDetails.add(commitInfo);
+        }
+
+        return commitDetails;
+    }
+
 
 
 
     /*
 
-    faire une methode qui accepte commit id et retourne les diff differences avec la version actuelle
+    faire une methode qui accepte commit id et retourne les diff differences avec la version actuelle( fait)
     methode qui renvoie n derniers indice de commit
     methode ayant idcommit retourne data
 
@@ -196,4 +295,4 @@ public class BackupManagerJGit {
             }
         }
     }
-}
+
