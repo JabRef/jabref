@@ -266,8 +266,10 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
 
     private void addPreviewPanel() {
         SplitPane container = (SplitPane) this.getContent();
-        container.getItems().add(1, previewPanel);
-        container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+        if (!container.getItems().contains(previewPanel)) {
+            container.getItems().add(1, previewPanel);
+            container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+        }
     }
 
     /**
@@ -278,7 +280,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         Parent parent = previewPanel.getParent();
         if (parent != null) {  // On first run, there is no parent container attached
             container = (SplitPane) parent.getParent();
-            container.getItems().remove(previewPanel);
+            if (container instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
+                container.getItems().remove(previewPanel);
+            }
         }
     }
 
