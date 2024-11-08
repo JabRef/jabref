@@ -74,7 +74,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private final OptionalObjectProperty<org.jabref.model.search.query.SearchQuery> searchQueryProperty;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
 
     // Used for resolving strings and pdf directories for links.
     private @Nullable BibDatabaseContext databaseContext;
