@@ -589,9 +589,6 @@ public class LibraryTab extends Tab {
         entryEditor.requestFocus();
     }
 
-    /**
-     * Removes the bottom component.
-     */
     public void closeBottomPane() {
         mode = PanelMode.MAIN_TABLE;
         splitPane.getItems().remove(entryEditor);
