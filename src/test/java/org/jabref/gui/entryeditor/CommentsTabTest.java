@@ -79,7 +79,6 @@ class CommentsTabTest {
     @BeforeEach
     void setUp() throws Exception {
         try (AutoCloseable mocks = MockitoAnnotations.openMocks(CommentsTabTest.class)) {
-
             when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
             when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
             when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
