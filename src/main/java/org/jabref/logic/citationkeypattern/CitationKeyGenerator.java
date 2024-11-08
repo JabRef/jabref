@@ -32,7 +32,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
     ///
     /// See also #DISALLOWED_CHARACTERS
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "`ʹ!;?^";
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";
 
     /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
     /// These characters are disallowed in BibTeX keys.
