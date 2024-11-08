@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import javafx.scene.control.SplitPane;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -22,7 +24,7 @@ public class PreviewTab extends EntryEditorTab {
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
         setText(Localization.lang("Preview"));
-        setContent(previewPanel);
+        setContent(new SplitPane(previewPanel));
     }
 
     @Override
