@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -124,7 +123,6 @@ public class EntryEditor extends BorderPane {
     @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
-    private final Collection<OffersPreview> previewTabs;
 
     public EntryEditor(LibraryTab libraryTab, UndoAction undoAction, RedoAction redoAction) {
         this.libraryTab = libraryTab;
@@ -152,7 +150,6 @@ public class EntryEditor extends BorderPane {
         setupKeyBindings();
 
         this.allPossibleTabs = createTabs();
-        this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList();
 
         setupDragAndDrop(libraryTab);
 
@@ -470,10 +467,10 @@ public class EntryEditor extends BorderPane {
     }
 
     public void nextPreviewStyle() {
-        this.previewTabs.forEach(OffersPreview::nextPreviewStyle);
+        this.previewPanel.nextPreviewStyle();
     }
 
     public void previousPreviewStyle() {
-        this.previewTabs.forEach(OffersPreview::previousPreviewStyle);
+        this.previewPanel.previousPreviewStyle();
     }
 }

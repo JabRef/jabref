@@ -7,11 +7,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class PreviewTab extends EntryEditorTab implements OffersPreview {
+public class PreviewTab extends EntryEditorTab {
     public static final String NAME = "Preview";
     private final BibDatabaseContext databaseContext;
     private final GuiPreferences preferences;
-    private PreviewPanel previewPanel;
+    private final PreviewPanel previewPanel;
 
     public PreviewTab(BibDatabaseContext databaseContext,
                       GuiPreferences preferences,
@@ -23,20 +23,6 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
         setText(Localization.lang("Preview"));
         setContent(previewPanel);
-    }
-
-    @Override
-    public void nextPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.nextPreviewStyle();
-        }
-    }
-
-    @Override
-    public void previousPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.previousPreviewStyle();
-        }
     }
 
     @Override

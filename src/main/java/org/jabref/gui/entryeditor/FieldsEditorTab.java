@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
+abstract class FieldsEditorTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
 
@@ -217,16 +217,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         setupPanel(entry, isCompressed);
         previewPanel.setDatabase(databaseContext);
         previewPanel.setEntry(entry);
-    }
-
-    @Override
-    public void nextPreviewStyle() {
-        previewPanel.nextPreviewStyle();
-    }
-
-    @Override
-    public void previousPreviewStyle() {
-        previewPanel.previousPreviewStyle();
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
