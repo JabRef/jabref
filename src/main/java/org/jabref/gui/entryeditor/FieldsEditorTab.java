@@ -270,6 +270,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
     }
 
+    /**
+     * Removes the preview panel (also from other tabs!)
+     */
     private void removePreviewPanel() {
         SplitPane container;
         Parent parent = previewPanel.getParent();
