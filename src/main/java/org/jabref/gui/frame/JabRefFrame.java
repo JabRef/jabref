@@ -524,7 +524,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Refreshes the ui after preferences changes
      */
     public void refresh() {
-        getLibraryTabs().forEach(LibraryTab::setupMainPanel);
+        // Disabled, because Bindings implement automatic update. Left here as commented out code to guide if something does not work after updating the preferences.
+        // getLibraryTabs().forEach(LibraryTab::setupMainPanel);
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
