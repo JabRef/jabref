@@ -250,10 +250,19 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
-            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
-                removePreviewPanel();
-                if (!show) {
-                    addPreviewPanel();
+            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), showInExtraTab -> {
+                if (showInExtraTab) {
+                    removePreviewPanelFromThisTab();
+                } else {
+                    // Add it to the split pane
+                    // No removal needed, because previously, it is contained in the preview tab itself
+
+                    // In case the entry preview tab is focused - and the preview is not to be shown any more, the next selected tab is the required fields tab
+                    // Addition only needed if it will be shown. Otherwise, {@link #handleFocus()} will take care of it
+                    if (this instanceof RequiredFieldsTab || this.getContent().isVisible()) {
+                        // previewPanel.getParent();
+                        addPreviewPanel();
+                    }
                 }
             });
 
@@ -265,16 +274,23 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     }
 
     private void addPreviewPanel() {
-        if ((this.getContent() instanceof SplitPane splitPane) && (!splitPane.getItems().contains(previewPanel))) {
+        assert this.getContent() instanceof SplitPane;
+        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel) && splitPane.isVisible()) {
             splitPane.getItems().add(1, previewPanel);
             splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
         }
     }
 
-    /**
-     * Removes the preview panel (also from other tabs!)
-     */
-    private void removePreviewPanel() {
+    private void removePreviewPanelFromThisTab() {
+        assert this.getContent() instanceof SplitPane;
+        if (this.getContent() instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
+            splitPane.getItems().remove(previewPanel);
+            // Needed to "redraw" the split pane with one item (because JavaFX does not readjust if it is shown)
+            // splitPane.setDividerPositions(1.0);
+        }
+    }
+
+    private void removePreviewPanelFromOtherTabs() {
         Parent parent = previewPanel.getParent();
         if (parent != null) {  // On first run, there is no parent container attached
             if (parent.getParent() instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
@@ -288,12 +304,16 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
             LOGGER.error("Focus on preview panel");
 
-            removePreviewPanel();
+            // We need to move the preview panel from the non-visible tab to the visible tab
+            removePreviewPanelFromOtherTabs();
             addPreviewPanel();
         }
     }
 
     private void savePreviewWidthDividerPosition(Number position) {
+        if (position.doubleValue() == 1.0) {
+            return;
+        }
         if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
             preferences.getEntryEditorPreferences().setPreviewWidthDividerPosition(position.doubleValue());
         }
