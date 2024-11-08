@@ -70,6 +70,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -385,8 +386,12 @@ public class EntryEditor extends BorderPane {
         return currentlyEditedEntry;
     }
 
-    public void setCurrentlyEditedEntry(BibEntry currentlyEditedEntry) {
-        this.currentlyEditedEntry = Objects.requireNonNull(currentlyEditedEntry);
+    public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
+        if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
+            return;
+        }
+
+        this.currentlyEditedEntry = currentlyEditedEntry;
 
         // Subscribe to type changes for rebuilding the currently visible tab
         if (typeSubscription != null) {
@@ -396,16 +401,13 @@ public class EntryEditor extends BorderPane {
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), type -> {
             typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, databaseContext.getMode()).getTypeForDisplay());
             adaptVisibleTabs();
+            setupToolBar();
             getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
         });
-
-        adaptVisibleTabs();
-        setupToolBar();
 
         if (entryEditorPreferences.showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
         }
-        getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
     }
 
     private EntryEditorTab getSelectedTab() {
