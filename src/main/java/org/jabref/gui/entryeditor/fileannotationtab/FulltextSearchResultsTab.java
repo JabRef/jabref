@@ -77,6 +77,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
+
+        // Rebinding is necessary because of re-rendering of highlighting of matched text
         searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
