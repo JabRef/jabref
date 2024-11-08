@@ -41,11 +41,16 @@ import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
+
     protected final BibDatabaseContext databaseContext;
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
@@ -258,6 +263,24 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                                                   .mapObservable(SplitPane.Divider::positionProperty)
                                                   .subscribeToValues(this::savePreviewWidthDividerPosition);
             setContent(container);
+        }
+    }
+
+    @Override
+    protected void handleFocus() {
+        if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
+            LOGGER.error("Focus on preview panel");
+
+            SplitPane container;
+            Parent parent = previewPanel.getParent();
+            if (parent != null) {  // On first run, there is no parent container attached
+                container = (SplitPane) parent.getParent();
+                container.getItems().remove(previewPanel);
+            }
+
+            container = (SplitPane) this.getContent();
+            container.getItems().add(1, previewPanel);
+            container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
         }
     }
 
