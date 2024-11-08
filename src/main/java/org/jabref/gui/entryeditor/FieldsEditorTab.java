@@ -249,20 +249,33 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
+            setContent(container);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
-                if (show) {
-                    container.getItems().remove(previewPanel);
-                } else {
-                    container.getItems().add(1, previewPanel);
-                    container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+                removePreviewPanel();
+                if (!show) {
+                    addPreviewPanel();
                 }
             });
 
-            // save position
+            // save divider position
             dividerPositionSubscription = EasyBind.valueAt(container.getDividers(), 0)
                                                   .mapObservable(SplitPane.Divider::positionProperty)
                                                   .subscribeToValues(this::savePreviewWidthDividerPosition);
-            setContent(container);
+        }
+    }
+
+    private void addPreviewPanel() {
+        SplitPane container = (SplitPane) this.getContent();
+        container.getItems().add(1, previewPanel);
+        container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+    }
+
+    private void removePreviewPanel() {
+        SplitPane container;
+        Parent parent = previewPanel.getParent();
+        if (parent != null) {  // On first run, there is no parent container attached
+            container = (SplitPane) parent.getParent();
+            container.getItems().remove(previewPanel);
         }
     }
 
@@ -271,16 +284,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
             LOGGER.error("Focus on preview panel");
 
-            SplitPane container;
-            Parent parent = previewPanel.getParent();
-            if (parent != null) {  // On first run, there is no parent container attached
-                container = (SplitPane) parent.getParent();
-                container.getItems().remove(previewPanel);
-            }
-
-            container = (SplitPane) this.getContent();
-            container.getItems().add(1, previewPanel);
-            container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+            removePreviewPanel();
+            addPreviewPanel();
         }
     }
 
