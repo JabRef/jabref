@@ -255,7 +255,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     private void addPreviewPanel() {
         assert this.getContent() instanceof SplitPane;
-        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel) && splitPane.isVisible()) {
+
+        // Really ensure it is not already there
+        removePreviewPanelFromThisTab();
+
+        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel)) { // we do not check for "visible", because the split pane will (!) become visible, but it is not visible yet.
             splitPane.getItems().add(1, previewPanel);
             splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
         }
