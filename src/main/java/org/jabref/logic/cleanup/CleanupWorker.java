@@ -4,23 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.FilePreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final List<JabRefException> failures;
 
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.failures = new ArrayList<>();
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
@@ -28,10 +30,12 @@ public class CleanupWorker {
         Objects.requireNonNull(entry);
 
         List<CleanupJob> jobs = determineCleanupActions(preset);
-
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
+            if (job instanceof MoveFilesCleanup cleanup) {
+                failures.addAll(cleanup.getIoExceptions());
+            }
         }
 
         return changes;
@@ -86,5 +90,9 @@ public class CleanupWorker {
             default ->
                     throw new UnsupportedOperationException(action.name());
         };
+    }
+
+    public List<JabRefException> getFailures() {
+        return failures;
     }
 }

@@ -18,11 +18,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -31,25 +31,25 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(Encodings.getCharsets().getFirst());
     private final ListProperty<BibDatabaseMode> databaseModesProperty = new SimpleListProperty<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
     private final SimpleObjectProperty<BibDatabaseMode> selectedDatabaseModeProperty = new SimpleObjectProperty<>(BibDatabaseMode.BIBLATEX);
-    private final StringProperty generalFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferencesService) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
     }
 
     @Override
@@ -59,9 +59,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
         selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
-        generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
-        userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).orElse("").trim());
-        laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
+        librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
+        userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
+        laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
     }
 
     @Override
@@ -71,33 +71,33 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         newMetaData.setEncoding(selectedEncodingProperty.getValue());
         newMetaData.setMode(selectedDatabaseModeProperty.getValue());
 
-        String generalFileDirectory = generalFileDirectoryProperty.getValue().trim();
-        if (generalFileDirectory.isEmpty()) {
-            newMetaData.clearDefaultFileDirectory();
+        String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
+        if (librarySpecificFileDirectory.isEmpty()) {
+            newMetaData.clearLibrarySpecificFileDirectory();
         } else {
-            newMetaData.setDefaultFileDirectory(generalFileDirectory);
+            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
+            newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else {
-            newMetaData.setUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
+            newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
+            newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else {
-            newMetaData.setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
         }
 
         databaseContext.setMetaData(newMetaData);
     }
 
-    public void browseGeneralDir() {
+    public void browseLibrarySpecificDir() {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> generalFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseUserDir() {
@@ -130,8 +130,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return selectedDatabaseModeProperty;
     }
 
-    public StringProperty generalFileDirectoryPropertyProperty() {
-        return this.generalFileDirectoryProperty;
+    public StringProperty librarySpecificDirectoryPropertyProperty() {
+        return this.librarySpecificDirectoryProperty;
     }
 
     public StringProperty userSpecificFileDirectoryProperty() {

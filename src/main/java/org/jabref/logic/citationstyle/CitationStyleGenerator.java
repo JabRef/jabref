@@ -31,8 +31,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(List<BibEntry> bibEntries, CitationStyle style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(bibEntries, style.getSource(), entryTypesManager);
+    protected static String generateBibliography(List<BibEntry> bibEntries, CitationStyle style, BibEntryTypesManager entryTypesManager) {
+        return generateBibliography(bibEntries, style.getSource(), entryTypesManager);
     }
 
     /**
@@ -40,8 +40,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(bibEntries, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager).getFirst();
+    protected static String generateBibliography(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
+        return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager).getFirst();
     }
 
     /**
@@ -49,12 +49,12 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static List<String> generateCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
-        return generateCitations(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+    public static List<String> generateBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+        return generateBibliographies(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
-    public static Citation generateInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
-        return CSL_ADAPTER.makeInText(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+    public static Citation generateCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+        return CSL_ADAPTER.makeCitation(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
     /**
@@ -62,7 +62,7 @@ public class CitationStyleGenerator {
      *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
-    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+    public static List<String> generateBibliographies(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {
             return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
         } catch (IllegalArgumentException e) {

@@ -14,11 +14,13 @@ import java.util.stream.StreamSupport;
 
 import javafx.scene.control.CheckBoxTreeItem;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     }
 
     @Override
-    protected FileNodeViewModel call() throws IOException {
+    public FileNodeViewModel call() throws IOException {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
         return searchDirectory(directory, unlinkedPDFFileFilter);
     }

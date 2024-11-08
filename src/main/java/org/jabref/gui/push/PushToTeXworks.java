@@ -1,9 +1,11 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.gui.preferences.GuiPreferences;
 
 public class PushToTeXworks extends AbstractPushToApplication {
 
@@ -13,10 +15,10 @@ public class PushToTeXworks extends AbstractPushToApplication {
      * Constructs a new {@code PushToTeXworks} instance.
      *
      * @param dialogService The dialog service for displaying messages to the user.
-     * @param preferencesService The service for accessing user preferences.
+     * @param preferences The service for accessing user preferences.
      */
-    public PushToTeXworks(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToTeXworks(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override
@@ -32,5 +34,10 @@ public class PushToTeXworks extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-text", "%s%s%s".formatted(getCitePrefix(), keyString, getCiteSuffix())};
+    }
+
+    @Override
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        return new String[] {commandPath, "--position=\"%s\"".formatted(line), fileName.toString()};
     }
 }

@@ -61,7 +61,16 @@ The import statement for all the classes using this class will be automatically 
 
 More information on the architecture can be found at [../getting-into-the-code/high-level-documentation.md](High-level documentation).
 
-## Gradle outpus
+### `Check external href links in the documentation / lychee (push)` <span style="color:red">FAILED</span>
+
+This test is triggered when any kind of documentation is touched (be it the JabRef docs, or JavaDoc in code). If you changed something in the documentation, and particularly added/changed any links (to external files or websites), check if the links are correct and working. If you didn't change/add any link, or added correct links, the test is most probably failing due to any of the existing links being broken, and thus can be ignored (in the context of your contribution).
+
+### Failing <b>Fetcher</b> tests
+
+Fetcher tests are run when any file in the `.../fetcher` directory has been touched. If you have changed any fetcher logic, check if the changes are correct. You can look for more details on how to locally run fetcher tests [here](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
+Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look [here](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
+
+## Gradle outputs
 
 ### `ANTLR Tool version 4.12.0 used for code generation does not match the current runtime version 4.13.1`
 
@@ -71,5 +80,73 @@ Execute the Gradle task `clean` from the `build` group of the Gradle Tool Window
 ### `BstVMVisitor.java:157: error: package BstParser does not exist`
 
 Execute gradle task `clean` from the `build` group of the Gradle Tool Window in IntelliJ.
+
+### `No test candidates found`
+
+You probably chose the wrong gradle task:
+
+![Gradle tests](../images/gradle-tests.png)<br>
+
+## Submodules
+
+### The problem
+
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org` or `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+
+![Changed submodules](../images/submodules.png)
+
+### Context
+
+JabRef needs external submodules (such as CSL style files) for some of its respective features. These are cloned once when you set up a local development environment, using `--recurse-submodules` (you may have noticed). These submodules, in the main branch, are automatically periodically updated but not fetched into local again when you pull, as they are set to be ignored in `.gitmodules` (this is to avoid merge conflicts). So when remote has updated submodules, and your local has the old ones, when you stage all files, these changes are noticed.  
+What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes should ideally not be noticed on staging, as per the `.gitmodules` configuration. However, that is somehow overruled when using IntelliJ's CLI.
+  
+### Fix
+
+For `csl-styles`:
+
+```bash
+git merge origin/main
+git checkout main -- src/main/resources/csl-styles
+... git commit ... 
+git push
+```
+
+And similarly for `csl-locales` or `abbrv.jabref.org`.
+
+#### Alternative method (if the above doesn't work)
+
+1. Edit `.gitmodules`: comment out `ignore = all` (for the respective submodules you are trying to reset)
+
+    ```gitignore
+    # ignore = all
+    ```
+
+2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
+
+    ```bash
+    cd src/main/resources/csl-styles
+    ```
+
+3. Find the latest submodule commit id from remote (github):
+
+    ![Submodule commits](../images/submodule-commit.png)
+
+    Here, in the case of `csl-styles`, it is `4e0902d`.
+
+4. Checkout the commit:
+
+    ```bash
+    git checkout 4e0902d
+    ```
+
+5. Now, IntelliJ's commit tab will notice that the submodules have been modified. This means we are on the right track.
+
+6. Use IntelliJ's git manager (commit tab) or `git gui` to commit submodule changes only. Repeat steps 2-5 for other submodules that are shown as modified in the PR. Then, push these changes.
+
+7. Revert the changes in `.gitmodules` (that you made in step 1).
+
+### Prevention
+
+To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
 
 <!-- markdownlint-disable-file MD033 -->

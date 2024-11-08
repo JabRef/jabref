@@ -227,14 +227,14 @@ public class BstWidthCalculator {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    LOGGER.warn("Too many closing braces in string: " + toMeasure);
+                    LOGGER.warn("Too many closing braces in string: {}", toMeasure);
                 }
             }
             result += BstWidthCalculator.getCharWidth(c[i]);
             i++;
         }
         if (braceLevel > 0) {
-            LOGGER.warn("No enough closing braces in string: " + toMeasure);
+            LOGGER.warn("No enough closing braces in string: {}", toMeasure);
         }
         return result;
     }

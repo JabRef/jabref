@@ -10,18 +10,18 @@ import javafx.scene.Node;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.preferences.PreferencesService;
 
 public class CellFactory {
 
     private final Map<Field, JabRefIcon> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(PreferencesService preferencesService, UndoManager undoManager) {
+    public CellFactory(GuiPreferences preferences, UndoManager undoManager) {
         JabRefIcon icon;
         icon = IconTheme.JabRefIcons.PDF_FILE;
         // icon.setToo(Localization.lang("Open") + " PDF");
@@ -55,42 +55,42 @@ public class CellFactory {
         // icon.setToolTipText(Localization.lang("Open file"));
         TABLE_ICONS.put(StandardField.FILE, icon);
 
-        for (ExternalFileType fileType : preferencesService.getFilePreferences().getExternalFileTypes()) {
+        for (ExternalFileType fileType : preferences.getExternalApplicationsPreferences().getExternalFileTypes()) {
             icon = fileType.getIcon();
             // icon.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             TABLE_ICONS.put(fileType.getField(), icon);
         }
 
-        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE, preferencesService, undoManager);
+        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE, preferences, undoManager);
         icon = relevanceViewModel.getIcon();
         // icon.setToolTipText(relevanceViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.RELEVANCE, icon);
 
-        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY, preferencesService, undoManager);
+        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY, preferences, undoManager);
         icon = qualityViewModel.getIcon();
         // icon.setToolTipText(qualityViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.QUALITY, icon);
 
         // Ranking item in the menu uses one star
-        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager);
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING, preferences, undoManager);
         icon = rankViewModel.getIcon();
         // icon.setToolTipText(rankViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.RANKING, icon);
 
         // Priority icon used for the menu
-        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY, preferencesService, undoManager);
+        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY, preferences, undoManager);
         icon = priorityViewModel.getIcon();
         // icon.setToolTipText(priorityViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.PRIORITY, icon);
 
         // Read icon used for menu
-        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS, preferencesService, undoManager);
+        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS, preferences, undoManager);
         icon = readViewModel.getIcon();
         // icon.setToolTipText(readViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.READ_STATUS, icon);
 
         // Print icon used for menu
-        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED, preferencesService, undoManager);
+        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED, preferences, undoManager);
         icon = printedViewModel.getIcon();
         // icon.setToolTipText(printedViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.PRINTED, icon);

@@ -3,7 +3,7 @@ package org.jabref.gui.preferences.externalfiletypes;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +20,12 @@ import static org.mockito.Mockito.spy;
 
 public class ExternalFileTypesTabViewModelTest {
 
-    private FilePreferences filePreferences = mock(FilePreferences.class);
+    private ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private DialogService dialogService = mock(DialogService.class);
     private ExternalFileTypeItemViewModel externalFileTypeItemViewModel = new ExternalFileTypeItemViewModel();
 
     @Spy
-    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(filePreferences, dialogService));
+    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(externalApplicationsPreferences, dialogService));
 
     @BeforeEach
     void setUp() {

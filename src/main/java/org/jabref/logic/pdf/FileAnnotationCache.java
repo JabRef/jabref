@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
-import org.jabref.preferences.FilePreferences;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileAnnotationCache {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationCache.class);
     // cache size in entries
     private final static int CACHE_SIZE = 10;
 

@@ -2,6 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Collections;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
 
 import org.junit.jupiter.api.BeforeEach;

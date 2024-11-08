@@ -6,12 +6,12 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
@@ -41,10 +41,10 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                                   AiService aiService,
                                   DialogService dialogService,
                                   AiPreferences aiPreferences,
-                                  FilePreferences filePreferences,
+                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                   TaskExecutor taskExecutor
     ) {
-        super(aiService, aiPreferences, filePreferences, dialogService);
+        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService);
 
         this.name = name;
         this.chatHistory = chatHistory;

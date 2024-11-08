@@ -40,8 +40,6 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesFilter;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -54,19 +52,22 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    public PreferencesDialogViewModel(DialogService dialogService, PreferencesService preferences) {
+    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+
+        // This enables passing unsaved preference values from the AI tab to the "web search" tab.
+        AiTab aiTab = new AiTab();
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(),
-                new AiTab(),
+                new WebSearchTab(aiTab.aiEnabledProperty()),
+                aiTab,
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

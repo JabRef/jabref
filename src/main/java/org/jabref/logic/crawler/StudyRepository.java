@@ -22,7 +22,8 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +36,6 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class StudyRepository {
     private final Path studyDefinitionFile;
     private final SlrGitHandler gitHandler;
     private final Study study;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager bibEntryTypesManager;
 
@@ -82,12 +82,12 @@ public class StudyRepository {
      */
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
-                           PreferencesService preferencesService,
+                           CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.bibEntryTypesManager = bibEntryTypesManager;
@@ -137,7 +137,7 @@ public class StudyRepository {
     public BibDatabaseContext getFetcherResultEntries(String query, String fetcherName) throws IOException {
         if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {
             return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName),
-                    preferencesService.getImportFormatPreferences(),
+                    preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
@@ -149,7 +149,7 @@ public class StudyRepository {
     public BibDatabaseContext getQueryResultEntries(String query) throws IOException {
         if (Files.exists(getPathToQueryResultFile(query))) {
             return OpenDatabase.loadDatabase(getPathToQueryResultFile(query),
-                    preferencesService.getImportFormatPreferences(),
+                    preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
@@ -161,7 +161,7 @@ public class StudyRepository {
     public BibDatabaseContext getStudyResultEntries() throws IOException {
         if (Files.exists(getPathToStudyResultFile())) {
             return OpenDatabase.loadDatabase(getPathToStudyResultFile(),
-                    preferencesService.getImportFormatPreferences(),
+                    preferences.getImportFormatPreferences(),
                     fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
@@ -283,8 +283,8 @@ public class StudyRepository {
         // Cannot use stream here since IOException has to be thrown
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 this.getActiveLibraryEntries(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
             converter.getActiveFetchers()
@@ -382,7 +382,7 @@ public class StudyRepository {
      * @param crawlResults The results that shall be persisted.
      */
     private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
-        DatabaseMerger merger = new DatabaseMerger(preferencesService.getBibEntryPreferences().getKeywordSeparator());
+        DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
 
         for (QueryResult result : crawlResults) {
@@ -421,7 +421,7 @@ public class StudyRepository {
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
         CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries,
-                preferencesService.getCitationKeyPatternPreferences());
+                preferences.getCitationKeyPatternPreferences());
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 
@@ -429,13 +429,13 @@ public class StudyRepository {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(so -> SelfContainedSaveOrder.of(so)).orElse(SaveOrder.getDefaultSaveOrder()))
-                    .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
+                    .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    preferencesService.getFieldPreferences(),
-                    preferencesService.getCitationKeyPatternPreferences(),
+                    preferences.getFieldPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager);
             databaseWriter.saveDatabase(context);
         } catch (UnsupportedCharsetException ex) {

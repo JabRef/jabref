@@ -20,14 +20,15 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -42,18 +43,18 @@ public class FromAuxDialogViewModel {
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
 
     private AuxParserResult auxParserResult;
 
     public FromAuxDialogViewModel(LibraryTabContainer tabContainer,
                                   DialogService dialogService,
-                                  PreferencesService preferencesService,
+                                  CliPreferences preferences,
                                   StateManager stateManager) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
 
         librariesProperty.setAll(stateManager.getOpenDatabases());
@@ -81,7 +82,7 @@ public class FromAuxDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileProperty.setValue(file.toAbsolutePath().toString()));
     }
 
@@ -96,7 +97,7 @@ public class FromAuxDialogViewModel {
             AuxParser auxParser = new DefaultAuxParser(referenceDatabase);
             auxParserResult = auxParser.parse(Path.of(auxName));
             notFoundList.setAll(auxParserResult.getUnresolvedKeys());
-            statusTextProperty.set(new AuxParserResultViewModel(auxParserResult).getInformation(false));
+            statusTextProperty.set(new AuxParserStatisticsProvider(auxParserResult).getInformation(false));
 
             if (!auxParserResult.getGeneratedBibDatabase().hasEntries()) {
                 // The generated database contains no entries -> no active generate-button

@@ -45,8 +45,9 @@ To write a localized string in FXML file, prepend it with `%`, like in this code
 ## General hints
 
 * Use the String you want to localize directly, do not use members or local variables: `Localization.lang("Translate me");` instead of `Localization.lang(someVariable)` (possibly in the form `someVariable = Localization.lang("Translate me")`
-* Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");`
+* Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entry(s).", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entry(s).");`
 * Use a full stop/period (".") to end full sentences
+* For pluralization, use a combined form. E.g., `Localization.lang("checked %0 entry(s)")`.
 
 ## Checking for correctness
 
@@ -66,3 +67,7 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 
 If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
+
+## Background information
+
+The localization is tested via the class [LocalizationConsistencyTest](https://github.com/JabRef/jabref/blob/main/src/test/java/org/jabref/logic/l10n/LocalizationConsistencyTest.java).

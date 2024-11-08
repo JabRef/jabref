@@ -8,15 +8,15 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.Pair;
 
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
  * And it also will store the embeddings.
  */
 public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsForSeveralTask.class);
 
-    private final StringProperty name;
+    private final StringProperty groupName;
     private final List<ProcessingInfo<LinkedFile, Void>> linkedFiles;
     private final FileEmbeddingsManager fileEmbeddingsManager;
     private final BibDatabaseContext bibDatabaseContext;
@@ -42,7 +42,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     private String currentFile = "";
 
     public GenerateEmbeddingsForSeveralTask(
-            StringProperty name,
+            StringProperty groupName,
             List<ProcessingInfo<LinkedFile, Void>> linkedFiles,
             FileEmbeddingsManager fileEmbeddingsManager,
             BibDatabaseContext bibDatabaseContext,
@@ -50,7 +50,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
             TaskExecutor taskExecutor,
             ReadOnlyBooleanProperty shutdownSignal
     ) {
-        this.name = name;
+        this.groupName = groupName;
         this.linkedFiles = linkedFiles;
         this.fileEmbeddingsManager = fileEmbeddingsManager;
         this.bibDatabaseContext = bibDatabaseContext;
@@ -58,7 +58,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
         this.taskExecutor = taskExecutor;
         this.shutdownSignal = shutdownSignal;
 
-        configure(name);
+        configure(groupName);
     }
 
     private void configure(StringProperty name) {
@@ -72,10 +72,11 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
-        LOGGER.debug("Starting embeddings generation of several files for {}", name.get());
+    public Void call() throws Exception {
+        LOGGER.debug("Starting embeddings generation of several files for {}", groupName.get());
 
         List<Pair<? extends Future<?>, String>> futures = new ArrayList<>();
+
         linkedFiles
                 .stream()
                 .map(processingInfo -> {
@@ -88,6 +89,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
                                     filePreferences,
                                     shutdownSignal
                             )
+                                    .showToUser(false)
                                     .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                                     .onFailure(processingInfo::setException)
                                     .onFinished(() -> progressCounter.increaseWorkDone(1))
@@ -101,7 +103,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
             pair.getKey().get();
         }
 
-        LOGGER.debug("Finished embeddings generation task of several files for {}", name.get());
+        LOGGER.debug("Finished embeddings generation task of several files for {}", groupName.get());
         progressCounter.stop();
         return null;
     }

@@ -47,7 +47,7 @@ JabRef stores files relative to one of [multiple possible directories](https://d
 The convert the relative path to an absolute one, there is the `find` method in `FileUtil`:
 
 ```java
-org.jabref.logic.util.io.FileUtil.find(org.jabref.model.database.BibDatabaseContext, java.lang.String, org.jabref.preferences.FilePreferences)
+org.jabref.logic.util.io.FileUtil.find(org.jabref.model.database.BibDatabaseContext, java.lang.String, org.jabref.logic.FilePreferences)
 ```
 
 `String path` Can be the files name or a relative path to it. The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
@@ -59,7 +59,7 @@ When adding a file to a library, the path should be stored relative to "the best
 This is implemented in `FileUtil`:
 
 ```java
-org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.model.database.BibDatabaseContext, org.jabref.preferences.FilePreferences)
+org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.model.database.BibDatabaseContext, org.jabref.logic.FilePreferences)
 ```
 
 ## Setting a Directory for a .bib File

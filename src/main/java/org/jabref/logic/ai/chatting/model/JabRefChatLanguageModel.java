@@ -7,16 +7,17 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiApiKeyProvider;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
@@ -24,13 +25,13 @@ import dev.langchain4j.model.output.Response;
 /**
  * Wrapper around langchain4j chat language model.
  * <p>
- * This class listens to preferences changes.
+ * Notice, that the real chat model is created lazily, when it's needed. This is done, so API key is fetched only,
+ * when user wants to chat with AI.
  */
 public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
     private final AiPreferences aiPreferences;
-    private final AiApiKeyProvider apiKeyProvider;
 
     private final HttpClient httpClient;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor(
@@ -39,9 +40,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
 
     private Optional<ChatLanguageModel> langchainChatModel = Optional.empty();
 
-    public JabRefChatLanguageModel(AiPreferences aiPreferences, AiApiKeyProvider apiKeyProvider) {
+    public JabRefChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
-        this.apiKeyProvider = apiKeyProvider;
         this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
         setupListeningToPreferencesChanges();
@@ -54,15 +54,19 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
      */
     private void rebuild() {
-        String apiKey = apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider());
-        if (!aiPreferences.getEnableAi() || apiKey.isEmpty()) {
+        String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());
+        if (!aiPreferences.getEnableAi() || (apiKey.isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL)) {
             langchainChatModel = Optional.empty();
             return;
         }
 
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
-                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, apiKeyProvider, httpClient));
+                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+            }
+
+            case GPT4ALL-> {
+                langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {
@@ -78,8 +82,20 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 );
             }
 
+            case GEMINI -> {
+                // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
+                langchainChatModel = Optional.of(GoogleAiGeminiChatModel
+                        .builder()
+                        .apiKey(apiKey)
+                        .modelName(aiPreferences.getSelectedChatModel())
+                        .temperature(aiPreferences.getTemperature())
+                        .logRequestsAndResponses(true)
+                        .build()
+                );
+            }
+
             case HUGGING_FACE -> {
-                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
+                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
                         .accessToken(apiKey)
@@ -118,7 +134,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
+            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set an API key inside JabRef preferences (AI tab)."));
             } else {
                 rebuild();

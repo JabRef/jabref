@@ -15,14 +15,14 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
 import org.jabref.gui.maintable.NameDisplayPreferences;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchQuery;
-import org.jabref.model.search.SearchResults;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,8 +35,8 @@ public class SearchResultsTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final TaskExecutor taskExecutor;
 
-    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, StateManager stateManager, TaskExecutor taskExecutor) {
-        NameDisplayPreferences nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
+    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, GuiPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
+        NameDisplayPreferences nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
@@ -66,18 +66,16 @@ public class SearchResultsTableDataModel {
             if (query.isPresent()) {
                 SearchResults searchResults = new SearchResults();
                 for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-                    stateManager.getLuceneManager(context).ifPresent(luceneManager -> {
-                        searchResults.mergeSearchResults(luceneManager.search(query.get()));
+                    stateManager.getIndexManager(context).ifPresent(indexManager -> {
+                        searchResults.mergeSearchResults(indexManager.search(query.get()));
                     });
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.searchScoreProperty().set(searchResults.getSearchScoreForEntry(entry.getEntry()));
                     entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));
-                    entry.isVisibleBySearch().set(entry.searchScoreProperty().get() > 0);
+                    entry.isVisibleBySearch().set(searchResults.isMatched(entry.getEntry()));
                 }
             } else {
                 for (BibEntryTableViewModel entry : entriesViewModel) {
-                    entry.searchScoreProperty().set(0);
                     entry.hasFullTextResultsProperty().set(false);
                     entry.isVisibleBySearch().set(true);
                 }

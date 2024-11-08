@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;

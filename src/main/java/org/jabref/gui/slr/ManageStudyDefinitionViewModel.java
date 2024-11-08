@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
@@ -32,7 +33,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
-import org.jabref.preferences.WorkspacePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

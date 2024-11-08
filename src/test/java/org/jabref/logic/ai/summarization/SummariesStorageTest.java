@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.jabref.preferences.ai.AiProvider;
+import org.jabref.model.ai.AiProvider;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

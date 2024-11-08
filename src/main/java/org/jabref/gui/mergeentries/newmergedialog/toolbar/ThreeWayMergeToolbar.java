@@ -14,11 +14,11 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.MergeDialogPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.base.Enums;
@@ -55,7 +55,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private CheckBox applyToAllEntriesCheck;
 
     @Inject
-    private PreferencesService preferencesService;
+    private GuiPreferences preferences;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
@@ -111,17 +111,17 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getMergeDialogPreferences().mergeShowChangedFieldOnlyProperty());
+        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferences.getMergeDialogPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
 
-        applyToAllEntriesCheck.selectedProperty().bindBidirectional(preferencesService.getMergeDialogPreferences().mergeApplyToAllEntriesProperty());
+        applyToAllEntriesCheck.selectedProperty().bindBidirectional(preferences.getMergeDialogPreferences().mergeApplyToAllEntriesProperty());
         applyToAllEntries.bind(applyToAllEntriesCheck.selectedProperty());
 
         loadSavedConfiguration();
     }
 
     private void loadSavedConfiguration() {
-        MergeDialogPreferences mergeDialogPreferences = preferencesService.getMergeDialogPreferences();
+        MergeDialogPreferences mergeDialogPreferences = preferences.getMergeDialogPreferences();
 
         PlainTextOrDiff plainTextOrDiffPreference = mergeDialogPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
         plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
@@ -133,11 +133,11 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public void saveToolbarConfiguration() {
-        preferencesService.getMergeDialogPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
-        preferencesService.getMergeDialogPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
+        preferences.getMergeDialogPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
+        preferences.getMergeDialogPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
 
         boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
-        preferencesService.getMergeDialogPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
+        preferences.getMergeDialogPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {

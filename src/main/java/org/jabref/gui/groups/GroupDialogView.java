@@ -36,6 +36,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabrefIconProvider;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -45,8 +46,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -88,6 +89,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private CheckBox keywordGroupRegex;
 
     @FXML private TextField searchGroupSearchTerm;
+    @FXML private CheckBox searchGroupCaseSensitive;
+    @FXML private CheckBox searchGroupRegex;
 
     @FXML private RadioButton autoGroupKeywordsOption;
     @FXML private TextField autoGroupKeywordsField;
@@ -111,7 +114,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
@@ -143,7 +146,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
         ActionFactory actionFactory = new ActionFactory();
-        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences());
+        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferences.getExternalApplicationsPreferences());
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,
                 helpAction,
@@ -170,7 +173,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, stateManager);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferences, editedGroup, parentNode, fileUpdateMonitor, stateManager);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -205,6 +208,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
+        searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
+        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
+        searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
+        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());
@@ -265,7 +272,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         }
 
         CustomTextField searchBox = new CustomTextField();
-        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         searchBox.textProperty().addListener((obs, oldValue, newValue) ->
                 filteredList.setPredicate(ikon -> newValue.isEmpty() || ikon.getDescription().toLowerCase()

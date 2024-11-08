@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
@@ -27,8 +27,8 @@ class OpenAccessDoiTest {
 
     @Test
     void findByDOI() throws IOException {
-        entry.setField(StandardField.DOI, "10.1038/nature12373");
-        assertEquals(Optional.of(new URL("https://dash.harvard.edu/bitstream/1/12285462/1/Nanometer-Scale%20Thermometry.pdf")), finder.findFullText(entry));
+        entry.setField(StandardField.DOI, "10.1186/s12993-024-00248-9");
+        assertEquals(Optional.of(URI.create("https://behavioralandbrainfunctions.biomedcentral.com/counter/pdf/10.1186/s12993-024-00248-9").toURL()), finder.findFullText(entry));
     }
 
     @Test

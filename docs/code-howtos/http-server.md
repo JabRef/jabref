@@ -3,23 +3,8 @@ parent: Code Howtos
 ---
 # HTTP Server
 
-## Get SSL Working
-
-(Based on <https://stackoverflow.com/a/57511038/873282>)
-
-Howto for Windows - other operating systems work similar:
-
-1. As admin `choco install mkcert`
-2. As admin: `mkcert -install`
-3. `cd %APPDATA%\..\local\org.jabref\jabref\ssl`
-4. `mkcert -pkcs12 jabref.desktop jabref localhost 127.0.0.1 ::1`
-5. Rename the file to `server.p12`
-
-Note: If you do not do this, you get following error message:
-
-```text
-Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
-```
+JabRef has a built-in http server.
+For example, the resource for a library is implemented at [`org.jabref.http.server.LibraryResource`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/http/server/LibraryResource.java).
 
 ## Start http server
 
@@ -69,3 +54,24 @@ DEBUG: Server started.
 
 IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `src/test/java/org/jabref/testutils/interactive/http/rest-api.http`.
 Then, there are play buttons appearing for interacting with the server.
+
+## Get SSL Working
+
+When interacting with the [Microsoft Word AddIn](https://github.com/JabRef/JabRef-Word-Addin), a SSL-based connection is required.
+[The Word-AddIn is currentely under development](https://github.com/JabRef/JabRef-Word-Addin/pull/568).
+
+(Based on <https://stackoverflow.com/a/57511038/873282>)
+
+Howto for Windows - other operating systems work similar:
+
+1. As admin `choco install mkcert`
+2. As admin: `mkcert -install`
+3. `cd %APPDATA%\..\local\org.jabref\jabref\ssl`
+4. `mkcert -pkcs12 jabref.desktop jabref localhost 127.0.0.1 ::1`
+5. Rename the file to `server.p12`
+
+Note: If you do not do this, you get following error message:
+
+```text
+Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
+```

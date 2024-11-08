@@ -1,20 +1,20 @@
 package org.jabref.gui.entryeditor;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private PreviewPanel previewPanel;
 
     public PreviewTab(BibDatabaseContext databaseContext,
-                      PreferencesService preferences,
+                      GuiPreferences preferences,
                       PreviewPanel previewPanel) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;

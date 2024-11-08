@@ -107,8 +107,7 @@ public class IconTheme {
     public static URL getIconUrl(String name) {
         String key = Objects.requireNonNull(name, "icon name");
         if (!KEY_TO_ICON.containsKey(key)) {
-            LOGGER.warn("Could not find icon url by name " + name + ", so falling back on default icon "
-                        + DEFAULT_ICON_PATH);
+            LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
         String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
@@ -170,6 +169,7 @@ public class IconTheme {
         ADD_NOBOX(MaterialDesignP.PLUS),
         ADD_ARTICLE(MaterialDesignP.PLUS),
         ADD_ENTRY(MaterialDesignP.PLAYLIST_PLUS),
+        CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         EDIT_ENTRY(MaterialDesignT.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignT.TOOLTIP_TEXT),
         FOLDER(MaterialDesignF.FOLDER_OUTLINE),
@@ -283,6 +283,7 @@ public class IconTheme {
         APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
         APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
         APPLICATION_TEXWORS(JabRefMaterialDesignIcon.TEXWORKS),
+        APPLICATION_VSCODE(JabRefMaterialDesignIcon.VSCODE),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
         CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),

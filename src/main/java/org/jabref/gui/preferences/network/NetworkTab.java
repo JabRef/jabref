@@ -71,7 +71,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
         versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 

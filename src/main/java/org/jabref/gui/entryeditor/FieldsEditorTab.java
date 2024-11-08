@@ -29,15 +29,15 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -54,12 +54,14 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final UndoAction undoAction;
     private final RedoAction redoAction;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final PreviewPanel previewPanel;
     private final UndoManager undoManager;
+
     private Collection<Field> fields = new ArrayList<>();
+
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
 
@@ -70,7 +72,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            UndoAction undoAction,
                            RedoAction redoAction,
                            DialogService dialogService,
-                           PreferencesService preferences,
+                           GuiPreferences preferences,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            PreviewPanel previewPanel) {

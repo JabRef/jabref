@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.DialogPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Control?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Control?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.mergeentries.MultiMergeEntriesView"
             prefHeight="500.0" prefWidth="800.0">

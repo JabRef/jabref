@@ -204,8 +204,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 return Collections.emptyList();
             }
             if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info(
-                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
+                LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);
             }
 
             // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids

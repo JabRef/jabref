@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -16,7 +17,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class MoveFilesCleanupTest {
         Files.createFile(fileBefore);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
+        metaData.setLibrarySpecificFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
@@ -64,7 +64,7 @@ class MoveFilesCleanupTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
-        cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
+        cleanup = new MoveFilesCleanup(() -> databaseContext, filePreferences);
     }
 
     @Test

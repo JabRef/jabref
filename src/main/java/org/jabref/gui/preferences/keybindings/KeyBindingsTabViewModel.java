@@ -18,18 +18,18 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -38,7 +38,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
+    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, GuiPreferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
@@ -53,17 +53,28 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
+        rootKeyBinding.set(root);
+        filterValues("");
+    }
+
+    public void filterValues(String term) {
+        KeyBindingViewModel root = rootKeyBinding.get();
+        root.clear();
+        root.getChildren().clear();
         for (KeyBindingCategory category : KeyBindingCategory.values()) {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
             keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -> {
-                if (keyBinding.getCategory() == category) {
+                if (keyBinding.getCategory() == category &&
+                        (keyBinding.getLocalization().toLowerCase().contains(term.toLowerCase()) ||
+                                keyBinding.getCategory().getName().toLowerCase().contains(term.toLowerCase()))) {
                     KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);
                     categoryItem.getChildren().add(keyBindViewModel);
                 }
             });
-            root.getChildren().add(categoryItem);
+            if (!categoryItem.getChildren().isEmpty()) {
+                root.getChildren().add(categoryItem);
+            }
         }
-        rootKeyBinding.set(root);
     }
 
     public void setNewBindingForCurrent(KeyEvent event) {

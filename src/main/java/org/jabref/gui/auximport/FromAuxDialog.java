@@ -15,8 +15,8 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -32,7 +32,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @FXML private TextArea statusInfos;
     @FXML private ComboBox<BibDatabaseContext> libraryListView;
 
-    @Inject private PreferencesService preferences;
+    @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;

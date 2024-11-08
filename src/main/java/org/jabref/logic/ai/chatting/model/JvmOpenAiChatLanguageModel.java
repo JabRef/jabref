@@ -3,8 +3,7 @@ package org.jabref.logic.ai.chatting.model;
 import java.net.http.HttpClient;
 import java.util.List;
 
-import org.jabref.preferences.ai.AiApiKeyProvider;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -30,11 +29,11 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
 
     private final ChatClient chatClient;
 
-    public JvmOpenAiChatLanguageModel(AiPreferences aiPreferences, AiApiKeyProvider aiApiKeyProvider, HttpClient httpClient) {
+    public JvmOpenAiChatLanguageModel(AiPreferences aiPreferences, HttpClient httpClient) {
         this.aiPreferences = aiPreferences;
 
         OpenAI openAI = OpenAI
-                .newBuilder(aiApiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider()))
+                .newBuilder(aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()))
                 .httpClient(httpClient)
                 .baseUrl(aiPreferences.getSelectedApiBaseUrl())
                 .build();

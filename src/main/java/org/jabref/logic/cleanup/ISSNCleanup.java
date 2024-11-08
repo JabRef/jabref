@@ -14,7 +14,7 @@ public class ISSNCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         Optional<String> issnString = entry.getField(StandardField.ISSN);
-        if (!issnString.isPresent()) {
+        if (issnString.isEmpty()) {
             return Collections.emptyList();
         }
 

@@ -9,9 +9,9 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -19,11 +19,11 @@ import jakarta.inject.Inject;
 public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> {
     @FXML private ComboBox<Charset> encoding;
     @FXML private ComboBox<BibDatabaseMode> databaseMode;
-    @FXML private TextField generalFileDirectory;
+    @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -39,7 +39,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences);
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)
@@ -54,14 +54,14 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
-        generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
+        librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
     }
 
     @FXML
-    public void browseGeneralFileDirectory() {
-        viewModel.browseGeneralDir();
+    public void browseLibrarySpecificFileDirectory() {
+        viewModel.browseLibrarySpecificDir();
     }
 
     @FXML

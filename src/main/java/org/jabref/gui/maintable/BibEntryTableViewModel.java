@@ -14,11 +14,9 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.FloatProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -50,7 +48,6 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
-    private final FloatProperty searchScore = new SimpleFloatProperty(0);
     private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
     private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);
     private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
@@ -60,12 +57,12 @@ public class BibEntryTableViewModel {
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
+        this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter = fieldValueFormatter;
 
         this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
-        this.bibDatabaseContext = bibDatabaseContext;
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -161,10 +158,6 @@ public class BibEntryTableViewModel {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return bibDatabaseContext;
-    }
-
-    public FloatProperty searchScoreProperty() {
-        return searchScore;
     }
 
     public BooleanProperty hasFullTextResultsProperty() {

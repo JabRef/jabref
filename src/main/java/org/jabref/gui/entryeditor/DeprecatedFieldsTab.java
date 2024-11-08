@@ -12,19 +12,19 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -39,7 +39,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
                                UndoAction undoAction,
                                RedoAction redoAction,
                                DialogService dialogService,
-                               PreferencesService preferences,
+                               GuiPreferences preferences,
                                BibEntryTypesManager entryTypesManager,
                                TaskExecutor taskExecutor,
                                JournalAbbreviationRepository journalAbbreviationRepository,
@@ -75,7 +75,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new));
+            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> entry.getField(field).isPresent()).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
             // Entry type unknown -> treat all fields as required (thus no optional fields)
             return new LinkedHashSet<>();

@@ -16,19 +16,22 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -41,7 +44,6 @@ import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -70,21 +72,25 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     private EntryType type;
     private EntryTypeViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferences) {
+    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.preferencesService = preferences;
+        this.preferences = preferences;
 
         this.setTitle(Localization.lang("Select entry type"));
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+        stage.setMinHeight(400);
+        stage.setMinWidth(500);
 
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
         setOnCloseRequest(e -> viewModel.cancelFetcherWorker());
@@ -131,11 +137,11 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
         viewModel = new EntryTypeViewModel(
-                preferencesService,
+                preferences,
                 libraryTab,
                 dialogService,
                 stateManager,
-                taskExecutor,
+                (UiTaskExecutor) taskExecutor,
                 fileUpdateMonitor);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());

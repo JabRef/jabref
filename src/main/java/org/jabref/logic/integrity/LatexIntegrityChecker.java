@@ -37,7 +37,7 @@ import static uk.ac.ed.ph.snuggletex.definitions.Globals.TEXT_MODE_ONLY;
  */
 public class LatexIntegrityChecker implements EntryChecker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LatexIntegrityChecker.class);
     private static final SnuggleEngine ENGINE = new SnuggleEngine();
     private static final SnuggleSession SESSION;
     private static final ResourceBundle ERROR_MESSAGES = ENGINE.getPackages().getFirst().getErrorMessageBundle();

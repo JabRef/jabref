@@ -14,13 +14,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -36,12 +36,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
 
     private final DialogService dialogService;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, FilePreferences filePreferences) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
-        this.filePreferences = filePreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
@@ -105,7 +105,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.STRING_EDITOR, dialogService, filePreferences).execute();
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService, externalApplicationsPreferences).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

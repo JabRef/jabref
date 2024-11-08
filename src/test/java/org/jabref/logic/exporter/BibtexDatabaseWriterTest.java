@@ -28,7 +28,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -810,7 +810,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeFileDirectories() throws Exception {
-        metaData.setDefaultFileDirectory("\\Literature\\");
+        metaData.setLibrarySpecificFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
         metaData.setLatexFileDirectory("defaultOwner-user", Path.of("D:\\Latex"));
 

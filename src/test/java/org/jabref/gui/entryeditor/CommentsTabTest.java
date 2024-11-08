@@ -7,15 +7,15 @@ import java.util.Set;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -25,7 +25,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +38,6 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,9 +61,7 @@ class CommentsTabTest {
     @Mock
     private DialogService dialogService;
     @Mock
-    private PreferencesService preferences;
-    @Mock
-    private StateManager stateManager;
+    private GuiPreferences preferences;
     @Mock
     private ThemeManager themeManager;
     @Mock
@@ -81,8 +77,8 @@ class CommentsTabTest {
     private EntryEditorPreferences entryEditorPreferences;
 
     @BeforeEach
-    void setUp() {
-        try(AutoCloseable mocks = MockitoAnnotations.openMocks(CommentsTabTest.class)) {
+    void setUp() throws Exception {
+        try (AutoCloseable mocks = MockitoAnnotations.openMocks(CommentsTabTest.class)) {
 
             when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
             when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
@@ -102,9 +98,8 @@ class CommentsTabTest {
                     dialogService,
                     taskExecutor,
                     journalAbbreviationRepository,
-                    previewPanel);
-        } catch (Exception e) {
-            fail(e);
+                    previewPanel
+            );
         }
     }
 

@@ -10,17 +10,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
-import org.jabref.preferences.FilePreferences;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -144,7 +144,7 @@ public class BibDatabaseContext {
      * <ol>
      * <li>next to the .bib file.</li>
      * <li>the preferences can specify a default one.</li>
-     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a library-specific directory.</li>
      * <li>the database's metadata can specify a user-specific directory.</li>
      * </ol>
      * <p>
@@ -165,12 +165,12 @@ public class BibDatabaseContext {
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
-        generalFileDirectory.ifPresent(fileDirs::add);
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
-        //   2) no general file directory is set (in the metadata of the bib file)
+        //   2) no library-specific file directory is set (in the metadata of the bib file)
 
         // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -257,7 +257,7 @@ public class BibDatabaseContext {
      */
     @NonNull
     public Path getFulltextIndexPath() {
-        Path appData = JabRefDesktop.getFulltextIndexBaseDirectory();
+        Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {

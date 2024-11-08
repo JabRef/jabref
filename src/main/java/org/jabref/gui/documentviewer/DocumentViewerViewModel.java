@@ -21,10 +21,10 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.Loader;
@@ -37,16 +37,16 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
-    public DocumentViewerViewModel(StateManager stateManager, PreferencesService preferencesService) {
+    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
             // Switch to currently selected entry in live mode
@@ -112,7 +112,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase()
-                        .flatMap(database -> file.findIn(database, preferencesService.getFilePreferences()))
+                        .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
                         .ifPresent(this::setCurrentDocument);
             currentPage.set(1);
         }

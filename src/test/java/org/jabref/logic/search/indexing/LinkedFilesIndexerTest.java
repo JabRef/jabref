@@ -6,15 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.LuceneIndexer;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.index.IndexReader;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class LinkedFilesIndexerTest {
-    private final PreferencesService preferencesService = mock(PreferencesService.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     private LuceneIndexer indexer;
@@ -35,7 +35,7 @@ public class LinkedFilesIndexerTest {
     @BeforeEach
     void setUp(@TempDir Path indexDir) throws IOException {
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
-        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
 
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));

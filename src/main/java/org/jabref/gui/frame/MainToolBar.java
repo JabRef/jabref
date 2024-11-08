@@ -20,7 +20,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.edit.EditAction;
@@ -31,19 +30,20 @@ import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -56,7 +56,7 @@ public class MainToolBar extends ToolBar {
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -73,7 +73,7 @@ public class MainToolBar extends ToolBar {
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
-                       PreferencesService preferencesService,
+                       GuiPreferences preferences,
                        AiService aiService,
                        FileUpdateMonitor fileUpdateMonitor,
                        TaskExecutor taskExecutor,
@@ -85,7 +85,7 @@ public class MainToolBar extends ToolBar {
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
@@ -107,15 +107,11 @@ public class MainToolBar extends ToolBar {
 
         // Setup Toolbar
 
-        // The action itself asks the user if it is OK to use Grobid (in some cases).
-        // Therefore, the condition of enablement is "only" if a library is opened. (Parameter "false")
-        Button newEntryFromPlainTextOnlineButton = factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexActionOnline(dialogService, preferencesService, stateManager, false));
-
         getItems().addAll(
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
+                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
 
                 leftSpacer,
 
@@ -124,17 +120,17 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         createNewEntryFromIdButton(),
-                        newEntryFromPlainTextOnlineButton,
+                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
@@ -143,8 +139,8 @@ public class MainToolBar extends ToolBar {
 
                 new HBox(
                         pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferencesService, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager))),
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -154,7 +150,7 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getFilePreferences()))));
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
@@ -173,7 +169,7 @@ public class MainToolBar extends ToolBar {
         newEntryFromIdButton.setFocusTraversable(false);
         newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferencesService, taskExecutor, stateManager);
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferences, taskExecutor, stateManager);
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
@@ -200,8 +196,8 @@ public class MainToolBar extends ToolBar {
         indicator.getStyleClass().add("progress-indicatorToolbar");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background tasks are finished"));
         indicator.setTooltip(noTasksRunning);
         stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -229,16 +225,17 @@ public class MainToolBar extends ToolBar {
             if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
                 progressViewPopOver.hide();
                 taskProgressSubscription.unsubscribe();
+                return;
             }
 
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
             taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
             taskProgressView.setRetainTasks(false);
-            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+            taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setTitle(Localization.lang("Background tasks"));
                 progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
             }
 

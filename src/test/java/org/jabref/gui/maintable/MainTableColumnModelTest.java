@@ -1,6 +1,6 @@
 package org.jabref.gui.maintable;
 
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,7 +20,7 @@ class MainTableColumnModelTest {
 
     @BeforeAll
     static void setup() {
-        Injector.setModelOrService(PreferencesService.class, mock(PreferencesService.class));
+        Injector.setModelOrService(CliPreferences.class, mock(CliPreferences.class));
     }
 
     @Test

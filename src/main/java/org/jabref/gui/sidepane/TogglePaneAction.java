@@ -2,7 +2,7 @@ package org.jabref.gui.sidepane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.preferences.SidePanePreferences;
+import org.jabref.gui.frame.SidePanePreferences;
 
 public class TogglePaneAction extends SimpleCommand {
     private final StateManager stateManager;

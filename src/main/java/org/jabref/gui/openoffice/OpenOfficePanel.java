@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -33,14 +34,14 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -48,12 +49,14 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -61,11 +64,11 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,12 +97,14 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final PreferencesService preferencesService;
-    private final AiService aiService;
+    private final GuiPreferences preferences;
+    private final OpenOfficePreferences openOfficePreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
+    private final AiService aiService;
     private final StyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -107,13 +112,18 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private OOStyle currentStyle;
 
+    private final SimpleObjectProperty<OOStyle> currentStyleProperty;
+
     public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           PreferencesService preferencesService,
-                           AiService aiService,
-                           KeyBindingRepository keyBindingRepository,
+                           GuiPreferences preferences,
+                           OpenOfficePreferences openOfficePreferences,
+                           ExternalApplicationsPreferences externalApplicationsPreferences,
+                           LayoutFormatterPreferences layoutFormatterPreferences,
+                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                            JournalAbbreviationRepository abbreviationRepository,
-                           TaskExecutor taskExecutor,
+                           UiTaskExecutor taskExecutor,
                            DialogService dialogService,
+                           AiService aiService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
@@ -122,14 +132,16 @@ public class OpenOfficePanel {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.preferencesService = preferencesService;
-        this.aiService = aiService;
+        this.preferences = preferences;
+        this.openOfficePreferences = openOfficePreferences;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
-        this.currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        this.currentStyle = openOfficePreferences.getCurrentStyle();
 
         ActionFactory factory = new ActionFactory();
 
@@ -143,7 +155,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, preferencesService.getFilePreferences()));
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, externalApplicationsPreferences));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -157,9 +169,11 @@ public class OpenOfficePanel {
         update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(
-                preferencesService.getOpenOfficePreferences(),
-                preferencesService.getLayoutFormatterPreferences(),
+                openOfficePreferences,
+                layoutFormatterPreferences,
                 abbreviationRepository);
+
+        currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
 
         initPanel();
     }
@@ -174,6 +188,7 @@ public class OpenOfficePanel {
      */
     private boolean getOrUpdateTheStyle(String title) {
         currentStyle = loader.getUsedStyleUnified();
+        currentStyleProperty.set(currentStyle);
         final boolean FAIL = true;
         final boolean PASS = false;
 
@@ -219,6 +234,8 @@ public class OpenOfficePanel {
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
+                             currentStyleProperty.set(currentStyle);
+
                              if (currentStyle instanceof JStyle jStyle) {
                                  try {
                                      jStyle.ensureUpToDate();
@@ -309,8 +326,8 @@ public class OpenOfficePanel {
                     databaseContext,
                     tabContainer,
                     dialogService,
-                    preferencesService,
                     aiService,
+                    preferences,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
@@ -323,7 +340,7 @@ public class OpenOfficePanel {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferencesService.getOpenOfficePreferences().getUseAllDatabases()) {
+        if (openOfficePreferences.getUseAllDatabases()) {
             for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
                 databases.add(database.getDatabase());
             }
@@ -337,7 +354,7 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferencesService.getOpenOfficePreferences(), dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
 
         if (officeInstallation.isExecutablePathDefined()) {
             connect();
@@ -371,7 +388,7 @@ public class OpenOfficePanel {
         var fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty("user.home")).build();
         Optional<Path> selectedPath = dialogService.showDirectorySelectionDialog(fileDialogConfiguration);
 
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferencesService.getOpenOfficePreferences(), dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
 
         if (selectedPath.isPresent()) {
             BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))
@@ -390,30 +407,24 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnected = ooBase != null;
-        boolean isConnectedToDocument = isConnected && !ooBase.isDocumentConnectionMissing();
+        boolean isConnectedToDocument = (ooBase != null && !ooBase.isDocumentConnectionMissing());
+        boolean hasStyle = (currentStyle != null);
+        boolean hasDatabase = !getBaseList().isEmpty();
+        boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
+        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
+        boolean cslStyleSelected = currentStyle instanceof CitationStyle;
 
-        // For these, we need to watch something
-        boolean hasStyle = true; // (style != null);
-        boolean hasDatabase = true; // !getBaseList().isEmpty();
-        boolean hasSelectedBibEntry = true;
+        selectDocument.setDisable(!isConnectedToDocument);
 
-        selectDocument.setDisable(!isConnected);
-        pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
-
-        boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
-        boolean cslStyleSelected = preferencesService.getOpenOfficePreferences().getCurrentStyle() instanceof CitationStyle;
+        pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite);
         pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
-
-        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
 
         update.setDisable(!canRefreshDocument);
         merge.setDisable(!canRefreshDocument || cslStyleSelected);
         unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
         manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
-
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
     }
 
@@ -423,7 +434,7 @@ public class OpenOfficePanel {
             protected OOBibBase call() throws BootstrapException, CreationException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
-                Path path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
+                Path path = Path.of(openOfficePreferences.getExecutablePath());
                 return createBibBase(path);
             }
         };
@@ -447,13 +458,13 @@ public class OpenOfficePanel {
             LOGGER.error("autodetect failed", ex);
             switch (ex) {
                 case UnsatisfiedLinkError unsatisfiedLinkError -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", unsatisfiedLinkError);
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
                 }
                 case IOException ioException -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ioException);
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
                             Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
@@ -477,7 +488,7 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException {
-        return new OOBibBase(loPath, dialogService);
+        return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
     /**
@@ -498,23 +509,19 @@ public class OpenOfficePanel {
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
-        if (stateManager.getActiveDatabase().isEmpty()
-                || (stateManager.getActiveDatabase().get().getDatabase() == null)) {
+        final Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+
+        if (activeDatabase.isEmpty() || (activeDatabase.get().getDatabase() == null)) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
             return;
         }
 
-        final BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
-        if (bibDatabaseContext == null) {
-            OOError.noDataBaseIsOpenForCiting()
-                   .setTitle(errorDialogTitle)
-                   .showErrorDialog(dialogService);
-            return;
-        }
+        final BibDatabaseContext bibDatabaseContext = activeDatabase.get();
 
         List<BibEntry> entries = stateManager.getSelectedEntries();
+
         if (entries.isEmpty()) {
             OOError.noEntriesSelectedForCitation()
                    .setTitle(errorDialogTitle)
@@ -549,12 +556,12 @@ public class OpenOfficePanel {
         }
 
         Optional<Update.SyncOptions> syncOptions =
-                preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
+                openOfficePreferences.getSyncWhenCiting()
                         ? Optional.of(new Update.SyncOptions(getBaseList()))
                         : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
-        if (syncOptions.isPresent() && preferencesService.getOpenOfficePreferences().getSyncWhenCiting()) {
+        if (syncOptions.isPresent() && openOfficePreferences.getSyncWhenCiting()) {
             syncOptions.get().setUpdateBibliography(true);
         }
         ooBase.guiActionInsertEntry(entries,
@@ -597,12 +604,11 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            CitationKeyPatternPreferences prefs = preferencesService.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (entry.getCitationKey().isEmpty()) {
                     // Generate key
-                    new CitationKeyGenerator(databaseContext.get(), prefs)
+                    new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
                             .generateAndSetKey(entry)
                             .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
@@ -619,12 +625,27 @@ public class OpenOfficePanel {
     }
 
     private ContextMenu createSettingsPopup() {
-        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
-
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
-        autoSync.selectedProperty().set(preferencesService.getOpenOfficePreferences().getSyncWhenCiting());
+        autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
+
+        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
+        alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
+        alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+
+        EasyBind.listen(currentStyleProperty, (obs, oldValue, newValue) -> {
+            switch (newValue) {
+                case JStyle ignored -> {
+                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
+                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
+                    }
+                }
+                case CitationStyle ignored ->
+                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
+                default -> { }
+            }
+        });
 
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
@@ -655,6 +676,10 @@ public class OpenOfficePanel {
                 useAllBases,
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
+
+        if (currentStyle instanceof JStyle) {
+            contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
+        }
 
         return contextMenu;
     }

@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -198,19 +198,19 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprint() throws IOException {
         entry.setField(StandardField.EPRINT, "1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprintWithPrefix() throws IOException {
         entry.setField(StandardField.EPRINT, "arXiv:1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -218,21 +218,21 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/unknown");
         entry.setField(StandardField.EPRINT, "1603.06570");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/1603.06570v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitle() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitleWithCurlyBracket() throws IOException {
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2010.15942v3").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -240,7 +240,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.JOURNAL, "arXiv:2002.10248v4 [cs]");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2002.10248v4").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -248,7 +248,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.URL, "http://arxiv.org/abs/2002.10248v4");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2002.10248v4").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -256,7 +256,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/cond-mat/0406246v1").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -264,7 +264,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
         entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URI.create("http://arxiv.org/pdf/2010.15942v3").toURL()), fetcher.findFullText(entry));
     }
 
     @Test
@@ -574,5 +574,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
         assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    void abstractIsCleanedUp() throws Exception {
+        Optional<BibEntry> entry = fetcher.performSearchById("2407.02238");
+        String escaped = "{One of the primary areas of interest in High Performance Computing is the improvement of performance of parallel workloads. Nowadays, compilable source code-based optimization tasks that employ deep learning often exploit LLVM Intermediate Representations (IRs) for extracting features from source code. Most such works target specific tasks, or are designed with a pre-defined set of heuristics. So far, pre-trained models are rare in this domain, but the possibilities have been widely discussed. Especially approaches mimicking large-language models (LLMs) have been proposed. But these have prohibitively large training costs. In this paper, we propose MIREncoder, a M}ulti-modal IR-based Auto-Encoder that can be pre-trained to generate a learned embedding space to be used for downstream tasks by machine learning-based approaches. A multi-modal approach enables us to better extract features from compilable programs. It allows us to better model code syntax, semantics and structure. For code-based performance optimizations, these features are very important while making optimization decisions. A pre-trained model/embedding implicitly enables the usage of transfer learning, and helps move away from task-specific trained models. Additionally, a pre-trained model used for downstream performance optimization should itself have reduced overhead, and be easily usable. These considerations have led us to propose a modeling approach that i) understands code semantics and structure, ii) enables use of transfer learning, and iii) is small and simple enough to be easily re-purposed or reused even with low resource availability. Our evaluations will show that our proposed approach can outperform the state of the art while reducing overhead.";
+        assertEquals(Optional.of(escaped), entry.get().getField(StandardField.ABSTRACT));
     }
 }

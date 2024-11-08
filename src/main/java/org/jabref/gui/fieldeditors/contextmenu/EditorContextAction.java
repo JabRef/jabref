@@ -14,7 +14,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
 import com.sun.javafx.scene.control.Properties;
 

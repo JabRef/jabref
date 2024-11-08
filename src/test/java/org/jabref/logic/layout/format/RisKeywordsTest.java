@@ -1,6 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
 import org.junit.jupiter.api.Test;
 

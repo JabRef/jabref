@@ -24,24 +24,18 @@ import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.search.LuceneManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jabref.model.search.query.SearchQuery;
 
 public class PreviewPanel extends VBox {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -53,24 +47,23 @@ public class PreviewPanel extends VBox {
 
     public PreviewPanel(DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
-                        PreferencesService preferencesService,
+                        GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
-                        LuceneManager luceneManager,
                         StateManager stateManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        this.previewPreferences = preferencesService.getPreviewPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), dialogService, stateManager);
+        this.previewPreferences = preferences.getPreviewPreferences();
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);
 
-        PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferencesService, themeManager, taskExecutor, searchQueryProperty);
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, searchQueryProperty);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);
         previewView.setOnDragOver(PreviewPanel::onDragOver);
-        previewView.setOnDragDropped(event -> onDragDropped(luceneManager, event));
+        previewView.setOnDragDropped(event -> onDragDropped(event));
 
         this.getChildren().add(previewView);
 
@@ -96,23 +89,12 @@ public class PreviewPanel extends VBox {
         event.consume();
     }
 
-    private void onDragDropped(LuceneManager luceneManager, DragEvent event) {
+    private void onDragDropped(DragEvent event) {
         boolean success = false;
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
+            TransferMode transferMode = event.getTransferMode();
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-
-            if (event.getTransferMode() == TransferMode.MOVE) {
-                LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, luceneManager);
-            }
-            if (event.getTransferMode() == TransferMode.LINK) {
-                LOGGER.debug("Node LINK"); // alt on win
-                fileLinker.addFilesToEntry(entry, files);
-            }
-            if (event.getTransferMode() == TransferMode.COPY) {
-                LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, luceneManager);
-            }
+            DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
             success = true;
         }
 

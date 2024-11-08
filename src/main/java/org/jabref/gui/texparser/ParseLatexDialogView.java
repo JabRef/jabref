@@ -16,12 +16,12 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -43,7 +43,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
     @FXML private ButtonType parseButtonType;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private ThemeManager themeManager;
     private ParseLatexDialogViewModel viewModel;
@@ -66,7 +66,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService, fileMonitor);
+        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferences, fileMonitor);
 
         fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());
