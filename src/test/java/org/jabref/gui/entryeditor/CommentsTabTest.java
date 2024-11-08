@@ -10,7 +10,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -63,8 +62,6 @@ class CommentsTabTest {
     @Mock
     private GuiPreferences preferences;
     @Mock
-    private ThemeManager themeManager;
-    @Mock
     private TaskExecutor taskExecutor;
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
@@ -77,29 +74,29 @@ class CommentsTabTest {
     private EntryEditorPreferences entryEditorPreferences;
 
     @BeforeEach
-    void setUp() throws Exception {
-        try (AutoCloseable mocks = MockitoAnnotations.openMocks(CommentsTabTest.class)) {
-            when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
-            when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
-            when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
-            when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
-            when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
-            BibEntryType entryTypeMock = mock(BibEntryType.class);
-            when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-            commentsTab = new CommentsTab(
-                    preferences,
-                    databaseContext,
-                    suggestionProviders,
-                    undoManager,
-                    mock(UndoAction.class),
-                    mock(RedoAction.class),
-                    dialogService,
-                    taskExecutor,
-                    journalAbbreviationRepository,
-                    previewPanel
-            );
-        }
+        when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+        when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
+        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+        when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
+        BibEntryType entryTypeMock = mock(BibEntryType.class);
+        when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
+
+        commentsTab = new CommentsTab(
+                preferences,
+                databaseContext,
+                suggestionProviders,
+                undoManager,
+                mock(UndoAction.class),
+                mock(RedoAction.class),
+                dialogService,
+                taskExecutor,
+                journalAbbreviationRepository,
+                previewPanel
+        );
     }
 
     @Test
