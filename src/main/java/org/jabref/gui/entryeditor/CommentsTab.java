@@ -16,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -28,7 +27,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -49,8 +47,6 @@ public class CommentsTab extends FieldsEditorTab {
                        UndoManager undoManager,
                        UndoAction undoAction,
                        RedoAction redoAction,
-                       DialogService dialogService,
-                       TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
                        PreviewPanel previewPanel) {
         super(false,
@@ -59,9 +55,7 @@ public class CommentsTab extends FieldsEditorTab {
                 undoManager,
                 undoAction,
                 redoAction,
-                dialogService,
                 preferences,
-                taskExecutor,
                 journalAbbreviationRepository,
                 previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");

@@ -24,7 +24,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -34,7 +33,6 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -47,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
+abstract class FieldsEditorTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
 
@@ -58,9 +56,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final SuggestionProviders suggestionProviders;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
-    private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final PreviewPanel previewPanel;
     private final UndoManager undoManager;
@@ -76,9 +72,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            UndoManager undoManager,
                            UndoAction undoAction,
                            RedoAction redoAction,
-                           DialogService dialogService,
                            GuiPreferences preferences,
-                           TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            PreviewPanel previewPanel) {
         this.isCompressed = compressed;
@@ -87,9 +81,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.undoManager = Objects.requireNonNull(undoManager);
         this.undoAction = undoAction;
         this.redoAction = redoAction;
-        this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.previewPanel = previewPanel;
     }
@@ -152,8 +144,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     protected Label createLabelAndEditor(BibEntry entry, Field field) {
         FieldEditorFX fieldEditor = FieldEditors.getForField(
                 field,
-                taskExecutor,
-                dialogService,
                 journalAbbreviationRepository,
                 preferences,
                 databaseContext,
@@ -217,16 +207,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         setupPanel(entry, isCompressed);
         previewPanel.setDatabase(databaseContext);
         previewPanel.setEntry(entry);
-    }
-
-    @Override
-    public void nextPreviewStyle() {
-        previewPanel.nextPreviewStyle();
-    }
-
-    @Override
-    public void previousPreviewStyle() {
-        previewPanel.previousPreviewStyle();
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
