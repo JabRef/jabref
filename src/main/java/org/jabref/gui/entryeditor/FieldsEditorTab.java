@@ -259,7 +259,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         // Really ensure it is not already there
         removePreviewPanelFromThisTab();
 
-        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel)) { // we do not check for "visible", because the split pane will (!) become visible, but it is not visible yet.
+        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel) && this.getContent().isVisible()) {
             splitPane.getItems().add(1, previewPanel);
             splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
         }
@@ -285,6 +285,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void handleFocus() {
+        LOGGER.error("This is {}", preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
+        LOGGER.error("This is then {}", !preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
         if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
             LOGGER.error("Focus on preview panel");
 
