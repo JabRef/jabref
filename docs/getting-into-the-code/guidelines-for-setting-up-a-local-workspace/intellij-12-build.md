@@ -6,24 +6,24 @@ nav_order: 12
 
 # Step 2: Set up the build system: JDK and Gradle
 
-## Ensure that JDK 21 is available to IntelliJ
+## Ensure that JDK 23 is available to IntelliJ
 
-Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.<br>
+Ensure you have a Java 23 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.<br>
 **Note:** In some MacBooks, `Project Structure` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
-{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 21 is missing." %}
+{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 23 is missing." %}
 ![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
-If there is another JDK than JDK 21 selected, click on the plus button and choose "Download JDK..."
+If there is another JDK than JDK 23 selected, click on the plus button and choose "Download JDK..."
 
 {% figure caption:"Download JDK..." %}
 ![Plattform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
 {% endfigure %}
 
-Select JDK version 21 and then Eclipse Temurin.
+Select JDK version 23 and then Eclipse Temurin.
 
-{% figure caption:"Example for JDK 21 - Choose Eclipse Temurin" %}
+{% figure caption:"Example for JDK 23 - Choose Eclipse Temurin" %}
 ![Download Eclipse Temurin](guidelines-intellij-select-jdk-eclipse-temurin.png)
 {% endfigure %}
 
@@ -33,10 +33,10 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
 {% endfigure %}
 
-Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 21.
+Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 23.
 
-{% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 21 as example)" %}
-![Project SDK is JDK 21](guidelines-intellij-project-settings-jdk.png)
+{% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 23 as example)" %}
+![Project SDK is JDK 23](guidelines-intellij-project-settings-jdk.png)
 {% endfigure %}
 
 Click "OK" to store the changes.
@@ -44,9 +44,9 @@ Click "OK" to store the changes.
 ## Ensure correct JDK setting for Gradle
 
 Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
-If that does not exist, just select JDK 21.
+If that does not exist, just select JDK 23.
 
-{% figure caption:"Gradle JVM is project SDK (showing "Projekt SDK temurin-21" as example)" %}
+{% figure caption:"Gradle JVM is project SDK (showing "Projekt SDK temurin-23" as example)" %}
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
 
