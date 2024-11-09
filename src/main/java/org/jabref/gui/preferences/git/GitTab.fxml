@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.preferences.git.GitTab">
+    <fx:define>
+        <ToggleGroup fx:id="groupViewMode"/>
+    </fx:define>
+    <Label styleClass="titleHeader" text="%Git Support"/>
+    <GridPane hgap="10.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+
+        <CheckBox fx:id="enableGitSupport" text="%Autoperform git operations"
+                  GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
+
+        <CheckBox text="Set frequency of pushes" visible="true" fx:id="frequencyLabel"
+               GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <ComboBox fx:id="setPushFrequency" visible="true" accessibleHelp=""
+                  GridPane.rowIndex="1" GridPane.columnIndex="1">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="15 min"/>
+                    <String fx:value="30 min"/>
+                    <String fx:value="60 min"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <Label fx:id="authentificationLabel" text="Authentification Method"
+                  GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="authenticationMethod" visible="true" accessibleHelp=""
+                  GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="SSH"/>
+                    <String fx:value="Git Credentials"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <Button text="Synchronize" fx:id="synchronizeButton"
+                GridPane.rowIndex="3" GridPane.columnIndex="0"
+        />
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </GridPane>
+</fx:root>

@@ -50,6 +50,8 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.AuthenticationViewMode;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
@@ -331,7 +333,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
-    // Dialog states
+    // AuthenticationViewMode
+    private static final String AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE = "authenticationSSHCredentialsViewMode";
+    private static final String GIT_SUPPORT_ENABLED_PROPERTY = "gitSupportEnabledProperty";
+    private static final String PUSH_FREQUENCY_PROPERTY = "pushFrequency";
+    // Dilog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
@@ -370,6 +376,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
+
+
 
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
@@ -411,6 +419,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private GitPreferences gitPreferences;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -650,6 +659,9 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+        defaults.put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, AuthenticationViewMode.SSH.name());
+        defaults.put(GIT_SUPPORT_ENABLED_PROPERTY, Boolean.FALSE);
+        defaults.put(PUSH_FREQUENCY_PROPERTY, Boolean.FALSE);
         // endregion
     }
 
@@ -693,7 +705,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
-
     //*************************************************************************************************************
     // Backingstore access logic
     //*************************************************************************************************************
@@ -826,6 +837,20 @@ public class JabRefCliPreferences implements CliPreferences {
     private void clearTruststoreFromCustomCertificates() {
         TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
+    }
+
+    @Override
+    public GitPreferences getGitSupportPreferences() {
+        if (gitPreferences != null) {
+            return gitPreferences;
+        }
+
+        gitPreferences = new GitPreferences(getBoolean(GIT_SUPPORT_ENABLED_PROPERTY), AuthenticationViewMode.valueOf(get(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE)), getBoolean(PUSH_FREQUENCY_PROPERTY));
+        EasyBind.listen(gitPreferences.getGitSupportEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_SUPPORT_ENABLED_PROPERTY, newValue));
+        EasyBind.listen(gitPreferences.getAuthenticationProperty(), (obs, oldValue, newValue) ->
+                put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, newValue.name()));
+        EasyBind.listen(gitPreferences.getFrequencyLabelEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(PUSH_FREQUENCY_PROPERTY, newValue));
+        return gitPreferences;
     }
 
     /**
