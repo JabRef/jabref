@@ -217,9 +217,11 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
         colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(JabRefIcon::getGraphicNode));
-        importResultTable.setColumnResizePolicy(param -> true);
-
+        colFile.setResizable(true);
+        colStatus.setResizable(true);
+        colMessage.setResizable(true);
         importResultTable.setItems(viewModel.resultTableItems());
+        importResultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void initButtons() {
