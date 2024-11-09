@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -36,6 +37,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -143,6 +145,7 @@ public class EntryEditor extends BorderPane {
         this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList();
 
         setupDragAndDrop(libraryTab);
+        EditorTextField.entryContext(tabbed);
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -463,4 +466,20 @@ public class EntryEditor extends BorderPane {
     public void previousPreviewStyle() {
         this.previewTabs.forEach(OffersPreview::previousPreviewStyle);
     }
+
+    public static boolean checkLastTextField(TabPane tabs, TextField textField) {
+        FieldsEditorTab currentTab = (FieldsEditorTab) tabs.getSelectionModel().getSelectedItem();
+        Collection<Field> shownFields = currentTab.getShownFields();
+        Field lastField = null;
+        for (Field field : shownFields) {
+            lastField = field;
+        }
+        if (textField != null && lastField != null) {
+            if (textField.getId() == null) {
+                return false;
+            }
+            return lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+        }
+    return false;
+}
 }
