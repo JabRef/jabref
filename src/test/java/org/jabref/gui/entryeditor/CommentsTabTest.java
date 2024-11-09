@@ -92,8 +92,6 @@ class CommentsTabTest {
                 undoManager,
                 mock(UndoAction.class),
                 mock(RedoAction.class),
-                dialogService,
-                taskExecutor,
                 journalAbbreviationRepository,
                 previewPanel
         );
