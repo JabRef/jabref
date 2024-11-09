@@ -3,8 +3,6 @@
 
 package org.jabref.logic.git;
 
-import org.eclipse.jgit.api.Status;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -28,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class GitActionExecutorTest {
@@ -51,7 +50,7 @@ class GitActionExecutorTest {
     }
 
     @Test
-    void testAdd_addOneFile() throws IOException, GitAPIException {
+    void testAdd_addOneFile() throws IOException, GitAPIException, GitException {
         Status status0 = gitActionExecutor.getGit().status().call();
 
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
@@ -71,7 +70,7 @@ class GitActionExecutorTest {
     }
 
     @Test
-    void testAdd_addMultipleFiles() throws IOException, GitAPIException {
+    void testAdd_addMultipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
         for(int i = 0; i < numberOfFiles; i++){
@@ -95,7 +94,7 @@ class GitActionExecutorTest {
 
     // don't really understand append completely, testing with false
     @Test
-    void testCommit_singleFile() throws IOException, GitAPIException {
+    void testCommit_singleFile() throws IOException, GitAPIException, GitException {
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
         gitActionExecutor.add(pathToTempFile);
 
@@ -116,7 +115,7 @@ class GitActionExecutorTest {
     }
 
     @Test
-    void testCommit_multipleFiles() throws IOException, GitAPIException {
+    void testCommit_multipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
         for(int i = 0; i < numberOfFiles; i++){
@@ -199,6 +198,9 @@ class GitActionExecutorTest {
 
         } catch (
                 URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (
+                GitException e) {
             throw new RuntimeException(e);
         }
     }

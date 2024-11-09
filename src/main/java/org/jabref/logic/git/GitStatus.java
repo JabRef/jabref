@@ -14,21 +14,27 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GitStatus {
 
-    private Git git;
+    private final static Logger LOGGER = LoggerFactory.getLogger(GitStatus.class);
+
+    private final Git git;
 
     public GitStatus(Git git) {
         this.git = git;
     }
 
-    // i am assuming the first method in the UML is supposed to be called
-    // getBranchName*s*() with 's' plural? Just fetching all branches (remote
-    // as well as local), equivalent to git branch -a
-    // TODO: @amer check this out pls
-    public List<String> getBranchNames() throws GitAPIException {
-        List<Ref> localBranches = this.git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+    // TODO: decide whether this is needed
+    public List<String> getBranchNames() throws GitException {
+        List<Ref> localBranches;
+        try {
+            localBranches = this.git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+        } catch (GitAPIException e) {
+            throw new GitException("An error occurred while fetching branch names", e);
+        }
         List<String> branchNames = new ArrayList<>();
         for (Ref branch : localBranches) {
             branchNames.add(branch.getName());
@@ -37,28 +43,50 @@ public class GitStatus {
     }
 
     // renaming these two methods to Untracked
-    public boolean hasUntrackedFiles() throws GitAPIException {
-        Status status = this.git.status().call();
+    public boolean hasUntrackedFiles() throws GitException {
+        Status status;
+        try {
+            status = this.git.status().call();
+        } catch (GitAPIException e) {
+            throw new GitException("Failed to get git status", e);
+        }
         return status.getUntracked().isEmpty();
     }
 
-    public Set<String> getUntrackedFiles() throws GitAPIException {
-        Status status = this.git.status().call();
+    public Set<String> getUntrackedFiles() throws GitException {
+        Status status;
+        try {
+            status = this.git.status().call();
+        } catch (GitAPIException e) {
+            throw new GitException("Failed to get git status", e);
+        }
         return status.getUntracked();
     }
 
     // tracked files just means those files that are staged
 
-    public boolean hasTrackedFiles() throws GitAPIException {
-        Status status = this.git.status().call();
+    public boolean hasTrackedFiles() throws GitException {
+        Status status;
+        try {
+            status = this.git.status().call();
+        } catch (GitAPIException e) {
+            throw new GitException("Failed to get git status", e);
+        }
         return status.getAdded().isEmpty();
     }
 
-    public Set<String> getTrackedFiles() throws GitAPIException {
-        Status status = this.git.status().call();
+    public Set<String> getTrackedFiles() throws GitException {
+        Status status;
+        try {
+            status = this.git.status().call();
+        } catch (GitAPIException e) {
+            throw new GitException("Failed to get git status", e);
+        }
         return status.getAdded();
     }
 
+    // TODO: wouldn't it be sufficient to check whether the latest commit on the local branch
+    //  is present on the remote or not?
     public boolean hasUnpushedCommits() throws IOException {
         boolean hasUnpushedCommits = false;
 
@@ -81,12 +109,12 @@ public class GitStatus {
 
             // invariant: if walk == empty, then upto date, else we have unpushed commits
             for (RevCommit commit : walk) {
-                System.out.println("Unpushed commit: " + commit.getFullMessage());
+                LOGGER.debug("Unpushed commit: " + commit.getFullMessage());
                 hasUnpushedCommits = true;
             }
 
             if (!hasUnpushedCommits) {
-                System.out.println("All commits are pushed.");
+                LOGGER.debug("All commits are pushed.");
             }
         }
 
