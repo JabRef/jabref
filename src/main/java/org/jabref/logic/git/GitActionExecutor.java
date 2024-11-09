@@ -19,9 +19,9 @@ public class GitActionExecutor {
         this.git = git;
     }
 
-    //git.add() returns an 'AddCommand object'
-    //the .addFilepattern() call also returns an AddCommand object
-    //we need to call .call() on an AddCommand object to execute the command
+    // git.add() returns an 'AddCommand object'
+    // the .addFilepattern() call also returns an AddCommand object
+    // we need to call .call() on an AddCommand object to execute the command
     public void add(Path path) {
         try {
             // addFilePattern takes relative paths bruhhhh  ://////////
@@ -41,7 +41,6 @@ public class GitActionExecutor {
     }
 
     public void add(List<Path> paths) {
-
         File gitRepository = git.getRepository().getDirectory();
         File parentFile = gitRepository.getParentFile();
         Path pathOfParentFile = parentFile.toPath();
@@ -56,7 +55,6 @@ public class GitActionExecutor {
             LOGGER.error("Failed to add files: " + e.getMessage());
         }
     }
-
 
     public void commit(String message, boolean append) {
         try {
@@ -103,8 +101,7 @@ public class GitActionExecutor {
         pull(false, remote, branch);
     }
 
-
-    public Git getGit(){
+    public Git getGit() {
         return git;
     }
 

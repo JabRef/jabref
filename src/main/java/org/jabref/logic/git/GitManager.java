@@ -22,14 +22,13 @@ public class GitManager {
 
     private GitStatus gitStatus;
 
-
-    public GitManager(Path pathToRepository){
+    public GitManager(Path pathToRepository) {
         this.pathToRepository = pathToRepository;
         this.repositoryPathAsFile = pathToRepository.toFile();
-        //we need to call the .initGitRepository to get our git object and
-        //create our GitActionExecutor
+        // we need to call the .initGitRepository to get our git object and
+        // create our GitActionExecutor
         initGitRepository();
-        //here we have invariant: private Git git != null, so we can create the GitActionExecutor object
+        // here we have invariant: private Git git != null, so we can create the GitActionExecutor object
         this.gitActionExecutor = new GitActionExecutor(this.git);
         this.gitStatus = new GitStatus(this.git);
     }
@@ -38,7 +37,7 @@ public class GitManager {
      *
      * @return Returns true if the given repository path to the GitManager object to a directory that is a git repository (contains a .git folder)
      */
-    public boolean isGitRepository(){
+    public boolean isGitRepository() {
         return Files.exists(Path.of(pathToRepository.toString(), ".git"));
         // .of() returns the concatenated path, .exists() then checks if at this path
         // the .git file is there
@@ -49,10 +48,9 @@ public class GitManager {
      * @param filePath
      * @return Returns true if the given path points to a directory that is a git repository (contains a .git folder)
      */
-    public boolean isGitRepository(Path filePath){
+    public boolean isGitRepository(Path filePath) {
         return Files.exists(Path.of(filePath.toString(), ".git"));
     }
-
 
     // Note: difference to UML, function does not return a GitManager
     // its also private being called by the constructor implicitly
@@ -68,17 +66,15 @@ public class GitManager {
                              .call();
                 LOGGER.info("Git repository initialized successfully.");
                 this.git = git;
-            }
-            else{
+            } else {
                 this.git = Git.open(repositoryPathAsFile);
             }
-        }
-        catch (GitAPIException | IOException e) {
+        } catch (GitAPIException | IOException e) {
             LOGGER.error("Initialization failed");
         }
     }
 
-    public GitActionExecutor getGitActionExecutor(){
+    public GitActionExecutor getGitActionExecutor() {
         return this.gitActionExecutor;
     }
 }

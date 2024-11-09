@@ -19,7 +19,7 @@ public class GitStatus {
 
     private Git git;
 
-    public GitStatus(Git git){
+    public GitStatus(Git git) {
         this.git = git;
     }
 
@@ -68,20 +68,18 @@ public class GitStatus {
         Ref currentLocalBranchRef = repo.exactRef(currentBranchName);
         Ref remoteBranchRef = repo.findRef("refs/remotes/origin/" + currentBranchName);
 
-        //now that we have the references, we can comapre histories
-        try  (RevWalk walk = new RevWalk(git.getRepository())) {
-
+        // now that we have the references, we can comapre histories
+        try (RevWalk walk = new RevWalk(git.getRepository())) {
             ObjectId localBranchHead = currentLocalBranchRef.getObjectId(); // need obj ids to feed into walk start
             ObjectId remoteBranchHead = remoteBranchRef.getObjectId();
 
             // Start walking from the local branch head
             walk.markStart(walk.parseCommit(localBranchHead));
 
-            //walk.markUninteresting();
+            // walk.markUninteresting();
             walk.markUninteresting(walk.parseCommit(remoteBranchHead)); // anything on the remote we skip
 
-
-            //invariant: if walk == empty, then upto date, else we have unpushed commits
+            // invariant: if walk == empty, then upto date, else we have unpushed commits
             for (RevCommit commit : walk) {
                 System.out.println("Unpushed commit: " + commit.getFullMessage());
                 hasUnpushedCommits = true;
@@ -93,8 +91,5 @@ public class GitStatus {
         }
 
         return hasUnpushedCommits;
-
-
     }
-
 }
