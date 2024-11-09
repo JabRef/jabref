@@ -6,7 +6,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.9.3'
+    id 'com.github.andygoossens.modernizer' version '1.10.0'
 
     id 'me.champeau.jmh' version '0.7.2'
 
@@ -15,7 +15,7 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
-    id 'org.beryx.jlink' version '3.0.1'
+    id 'org.beryx.jlink' version 'v3.1.0-rc-1'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
