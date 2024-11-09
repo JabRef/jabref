@@ -45,11 +45,10 @@ import org.slf4j.LoggerFactory;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab {
+abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
 
-    protected final BibDatabaseContext databaseContext;
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
     private final boolean isCompressed;
@@ -58,7 +57,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final RedoAction redoAction;
     private final GuiPreferences preferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final PreviewPanel previewPanel;
     private final UndoManager undoManager;
 
     private Collection<Field> fields = new ArrayList<>();
@@ -75,15 +73,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            GuiPreferences preferences,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            PreviewPanel previewPanel) {
+        super(databaseContext, previewPanel);
         this.isCompressed = compressed;
-        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
         this.undoManager = Objects.requireNonNull(undoManager);
         this.undoAction = undoAction;
         this.redoAction = redoAction;
         this.preferences = Objects.requireNonNull(preferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.previewPanel = previewPanel;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -205,8 +202,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         initPanel();
         setupPanel(entry, isCompressed);
-        previewPanel.setDatabase(databaseContext);
-        previewPanel.setEntry(entry);
+        super.bindToEntry(entry);
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
@@ -230,21 +226,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
-            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), showInExtraTab -> {
-                if (showInExtraTab) {
-                    removePreviewPanelFromThisTab();
-                } else {
-                    // Add it to the split pane
-                    // No removal needed, because previously, it is contained in the preview tab itself
 
-                    // In case the entry preview tab is focused - and the preview is not to be shown any more, the next selected tab is the required fields tab
-                    // Addition only needed if it will be shown. Otherwise, {@link #handleFocus()} will take care of it
-                    if (this instanceof RequiredFieldsTab || this.getContent().isVisible()) {
-                        // previewPanel.getParent();
-                        addPreviewPanel();
-                    }
-                }
-            });
+            // Adaption of visible tabs done in {@link org.jabref.gui.entryeditor.EntryEditor.EntryEditor}, where the subscription to
+            // preferences.getPreviewPreferences().showPreviewAsExtraTabProperty() is established
 
             // save divider position
             dividerPositionSubscription = EasyBind.valueAt(container.getDividers(), 0)
@@ -265,21 +249,12 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    private void removePreviewPanelFromThisTab() {
+    public void removePreviewPanelFromThisTab() {
         assert this.getContent() instanceof SplitPane;
         if (this.getContent() instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
             splitPane.getItems().remove(previewPanel);
             // Needed to "redraw" the split pane with one item (because JavaFX does not readjust if it is shown)
             // splitPane.setDividerPositions(1.0);
-        }
-    }
-
-    private void removePreviewPanelFromOtherTabs() {
-        Parent parent = previewPanel.getParent();
-        if (parent != null) {  // On first run, there is no parent container attached
-            if (parent.getParent() instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
-                splitPane.getItems().remove(previewPanel);
-            }
         }
     }
 

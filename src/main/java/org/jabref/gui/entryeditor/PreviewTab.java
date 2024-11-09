@@ -9,22 +9,23 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class PreviewTab extends EntryEditorTab {
+public class PreviewTab extends TabWithPreviewPanel {
     public static final String NAME = "Preview";
-    private final BibDatabaseContext databaseContext;
+
     private final GuiPreferences preferences;
-    private final PreviewPanel previewPanel;
+    private final SplitPane splitPane;
 
     public PreviewTab(BibDatabaseContext databaseContext,
                       GuiPreferences preferences,
                       PreviewPanel previewPanel) {
-        this.databaseContext = databaseContext;
+        super(databaseContext, previewPanel);
         this.preferences = preferences;
-        this.previewPanel = previewPanel;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
         setText(Localization.lang("Preview"));
-        setContent(new SplitPane(previewPanel));
+
+        splitPane = new SplitPane();
+        setContent(splitPane);
     }
 
     @Override
@@ -32,9 +33,9 @@ public class PreviewTab extends EntryEditorTab {
         return preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab();
     }
 
-    @Override
-    protected void bindToEntry(BibEntry entry) {
-        previewPanel.setDatabase(databaseContext);
-        previewPanel.setEntry(entry);
+    protected void handleFocus() {
+        removePreviewPanelFromOtherTabs();
+        this.splitPane.getItems().clear();
+        this.splitPane.getItems().add(previewPanel);
     }
 }

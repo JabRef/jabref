@@ -164,6 +164,13 @@ public class EntryEditor extends BorderPane {
                 (obs, oldValue, newValue) -> {
                     if (currentlyEditedEntry != null) {
                         adaptVisibleTabs();
+                        Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
+                        if (newValue && tab instanceof FieldsEditorTab fieldsEditorTab) {
+                            fieldsEditorTab.removePreviewPanelFromThisTab();
+                        }
+                        if (tab instanceof TabWithPreviewPanel previewTab) {
+                            previewTab.handleFocus();
+                        }
                     }
                 });
     }
