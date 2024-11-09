@@ -280,7 +280,7 @@ public class LibraryTab extends Tab {
         String mode = bibDatabaseContext.getMode().getFormattedName();
         String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
         text.append(modeInfo);
-    }
+    } // FIXME
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());

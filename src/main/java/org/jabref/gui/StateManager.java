@@ -38,6 +38,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jabref.model.entry.field.Field;
+import javafx.scene.control.TextInputDialog;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -78,6 +80,8 @@ public class StateManager {
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
     private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
+    private final OptionalObjectProperty<String> searchFieldName = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<BibEntry> selectedEntryForJump = OptionalObjectProperty.empty();
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -230,5 +234,40 @@ public class StateManager {
 
     public List<AiChatWindow> getAiChatWindows() {
         return aiChatWindows;
+    }
+
+
+
+
+    //methods
+    public OptionalObjectProperty<String> searchFieldNameProperty() {
+        return searchFieldName;
+    }
+
+//    public OptionalObjectProperty<BibEntry> selectedEntryForJumpProperty() {
+//        case CTRL_J:
+//            showFieldNameDialog();
+//            event.consume();
+//            break;
+//        return selectedEntryForJump;
+//    }
+
+    private void showFieldNameDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Search by File Name");
+        dialog.setHeaderText("Enter the field name to search for:");
+        dialog.setContentText("Field name:");
+
+        Optional<String> result = dialog.showAndWait();
+       // result.ifPresent(fieldName -> searchEntryByFieldName(fieldName));
+
+    }
+
+    public void searchEntryByFieldName(Field fieldName) {
+        searchFieldName.set(Optional.of(String.valueOf(fieldName)));
+        getSelectedEntries().stream()
+                .filter(entry -> entry.hasField(fieldName))
+                .findFirst()
+                .ifPresent(entry -> selectedEntryForJump.set(Optional.of(entry)));
     }
 }

@@ -318,7 +318,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
-    }
+    } //FIXME
 
     public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);

@@ -61,7 +61,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * If you need all required fields as sole entities use @see{getRequiredFieldsFlat} .
      *
      * @return a Set of required field name Strings
-     */
+     */ // FIXME
     public SequencedSet<OrFields> getRequiredFields() {
         return Collections.unmodifiableSequencedSet(requiredFields);
     }
