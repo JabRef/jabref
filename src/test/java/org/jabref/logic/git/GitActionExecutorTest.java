@@ -41,11 +41,9 @@ class GitActionExecutorTest {
 
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryRepository){
+    void setUp(@TempDir Path temporaryRepository) throws GitException {
         this.repositoryPath = temporaryRepository;
-        // make the directory at repository path a respository by passing into gitmanager
-        // which will call init
-        this.gitManager = new GitManager(repositoryPath);
+        this.gitManager = GitManager.initGitRepository(repositoryPath);
         this.gitActionExecutor = this.gitManager.getGitActionExecutor();
     }
 
