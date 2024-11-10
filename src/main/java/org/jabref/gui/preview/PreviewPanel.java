@@ -35,6 +35,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 
+/// Displays the entry preview
+///
+/// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
 public class PreviewPanel extends VBox {
 
     private final ExternalFilesEntryLinker fileLinker;
