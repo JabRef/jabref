@@ -21,22 +21,24 @@ import org.slf4j.LoggerFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
+
     /**
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
 
-    /**
-     * List of unwanted characters. These will be removed at the end.
-     * Note that <code>+</code> is a wanted character to indicate "et al." in authorsAlpha.
-     * Example: "ABC+". See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
-     */
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^";
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";
+
+    /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
+    /// These characters are disallowed in BibTeX keys.
+    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
-
-    // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
-    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
