@@ -17,18 +17,18 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GitStatus {
+class GitStatus {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GitStatus.class);
 
     private final Git git;
 
-    public GitStatus(Git git) {
+    GitStatus(Git git) {
         this.git = git;
     }
 
     // TODO: decide whether this is needed
-    public List<String> getBranchNames() throws GitException {
+    List<String> getBranchNames() throws GitException {
         List<Ref> localBranches;
         try {
             localBranches = this.git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
@@ -43,7 +43,7 @@ public class GitStatus {
     }
 
     // renaming these two methods to Untracked
-    public boolean hasUntrackedFiles() throws GitException {
+    boolean hasUntrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -53,7 +53,7 @@ public class GitStatus {
         return status.getUntracked().isEmpty();
     }
 
-    public Set<String> getUntrackedFiles() throws GitException {
+    Set<String> getUntrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -65,7 +65,7 @@ public class GitStatus {
 
     // tracked files just means those files that are staged
 
-    public boolean hasTrackedFiles() throws GitException {
+    boolean hasTrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -75,7 +75,7 @@ public class GitStatus {
         return status.getAdded().isEmpty();
     }
 
-    public Set<String> getTrackedFiles() throws GitException {
+    Set<String> getTrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -87,7 +87,7 @@ public class GitStatus {
 
     // TODO: wouldn't it be sufficient to check whether the latest commit on the local branch
     //  is present on the remote or not?
-    public boolean hasUnpushedCommits() throws IOException {
+    boolean hasUnpushedCommits() throws IOException {
         boolean hasUnpushedCommits = false;
 
         Repository repo = git.getRepository(); // we need the name of the branch we are on, on which we even check if commits are unpushed

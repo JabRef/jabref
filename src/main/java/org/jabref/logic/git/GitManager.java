@@ -3,6 +3,7 @@ package org.jabref.logic.git;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -21,6 +22,24 @@ public class GitManager {
         this.git = git;
         this.gitActionExecutor = new GitActionExecutor(this.git);
         this.gitStatus = new GitStatus(this.git);
+    }
+
+    /**
+     * TODO
+     *  commits given bibFile -> pull -> push
+     *  it must make sure that the state of the repository is not affected
+     *  and no side effects like pushing other changes are performed
+     */
+    public void synchronize(Path filePath) throws GitException {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * TODO
+     *  pulls changes handling possible problems
+     */
+    public void update() throws GitException {
+        throw new NotImplementedException();
     }
 
     /**
@@ -61,11 +80,11 @@ public class GitManager {
         }
     }
 
-    public GitActionExecutor getGitActionExecutor() {
+    GitActionExecutor getGitActionExecutor() {
         return this.gitActionExecutor;
     }
 
-    public Path getPath() {
+    Path getPath() {
         return path;
     }
 }
