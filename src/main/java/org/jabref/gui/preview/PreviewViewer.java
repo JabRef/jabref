@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.Objects;
-import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -33,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -74,26 +74,33 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private final BibDatabaseContext database;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
 
-    private Optional<BibEntry> entry = Optional.empty();
+    // Used for resolving strings and pdf directories for links.
+    private @Nullable BibDatabaseContext databaseContext;
+
+    private @Nullable BibEntry entry;
+
     private PreviewLayout layout;
+
     private String layoutText;
 
-    /**
-     * @param database Used for resolving strings and pdf directories for links.
-     */
-    public PreviewViewer(BibDatabaseContext database,
-                         DialogService dialogService,
+    public PreviewViewer(DialogService dialogService,
+                         GuiPreferences preferences,
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
+        this(dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
+    }
+
+    public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
+
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((queryObservable, queryOldValue, queryNewValue) -> highlightLayoutText());
 
@@ -135,14 +142,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         themeManager.installCss(previewView.getEngine());
     }
 
-    public PreviewViewer(BibDatabaseContext database,
-                         DialogService dialogService,
-                         GuiPreferences preferences,
-                         ThemeManager themeManager,
-                         TaskExecutor taskExecutor) {
-        this(database, dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
-    }
-
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
         if (newLayout == null || newLayout.equals(layout)) {
@@ -152,29 +151,43 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         update();
     }
 
-    public void setEntry(BibEntry newEntry) {
-        if (newEntry.equals(entry.orElse(null))) {
+    public void setEntry(@Nullable BibEntry newEntry) {
+        if (Objects.equals(entry, newEntry)) {
             return;
         }
 
         // Remove update listener for old entry
-        entry.ifPresent(oldEntry -> {
-            for (Observable observable : oldEntry.getObservables()) {
+        if (entry != null) {
+            for (Observable observable : entry.getObservables()) {
                 observable.removeListener(this);
             }
-        });
+        }
 
-        entry = Optional.of(newEntry);
+        entry = newEntry;
 
-        // Register for changes
-        for (Observable observable : newEntry.getObservables()) {
-            observable.addListener(this);
+        if (entry != null) {
+            // Register for changes
+            for (Observable observable : newEntry.getObservables()) {
+                observable.addListener(this);
+            }
         }
         update();
     }
 
+    public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
+        if (Objects.equals(databaseContext, newDatabaseContext)) {
+            return;
+        }
+
+        setEntry(null);
+
+        databaseContext = newDatabaseContext;
+        update();
+    }
+
     private void update() {
-        if (entry.isEmpty() || (layout == null)) {
+        if (databaseContext == null || entry == null || layout == null) {
+            LOGGER.debug("databaseContext null {}, entry null {}, or layout null {}", databaseContext == null, entry == null, layout == null);
             // Make sure that the preview panel is not completely white, especially with dark theme on
             setPreviewText("");
             return;
@@ -182,9 +195,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
-        final BibEntry theEntry = entry.get();
+        final BibEntry theEntry = entry;
         BackgroundTask
-                .wrap(() -> layout.generatePreview(theEntry, database))
+                .wrap(() -> layout.generatePreview(theEntry, databaseContext))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);
@@ -228,13 +241,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
         boolean proceed = dialogService.showPrintDialog(job);
-        if (!proceed) {
+        if (!proceed && entry != null) {
             return;
         }
 
         BackgroundTask
                 .wrap(() -> {
-                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCitationKey).orElse("NO ENTRY"));
+                    job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
                     previewView.getEngine().print(job);
                     job.endJob();
                 })

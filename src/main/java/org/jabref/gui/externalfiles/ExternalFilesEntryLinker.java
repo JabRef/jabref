@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -27,13 +29,16 @@ public class ExternalFilesEntryLinker {
 
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
-    private final BibDatabaseContext bibDatabaseContext;
     private final NotificationService notificationService;
+    private final Supplier<BibDatabaseContext> bibDatabaseContextSupplier;
 
-    public ExternalFilesEntryLinker(ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, NotificationService notificationService) {
+    /**
+     * @param stateManager required for currently active BibDatabaseContext
+     */
+    public ExternalFilesEntryLinker(ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, NotificationService notificationService, StateManager stateManager) {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
-        this.bibDatabaseContext = bibDatabaseContext;
+        this.bibDatabaseContextSupplier = () -> stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         this.notificationService = notificationService;
     }
 
@@ -43,7 +48,7 @@ public class ExternalFilesEntryLinker {
             String typeName = FileUtil.getFileExtension(file)
                                       .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
                                       .orElse("");
-            Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
+            Path relativePath = FileUtil.relativize(file, bibDatabaseContextSupplier.get(), filePreferences);
             LinkedFile linkedFile = new LinkedFile("", relativePath, typeName);
 
             String link = linkedFile.getLink();
@@ -75,7 +80,7 @@ public class ExternalFilesEntryLinker {
                                       .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
                                       .orElse("");
             LinkedFile linkedFile = new LinkedFile("", file, typeName);
-            LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContext, filePreferences);
+            LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContextSupplier.get(), filePreferences);
             try {
                 linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
             } catch (IOException exception) {

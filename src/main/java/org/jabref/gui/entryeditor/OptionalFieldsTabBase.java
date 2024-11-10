@@ -8,24 +8,20 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.query.SearchQuery;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
@@ -38,25 +34,19 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  UndoManager undoManager,
                                  UndoAction undoAction,
                                  RedoAction redoAction,
-                                 DialogService dialogService,
                                  GuiPreferences preferences,
-                                 ThemeManager themeManager,
                                  BibEntryTypesManager entryTypesManager,
-                                 TaskExecutor taskExecutor,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
-                                 OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                                 PreviewPanel previewPanel) {
         super(true,
                 databaseContext,
                 suggestionProviders,
                 undoManager,
                 undoAction,
                 redoAction,
-                dialogService,
                 preferences,
-                themeManager,
-                taskExecutor,
                 journalAbbreviationRepository,
-                searchQueryProperty);
+                previewPanel);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);
