@@ -1,5 +1,7 @@
 package org.jabref.gui.frame;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
@@ -146,7 +149,26 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
-            return;
+            if (tabContainer.getLibraryTabs().isEmpty()) {
+                Optional<Path> firstBibFile = firstBibFile();
+                if (firstBibFile.isPresent()) {
+                    ParserResult parserResult;
+                    try {
+                        parserResult = OpenDatabase.loadDatabase(
+                                firstBibFile.get(),
+                                preferences.getImportFormatPreferences(),
+                                fileUpdateMonitor);
+                    } catch (IOException e) {
+                        LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
+                        return;
+                    }
+                    uiCommands = List.of(new UiCommand.OpenDatabases(new ArrayList<>(List.of(parserResult))));
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
 
         // Handle blank workspace
@@ -180,6 +202,29 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                   });
     }
 
+    private Optional<Path> firstBibFile() {
+        Path currentDir = Path.of("").toAbsolutePath();
+
+        while (currentDir != null) {
+            try {
+                Optional<Path> bibFile = Files.list(currentDir)
+                                              .filter(path -> path.toString().endsWith(".bib"))
+                                              .findFirst();
+                if (bibFile.isPresent()) {
+                    return bibFile;
+                }
+                currentDir = currentDir.getParent();
+            } catch (IOException e) {
+                LOGGER.error("Could not crawl for first bib file {}", currentDir, e);
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    /// Opens the libraries given in `parserResults`. This list needs to be modifiable, because invalidDatabases are removed.
+    ///
+    /// @param parserResults A modifiable list of parser results
     private void openDatabases(List<ParserResult> parserResults) {
         final List<ParserResult> toOpenTab = new ArrayList<>();
 
