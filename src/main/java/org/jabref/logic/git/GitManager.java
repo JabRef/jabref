@@ -3,7 +3,6 @@ package org.jabref.logic.git;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public class GitManager {
      *  and no side effects like pushing other changes are performed
      */
     public void synchronize(Path filePath) throws GitException {
-        throw new NotImplementedException();
+        throw new GitException("NotImplemented");
     }
 
     /**
@@ -39,7 +38,7 @@ public class GitManager {
      *  pulls changes handling possible problems
      */
     public void update() throws GitException {
-        throw new NotImplementedException();
+        throw new GitException("NotImplemented");
     }
 
     /**

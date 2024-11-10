@@ -46,7 +46,7 @@ class GitActionExecutorTest {
     }
 
     @Test
-    void testAdd_addOneFile() throws IOException, GitAPIException, GitException {
+    void addAddOneFile() throws IOException, GitAPIException, GitException {
         Status status0 = gitActionExecutor.getGit().status().call();
 
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
@@ -62,11 +62,11 @@ class GitActionExecutorTest {
         assertTrue(status.getAdded().contains(fileName));
 
         boolean isDeleted = pathToTempFile.toFile().delete();
-        LOGGER.info("Temp file for test 1: " + isDeleted);
+        LOGGER.info("Temp file for test 1: {}", isDeleted);
     }
 
     @Test
-    void testAdd_addMultipleFiles() throws IOException, GitAPIException, GitException {
+    void addAddMultipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
         for (int i = 0; i < numberOfFiles; i++) {
@@ -89,7 +89,7 @@ class GitActionExecutorTest {
 
     // don't really understand append completely, testing with false
     @Test
-    void testCommit_singleFile() throws IOException, GitAPIException, GitException {
+    void commitSingleFile() throws IOException, GitAPIException, GitException {
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
         gitActionExecutor.add(pathToTempFile);
 
@@ -110,7 +110,7 @@ class GitActionExecutorTest {
     }
 
     @Test
-    void testCommit_multipleFiles() throws IOException, GitAPIException, GitException {
+    void commitMultipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
         for (int i = 0; i < numberOfFiles; i++) {
@@ -141,7 +141,7 @@ class GitActionExecutorTest {
     // following amer;s test idea: create two directories, remote and local. add, commit to local, push to remote
     // verify
     @Test
-    void testPush_withoutSpecifyingMainAndBranch() throws IOException, GitAPIException {
+    void pushWithoutSpecifyingMainAndBranch() throws IOException, GitAPIException {
         Path remoteRepoPath = Files.createTempDirectory("remote-repo");
         try (Repository remoteRepo = FileRepositoryBuilder.create(new File(remoteRepoPath.toFile(), ".git"))) {
             remoteRepo.create();
@@ -177,10 +177,10 @@ class GitActionExecutorTest {
 
                 String latestCommitMessageAccessedFromRemote = "";
                 for (RevCommit commit : commits) {
-                    LOGGER.info("Commit: " + commit.getName());
-                    LOGGER.info("Author: " + commit.getAuthorIdent().getName());
-                    LOGGER.info("Date: " + commit.getAuthorIdent().getWhen());
-                    LOGGER.info("Message: " + commit.getFullMessage());
+                    LOGGER.info("Commit: {}", commit.getName());
+                    LOGGER.info("Author: {}", commit.getAuthorIdent().getName());
+                    LOGGER.info("Date: {}", commit.getAuthorIdent().getWhen());
+                    LOGGER.info("Message: {}", commit.getFullMessage());
                     latestCommitMessageAccessedFromRemote = commit.getFullMessage();
 
                     LOGGER.info("-----------------------------------");

@@ -109,7 +109,7 @@ class GitStatus {
 
             // invariant: if walk == empty, then upto date, else we have unpushed commits
             for (RevCommit commit : walk) {
-                LOGGER.debug("Unpushed commit: " + commit.getFullMessage());
+                LOGGER.debug("Unpushed commit: {}", commit.getFullMessage());
                 hasUnpushedCommits = true;
             }
 

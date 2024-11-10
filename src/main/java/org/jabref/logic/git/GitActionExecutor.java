@@ -27,7 +27,7 @@ class GitActionExecutor {
         try {
             Path relativePath = repository.relativize(path);
             git.add().addFilepattern(relativePath.toString()).call();
-            LOGGER.debug("File added to staging: " + path);
+            LOGGER.debug("File added to staging: {}", path);
         } catch (GitAPIException e) {
             throw new GitException("Failed to add file " + path + " to staging area", e);
         }
@@ -42,7 +42,7 @@ class GitActionExecutor {
     void commit(String message, boolean append) throws GitException {
         try {
             git.commit().setMessage(message).setAmend(append).call();
-            LOGGER.debug("Commit successful with message: " + message);
+            LOGGER.debug("Commit successful with message: {}", message);
         } catch (GitAPIException e) {
             throw new GitException("Commit failed", e);
         }
@@ -51,7 +51,7 @@ class GitActionExecutor {
     void push(String remote, String branch) throws GitException {
         try {
             git.push().setRemote(remote).add(branch).call();
-            LOGGER.debug("Pushed to remote: " + remote + ", branch: " + branch);
+            LOGGER.debug("Pushed to remote: {}, branch: {}", remote, branch);
         } catch (GitAPIException e) {
             throw new GitException("Push failed", e);
         }
@@ -74,7 +74,7 @@ class GitActionExecutor {
                .setRemote(remote)
                .setRemoteBranchName(branch)
                .call();
-            LOGGER.debug("Pulled from remote: " + remote + ", branch: " + branch);
+            LOGGER.debug("Pulled from remote: {}, branch: {}", remote, branch);
         } catch (GitAPIException e) {
             throw new GitException("Pull failed", e);
         }

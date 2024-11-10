@@ -24,7 +24,7 @@ class GitManagerTest {
     }
 
     @Test
-    void testInitGitRepository_createsNewRepositoryWhenNoneExists() throws GitException {
+    void initGitRepositoryCreatesNewRepositoryWhenNoneExists() throws GitException {
         assertFalse(GitManager.isGitRepository(tempPath));
         GitException exception = assertThrows(GitException.class, () -> GitManager.openGitRepository(this.tempPath));
         assertEquals(tempPath.getFileName() + " is not a git repository.", exception.getMessage());
@@ -33,7 +33,7 @@ class GitManagerTest {
     }
 
     @Test
-    void testInitGitRepository_opensExistingRepository() throws GitAPIException {
+    void initGitRepositoryOpensExistingRepository() throws GitAPIException {
         // manually create Git repository
         try (Git git = Git.init().setDirectory(tempPath.toFile()).call()) {
             GitException exception = assertThrows(GitException.class, () -> GitManager.initGitRepository(tempPath));
