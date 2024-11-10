@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 class GitActionExecutorTest {
 
     private Path repositoryPath;
@@ -38,7 +37,6 @@ class GitActionExecutorTest {
     private GitActionExecutor gitActionExecutor;
 
     private final Logger LOGGER = LoggerFactory.getLogger(GitActionExecutorTest.class);
-
 
     @BeforeEach
     void setUp(@TempDir Path temporaryRepository) throws GitException {
@@ -71,7 +69,7 @@ class GitActionExecutorTest {
     void testAdd_addMultipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
-        for(int i = 0; i < numberOfFiles; i++){
+        for (int i = 0; i < numberOfFiles; i++) {
             listOfPaths.add(Files.createTempFile(repositoryPath, "tmpNumber_" + i + "_", null));
         }
         gitActionExecutor.add(listOfPaths);
@@ -79,15 +77,14 @@ class GitActionExecutorTest {
         Status status = gitActionExecutor.getGit().status().call();
         Set<String> addedFiles = status.getAdded();
 
-        for(Path p : listOfPaths){
+        for (Path p : listOfPaths) {
             String f = p.getFileName().toString();
             assertTrue(addedFiles.contains(f));
         }
 
-        for(Path p : listOfPaths){
+        for (Path p : listOfPaths) {
             p.toFile().delete();
         }
-
     }
 
     // don't really understand append completely, testing with false
@@ -116,7 +113,7 @@ class GitActionExecutorTest {
     void testCommit_multipleFiles() throws IOException, GitAPIException, GitException {
         List<Path> listOfPaths = new ArrayList<>();
         int numberOfFiles = 10;
-        for(int i = 0; i < numberOfFiles; i++){
+        for (int i = 0; i < numberOfFiles; i++) {
             listOfPaths.add(Files.createTempFile(repositoryPath, "tmpNumber_" + i + "_", null));
         }
         gitActionExecutor.add(listOfPaths);
@@ -130,7 +127,7 @@ class GitActionExecutorTest {
         // same as above, stage should not contain commited files
         Set<String> addedFiles = statusAfterCommit.getAdded();
 
-        for(Path p : listOfPaths){
+        for (Path p : listOfPaths) {
             String f = p.getFileName().toString();
             assertFalse(addedFiles.contains(f));
         }
@@ -150,7 +147,7 @@ class GitActionExecutorTest {
             remoteRepo.create();
 
             URI remoteRepoURI = remoteRepoPath.toUri();
-            URIish remoteRepoURIish =  new URIish(remoteRepoURI.toString());
+            URIish remoteRepoURIish = new URIish(remoteRepoURI.toString());
             gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
 
             List<Path> listOfPaths = new ArrayList<>();
@@ -175,7 +172,6 @@ class GitActionExecutorTest {
 
                 assertTrue(commitExists);
 
-
                 Iterable<RevCommit> commits = remoteGit.log().all().call();
                 LOGGER.info("-----------------------------------");
 
@@ -192,22 +188,9 @@ class GitActionExecutorTest {
 
                 assertEquals(commitMessage, latestCommitMessageAccessedFromRemote);
             }
-
-
-        } catch (
-                URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (
-                GitException e) {
+        } catch (URISyntaxException | GitException e) {
             throw new RuntimeException(e);
         }
     }
-
-    @Test
-    void testPull(){
-
-
-    }
-
 }
 
