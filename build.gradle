@@ -150,7 +150,7 @@ javafx {
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.13.202411081104"
 }
 
 dependencies {
