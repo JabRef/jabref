@@ -241,7 +241,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.63.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.64.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
