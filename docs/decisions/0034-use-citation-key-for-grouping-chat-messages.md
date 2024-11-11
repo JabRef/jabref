@@ -67,3 +67,5 @@ This approach cannot be used here, because there is no server running which we c
 ## More Information
 
 Refer to [issue #160](https://github.com/JabRef/jabref/issues/160) in JabRef main repository
+
+[ADR-038](0038-use-entryId-for-bibentries.md) takes another option, because it re-generates the index at each start of JabRef.
