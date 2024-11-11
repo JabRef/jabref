@@ -1590,9 +1590,8 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-and-groups:odd {
     -fx-background-color: -jr-match-1-odd;
 }
-.main-table .table-row-cell:matching-search-and-groups:odd:selected,
-.main-table .table-row-cell:matching-search-and-groups:odd:focused,
-.main-table .table-row-cell:matching-search-and-groups:odd:focused:hover,
+.main-table .table-row-cell:matching-search-and-groups:selected,
+.main-table .table-row-cell:matching-search-and-groups:focused,
 .main-table .table-row-cell:matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
@@ -1627,10 +1626,10 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-not-groups:odd {
     -fx-background-color: -jr-match-2-odd;
 }
-.main-table .table-row-cell:matching-search-not-groups:odd:selected,
-.main-table .table-row-cell:matching-search-not-groups:odd:focused,
-.main-table .table-row-cell:matching-search-not-groups:odd:focused:hover,
-.main-table .table-row-cell:matching-search-not-groups:focused:hover {
+.main-table .table-row-cell:matching-search-not-groups:selected,
+.main-table .table-row-cell:matching-search-not-groups:focused,
+.main-table .table-row-cell:matching-search-not-groups:focused:hover,
+.main-table .table-row-cell:matching-search-not-groups:hover {
     -fx-background-color: -jr-selected;
 }
 .main-table .table-row-cell:matching-search-not-groups:hover {
@@ -1664,10 +1663,10 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-groups-not-search:odd {
     -fx-background-color: -jr-match-3-odd;
 }
-.main-table .table-row-cell:matching-groups-not-search:odd:selected,
-.main-table .table-row-cell:matching-groups-not-search:odd:focused,
-.main-table .table-row-cell:matching-groups-not-search:odd:focused:hover,
-.main-table .table-row-cell:matching-groups-not-search:focused:hover {
+.main-table .table-row-cell:matching-groups-not-search:selected,
+.main-table .table-row-cell:matching-groups-not-search:focused,
+.main-table .table-row-cell:matching-groups-not-search:focused:hover,
+.main-table .table-row-cell:matching-groups-not-search:hover {
     -fx-background-color: -jr-selected;
 }
 .main-table .table-row-cell:matching-groups-not-search:hover {
@@ -1701,9 +1700,8 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:not-matching-search-and-groups:odd {
     -fx-background-color: -jr-match-4-odd;
 }
-.main-table .table-row-cell:not-matching-search-and-groups:odd:selected,
-.main-table .table-row-cell:not-matching-search-and-groups:odd:focused,
-.main-table .table-row-cell:not-matching-search-and-groups:odd:focused:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:selected,
+.main-table .table-row-cell:not-matching-search-and-groups:focused,
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
