@@ -269,7 +269,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
             AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
             String oldGroupName = oldGroupDef.getName(); // Zachytenie starého názvu pred otvorením dialógu
 
-
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
                     new RenameGroupView(database,
                             oldGroup.getGroupNode().getGroup())
@@ -279,27 +278,20 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 String newGroupName = group.getName();
 
-
-                //check if it´s empty new string
                 if (newGroupName.trim().isEmpty()) {
-                    dialogService.notify(Localization.lang("The new group name cannot be empty or consist only of spaces."));
                     return;
                 }
 
                 // check if is not include ","
                 if (newGroupName.contains(",")) {
-                    dialogService.notify(Localization.lang("The new group name cannot contain commas."));
                     return;
                 }
 
                 // chceck if old group name dont equels with new group name
                 if (oldGroupName.equals(newGroupName)) {
-                    dialogService.notify(Localization.lang("The new group name is the same as the old one. No changes made."));
                     return;
                 }
 
-
-                // check if other groups name are not same
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                 if (databaseRootGroup.isPresent()) {
@@ -309,7 +301,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // then change name
                 if (groupsWithSameName < 2) {
                     oldGroup.getGroupNode().setGroup(group, true, true, database.getEntries());
-                    dialogService.notify(Localization.lang("Renamed group from \"%0\" to \"%1\".", oldGroupName, newGroupName));
                     writeGroupChangesToMetaData();
                     refresh();
                 }
@@ -322,6 +313,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
 
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(

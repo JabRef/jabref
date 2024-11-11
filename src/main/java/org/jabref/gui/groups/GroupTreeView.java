@@ -10,11 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -673,6 +668,7 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupNoSubgroups(group);
                 case GROUP_RENAME -> {
                     viewModel.renameGroup(group);
+                    groupTree.refresh();
                 }
                 case GROUP_REMOVE_KEEP_SUBGROUPS ->
                         viewModel.removeGroupKeepSubgroups(group);

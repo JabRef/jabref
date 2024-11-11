@@ -1,17 +1,21 @@
 package org.jabref.gui.groups;
 
-import jakarta.inject.Inject;
+import java.util.Optional;
+
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.groups.*;
-import org.jspecify.annotations.Nullable;
+import org.jabref.model.groups.AbstractGroup;
 
-import java.util.Optional;
+import jakarta.inject.Inject;
+import org.jspecify.annotations.Nullable;
 
 public class RenameGroupView extends BaseDialog<AbstractGroup> {
 
@@ -68,8 +72,7 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
             String newGroupName = nameField.getText().trim();
 
             if (editedGroup != null) {
-                //set new input
-                editedGroup.nameProperty().set(newGroupName);
+                editedGroup.nameProperty().setValue(newGroupName);
                 return Optional.of(editedGroup);
             }
 
