@@ -80,7 +80,7 @@ public class MainTableColumnFactory {
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -120,12 +120,12 @@ public class MainTableColumnFactory {
                     }
                 }
                 break;
-            default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
+            default:
         }
         return returnColumn;
     }
