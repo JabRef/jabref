@@ -27,11 +27,9 @@ import org.jabref.logic.util.NotificationService;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
 
-
 /**
  * This interface provides methods to create dialogs and show them to the user.
  */
-@SuppressWarnings("checkstyle:EmptyLineSeparator")
 public interface DialogService extends NotificationService {
 
     /**
