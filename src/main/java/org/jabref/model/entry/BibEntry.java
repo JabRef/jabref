@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,7 +94,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 @AllowedToUseLogic("because it needs access to parser and writers")
-public class BibEntry implements Cloneable {
+public class BibEntry implements Cloneable, Serializable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
@@ -992,6 +993,11 @@ public class BibEntry implements Cloneable {
     public BibEntry withMonth(Month parsedMonth) {
         setMonth(parsedMonth);
         this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withType(EntryType type) {
+        this.setType(type);
         return this;
     }
 
