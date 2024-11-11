@@ -81,6 +81,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private PreviewLayout layout;
     private String layoutText;
 
+    private String bookCover;   // TODO DAMIAN - consider making this Optional?
+
     /**
      * @param database Used for resolving strings and pdf directories for links.
      */
@@ -183,6 +185,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
         final BibEntry theEntry = entry.get();
+        bookCover = theEntry.getPathToCoverImage();
         BackgroundTask
                 .wrap(() -> layout.generatePreview(theEntry, database))
                 .onSuccess(this::setPreviewText)
@@ -205,10 +208,17 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         layoutText = """
                 <html>
                     <body id="previewBody">
-                        <div id="content"> %s </div>
+                        <div style="display: flex;">
+                            <div id="content" style="flex: 1;">
+                                %s
+                            </div>
+                            <div id="bookCover" style="flex: 1;">
+                                <img src=%s style="width: 15vw; height: auto;">
+                            </div>
+                        </div>
                     </body>
                 </html>
-                """.formatted(text);
+                """.formatted(text, bookCover);
         highlightLayoutText();
         this.setHvalue(0);
     }
