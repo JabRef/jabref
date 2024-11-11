@@ -81,7 +81,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private PreviewLayout layout;
     private String layoutText;
 
-    private String bookCover;   // TODO DAMIAN - consider making this Optional?
+    private String bookCover;
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
