@@ -775,6 +775,22 @@ public class BibEntry implements Cloneable {
         return getField(StandardField.ISBN).flatMap(ISBN::parse);
     }
 
+    public String getPathToCoverImage() {
+        String path = "";
+
+        for (LinkedFile file : getFiles()) {
+            if (file.isImage()) {
+                path = "file:///" + file.getLink();
+                if (file.getDescription().equalsIgnoreCase("cover")) {
+                    path = "file:///" + file.getLink();
+                    break;
+                }
+            }
+        }
+
+        return path;
+    }
+
     /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
