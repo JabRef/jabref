@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,13 +29,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -55,10 +49,6 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.io.ByteOrderMark;
-import org.apache.commons.io.input.BOMInputStream;
-
-import org.w3c.dom.Element;
 
 public class CitaviXmlImporter extends Importer implements Parser {
 
@@ -76,6 +66,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private List<String> refIdWithPublishers = new ArrayList<>();
 
     private XMLStreamReader mapper = null;
+    private List<BibEntry> bibItems = new ArrayList<>();
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
@@ -129,7 +120,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            List<BibEntry> bibEntry = new ArrayList();
             mapper = mapperRoot(reader);
 
             while (mapper.hasNext()) {
@@ -137,89 +127,92 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 if (mapper.getEventType() == XMLStreamConstants.START_ELEMENT) {
                     String elementName = mapper.getName().getLocalPart();
                     if ("Person".equals(elementName)) {
-//                         this.refIdWithAuthors.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithAuthors.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("Periodical".equals(elementName)) {
-//                         this.refIdWithEditors.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithEditors.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("Library".equals(elementName)) {
-//                         this.refIdWithPublishers.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithPublishers.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("Keyword".equals(elementName)) {
-//                         this.refIdWithKeywords.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithKeywords.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("UniqueFullName".equals(elementName)) {
-//                         this.refIdWithAuthors.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithAuthors.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("Editor".equals(elementName)) {
-//                         this.refIdWithEditors.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithEditors.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                     else if ("Publisher".equals(elementName)) {
-//                         this.refIdWithPublishers.add(mapper.getAttributeValue(null, "id"));
-                        bibEntry.addAll(parseElements(mapper, elementName));
+                        this.refIdWithPublishers.add(mapper.getAttributeValue(null, "id"));
+                        parseElements(mapper, elementName);
                     }
                 }
             }
 
-            return new ParserResult(bibEntry);
+            return new ParserResult(bibItems);
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
     }
 
-    private List<BibEntry> parseElements(XMLStreamReader reader, String startElement) {
+    private void parseElements(XMLStreamReader reader, String startElement) {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        List<BibEntry> bibItems = new ArrayList();
         Map<Field, String> fields = new HashMap<>();
+        String elementName = "";
+        String endElement = startElement;
 
         try{
             while (reader.hasNext()) {
                 reader.next();
-                if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && reader.getName().getLocalPart().equals(startElement)) {
+                if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && reader.getName().getLocalPart().equals(endElement)) {
                     break;
                 }
-
-                if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                else if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
                     if (reader.getEventType() == XMLStreamConstants.CHARACTERS) {
-                        String elementName = reader.getName().getLocalPart();
+                        elementName = reader.getName().getLocalPart();
                         if ("Title".equals(elementName)) {
-                            fields.put(StandardField.TITLE, reader.getElementText());
+                            fields.put(StandardField.TITLE, reader.getText());
                         } else if ("Name".equals(elementName)) {
-                            fields.put(StandardField.TITLE, reader.getElementText());
+                            fields.put(StandardField.TITLE, reader.getText());
                         } else if ("LastName".equals(elementName)) {
-                            fields.put(StandardField.AUTHOR, reader.getElementText());
+                            fields.put(StandardField.AUTHOR, reader.getText());
                         } else if ("FirstName".equals(elementName)) {
-                            fields.put(StandardField.AUTHOR, reader.getElementText());
+                            fields.put(StandardField.AUTHOR, reader.getText());
                         } else if ("MiddleName".equals(elementName)) {
-                            fields.put(StandardField.AUTHOR, reader.getElementText());
+                            fields.put(StandardField.AUTHOR, reader.getText());
                         } else if ("Year".equals(elementName)) {
-                            fields.put(StandardField.YEAR, reader.getElementText());
+                            fields.put(StandardField.YEAR, reader.getText());
                         } else if ("Volume".equals(elementName)) {
-                            fields.put(StandardField.VOLUME, reader.getElementText());
+                            fields.put(StandardField.VOLUME, reader.getText());
                         } else if ("ISBN".equals(elementName)) {
-                            fields.put(StandardField.ISBN, reader.getElementText());
+                            fields.put(StandardField.ISBN, reader.getText());
                         } else if ("Abstract".equals(elementName)) {
-                            fields.put(StandardField.ABSTRACT, reader.getElementText());
+                            fields.put(StandardField.ABSTRACT, reader.getText());
                         } else if ("DOI".equals(elementName)) {
-                            fields.put(StandardField.DOI, reader.getElementText());
+                            fields.put(StandardField.DOI, reader.getText());
                         } else if ("KnowledgeItem".equals(elementName)) {
-                            fields.put(StandardField.COMMENT, reader.getElementText());
+                            fields.put(StandardField.COMMENT, reader.getText());
                         } else if ("SeriesTitle".equals(elementName)) {
-                            fields.put(new UnknownField("references"), reader.getElementText());
+                            fields.put(new UnknownField("references"), reader.getText());
                         } else if ("Reference".equals(elementName)) {
-                            fields.put(new UnknownField("references"), reader.getElementText());
+                            fields.put(new UnknownField("references"), reader.getText());
                         } else if ("OneToN".equals(elementName)) {
-                            fields.put(new UnknownField("references"), reader.getElementText());
+                            fields.put(new UnknownField("references"), reader.getText());
                         } else if ("PageRangeNumber".equals(elementName)) {
-                            fields.put(StandardField.PAGES, reader.getElementText());
+                            fields.put(StandardField.PAGES, reader.getText());
                         }
+                    }
+                    if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && reader.getName().getLocalPart().equals(elementName)) {
+                        reader.next();
                     }
                 }
             }
@@ -229,8 +222,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
         entry.setField(fields);
         bibItems.add(entry);
-
-        return bibItems;
     }
 
     private EntryType getType(XMLStreamReader reader, String startElement) {
