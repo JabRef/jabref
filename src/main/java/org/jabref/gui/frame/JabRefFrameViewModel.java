@@ -203,7 +203,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                     LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
                     return;
                 }
-                openDatabases(List.of(parserResult));
+                List<ParserResult> librariesToOpen = new ArrayList<>(1);
+                librariesToOpen.add(parserResult);
+                openDatabases(librariesToOpen);
             }
         }
     }
