@@ -107,7 +107,7 @@ public class AiDefaultPreferences {
                 Mention any significant experiments, data, or discussions presented in the paper.
 
                 DOCUMENT:
-                $document
+                $text
 
                 OVERVIEW:""",
 
@@ -116,7 +116,7 @@ public class AiDefaultPreferences {
                 of the paper. Now your task is to combine all of the notes in one structured message.
 
                 SUMMARIES:
-                $summaries
+                $chunks
 
                 FINAL OVERVIEW:"""
     );
