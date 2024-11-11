@@ -102,7 +102,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
@@ -159,8 +158,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
         // handle validation before closing dialog and calling resultConverter
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
-
-
     }
 
     private @Nullable AbstractGroup parentGroup() {

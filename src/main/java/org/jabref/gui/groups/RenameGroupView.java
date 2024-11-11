@@ -10,7 +10,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 
@@ -39,7 +38,7 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         setHeight(150);
 
         // set Title name
-        setTitle(Localization.lang("Rename group"));
+        setTitle("Rename group");
 
         // add OK and Cancel buttons
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
