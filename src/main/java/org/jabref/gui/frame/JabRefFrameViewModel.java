@@ -214,8 +214,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
     ///
     /// Paths:
-    ///   - `...\{example-dir}\JabRef\JabRef.exe`
-    ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat`
+    ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
+    ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
+    ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)
     ///
     /// In the example, `...\{example-dir}\example.bib` should be found.
     ///
@@ -224,8 +225,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // We check JabRef.bat dir, JabRef.exe dir and the dir above JabRef.exe
         // We do NOT check "runtime" subdir (nested below JabRef.exe)
         List<Path> dirsToCheck = List.of(
-                Path.of(""),    // `JabRef.exe` and `JabRef.bat` directory
-                Path.of("../"), // directory above `JabRef.exe` directory
+                Path.of(""),           // `JabRef.exe` and `JabRef.bat` directory
+                Path.of("../"),        // directory above `JabRef.exe` directory
+                Path.of("../../"),     // directory above `bin/JabRef` directory
                 Path.of("../../../")); // directory above `runtime\bin\JabRef.bat`
 
         // We want to check dirsToCheck only, not all subdirs (due to unnecessary disk i/o)
