@@ -238,7 +238,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                               .filter(path -> FileUtil.getFileExtension(path).equals(Optional.of("bib")))
                               .findFirst();
         } catch (UncheckedIOException ex) {
-            LOGGER.error("Could not check for existing bib file {}", dirsToCheck, ex);
+            // Could be access denied exception - when this is started from the application directory
+            // Therefore log level "debug"
+            LOGGER.debug("Could not check for existing bib file {}", dirsToCheck, ex);
             return Optional.empty();
         }
     }
