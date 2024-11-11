@@ -1,4 +1,5 @@
 .root {
+    /* Note that counting for odd/even starts at 0, thus the first displayed row is even */
     -jr-row-odd-background: -fx-control-inner-background-alt;
     -jr-row-even-background: -fx-control-inner-background;
     /*
@@ -1595,7 +1596,7 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
-.main-table .table-row-cell:matching-search-and-groups:odd:hover {
+.main-table .table-row-cell:matching-search-and-groups:hover {
     -fx-background-color: -jr-hover;
 }
 
@@ -1632,7 +1633,7 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-search-not-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
-.main-table .table-row-cell:matching-search-not-groups:odd:hover {
+.main-table .table-row-cell:matching-search-not-groups:hover {
     -fx-background-color: -jr-hover;
 }
 
@@ -1669,7 +1670,7 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:matching-groups-not-search:focused:hover {
     -fx-background-color: -jr-selected;
 }
-.main-table .table-row-cell:matching-groups-not-search:odd:hover {
+.main-table .table-row-cell:matching-groups-not-search:hover {
     -fx-background-color: -jr-hover;
 }
 
@@ -1706,7 +1707,7 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
-.main-table .table-row-cell:not-matching-search-and-groups:odd:hover {
+.main-table .table-row-cell:not-matching-search-and-groups:hover {
     -fx-background-color: -jr-hover;
 }
 
