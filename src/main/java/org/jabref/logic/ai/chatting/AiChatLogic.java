@@ -171,7 +171,7 @@ public class AiChatLogic {
 
         chatMemory.messages().forEach(tempChatMemory::add);
 
-        tempChatMemory.add(new UserMessage(templatesService.makeChattingUserMessage(message.singleText(), excerpts)));
+        tempChatMemory.add(new UserMessage(templatesService.makeChattingUserMessage(entries, message.singleText(), excerpts)));
         chatMemory.add(message);
 
         AiMessage aiMessage = chatLanguageModel.generate(tempChatMemory.messages()).content();
