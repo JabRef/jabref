@@ -152,27 +152,11 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
-            if (tabContainer.getLibraryTabs().isEmpty()) {
-                Optional<Path> firstBibFile = firstBibFile();
-                if (firstBibFile.isPresent()) {
-                    ParserResult parserResult;
-                    try {
-                        parserResult = OpenDatabase.loadDatabase(
-                                firstBibFile.get(),
-                                preferences.getImportFormatPreferences(),
-                                fileUpdateMonitor);
-                    } catch (IOException e) {
-                        LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
-                        return;
-                    }
-                    uiCommands = List.of(new UiCommand.OpenDatabases(new ArrayList<>(List.of(parserResult))));
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
+            checkForBibInUpperDir();
+            return;
         }
+
+        assert !uiCommands.isEmpty();
 
         // Handle blank workspace
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
@@ -203,6 +187,25 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                       // tabs must be present and contents async loaded for an entry to be selected
                       waitForLoadingFinished(() -> jumpToEntry(entryKey));
                   });
+    }
+
+    private void checkForBibInUpperDir() {
+        if (tabContainer.getLibraryTabs().isEmpty()) {
+            Optional<Path> firstBibFile = firstBibFile();
+            if (firstBibFile.isPresent()) {
+                ParserResult parserResult;
+                try {
+                    parserResult = OpenDatabase.loadDatabase(
+                            firstBibFile.get(),
+                            preferences.getImportFormatPreferences(),
+                            fileUpdateMonitor);
+                } catch (IOException e) {
+                    LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
+                    return;
+                }
+                openDatabases(List.of(parserResult));
+            }
+        }
     }
 
     /// Use case: User starts `JabRef.bat` or `JabRef.exe`. JabRef should open a "close by" bib file.
