@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +40,8 @@ public class LinkedFile implements Serializable {
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
+
+    private static final List<String> IMAGE_EXTENSIONS = new ArrayList<>(List.of("jpeg", "jpg", "png", "gif"));
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -218,6 +221,10 @@ public class LinkedFile implements Serializable {
 
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
+    }
+
+    public boolean isImage() {
+        return IMAGE_EXTENSIONS.stream().anyMatch(getFileType().toLowerCase()::contains);
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
