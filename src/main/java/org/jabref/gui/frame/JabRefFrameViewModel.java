@@ -1,6 +1,7 @@
 package org.jabref.gui.frame;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -40,11 +41,13 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,24 +205,35 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                   });
     }
 
+    /// Use case: User starts `JabRef.bat` or `JabRef.exe`. JabRef should open a "close by" bib file.
+    /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
+    ///
+    /// Paths:
+    ///   - `...\{example-dir}\JabRef\JabRef.exe`
+    ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat`
+    ///
+    /// In the example, `...\{example-dir}\example.bib` should be found.
+    ///
+    /// We do NOT go up another level (i.e., everything in `...` is not found)
     private Optional<Path> firstBibFile() {
-        Path currentDir = Path.of("").toAbsolutePath();
+        // We check JabRef.bat dir, JabRef.exe dir and the dir above JabRef.exe
+        // We do NOT check "runtime" subdir (nested below JabRef.exe)
+        List<Path> dirsToCheck = List.of(
+                Path.of(""),    // `JabRef.exe` and `JabRef.bat` directory
+                Path.of("../"), // directory above `JabRef.exe` directory
+                Path.of("../../../")); // directory above `runtime\bin\JabRef.bat`
 
-        while (currentDir != null) {
-            try {
-                Optional<Path> bibFile = Files.list(currentDir)
-                                              .filter(path -> path.toString().endsWith(".bib"))
-                                              .findFirst();
-                if (bibFile.isPresent()) {
-                    return bibFile;
-                }
-                currentDir = currentDir.getParent();
-            } catch (IOException e) {
-                LOGGER.error("Could not crawl for first bib file {}", currentDir, e);
-                return Optional.empty();
-            }
+        // We want to check dirsToCheck only, not all subdirs (due to unnecessary disk i/o)
+        try {
+            return dirsToCheck.stream()
+                              .map(Path::toAbsolutePath)
+                              .flatMap(Unchecked.function(dir -> Files.list(dir)))
+                              .filter(path -> FileUtil.getFileExtension(path).equals(Optional.of("bib")))
+                              .findFirst();
+        } catch (UncheckedIOException ex) {
+            LOGGER.error("Could not check for existing bib file {}", dirsToCheck, ex);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     /// Opens the libraries given in `parserResults`. This list needs to be modifiable, because invalidDatabases are removed.
