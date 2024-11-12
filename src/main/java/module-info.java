@@ -177,6 +177,7 @@ open module org.jabref {
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
+    requires org.eclipse.jgit.ssh.apache;
 
     requires transitive org.jspecify;
 

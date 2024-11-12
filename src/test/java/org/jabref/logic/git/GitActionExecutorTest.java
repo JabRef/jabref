@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitActionExecutorTest {
@@ -191,6 +193,19 @@ class GitActionExecutorTest {
         } catch (URISyntaxException | GitException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void pushWithoutSettingOrigin(@TempDir Path tempPath) throws GitException, IOException {
+        GitManager gitManager = GitManager.initGitRepository(tempPath);
+        GitActionExecutor actionExecutor = gitManager.getGitActionExecutor();
+        Path tempFile = Files.createTempFile(tempPath, "test", null);
+        actionExecutor.add(tempFile);
+        actionExecutor.commit("test", false);
+        GitException exception = assertThrows(GitException.class, actionExecutor::push);
+        assertEquals("Push failed", exception.getMessage());
+        assertEquals(TransportException.class, exception.getCause().getClass());
+        assertEquals("origin: not found.", exception.getCause().getMessage());
     }
 }
 

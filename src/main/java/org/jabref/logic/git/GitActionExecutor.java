@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -50,7 +52,13 @@ class GitActionExecutor {
 
     void push(String remote, String branch) throws GitException {
         try {
-            git.push().setRemote(remote).add(branch).call();
+            PushCommand pushCommand = git.push();
+            GitAuthenticator.authenticate(pushCommand);
+            if (branch != null) {
+                pushCommand.add(branch);
+            }
+            pushCommand.setRemote(remote)
+                       .call();
             LOGGER.debug("Pushed to remote: {}, branch: {}", remote, branch);
         } catch (GitAPIException e) {
             throw new GitException("Push failed", e);
@@ -59,29 +67,25 @@ class GitActionExecutor {
 
     // TODO: test
     void push() throws GitException {
-        try {
-            git.push().call();
-            LOGGER.debug("Pushed to default remote and branch.");
-        } catch (GitAPIException e) {
-            throw new GitException("Push failed", e);
-        }
+        push(null, null);
     }
 
     void pull(boolean withRebase, String remote, String branch) throws GitException {
         try {
-            git.pull()
-               .setRebase(withRebase)
-               .setRemote(remote)
-               .setRemoteBranchName(branch)
-               .call();
+            PullCommand pullCommand = git.pull();
+            GitAuthenticator.authenticate(pullCommand);
+            pullCommand.setRebase(withRebase)
+                       .setRemote(remote)
+                       .setRemoteBranchName(branch)
+                       .call();
             LOGGER.debug("Pulled from remote: {}, branch: {}", remote, branch);
         } catch (GitAPIException e) {
             throw new GitException("Pull failed", e);
         }
     }
 
-    void pull(String remote, String branch) throws GitException {
-        pull(false, remote, branch);
+    void pull(boolean withRebase) throws GitException {
+        pull(withRebase, null, null);
     }
 
     Git getGit() {

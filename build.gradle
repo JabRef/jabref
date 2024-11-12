@@ -199,6 +199,10 @@ dependencies {
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.0.0.202409031743-r'
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.0.0.202409031743-r") {
+        exclude group: 'org.slf4j'
+        exclude module: 'org.eclipse.jgit'
+    }
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.0'
