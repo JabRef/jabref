@@ -460,8 +460,7 @@ public class ArgumentProcessor {
         try {
             // extract current thread task executor from indexManager
             matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), cliPreferences).getMatches();
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
             return false;
         }
