@@ -99,6 +99,9 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+    private static final List<EntryType> COVERABLE_TYPES = List.of(StandardEntryType.Book, StandardEntryType.InBook, StandardEntryType.Booklet);
+    // TODO DAMIAN _ run style checker particularly ehre
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
 
@@ -778,9 +781,14 @@ public class BibEntry implements Cloneable {
     public String getPathToCoverImage() {
         String path = "";
 
+
+        if (!isCoverable(this.type.get())) {
+            return "";
+        }
+
         for (LinkedFile file : getFiles()) {
             if (file.isImage()) {
-                path = "file:///" + file.getLink();
+                path = "file:///" + file.getLink(); // TODO DAMIAN - is the LinkedFile link always a local file?
                 if (file.getDescription().equalsIgnoreCase("cover")) {
                     path = "file:///" + file.getLink();
                     break;
@@ -789,6 +797,10 @@ public class BibEntry implements Cloneable {
         }
 
         return path;
+    }
+
+    private boolean isCoverable(EntryType type) {
+        return COVERABLE_TYPES.contains(type);
     }
 
     /**
