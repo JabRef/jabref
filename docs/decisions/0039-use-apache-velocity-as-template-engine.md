@@ -109,6 +109,6 @@ Here are the papers you are analyzing:
 As stated in [the template discussion issue](https://github.com/koppor/jabref/issues/392), we should choose a template engine, and then slowly migrate previous code and templates to the chosen engine.
 
 Other template engines are discussed at <https://www.baeldung.com/spring-template-engines>, especially [`#other-template-engines`](https://www.baeldung.com/spring-template-engines#other-template-engines).
-We did not find any other engine there being worth switchting.
+We did not find any other engine there worth switching to.
 
 <!-- markdownlint-disable-file MD004 -->
