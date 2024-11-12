@@ -33,6 +33,12 @@
     <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
     <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
     <option name="WRAP_COMMENTS" value="true" />
+    <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="true" />
+    <option name="BRACE_STYLE" value="2" />
+    <option name="CLASS_BRACE_STYLE" value="2" />
+    <option name="METHOD_BRACE_STYLE" value="2" />
+    <option name="CATCH_ON_NEW_LINE" value="false" />
+    <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
     <arrangement>
       <rules>
         <section>
