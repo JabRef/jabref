@@ -270,7 +270,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCitationKey());
+        assertEquals(Optional.of("Problem:NoAuthorProvided"), entry.getCitationKey());
     }
 
     @Test

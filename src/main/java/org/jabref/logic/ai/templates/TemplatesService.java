@@ -30,8 +30,9 @@ public class TemplatesService {
         return makeTemplate(AiTemplate.CHATTING_SYSTEM_MESSAGE, context);
     }
 
-    public String makeChattingUserMessage(String message, List<PaperExcerpt> excerpts) {
+    public String makeChattingUserMessage(List<BibEntry> entries, String message, List<PaperExcerpt> excerpts) {
         VelocityContext context = new VelocityContext(baseContext);
+        context.put("entries", entries);
         context.put("message", message);
         context.put("excerpts", excerpts);
 
