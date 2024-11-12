@@ -100,7 +100,6 @@ public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final List<EntryType> COVERABLE_TYPES = List.of(StandardEntryType.Book, StandardEntryType.InBook, StandardEntryType.Booklet);
-    // TODO DAMIAN _ run style checker particularly ehre
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
@@ -1128,16 +1127,20 @@ public class BibEntry implements Cloneable {
         return setFiles(currentFiles);
     }
 
+    /**
+     * @return String - "file:///" + path to a cover image from LinkedFiles
+     * and the BibEntry is a Book or other <code>COVERABLE_TYPES</code>
+     */
     public String getCoverImageFilePath() {
         String path = "";
 
-        if (!isCoverable(this.type.get())) {
+        if (!isCoverable()) {
             return "";
         }
 
         for (LinkedFile file : getFiles()) {
             if (file.isImage()) {
-                path = "file:///" + file.getLink(); // TODO DAMIAN - is the LinkedFile link always a local file?
+                path = "file:///" + file.getLink();
                 if (file.getDescription().equalsIgnoreCase("cover")) {
                     path = "file:///" + file.getLink();
                     break;
@@ -1277,7 +1280,10 @@ public class BibEntry implements Cloneable {
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
 
-    private boolean isCoverable(EntryType type) {
-        return COVERABLE_TYPES.contains(type);
+    /**
+     * @return <code>true</code> if this entry's <code>type</code> is a Book or one of <code>COVERABLE_TYPES</code>
+     */
+    private boolean isCoverable() {
+        return COVERABLE_TYPES.contains(this.type.get());
     }
 }
