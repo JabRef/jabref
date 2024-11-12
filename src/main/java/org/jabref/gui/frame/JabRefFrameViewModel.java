@@ -36,6 +36,7 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -190,6 +191,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     }
 
     private void checkForBibInUpperDir() {
+        // "Open last edited databases" happened before this call
+        // Moreover, there is not any CLI command (especially, not opening any new tab)
+        // Thus, we check if there are any tabs open.
         if (tabContainer.getLibraryTabs().isEmpty()) {
             Optional<Path> firstBibFile = firstBibFile();
             if (firstBibFile.isPresent()) {
@@ -222,13 +226,30 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     ///
     /// We do NOT go up another level (i.e., everything in `...` is not found)
     private Optional<Path> firstBibFile() {
-        // We check JabRef.bat dir, JabRef.exe dir and the dir above JabRef.exe
-        // We do NOT check "runtime" subdir (nested below JabRef.exe)
-        List<Path> dirsToCheck = List.of(
-                Path.of(""),           // `JabRef.exe` and `JabRef.bat` directory
-                Path.of("../"),        // directory above `JabRef.exe` directory
-                Path.of("../../"),     // directory above `bin/JabRef` directory
-                Path.of("../../../")); // directory above `runtime\bin\JabRef.bat`
+        Path absolutePath = Path.of(".").toAbsolutePath();
+        if (OS.LINUX && absolutePath.startsWith("/usr")) {
+            return Optional.empty();
+        }
+        if (OS.OS_X && absolutePath.startsWith("/Applications")) {
+            return Optional.empty();
+        }
+        if (OS.WINDOWS && absolutePath.startsWith("C:\\Program Files")) {
+            return Optional.empty();
+        }
+
+        boolean isJabRefExe = Files.exists(Path.of("JabRef.exe"));
+        boolean isJabRefBat = Files.exists(Path.of("JabRef.bat"));
+        boolean isJabRef = Files.exists(Path.of("JabRef"));
+
+        ArrayList<Path> dirsToCheck = new ArrayList<>(2);
+        dirsToCheck.add(Path.of(""));
+        if (isJabRefExe) {
+            dirsToCheck.add(Path.of("../"));       // directory above `JabRef.exe` directory
+        } else if (isJabRefBat) {
+            dirsToCheck.add(Path.of("../../../")); // directory above `runtime\bin\JabRef.bat`
+        } else if (isJabRef) {
+            dirsToCheck.add(Path.of("../..(/"));   // directory above `bin/JabRef` directory
+        }
 
         // We want to check dirsToCheck only, not all subdirs (due to unnecessary disk i/o)
         try {
