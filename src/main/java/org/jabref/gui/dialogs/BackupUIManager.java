@@ -14,6 +14,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupChoiceDialog;
+import org.jabref.gui.backup.BackupEntry;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
@@ -61,11 +62,17 @@ public class BackupUIManager {
                 BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
-                var actions = showBackupChoiceDialog(
-                        dialogService,
-                        preferences.getExternalApplicationsPreferences(),
-                        originalPath,
-                        preferences.getFilePreferences().getBackupDirectory());
+                var test = showBackupChoiceDialog(dialogService, originalPath, preferences);
+                if (test.isPresent()) {
+                    LOGGER.warn(String.valueOf(test.get().getEntries()));
+                    showBackupResolverDialog(
+                            dialogService,
+                            preferences.getExternalApplicationsPreferences(),
+                            originalPath,
+                            preferences.getFilePreferences().getBackupDirectory());
+                } else {
+                    LOGGER.warn("Empty");
+                }
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
         }
@@ -81,12 +88,11 @@ public class BackupUIManager {
                 () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
     }
 
-    private static Optional<ButtonType> showBackupChoiceDialog(DialogService dialogService,
-                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
-                                                                 Path originalPath,
-                                                                 Path backupDir) {
+    private static Optional<BackupEntry> showBackupChoiceDialog(DialogService dialogService,
+                                                                Path originalPath,
+                                                                GuiPreferences preferences) {
         return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(originalPath, backupDir, externalApplicationsPreferences)));
+                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(originalPath, preferences.getFilePreferences().getBackupDirectory(), preferences.getExternalApplicationsPreferences())));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
