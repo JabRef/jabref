@@ -25,7 +25,7 @@ BibTeX entry and a list of messages. We need to specify the key of this map. Tur
 
 ## Decision Outcome
 
-Chosen option: "`BibEntry`'s citation key", because this is the only choice that copmlies to the third point in Decision Drivers.
+Chosen option: "`BibEntry`'s citation key", because this is the only choice that complies to the third point in Decision Drivers.
 
 ### Positive Consequences
 
