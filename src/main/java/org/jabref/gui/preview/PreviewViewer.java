@@ -185,7 +185,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
         final BibEntry theEntry = entry.get();
-        bookCover = theEntry.getPathToCoverImage();
+        bookCover = theEntry.getCoverImageFilePath();
         BackgroundTask
                 .wrap(() -> layout.generatePreview(theEntry, database))
                 .onSuccess(this::setPreviewText)

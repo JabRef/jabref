@@ -778,31 +778,6 @@ public class BibEntry implements Cloneable {
         return getField(StandardField.ISBN).flatMap(ISBN::parse);
     }
 
-    public String getPathToCoverImage() {
-        String path = "";
-
-
-        if (!isCoverable(this.type.get())) {
-            return "";
-        }
-
-        for (LinkedFile file : getFiles()) {
-            if (file.isImage()) {
-                path = "file:///" + file.getLink(); // TODO DAMIAN - is the LinkedFile link always a local file?
-                if (file.getDescription().equalsIgnoreCase("cover")) {
-                    path = "file:///" + file.getLink();
-                    break;
-                }
-            }
-        }
-
-        return path;
-    }
-
-    private boolean isCoverable(EntryType type) {
-        return COVERABLE_TYPES.contains(type);
-    }
-
     /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
@@ -1152,6 +1127,26 @@ public class BibEntry implements Cloneable {
         currentFiles.addAll(filesToAdd);
         return setFiles(currentFiles);
     }
+
+    public String getCoverImageFilePath() {
+        String path = "";
+
+        if (!isCoverable(this.type.get())) {
+            return "";
+        }
+
+        for (LinkedFile file : getFiles()) {
+            if (file.isImage()) {
+                path = "file:///" + file.getLink(); // TODO DAMIAN - is the LinkedFile link always a local file?
+                if (file.getDescription().equalsIgnoreCase("cover")) {
+                    path = "file:///" + file.getLink();
+                    break;
+                }
+            }
+        }
+
+        return path;
+    }
     // endregion
 
     /**
@@ -1280,5 +1275,9 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    private boolean isCoverable(EntryType type) {
+        return COVERABLE_TYPES.contains(type);
     }
 }
