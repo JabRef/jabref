@@ -30,6 +30,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -185,7 +186,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
         final BibEntry theEntry = entry.get();
-        bookCover = theEntry.getCoverImageFilePath();
         BackgroundTask
                 .wrap(() -> layout.generatePreview(theEntry, database))
                 .onSuccess(this::setPreviewText)
@@ -218,9 +218,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                         </div>
                     </body>
                 </html>
-                """.formatted(text, bookCover);
+                """.formatted(text, getBookCoverURI());
         highlightLayoutText();
         this.setHvalue(0);
+    }
+
+    private String getBookCoverURI() {
+        return entry
+                .flatMap(e -> e.getCoverImageFile()
+                .map(file -> "file:///" + file.getLink()))
+                .orElse("");
     }
 
     private void highlightLayoutText() {
