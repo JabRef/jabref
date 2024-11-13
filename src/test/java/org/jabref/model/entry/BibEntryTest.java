@@ -268,6 +268,19 @@ class BibEntryTest {
     }
 
     @Test
+    void getCoverImagePathStringReturnsLinkToImageFile() {
+        LinkedFile image = new LinkedFile("", "png", "resources/images/external/JabRef-icon-128.png");
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+        entry.addFile(new LinkedFile("", "", ""));
+        System.out.println(image);
+    }
+
+    // TODO DAMIAN write tests for the following:
+    //  only an image should be used as cover image
+    //  an image with "cover" tag should be given preference
+    //  check that only COVERABLE TYPES will return a valid string
+
+    @Test
     void getEmptyKeywords() {
         KeywordList actual = entry.getKeywords(',');
 
