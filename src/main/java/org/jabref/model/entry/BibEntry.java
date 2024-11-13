@@ -21,6 +21,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.text.html.Option;
+
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -1128,27 +1130,26 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * @return String - "file:///" + path to a cover image from LinkedFiles
-     * and the BibEntry is a Book or other <code>COVERABLE_TYPES</code>
+     * @return <code>LinkedFile</code> that contains the cover image
+     * if the <code>BibEntry</code> is a Book or other <code>COVERABLE_TYPES</code>
      */
-    public String getCoverImageFilePath() {
-        String path = "";
-
+    public Optional<LinkedFile> getCoverImageFile() {
         if (!isCoverable()) {
-            return "";
+            return Optional.empty();
         }
+
+        Optional<LinkedFile> output = Optional.empty();
 
         for (LinkedFile file : getFiles()) {
             if (file.isImage()) {
-                path = "file:///" + file.getLink();
-                if (file.getDescription().equalsIgnoreCase("cover")) {
-                    path = "file:///" + file.getLink();
-                    break;
+                output = Optional.of(file);
+                if (file.getDescription().equalsIgnoreCase("cover")) { // TODO DAMIAN - move to a final field
+                    return output;
                 }
             }
         }
 
-        return path;
+        return output;
     }
     // endregion
 
