@@ -14,7 +14,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupChoiceDialog;
-import org.jabref.gui.backup.BackupEntry;
+import org.jabref.gui.backup.BackupChoiceDialogRecord;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
@@ -61,6 +61,31 @@ public class BackupUIManager {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
+            } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
+                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+            } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
+                var recordBackupChoice = showBackupChoiceDialog(dialogService, originalPath, preferences);
+                if (recordBackupChoice.isEmpty()) {
+                    return Optional.empty();
+                }
+                if (recordBackupChoice.get().action() == BackupChoiceDialog.RESTORE_BACKUP) {
+                    LOGGER.warn(recordBackupChoice.get().entry().getSize());
+                    BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                    return Optional.empty();
+                }
+                if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {
+                    LOGGER.warn(recordBackupChoice.get().entry().getSize());
+                    return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                }
+            }
+            return Optional.empty();
+        });
+    }
+        /*
+        return actionOpt.flatMap(action -> {
+            if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
+                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                return Optional.empty();
             } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
                 var test = showBackupChoiceDialog(dialogService, originalPath, preferences);
                 if (test.isPresent()) {
@@ -78,8 +103,8 @@ public class BackupUIManager {
         }
             return Optional.empty();
         });
-    }
 
+        */
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
@@ -88,11 +113,11 @@ public class BackupUIManager {
                 () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
     }
 
-    private static Optional<BackupEntry> showBackupChoiceDialog(DialogService dialogService,
-                                                                Path originalPath,
-                                                                GuiPreferences preferences) {
+    private static Optional<BackupChoiceDialogRecord> showBackupChoiceDialog(DialogService dialogService,
+                                                                             Path originalPath,
+                                                                             GuiPreferences preferences) {
         return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(originalPath, preferences.getFilePreferences().getBackupDirectory(), preferences.getExternalApplicationsPreferences())));
+                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(originalPath, preferences.getFilePreferences().getBackupDirectory())));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
