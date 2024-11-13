@@ -220,11 +220,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                             undoManager,
                             clipBoardManager,
                             taskExecutor);
-                } catch (
-                        SQLException |
-                        DatabaseNotSupportedException |
-                        InvalidDBMSConnectionPropertiesException |
-                        NotASharedDatabaseException e) {
+                } catch (SQLException
+                         | DatabaseNotSupportedException
+                         | InvalidDBMSConnectionPropertiesException
+                         | NotASharedDatabaseException e) {
                     LOGGER.error("Connection error", e);
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Connection error"),
