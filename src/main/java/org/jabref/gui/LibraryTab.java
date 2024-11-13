@@ -589,9 +589,6 @@ public class LibraryTab extends Tab {
         entryEditor.requestFocus();
     }
 
-    /**
-     * Removes the bottom component.
-     */
     public void closeBottomPane() {
         mode = PanelMode.MAIN_TABLE;
         splitPane.getItems().remove(entryEditor);
@@ -902,7 +899,7 @@ public class LibraryTab extends Tab {
     public void copyEntry() {
         int entriesCopied = doCopyEntry(getSelectedEntries());
         if (entriesCopied >= 0) {
-            dialogService.notify(Localization.lang("Copied %0 entry(ies)", entriesCopied));
+            dialogService.notify(Localization.lang("Copied %0 entry(s)", entriesCopied));
         } else {
             dialogService.notify(Localization.lang("Copy failed", entriesCopied));
         }
@@ -966,7 +963,7 @@ public class LibraryTab extends Tab {
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 
         if (entriesCopied == entriesDeleted) {
-            dialogService.notify(Localization.lang("Cut %0 entry(ies)", entriesCopied));
+            dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesCopied));
         } else {
             dialogService.notify(Localization.lang("Cut failed", entriesCopied));
             undoManager.undo();
@@ -979,7 +976,7 @@ public class LibraryTab extends Tab {
      */
     public void deleteEntry() {
         int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
-        dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entriesDeleted));
+        dialogService.notify(Localization.lang("Deleted %0 entry(s)", entriesDeleted));
     }
 
     public void deleteEntry(BibEntry entry) {
