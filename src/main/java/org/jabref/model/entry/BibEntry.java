@@ -101,7 +101,9 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+
     private static final List<EntryType> COVERABLE_TYPES = List.of(StandardEntryType.Book, StandardEntryType.InBook, StandardEntryType.Booklet);
+    private static final String COVER_TAG = "cover";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
@@ -1143,7 +1145,7 @@ public class BibEntry implements Cloneable {
         for (LinkedFile file : getFiles()) {
             if (file.isImage()) {
                 output = Optional.of(file);
-                if (file.getDescription().equalsIgnoreCase("cover")) { // TODO DAMIAN - move to a final field
+                if (file.getDescription().equalsIgnoreCase(COVER_TAG)) {
                     return output;
                 }
             }
