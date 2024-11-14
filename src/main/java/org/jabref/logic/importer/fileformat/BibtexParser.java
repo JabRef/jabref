@@ -342,7 +342,7 @@ public class BibtexParser implements Parser {
         }
     }
 
-    void parseJabRefComment(Map<String, String> meta) {
+    private void parseJabRefComment(Map<String, String> meta) {
         StringBuilder buffer;
         try {
             buffer = parseBracketedFieldContent();
@@ -390,12 +390,12 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(ex);
             }
-        } else if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG_010.length())).equals(MetaData.META_FLAG_010)) {
-            parseCommentToJson(comment, meta);
+        } else if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG_VERSION_010.length())).equals(MetaData.META_FLAG_VERSION_010)) {
+            parseCommentToJson(comment);
         }
     }
 
-    private void parseCommentToJson(String comment, Map<String, String> meta) {
+    private JsonObject parseCommentToJson(String comment, Map<String, String> meta) {
         Pattern pattern = Pattern.compile("\\{.*}", Pattern.DOTALL);
         Matcher matcher = pattern.matcher(comment);
         if (matcher.find()) {
@@ -403,8 +403,10 @@ public class BibtexParser implements Parser {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
             String jsonResult = gson.toJson(jsonObject);
-            meta.putIfAbsent(MetaData.META_FLAG_010, jsonResult);
+            meta.putIfAbsent(MetaData.META_FLAG_VERSION_010, jsonResult);
+            return jsonObject;
         }
+        return null;
     }
 
     /**
