@@ -1,11 +1,12 @@
 package org.jabref.logic.git;
 
+import java.io.File;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.URIish;
@@ -27,6 +28,8 @@ class GitAuthenticator {
     private static Path homeDirectory = Path.of(Optional.of(System.getProperty("user.home")).orElse(""));
     // TODO: temp
     private static Path sshDirectory = homeDirectory.resolve(".ssh");
+    // TODO: temp
+    private static boolean disableStrictHostKeyChecking = true;
 
     static <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
         transportCommand.setCredentialsProvider(getCredentialsProvider());
@@ -42,7 +45,7 @@ class GitAuthenticator {
             LOGGER.debug("git repository does not use a SSH protocol");
             return;
         }
-        SshSessionFactory sshSessionFactory = new SshdSessionFactoryBuilder()
+        SshdSessionFactoryBuilder sshdSessionFactoryBuilder = new SshdSessionFactoryBuilder()
                 .setPreferredAuthentications("publickey")
                 .setHomeDirectory(homeDirectory.toFile())
                 .setSshDirectory(sshDirectory.toFile())
@@ -51,8 +54,19 @@ class GitAuthenticator {
                     protected char[] getPassword(URIish uri, String message) {
                         return sshPassPhrase.toCharArray();
                     }
-                }).build(null);
-        sshTransport.setSshSessionFactory(sshSessionFactory);
+                });
+        if (disableStrictHostKeyChecking) {
+            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile((f) -> file));
+        }
+        sshTransport.setSshSessionFactory(sshdSessionFactoryBuilder.build(null));
+    }
+
+    private static Optional<File> getSshConfigFile() {
+        URL sshConfigURL = GitAuthenticator.class.getResource("ssh-config");
+        if (sshConfigURL == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new File(sshConfigURL.getFile()));
     }
 
     static void setUserName(String userName) {
