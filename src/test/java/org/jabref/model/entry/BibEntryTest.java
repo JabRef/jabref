@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -266,19 +267,6 @@ class BibEntryTest {
         entry.replaceDownloadedFile(urlAsString, linkedFile);
         assertEquals(List.of(linkedFile), entry.getFiles());
     }
-
-    @Test
-    void getCoverImagePathStringReturnsLinkToImageFile() {
-        LinkedFile image = new LinkedFile("", "png", "resources/images/external/JabRef-icon-128.png");
-        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        entry.addFile(new LinkedFile("", "", ""));
-        System.out.println(image);
-    }
-
-    // TODO DAMIAN write tests for the following:
-    //  only an image should be used as cover image
-    //  an image with "cover" tag should be given preference
-    //  check that only COVERABLE TYPES will return a valid string
 
     @Test
     void getEmptyKeywords() {
@@ -824,6 +812,74 @@ class BibEntryTest {
 
         copyEntry.mergeWith(otherEntry, otherPrioritizedFields);
         assertEquals(expected.getFields(), copyEntry.getFields());
+    }
+
+    @Test
+    void getCoverImageReturnsEmptyIfNoFiles() {
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+        assertEquals(Optional.empty(), entry.getCoverImageFile());
+    }
+
+    @Test
+    void getCoverImageReturnsEmptyIfNoImageFiles() {
+        LinkedFile pdf = new LinkedFile("", Paths.get("Baldoni2002.pdf").toAbsolutePath().toString(), "pdf");
+        LinkedFile markdown = new LinkedFile("", "readme.md", "md");
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+
+        entry.addFile(markdown);
+        entry.addFile(pdf);
+
+        assertEquals(Optional.empty(), entry.getCoverImageFile());
+    }
+
+    @Test
+    void getCoverImageReturnsEmptyIfEntryIsNotCoverableType() {
+        LinkedFile image = new LinkedFile("", Paths.get("JabRef-icon-128.png").toAbsolutePath().toString(), "png");
+        entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "value");
+
+        entry.addFile(image);
+
+        assertEquals(Optional.empty(), entry.getCoverImageFile());
+    }
+
+    @Test
+    void getCoverImageReturnsImageFileNotDocuments() {
+        LinkedFile image = new LinkedFile("", Paths.get("JabRef-icon-128.png").toAbsolutePath().toString(), "png");
+        LinkedFile pdf = new LinkedFile("", Paths.get("Baldoni2002.pdf").toAbsolutePath().toString(), "pdf");
+        LinkedFile markdown = new LinkedFile("", "readme.md", "md");
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+
+        entry.addFile(image);
+        entry.addFile(pdf);
+        entry.addFile(markdown);
+
+        assertEquals(Optional.of(image), entry.getCoverImageFile());
+    }
+
+    @Test
+    void getCoverImagePrefersImageWithCoverTag() {
+        LinkedFile cover1 = new LinkedFile("", Paths.get("JabRef-icon-128.png"), "png");
+        LinkedFile cover2 = new LinkedFile("", Paths.get("JabRef-icon-64.png"), "png");
+        LinkedFile cover3 = new LinkedFile("cover", Paths.get("JabRef-icon-32.png"), "png");
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+
+        entry.addFile(cover1);
+        entry.addFile(cover2);
+        entry.addFile(cover3);
+
+        assertEquals(Optional.of(cover3), entry.getCoverImageFile());
+    }
+
+    @Test
+    void getCoverImageDoesntReturnDocumentWithCoverTag() {
+        LinkedFile pdf = new LinkedFile("", Paths.get("Baldoni2002.pdf"), "pdf");
+        LinkedFile md = new LinkedFile("cover", Paths.get("readme.md"), "md");
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+
+        entry.addFile(pdf);
+        entry.addFile(md);
+
+        assertNotEquals(Optional.of(md), entry.getCoverImageFile());
     }
 
     public static Stream<BibEntry> isEmpty() {
