@@ -13,6 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
@@ -21,13 +22,24 @@ public class MarkdownEditor extends SimpleEditor {
 
     private final FlexmarkHtmlConverter flexmarkHtmlConverter = FlexmarkHtmlConverter.builder().build();
 
-    public MarkdownEditor(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, GuiPreferences preferences, UndoManager undoManager, UndoAction undoAction, RedoAction redoAction) {
+    private final BibDatabaseContext databaseContext;
+
+    public MarkdownEditor(Field field,
+                          SuggestionProvider<?> suggestionProvider,
+                          FieldCheckers fieldCheckers,
+                          GuiPreferences preferences,
+                          UndoManager undoManager,
+                          UndoAction undoAction,
+                          RedoAction redoAction,
+                          BibDatabaseContext databaseContext) {
         super(field, suggestionProvider, fieldCheckers, preferences, true, undoManager, undoAction, redoAction);
+
+        this.databaseContext = databaseContext;
 
         this.setOnDragDropped(event -> {
             boolean success = false;
             if (event.getDragboard().hasFiles()) {
-                String mdText = insertImages(event.getDragboard().getFiles());
+                String mdText = imageToMdText(event.getDragboard().getFiles());
 
                 this.insertTextFromDragInput(event.getX(), event.getY(), mdText);
 
@@ -38,9 +50,14 @@ public class MarkdownEditor extends SimpleEditor {
         });
     }
 
-    private String insertImages(List<File> files) {
+    private String imageToMdText(List<File> files) {
         String mdImageTemplate = "![%s](file://%s)\n";
         StringBuilder allImagesText = new StringBuilder();
+
+        // With this you can get the path to the default directory
+        if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+            databaseContext.getMetaData().getDefaultFileDirectory().get();
+        }
 
         for (File file: files) {
             allImagesText.append(mdImageTemplate.formatted(file.getName(), file.getAbsolutePath()));
@@ -61,7 +78,7 @@ public class MarkdownEditor extends SimpleEditor {
                 } else if (ClipBoardManager.hasFiles()) {
                     List<File> files = ClipBoardManager.getFiles();
 
-                    String mdText = insertImages(files);
+                    String mdText = imageToMdText(files);
 
                     super.replaceSelection(mdText);
                 } else {
