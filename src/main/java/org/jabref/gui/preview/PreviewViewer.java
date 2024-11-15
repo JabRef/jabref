@@ -30,7 +30,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -81,8 +80,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private Optional<BibEntry> entry = Optional.empty();
     private PreviewLayout layout;
     private String layoutText;
-
-    private String bookCover;
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
