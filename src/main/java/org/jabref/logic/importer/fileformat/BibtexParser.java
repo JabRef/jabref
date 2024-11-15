@@ -391,7 +391,7 @@ public class BibtexParser implements Parser {
                 parserResult.addException(ex);
             }
         } else if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG_VERSION_010.length())).equals(MetaData.META_FLAG_VERSION_010)) {
-            parseCommentToJson(comment);
+            parseCommentToJson(comment, meta);
         }
     }
 
