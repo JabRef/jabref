@@ -21,8 +21,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.text.html.Option;
-
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -57,6 +55,7 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.annotation.meta.field;
 
 /**
  * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
@@ -1140,18 +1139,15 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        Optional<LinkedFile> output = Optional.empty();
-
         for (LinkedFile file : getFiles()) {
-            if (file.isImage()) {
-                output = Optional.of(file);
-                if (file.getDescription().equalsIgnoreCase(COVER_TAG)) {
-                    return output;
+            if (file.getDescription().equalsIgnoreCase(COVER_TAG)) {
+                if (file.isImage()) {
+                    return Optional.of(file);
                 }
             }
         }
 
-        return output;
+        return Optional.empty();
     }
     // endregion
 
@@ -1185,7 +1181,8 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public OptionalBinding<String> getFieldBinding(Field field) {
+    public OptionalBinding<String> getFieldBinding(Field
+        field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
             return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
         }
