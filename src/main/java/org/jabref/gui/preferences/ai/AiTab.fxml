@@ -16,6 +16,9 @@
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.SearchableComboBox?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TextArea?>
 <fx:root
         spacing="10.0"
         type="VBox"
@@ -41,6 +44,21 @@
                 text="%Enable AI functionality (summary generation and chatting) in JabRef"
                 HBox.hgrow="ALWAYS"
                 maxWidth="Infinity"/>
+
+        <CheckBox fx:id="autoGenerateEmbeddings"
+                  mnemonicParsing="false"
+                  text="%Automatically generate embeddings for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <CheckBox fx:id="autoGenerateSummaries"
+                  mnemonicParsing="false"
+                  text="%Automatically generate summaries for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <Label styleClass="sectionHeader"
+               text="%Connection"/>
 
         <HBox alignment="CENTER_LEFT"
               spacing="10.0">
@@ -147,10 +165,6 @@
             </children>
         </HBox>
 
-        <ResizableTextArea
-                fx:id="instructionTextArea"
-                wrapText="true"/>
-
         <GridPane hgap="10" vgap="10">
             <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
@@ -215,6 +229,38 @@
 
         <Button onAction="#onResetExpertSettingsButtonClick"
                 text="%Reset expert settings to default">
+            <graphic>
+                <JabRefIconView
+                        glyph="REFRESH"/>
+            </graphic>
+        </Button>
+
+        <HBox alignment="BASELINE_CENTER">
+            <Label styleClass="sectionHeader"
+                   text="%Templates"
+                   maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+            <Button fx:id="templatesHelp"
+                    prefWidth="20.0"/>
+        </HBox>
+
+        <TabPane>
+            <Tab text="%System message for chatting" closable="false">
+                <TextArea fx:id="systemMessageTextArea"/>
+            </Tab>
+            <Tab text="User message for chatting" closable="false">
+                <TextArea fx:id="userMessageTextArea"/>
+            </Tab>
+            <Tab text="Completion text for summarization of a chunk" closable="false">
+                <TextArea fx:id="summarizationChunkTextArea"/>
+            </Tab>
+            <Tab text="Completion text for summarization of several chunks" closable="false">
+                <TextArea fx:id="summarizationCombineTextArea"/>
+            </Tab>
+        </TabPane>
+
+        <Button onAction="#onResetTemplatesButtonClick"
+                text="%Reset templates to default">
             <graphic>
                 <JabRefIconView
                         glyph="REFRESH"/>

@@ -31,12 +31,14 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -52,12 +54,16 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
-import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -76,10 +82,10 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -99,6 +105,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 
@@ -203,6 +210,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
+    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
+    public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
@@ -210,10 +219,11 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
+    public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
-    public static final String GROBID_OPT_OUT = "grobidOptOut";
+    public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -340,17 +350,21 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     private static final String AI_ENABLED = "aiEnabled";
+    private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
+    private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_OPEN_AI_CHAT_MODEL = "aiOpenAiChatModel";
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
     private static final String AI_GEMINI_CHAT_MODEL = "aiGeminiChatModel";
     private static final String AI_HUGGING_FACE_CHAT_MODEL = "aiHuggingFaceChatModel";
+    private static final String AI_GPT_4_ALL_MODEL = "aiGpt4AllChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_OPEN_AI_API_BASE_URL = "aiOpenAiApiBaseUrl";
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
+    private static final String AI_GPT_4_ALL_API_BASE_URL = "aiGpt4AllApiBaseUrl";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_CONTEXT_WINDOW_SIZE = "aiMessageWindowSize";
@@ -358,6 +372,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
+
+    private static final String AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE = "aiChattingSystemMessageTemplate";
+    private static final String AI_CHATTING_USER_MESSAGE_TEMPLATE = "aiChattingUserMessageTemplate";
+    private static final String AI_SUMMARIZATION_CHUNK_TEMPLATE = "aiSummarizationChunkTemplate";
+    private static final String AI_SUMMARIZATION_COMBINE_TEMPLATE = "aiSummarizationCombineTemplate";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -425,6 +444,8 @@ public class JabRefCliPreferences implements CliPreferences {
         Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
+        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
@@ -436,12 +457,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 SpringerFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
+        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
         // region: Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
-        defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
+        defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
 
@@ -620,24 +642,36 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // region:AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
+        defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
-        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI));
-        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI));
-        defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI));
-        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE));
+        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
+        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
+        defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());
+        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE).getName());
+        defaults.put(AI_GPT_4_ALL_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GPT4ALL).getName());
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_OPEN_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.OPEN_AI));
-        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.MISTRAL_AI));
-        defaults.put(AI_GEMINI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.GEMINI));
-        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.HUGGING_FACE));
+        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());
+        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());
+        defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());
+        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());
+        defaults.put(AI_GPT_4_ALL_API_BASE_URL, AiProvider.GPT4ALL.getApiUrl());
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER)));
+        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.getContextWindowSize(AiDefaultPreferences.PROVIDER, AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER).getName()));
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+
+        // region:AI templates
+        defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
+        defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));
+        defaults.put(AI_SUMMARIZATION_CHUNK_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK));
+        defaults.put(AI_SUMMARIZATION_COMBINE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE));
+        // endregion
+
         // endregion
     }
 
@@ -653,8 +687,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @return Instance of JaRefPreferences
-     * @deprecated Use {@link CliPreferences} instead
+     * @deprecated Never ever add a call to this method. There should be only one caller.
+     *             All other usages should get the preferences passed (or injected).
+     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -1811,16 +1846,20 @@ public class JabRefCliPreferences implements CliPreferences {
 
         aiPreferences = new AiPreferences(
                 aiEnabled,
+                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
+                getBoolean(AI_AUTO_GENERATE_SUMMARIES),
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_GEMINI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
+                get(AI_GPT_4_ALL_MODEL),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
                 get(AI_GEMINI_API_BASE_URL),
                 get(AI_HUGGING_FACE_API_BASE_URL),
+                get(AI_GPT_4_ALL_API_BASE_URL),
                 EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
@@ -1828,9 +1867,17 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
                 getInt(AI_RAG_MAX_RESULTS_COUNT),
-                getDouble(AI_RAG_MIN_SCORE));
+                getDouble(AI_RAG_MIN_SCORE),
+                Map.of(
+                        AiTemplate.CHATTING_SYSTEM_MESSAGE, get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE),
+                        AiTemplate.CHATTING_USER_MESSAGE, get(AI_CHATTING_USER_MESSAGE_TEMPLATE),
+                        AiTemplate.SUMMARIZATION_CHUNK, get(AI_SUMMARIZATION_CHUNK_TEMPLATE),
+                        AiTemplate.SUMMARIZATION_COMBINE, get(AI_SUMMARIZATION_COMBINE_TEMPLATE)
+                ));
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
 
@@ -1838,6 +1885,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.geminiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_GEMINI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.gpt4AllChatModelProperty(), (obs, oldValue, newValue) -> put(AI_GPT_4_ALL_MODEL, newValue));
 
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
@@ -1845,6 +1893,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.gpt4AllApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_GPT_4_ALL_API_BASE_URL, newValue));
 
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
@@ -1854,6 +1903,11 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
         EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (obs, oldValue, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
         EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
+
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE), (obs, oldValue, newValue) -> put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_USER_MESSAGE), (obs, oldValue, newValue) -> put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK), (obs, oldValue, newValue) -> put(AI_SUMMARIZATION_CHUNK_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE), (obs, oldValue, newValue) -> put(AI_SUMMARIZATION_COMBINE_TEMPLATE, newValue));
 
         return aiPreferences;
     }
@@ -1866,6 +1920,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         searchPreferences = new SearchPreferences(
                 getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
+                getBoolean(SEARCH_REG_EXP),
+                getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
@@ -1987,8 +2043,11 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getCustomImportFormats(),
                 getFetcherKeys(),
+                getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
-                getStringList(SEARCH_CATALOGS));
+                getStringList(SEARCH_CATALOGS),
+                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER))
+        );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
@@ -1998,6 +2057,7 @@ public class JabRefCliPreferences implements CliPreferences {
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
         importerPreferences.getCatalogs().addListener((InvalidationListener) c -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
+        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (obs, oldValue, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
 
         return importerPreferences;
     }
@@ -2071,6 +2131,24 @@ public class JabRefCliPreferences implements CliPreferences {
         return keys;
     }
 
+    private Map<String, String> getDefaultFetcherKeys() {
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        if (buildInfo == null) {
+            LOGGER.warn("Could not instantiate BuildInfo.");
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> keys = new HashMap<>();
+        keys.put(SemanticScholarFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
+        keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
+        keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
+        keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
+        keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        // SpringerLink uses the same key and fetcher name as SpringerFetcher
+
+        return keys;
+    }
+
     private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
@@ -2136,11 +2214,11 @@ public class JabRefCliPreferences implements CliPreferences {
 
         grobidPreferences = new GrobidPreferences(
                 getBoolean(GROBID_ENABLED),
-                getBoolean(GROBID_OPT_OUT),
+                getBoolean(GROBID_PREFERENCE),
                 get(GROBID_URL));
 
         EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(grobidPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
         EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;

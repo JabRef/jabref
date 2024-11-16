@@ -79,4 +79,16 @@ class RegexFormatterTest {
         formatter = new RegexFormatter("(\"(\", \"\")");
         assertEquals("AaBbCc", formatter.format("AaBbCc"));
     }
+
+    @Test
+    void extractFirstWord() {
+        formatter = new RegexFormatter("(\"(\\w+).*\", \"$1\")");
+        assertEquals("First", formatter.format("First Second Third"));
+    }
+
+    @Test
+    void addDash() {
+        formatter = new RegexFormatter("(\"(.)([A-Z])\", \"$1-$2\")");
+        assertEquals("First-Second-Third", formatter.format("FirstSecondThird"));
+    }
 }

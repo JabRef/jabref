@@ -27,14 +27,14 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class BiodiversityLibraryTest {
-    private final String BASE_URL = "https://www.biodiversitylibrary.org/api3?";
     private final String RESPONSE_FORMAT = "&format=json";
-    private final BuildInfo buildInfo = new BuildInfo();
 
+    private String apiKey;
     private BiodiversityLibrary fetcher;
 
     @BeforeEach
     void setUp() {
+        apiKey = new BuildInfo().biodiversityHeritageApiKey;
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         fetcher = new BiodiversityLibrary(importerPreferences);
@@ -49,15 +49,14 @@ class BiodiversityLibraryTest {
 
     @Test
     void biodiversityHeritageApiKeyIsNotEmpty() {
-        BuildInfo buildInfo = new BuildInfo();
-        assertNotNull(buildInfo.biodiversityHeritageApiKey);
+        assertNotNull(apiKey);
     }
 
     @Test
     void baseURLConstruction() throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
-                .concat(buildInfo.biodiversityHeritageApiKey)
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT);
 
         assertEquals(expected, fetcher.getBaseURL().toString());
@@ -68,7 +67,7 @@ class BiodiversityLibraryTest {
     void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
-                .concat(buildInfo.biodiversityHeritageApiKey)
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetPartMetadata&pages=f&names=f")
                 .concat("&id=");
@@ -81,7 +80,7 @@ class BiodiversityLibraryTest {
     void getItemMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
-                .concat(buildInfo.biodiversityHeritageApiKey)
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetItemMetadata&pages=f&ocr=f&ocr=f")
                 .concat("&id=");

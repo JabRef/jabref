@@ -97,6 +97,8 @@ open module org.jabref {
     // endregion
 
     // region: SQL databases
+    requires embedded.postgres;
+    requires org.tukaani.xz;
     requires ojdbc10;
     requires org.postgresql.jdbc;
     requires org.mariadb.jdbc;
@@ -108,6 +110,7 @@ open module org.jabref {
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires org.apache.commons.cli;
+    requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
     requires org.apache.commons.lang3;
@@ -149,6 +152,7 @@ open module org.jabref {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
+    requires langchain4j.google.ai.gemini;
     requires langchain4j.hugging.face;
     requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
@@ -156,13 +160,14 @@ open module org.jabref {
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    requires velocity.engine.core;
     // endregion
 
     // region: Lucene
-    /**
-     * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
+    /*
+     * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
+    uses org.apache.lucene.codecs.lucene100.Lucene100Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
@@ -188,6 +193,5 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires langchain4j.google.ai.gemini;
     // endregion
 }
