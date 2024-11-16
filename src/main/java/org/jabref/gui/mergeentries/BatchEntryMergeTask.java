@@ -110,12 +110,9 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
 
     private void handleEntryProcessingError(BibEntry entry, Exception e) {
         String citationKey = entry.getCitationKey().orElse("unknown");
-        String errorMessage = String.format("Error processing entry %s: %s",
-                citationKey,
-                e.getMessage());
-
-        LOGGER.error(errorMessage, e);
-        context.notificationService().notify(Localization.lang(errorMessage));
+        String message = Localization.lang("Error processing entry", citationKey, e.getMessage());
+        LOGGER.error(message, e);
+        context.notificationService().notify(message);
     }
 
     private void finalizeOperation(List<String> updatedEntries) {
