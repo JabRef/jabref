@@ -150,4 +150,13 @@ class MainArchitectureTest {
                    .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
     }
+
+    @ArchTest
+    public void shouldNotCallUriCreateMethod(JavaClasses classes) {
+       noClasses()
+               .that()
+               .resideInAPackage("org.jabref..")
+               .should().callMethod(java.net.URI.class, "create", java.lang.String.class)
+               .check(classes);
+    }
 }

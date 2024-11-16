@@ -143,13 +143,34 @@ public class URLUtil {
             return Optional.ofNullable(suffix);
         }
     }
+    /**
+     * Creates a {@link URL} object from the given string URL.
+     *
+     * @param url the URL string to be converted into a {@link URL}.
+     * @return the {@link URL} object created from the string URL.
+     * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
+     */
 
     public static URL create(String url) throws MalformedURLException {
         return URLUtil.createUri(url).toURL();
     }
 
+    /**
+     * Creates a {@link URI} object from the given string URL.
+     *
+     * This method attempts to convert the given URL string into a {@link URI} object.
+     * The pipe character ('|') is replaced with its percent-encoded equivalent ("%7C") because the pipe character
+     * is not a valid character in certain parts of a URI (specifically, in the path or query components).
+     * According to the URI specification (RFC 3986), certain characters must be percent-encoded when used in specific contexts.
+     *
+     * @param url the URL string to be converted into a {@link URI}.
+     * @return the {@link URI} object created from the string URL.
+     * @throws IllegalArgumentException if the string URL is not a valid URI or if the URI format is incorrect.
+     * @throws URISyntaxException if the string URL has an invalid syntax and cannot be converted into a {@link URI}.
+     */
     public static URI createUri(String url) {
         try {
+            // Replace '|' character with its percent-encoded representation '%7C'.
             String urlFormat = url.replace("|", "%7C");
             return new URI(urlFormat);
         } catch (URISyntaxException e) {
