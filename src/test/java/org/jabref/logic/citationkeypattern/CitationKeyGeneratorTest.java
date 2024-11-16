@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
+import static org.jabref.gui.search.TextFlowEqualityHelper.assertEquals;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -129,6 +130,15 @@ class CitationKeyGeneratorTest {
         assertEquals("Holland",
                 CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @Test
+    void testLatexCommandsAreStrippedFromCitationKey() throws ParseException {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");
+        String pattern = "[title]";
+        String generatedKey = generateKey(entry, pattern);
+        assertEquals("BuildingCommunity", generatedKey);
     }
 
     @Test
