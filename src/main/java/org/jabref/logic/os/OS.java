@@ -49,8 +49,7 @@ public class OS {
         if (StringUtil.isBlank(hostName)) {
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
-            } catch (
-                    UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
@@ -65,12 +64,10 @@ public class OS {
                 return false;
             }
             keyring.deletePassword("JabRef", "keyringTest");
-        } catch (
-                BackendNotSupportedException ex) {
+        } catch (BackendNotSupportedException ex) {
             LoggerFactory.getLogger(OS.class).warn("Credential store not supported.");
             return false;
-        } catch (
-                PasswordAccessException ex) {
+        } catch (PasswordAccessException ex) {
             LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
             return false;
         } catch (Exception ex) {
@@ -90,9 +87,8 @@ public class OS {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (
-                        IOException |
-                        ShellLinkException e) {
+                } catch (IOException
+                         | ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
                     Logger logger = Logger.getLogger(OS.class.getName());
                     logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);

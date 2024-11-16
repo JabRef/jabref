@@ -32,11 +32,12 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_owner == 'JabRef'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
-        jdk: [22]
+        jdk: [23]
         javafx: [24]
         include:
           - os: ubuntu-latest

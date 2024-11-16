@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,11 +16,13 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final List<JabRefException> failures;
 
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.failures = new ArrayList<>();
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
@@ -27,10 +30,12 @@ public class CleanupWorker {
         Objects.requireNonNull(entry);
 
         List<CleanupJob> jobs = determineCleanupActions(preset);
-
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
+            if (job instanceof MoveFilesCleanup cleanup) {
+                failures.addAll(cleanup.getIoExceptions());
+            }
         }
 
         return changes;
@@ -61,9 +66,9 @@ public class CleanupWorker {
             case MAKE_PATHS_RELATIVE ->
                     new RelativePathsCleanup(databaseContext, filePreferences);
             case RENAME_PDF ->
-                    new RenamePdfCleanup(false, databaseContext, filePreferences);
+                    new RenamePdfCleanup(false, () -> databaseContext, filePreferences);
             case RENAME_PDF_ONLY_RELATIVE_PATHS ->
-                    new RenamePdfCleanup(true, databaseContext, filePreferences);
+                    new RenamePdfCleanup(true, () -> databaseContext, filePreferences);
             case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
                     new UpgradePdfPsToFileCleanup();
             case CLEAN_UP_DELETED_LINKED_FILES ->
@@ -77,7 +82,7 @@ public class CleanupWorker {
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
                     new TimeStampToModificationDate(timestampPreferences);
             case MOVE_PDF ->
-                    new MoveFilesCleanup(databaseContext, filePreferences);
+                    new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
@@ -85,5 +90,9 @@ public class CleanupWorker {
             default ->
                     throw new UnsupportedOperationException(action.name());
         };
+    }
+
+    public List<JabRefException> getFailures() {
+        return failures;
     }
 }

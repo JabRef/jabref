@@ -39,7 +39,7 @@ public class ApsFetcher implements FulltextFetcher {
             return Optional.empty();
         }
 
-        Optional<String> id = getId(doi.get().getDOI());
+        Optional<String> id = getId(doi.get().asString());
 
         if (id.isPresent()) {
             String pdfRequestUrl = PDF_URL + id.get();

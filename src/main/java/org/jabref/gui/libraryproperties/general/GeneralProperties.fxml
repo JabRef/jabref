@@ -31,11 +31,11 @@
 
         <Label styleClass="sectionHeader" text="%Override default file directories"
                GridPane.columnSpan="3" GridPane.rowIndex="0"/>
-        <Label text="%General file directory"
+        <Label text="%Library-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <TextField fx:id="generalFileDirectory"
+        <TextField fx:id="librarySpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button onAction="#browseGeneralFileDirectory"
+        <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="1">
             <graphic>

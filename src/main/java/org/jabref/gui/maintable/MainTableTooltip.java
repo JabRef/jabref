@@ -20,17 +20,18 @@ public class MainTableTooltip extends Tooltip {
     private final VBox tooltipContent = new VBox();
     private final Label fieldValueLabel = new Label();
 
-    public MainTableTooltip(BibDatabaseContext databaseContext, DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
+    public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
-        this.preview = new PreviewViewer(databaseContext, dialogService, preferences, themeManager, taskExecutor);
+        this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
         this.setShowDelay(Duration.seconds(1));
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
     }
 
-    public Tooltip createTooltip(BibEntry entry, String fieldValue) {
+    public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
         fieldValueLabel.setText(fieldValue + "\n");
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
+            preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
             this.setGraphic(tooltipContent);
         } else {

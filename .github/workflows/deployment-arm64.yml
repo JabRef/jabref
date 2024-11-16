@@ -34,6 +34,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_owner == 'JabRef'
     strategy:
       fail-fast: false
       matrix:
@@ -77,7 +78,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.2
+          java-version: 23.0.1
           distribution: 'temurin'
       - name: Clean up keychain
         run: |

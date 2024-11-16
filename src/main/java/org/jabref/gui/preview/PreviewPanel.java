@@ -11,103 +11,98 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/// Displays the entry preview
+///
+/// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
 public class PreviewPanel extends VBox {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
     private final PreviewViewer previewView;
     private final PreviewPreferences previewPreferences;
     private final DialogService dialogService;
+
     private BibEntry entry;
 
-    public PreviewPanel(BibDatabaseContext database,
-                        DialogService dialogService,
+    public PreviewPanel(DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
                         GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
-                        LuceneManager luceneManager,
+                        StateManager stateManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.previewPreferences = preferences.getPreviewPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, preferences, themeManager, taskExecutor, searchQueryProperty);
+        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, searchQueryProperty);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setOnDragDetected(event -> {
-            previewView.startFullDrag();
+        previewView.setOnDragDetected(this::onDragDetected);
+        previewView.setOnDragOver(PreviewPanel::onDragOver);
+        previewView.setOnDragDropped(event -> onDragDropped(event));
 
-            Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);
-            ClipboardContent content = new ClipboardContent();
-            content.putHtml(previewView.getSelectionHtmlContent());
-            dragboard.setContent(content);
-
-            event.consume();
-        });
-
-        previewView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
-            }
-            event.consume();
-        });
-
-        previewView.setOnDragDropped(event -> {
-            boolean success = false;
-            if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-
-                if (event.getTransferMode() == TransferMode.MOVE) {
-                    LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                    fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, luceneManager);
-                }
-                if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); // alt on win
-                    fileLinker.addFilesToEntry(entry, files);
-                }
-                if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, luceneManager);
-                }
-                success = true;
-            }
-
-            event.setDropCompleted(success);
-            event.consume();
-        });
         this.getChildren().add(previewView);
 
         createKeyBindings();
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
+    }
+
+    private void onDragDetected(MouseEvent event) {
+        previewView.startFullDrag();
+
+        Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);
+        ClipboardContent content = new ClipboardContent();
+        content.putHtml(previewView.getSelectionHtmlContent());
+        dragboard.setContent(content);
+
+        event.consume();
+    }
+
+    private static void onDragOver(DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+        }
+        event.consume();
+    }
+
+    private void onDragDropped(DragEvent event) {
+        boolean success = false;
+        if (event.getDragboard().hasContent(DataFormat.FILES)) {
+            TransferMode transferMode = event.getTransferMode();
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+            success = true;
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
     }
 
     private void createKeyBindings() {
@@ -151,6 +146,10 @@ public class PreviewPanel extends VBox {
         this.entry = entry;
         previewView.setEntry(entry);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
+    }
+
+    public void setDatabase(BibDatabaseContext databaseContext) {
+        previewView.setDatabaseContext(databaseContext);
     }
 
     public void print() {

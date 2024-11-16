@@ -152,9 +152,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             URIBuilder source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
-            source.addParameter("query", doi.getDOI());
+            source.addParameter("query", doi.asString());
 
-            source = new URIBuilder(GOOGLE_SEARCH + doi.getDOI() + GOOGLE_SITE);
+            source = new URIBuilder(GOOGLE_SEARCH + doi.asString() + GOOGLE_SITE);
             Connection connection = Jsoup.connect(source.toString());
             Document html = connection
                     .cookieStore(connection.cookieStore())
