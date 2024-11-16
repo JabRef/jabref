@@ -1,4 +1,3 @@
-
 package org.jabref.gui.mergeentries;
 
 import javax.swing.undo.UndoManager;
