@@ -53,6 +53,7 @@ import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
+import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
@@ -279,15 +280,14 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(
+                        StandardActions.MERGE_WITH_FETCHED_ENTRY,
+                        new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
-                        new BatchEntryMergeWithFetchedDataAction(
-                                frame::getCurrentLibraryTab,
-                                preferences,
-                                dialogService,
-                                stateManager,
-                                taskExecutor
-                        )
-                )
+                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor))
         );
 
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);

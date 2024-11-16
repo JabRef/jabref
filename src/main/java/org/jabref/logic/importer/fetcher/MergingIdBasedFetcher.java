@@ -2,17 +2,19 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mariadb.jdbc.internal.logging.Logger;
+import org.mariadb.jdbc.internal.logging.LoggerFactory;
 
 /**
  * Fetches and merges bibliographic information from external sources into existing BibEntry objects.
@@ -22,81 +24,130 @@ import org.slf4j.LoggerFactory;
  * in the library entry.
  */
 public class MergingIdBasedFetcher {
-
-    public record FetcherResult(BibEntry entryFromLibrary, BibEntry mergedEntry, boolean hasChanges) {
-    }
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);
     private static final List<StandardField> SUPPORTED_FIELDS =
             List.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT);
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);
     private final ImportFormatPreferences importFormatPreferences;
 
     public MergingIdBasedFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public Optional<FetcherResult> fetchEntry(BibEntry entryFromLibrary) {
-        LOGGER.debug("Processing library entry {}", entryFromLibrary);
+    public record FetcherResult(
+            BibEntry entryFromLibrary,
+            BibEntry mergedEntry,
+            boolean hasChanges,
+            Set<Field> updatedFields
+    ) {
+        public FetcherResult {
+            updatedFields = Set.copyOf(updatedFields);
+        }
+    }
 
+    public Optional<FetcherResult> fetchEntry(BibEntry entryFromLibrary) {
+        if (entryFromLibrary == null) {
+            return Optional.empty();
+        }
+
+        logEntryProcessing(entryFromLibrary);
+        return findFirstValidFetch(entryFromLibrary);
+    }
+
+    private void logEntryProcessing(BibEntry entry) {
+        LOGGER.debug("Processing library entry: {}",
+                entry.getCitationKey().orElse("[no key]"));
+
+        SUPPORTED_FIELDS.forEach(field ->
+                entry.getField(field).ifPresent(value ->
+                        LOGGER.debug("Entry has {} identifier: {}", field, value)));
+    }
+
+    private Optional<FetcherResult> findFirstValidFetch(BibEntry entry) {
         return SUPPORTED_FIELDS.stream()
-                               .map(field -> tryFetch(entryFromLibrary, field))
-                               .filter(Optional::isPresent)
-                               .map(Optional::get)
+                               .map(field -> fetchWithField(entry, field))
+                               .flatMap(Optional::stream)
                                .findFirst();
     }
 
-    private Optional<FetcherResult> tryFetch(BibEntry entryFromLibrary, Field field) {
-        return entryFromLibrary.getField(field)
-                               .flatMap(identifier -> getFetcherForField(field)
-                                       .flatMap(fetcher -> performFetch(fetcher, field, identifier, entryFromLibrary)));
+    private Optional<FetcherResult> fetchWithField(BibEntry entry, Field field) {
+        return entry.getField(field)
+                    .flatMap(identifier -> fetchWithIdentifier(field, identifier, entry));
     }
 
-    private Optional<FetcherResult> performFetch(IdBasedFetcher fetcher, Field field,
+    private Optional<FetcherResult> fetchWithIdentifier(Field field, String identifier,
+                                                        BibEntry entryFromLibrary) {
+        return WebFetchers.getIdBasedFetcherForField(field, importFormatPreferences)
+                          .flatMap(fetcher -> executeFetch(fetcher, field, identifier, entryFromLibrary));
+    }
+
+    private Optional<FetcherResult> executeFetch(IdBasedFetcher fetcher, Field field,
                                                  String identifier, BibEntry entryFromLibrary) {
         try {
-            return attemptFetch(fetcher, identifier, entryFromLibrary);
-        } catch (Exception exception) {
-            LOGGER.error("Error fetching entry with {} identifier: {}", field, identifier, exception);
+            LOGGER.debug("Fetching with {}: {}",
+                    fetcher.getClass().getSimpleName(), identifier);
+            return fetcher.performSearchById(identifier)
+                          .map(fetchedEntry -> mergeBibEntries(entryFromLibrary, fetchedEntry));
+        } catch (FetcherException e) {
+            LOGGER.error("Fetch failed for {} with identifier: {}",
+                    field, identifier, e);
             return Optional.empty();
         }
     }
 
-    private Optional<FetcherResult> attemptFetch(IdBasedFetcher fetcher, String identifier,
-                                                 BibEntry entryFromLibrary) throws FetcherException {
-        return fetcher.performSearchById(identifier)
-                      .map(entryFromFetcher -> {
-                          BibEntry mergedEntry = (BibEntry) entryFromLibrary.clone();
-                          boolean hasChanges = mergeBibEntry(entryFromFetcher, mergedEntry);
-                          return new FetcherResult(entryFromLibrary, mergedEntry, hasChanges);
-                      });
+    private FetcherResult mergeBibEntries(BibEntry entryFromLibrary,
+                                          BibEntry fetchedEntry) {
+        BibEntry mergedEntry = new BibEntry(entryFromLibrary.getType());
+
+        entryFromLibrary.getFields().forEach(field ->
+                entryFromLibrary.getField(field)
+                                .ifPresent(value -> mergedEntry.setField(field, value)));
+
+        Set<Field> updatedFields = updateFieldsFromSource(fetchedEntry, mergedEntry);
+
+        return new FetcherResult(entryFromLibrary, mergedEntry,
+                !updatedFields.isEmpty(), updatedFields);
     }
 
-    private boolean mergeBibEntry(BibEntry entryFromFetcher, BibEntry entryFromLibrary) {
-        return entryFromFetcher.getFields().stream()
-                               .filter(field -> isNewFieldFromFetcher(entryFromFetcher, entryFromLibrary, field))
-                               .map(field -> {
-                                   entryFromFetcher.getField(field)
-                                                   .ifPresent(value -> entryFromLibrary.setField(field, value));
-                                   return true;
-                               })
-                               .findAny()
-                               .orElse(false);
+    private Set<Field> updateFieldsFromSource(BibEntry sourceEntry,
+                                              BibEntry targetEntry) {
+        return sourceEntry.getFields().stream()
+                          .filter(field -> shouldUpdateField(field, sourceEntry, targetEntry))
+                          .peek(field -> updateField(field, sourceEntry, targetEntry))
+                          .collect(Collectors.toSet());
     }
 
-    private boolean isNewFieldFromFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, Field field) {
-        Optional<String> fetcherValue = entryFromFetcher.getField(field);
-        Optional<String> libraryValue = entryFromLibrary.getField(field);
-
-        return fetcherValue.isPresent() && libraryValue.isEmpty();
+    private boolean shouldUpdateField(Field field, BibEntry sourceEntry,
+                                      BibEntry targetEntry) {
+        String sourceValue = sourceEntry.getField(field)
+                                        .map(StringNormalizer::normalize)
+                                        .orElse("");
+        String targetValue = targetEntry.getField(field)
+                                        .map(StringNormalizer::normalize)
+                                        .orElse("");
+        return !sourceValue.equals(targetValue);
     }
 
-    private Optional<IdBasedFetcher> getFetcherForField(Field field) {
-        return switch (field) {
-            case StandardField.DOI -> Optional.of(new DoiFetcher(importFormatPreferences));
-            case StandardField.ISBN -> Optional.of(new IsbnFetcher(importFormatPreferences));
-            case StandardField.EPRINT -> Optional.of(new IacrEprintFetcher(importFormatPreferences));
-            default -> Optional.empty();
-        };
+    private void updateField(Field field, BibEntry sourceEntry,
+                             BibEntry targetEntry) {
+        sourceEntry.getField(field).ifPresent(value -> {
+            targetEntry.setField(field, value);
+            LOGGER.debug("Updated field {}: '{}'", field, value);
+        });
     }
 }
+
+class StringNormalizer {
+    public static String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim()
+                    .replaceAll("\\s+", " ")
+                    .replaceAll("\\r\\n|\\r|\\n", " ")
+                    .replaceAll("\\s*-+\\s*", "-")
+                    .replaceAll("\\s*,\\s*", ", ")
+                    .replaceAll("\\s*;\\s*", "; ")
+                    .replaceAll("\\s*:\\s*", ": ");
+    }
+}
+
