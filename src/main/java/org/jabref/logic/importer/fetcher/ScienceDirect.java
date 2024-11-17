@@ -56,7 +56,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        String urlFromDoi = getUrlByDoi(doi.get().getDOI());
+        String urlFromDoi = getUrlByDoi(doi.get().asString());
         if (urlFromDoi.isEmpty()) {
             return Optional.empty();
         }

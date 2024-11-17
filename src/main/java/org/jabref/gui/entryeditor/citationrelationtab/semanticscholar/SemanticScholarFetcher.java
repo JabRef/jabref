@@ -25,7 +25,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     }
 
     public String getAPIUrl(String entry_point, BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().getDOI() + "/" + entry_point
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entry_point
                 + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
                 + "&limit=1000";
     }

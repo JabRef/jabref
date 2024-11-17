@@ -200,7 +200,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @return ArXiv-issued DOI
      */
     private static String getAutomaticDoi(ArXivIdentifier arXivId) {
-        return getAutomaticDoi(arXivId.getNormalizedWithoutVersion());
+        return getAutomaticDoi(arXivId.asStringWithoutVersion());
     }
 
     /**
@@ -473,7 +473,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             String query;
             Optional<String> doiString = entry.getField(StandardField.DOI)
                                               .flatMap(DOI::parse)
-                                              .map(DOI::getNormalized);
+                                              .map(DOI::asString);
 
             // ArXiv-issued DOIs seem to be unsearchable from ArXiv API's "query string", so ignore it
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
@@ -543,7 +543,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
-                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+                        ids.stream().map(ArXivIdentifier::asString).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -748,7 +748,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
              * Returns the arXiv identifier
              */
             public Optional<String> getIdString() {
-                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::getNormalizedWithoutVersion);
+                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::asStringWithoutVersion);
             }
 
             public Optional<ArXivIdentifier> getId() {

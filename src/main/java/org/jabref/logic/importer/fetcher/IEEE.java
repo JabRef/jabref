@@ -158,7 +158,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // If not, try DOI
         if (stampString.isEmpty()) {
             Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
+            if (doi.isPresent() && doi.get().asString().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = null;
                 try {

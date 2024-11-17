@@ -53,7 +53,7 @@ public class OpenAccessDoi implements FulltextFetcher {
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException {
-        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
+        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.asString() + "?email=developers@jabref.org")
                                                 .header("accept", "application/json")
                                                 .asJson();
 

@@ -33,7 +33,6 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
-import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -81,15 +80,12 @@ public class MainTableColumnFactory {
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(database, dialogService, preferences, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
-            case MATCH_SCORE:
-                returnColumn = createScoreColumn(column);
-                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -124,12 +120,12 @@ public class MainTableColumnFactory {
                     }
                 }
                 break;
-            default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
                     returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
+            default:
         }
         return returnColumn;
     }
@@ -160,21 +156,6 @@ public class MainTableColumnFactory {
         column.setSortable(true);
         column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);
-        return column;
-    }
-
-    private TableColumn<BibEntryTableViewModel, Number> createScoreColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
-        Node header = new Text(Localization.lang("Score"));
-        header.getStyleClass().add("mainTable-header");
-        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_SCORE.getDisplayName()));
-        column.setGraphic(header);
-        column.setStyle("-fx-alignment: CENTER-RIGHT;");
-        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty());
-        new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
-        column.setSortable(true);
-        column.setReorderable(false);
-        column.visibleProperty().bind(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).isPresent());
         return column;
     }
 

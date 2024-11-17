@@ -139,6 +139,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String PUSH_VIM_SERVER = "vimServer";
     private static final String PUSH_VIM = "vim";
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
+    private static final String PUSH_VSCODE_PATH = "VScodePath";
     // endregion
 
     // region NameDisplayPreferences
@@ -360,6 +361,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
         defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
 
         if (OS.OS_X) {
             defaults.put(PUSH_EMACS_PATH, "emacsclient");
@@ -373,8 +375,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region: Main table, main table column, and search dialog column preferences
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        defaults.put(COLUMN_NAMES, "search_score;groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "50;28;40;28;28;75;300;470;60;130;50;50;50");
+        defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:citationkey;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "28;40;28;28;100;75;300;470;60;130;50;50;50");
 
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
@@ -937,6 +939,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
         applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
+        applicationCommands.put(PushToApplications.VSCODE, getEmptyIsDefault(PUSH_VSCODE_PATH));
 
         pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
@@ -971,6 +974,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         put(PUSH_WINEDT_PATH, value);
                 case PushToApplications.SUBLIME_TEXT ->
                         put(PUSH_SUBLIME_TEXT_PATH, value);
+                case PushToApplications.VSCODE ->
+                        put(PUSH_VSCODE_PATH, value);
             }
         });
     }

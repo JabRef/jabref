@@ -40,7 +40,8 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferences, themeManager, taskExecutor);
+        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        previewClone.setDatabaseContext(databaseContext);
 
         // The scroll bar used is not part of ScrollPane, but the attached WebView.
         WebView previewCloneView = (WebView) previewClone.getContent();
