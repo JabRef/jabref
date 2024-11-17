@@ -31,12 +31,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class MVStoreBibEntryRelationsRepositoryTest {
+class MVStoreBibEntryRelationsRepositoryPrototypingTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(MVStoreBibEntryRelationsRepositoryTest::createBibEntry);
+            .mapToObj(MVStoreBibEntryRelationsRepositoryPrototypingTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -270,5 +270,11 @@ class MVStoreBibEntryRelationsRepositoryTest {
             var citations = citationsFromStore.get(entry.getKey());
             Assertions.assertEquals(entry.getValue(), citations);
         }
+    }
+
+    @Test
+    void test() {
+        var s = Stream.<String>of(null, "test", null).collect(Collectors.joining());
+        System.out.println(s);
     }
 }
