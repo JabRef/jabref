@@ -12,6 +12,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 import org.mariadb.jdbc.internal.logging.Logger;
 import org.mariadb.jdbc.internal.logging.LoggerFactory;
@@ -116,13 +117,12 @@ public class MergingIdBasedFetcher {
                           .collect(Collectors.toSet());
     }
 
-    private boolean shouldUpdateField(Field field, BibEntry sourceEntry,
-                                      BibEntry targetEntry) {
+    private boolean shouldUpdateField(Field field, BibEntry sourceEntry, BibEntry targetEntry) {
         String sourceValue = sourceEntry.getField(field)
-                                        .map(StringNormalizer::normalize)
+                                        .map(StringUtil::normalize)
                                         .orElse("");
         String targetValue = targetEntry.getField(field)
-                                        .map(StringNormalizer::normalize)
+                                        .map(StringUtil::normalize)
                                         .orElse("");
         return !sourceValue.equals(targetValue);
     }
@@ -133,21 +133,6 @@ public class MergingIdBasedFetcher {
             targetEntry.setField(field, value);
             LOGGER.debug("Updated field {}: '{}'", field, value);
         });
-    }
-}
-
-class StringNormalizer {
-    public static String normalize(String value) {
-        if (value == null) {
-            return "";
-        }
-        return value.trim()
-                    .replaceAll("\\s+", " ")
-                    .replaceAll("\\r\\n|\\r|\\n", " ")
-                    .replaceAll("\\s*-+\\s*", "-")
-                    .replaceAll("\\s*,\\s*", ", ")
-                    .replaceAll("\\s*;\\s*", "; ")
-                    .replaceAll("\\s*:\\s*", ": ");
     }
 }
 
