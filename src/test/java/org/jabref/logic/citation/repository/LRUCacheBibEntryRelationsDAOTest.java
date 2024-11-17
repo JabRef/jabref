@@ -65,9 +65,7 @@ class LRUCacheBibEntryRelationsDAOTest {
 
     private static Stream<Arguments> createCacheAndBibEntry() {
         return Stream
-            .of(LRUCacheBibEntryRelationsDAO.LRUCacheBibEntryCitations.getInstance(),
-                LRUCacheBibEntryRelationsDAO.LRUCacheBibEntryReferences.getInstance()
-            )
+            .of(LRUCacheBibEntryRelationsDAO.CITATIONS, LRUCacheBibEntryRelationsDAO.REFERENCES)
             .flatMap(dao -> createBibEntries().map(entry -> Arguments.of(dao, entry)));
     }
 
@@ -75,6 +73,7 @@ class LRUCacheBibEntryRelationsDAOTest {
     @MethodSource("createCacheAndBibEntry")
     void repositoryShouldMergeCitationsWhenInserting(LRUCacheBibEntryRelationsDAO dao, BibEntry entry) {
         // GIVEN
+        dao.clearEntries();
         assertFalse(dao.containsKey(entry));
 
         // WHEN

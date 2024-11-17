@@ -1,8 +1,12 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,8 +47,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.citation.repository.LRUBibEntryRelationsCache;
-import org.jabref.logic.citation.repository.LRUBibEntryRelationsRepository;
+import org.jabref.logic.citation.repository.ChainBibEntryRelationsRepository;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
@@ -112,12 +115,20 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
-        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
-            new LRUBibEntryRelationsCache()
-        );
-        this.searchCitationsRelationsService = new SearchCitationsRelationsService(
-            new SemanticScholarCitationFetcher(preferences.getImporterPreferences()), bibEntryRelationsRepository
-        );
+
+        try {
+            var jabRefPath = Paths.get("/home/sacha/Documents/projects/JabRef");
+            var citationsPath = Path.of(jabRefPath.toAbsolutePath() + File.separator + "citations");
+            var relationsPath = Path.of(jabRefPath.toAbsolutePath() + File.separator + "references");
+            var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(citationsPath, relationsPath);
+            this.searchCitationsRelationsService = new SearchCitationsRelationsService(
+                new SemanticScholarCitationFetcher(preferences.getImporterPreferences()), bibEntryRelationsRepository
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
             databaseContext,
             preferences,

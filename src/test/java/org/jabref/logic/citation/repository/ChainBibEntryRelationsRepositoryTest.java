@@ -1,5 +1,6 @@
 package org.jabref.logic.citation.repository;
 
+import java.nio.file.Files;
 import java.util.List;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
@@ -16,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-class LRUBibEntryRelationsRepositoryTest {
+class ChainBibEntryRelationsRepositoryTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(LRUBibEntryRelationsRepositoryTest::createBibEntry);
+            .mapToObj(ChainBibEntryRelationsRepositoryTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -46,11 +47,11 @@ class LRUBibEntryRelationsRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void repositoryShouldMergeCitationsWhenInserting(BibEntry bibEntry) {
+    void repositoryShouldMergeCitationsWhenInserting(BibEntry bibEntry) throws Exception {
         // GIVEN
-        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
-            new LRUBibEntryRelationsCache()
-        );
+        var tempDir = Files.createTempDirectory("temp");
+        var mvStorePath = Files.createTempFile(tempDir, "cache", "");
+        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath);
         assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
 
         // WHEN
@@ -72,11 +73,11 @@ class LRUBibEntryRelationsRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void repositoryShouldMergeReferencesWhenInserting(BibEntry bibEntry) {
+    void repositoryShouldMergeReferencesWhenInserting(BibEntry bibEntry) throws Exception {
         // GIVEN
-        var bibEntryRelationsRepository = new LRUBibEntryRelationsRepository(
-            new LRUBibEntryRelationsCache()
-        );
+        var tempDir = Files.createTempDirectory("temp");
+        var mvStorePath = Files.createTempFile(tempDir, "cache", "");
+        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath);
         assertFalse(bibEntryRelationsRepository.containsReferences(bibEntry));
 
         // WHEN

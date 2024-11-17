@@ -10,9 +10,16 @@ import org.jabref.model.entry.identifier.DOI;
 
 import org.eclipse.jgit.util.LRUMap;
 
-public abstract class LRUCacheBibEntryRelationsDAO implements BibEntryRelationDAO {
+import static org.jabref.logic.citation.repository.LRUCacheBibEntryRelationsDAO.Configuration.MAX_CACHED_ENTRIES;
 
-    private static final Integer MAX_CACHED_ENTRIES = 100;
+public enum LRUCacheBibEntryRelationsDAO implements BibEntryRelationDAO {
+
+    CITATIONS(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES)),
+    REFERENCES(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES));
+
+    public static class Configuration {
+        public static final int MAX_CACHED_ENTRIES = 100;
+    }
 
     private final Map<DOI, Set<BibEntry>> relationsMap;
 
@@ -45,31 +52,5 @@ public abstract class LRUCacheBibEntryRelationsDAO implements BibEntryRelationDA
 
     public void clearEntries() {
         this.relationsMap.clear();
-    }
-
-    public static class LRUCacheBibEntryCitations extends LRUCacheBibEntryRelationsDAO {
-
-        private final static LRUCacheBibEntryCitations CITATIONS_CACHE = new LRUCacheBibEntryCitations();
-
-        private LRUCacheBibEntryCitations() {
-            super(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES));
-        }
-
-        public static LRUCacheBibEntryCitations getInstance() {
-            return CITATIONS_CACHE;
-        }
-    }
-
-    public static class LRUCacheBibEntryReferences extends LRUCacheBibEntryRelationsDAO {
-
-        private final static LRUCacheBibEntryReferences REFERENCES_CACHE = new LRUCacheBibEntryReferences();
-
-        private LRUCacheBibEntryReferences() {
-            super(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES));
-        }
-
-        public static LRUCacheBibEntryReferences getInstance() {
-            return REFERENCES_CACHE;
-        }
     }
 }

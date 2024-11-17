@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.h2.mvstore.DataUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.WriteBuffer;
@@ -23,14 +22,14 @@ import org.h2.mvstore.type.BasicDataType;
 
 public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
-    private final Path path;
     private final String mapName;
+    private final MVStore.Builder storeConfiguration;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration =
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
 
     MVStoreBibEntryRelationDAO(Path path, String mapName) {
-        this.path = Objects.requireNonNull(path);
         this.mapName = mapName;
+        this.storeConfiguration = new MVStore.Builder().autoCommitDisabled().fileName(path.toAbsolutePath().toString());
     }
 
     @Override
@@ -38,7 +37,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         return entry
             .getDOI()
             .map(doi -> {
-                try (var store = new MVStore.Builder().fileName(path.toAbsolutePath().toString()).open()) {
+                try (var store = this.storeConfiguration.open()) {
                     MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
                     return relationsMap.getOrDefault(doi.getDOI(), new LinkedHashSet<>()).stream().toList();
                 }
@@ -49,7 +48,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
     @Override
     synchronized public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {
-            try (var store = new MVStore.Builder().fileName(path.toAbsolutePath().toString()).open()) {
+            try (var store = this.storeConfiguration.open()) {
                 MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
                 var relationsAlreadyStored = relationsMap.getOrDefault(doi.getDOI(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
@@ -64,7 +63,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         return entry
             .getDOI()
             .map(doi -> {
-                try (var store = new MVStore.Builder().fileName(path.toAbsolutePath().toString()).open()) {
+                try (var store = this.storeConfiguration.open()) {
                     MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
                     return relationsMap.containsKey(doi.getDOI());
                 }
@@ -82,7 +81,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                 entry.getTitle().orElse("null"),
                 entry.getField(StandardField.YEAR).orElse("null"),
                 entry.getField(StandardField.AUTHOR).orElse("null"),
-                entry.getType().getDisplayName(),
+                entry.getType().getDisplayName() == null ? "null" : entry.getType().getDisplayName(),
                 entry.getDOI().map(DOI::getDOI).orElse("null"),
                 entry.getField(StandardField.URL).orElse("null"),
                 entry.getField(StandardField.ABSTRACT).orElse("null")
@@ -124,8 +123,9 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         @Override
         public BibEntry read(ByteBuffer buff) {
             int serializedEntrySize = buff.getInt();
-            var serializedEntry = DataUtils.readString(buff, serializedEntrySize);
-            return fromString(serializedEntry);
+            var serializedEntry = new byte[serializedEntrySize];
+            buff.get(serializedEntry);
+            return fromString(new String(serializedEntry, StandardCharsets.UTF_8));
         }
 
         @Override
@@ -140,6 +140,11 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         public BibEntry[] createStorage(int size) {
             return new BibEntry[size];
         }
+
+        @Override
+        public boolean isMemoryEstimationAllowed() {
+            return false;
+        }
     }
 
     private static class BibEntryHashSetSerializer extends BasicDataType<LinkedHashSet<BibEntry>> {
@@ -149,6 +154,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         /**
          * Memory size is the sum of all aggregated bibEntries memory size plus 4 bytes.
          * Those 4 bytes are used to store the length of the collection itself.
+         *
          * @param bibEntries should not be null
          * @return total size in memory of the serialized collection of bib entries
          */
@@ -174,8 +180,14 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public LinkedHashSet<BibEntry>[] createStorage(int size) {
             return new LinkedHashSet[size];
+        }
+
+        @Override
+        public boolean isMemoryEstimationAllowed() {
+            return false;
         }
     }
 }
