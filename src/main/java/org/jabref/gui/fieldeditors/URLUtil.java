@@ -23,7 +23,6 @@ public class URLUtil {
 
     /**
      * Cleans URLs returned by Google search.
-     *
      * <example>
      * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
      * https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
@@ -63,8 +62,7 @@ public class URLUtil {
                 }
             }
             return url;
-        } catch (
-                MalformedURLException e) {
+        } catch (MalformedURLException e) {
             return url;
         }
     }
@@ -143,6 +141,7 @@ public class URLUtil {
             return Optional.ofNullable(suffix);
         }
     }
+
     /**
      * Creates a {@link URL} object from the given string URL.
      *
@@ -150,14 +149,12 @@ public class URLUtil {
      * @return the {@link URL} object created from the string URL.
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
-
     public static URL create(String url) throws MalformedURLException {
         return URLUtil.createUri(url).toURL();
     }
 
     /**
      * Creates a {@link URI} object from the given string URL.
-     *
      * This method attempts to convert the given URL string into a {@link URI} object.
      * The pipe character ('|') is replaced with its percent-encoded equivalent ("%7C") because the pipe character
      * is not a valid character in certain parts of a URI (specifically, in the path or query components).
