@@ -210,7 +210,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                 %s
                             </div>
                             <div id="bookCover" style="flex: 1;">
-                                <img src=%s style="width: auto; height: 100vh;" align="right">
+                                <img src="%s" style="width: auto; height: 100vh;" align="right">
                             </div>
                         </div>
                     </body>
@@ -221,10 +221,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String getBookCoverURI() {
-        return entry
+        String output = entry
                 .flatMap(e -> e.getCoverImageFile()
                 .map(file -> "file:///" + file.getLink()))
                 .orElse("");
+
+        System.out.println(output);
+        return output;
     }
 
     private void highlightLayoutText() {
