@@ -40,7 +40,7 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
     }
 
     private void configureTask() {
-        setTitle(Localization.lang("Fetching and merging entries"));
+        setTitle(Localization.lang("Fetching and merging entry(s)"));
         withInitialMessage(Localization.lang("Starting merge operation..."));
         showToUser(true);
     }
@@ -127,7 +127,7 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
     private void notifySuccess(int updateCount) {
         String message = updateCount == 0
                 ? Localization.lang("No updates found.")
-                : Localization.lang("Batch update successful. %0 entries updated.", updateCount);
+                : Localization.lang("Batch update successful. %0 entry(s) updated.", updateCount);
         context.notificationService().notify(message);
     }
 
