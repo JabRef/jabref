@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 - We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
+- We added the ability for users to display a cover image in the preview panel of the entry editor for book, in-book and booklet citations [#10120](https://github.com/JabRef/jabref/issues/10120)
 
 ### Changed
 
