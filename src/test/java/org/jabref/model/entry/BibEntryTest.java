@@ -887,6 +887,27 @@ class BibEntryTest {
         assertEquals(Optional.of(cover3), entry.getCoverImageFile());
     }
 
+    @Test
+    void getCoverImageUpdatesWithChangeToDescription() {
+        List<LinkedFile> files = new ArrayList<>();
+
+        files.add(new LinkedFile("cover", Paths.get("JabRef-icon-128.png"), "png"));
+        files.add(new LinkedFile("", Paths.get("JabRef-icon-64.png"), "png"));
+        LinkedFile cover1 = files.get(0);
+        LinkedFile cover2 = files.get(1);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+        entry.setFiles(files);
+
+        assertEquals(Optional.of(cover1), entry.getCoverImageFile());
+
+        cover1.setDescription("");
+        cover2.setDescription("cover");
+        entry.setFiles(files);
+
+        assertEquals(Optional.of(cover2), entry.getCoverImageFile());
+    }
+
     public static Stream<BibEntry> isEmpty() {
         return Stream.of(
                 new BibEntry(),
