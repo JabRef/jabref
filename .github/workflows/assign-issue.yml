@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@beta
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 30
+          days_until_unassign: 90
           maintainers: koppor, Siedlerchr, ThiloteE, calixtus, HoussemNasri
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
