@@ -23,10 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * Tests whole citation key patterns such as <code>[authorsAlpha][year]</code>.
  * The concrete patterns such as <code>authorsAlpha</code> should better be tested at {@link BracketedPatternTest}.
