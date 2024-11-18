@@ -221,10 +221,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String getBookCoverURI() {
-        return entry
-                .flatMap(e -> e.getCoverImageFile()
-                .map(file -> "file:///" + file.getLink()))
-                .orElse("");
+        if (entry.isPresent()) {
+            BibEntry theEntry = entry.get();
+            if (theEntry.getCoverImageFile().isPresent()) {
+                return "file:///" + theEntry.getCoverImageFile().get().getLink();
+            }
+        }
+
+        return "";
     }
 
     private void highlightLayoutText() {
