@@ -341,7 +341,7 @@ dependencies {
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-mistral-ai:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
