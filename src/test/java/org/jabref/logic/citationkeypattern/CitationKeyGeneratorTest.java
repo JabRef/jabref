@@ -132,7 +132,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testLatexCommandsAreStrippedFromCitationKey() throws ParseException {
+    void latexCommandsAreStrippedFromCitationKey() throws ParseException {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");
         String pattern = "[bibtexkey] - [fulltitle]";

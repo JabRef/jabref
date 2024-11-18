@@ -105,7 +105,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);
-        newKey = newKey.replaceAll("\\\\[a-zA-Z]+\\{([^}]+)\\}", "$1");
+        RemoveLatexCommandsFormatter formatter = new RemoveLatexCommandsFormatter();
+        newKey = formatter.format(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
         return cleanKey(newKey, unwantedCharacters);
     }
