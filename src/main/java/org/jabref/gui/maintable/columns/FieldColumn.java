@@ -67,6 +67,6 @@ public class FieldColumn extends MainTableColumn<String> {
     }
 
     private Tooltip createTooltip(BibEntryTableViewModel entry, String fieldValue) {
-        return tooltip.createTooltip(entry.getEntry(), fieldValue);
+        return tooltip.createTooltip(entry.getBibDatabaseContext(), entry.getEntry(), fieldValue);
     }
 }

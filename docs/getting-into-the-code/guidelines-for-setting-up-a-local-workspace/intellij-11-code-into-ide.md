@@ -62,4 +62,19 @@ This will make these directories "Unregistered roots:", which is fine.
 ![Directory Mappings having three repositories unregsitered](intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
 
+## Ensure that committing with other tools work
+
+Open a "git bash".
+On Windows, navigate to `C:\git-repositories\JabRef`.
+Open the context menu of the file explorer (using the right mouse button), choose "Open Git Bash here".
+
+Execute following command:
+
+```shell
+git update-index --assume-unchanged buildres/abbrv.jabref.org src/main/resources/csl-styles src/main/resources/csl-locales
+```
+
+{: .tip }
+If you do not see the context menu, re-install git following the steps given at [StackOverflow](https://stackoverflow.com/a/50667280/873282).
+
 <!-- markdownlint-disable-file MD033 -->
