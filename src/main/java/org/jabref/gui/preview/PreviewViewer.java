@@ -234,10 +234,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String getBookCoverURI() {
-        if (entry.isPresent()) {
-            BibEntry theEntry = entry.get();
-            if (theEntry.getCoverImageFile().isPresent()) {
-                return "file:///" + theEntry.getCoverImageFile().get().getLink();
+        if (entry != null) {
+            if (entry.getCoverImageFile().isPresent()) {
+                return "file:///" + entry.getCoverImageFile().get().getLink();
             }
         }
 
