@@ -334,23 +334,23 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
 
     // region AI
-    implementation 'dev.langchain4j:langchain4j:0.35.0'
+    implementation 'dev.langchain4j:langchain4j:0.36.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation('dev.langchain4j:langchain4j-open-ai:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-open-ai:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-mistral-ai:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
     }
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
