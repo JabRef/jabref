@@ -263,11 +263,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "Rename Group Dialog" and change name of group
      */
-
     public void renameGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
-            String oldGroupName = oldGroupDef.getName(); // Zachytenie starého názvu pred otvorením dialógu
+            String oldGroupName = oldGroupDef.getName();
 
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
                     new RenameGroupView(database,
@@ -282,12 +281,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     return;
                 }
 
-                // check if is not include ","
                 if (newGroupName.contains(",")) {
                     return;
                 }
 
-                // chceck if old group name dont equels with new group name
                 if (oldGroupName.equals(newGroupName)) {
                     return;
                 }
@@ -298,7 +295,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(newGroupName)).size();
                 }
 
-                // then change name
                 if (groupsWithSameName < 2) {
                     oldGroup.getGroupNode().setGroup(group, true, true, database.getEntries());
                     writeGroupChangesToMetaData();
@@ -308,12 +304,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
-
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(

@@ -10,11 +10,11 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 
 import jakarta.inject.Inject;
-import org.jspecify.annotations.Nullable;
 
 public class RenameGroupView extends BaseDialog<AbstractGroup> {
 
@@ -26,36 +26,30 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
 
 
     private final BibDatabaseContext currentDatabase;
-    private final @Nullable AbstractGroup editedGroup;
+    private final AbstractGroup editedGroup;
 
     public RenameGroupView(BibDatabaseContext currentDatabase,
-                           @Nullable AbstractGroup editedGroup) {
+                           AbstractGroup editedGroup) {
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
 
-        // set Width and Height
         setWidth(400);
         setHeight(150);
 
-        // set Title name
-        setTitle("Rename group");
+        setTitle(Localization.lang("Rename group"));
 
-        // add OK and Cancel buttons
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         nameField = new TextField();
-        nameField.setPromptText("Enter new group name");
+        nameField.setPromptText(Localization.lang("Enter new group name"));
 
-        // add Input
-        VBox vbox = new VBox(new Label("New group name:"), nameField);
+        VBox vbox = new VBox(new Label(Localization.lang("New group name")), nameField);
         getDialogPane().setContent(vbox);
 
-        // If press OK change name else return null
         setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 return resultConverter(ButtonType.OK).orElse(null);
             } else {
-                // Ak sa zvolí Cancel alebo sa dialóg zavrie cez X
                 return null;
             }
         });
@@ -67,7 +61,6 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         }
 
         try {
-            // Get new name from Input
             String newGroupName = nameField.getText().trim();
 
             if (editedGroup != null) {
