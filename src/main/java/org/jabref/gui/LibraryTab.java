@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -23,13 +22,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -45,7 +42,6 @@ import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -57,8 +53,6 @@ import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.RedoAction;
-import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -112,11 +106,6 @@ import org.slf4j.LoggerFactory;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab {
-    /**
-     * Defines the different modes that the tab can operate in
-     */
-    private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
@@ -131,10 +120,7 @@ public class LibraryTab extends Tab {
     private BibDatabaseContext bibDatabaseContext;
     private MainTableDataModel tableModel;
     private FileAnnotationCache annotationCache;
-    private EntryEditor entryEditor;
     private MainTable mainTable;
-    private PanelMode mode = PanelMode.MAIN_TABLE;
-    private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
 
     // Indicates whether the tab is loading data using a dataloading task
@@ -242,7 +228,6 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -251,8 +236,6 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
 
-        this.entryEditor = createEntryEditor();
-
         aiService.setupDatabase(bibDatabaseContext);
 
         Platform.runLater(() -> {
@@ -260,14 +243,6 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
-    }
-
-    private EntryEditor createEntryEditor() {
-        Supplier<LibraryTab> tabSupplier = () -> this;
-        return new EntryEditor(this,
-                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(tabSupplier, undoManager, dialogService, stateManager),
-                new RedoAction(tabSupplier, undoManager, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -498,33 +473,20 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 taskExecutor,
                 importHandler);
+
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
         mainTable.addSelectionListener(event -> {
             List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
             stateManager.setSelectedEntries(entries);
-            if (!entries.isEmpty()) {
-                // Update entry editor and preview according to selected entries
-                entryEditor.setCurrentlyEditedEntry(entries.getFirst());
-            }
         });
     }
 
     public void setupMainPanel() {
-        splitPane = new SplitPane();
-        splitPane.setOrientation(Orientation.VERTICAL);
-
         createMainTable();
 
-        splitPane.getItems().add(mainTable);
-        databaseNotificationPane = new DatabaseNotification(splitPane);
+        databaseNotificationPane = new DatabaseNotification(mainTable);
         setContent(databaseNotificationPane);
-
-        // Saves the divider position as soon as it changes
-        // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
-                                              .mapObservable(SplitPane.Divider::positionProperty)
-                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -559,10 +521,6 @@ public class LibraryTab extends Tab {
 
     public SuggestionProvider<Author> getAutoCompleter() {
         return searchAutoCompleter;
-    }
-
-    public EntryEditor getEntryEditor() {
-        return entryEditor;
     }
 
     /**
@@ -618,17 +576,6 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Closes the entry editor if it is showing any of the given entries.
-     */
-    private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
-        // This method is not able to close the bottom pane currently
-
-        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getCurrentlyEditedEntry()))) {
-            closeBottomPane();
-        }
-    }
-
-    /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
     public synchronized void markChangedOrUnChanged() {
@@ -673,15 +620,6 @@ public class LibraryTab extends Tab {
                     optOut -> preferences.getWorkspacePreferences().setConfirmDelete(!optOut));
         } else {
             return true;
-        }
-    }
-
-    /**
-     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
-     */
-    private void saveDividerLocation(Number position) {
-        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            preferences.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 
@@ -1014,7 +952,6 @@ public class LibraryTab extends Tab {
             }
         }
 
-        ensureNotShowingBottomPanel(entries);
         markBaseChanged();
 
         // prevent the main table from loosing focus
@@ -1127,14 +1064,6 @@ public class LibraryTab extends Tab {
                 stateManager.getSelectedGroups(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
-        }
-    }
-
-    private class EntriesRemovedListener {
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
-            ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
         }
     }
 

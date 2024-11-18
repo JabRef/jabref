@@ -38,7 +38,7 @@ import org.jabref.model.search.query.SearchQuery;
 /// Displays the entry preview
 ///
 /// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
-public class PreviewPanel extends VBox {
+public class PreviewPanel extends VBox implements PreviewControls {
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -156,10 +156,12 @@ public class PreviewPanel extends VBox {
         previewView.print();
     }
 
+    @Override
     public void nextPreviewStyle() {
         cyclePreview(previewPreferences.getLayoutCyclePosition() + 1);
     }
 
+    @Override
     public void previousPreviewStyle() {
         cyclePreview(previewPreferences.getLayoutCyclePosition() - 1);
     }

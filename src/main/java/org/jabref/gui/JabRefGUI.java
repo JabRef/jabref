@@ -264,7 +264,10 @@ public class JabRefGUI extends Application {
     }
 
     public void onShowing(WindowEvent event) {
-        Platform.runLater(() -> mainFrame.updateDividerPosition());
+        Platform.runLater(() -> {
+            mainFrame.updateHorizontalDividerPosition();
+            mainFrame.updateVerticalDividerPosition();
+        });
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)

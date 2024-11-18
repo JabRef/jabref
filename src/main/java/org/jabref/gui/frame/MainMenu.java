@@ -56,6 +56,7 @@ import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
+import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
@@ -100,6 +101,7 @@ public class MainMenu extends MenuBar {
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
     private final AiService aiService;
+    private final PreviewControls previewControls;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -115,7 +117,8 @@ public class MainMenu extends MenuBar {
                     CountingUndoManager undoManager,
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
-                    AiService aiService) {
+                    AiService aiService,
+                    PreviewControls previewControls) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
@@ -131,6 +134,7 @@ public class MainMenu extends MenuBar {
         this.clipBoardManager = clipBoardManager;
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.aiService = aiService;
+        this.previewControls = previewControls;
 
         createMenu();
     }
@@ -323,8 +327,8 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, frame::getCurrentLibraryTab, stateManager)),
-                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, previewControls, stateManager)),
+                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, previewControls, stateManager)),
 
                 new SeparatorMenuItem(),
 

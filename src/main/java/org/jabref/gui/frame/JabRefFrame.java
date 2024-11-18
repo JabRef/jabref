@@ -14,6 +14,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
+import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -34,6 +35,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -45,6 +47,8 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -68,12 +72,15 @@ import org.slf4j.LoggerFactory;
  * Represents the inner frame of the JabRef window
  */
 public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
+    /**
+     * Defines the different modes that the tab can operate in
+     */
+    private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
-    private final SplitPane splitPane = new SplitPane();
     private final GuiPreferences preferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
@@ -94,10 +101,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final JabRefFrameViewModel viewModel;
     private final PushToApplicationCommand pushToApplicationCommand;
+    private final SplitPane horizontalSplit = new SplitPane();
     private final SidePane sidePane;
+    private final SplitPane verticalSplit = new SplitPane();
     private final TabPane tabbedPane = new TabPane();
+    private final EntryEditor entryEditor;
 
-    private Subscription dividerSubscription;
+    private PanelMode mode = PanelMode.MAIN_TABLE;
+
+    // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
+    private Subscription horizontalDividerSubscription;
+    private Subscription verticalDividerSubscription;
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -163,6 +177,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 undoManager);
 
+        this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
+                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+
         this.pushToApplicationCommand = new PushToApplicationCommand(
                 stateManager,
                 dialogService,
@@ -217,38 +236,71 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 undoManager,
                 clipBoardManager,
                 this::getOpenDatabaseAction,
-                aiService);
+                aiService,
+                entryEditor);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        verticalSplit.getItems().addAll(tabbedPane);
+        verticalSplit.setOrientation(Orientation.VERTICAL);
+        updateEditorPane();
+
+        horizontalSplit.getItems().addAll(verticalSplit);
+        horizontalSplit.setOrientation(Orientation.HORIZONTAL);
+
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
-        setCenter(splitPane);
+        setCenter(horizontalSplit);
     }
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
-            if (dividerSubscription != null) {
-                dividerSubscription.unsubscribe();
+            if (horizontalDividerSubscription != null) {
+                horizontalDividerSubscription.unsubscribe();
             }
-            splitPane.getItems().remove(sidePane);
+            horizontalSplit.getItems().remove(sidePane);
         } else {
-            if (!splitPane.getItems().contains(sidePane)) {
-                splitPane.getItems().addFirst(sidePane);
-                updateDividerPosition();
+            if (!horizontalSplit.getItems().contains(sidePane)) {
+                horizontalSplit.getItems().addFirst(sidePane);
+                updateHorizontalDividerPosition();
             }
         }
     }
 
-    public void updateDividerPosition() {
+    private void updateEditorPane() {
+        if (mode == PanelMode.MAIN_TABLE) {
+            if (verticalDividerSubscription != null) {
+                verticalDividerSubscription.unsubscribe();
+            }
+            verticalSplit.getItems().remove(entryEditor);
+        } else {
+            if (!verticalSplit.getItems().contains(entryEditor)) {
+                verticalSplit.getItems().addLast(entryEditor);
+                updateVerticalDividerPosition();
+            }
+        }
+    }
+
+    public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (obs, old, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / horizontalSplit.getWidth());
+            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                    .mapObservable(SplitPane.Divider::positionProperty)
+                                                    .listenToValues((oldValue, newValue) -> preferences.getGuiPreferences().setSidePaneWidth(newValue.doubleValue()));
+        }
+    }
+
+    public void updateVerticalDividerPosition() {
+        if (mainStage.isShowing() && mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
+            verticalSplit.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition() / verticalSplit.getHeight());
+            // ToDo: Move DividerPosition to GuiPreferences
+            verticalDividerSubscription = EasyBind.valueAt(verticalSplit.getDividers(), 0)
+                                                  .mapObservable(SplitPane.Divider::positionProperty)
+                                                  .listenToValues((oldValue, newValue) -> preferences.getEntryEditorPreferences().setDividerPosition(newValue.doubleValue()));
         }
     }
 
