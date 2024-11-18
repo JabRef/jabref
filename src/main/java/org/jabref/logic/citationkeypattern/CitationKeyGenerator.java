@@ -16,6 +16,7 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 
 /**
  * This is the utility class of the LabelPattern package.
