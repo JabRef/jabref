@@ -236,7 +236,9 @@ public class BackupManager {
                 LOGGER.error("Could not delete backup file {}", oldestBackupFile, e);
             }
         }
-
+        //l'ordre dans lequel les entrées BibTeX doivent être écrites dans le fichier de sauvegarde.
+        // Si l'utilisateur a trié la table d'affichage des entrées dans JabRef, cet ordre est récupéré.
+        // Sinon, un ordre par défaut est utilisé.
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         SelfContainedSaveOrder saveOrder = bibDatabaseContext
                 .getMetaData().getSaveOrder()
@@ -256,6 +258,10 @@ public class BackupManager {
                     }
                 })
                 .orElse(SaveOrder.getDefaultSaveOrder());
+
+        //Elle configure la sauvegarde, en indiquant qu'aucune sauvegarde supplémentaire (backup) ne doit être créée,
+        // que l'ordre de sauvegarde doit être celui défini, et que les entrées doivent être formatées selon les préférences
+        // utilisateur.
         SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                 .withMakeBackup(false)
                 .withSaveOrder(saveOrder)
@@ -263,13 +269,15 @@ public class BackupManager {
 
         // "Clone" the database context
         // We "know" that "only" the BibEntries might be changed during writing (see [org.jabref.logic.exporter.BibDatabaseWriter.savePartOfDatabase])
+        //Chaque entrée BibTeX (comme un article, livre, etc.) est clonée en utilisant la méthode clone().
+        // Cela garantit que les modifications faites pendant la sauvegarde n'affecteront pas l'entrée originale.
         List<BibEntry> list = bibDatabaseContext.getDatabase().getEntries().stream()
                                                 .map(BibEntry::clone)
                                                 .map(BibEntry.class::cast)
                                                 .toList();
         BibDatabase bibDatabaseClone = new BibDatabase(list);
         BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
-
+        //Elle définit l'encodage à utiliser pour écrire le fichier. Cela garantit que les caractères spéciaux sont bien sauvegardés.
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
@@ -335,7 +343,7 @@ public class BackupManager {
     }
 
     private void startBackupTask(Path backupDir) {
-        fillQueue(backupDir);
+        fillQueue(backupDir);//remplie backupFilesQueue les files .sav de le meme bibl
 
         executor.scheduleAtFixedRate(
                                      // We need to determine the backup path on each action, because we use the timestamp in the filename
@@ -344,7 +352,8 @@ public class BackupManager {
                                      DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
                                      TimeUnit.SECONDS);
     }
-
+//La méthode fillQueue(backupDir) est définie dans le code et son rôle est de lister et d'ajouter
+// les fichiers de sauvegarde existants dans une file d'attente,
     private void fillQueue(Path backupDir) {
         if (!Files.exists(backupDir)) {
             return;
@@ -355,7 +364,7 @@ public class BackupManager {
             try {
                 List<Path> allSavFiles = Files.list(backupDir)
                                               // just list the .sav belonging to the given targetFile
-                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
+                                              .filter(p -> p.getFileName().toString().startsWith(prefix))//tous les files .sav commencerait par ce prefix
                                               .sorted().toList();
                 backupFilesQueue.addAll(allSavFiles);
             } catch (IOException e) {

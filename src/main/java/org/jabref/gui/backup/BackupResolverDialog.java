@@ -20,9 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BackupResolverDialog extends FXDialog {
-    public static final ButtonType RESTORE_FROM_BACKUP = new ButtonType(Localization.lang("Restore from backup"), ButtonBar.ButtonData.OK_DONE);
-    public static final ButtonType REVIEW_BACKUP = new ButtonType(Localization.lang("Review backup"), ButtonBar.ButtonData.LEFT);
+    public static final ButtonType RESTORE_FROM_BACKUP = new ButtonType(Localization.lang("Restore from latest backup"), ButtonBar.ButtonData.OK_DONE);
+    public static final ButtonType REVIEW_BACKUP = new ButtonType(Localization.lang("Review latest backup"), ButtonBar.ButtonData.LEFT);
     public static final ButtonType IGNORE_BACKUP = new ButtonType(Localization.lang("Ignore backup"), ButtonBar.ButtonData.CANCEL_CLOSE);
+    public static final ButtonType COMPARE_OLDER_BACKUP = new ButtonType("Compare older backup", ButtonBar.ButtonData.LEFT);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
 
@@ -30,7 +31,7 @@ public class BackupResolverDialog extends FXDialog {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().setMinHeight(180);
-        getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
+        getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP, COMPARE_OLDER_BACKUP);
 
         Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
         String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));

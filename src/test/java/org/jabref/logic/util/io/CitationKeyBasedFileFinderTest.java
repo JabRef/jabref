@@ -47,8 +47,8 @@ class CitationKeyBasedFileFinderTest {
         Files.createFile(dir2003.resolve("Paper by HipKro03.pdf"));
 
         Path dirTest = Files.createDirectory(rootDir.resolve("test"));
-        Files.createFile(dirTest.resolve(".TEST"));
-        Files.createFile(dirTest.resolve("TEST["));
+        Files.createFile(dirTest.resolve(".COMPARE_OLDER_BACKUP"));
+        Files.createFile(dirTest.resolve("COMPARE_OLDER_BACKUP["));
         Files.createFile(dirTest.resolve("TE.ST"));
         Files.createFile(dirTest.resolve("foo.dat"));
 
