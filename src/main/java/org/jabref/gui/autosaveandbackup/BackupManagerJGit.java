@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -269,6 +270,9 @@ public class BackupManagerJGit {
                     commitInfo.add(sizeFormatted); // Add Formatted size
                 }
 
+                // adding date detail
+                Date date= commit.getAuthorIdent().getWhen();
+                commitInfo.add(date.toString());
                 // Add list of details to the main list
                 commitDetails.add(commitInfo);
             }
