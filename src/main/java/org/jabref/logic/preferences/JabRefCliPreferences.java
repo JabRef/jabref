@@ -343,6 +343,12 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
     private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
 
+    private static final String GIT_USERNAME = "git_username";
+
+    private static final String GIT_PASSWORD = "git_password";
+
+    private static final String SSH_PATH = "ssh_path";
+
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
     private static final int EXPORTER_FILENAME_INDEX = 1;
@@ -840,16 +846,31 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     @Override
-    public GitPreferences getGitSupportPreferences() {
+    public GitPreferences getGitPreferences() {
         if (gitPreferences != null) {
             return gitPreferences;
         }
 
-        gitPreferences = new GitPreferences(getBoolean(GIT_SUPPORT_ENABLED_PROPERTY), AuthenticationViewMode.valueOf(get(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE)), getBoolean(PUSH_FREQUENCY_PROPERTY));
+        gitPreferences = new GitPreferences(
+                getBoolean(GIT_SUPPORT_ENABLED_PROPERTY),
+                AuthenticationViewMode.valueOf(get(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE)),
+                getBoolean(PUSH_FREQUENCY_PROPERTY),
+                get(GIT_USERNAME),
+                get(SSH_PATH),
+                get(GIT_PASSWORD)
+        );
+
         EasyBind.listen(gitPreferences.getGitSupportEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_SUPPORT_ENABLED_PROPERTY, newValue));
         EasyBind.listen(gitPreferences.getAuthenticationProperty(), (obs, oldValue, newValue) ->
                 put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, newValue.name()));
         EasyBind.listen(gitPreferences.getFrequencyLabelEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(PUSH_FREQUENCY_PROPERTY, newValue));
+        EasyBind.listen(gitPreferences.getUsernameProperty(), (obs, oldValue, newValue) ->
+                put(GIT_USERNAME, newValue));
+        EasyBind.listen(gitPreferences.getSshPathProperty(), (obs, oldValue, newValue) ->
+                put(SSH_PATH, newValue));
+        EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) ->
+                put(GIT_PASSWORD, newValue));
+
         return gitPreferences;
     }
 
