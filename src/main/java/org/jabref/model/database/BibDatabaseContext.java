@@ -13,6 +13,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.git.GitManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -54,6 +55,7 @@ public class BibDatabaseContext {
      * The path where this database was last saved to.
      */
     private Path path;
+    private boolean isInGitRepository;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -81,6 +83,7 @@ public class BibDatabaseContext {
         this(database, metaData);
         Objects.requireNonNull(location);
         this.path = path;
+        isInGitRepository = GitManager.isGitRepository(path);
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -97,6 +100,7 @@ public class BibDatabaseContext {
 
     public void setDatabasePath(Path file) {
         this.path = file;
+        this.isInGitRepository = GitManager.isGitRepository(file);
     }
 
     /**
@@ -110,6 +114,7 @@ public class BibDatabaseContext {
 
     public void clearDatabasePath() {
         this.path = null;
+        this.isInGitRepository = false;
     }
 
     public BibDatabase getDatabase() {
@@ -228,6 +233,10 @@ public class BibDatabaseContext {
 
     public DatabaseLocation getLocation() {
         return this.location;
+    }
+
+    public boolean isInGitRepository() {
+        return isInGitRepository;
     }
 
     public void convertToSharedDatabase(DatabaseSynchronizer dmbsSynchronizer) {

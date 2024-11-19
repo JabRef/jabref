@@ -26,6 +26,8 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.GitException;
+import org.jabref.logic.git.GitManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -210,6 +212,17 @@ public class OpenDatabaseAction extends SimpleCommand {
                 clipboardManager,
                 taskExecutor);
         tabContainer.addTab(newTab, true);
+        if (GitManager.isGitRepository(file)) {
+            LOGGER.debug("File is in a git repository");
+            try {
+                GitManager gitManager = GitManager.openGitRepository(file);
+                gitManager.update();
+                dialogService.notify(Localization.lang("Pulled the latest changes from the remote repository."));
+            } catch (GitException e) {
+                LOGGER.warn("Error performing git pull for git repo containing {}", file, e);
+                dialogService.notify(Localization.lang("Error during Git pull operation."));
+            }
+        }
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
