@@ -104,8 +104,7 @@ public class BackupManagerJGit {
 
     private void performBackup(Path backupDir,Path originalPath) throws IOException, GitAPIException {
         /*
-
-        il faut initialiser needsBackup
+        needsBackup must be initialized
          */
         needsBackup=BackupManagerJGit.backupGitDiffers(backupDir,originalPath);
         if (!needsBackup) {
@@ -125,13 +124,18 @@ public class BackupManagerJGit {
         try {
             Git git = Git.open(backupDir.toFile());
 
+<<<<<<< HEAD
             // Extraire le contenu de l'objet spécifié (commit) dans le répertoire de travail
            git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
+=======
+            //Extract the content of the object (commit) in the work repository
+            git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
+>>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
 
-            // Ajouter les modifications au staging
+            // Add commits to staging Area
             git.add().addFilepattern(".").call();
 
-            // Faire un commit avec un message explicite
+            // Commit with a message
             git.commit().setMessage("Restored content from commit: " + objectId.getName()).call();
 
             LOGGER.info("Restored backup from Git repository and committed the changes");
@@ -140,6 +144,23 @@ public class BackupManagerJGit {
         }
     }
 
+<<<<<<< HEAD
+=======
+    public static void restoreBackupj(Path originalPath, Path backupDir, ObjectId objectId) {
+        try {
+
+            Git git = Git.open(backupDir.toFile());
+            git.checkout().setName(objectId.getName()).call();
+            /*
+            faut une methode pour evite le branch nouveau
+            need a method to avoid the new branch
+             */
+            LOGGER.info("Restored backup from Git repository");
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Error while restoring the backup", e);
+        }
+    }
+>>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
 
     /*
         compare what is in originalPath and last commit
@@ -173,7 +194,7 @@ public class BackupManagerJGit {
                 .setGitDir(new File(repoDir, ".git"))
                 .build();
         /*
-        il faut une classe qui affiche les dix dernier backup avec les data: date/ size / number of entries
+        need a class to show the last ten backups indicating: date/ size/ number of entries
          */
 
         ObjectId oldCommit = repository.resolve(CommitId);
@@ -186,16 +207,16 @@ public class BackupManagerJGit {
     }
 
 
-// n sera un conteur qui incremente de 1 si l'utilisateur a demandé de voir d'autres versions plus anciens(paquet de 10)
-// et decremente de 1 si il veut voir le paquet de 10 versions les plus recentes
-// le scroll bas : n->n+1  ; le scroll en haut : n->n-1
+// n is a counter incrementing by 1 when the user asks to see older versions (packs of 10)
+// and decrements by 1 when the user asks to see the pack of the 10 earlier versions
+// the scroll down: n->n+1 ; the scroll up: n->n-1
     public List<RevCommit> retreiveCommits(Path backupDir, int n) throws IOException, GitAPIException {
         List<RevCommit> retrievedCommits = new ArrayList<>();
-        // Ouvrir le dépôt Git
+        // Open Git depository
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
-            // Utiliser RevWalk pour parcourir l'historique des commits
+            //  Use RevWalk to go through all commits
             try (RevWalk revWalk = new RevWalk(repository)) {
-                // Commencer depuis HEAD
+                // Start from HEAD
                 RevCommit startCommit = revWalk.parseCommit(repository.resolve("HEAD"));
                 revWalk.markStart(startCommit);
 
@@ -204,16 +225,21 @@ public class BackupManagerJGit {
                 int endIndex = startIndex + 9;
 
                 for (RevCommit commit : revWalk) {
-                    // Ignorer les commits jusqu'à l'index de départ
+                    // Ignore commits before starting index
                     if (count < startIndex) {
                         count++;
                         continue;
                     }
+<<<<<<< HEAD
                     // Arrêter lorsque nous avons atteint l'index de fin
                     if (count > endIndex) {
+=======
+                    // Stop at endIndex
+                    if (count >= endIndex) {
+>>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
                         break;
                     }
-                    // Ajouter les commits à la liste principale
+                    // Add commits to the main list
                     retrievedCommits.add(commit);
                     count++;
                 }
@@ -227,6 +253,7 @@ public class BackupManagerJGit {
     public  List<List<String>> retrieveCommitDetails(List<RevCommit> Commits, Path backupDir) throws IOException, GitAPIException
         {
 
+<<<<<<< HEAD
             try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
                 List<List<String>> commitDetails = new ArrayList<>();
 
@@ -261,6 +288,35 @@ public class BackupManagerJGit {
 
                 return commitDetails;
             }
+=======
+        // Browse the list of commits given as a parameter
+        for (RevCommit commit : commits) {
+            // A list to stock details about the commit
+            List<String> commitInfo = new ArrayList<>();
+            commitInfo.add(commit.getName()); // ID of commit
+
+            // Get the size of files changes by the commit
+            try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                treeWalk.addTree(commit.getTree());
+                treeWalk.setRecursive(true);
+                long totalSize = 0;
+
+                while (treeWalk.next()) {
+                    ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
+                    totalSize += loader.getSize(); // size in bytes
+                }
+
+                // Convert the size to Kb or Mb
+                String sizeFormatted = (totalSize > 1024 * 1024)
+                        ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
+                        : String.format("%.2f Ko", totalSize / 1024.0);
+
+                commitInfo.add(sizeFormatted); // Add Formatted size
+            }
+
+            // Add list of details to the main list
+            commitDetails.add(commitInfo);
+>>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
         }
 
 
