@@ -49,7 +49,6 @@ public class BackupManagerJGit {
     private final LibraryTab libraryTab;
     private final Git git;
 
-
     private boolean needsBackup = false;
 
     BackupManagerJGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
@@ -76,24 +75,28 @@ public class BackupManagerJGit {
         }
     }
 
-    public static BackupManagerJGit startJGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+    public BackupManagerJGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
         BackupManagerJGit backupManagerJGit = new BackupManagerJGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
-        backupManagerJGit.startBackupTaskJGit(preferences.getFilePreferences().getBackupDirectory());
+        backupManagerJGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
         runningInstances.add(backupManagerJGit);
         return backupManagerJGit;
     }
 
-    public static void shutdownJGit(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownJGit(backupDir, createBackup));
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup,Path originalPath) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownJGit(backupDir, createBackup , originalPath));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
-    private void startBackupTaskJGit(Path backupDir) {
+    @SuppressWarnings({"checkstyle:WhitespaceAfter", "checkstyle:LeftCurly"})
+    private void startBackupTask(Path backupDir, Path originalPath)
+    {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
-                        performBackup(backupDir,originalPath);
-                    } catch (IOException | GitAPIException e) {
+                        performBackup(backupDir, originalPath);
+                    } catch (
+                            IOException |
+                            GitAPIException e) {
                         LOGGER.error("Error during backup", e);
                     }
                 },
@@ -102,11 +105,11 @@ public class BackupManagerJGit {
                 TimeUnit.SECONDS);
     }
 
-    private void performBackup(Path backupDir,Path originalPath) throws IOException, GitAPIException {
+    private void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         /*
         needsBackup must be initialized
          */
-        needsBackup=BackupManagerJGit.backupGitDiffers(backupDir,originalPath);
+        needsBackup = BackupManagerJGit.backupGitDiffers(backupDir, originalPath);
         if (!needsBackup) {
             return;
         }
@@ -120,18 +123,12 @@ public class BackupManagerJGit {
         this.needsBackup = false;
     }
 
-    public static void restoreBackupJGit(Path originalPath, Path backupDir, ObjectId objectId) {
+    @SuppressWarnings("checkstyle:TodoComment")
+    public static void restoreBackup(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
             Git git = Git.open(backupDir.toFile());
 
-<<<<<<< HEAD
-            // Extraire le contenu de l'objet spécifié (commit) dans le répertoire de travail
-           git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
-=======
-            //Extract the content of the object (commit) in the work repository
             git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
->>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
-
             // Add commits to staging Area
             git.add().addFilepattern(".").call();
 
@@ -139,13 +136,13 @@ public class BackupManagerJGit {
             git.commit().setMessage("Restored content from commit: " + objectId.getName()).call();
 
             LOGGER.info("Restored backup from Git repository and committed the changes");
-        } catch (IOException | GitAPIException e) {
+        } catch (
+                IOException |
+                GitAPIException e) {
             LOGGER.error("Error while restoring the backup", e);
         }
     }
 
-<<<<<<< HEAD
-=======
     public static void restoreBackupj(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
 
@@ -156,12 +153,12 @@ public class BackupManagerJGit {
             need a method to avoid the new branch
              */
             LOGGER.info("Restored backup from Git repository");
-        } catch (IOException | GitAPIException e) {
+        } catch (
+                IOException |
+                GitAPIException e) {
             LOGGER.error("Error while restoring the backup", e);
         }
     }
->>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
-
     /*
         compare what is in originalPath and last commit
         */
@@ -187,7 +184,7 @@ public class BackupManagerJGit {
         }
     }
 
-    public List<DiffEntry> showDiffersJGit(Path originalPath, Path backupDir, String CommitId) throws IOException, GitAPIException {
+    public List<DiffEntry> showDiffers(Path originalPath, Path backupDir, String CommitId) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
@@ -206,8 +203,7 @@ public class BackupManagerJGit {
         return diffFr.scan(oldCommit, newCommit);
     }
 
-
-// n is a counter incrementing by 1 when the user asks to see older versions (packs of 10)
+    // n is a counter incrementing by 1 when the user asks to see older versions (packs of 10)
 // and decrements by 1 when the user asks to see the pack of the 10 earlier versions
 // the scroll down: n->n+1 ; the scroll up: n->n-1
     public List<RevCommit> retreiveCommits(Path backupDir, int n) throws IOException, GitAPIException {
@@ -230,13 +226,7 @@ public class BackupManagerJGit {
                         count++;
                         continue;
                     }
-<<<<<<< HEAD
-                    // Arrêter lorsque nous avons atteint l'index de fin
-                    if (count > endIndex) {
-=======
-                    // Stop at endIndex
                     if (count >= endIndex) {
->>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
                         break;
                     }
                     // Add commits to the main list
@@ -246,92 +236,47 @@ public class BackupManagerJGit {
             }
         }
 
-
         return retrievedCommits;
     }
 
-    public  List<List<String>> retrieveCommitDetails(List<RevCommit> Commits, Path backupDir) throws IOException, GitAPIException
-        {
+    public List<List<String>> retrieveCommitDetails(List<RevCommit> commits, Path backupDir) throws IOException, GitAPIException {
+        List<List<String>> commitDetails;
+        try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
+            commitDetails = new ArrayList<>();
 
-<<<<<<< HEAD
-            try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
-                List<List<String>> commitDetails = new ArrayList<>();
+            // Browse the list of commits given as a parameter
+            for (RevCommit commit : commits) {
+                // A list to stock details about the commit
+                List<String> commitInfo = new ArrayList<>();
+                commitInfo.add(commit.getName()); // ID of commit
 
-                // Parcourir la liste des commits fournie en paramètre
-                for (RevCommit commit : Commits) {
-                    // Liste pour stocker les détails du commit
-                    List<String> commitInfo = new ArrayList<>();
-                    commitInfo.add(commit.getName()); // ID du commit
+                // Get the size of files changes by the commit
+                try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                    treeWalk.addTree(commit.getTree());
+                    treeWalk.setRecursive(true);
+                    long totalSize = 0;
 
-                    // Récupérer la taille des fichiers modifiés par le commit
-                    try (TreeWalk treeWalk = new TreeWalk(repository)) {
-                        treeWalk.addTree(commit.getTree());
-                        treeWalk.setRecursive(true);
-                        long totalSize = 0;
-
-                        while (treeWalk.next()) {
-                            ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
-                            totalSize += loader.getSize(); // Calculer la taille en octets
-                        }
-
-                        // Convertir la taille en Ko ou Mo
-                        String sizeFormatted = (totalSize > 1024 * 1024)
-                                ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
-                                : String.format("%.2f Ko", totalSize / 1024.0);
-
-                        commitInfo.add(sizeFormatted); // Ajouter la taille formatée
+                    while (treeWalk.next()) {
+                        ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
+                        totalSize += loader.getSize(); // size in bytes
                     }
 
-                    // Ajouter la liste des détails à la liste principale
-                    commitDetails.add(commitInfo);
+                    // Convert the size to Kb or Mb
+                    String sizeFormatted = (totalSize > 1024 * 1024)
+                            ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
+                            : String.format("%.2f Ko", totalSize / 1024.0);
+
+                    commitInfo.add(sizeFormatted); // Add Formatted size
                 }
 
-                return commitDetails;
+                // Add list of details to the main list
+                commitDetails.add(commitInfo);
             }
-=======
-        // Browse the list of commits given as a parameter
-        for (RevCommit commit : commits) {
-            // A list to stock details about the commit
-            List<String> commitInfo = new ArrayList<>();
-            commitInfo.add(commit.getName()); // ID of commit
-
-            // Get the size of files changes by the commit
-            try (TreeWalk treeWalk = new TreeWalk(repository)) {
-                treeWalk.addTree(commit.getTree());
-                treeWalk.setRecursive(true);
-                long totalSize = 0;
-
-                while (treeWalk.next()) {
-                    ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
-                    totalSize += loader.getSize(); // size in bytes
-                }
-
-                // Convert the size to Kb or Mb
-                String sizeFormatted = (totalSize > 1024 * 1024)
-                        ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
-                        : String.format("%.2f Ko", totalSize / 1024.0);
-
-                commitInfo.add(sizeFormatted); // Add Formatted size
-            }
-
-            // Add list of details to the main list
-            commitDetails.add(commitInfo);
->>>>>>> b82682aa2e4f9dc82f5abbe95bb5858c02a58d32
         }
 
-
-
-
-    /*
-
-    faire une methode qui accepte commit id et retourne les diff differences avec la version actuelle( fait)
-    methode qui renvoie n derniers indice de commit
-    methode ayant idcommit retourne data
-
-     */
-
-
-    private void shutdownJGit(Path backupDir, boolean createBackup) {
+        return commitDetails;
+    }
+    private void shutdownJGit(Path backupDir, boolean createBackup, Path originalPath) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
@@ -344,4 +289,10 @@ public class BackupManagerJGit {
             }
         }
     }
+}
+
+
+
+
+
 
