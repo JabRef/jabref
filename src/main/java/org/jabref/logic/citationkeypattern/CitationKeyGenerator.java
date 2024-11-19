@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter; //added import
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
