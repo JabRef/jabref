@@ -82,7 +82,7 @@ public interface CliPreferences {
 
     LibraryPreferences getLibraryPreferences();
 
-    GitPreferences getGitSupportPreferences();
+    GitPreferences getGitPreferences();
 
     DOIPreferences getDOIPreferences();
 
