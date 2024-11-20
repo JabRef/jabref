@@ -181,7 +181,7 @@ class BackupManagerTest {
         fullBackupPath.ifPresent(manager::performBackup);
         manager.listen(new GroupUpdatedEvent(new MetaData()));
 
-        BackupManager.shutdown(database, backupDir, true);
+        BackupManager.shutdown(database, backupDir, true, bibPath);
 
         List<Path> files = Files.list(backupDir).sorted().toList();
         // we only know the first backup path because the second one is created on shutdown
