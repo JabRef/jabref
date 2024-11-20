@@ -953,7 +953,3 @@ jmh {
 requirementTracing {
     inputDirectories = files('docs', 'src/main/java', 'src/test/java')
 }
-
-test {
-    jvmArgs += "-Djdk.attach.allowAttachSelf=true"
-}
