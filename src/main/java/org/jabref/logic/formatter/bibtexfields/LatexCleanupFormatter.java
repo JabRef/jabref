@@ -10,9 +10,9 @@ import org.jabref.logic.l10n.Localization;
  */
 public class LatexCleanupFormatter extends Formatter {
 
+    private static final Pattern REMOVE_MKBIBQUOTE = Pattern.compile("\\\\mkbibquote\\{([^}]*)}");
     private static final Pattern REMOVE_REDUNDANT = Pattern
             .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");
-
     private static final Pattern REPLACE_WITH_AT = Pattern.compile("(^|[^\\\\$])\\$");
     private static final Pattern REPLACE_EVERY_OTHER_AT = Pattern.compile("([^@]*)@@([^@]*)@@");
     private static final Pattern MOVE_NUMBERS_WITH_OPERATORS = Pattern.compile("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$");
@@ -31,7 +31,13 @@ public class LatexCleanupFormatter extends Formatter {
 
     @Override
     public String format(String oldString) {
-        String newValue = oldString;
+        if (oldString == null || oldString.isEmpty()) {
+            return oldString;
+        }
+
+        String newValue = REMOVE_MKBIBQUOTE.matcher(oldString).replaceAll("$1");;
+
+        newValue = REMOVE_MKBIBQUOTE.matcher(newValue).replaceAll("$1");
 
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
         newValue = newValue.replace("$$", "");
@@ -53,7 +59,7 @@ public class LatexCleanupFormatter extends Formatter {
 
         newValue = ESCAPE_PERCENT_SIGN_ONCE.matcher(newValue).replaceAll("$1\\\\%"); // escape %, but do not escapee \% again,  used for comments in TeX
 
-        return newValue;
+        return newValue.trim();
     }
 
     @Override
