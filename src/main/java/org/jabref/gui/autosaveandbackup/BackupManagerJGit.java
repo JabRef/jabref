@@ -83,14 +83,13 @@ public class BackupManagerJGit {
         return backupManagerJGit;
     }
 
-    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup,Path originalPath) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownJGit(backupDir, createBackup , originalPath));
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup, Path originalPath) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownJGit(backupDir, createBackup, originalPath));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
     @SuppressWarnings({"checkstyle:WhitespaceAfter", "checkstyle:LeftCurly"})
-    private void startBackupTask(Path backupDir, Path originalPath)
-    {
+    private void startBackupTask(Path backupDir, Path originalPath) {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
@@ -271,7 +270,7 @@ public class BackupManagerJGit {
                 }
 
                 // adding date detail
-                Date date= commit.getAuthorIdent().getWhen();
+                Date date = commit.getAuthorIdent().getWhen();
                 commitInfo.add(date.toString());
                 // Add list of details to the main list
                 commitDetails.add(commitInfo);
@@ -280,6 +279,7 @@ public class BackupManagerJGit {
 
         return commitDetails;
     }
+
     private void shutdownJGit(Path backupDir, boolean createBackup, Path originalPath) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
@@ -287,7 +287,7 @@ public class BackupManagerJGit {
 
         if (createBackup) {
             try {
-                performBackup(backupDir,originalPath);
+                performBackup(backupDir, originalPath);
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Error during shutdown backup", e);
             }
