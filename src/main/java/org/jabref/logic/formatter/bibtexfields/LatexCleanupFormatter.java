@@ -9,8 +9,6 @@ import org.jabref.logic.l10n.Localization;
  * Simplifies LaTeX syntax. {@see org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
  */
 public class LatexCleanupFormatter extends Formatter {
-
-    private static final Pattern REMOVE_MKBIBQUOTE = Pattern.compile("\\\\mkbibquote\\{([^}]*)}");
     private static final Pattern REMOVE_REDUNDANT = Pattern
             .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");
     private static final Pattern REPLACE_WITH_AT = Pattern.compile("(^|[^\\\\$])\\$");
@@ -31,13 +29,7 @@ public class LatexCleanupFormatter extends Formatter {
 
     @Override
     public String format(String oldString) {
-        if (oldString == null || oldString.isEmpty()) {
-            return oldString;
-        }
-
-        String newValue = REMOVE_MKBIBQUOTE.matcher(oldString).replaceAll("$1");;
-
-        newValue = REMOVE_MKBIBQUOTE.matcher(newValue).replaceAll("$1");
+        String newValue = oldString;
 
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
         newValue = newValue.replace("$$", "");
