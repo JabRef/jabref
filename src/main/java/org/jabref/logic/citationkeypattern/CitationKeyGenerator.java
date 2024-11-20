@@ -45,6 +45,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
+    private final RemoveLatexCommandsFormatter formatter = new RemoveLatexCommandsFormatter();
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
@@ -106,7 +107,6 @@ public class CitationKeyGenerator extends BracketedPattern {
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);
-        RemoveLatexCommandsFormatter formatter = new RemoveLatexCommandsFormatter();
         newKey = formatter.format(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
         return cleanKey(newKey, unwantedCharacters);
