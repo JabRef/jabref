@@ -144,26 +144,6 @@ public class BackupManager {
         }
     }
 
-    public static void restoreBackupj(Path originalPath, Path backupDir, ObjectId objectId) {
-        try {
-
-            Git git = Git.open(backupDir.toFile());
-            git.checkout().setName(objectId.getName()).call();
-            /*
-            faut une methode pour evite le branch nouveau
-            need a method to avoid the new branch
-             */
-            LOGGER.info("Restored backup from Git repository");
-        } catch (
-                IOException |
-                GitAPIException e) {
-            LOGGER.error("Error while restoring the backup", e);
-        }
-    }
-    /*
-        compare what is in originalPath and last commit
-        */
-
     public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
