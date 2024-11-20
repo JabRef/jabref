@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -358,8 +357,7 @@ public class BibtexParser implements Parser {
         // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
 
-        if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
-            if (comment.startsWith(MetaData.META_FLAG)) {
+        if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
                 int pos = rest.indexOf(':');
@@ -370,9 +368,7 @@ public class BibtexParser implements Parser {
                     // meta comments are always re-written by JabRef and not stored in the file
                     dumpTextReadSoFarToString();
                 }
-            }
-        } else if (comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length()))
-                          .equals(MetaData.ENTRYTYPE_FLAG)) {
+        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
@@ -390,23 +386,15 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(ex);
             }
-        } else if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG_VERSION_010.length())).equals(MetaData.META_FLAG_VERSION_010)) {
-            parseCommentToJson(comment, meta);
+        } else if (comment.startsWith(MetaData.META_FLAG_VERSION_010)) {
+            parseCommentToJson(comment);
         }
     }
 
-    private JsonObject parseCommentToJson(String comment, Map<String, String> meta) {
-        Pattern pattern = Pattern.compile("\\{.*}", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(comment);
-        if (matcher.find()) {
-            String jsonString = matcher.group();
-            Gson gson = new Gson();
-            JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
-            String jsonResult = gson.toJson(jsonObject);
-            meta.putIfAbsent(MetaData.META_FLAG_VERSION_010, jsonResult);
-            return jsonObject;
-        }
-        return null;
+    private Optional<JsonObject> parseCommentToJson(String comment) {
+        String content = comment.substring(comment.indexOf(MetaData.META_FLAG_VERSION_010) + MetaData.META_FLAG_VERSION_010.length());
+        Gson gson = new Gson();
+        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
     }
 
     /**
