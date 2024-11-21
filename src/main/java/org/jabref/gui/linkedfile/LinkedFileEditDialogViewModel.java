@@ -109,6 +109,7 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                     try {
                         Files.move(fileToAdd, correctPath);
                         link.set(relativize(correctPath));
+                        filePreferences.setWorkingDirectory(correctPath);
                         setExternalFileTypeByExtension(link.getValueSafe());
                     } catch (IOException ex) {
                         LOGGER.error("Error moving file", ex);
