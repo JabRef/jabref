@@ -4,71 +4,57 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.strings.StringUtil;
 
 public class RemoveLatexCommandsFormatter implements LayoutFormatter {
-
     @Override
     public String format(String field) {
         StringBuilder cleanedField = new StringBuilder();
         StringBuilder currentCommand = null;
-        char currentCharacter;
         boolean escaped = false;
         boolean incommand = false;
-        int currentFieldPosition;
-        for (currentFieldPosition = 0; currentFieldPosition < field.length(); currentFieldPosition++) {
-            currentCharacter = field.charAt(currentFieldPosition);
-            if (escaped && (currentCharacter == '\\')) {
-                cleanedField.append('\\');
-                escaped = false;
-                // \\ --> first \ begins the command, second \ ends the command
-                // \latexommand\\ -> \latexcommand is the command, terminated by \, which begins a new command
-                incommand = false;
-            } else if (currentCharacter == '\\') {
+
+        for (int currentFieldPosition = 0; currentFieldPosition < field.length(); currentFieldPosition++) {
+            char currentCharacter = field.charAt(currentFieldPosition);
+
+            if (currentCharacter == '\\') {
+                // Start of a LaTeX command
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
-            } else if (!incommand && ((currentCharacter == '{') || (currentCharacter == '}'))) {
-                // Swallow the brace.
-            } else if (Character.isLetter(currentCharacter) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(currentCharacter))) {
-                escaped = false;
-                if (incommand) {
+            } else if (incommand) {
+                // Collect characters for the LaTeX command name
+                if (Character.isLetter(currentCharacter) ||
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(currentCharacter))) {
                     currentCommand.append(currentCharacter);
-                    if ((currentCommand.length() == 1)
-                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
-                        // This indicates that we are in a command of the type \^o or \~{n}
-                        incommand = false;
-                        escaped = false;
-                    }
-                } else {
-                    cleanedField.append(currentCharacter);
-                }
-            } else if (Character.isLetter(currentCharacter)) {
-                escaped = false;
-                if (incommand) {
-                    // We are in a command, and should not keep the letter.
-                    currentCommand.append(currentCharacter);
-                } else {
-                    cleanedField.append(currentCharacter);
-                }
-            } else {
-                if (!incommand || (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{'))) {
-                    cleanedField.append(currentCharacter);
-                } else {
-                    if (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{')) {
-                        // do not append the opening brace of a command parameter
-                        // do not append the whitespace character
-                        cleanedField.append(currentCharacter);
-                    }
-                    if (incommand) {
-                        // eat up all whitespace characters
-                        while (currentFieldPosition + 1 < field.length() && Character.isWhitespace(field.charAt(currentFieldPosition + 1))) {
-                            currentFieldPosition++;
+                } else if (currentCharacter == '{') {
+                    // Found the start of the command's parameters; skip the command name
+                    int braceLevel = 1;
+                    currentFieldPosition++; // Move past the opening brace
+                    while (currentFieldPosition < field.length() && braceLevel > 0) {
+                        currentCharacter = field.charAt(currentFieldPosition);
+                        if (currentCharacter == '{') {
+                            braceLevel++;
+                        } else if (currentCharacter == '}') {
+                            braceLevel--;
                         }
+                        // Append parameter content if we're still inside the braces
+                        if (braceLevel > 0) {
+                            cleanedField.append(currentCharacter);
+                        }
+                        currentFieldPosition++;
                     }
+                    incommand = false;
+                    escaped = false;
+                } else {
+                    // End of the command (no parameters)
+                    incommand = false;
+                    escaped = false;
                 }
-                incommand = false;
-                escaped = false;
+            } else if (currentCharacter != '{' && currentCharacter != '}') {
+                // Append regular characters (non-command, non-braces)
+                cleanedField.append(currentCharacter);
             }
         }
 
         return cleanedField.toString();
     }
+
 }
