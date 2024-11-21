@@ -124,7 +124,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return files;
     }
 
-
     public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(new LinkedFileViewModel(
                 linkedFile,
