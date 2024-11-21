@@ -20,19 +20,23 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel.LOGGER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UnlinkedFilesDialogViewModelTest {
-
-    @Mock
-    private ImportHandler importHandler;
+    @TempDir
+    Path tempDir;
+    @TempDir
+    Path subDir;
+    @TempDir
+    Path file1;
+    @TempDir
+    Path file2;
     @Mock
     private TaskExecutor taskExecutor;
     @Mock
@@ -42,8 +46,8 @@ public class UnlinkedFilesDialogViewModelTest {
     @Mock
     private BibDatabaseContext bibDatabaseContext;
 
-    private UnlinkedFilesDialogViewModel viewModel;
 
+    private UnlinkedFilesDialogViewModel viewModel;
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
@@ -69,21 +73,21 @@ public class UnlinkedFilesDialogViewModelTest {
     @Test
     public void testStartImportWithValidFiles() throws Exception {
         // Create temporary test files
-        Path tempDir = Files.createTempDirectory("testDir");
-        Path subDir = tempDir.resolve("subdir");
+        tempDir = Files.createTempDirectory("testDir");
+        subDir = tempDir.resolve("subdir");
         Files.createDirectories(subDir);
 
         // Create test files: one in the main directory and one in the subdirectory
-        Path tempFile1 = Files.createTempFile(tempDir, "file1", ".pdf"); // Main directory
-        Path tempFile2 = Files.createTempFile(subDir, "file2", ".txt");
+        file1 = Files.createTempFile(tempDir, "file1", ".pdf"); // Main directory
+        file2 = Files.createTempFile(subDir, "file2", ".txt");
 
         // Arrange: Mock file nodes with the absolute paths of the temporary files
         FileNodeViewModel fileNode1 = mock(FileNodeViewModel.class);
         FileNodeViewModel fileNode2 = mock(FileNodeViewModel.class);
 
         // Mock the getPath method to return the expected paths
-        when(fileNode1.getPath()).thenReturn(tempFile1);
-        when(fileNode2.getPath()).thenReturn(tempFile2);
+        when(fileNode1.getPath()).thenReturn(file1);
+        when(fileNode2.getPath()).thenReturn(file2);
 
         // Create TreeItem for each FileNodeViewModel
         TreeItem<FileNodeViewModel> treeItem1 = new TreeItem<>(fileNode1);
@@ -95,8 +99,8 @@ public class UnlinkedFilesDialogViewModelTest {
 
         // Assert that the list contains 2 items
         assertEquals(2, checkedFileListProperty.get().size());
-        assertEquals(tempFile1, checkedFileListProperty.get().get(0).getValue().getPath());
-        assertEquals(tempFile2, checkedFileListProperty.get().get(1).getValue().getPath());
+        assertEquals(file1, checkedFileListProperty.get().get(0).getValue().getPath());
+        assertEquals(file2, checkedFileListProperty.get().get(1).getValue().getPath());
 
         Path directory = tempDir; // Base directory for relativization
 
@@ -104,23 +108,12 @@ public class UnlinkedFilesDialogViewModelTest {
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
-                                                     .map(path -> directory.toAbsolutePath().relativize(path.toAbsolutePath())) // Convert to relative path
+                                                     .map(path -> directory.relativize(path))
                                                      .collect(Collectors.toList());
-
-        // Check if fileList is empty
-        if (fileList.isEmpty()) {
-            LOGGER.warn("There are no valid files checked");
-            return;
-        }
-
-        assertEquals(2, fileList.size(), "fileList should contain 2 paths");
-        assertTrue(fileList.contains(directory.toAbsolutePath().relativize(tempFile1.toAbsolutePath())),
-                "fileList should contain the relative path of file1.pdf");
-        assertTrue(fileList.contains(directory.toAbsolutePath().relativize(tempFile2.toAbsolutePath())),
-                "fileList should contain the relative path of file2.txt");
-        Files.deleteIfExists(tempFile1);
-        Files.deleteIfExists(tempFile2);
-        Files.deleteIfExists(subDir);
-        Files.deleteIfExists(tempDir);
+        assertEquals(
+                List.of(directory.relativize(file1), directory.relativize(file2)),
+                fileList,
+                "fileList should contain exactly the relative paths of file1.pdf and file2.txt"
+        );
     }
 }

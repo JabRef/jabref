@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
@@ -146,11 +145,11 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        Path directory = Paths.get(this.getSearchDirectory().toString()); // Get the base directory
+        Path directory = this.getSearchDirectory();
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
-                                                     .map(path -> directory.toAbsolutePath().relativize(path.toAbsolutePath())) // Convert to relative path
+                                                     .map(path -> directory.relativize(path))
                                                      .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
