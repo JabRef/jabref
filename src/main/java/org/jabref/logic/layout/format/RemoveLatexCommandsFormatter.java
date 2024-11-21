@@ -56,5 +56,4 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
 
         return cleanedField.toString();
     }
-
 }
