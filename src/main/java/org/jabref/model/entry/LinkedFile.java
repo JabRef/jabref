@@ -8,7 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -39,9 +40,14 @@ public class LinkedFile implements Serializable {
     private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
-    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
+    private static final HashSet<String> IMAGE_EXTENSIONS = new HashSet<>();
+    static {
+        IMAGE_EXTENSIONS.add(StandardExternalFileType.JPG.getExtension());
+        IMAGE_EXTENSIONS.add(StandardExternalFileType.PNG.getExtension());
+        IMAGE_EXTENSIONS.add(StandardExternalFileType.GIF.getExtension());
+    }
 
-    private static final List<String> IMAGE_EXTENSIONS = new ArrayList<>(List.of("jpeg", "jpg", "png", "gif"));
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -224,7 +230,7 @@ public class LinkedFile implements Serializable {
     }
 
     public boolean isImage() {
-        return IMAGE_EXTENSIONS.stream().anyMatch(getFileType().toLowerCase()::contains);
+        return IMAGE_EXTENSIONS.contains(fileTypeProperty().getValue());
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
