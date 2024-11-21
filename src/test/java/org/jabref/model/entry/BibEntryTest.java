@@ -857,9 +857,9 @@ class BibEntryTest {
 
     static Stream<LinkedFile> imagesWithoutCoverDescription() {
         return Stream.of(
-                new LinkedFile("", Paths.get("JabRef-icon-128.png"), "png"),
-                new LinkedFile("", Paths.get("JabRef-icon-64.png"), "png"),
-                new LinkedFile("", Paths.get("JabRef-icon-32.png"), "png")
+                new LinkedFile("", Paths.get("JabRef-icon-128.png"), "PNG image"),
+                new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image"),
+                new LinkedFile("", Paths.get("JabRef-icon-32.png"), "PNG image")
         );
     }
 
@@ -882,9 +882,9 @@ class BibEntryTest {
 
     @Test
     void getCoverImageReturnsCorrectImage() {
-        LinkedFile cover1 = new LinkedFile("", Paths.get("JabRef-icon-128.png"), "png");
-        LinkedFile cover2 = new LinkedFile("", Paths.get("JabRef-icon-64.png"), "png");
-        LinkedFile cover3 = new LinkedFile("cover", Paths.get("JabRef-icon-32.png"), "png");
+        LinkedFile cover1 = new LinkedFile("", Paths.get("JabRef-icon-128.png"), "PNG image");
+        LinkedFile cover2 = new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image");
+        LinkedFile cover3 = new LinkedFile("cover", Paths.get("wallpaper.jpg"), "JPG image");
         BibEntry entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
 
         entry.addFile(cover1);
@@ -898,8 +898,8 @@ class BibEntryTest {
     void getCoverImageUpdatesWithChangeToDescription() {
         List<LinkedFile> files = new ArrayList<>();
 
-        files.add(new LinkedFile("cover", Paths.get("JabRef-icon-128.png"), "png"));
-        files.add(new LinkedFile("", Paths.get("JabRef-icon-64.png"), "png"));
+        files.add(new LinkedFile("cover", Paths.get("JabRef-icon-128.png"), "PNG image"));
+        files.add(new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image"));
         LinkedFile cover1 = files.get(0);
         LinkedFile cover2 = files.get(1);
 
