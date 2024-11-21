@@ -75,6 +75,7 @@ done
 # Remove the auto-install triggers of the browser addon for chrom/chromium
 rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
 rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
+COMMON_SCRIPTS
 DESKTOP_SCRIPTS
 DESKTOP_COMMANDS_UNINSTALL
 
