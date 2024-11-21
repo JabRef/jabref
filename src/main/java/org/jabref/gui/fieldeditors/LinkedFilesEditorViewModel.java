@@ -31,7 +31,6 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -39,7 +38,6 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -106,19 +104,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return new LinkedFile("", relativePath, suggestedFileType.getName());
     }
 
-    public LinkedFileViewModel fromFile(Path file, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-
-        LinkedFile linkedFile = fromFile(file, fileDirectories, externalApplicationsPreferences);
-        return new LinkedFileViewModel(
-                linkedFile,
-                entry,
-                databaseContext,
-                taskExecutor,
-                dialogService,
-                preferences);
-    }
-
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
                               .map(linkedFile -> new LinkedFileViewModel(
@@ -160,7 +145,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(list -> {
                         if (!list.isEmpty()) {
-                            LOGGER.debug("Found non-associated files: {}" ,list);
+                            LOGGER.debug("Found non-associated files: {}", list);
                             files.addAll(list);
                         }
                     });
