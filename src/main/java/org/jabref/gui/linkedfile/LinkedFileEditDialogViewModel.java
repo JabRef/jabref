@@ -1,7 +1,9 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -22,14 +24,20 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedFileEditDialogViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileEditDialogViewModel.class);
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty link = new SimpleStringProperty("");
@@ -86,12 +94,28 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                 .withInitialFileName(fileName)
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(fileToAdd -> {
             // Store the directory for next time:
-            filePreferences.setWorkingDirectory(path);
-            link.set(relativize(path));
 
-            setExternalFileTypeByExtension(link.getValueSafe());
+            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
+                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+
+                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
+                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
+                        Localization.lang("Rename and add"));
+
+                if (correctButtonPressed) {
+                    Path correctPath = fileToAdd.resolveSibling(newFilename);
+                    try {
+                        Files.move(fileToAdd, correctPath);
+                        link.set(relativize(correctPath));
+                        setExternalFileTypeByExtension(link.getValueSafe());
+                    } catch (IOException ex) {
+                        LOGGER.error("Error moving file", ex);
+                        dialogService.showErrorDialogAndWait(ex);
+                    }
+                }
+            }
         });
     }
 

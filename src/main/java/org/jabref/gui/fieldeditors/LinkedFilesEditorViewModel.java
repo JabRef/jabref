@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,40 +139,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return files;
     }
 
-    public void addNewFile() {
-        Path workingDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
-                                               .orElse(preferences.getFilePreferences().getWorkingDirectory());
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDirectory)
-                .build();
-
-        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-
-        for (Path fileToAdd : selectedFiles) {
-            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
-                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
-
-                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
-                        Localization.lang("Rename and add"));
-
-                if (correctButtonPressed) {
-                    Path correctPath = fileToAdd.resolveSibling(newFilename);
-                    try {
-                        Files.move(fileToAdd, correctPath);
-                        addNewLinkedFile(correctPath, fileDirectories);
-                    } catch (IOException ex) {
-                        LOGGER.error("Error moving file", ex);
-                        dialogService.showErrorDialogAndWait(ex);
-                    }
-                }
-            } else {
-                addNewLinkedFile(fileToAdd, fileDirectories);
-            }
-        }
-    }
 
     public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(new LinkedFileViewModel(
@@ -185,22 +150,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences));
     }
 
-    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
-        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getExternalApplicationsPreferences());
-        addNewLinkedFile(newLinkedFile);
-    }
-
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
-        if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+        if (preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             LOGGER.debug("Auto-linking files for entry {}", entry);
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(list -> {
                         if (!list.isEmpty()) {
-                            LOGGER.debug("Found non-associated files:", list);
+                            LOGGER.debug("Found non-associated files: {}" ,list);
                             files.addAll(list);
                         }
                     });
