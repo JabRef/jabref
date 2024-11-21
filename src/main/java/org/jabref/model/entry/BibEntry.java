@@ -55,7 +55,6 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.annotation.meta.field;
 
 /**
  * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
@@ -1181,8 +1180,7 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public OptionalBinding<String> getFieldBinding(Field
-        field) {
+    public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
             return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
         }
