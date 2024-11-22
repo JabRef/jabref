@@ -9,10 +9,11 @@ import org.jabref.logic.l10n.Localization;
  * Simplifies LaTeX syntax. {@see org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
  */
 public class LatexCleanupFormatter extends Formatter {
-    private static final Pattern REMOVE_REDUNDANT = Pattern
-            .compile("(?<!\\\\[\\p{Alpha}]+\\{)\\}([-/ ]?)\\{");
 
-    private static final Pattern REPLACE_WITH_AT = Pattern.compile("(^|[^\\\\])\\$(?!\\$)");
+    private static final Pattern REMOVE_REDUNDANT = Pattern
+            .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");
+
+    private static final Pattern REPLACE_WITH_AT = Pattern.compile("(^|[^\\\\$])\\$");
     private static final Pattern REPLACE_EVERY_OTHER_AT = Pattern.compile("([^@]*)@@([^@]*)@@");
     private static final Pattern MOVE_NUMBERS_WITH_OPERATORS = Pattern.compile("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$");
     private static final Pattern MOVE_NUMBERS_RIGHT_INTO_EQUATION = Pattern.compile("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)");
@@ -51,8 +52,6 @@ public class LatexCleanupFormatter extends Formatter {
         newValue = newValue.replace(" )$", ")$");
 
         newValue = ESCAPE_PERCENT_SIGN_ONCE.matcher(newValue).replaceAll("$1\\\\%"); // escape %, but do not escapee \% again,  used for comments in TeX
-
-        newValue = newValue.replace("mkbibquote", "");
 
         return newValue.trim();
     }
