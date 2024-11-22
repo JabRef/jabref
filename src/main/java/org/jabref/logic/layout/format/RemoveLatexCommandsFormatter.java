@@ -54,6 +54,6 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
             }
         }
 
-        return cleanedField.toString().replaceAll("\\s+", " ").toString();
+        return cleanedField.toString();
     }
 }
