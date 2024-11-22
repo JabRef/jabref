@@ -41,9 +41,9 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         nameField = new TextField();
-        nameField.setPromptText(Localization.lang("Enter new group name"));
+        nameField.setPromptText(Localization.lang("Name"));
 
-        VBox vbox = new VBox(new Label(Localization.lang("New group name")), nameField);
+        VBox vbox = new VBox(new Label(Localization.lang("New group")), nameField);
         getDialogPane().setContent(vbox);
 
         setResultConverter(buttonType -> {
