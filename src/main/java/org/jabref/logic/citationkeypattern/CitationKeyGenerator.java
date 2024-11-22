@@ -7,13 +7,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 

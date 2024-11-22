@@ -131,7 +131,6 @@ class CitationKeyGeneratorTest {
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
-
     @Test
     void latexCommandsAreStrippedFromCitationKey() throws ParseException {
         BibEntry entry = new BibEntry()
