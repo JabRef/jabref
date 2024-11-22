@@ -30,6 +30,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.slf4j.Logger;
@@ -94,30 +95,31 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                 .withInitialFileName(fileName)
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(fileToAdd -> {
-            // Store the directory for next time:
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::checkForBadFileNameAndAdd);
+    }
 
-            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
-                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+    @VisibleForTesting
+    void checkForBadFileNameAndAdd(Path fileToAdd) {
+        if (FileUtil.detectBadFileName(fileToAdd.toString())) {
+            String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
 
-                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
-                        Localization.lang("Rename and add"));
+            boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
+                    Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
+                    Localization.lang("Rename and add"));
 
-                if (correctButtonPressed) {
-                    Path correctPath = fileToAdd.resolveSibling(newFilename);
-                    try {
-                        Files.move(fileToAdd, correctPath);
-                        link.set(relativize(correctPath));
-                        filePreferences.setWorkingDirectory(correctPath);
-                        setExternalFileTypeByExtension(link.getValueSafe());
-                    } catch (IOException ex) {
-                        LOGGER.error("Error moving file", ex);
-                        dialogService.showErrorDialogAndWait(ex);
-                    }
+            if (correctButtonPressed) {
+                Path correctPath = fileToAdd.resolveSibling(newFilename);
+                try {
+                    Files.move(fileToAdd, correctPath);
+                    link.set(relativize(correctPath));
+                    filePreferences.setWorkingDirectory(correctPath);
+                    setExternalFileTypeByExtension(link.getValueSafe());
+                } catch (IOException ex) {
+                    LOGGER.error("Error moving file", ex);
+                    dialogService.showErrorDialogAndWait(ex);
                 }
             }
-        });
+        }
     }
 
     public void setValues(LinkedFile linkedFile) {
