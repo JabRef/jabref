@@ -52,6 +52,8 @@ public class LatexCleanupFormatter extends Formatter {
 
         newValue = ESCAPE_PERCENT_SIGN_ONCE.matcher(newValue).replaceAll("$1\\\\%"); // escape %, but do not escapee \% again,  used for comments in TeX
 
+        newValue = newValue.replace("mkbibquote", "");
+
         return newValue.trim();
     }
 

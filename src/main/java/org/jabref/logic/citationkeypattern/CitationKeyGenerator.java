@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -93,7 +95,11 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     public static String cleanKey(String key, String unwantedCharacters) {
-        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
+        String cleanedKey = removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
+        if (cleanedKey.startsWith("-")) {
+            cleanedKey = cleanedKey.substring(1);
+        }
+        return cleanedKey;
     }
 
     /**
@@ -104,6 +110,11 @@ public class CitationKeyGenerator extends BracketedPattern {
      */
     public String generateKey(BibEntry entry) {
         Objects.requireNonNull(entry);
+
+        LatexCleanupFormatter formatter = new LatexCleanupFormatter();
+        String formattedTitle = formatter.format(entry.getField(StandardField.TITLE).orElse(""));
+        entry.setField(StandardField.TITLE, formattedTitle);
+
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);
