@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
+ * Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
  */
 public class DownloadFullTextAction extends SimpleCommand {
 
@@ -68,11 +68,9 @@ public class DownloadFullTextAction extends SimpleCommand {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Download full text documents"),
                     Localization.lang(
-                            "You are about to download full text documents for %0 entries.",
-                            String.valueOf(stateManager.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
+                            "You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.",
+                            String.valueOf(stateManager.getSelectedEntries().size())),
+                    // [impl->req~ui.dialogs.confirmation.naming~1]
                     Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
 

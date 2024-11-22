@@ -98,8 +98,35 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                          .getGraphicNode());
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                .withGraphic((entry, linkedFiles) -> createFileIcon(entry, linkedFiles.stream().filter(linkedFile ->
-                                linkedFile.getFileType().equalsIgnoreCase(fileType)).collect(Collectors.toList())))
+                .withGraphic((entry, linkedFiles) -> createFileIcon(entry, linkedFiles.stream()
+                                                                                      .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
+                                                                                      .collect(Collectors.toList())))
+                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
+                    List<LinkedFile> filteredFiles = linkedFiles.stream()
+                                                                .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
+                                                                .collect(Collectors.toList());
+
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (filteredFiles.size() == 1) {
+                            // Only one file - open directly
+                            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(filteredFiles.getFirst(),
+                                    entry.getEntry(), database, taskExecutor, dialogService, preferences);
+                            linkedFileViewModel.open();
+                        } else if (filteredFiles.size() > 1) {
+                            // Multiple files - show context menu to choose file
+                            ContextMenu contextMenu = new ContextMenu();
+                            for (LinkedFile linkedFile : filteredFiles) {
+                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile,
+                                        entry.getEntry(), database, taskExecutor, dialogService, preferences);
+                                MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
+                                        linkedFileViewModel.getTypeIcon().getGraphicNode());
+                                menuItem.setOnAction(e -> linkedFileViewModel.open());
+                                contextMenu.getItems().add(menuItem);
+                            }
+                            contextMenu.show(((Node) event.getSource()), event.getScreenX(), event.getScreenY());
+                        }
+                    }
+                })
                 .install(this);
     }
 

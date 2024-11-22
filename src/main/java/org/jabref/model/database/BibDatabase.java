@@ -38,7 +38,6 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,22 +82,6 @@ public class BibDatabase {
 
     public BibDatabase() {
         this.registerListener(new KeyChangeListener(this));
-    }
-
-    /**
-     * Returns a text with references resolved according to an optionally given database.
-     *
-     * @param toResolve The text to resolve.
-     * @param database  The database to use for resolving the text.
-     * @return The resolved text or the original text if either the text or the database are null
-     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     */
-    @Deprecated
-    public static String getText(@Nullable String toResolve, @Nullable BibDatabase database) {
-        if ((toResolve != null) && (database != null)) {
-            return database.resolveForStrings(toResolve);
-        }
-        return toResolve;
     }
 
     /**
@@ -654,7 +637,11 @@ public class BibDatabase {
      */
     public int indexOf(BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
-        return index >= 0 ? index : -1;
+        if (index >= 0) {
+            return index;
+        }
+        LOGGER.warn("Could not find entry with ID {} in the database", bibEntry.getId());
+        return -1;
     }
 
     public BibEntry getEntryById(String id) {

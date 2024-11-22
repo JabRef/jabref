@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   lychee:
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +32,7 @@ jobs:
           restore-keys: cache-lychee-
       - name: Link Checker
         id: lychee
-        uses: lycheeverse/lychee-action@v1.10.0
+        uses: lycheeverse/lychee-action@v2.1.0
         with:
           fail: true
           args: --accept '200,201,202,203,204,403,429,500' --max-concurrency 1 --cache --no-progress --exclude-all-private './**/*.md'

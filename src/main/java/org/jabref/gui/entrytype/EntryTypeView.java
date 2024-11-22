@@ -16,6 +16,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -86,6 +87,10 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+        stage.setMinHeight(400);
+        stage.setMinWidth(500);
 
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
         setOnCloseRequest(e -> viewModel.cancelFetcherWorker());

@@ -49,7 +49,7 @@ class IacrEprintTest {
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideTestData")
     void acceptCorrectIacrEprintIdentifier(String name, String identifier) {
-        assertEquals("2019/001", new IacrEprint(identifier).getNormalized());
+        assertEquals("2019/001", new IacrEprint(identifier).asString());
     }
 
     @Test
