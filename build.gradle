@@ -950,3 +950,6 @@ jmh {
     fork = 2
 }
 
+requirementTracing {
+    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
+}
