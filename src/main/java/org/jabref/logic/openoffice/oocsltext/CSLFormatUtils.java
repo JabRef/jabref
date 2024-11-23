@@ -75,14 +75,11 @@ public class CSLFormatUtils {
         // Convert line breaks to paragraph breaks
         html = html.replaceAll("[\n\r]+", "<p></p>");
 
-        // First ensure only single paragraph tags
-        html = html.replaceAll("(<p>\\s*</p>)+", "<p></p>");
-
         // Remove leading paragraph tags (including any whitespace after them)
         html = html.replaceAll("^\\s*<p>\\s*</p>", "");
 
-        // Remove extra paragraph tag when there are two at the end (keeping one)
-        html = html.replaceAll("<p>\\s*</p>\\s*<p>\\s*</p>$", "<p></p>");
+        // Remove extra trailing paragraph tags when there are multiple (keeping one)
+        html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
 
         return html;
     }
