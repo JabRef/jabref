@@ -10,7 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
-
+- We added a preview for themes, when they are selected in preferences (to solve: https://github.com/JabRef/themes.jabref.org/issues/10)
 - We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)

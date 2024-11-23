@@ -9,8 +9,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -56,6 +59,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
+    @FXML private ImageView imageView;
+    @FXML private Label imageViewText;
+
+
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
 
@@ -159,5 +166,36 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML
     public void openBrowser() {
         viewModel.openBrowser();
+    }
+
+    //Function that is called when a theme is selected to show a preview
+    @FXML
+    private void onComboBoxAction() {
+        String selectedValue = theme.getValue().getDisplayName(); //Get value
+        if (selectedValue.equals("Light")) { //User selects light
+            Image image = new Image(getClass().getResource("LightPreview.PNG").toExternalForm()); //Get image
+            if (!image.isError()) { //Error handling to ensure the image exists
+                imageView.setImage(image); //Show image
+                imageView.setVisible(true);
+                imageViewText.setVisible(true);
+                imageView.setManaged(true);
+                imageViewText.setManaged(true);
+            }
+        } else if (selectedValue.equals("Dark")) { //User selects dark
+            Image image = new Image(getClass().getResource("DarkPreview.PNG").toExternalForm()); //Get image
+            if (!image.isError()) { //Error handling to ensure the image exists
+                imageView.setImage(image); //Show image
+                imageView.setVisible(true);
+                imageViewText.setVisible(true);
+                imageView.setManaged(true);
+                imageViewText.setManaged(true);
+            }
+        } else { //Custom (no preview)
+            imageViewText.setVisible(false);
+            imageViewText.setManaged(false);
+
+            imageView.setVisible(false);
+            imageView.setManaged(false);
+        }
     }
 }
