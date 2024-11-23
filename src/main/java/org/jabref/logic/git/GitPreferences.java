@@ -9,6 +9,8 @@ import javafx.beans.property.SimpleStringProperty;
 public class GitPreferences {
     private final BooleanProperty gitSupportEnabledProperty;
     private final BooleanProperty frequencyLabelEnabledProperty;
+
+    private final BooleanProperty hostKeyCheckProperty;
     private final ObjectProperty<AuthenticationViewMode> authenticationMethod;
     private SimpleStringProperty sshPath;
 
@@ -17,13 +19,14 @@ public class GitPreferences {
 
     private final SimpleStringProperty username;
 
-    public GitPreferences(boolean gitSupportEnabledProperty, AuthenticationViewMode authenticationMethod, boolean frequencyLabelEnabledProperty, String username, String sshPath, String password) {
+    public GitPreferences(boolean gitSupportEnabledProperty, AuthenticationViewMode authenticationMethod, boolean frequencyLabelEnabledProperty, String username, String sshPath, String password, boolean hostKeyCheckProperty) {
         this.gitSupportEnabledProperty = new SimpleBooleanProperty(gitSupportEnabledProperty);
         this.authenticationMethod = new SimpleObjectProperty<>(authenticationMethod);
         this.frequencyLabelEnabledProperty = new SimpleBooleanProperty(frequencyLabelEnabledProperty);
         this.username = new SimpleStringProperty(username != null ? username : ""); // Default to empty if null
         this.sshPath = new SimpleStringProperty(sshPath);
         this.password = new SimpleStringProperty(password);
+        this.hostKeyCheckProperty = new SimpleBooleanProperty(hostKeyCheckProperty);
     }
 
     public AuthenticationViewMode getAuthenticationMethod() {
@@ -82,6 +85,18 @@ public class GitPreferences {
 
     public boolean isFrequencyLabelEnabled() {
         return frequencyLabelEnabledProperty.getValue();
+    }
+
+    public boolean isHostKeyCheckEnabled() {
+        return hostKeyCheckProperty.getValue();
+    }
+
+    public void setHostKeyCheckProperty(boolean hostKeyCheckProperty) {
+        this.hostKeyCheckProperty.set((hostKeyCheckProperty));
+    }
+
+    public BooleanProperty getHostKeyCheckProperty() {
+        return hostKeyCheckProperty;
     }
 
     public BooleanProperty getGitSupportEnabledProperty() {

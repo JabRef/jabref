@@ -16,6 +16,8 @@ public class GitViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty gitSupportEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty frequencyLabelEnabledProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty hostKeyCheckProperty = new SimpleBooleanProperty();
     private final SimpleStringProperty sshPath = new SimpleStringProperty("");
     private final DialogService dialogService;
     private final GitPreferences gitPreferences;
@@ -29,6 +31,7 @@ public class GitViewModel implements PreferenceTabViewModel {
     public void setValues() {
         gitSupportEnabledProperty.setValue(gitPreferences.isGitEnabled());
         frequencyLabelEnabledProperty.setValue(gitPreferences.isFrequencyLabelEnabled());
+        hostKeyCheckProperty.setValue(gitPreferences.isHostKeyCheckEnabled());
     }
 
     /**
@@ -38,10 +41,15 @@ public class GitViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         gitPreferences.setGitSupportEnabledProperty(gitSupportEnabledProperty.getValue());
         gitPreferences.setFrequencyLabelEnabledProperty(frequencyLabelEnabledProperty.getValue());
+        gitPreferences.setHostKeyCheckProperty(hostKeyCheckProperty.getValue());
     }
 
     public BooleanProperty gitSupportEnabledProperty() {
         return gitSupportEnabledProperty;
+    }
+
+    public BooleanProperty getHostKeyCheckProperty() {
+        return hostKeyCheckProperty;
     }
 
     public BooleanProperty frequencyLabelEnabledProperty() {

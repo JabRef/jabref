@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 
 public class GitTab extends AbstractPreferenceTabView<GitViewModel> implements PreferencesTab {
     @FXML private CheckBox enableGitSupport;
+    @FXML private CheckBox hostKeyCheck;
     @FXML private CheckBox frequencyLabel;
     @FXML private ComboBox<String> setPushFrequency;
     @FXML private Button authentifyButton;
@@ -61,7 +62,6 @@ public class GitTab extends AbstractPreferenceTabView<GitViewModel> implements P
 
     public void initialize() {
         this.viewModel = new GitViewModel(preferences.getGitPreferences(), dialogService);
-
         pushFrequencyInput.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
             // Allow only digits
@@ -72,14 +72,11 @@ public class GitTab extends AbstractPreferenceTabView<GitViewModel> implements P
         }));
 
         enableGitSupport.selectedProperty().bindBidirectional(viewModel.gitSupportEnabledProperty());
-//        frequencyLabel.selectedProperty().bindBidirectional(viewModel.frequencyLabelEnabledProperty());
-//        frequencyLabel.disableProperty().bind(enableGitSupport.selectedProperty().not());
         synchronizeButton.disableProperty().bind(enableGitSupport.selectedProperty().not());
         authentifyButton.disableProperty().bind(enableGitSupport.selectedProperty().not());
         sshPath.disableProperty().bind(enableGitSupport.selectedProperty().not());
         sshPath.textProperty().bindBidirectional(viewModel.sshPathProperty());
-
-        // System.out.println("LOG: USERNAME = " + preferences.getGitPreferences().getUsernameProperty());
-        // System.out.println("GITTAB: SSH PATH = " + preferences.getGitPreferences().getSshPath());
+        hostKeyCheck.disableProperty().bind(enableGitSupport.selectedProperty().not());
+        hostKeyCheck.selectedProperty().bindBidirectional(viewModel.getHostKeyCheckProperty());
     }
 }

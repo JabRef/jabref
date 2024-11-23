@@ -336,6 +336,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // AuthenticationViewMode
     private static final String AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE = "authenticationSSHCredentialsViewMode";
     private static final String GIT_SUPPORT_ENABLED_PROPERTY = "gitSupportEnabledProperty";
+
+    private static final String HOST_KEY_CHECK_ENABLED_PROPERTY = "hostKeyCheckProperty";
     private static final String PUSH_FREQUENCY_PROPERTY = "pushFrequency";
     // Dilog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
@@ -667,6 +669,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
         defaults.put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, AuthenticationViewMode.SSH.name());
         defaults.put(GIT_SUPPORT_ENABLED_PROPERTY, Boolean.FALSE);
+        defaults.put(HOST_KEY_CHECK_ENABLED_PROPERTY, Boolean.FALSE);
         defaults.put(PUSH_FREQUENCY_PROPERTY, Boolean.FALSE);
         // endregion
     }
@@ -857,7 +860,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(PUSH_FREQUENCY_PROPERTY),
                 get(GIT_USERNAME),
                 get(SSH_PATH),
-                get(GIT_PASSWORD)
+                get(GIT_PASSWORD),
+                getBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY)
         );
 
         EasyBind.listen(gitPreferences.getGitSupportEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_SUPPORT_ENABLED_PROPERTY, newValue));
@@ -870,6 +874,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 put(SSH_PATH, newValue));
         EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) ->
                 put(GIT_PASSWORD, newValue));
+        EasyBind.listen(gitPreferences.getHostKeyCheckProperty(), (obs, oldValue, newValue) -> putBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY, newValue));
+
+        System.out.println("We are in getGitPreferences, getHostKeyCheck is set to " + gitPreferences.getHostKeyCheckProperty());
 
         return gitPreferences;
     }

@@ -5,7 +5,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -56,9 +55,17 @@
                 </tooltip>
             </Button>
         </HBox>
+        <HBox spacing="1.0" GridPane.rowIndex="5" GridPane.columnIndex="0">
+            <CheckBox text="Disable strict host key check" visible="true" fx:id="hostKeyCheck">
+                <tooltip>
+                    <Tooltip text="Disabling strict host key checking allows connections even if the host key is unknown."/>
+                </tooltip>
+            </CheckBox>
+            <JabRefIconView glyph="INTEGRITY_INFO"/>
+        </HBox>
 
         <Button text="Synchronize" fx:id="synchronizeButton"
-                GridPane.rowIndex="5" GridPane.columnIndex="0"
+                GridPane.rowIndex="6" GridPane.columnIndex="0"
         />
         <padding>
             <Insets left="20.0"/>
