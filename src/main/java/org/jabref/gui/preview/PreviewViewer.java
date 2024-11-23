@@ -223,7 +223,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                 %s
                             </div>
                             <div id="bookCover" style="flex: 1;">
-                                <img src="%s" style="width: auto; height: 100vh;" align="right">
+                                <img
+                                    src="%s"
+                                    style="width: 75vh; height: auto; max-height: 100vh;"
+                                    align="right";
+                                >
                             </div>
                         </div>
                     </body>
