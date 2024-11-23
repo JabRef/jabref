@@ -100,7 +100,13 @@ public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
 
-    private static final List<EntryType> COVERABLE_TYPES = List.of(StandardEntryType.Book, StandardEntryType.InBook, StandardEntryType.Booklet);
+    private static final HashSet<EntryType> COVERABLE_TYPES = new HashSet<>();
+    static {
+        COVERABLE_TYPES.add(StandardEntryType.Book);
+        COVERABLE_TYPES.add(StandardEntryType.InBook);
+        COVERABLE_TYPES.add(StandardEntryType.Booklet);
+    }
+
     private static final String COVER_TAG = "cover";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
@@ -1282,6 +1288,6 @@ public class BibEntry implements Cloneable {
      * @return <code>true</code> if this entry's <code>type</code> is a Book or one of <code>COVERABLE_TYPES</code>
      */
     private boolean isCoverable() {
-        return COVERABLE_TYPES.contains(this.type.get());
+        return COVERABLE_TYPES.contains(getType());
     }
 }
