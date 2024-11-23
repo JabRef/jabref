@@ -265,7 +265,7 @@ dependencies {
 
     // region HTTP clients
     implementation 'org.jsoup:jsoup:1.18.1'
-    implementation 'com.konghq:unirest-java-core:4.4.4'
+    implementation 'com.konghq:unirest-java-core:4.4.5'
     implementation 'com.konghq:unirest-modules-gson:4.4.5'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
     // endregion
@@ -334,23 +334,23 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
 
     // region AI
-    implementation 'dev.langchain4j:langchain4j:0.35.0'
+    implementation 'dev.langchain4j:langchain4j:0.36.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation('dev.langchain4j:langchain4j-open-ai:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-open-ai:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-mistral-ai:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
     }
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.35.0') {
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.36.0') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
@@ -379,7 +379,7 @@ dependencies {
     implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.0.0')
 
     testImplementation 'io.github.classgraph:classgraph:4.8.177'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
     testImplementation 'org.mockito:mockito-core:5.14.2'
@@ -393,7 +393,7 @@ dependencies {
     testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.2"
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+    testImplementation 'org.wiremock:wiremock-standalone:3.9.2'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.20.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
