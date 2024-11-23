@@ -535,7 +535,7 @@ class CSLFormatUtilsTest {
                         STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
                 ),
 
-                // Type:"<BOLD>1."
+                // Type: "<BOLD>1."
                 Arguments.of(
                         "  \n" +
                                 "    <b>3</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.\n" +
