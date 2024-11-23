@@ -2,7 +2,7 @@ name: Assign Issue
 
 on:
   schedule:
-    - cron: 0 0 * * *
+    - cron: 4 12 * * *
   issue_comment:
     types: [created]
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@beta
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 30
+          days_until_unassign: 90
           maintainers: koppor, Siedlerchr, ThiloteE, calixtus, HoussemNasri
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉

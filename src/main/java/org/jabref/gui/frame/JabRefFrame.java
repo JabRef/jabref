@@ -64,6 +64,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
+
 /**
  * Represents the inner frame of the JabRef window
  */
@@ -79,7 +81,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
-    private final FrameDndHandler frameDndHandler;
 
     @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
@@ -136,7 +137,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, viewModel);
 
-        this.frameDndHandler = new FrameDndHandler(
+        FrameDndHandler frameDndHandler = new FrameDndHandler(
                 tabbedPane,
                 mainStage::getScene,
                 this::getOpenDatabaseAction,
@@ -425,7 +426,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)} (Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -524,7 +525,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Refreshes the ui after preferences changes
      */
     public void refresh() {
-        getLibraryTabs().forEach(LibraryTab::setupMainPanel);
+        // Disabled, because Bindings implement automatic update. Left here as commented out code to guide if something does not work after updating the preferences.
+        // getLibraryTabs().forEach(LibraryTab::setupMainPanel);
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
@@ -636,6 +638,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public OpenDatabaseFolder(Supplier<BibDatabaseContext> databaseContext) {
             this.databaseContext = databaseContext;
+            this.executable.bind(needsSavedLocalDatabase(stateManager));
         }
 
         @Override

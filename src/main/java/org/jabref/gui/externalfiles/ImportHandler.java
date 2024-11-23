@@ -35,6 +35,7 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -89,7 +90,7 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), database, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
@@ -127,7 +128,7 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            ParserResult pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
@@ -214,7 +215,6 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
-        entries = entries.stream().map(entry -> (BibEntry) entry.clone()).toList();
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
@@ -241,6 +241,8 @@ public class ImportHandler {
                           }
                           importCleanedEntries(List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
+                          BibEntry entryToFocus = finalEntry;
+                          stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
                       }).executeWith(taskExecutor);
     }
 

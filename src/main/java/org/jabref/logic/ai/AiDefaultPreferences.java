@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
@@ -23,7 +24,9 @@ public class AiDefaultPreferences {
         GEMINI_1_5_PRO(AiProvider.GEMINI, "gemini-1.5-pro", 2097152),
         GEMINI_1_0_PRO(AiProvider.GEMINI, "gemini-1.0-pro", 32000),
         // Dummy variant for Hugging Face models.
-        HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
+        // Blank entry used for cases where the model name is not specified.
+        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0),
+        BLANK_GPT4ALL(AiProvider.GPT4ALL, "", 0);
 
         private final AiProvider aiProvider;
         private final String name;
@@ -62,7 +65,8 @@ public class AiDefaultPreferences {
             AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.HUGGING_FACE
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
+            AiProvider.GPT4ALL, PredefinedChatModel.BLANK_GPT4ALL
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
@@ -76,6 +80,46 @@ public class AiDefaultPreferences {
     public static final double RAG_MIN_SCORE = 0.3;
 
     public static final int FALLBACK_CONTEXT_WINDOW_SIZE = 8196;
+
+    public static final Map<AiTemplate, String> TEMPLATES = Map.of(
+            AiTemplate.CHATTING_SYSTEM_MESSAGE, """
+                    You are an AI assistant that analyses research papers. You answer questions about papers.
+                    You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
+                    Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.
+
+                    Here are the papers you are analyzing:
+                    #foreach( $entry in $entries )
+                    ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
+                    #end""",
+
+            AiTemplate.CHATTING_USER_MESSAGE, """
+                    $message
+
+                    Here is some relevant information for you:
+                    #foreach( $excerpt in $excerpts )
+                    ${excerpt.citationKey()}:
+                    ${excerpt.text()}
+                    #end""",
+
+            AiTemplate.SUMMARIZATION_CHUNK, """
+                Please provide an overview of the following text. It is a part of a scientific paper.
+                The summary should include the main objectives, methodologies used, key findings, and conclusions.
+                Mention any significant experiments, data, or discussions presented in the paper.
+
+                DOCUMENT:
+                $text
+
+                OVERVIEW:""",
+
+            AiTemplate.SUMMARIZATION_COMBINE, """
+                You have written an overview of a scientific paper. You have been collecting notes from various parts
+                of the paper. Now your task is to combine all of the notes in one structured message.
+
+                SUMMARIES:
+                $chunks
+
+                FINAL OVERVIEW:"""
+    );
 
     public static List<String> getAvailableModels(AiProvider aiProvider) {
         return Arrays.stream(AiDefaultPreferences.PredefinedChatModel.values())
