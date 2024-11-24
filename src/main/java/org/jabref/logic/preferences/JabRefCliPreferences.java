@@ -50,7 +50,6 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.git.AuthenticationViewMode;
 import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -333,23 +332,12 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
-    // AuthenticationViewMode
-    private static final String AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE = "authenticationSSHCredentialsViewMode";
-    private static final String GIT_SUPPORT_ENABLED_PROPERTY = "gitSupportEnabledProperty";
-
-    private static final String HOST_KEY_CHECK_ENABLED_PROPERTY = "hostKeyCheckProperty";
-    private static final String PUSH_FREQUENCY_PROPERTY = "pushFrequency";
     // Dilog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
     private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
 
-    private static final String GIT_USERNAME = "git_username";
-    private static final String GIT_PASSWORD = "git_password";
-    private static final String IS_GIT_PASSWORD_ENCRYPTED = "isGitPasswordEncrypted";
-
-    private static final String SSH_PATH = "ssh_path";
 
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -381,6 +369,15 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
+
+    // GIT
+    private static final String GIT_ENABLED = "gitEnabled";
+    private static final String GIT_USERNAME = "gitUsername";
+    private static final String GIT_PASSWORD = "gitPassword";
+    private static final String GIT_PASSWORD_ENCRYPTED = "gitPasswordEncrypted";
+    private static final String GIT_SSH_DIR_PATH = "gitSshPath";
+    private static final String GIT_SHH_HOST_KEY_CHECK_DISABLED = "gitSshHostKeyCheckDisabled";
+    private static final String GIT_PUSH_FREQUENCY_ENABLED = "gitPushFrequencyEnabled";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -667,11 +664,13 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
-        defaults.put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, AuthenticationViewMode.SSH.name());
-        defaults.put(GIT_SUPPORT_ENABLED_PROPERTY, Boolean.FALSE);
-        defaults.put(HOST_KEY_CHECK_ENABLED_PROPERTY, Boolean.FALSE);
-        defaults.put(IS_GIT_PASSWORD_ENCRYPTED, Boolean.FALSE);
-        defaults.put(PUSH_FREQUENCY_PROPERTY, Boolean.FALSE);
+        // endregion
+
+        // region: Git
+        defaults.put(GIT_ENABLED, Boolean.FALSE);
+        defaults.put(GIT_SHH_HOST_KEY_CHECK_DISABLED, Boolean.FALSE);
+        defaults.put(GIT_PASSWORD_ENCRYPTED, Boolean.FALSE);
+        defaults.put(GIT_PUSH_FREQUENCY_ENABLED, Boolean.FALSE);
         // endregion
     }
 
@@ -856,30 +855,29 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         gitPreferences = new GitPreferences(
-                getBoolean(GIT_SUPPORT_ENABLED_PROPERTY),
-                AuthenticationViewMode.valueOf(get(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE)),
-                getBoolean(PUSH_FREQUENCY_PROPERTY),
+                getBoolean(GIT_ENABLED),
                 get(GIT_USERNAME),
-                get(SSH_PATH),
                 get(GIT_PASSWORD),
-                getBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY),
-                getBoolean(IS_GIT_PASSWORD_ENCRYPTED)
+                getBoolean(GIT_PASSWORD_ENCRYPTED),
+                get(GIT_SSH_DIR_PATH),
+                getBoolean(GIT_SHH_HOST_KEY_CHECK_DISABLED),
+                getBoolean(GIT_PUSH_FREQUENCY_ENABLED)
         );
 
-        EasyBind.listen(gitPreferences.getGitSupportEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_SUPPORT_ENABLED_PROPERTY, newValue));
-        EasyBind.listen(gitPreferences.getAuthenticationProperty(), (obs, oldValue, newValue) ->
-                put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, newValue.name()));
-        EasyBind.listen(gitPreferences.getFrequencyLabelEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(PUSH_FREQUENCY_PROPERTY, newValue));
-        EasyBind.listen(gitPreferences.getUsernameProperty(), (obs, oldValue, newValue) ->
-                put(GIT_USERNAME, newValue));
-        EasyBind.listen(gitPreferences.getSshPathProperty(), (obs, oldValue, newValue) ->
-                put(SSH_PATH, newValue));
-        EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) ->
-                put(GIT_PASSWORD, newValue));
-        EasyBind.listen(gitPreferences.getHostKeyCheckProperty(), (obs, oldValue, newValue) -> putBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY, newValue));
-        EasyBind.listen(gitPreferences.isPasswordEncryptedProperty(), (obs, oldValue, newValue) -> putBoolean(IS_GIT_PASSWORD_ENCRYPTED, newValue));
-
-        System.out.println("We are in getGitPreferences, getHostKeyCheck is set to " + gitPreferences.getHostKeyCheckProperty());
+        EasyBind.listen(gitPreferences.getGitEnabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GIT_ENABLED, newValue));
+        EasyBind.listen(gitPreferences.getPushFrequencyEnabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GIT_PUSH_FREQUENCY_ENABLED, newValue));
+        EasyBind.listen(gitPreferences.getUsernameProperty(),
+                (obs, oldValue, newValue) -> put(GIT_USERNAME, newValue));
+        EasyBind.listen(gitPreferences.getSshPathProperty(),
+                (obs, oldValue, newValue) -> put(GIT_SSH_DIR_PATH, newValue));
+        EasyBind.listen(gitPreferences.getPasswordProperty(),
+                (obs, oldValue, newValue) -> put(GIT_PASSWORD, newValue));
+        EasyBind.listen(gitPreferences.getHostKeyCheckDisabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GIT_SHH_HOST_KEY_CHECK_DISABLED, newValue));
+        EasyBind.listen(gitPreferences.getPasswordEncryptedProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GIT_PASSWORD_ENCRYPTED, newValue));
 
         return gitPreferences;
     }

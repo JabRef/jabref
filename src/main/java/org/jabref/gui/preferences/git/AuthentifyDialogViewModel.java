@@ -40,7 +40,7 @@ public class AuthentifyDialogViewModel extends AbstractViewModel {
         passPhrase = passPhrase.filter(phrase -> !phrase.isBlank()); // filter out empty strings
 
         preferences.setUsername(username.get());
-        preferences.setIsPasswordEncrypted(passPhrase.isPresent());
+        preferences.setPasswordEncrypted(passPhrase.isPresent());
         try {
             preferences.setPassword(new Password(password.get(), passPhrase.orElse(username.get())).encrypt());
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {

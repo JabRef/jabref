@@ -30,8 +30,8 @@ public class GitViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         gitSupportEnabledProperty.setValue(gitPreferences.isGitEnabled());
-        frequencyLabelEnabledProperty.setValue(gitPreferences.isFrequencyLabelEnabled());
-        hostKeyCheckProperty.setValue(gitPreferences.isHostKeyCheckEnabled());
+        frequencyLabelEnabledProperty.setValue(gitPreferences.isPushFrequencyEnabled());
+        hostKeyCheckProperty.setValue(gitPreferences.isHostKeyCheckDisabled());
     }
 
     /**
@@ -39,9 +39,9 @@ public class GitViewModel implements PreferenceTabViewModel {
      */
     @Override
     public void storeSettings() {
-        gitPreferences.setGitSupportEnabledProperty(gitSupportEnabledProperty.getValue());
-        gitPreferences.setFrequencyLabelEnabledProperty(frequencyLabelEnabledProperty.getValue());
-        gitPreferences.setHostKeyCheckProperty(hostKeyCheckProperty.getValue());
+        gitPreferences.setGitEnabled(gitSupportEnabledProperty.getValue());
+        gitPreferences.setPushFrequencyEnabled(frequencyLabelEnabledProperty.getValue());
+        gitPreferences.setHostKeyCheckDisabled(hostKeyCheckProperty.getValue());
     }
 
     public BooleanProperty gitSupportEnabledProperty() {
@@ -76,7 +76,7 @@ public class GitViewModel implements PreferenceTabViewModel {
         DirectoryDialogConfiguration dirDialogConfiguration =
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(sshPath.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> sshPath.setValue(f.toString()));
-        gitPreferences.setSshPath(sshPath.get());
+        gitPreferences.setSshDirPath(sshPath.get());
     }
 
     public SimpleStringProperty sshPathProperty() {
