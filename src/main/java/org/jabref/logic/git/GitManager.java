@@ -118,7 +118,7 @@ public class GitManager {
             requiresAuthentication = false;
         } catch (GitAPIException e) {
             LOGGER.warn("Error while testing connection to origin for git repository", e);
-            requiresAuthentication = (gitProtocol == GitProtocol.SSH || gitProtocol == GitProtocol.HTTPS);
+            requiresAuthentication = gitProtocol == GitProtocol.SSH || gitProtocol == GitProtocol.HTTPS;
         }
     }
 }

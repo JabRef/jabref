@@ -32,11 +32,8 @@ public class AuthentifyDialogView extends BaseDialog<GitViewModel> {
                   .load()
                   .setAsDialogPane(this);
 
-        System.out.println("We made it to AuthentifyDialog.constructor()");
-
         this.setResultConverter(button -> {
             if (button == save) {
-                System.out.println("We made it to AuthentifyDialogView Constructor, username = " + username);
                 return viewModel.saveCredentials();
             } else {
                 return null;

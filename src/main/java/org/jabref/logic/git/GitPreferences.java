@@ -86,7 +86,7 @@ public class GitPreferences {
     }
 
     public void setHostKeyCheckDisabled(boolean hostKeyCheckDisabled) {
-        this.hostKeyCheckDisabled.set((hostKeyCheckDisabled));
+        this.hostKeyCheckDisabled.set(hostKeyCheckDisabled);
     }
 
     public BooleanProperty getHostKeyCheckDisabledProperty() {
