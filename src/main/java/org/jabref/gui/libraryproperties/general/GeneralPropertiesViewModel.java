@@ -102,7 +102,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void browseUserDir() {
-
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(userSpecificFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
