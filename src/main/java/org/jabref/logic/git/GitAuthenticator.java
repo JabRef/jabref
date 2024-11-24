@@ -1,7 +1,11 @@
 package org.jabref.logic.git;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.Optional;
+
+import org.jabref.logic.shared.security.Password;
 
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -17,61 +21,46 @@ import org.slf4j.LoggerFactory;
 
 class GitAuthenticator {
     private final static Logger LOGGER = LoggerFactory.getLogger(GitAuthenticator.class);
-    // TODO: temp (get from preferences)
-    private static String userName = Optional.ofNullable(System.getenv("GIT_USERNAME")).orElse("");
-    // TODO: temp
-    private static String password = Optional.ofNullable(System.getenv("GIT_PASSWORD")).orElse("");
-    // TODO: temp
-    private static String sshPassPhrase = Optional.ofNullable(System.getenv("GIT_SSH_PASSPHRASE")).orElse("");
-    // TODO: temp
-    private static Path homeDirectory = Path.of(Optional.of(System.getProperty("user.home")).orElse(""));
-    // TODO: temp
-    private static Path sshDirectory = homeDirectory.resolve(".ssh");
+    private static final Path HOME_DIRECTORY = Path.of(Optional.of(System.getProperty("user.home")).orElse(""));
+    private final GitPreferences preferences;
 
-    static <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
+    GitAuthenticator(GitPreferences preferences) {
+        this.preferences = preferences;
+    }
+
+    <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
         transportCommand.setCredentialsProvider(getCredentialsProvider());
-        transportCommand.setTransportConfigCallback(GitAuthenticator::transportConfigCallback);
+        transportCommand.setTransportConfigCallback(this::transportConfigCallback);
     }
 
-    private static CredentialsProvider getCredentialsProvider() {
-        return new UsernamePasswordCredentialsProvider(userName, password);
+    private CredentialsProvider getCredentialsProvider() {
+        String password = preferences.getPassword();
+        try {
+            password = new Password(
+                    preferences.getPassword().toCharArray(),
+                    GitPreferences.getPasswordEncryptionKey().orElse(preferences.getUsername())
+            ).decrypt();
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            LOGGER.warn("Error while decrypting git password", e);
+        }
+        return new UsernamePasswordCredentialsProvider(preferences.getUsername(), password);
     }
 
-    private static void transportConfigCallback(Transport transport) {
+    private void transportConfigCallback(Transport transport) {
         if (!(transport instanceof SshTransport sshTransport)) {
             LOGGER.debug("git repository does not use a SSH protocol");
             return;
         }
         SshSessionFactory sshSessionFactory = new SshdSessionFactoryBuilder()
                 .setPreferredAuthentications("publickey")
-                .setHomeDirectory(homeDirectory.toFile())
-                .setSshDirectory(sshDirectory.toFile())
+                .setHomeDirectory(HOME_DIRECTORY.toFile())
+                .setSshDirectory(Path.of(preferences.getSshDirPath()).toFile())
                 .setKeyPasswordProvider(cp -> new IdentityPasswordProvider(cp) {
                     @Override
                     protected char[] getPassword(URIish uri, String message) {
-                        return sshPassPhrase.toCharArray();
+                        return GitPreferences.getSshPassphrase().orElse("").toCharArray();
                     }
                 }).build(null);
         sshTransport.setSshSessionFactory(sshSessionFactory);
-    }
-
-    static void setUserName(String userName) {
-        GitAuthenticator.userName = userName;
-    }
-
-    static void setPassword(String password) {
-        GitAuthenticator.password = password;
-    }
-
-    static void setSshPassPhrase(String sshPassPhrase) {
-        GitAuthenticator.sshPassPhrase = sshPassPhrase;
-    }
-
-    static void setHomeDirectory(Path homeDirectory) {
-        GitAuthenticator.homeDirectory = homeDirectory;
-    }
-
-    static void setSshDirectory(Path sshDirectory) {
-        GitAuthenticator.sshDirectory = sshDirectory;
     }
 }

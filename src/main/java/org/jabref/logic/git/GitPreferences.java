@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class GitPreferences {
     private static String passwordEncryptionKey = null;
+    private static String sshPassphrase = null;
     private final BooleanProperty gitEnabled;
     private final SimpleStringProperty username;
     private final SimpleStringProperty password;
@@ -61,7 +62,6 @@ public class GitPreferences {
     }
 
     public SimpleStringProperty getUsernameProperty() {
-        System.out.println("Get Method Username is " + username);
         return username;
     }
 
@@ -117,11 +117,19 @@ public class GitPreferences {
         this.passwordEncrypted.set(isPasswordEncrypted);
     }
 
-    public Optional<String> getPasswordEncryptionKey() {
-        return Optional.ofNullable(passwordEncryptionKey);
+    public static Optional<String> getPasswordEncryptionKey() {
+        return Optional.ofNullable(passwordEncryptionKey).filter(s -> !s.isBlank());
     }
 
-    public void setPasswordEncryptionKey(String key) {
+    public static void setPasswordEncryptionKey(String key) {
         passwordEncryptionKey = key;
+    }
+
+    public static Optional<String> getSshPassphrase() {
+        return Optional.ofNullable(sshPassphrase).filter(s -> !s.isBlank());
+    }
+
+    public static void setSshPassphrase(String sshPassphrase) {
+        GitPreferences.sshPassphrase = sshPassphrase;
     }
 }

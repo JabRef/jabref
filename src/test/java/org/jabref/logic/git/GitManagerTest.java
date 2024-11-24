@@ -1,6 +1,10 @@
 package org.jabref.logic.git;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+
+import org.jabref.logic.shared.security.Password;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -17,18 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GitManagerTest {
 
     private Path tempPath;
+    private GitPreferences preferences;
 
     @BeforeEach
-    void setUp(@TempDir Path tempDir) throws GitException {
+    void setUp(@TempDir Path tempDir) throws GeneralSecurityException, UnsupportedEncodingException {
         this.tempPath = tempDir;
+        preferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
     }
 
     @Test
-    void initGitRepositoryCreatesNewRepositoryWhenNoneExists() throws GitException {
+    void initGitRepositoryCreatesNewRepositoryWhenNoneExists() {
         assertFalse(GitManager.isGitRepository(tempPath));
-        GitException exception = assertThrows(GitException.class, () -> GitManager.openGitRepository(this.tempPath));
+        GitException exception = assertThrows(GitException.class, () -> GitManager.openGitRepository(this.tempPath, preferences));
         assertEquals(tempPath.getFileName() + " is not a git repository.", exception.getMessage());
-        assertDoesNotThrow(() -> GitManager.initGitRepository(tempPath));
+        assertDoesNotThrow(() -> GitManager.initGitRepository(tempPath, preferences));
         assertTrue(GitManager.isGitRepository(tempPath));
     }
 
@@ -36,9 +44,9 @@ class GitManagerTest {
     void initGitRepositoryOpensExistingRepository() throws GitAPIException {
         // manually create Git repository
         try (Git git = Git.init().setDirectory(tempPath.toFile()).call()) {
-            GitException exception = assertThrows(GitException.class, () -> GitManager.initGitRepository(tempPath));
+            GitException exception = assertThrows(GitException.class, () -> GitManager.initGitRepository(tempPath, preferences));
             assertEquals(tempPath.getFileName() + " is already a git repository.", exception.getMessage());
-            assertDoesNotThrow(() -> GitManager.openGitRepository(tempPath));
+            assertDoesNotThrow(() -> GitManager.openGitRepository(tempPath, preferences));
             assertTrue(GitManager.isGitRepository(tempPath));
         }
     }
