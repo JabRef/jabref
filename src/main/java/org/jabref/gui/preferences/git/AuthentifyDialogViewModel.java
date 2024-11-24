@@ -1,24 +1,31 @@
 package org.jabref.gui.preferences.git;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.git.GitPreferences;
+import org.jabref.logic.shared.security.Password;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthentifyDialogViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthentifyDialogViewModel.class);
     private final DialogService dialogService;
     private final GitPreferences preferences;
-    private SimpleStringProperty username;
-    private SimpleStringProperty password;
+    private final SimpleStringProperty username = new SimpleStringProperty("");
+    private final SimpleStringProperty password = new SimpleStringProperty("");
 
     public AuthentifyDialogViewModel(DialogService dialogService,
                                      GitPreferences preferences) {
 
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.username = preferences.getUsernameProperty();
-        this.password = preferences.getPasswordProperty();
     }
 
     public GitViewModel saveCredentials() {
@@ -27,25 +34,26 @@ public class AuthentifyDialogViewModel extends AbstractViewModel {
             return null;
         }
 
+        Optional<String> passPhrase = dialogService.showPasswordDialogAndWait("Passphrase",
+                "Please enter a passphrase to encrypt your password.",
+                "If you wish to not encrypt your password, leave the passphrase field empty or press cancel.");
+        passPhrase = passPhrase.filter(phrase -> !phrase.isBlank()); // filter out empty strings
+
         preferences.setUsername(username.get());
-        preferences.setPassword(password.get());
-        // preferences.store(); // Uncomment if preferences need to be saved persistently
+        preferences.setIsPasswordEncrypted(passPhrase.isPresent());
+        try {
+            preferences.setPassword(new Password(password.get(), passPhrase.orElse(username.get())).encrypt());
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            LOGGER.error("Could not store the password due to encryption problems.", e);
+        }
+        // changes apply as soon as the user clicks save
+        dialogService.notify("Credentials saved successfully.");
 
-        // dialogService.showInformationDialogAndWait("Success", "Credentials saved successfully.");
         return new GitViewModel(preferences, dialogService);
-    }
-
-    // TODO: look over this
-    public void setUsername(SimpleStringProperty username) {
-        this.username = username;
     }
 
     public SimpleStringProperty getUsername() {
         return this.username;
-    }
-
-    public void setPassword(SimpleStringProperty password) {
-        this.password = password;
     }
 
     public SimpleStringProperty getPassword() {

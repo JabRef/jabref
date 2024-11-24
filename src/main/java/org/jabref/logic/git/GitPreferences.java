@@ -1,5 +1,7 @@
 package org.jabref.logic.git;
 
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -7,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class GitPreferences {
+    private static String passwordEncryptionKey = null;
     private final BooleanProperty gitSupportEnabledProperty;
     private final BooleanProperty frequencyLabelEnabledProperty;
 
@@ -14,12 +17,11 @@ public class GitPreferences {
     private final ObjectProperty<AuthenticationViewMode> authenticationMethod;
     private SimpleStringProperty sshPath;
 
-    // TODO: encrypt
+    private final BooleanProperty isPasswordEncrypted;
     private final SimpleStringProperty password;
-
     private final SimpleStringProperty username;
 
-    public GitPreferences(boolean gitSupportEnabledProperty, AuthenticationViewMode authenticationMethod, boolean frequencyLabelEnabledProperty, String username, String sshPath, String password, boolean hostKeyCheckProperty) {
+    public GitPreferences(boolean gitSupportEnabledProperty, AuthenticationViewMode authenticationMethod, boolean frequencyLabelEnabledProperty, String username, String sshPath, String password, boolean hostKeyCheckProperty, boolean isPasswordEncrypted) {
         this.gitSupportEnabledProperty = new SimpleBooleanProperty(gitSupportEnabledProperty);
         this.authenticationMethod = new SimpleObjectProperty<>(authenticationMethod);
         this.frequencyLabelEnabledProperty = new SimpleBooleanProperty(frequencyLabelEnabledProperty);
@@ -27,6 +29,7 @@ public class GitPreferences {
         this.sshPath = new SimpleStringProperty(sshPath);
         this.password = new SimpleStringProperty(password);
         this.hostKeyCheckProperty = new SimpleBooleanProperty(hostKeyCheckProperty);
+        this.isPasswordEncrypted = new SimpleBooleanProperty(isPasswordEncrypted);
     }
 
     public AuthenticationViewMode getAuthenticationMethod() {
@@ -113,5 +116,25 @@ public class GitPreferences {
 
     public void setFrequencyLabelEnabledProperty(boolean frequencyLabelEnabledProperty) {
         this.frequencyLabelEnabledProperty.set(frequencyLabelEnabledProperty);
+    }
+
+    public BooleanProperty isPasswordEncryptedProperty() {
+        return isPasswordEncrypted;
+    }
+
+    public boolean isPasswordEncrypted() {
+        return isPasswordEncrypted.getValue();
+    }
+
+    public void setIsPasswordEncrypted(boolean isPasswordEncrypted) {
+        this.isPasswordEncrypted.set(isPasswordEncrypted);
+    }
+
+    public Optional<String> getPasswordEncryptionKey() {
+        return Optional.ofNullable(passwordEncryptionKey);
+    }
+
+    public void setPasswordEncryptionKey(String key) {
+        passwordEncryptionKey = key;
     }
 }

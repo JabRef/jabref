@@ -346,8 +346,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
 
     private static final String GIT_USERNAME = "git_username";
-
     private static final String GIT_PASSWORD = "git_password";
+    private static final String IS_GIT_PASSWORD_ENCRYPTED = "isGitPasswordEncrypted";
 
     private static final String SSH_PATH = "ssh_path";
 
@@ -670,6 +670,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AUTHENTICATION_SSH_CREDENTIALS_VIEW_MODE, AuthenticationViewMode.SSH.name());
         defaults.put(GIT_SUPPORT_ENABLED_PROPERTY, Boolean.FALSE);
         defaults.put(HOST_KEY_CHECK_ENABLED_PROPERTY, Boolean.FALSE);
+        defaults.put(IS_GIT_PASSWORD_ENCRYPTED, Boolean.FALSE);
         defaults.put(PUSH_FREQUENCY_PROPERTY, Boolean.FALSE);
         // endregion
     }
@@ -861,7 +862,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(GIT_USERNAME),
                 get(SSH_PATH),
                 get(GIT_PASSWORD),
-                getBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY)
+                getBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY),
+                getBoolean(IS_GIT_PASSWORD_ENCRYPTED)
         );
 
         EasyBind.listen(gitPreferences.getGitSupportEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_SUPPORT_ENABLED_PROPERTY, newValue));
@@ -875,6 +877,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) ->
                 put(GIT_PASSWORD, newValue));
         EasyBind.listen(gitPreferences.getHostKeyCheckProperty(), (obs, oldValue, newValue) -> putBoolean(HOST_KEY_CHECK_ENABLED_PROPERTY, newValue));
+        EasyBind.listen(gitPreferences.isPasswordEncryptedProperty(), (obs, oldValue, newValue) -> putBoolean(IS_GIT_PASSWORD_ENCRYPTED, newValue));
 
         System.out.println("We are in getGitPreferences, getHostKeyCheck is set to " + gitPreferences.getHostKeyCheckProperty());
 
