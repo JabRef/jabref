@@ -3,18 +3,22 @@ package org.jabref.logic.citation.repository;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.time.LocalDateTime;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.WriteBuffer;
@@ -22,13 +26,17 @@ import org.h2.mvstore.type.BasicDataType;
 
 public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
+    private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
+
     private final String mapName;
+    private final String insertionTimeStampMapName;
     private final MVStore.Builder storeConfiguration;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration =
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
 
     MVStoreBibEntryRelationDAO(Path path, String mapName) {
         this.mapName = mapName;
+        this.insertionTimeStampMapName = mapName + "-insertion-timestamp";
         this.storeConfiguration = new MVStore.Builder().autoCommitDisabled().fileName(path.toAbsolutePath().toString());
     }
 
@@ -47,19 +55,30 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
     @Override
     synchronized public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
+        if (relations.isEmpty()) {
+            return;
+        }
         entry.getDOI().ifPresent(doi -> {
             try (var store = this.storeConfiguration.open()) {
+                // Save the relations
                 MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
                 var relationsAlreadyStored = relationsMap.getOrDefault(doi.getDOI(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
                 relationsMap.put(doi.getDOI(), relationsAlreadyStored);
+
+                // Save insertion timestamp
+                var insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
+                MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
+                insertionTimeStampMap.put(doi.getDOI(), insertionTime);
+
+                // Commit
                 store.commit();
             }
         });
     }
 
     @Override
-    public boolean containsKey(BibEntry entry) {
+    synchronized public boolean containsKey(BibEntry entry) {
         return entry
             .getDOI()
             .map(doi -> {
@@ -69,6 +88,29 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                 }
             })
             .orElse(false);
+    }
+
+    @Override
+    synchronized public boolean isUpdatable(BibEntry entry) {
+        var clock = Clock.system(TIME_STAMP_ZONE_ID);
+        return this.isUpdatable(entry, clock);
+    }
+
+    @VisibleForTesting
+    boolean isUpdatable(final BibEntry entry, final Clock clock) {
+        final var executionTime = LocalDateTime.now(clock);
+        return entry
+            .getDOI()
+            .map(doi -> {
+                try (var store = this.storeConfiguration.open()) {
+                    MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
+                    return insertionTimeStampMap.getOrDefault(doi.getDOI(), executionTime);
+                }
+            })
+            .map(lastExecutionTime ->
+                lastExecutionTime.equals(executionTime) || lastExecutionTime.isBefore(executionTime.minusWeeks(1))
+            )
+            .orElse(true);
     }
 
     private static class BibEntrySerializer extends BasicDataType<BibEntry> {

@@ -12,10 +12,10 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     private final BibEntryRelationDAO referencesDao;
 
     public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore) {
-        this.citationsDao = ChainBibEntryRelationDAO.of(
+        this.citationsDao = BibEntryRelationDAOChain.of(
             LRUCacheBibEntryRelationsDAO.CITATIONS, new MVStoreBibEntryRelationDAO(citationsStore, "citations")
         );
-        this.referencesDao = ChainBibEntryRelationDAO.of(
+        this.referencesDao = BibEntryRelationDAOChain.of(
             LRUCacheBibEntryRelationsDAO.REFERENCES, new MVStoreBibEntryRelationDAO(relationsStore, "relations")
         );
     }
@@ -38,6 +38,11 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     }
 
     @Override
+    public boolean isCitationsUpdatable(BibEntry entry) {
+        return citationsDao.isUpdatable(entry);
+    }
+
+    @Override
     public void insertReferences(BibEntry entry, List<BibEntry> references) {
         referencesDao.cacheOrMergeRelations(
             entry, Objects.requireNonNullElseGet(references, List::of)
@@ -52,5 +57,10 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     @Override
     public boolean containsReferences(BibEntry entry) {
         return referencesDao.containsKey(entry);
+    }
+
+    @Override
+    public boolean isReferencesUpdatable(BibEntry entry) {
+        return referencesDao.isUpdatable(entry);
     }
 }

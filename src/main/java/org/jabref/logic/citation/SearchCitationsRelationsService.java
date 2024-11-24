@@ -26,7 +26,8 @@ public class SearchCitationsRelationsService {
     }
 
     public List<BibEntry> searchReferences(BibEntry referencer, boolean forceUpdate) {
-        if (forceUpdate || !this.relationsRepository.containsReferences(referencer)) {
+        if ((forceUpdate && this.relationsRepository.isReferencesUpdatable(referencer))
+            || !this.relationsRepository.containsReferences(referencer)) {
             try {
                 var references = this.citationFetcher.searchCiting(referencer);
                 if (!references.isEmpty()) {
@@ -40,7 +41,8 @@ public class SearchCitationsRelationsService {
     }
 
     public List<BibEntry> searchCitations(BibEntry cited, boolean forceUpdate) {
-        if (forceUpdate || !this.relationsRepository.containsCitations(cited)) {
+        if ((forceUpdate && this.relationsRepository.isCitationsUpdatable(cited))
+            || !this.relationsRepository.containsCitations(cited)) {
             try {
                 var citations = this.citationFetcher.searchCitedBy(cited);
                 if (!citations.isEmpty()) {

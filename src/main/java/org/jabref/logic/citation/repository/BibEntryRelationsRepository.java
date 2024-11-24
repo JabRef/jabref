@@ -12,9 +12,13 @@ public interface BibEntryRelationsRepository {
 
     boolean containsCitations(BibEntry entry);
 
+    boolean isCitationsUpdatable(BibEntry entry);
+
     void insertReferences(BibEntry entry, List<BibEntry> citations);
 
     List<BibEntry> readReferences(BibEntry entry);
 
     boolean containsReferences(BibEntry entry);
+
+    boolean isReferencesUpdatable(BibEntry entry);
 }

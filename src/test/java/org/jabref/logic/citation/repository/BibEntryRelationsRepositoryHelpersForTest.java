@@ -32,6 +32,11 @@ public class BibEntryRelationsRepositoryHelpersForTest {
                 }
 
                 @Override
+                public boolean isCitationsUpdatable(BibEntry entry) {
+                    return false;
+                }
+
+                @Override
                 public void insertReferences(BibEntry entry, List<BibEntry> citations) {
                     insertReferences.accept(entry, citations);
                 }
@@ -44,6 +49,11 @@ public class BibEntryRelationsRepositoryHelpersForTest {
                 @Override
                 public boolean containsReferences(BibEntry entry) {
                     return true;
+                }
+
+                @Override
+                public boolean isReferencesUpdatable(BibEntry entry) {
+                    return false;
                 }
             };
         }
@@ -68,6 +78,11 @@ public class BibEntryRelationsRepositoryHelpersForTest {
                 }
 
                 @Override
+                public boolean isCitationsUpdatable(BibEntry entry) {
+                    return false;
+                }
+
+                @Override
                 public void insertReferences(BibEntry entry, List<BibEntry> citations) {
                     referencesDB.put(entry, citations);
                 }
@@ -80,6 +95,11 @@ public class BibEntryRelationsRepositoryHelpersForTest {
                 @Override
                 public boolean containsReferences(BibEntry entry) {
                     return referencesDB.containsKey(entry);
+                }
+
+                @Override
+                public boolean isReferencesUpdatable(BibEntry entry) {
+                    return false;
                 }
             };
         }

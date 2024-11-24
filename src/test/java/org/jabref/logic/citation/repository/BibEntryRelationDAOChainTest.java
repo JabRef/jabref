@@ -19,12 +19,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class ChainBibEntryRelationDAOTest {
+class BibEntryRelationDAOChainTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(ChainBibEntryRelationDAOTest::createBibEntry);
+            .mapToObj(BibEntryRelationDAOChainTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -37,6 +37,7 @@ class ChainBibEntryRelationDAOTest {
      * Create a fake list of relations for a bibEntry based on the {@link PaperDetails#toBibEntry()} logic
      * that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
      * and mapped as BibEntry will be serializable by the MVStore.
+     *
      * @param entry should not be null
      * @return never empty
      */
@@ -68,7 +69,7 @@ class ChainBibEntryRelationDAOTest {
             });
     }
 
-    private class DaoMock implements BibEntryRelationDAO {
+    private static class DaoMock implements BibEntryRelationDAO {
 
         Map<BibEntry, List<BibEntry>> table = new HashMap<>();
 
@@ -86,6 +87,11 @@ class ChainBibEntryRelationDAOTest {
         public boolean containsKey(BibEntry entry) {
             return this.table.containsKey(entry);
         }
+
+        @Override
+        public boolean isUpdatable(BibEntry entry) {
+            return !this.containsKey(entry);
+        }
     }
 
     @ParameterizedTest
@@ -95,7 +101,7 @@ class ChainBibEntryRelationDAOTest {
         var relations = createRelations(entry);
         dao.cacheOrMergeRelations(entry, relations);
         var secondDao = new DaoMock();
-        var doaChain = ChainBibEntryRelationDAO.of(dao, secondDao);
+        var doaChain = BibEntryRelationDAOChain.of(dao, secondDao);
 
         // WHEN
         var relationsFromChain = doaChain.getRelations(entry);
@@ -112,7 +118,7 @@ class ChainBibEntryRelationDAOTest {
         var relations = createRelations(entry);
         dao.cacheOrMergeRelations(entry, relations);
         var firstDao = new DaoMock();
-        var doaChain = ChainBibEntryRelationDAO.of(firstDao, dao);
+        var doaChain = BibEntryRelationDAOChain.of(firstDao, dao);
 
         // WHEN
         var relationsFromChain = doaChain.getRelations(entry);
@@ -128,7 +134,7 @@ class ChainBibEntryRelationDAOTest {
         // GIVEN
         var relations = createRelations(entry);
         var firstDao = new DaoMock();
-        var doaChain = ChainBibEntryRelationDAO.of(firstDao, dao);
+        var doaChain = BibEntryRelationDAOChain.of(firstDao, dao);
 
         // WHEN
         doaChain.cacheOrMergeRelations(entry, relations);
@@ -142,18 +148,34 @@ class ChainBibEntryRelationDAOTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldContainAKeyEvenIfItWasOnlyInsertedInLastNode(BibEntryRelationDAO dao, BibEntry entry) {
+    void theChainShouldContainAKeyEvenIfItWasOnlyInsertedInLastNode(BibEntryRelationDAO secondDao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
         var firstDao = new DaoMock();
-        var doaChain = ChainBibEntryRelationDAO.of(firstDao, dao);
+        var doaChain = BibEntryRelationDAOChain.of(firstDao, secondDao);
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
-        Assertions.assertFalse(firstDao.containsKey(entry));
-        boolean doesChainContainsTheKey = doaChain.containsKey(entry);
+        secondDao.cacheOrMergeRelations(entry, relations);
 
         // THEN
-        Assertions.assertTrue(doesChainContainsTheKey);
+        Assertions.assertFalse(firstDao.containsKey(entry));
+        Assertions.assertTrue(doaChain.containsKey(entry));
+    }
+
+    @ParameterizedTest
+    @MethodSource("createCacheAndBibEntry")
+    void theChainShouldNotBeUpdatableBeforeInsertionAndNotAfterAnInsertion(BibEntryRelationDAO dao, BibEntry entry) {
+        // GIVEN
+        var relations = createRelations(entry);
+        var lastDao = new DaoMock();
+        var daoChain = BibEntryRelationDAOChain.of(dao, lastDao);
+        Assertions.assertTrue(daoChain.isUpdatable(entry));
+
+        // WHEN
+        daoChain.cacheOrMergeRelations(entry, relations);
+
+        // THEN
+        Assertions.assertTrue(daoChain.containsKey(entry));
+        Assertions.assertFalse(daoChain.isUpdatable(entry));
     }
 }

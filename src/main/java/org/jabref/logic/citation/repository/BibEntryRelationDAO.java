@@ -11,4 +11,8 @@ public interface BibEntryRelationDAO {
     void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations);
 
     boolean containsKey(BibEntry entry);
+
+    default boolean isUpdatable(BibEntry entry) {
+        return true;
+    }
 }
