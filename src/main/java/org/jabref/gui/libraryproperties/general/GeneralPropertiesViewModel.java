@@ -2,7 +2,9 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -18,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
@@ -40,16 +43,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
-    private final DirectoryDialogConfiguration directoryDialogConfiguration;
 
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
-
-        this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
     }
 
     @Override
@@ -96,16 +95,23 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void browseLibrarySpecificDir() {
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(librarySpecificDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseUserDir() {
+
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(userSpecificFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseLatexDir() {
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(laTexFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
@@ -140,5 +146,20 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
+    }
+
+    private Path getConfiguredDirOrDefaultAndNotifyOnMissing(String configuredDir) {
+        if (configuredDir.isEmpty()) {
+            return preferences.getFilePreferences().getWorkingDirectory();
+        }
+        Optional<Path> foundPath = this.databaseContext.getFileDirectories(preferences.getFilePreferences()).stream()
+                                                       .filter(path -> path.toString().endsWith(configuredDir))
+                                                       .filter(Files::exists).findFirst();
+
+        if (foundPath.isEmpty()) {
+            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working dir.", configuredDir));
+            return preferences.getFilePreferences().getWorkingDirectory();
+        }
+        return foundPath.get();
     }
 }
