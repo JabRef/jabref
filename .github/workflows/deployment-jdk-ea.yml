@@ -32,11 +32,12 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_owner == 'JabRef'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
-        jdk: [22]
+        jdk: [23]
         javafx: [24]
         include:
           - os: ubuntu-latest
@@ -84,12 +85,12 @@ jobs:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3.0.0
+        uses: gittools/actions/gitversion/setup@v3.0.3
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3.0.0
+        uses: gittools/actions/gitversion/execute@v3.0.3
 
       # JDK
       - name: 'Set up JDK ${{ matrix.jdk }}'

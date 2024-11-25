@@ -160,6 +160,7 @@ open module org.jabref {
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    requires velocity.engine.core;
     // endregion
 
     // region: Lucene

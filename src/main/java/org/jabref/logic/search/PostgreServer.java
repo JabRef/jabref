@@ -23,6 +23,7 @@ public class PostgreServer {
         EmbeddedPostgres embeddedPostgres;
         try {
             embeddedPostgres = EmbeddedPostgres.builder()
+                                               .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
                                                .start();
             LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
         } catch (IOException e) {
