@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ class MarkdownTitleExporterTest {
 
     private static Exporter htmlWebsiteExporter;
     private static BibDatabaseContext databaseContext;
+    private static final SelfContainedSaveOrder saveMostRecentFirstSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(new SaveOrder.SortCriterion(StandardField.YEAR, true)));
 
     @BeforeAll
     static void setUp() {
@@ -35,7 +37,7 @@ class MarkdownTitleExporterTest {
                 "title-markdown",
                 StandardFileType.MARKDOWN,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                SaveOrder.getDefaultSaveOrder(),
+                saveMostRecentFirstSaveOrder,
                 BlankLineBehaviour.DELETE_BLANKS);
 
         databaseContext = new BibDatabaseContext();
