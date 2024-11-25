@@ -13,9 +13,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.metadata.SaveOrder.SortCriterion;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 public class ExporterFactory {

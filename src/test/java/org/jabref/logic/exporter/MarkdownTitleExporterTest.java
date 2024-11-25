@@ -26,7 +26,7 @@ class MarkdownTitleExporterTest {
 
     private static Exporter htmlWebsiteExporter;
     private static BibDatabaseContext databaseContext;
-    private static final SelfContainedSaveOrder saveMostRecentFirstSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(new SaveOrder.SortCriterion(StandardField.YEAR, true)));
+    private static final SelfContainedSaveOrder SAVE_MOST_RECENT_FIRST_SAVE_ORDER = new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(new SaveOrder.SortCriterion(StandardField.YEAR, true)));
 
     @BeforeAll
     static void setUp() {
@@ -37,7 +37,7 @@ class MarkdownTitleExporterTest {
                 "title-markdown",
                 StandardFileType.MARKDOWN,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveMostRecentFirstSaveOrder,
+                SAVE_MOST_RECENT_FIRST_SAVE_ORDER,
                 BlankLineBehaviour.DELETE_BLANKS);
 
         databaseContext = new BibDatabaseContext();
