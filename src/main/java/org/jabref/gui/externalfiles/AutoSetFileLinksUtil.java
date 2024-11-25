@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -13,6 +14,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -20,6 +23,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +72,20 @@ public class AutoSetFileLinksUtil {
         this.filePreferences = filePreferences;
     }
 
+    // If file that is already linked to an existing entry is moved, the file should be relinked to the entry
+    private void relinkFileIfMoved(List<LinkedFile> newLinkedFiles, BibEntry entry) {
+        // Get the list of files linked to a specific entry
+        List<LinkedFile> allLinkedFiles = entry.getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
+        // newLinkedFiles refer to the new file path, while allLinkedFiles refer to both the old and new file paths
+        if (newLinkedFiles.size() == 1 && allLinkedFiles.size() == 2) {
+            String newPath = FileFieldWriter.getStringRepresentation(newLinkedFiles.getFirst());
+            // If the first item in allLinkedFiles is an invalid file path and leads to no existing file, reset the value of the File field with the new path
+            if (allLinkedFiles.getFirst().findIn(directories).isEmpty()) {
+                entry.setField(StandardField.FILE, newPath);
+            }
+        }
+    }
+
     public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<LinkedFile, BibEntry> onAddLinkedFile) {
         LinkFilesResult result = new LinkFilesResult();
 
@@ -85,6 +103,8 @@ public class AutoSetFileLinksUtil {
                 // store undo information
                 onAddLinkedFile.accept(linkedFile, entry);
             }
+
+            relinkFileIfMoved(linkedFiles, entry);
 
             result.addBibEntry(entry);
         }
