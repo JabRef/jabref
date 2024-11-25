@@ -1,5 +1,6 @@
 package org.jabref.architecture;
 
+import java.net.URI;
 import java.nio.file.Paths;
 
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
@@ -155,7 +156,7 @@ class MainArchitectureTest {
        noClasses()
                .that()
                .resideInAPackage("org.jabref..")
-               .should().callMethod(java.net.URI.class, "create", java.lang.String.class)
+               .should().callMethod(URI.class, "create", String.class)
                .check(classes);
     }
 }
