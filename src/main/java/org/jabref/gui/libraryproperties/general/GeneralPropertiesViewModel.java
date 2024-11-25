@@ -96,21 +96,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public void browseLibrarySpecificDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(librarySpecificDirectoryProperty.getValue())).build();
+                .withInitialDirectory(getBrowseDirectory(librarySpecificDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseUserDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(userSpecificFileDirectoryProperty.getValue())).build();
+                .withInitialDirectory(getBrowseDirectory(userSpecificFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public void browseLatexDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(getConfiguredDirOrDefaultAndNotifyOnMissing(laTexFileDirectoryProperty.getValue())).build();
+                .withInitialDirectory(getBrowseDirectory(laTexFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
