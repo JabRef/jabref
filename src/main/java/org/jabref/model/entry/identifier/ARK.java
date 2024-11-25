@@ -3,6 +3,7 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.URLUtil;
 
 /**
@@ -17,6 +18,7 @@ import org.jabref.logic.util.URLUtil;
  * and to provide them with ability to copy/paste the ark as is, we support arks with or without the prefix.
  * </p>
  */
+@AllowedToUseLogic("Because URL utility is needed")
 public class ARK extends EprintIdentifier {
     private final String ark;
 

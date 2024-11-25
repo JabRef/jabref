@@ -6,11 +6,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.URLUtil;
 
 /**
  * Represents an SSRN article, identified by its abstract ID.
  */
+@AllowedToUseLogic("Because URL utility is needed")
 public class SSRN extends EprintIdentifier {
 
     private static final String SSRN_URL_REGEX = "(https?://)?(papers\\.)?ssrn\\.com/(sol3/papers.cfm\\?)?abstract(_id)?=(?<id>\\d+)";
