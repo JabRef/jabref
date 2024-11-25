@@ -119,6 +119,10 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                     dialogService.showErrorDialogAndWait(ex);
                 }
             }
+        } else {
+            link.set(relativize(fileToAdd));
+            filePreferences.setWorkingDirectory(fileToAdd);
+            setExternalFileTypeByExtension(link.getValueSafe());
         }
     }
 
