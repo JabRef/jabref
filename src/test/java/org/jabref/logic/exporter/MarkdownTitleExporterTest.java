@@ -44,15 +44,15 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
-        Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
+        Path file = tempDir.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, tempFile, Collections.emptyList());
+        htmlWebsiteExporter.export(databaseContext, tempDir, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 
     @Test
-    final void exportsCorrectContentArticle(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentArticle(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -61,7 +61,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.PUBLISHER, "THE PRESS")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -72,7 +72,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInCollection(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentInCollection(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -81,7 +81,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.PUBLISHER, "PRESS")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -92,7 +92,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentBook(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentBook(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -101,7 +101,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.PUBLISHER, "PRESS")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -112,7 +112,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsPublisher(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentInProceeedingsPublisher(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -122,7 +122,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.SERIES, "CONF'20")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -133,7 +133,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsNoPublisher(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentInProceeedingsNoPublisher(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -142,7 +142,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.SERIES, "CONF'20")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -153,7 +153,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsNoSeries(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentInProceeedingsNoSeries(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -161,7 +161,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.BOOKTITLE, "Test Conference")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
@@ -172,7 +172,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentBracketsInTitle(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContentBracketsInTitle(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -180,7 +180,7 @@ class MarkdownTitleExporterTest {
                 .withField(StandardField.JOURNAL, "Journal of this \\& that")
                 .withField(StandardField.YEAR, "2020");
 
-        Path file = tempFile.resolve("RandomFileName");
+        Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
