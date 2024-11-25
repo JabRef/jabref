@@ -154,8 +154,7 @@ public class URLUtil {
      * Creates a {@link URI} object from the given string URL.
      * This method attempts to convert the given URL string into a {@link URI} object.
      * The pipe character ('|') is replaced with its percent-encoded equivalent ("%7C") because the pipe character
-     * is not a valid character in certain parts of a URI (specifically, in the path or query components).
-     * According to the URI specification (RFC 3986), certain characters must be percent-encoded when used in specific contexts.
+     * is only a valid character according to RFC3986. However, JDK's URI implementation is implementing RFC2396 and RFC2732, but not RFC3986.
      *
      * @param url the URL string to be converted into a {@link URI}.
      * @return the {@link URI} object created from the string URL.
