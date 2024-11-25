@@ -69,7 +69,6 @@ public class CSLCitationOOAdapter {
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
         insertReferences(cursor, entries, ooText, selectedStyle.isNumericStyle());
-        cursor.collapseToEnd();
     }
 
     /**
@@ -119,7 +118,6 @@ public class CSLCitationOOAdapter {
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertReferences(cursor, List.of(currentEntry), ooText, selectedStyle.isNumericStyle());
-            cursor.collapseToEnd();
         }
     }
 
@@ -131,9 +129,6 @@ public class CSLCitationOOAdapter {
             throws CreationException, Exception {
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
         insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
-
-        // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
-        cursor.collapseToEnd();
     }
 
     /**
@@ -165,11 +160,6 @@ public class CSLCitationOOAdapter {
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
                 OOTextIntoOO.write(document, cursor, ooText);
-                    // Select the paragraph break
-                    cursor.goLeft((short) 1, true);
-
-                    // Delete the selected content (paragraph break)
-                    cursor.setString("");
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
@@ -180,7 +170,6 @@ public class CSLCitationOOAdapter {
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
                 OOTextIntoOO.write(document, cursor, ooText);
             }
-            cursor.collapseToEnd();
         }
     }
 
@@ -208,12 +197,8 @@ public class CSLCitationOOAdapter {
         CSLReferenceMark mark = markManager.createReferenceMark(entries);
         mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
 
-        // Move the cursor to the end of the inserted text
-        cursor.collapseToEnd();
-
         markManager.setUpdateRequired(isNumericStyle);
         readAndUpdateExistingMarks();
-        cursor.collapseToEnd();
     }
 
     /**
