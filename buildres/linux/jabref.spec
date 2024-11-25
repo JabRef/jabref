@@ -24,6 +24,15 @@ Requires: PACKAGE_DEFAULT_DEPENDENCIES PACKAGE_CUSTOM_DEPENDENCIES
 #build time will substantially increase and it may require unpack200/system java to install
 %define __jar_repack %{nil}
 
+# on RHEL we got unwanted improved debugging enhancements
+%define _build_id_links none
+
+%define package_filelist %{_builddir}/%{name}.files
+%define app_filelist %{_builddir}/%{name}.app.files
+%define filesystem_filelist %{_builddir}/%{name}.filesystem.files
+
+%define default_filesystem / /opt /usr /usr/bin /usr/lib /usr/local /usr/local/bin /usr/local/lib
+
 %description
 APPLICATION_DESCRIPTION
 
@@ -39,19 +48,22 @@ install -d -m 755 %{buildroot}APPLICATION_DIRECTORY
 cp -r %{_sourcedir}APPLICATION_DIRECTORY/* %{buildroot}APPLICATION_DIRECTORY
 %if "xAPPLICATION_LICENSE_FILE" != "x"
   %define license_install_file %{_defaultlicensedir}/%{name}-%{version}/%{basename:APPLICATION_LICENSE_FILE}
-  install -d -m 755 %{buildroot}%{dirname:%{license_install_file}}
-  install -m 644 APPLICATION_LICENSE_FILE %{buildroot}%{license_install_file}
+  install -d -m 755 "%{buildroot}%{dirname:%{license_install_file}}"
+  install -m 644 "APPLICATION_LICENSE_FILE" "%{buildroot}%{license_install_file}"
+%endif
+(cd %{buildroot} && find . -path ./lib/systemd -prune -o -type d -print) | sed -e 's/^\.//' -e '/^$/d' | sort > %{app_filelist}
+{ rpm -ql filesystem || echo %{default_filesystem}; } | sort > %{filesystem_filelist}
+comm -23 %{app_filelist} %{filesystem_filelist} > %{package_filelist}
+sed -i -e 's/.*/%dir "&"/' %{package_filelist}
+(cd %{buildroot} && find . -not -type d) | sed -e 's/^\.//' -e 's/.*/"&"/' >> %{package_filelist}
+%if "xAPPLICATION_LICENSE_FILE" != "x"
+  sed -i -e 's|"%{license_install_file}"||' -e '/^$/d' %{package_filelist}
 %endif
 
-%files
+%files -f %{package_filelist}
 %if "xAPPLICATION_LICENSE_FILE" != "x"
-  %license %{license_install_file}
-  %{dirname:%{license_install_file}}
+  %license "%{license_install_file}"
 %endif
-# If installation directory for the application is /a/b/c, we want only root
-# component of the path (/a) in the spec file to make sure all subdirectories
-# are owned by the package.
-%(echo APPLICATION_DIRECTORY | sed -e "s|\(^/[^/]\{1,\}\).*$|\1|")
 
 %post
 # Install the native-messaging host script for firefox/chrome/chromium
@@ -62,6 +74,10 @@ install -D -m0755 /opt/jabref/lib/native-messaging-host/chromium/org.jabref.jabr
 install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
 install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
 DESKTOP_COMMANDS_INSTALL
+
+%pre
+package_type=rpm
+COMMON_SCRIPTS
 
 %preun
 # Remove the native-messaging hosts script only if relative to the deb package
