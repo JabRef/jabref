@@ -147,7 +147,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return this.laTexFileDirectoryProperty;
     }
 
-    private Path getConfiguredDirOrDefaultAndNotifyOnMissing(String configuredDir) {
+    private Path getBrowseDirectory(String configuredDir) {
         if (configuredDir.isEmpty()) {
             return preferences.getFilePreferences().getWorkingDirectory();
         }
