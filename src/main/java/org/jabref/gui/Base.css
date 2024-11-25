@@ -1521,7 +1521,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* region: maintable css */
 
-
 .main-table .column-icon {
     -fx-alignment: baseline-center;
     -fx-padding: 0;
@@ -1731,7 +1730,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
 }
 
-/* import from AboutDialog.css*/
+/* AboutDialog */
 .about-heading {
     -fx-font-size: 30;
     -fx-text-fill: -jr-theme;
@@ -1783,8 +1782,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: #4f5f8f;
 }
 
-
-/* import from DocumentViewer.css*/
+/* DocumentViewer */
 #mainPane {
     -fx-background-color: -fx-accented-background;
     -fx-padding: 0;
@@ -1795,7 +1793,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-/* import from EntryEditor.css*/
+/* EntryEditor */
 .editorPane {
     -fx-hgap: 10;
     -fx-vgap: 6;
@@ -1855,10 +1853,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-background-alt;
     -fx-background-insets: 0;
 }
-
-/*.tool-bar > .container > .separator {*/
-/*    -fx-background-color: -jr-separator;*/
-/*}*/
 
 .tool-bar .glyph-icon {
     -glyph-size: 1.0em;
@@ -1964,7 +1958,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-error;
 }
 
-/* import from ErrorConsole.css*/
+/* ErrorConsole */
 .list-content {
     -fx-padding: 0.625em;
 }
@@ -2010,7 +2004,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 
-/* import from GroupTree.css*/
+/* GroupTree */
 #groupTree:focused,
 #groupTree:filled:selected {
     -fx-background-color: -jr-sidepane-background;
@@ -2131,7 +2125,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 
-/* import from ImportEntriesDialog.css*/
+/* ImportEntriesDialog */
 .addEntryButton {
     -fx-font-size: 2em;
 }
@@ -2145,12 +2139,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 0em 0.5em 0em;
 }
 
-/* import from ManageStudyDefinition.css*/
+/* ManageStudyDefinition */
 .slr-tab {
     -fx-padding: 1em;
 }
 
-/* import from MultiMergeEntries.css*/
+/* MultiMergeEntries */
 .text-changed {
     -fx-fill: -jr-orange;
 }
@@ -2180,7 +2174,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-spacing: 10;
 }
 
-/* import from ParseLatexResult.css*/
+/* ParseLatexResult */
 #referenceListView {
     -fx-background-color: -jr-sidepane-background;
 }
@@ -2206,7 +2200,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 
-/* import from PreferenceDialog.css*/
+/* PreferenceDialog */
 #sidepane {
     -fx-background-color: -jr-sidepane-background;
 }
@@ -2287,7 +2281,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 
-/* import from CitationRelationsTab.css*/
+/* CitationRelationsTab */
 .addEntryButton {
     -fx-font-size: 2em;
 }
@@ -2301,7 +2295,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 0em 0.5em 0em;
 }
 
-/* import from JournalInfo.css*/
+/* JournalInfo */
 .info-container {
     -fx-background-color: -jr-background-alt;
 }
@@ -2331,8 +2325,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 0 0 0.062em 0;
 }
 
+/* KeyBindingsTab */
 
-/* import from KeyBindingsTab.css*/
 .keybinding-table {
     -fx-table-cell-border-color: transparent;
 }
@@ -2346,7 +2340,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: white;
 }
 
-/* import from ThreeWayMergeView.css*/
+/* ThreeWayMergeView */
 .merged-field .styled-text-area {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
@@ -2402,21 +2396,3 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-icon-size: 17;
     -fx-icon-color:  -jr-theme-text;
 }
-
-
-/* import from mkdocs-custom.css*/
-li.toctree-l2:first-child {
-    display: none;
-}
-
-li.toctree-l3:first-child {
-    display: none;
-}
-
-
-
-
-
-
-
-/* endregion */
