@@ -198,7 +198,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
-        URL url = org.jabref.logic.util.URLUtil.create("https://www.google.com/");
+        URL url = URLUtil.create("https://www.google.com/");
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 

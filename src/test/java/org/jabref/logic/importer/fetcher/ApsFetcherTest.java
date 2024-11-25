@@ -25,7 +25,7 @@ class ApsFetcherTest {
     @Test
     void findFullTextFromDoi() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1103/PhysRevLett.116.061102");
-        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102")), finder.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102")), finder.findFullText(entry));
     }
 
     @Test

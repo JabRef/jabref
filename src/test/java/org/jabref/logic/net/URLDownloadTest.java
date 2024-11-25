@@ -36,14 +36,14 @@ class URLDownloadTest {
 
     @Test
     void stringDownloadWithSetEncoding() throws Exception {
-        URLDownload dl = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
     void stringDownload() throws Exception {
-        URLDownload dl = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
@@ -52,7 +52,7 @@ class URLDownloadTest {
     void fileDownload() throws Exception {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
-            URLDownload dl = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+            URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
             dl.toFile(destination.toPath());
             assertTrue(destination.exists(), "file must exist");
         } finally {
@@ -65,14 +65,14 @@ class URLDownloadTest {
 
     @Test
     void determineMimeType() throws Exception {
-        URLDownload dl = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.getMimeType().get().startsWith("text/html"));
     }
 
     @Test
     void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
-        URLDownload google = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+        URLDownload google = new URLDownload(URLUtil.create("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.endsWith(".tmp"), path);
@@ -80,7 +80,7 @@ class URLDownloadTest {
 
     @Test
     void downloadToTemporaryFileKeepsName() throws Exception {
-        URLDownload google = new URLDownload(org.jabref.logic.util.URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
+        URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.contains("LICENSE"), path);
@@ -89,7 +89,7 @@ class URLDownloadTest {
     @Test
     @DisabledOnCIServer("CI Server is apparently blocked")
     void downloadOfFTPSucceeds() throws Exception {
-        URLDownload ftp = new URLDownload(org.jabref.logic.util.URLUtil.create("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
+        URLDownload ftp = new URLDownload(URLUtil.create("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
@@ -97,7 +97,7 @@ class URLDownloadTest {
 
     @Test
     void downloadOfHttpSucceeds() throws Exception {
-        URLDownload ftp = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.jabref.org"));
+        URLDownload ftp = new URLDownload(URLUtil.create("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
@@ -105,7 +105,7 @@ class URLDownloadTest {
 
     @Test
     void downloadOfHttpsSucceeds() throws Exception {
-        URLDownload ftp = new URLDownload(org.jabref.logic.util.URLUtil.create("https://www.jabref.org"));
+        URLDownload ftp = new URLDownload(URLUtil.create("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
@@ -113,21 +113,21 @@ class URLDownloadTest {
 
     @Test
     void checkConnectionSuccess() throws MalformedURLException {
-        URLDownload google = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.google.com"));
+        URLDownload google = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(google.canBeReached());
     }
 
     @Test
     void checkConnectionFail() throws MalformedURLException {
-        URLDownload nonsense = new URLDownload(org.jabref.logic.util.URLUtil.create("http://nonsenseadddress"));
+        URLDownload nonsense = new URLDownload(URLUtil.create("http://nonsenseadddress"));
 
         assertThrows(UnirestException.class, nonsense::canBeReached);
     }
 
     @Test
     void connectTimeoutIsNeverNull() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(org.jabref.logic.util.URLUtil.create("http://www.example.com"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://www.example.com"));
         assertNotNull(urlDownload.getConnectTimeout(), "there's a non-null default by the constructor");
 
         urlDownload.setConnectTimeout(null);
@@ -136,13 +136,13 @@ class URLDownloadTest {
 
     @Test
     void test503ErrorThrowsFetcherServerException() throws Exception {
-        URLDownload urlDownload = new URLDownload(org.jabref.logic.util.URLUtil.create("http://httpstat.us/503"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
     void test429ErrorThrowsFetcherClientException() throws Exception {
-        URLDownload urlDownload = new URLDownload(org.jabref.logic.util.URLUtil.create("http://httpstat.us/429"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 

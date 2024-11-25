@@ -75,7 +75,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     @Disabled("IEEE seems to block us")
     void findByDOI() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
-        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+        assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
@@ -83,7 +83,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     @Disabled("IEEE seems to block us")
     void findByDocumentUrl() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/document/7421926/");
-        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+        assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
@@ -91,7 +91,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     @Disabled("IEEE seems to block us")
     void findByURL() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926&ref=");
-        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+        assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
@@ -99,7 +99,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     @Disabled("IEEE blocks us - works in browser")
     void findByOldURL() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
-        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+        assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
