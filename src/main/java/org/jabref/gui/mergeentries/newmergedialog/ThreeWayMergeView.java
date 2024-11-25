@@ -67,6 +67,8 @@ public class ThreeWayMergeView extends VBox {
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.97);
 
         getChildren().addAll(toolbar, headerView, scrollPane);
+
+        getStyleClass().add("three-way-merge");
     }
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, GuiPreferences preferences) {

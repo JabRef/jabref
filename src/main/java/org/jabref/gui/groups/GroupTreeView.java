@@ -108,8 +108,7 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService
-    ) {
+                         AiService aiService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -124,6 +123,7 @@ public class GroupTreeView extends BorderPane {
     private void createNodes() {
         searchField = SearchTextField.create(preferences.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
+        searchField.setId("groupFilterBar");
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -151,7 +151,6 @@ public class GroupTreeView extends BorderPane {
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setId("addNewGroup");
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
