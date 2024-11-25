@@ -2,8 +2,8 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;

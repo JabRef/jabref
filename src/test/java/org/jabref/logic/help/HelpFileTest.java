@@ -6,8 +6,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

@@ -13,11 +13,11 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -93,7 +93,7 @@ class DownloadLinkedFileActionTest {
     void replacesLinkedFiles(@TempDir Path tempFolder) throws Exception {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
+        LinkedFile linkedFile = new LinkedFile(org.jabref.logic.util.URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -118,7 +118,7 @@ class DownloadLinkedFileActionTest {
     void doesntReplaceSourceURL(boolean keepHtml) throws Exception {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
+        LinkedFile linkedFile = new LinkedFile(org.jabref.logic.util.URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -173,7 +173,7 @@ class DownloadLinkedFileActionTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html; charset=utf-8")));
 
-        LinkedFile linkedFile = new LinkedFile(URLUtil.create("http://localhost:2331/html"), "");
+        LinkedFile linkedFile = new LinkedFile(org.jabref.logic.util.URLUtil.create("http://localhost:2331/html"), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");

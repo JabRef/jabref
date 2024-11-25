@@ -11,8 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 

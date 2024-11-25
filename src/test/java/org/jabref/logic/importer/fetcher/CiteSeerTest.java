@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -101,7 +101,7 @@ class CiteSeerTest {
     void findByIdAsDOI() throws FetcherException, IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e");
-        Optional<URL> expected = Optional.of(URLUtil.create("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
+        Optional<URL> expected = Optional.of(org.jabref.logic.util.URLUtil.create("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
         assertEquals(expected, fetcher.findFullText(entry));
     }
 

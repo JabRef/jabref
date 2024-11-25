@@ -3,7 +3,7 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.logic.util.URLUtil;
 
 /**
  * Archival Resource Key (ARK) identifiers are URLs that support long-term access to information. They are similar to DOIs

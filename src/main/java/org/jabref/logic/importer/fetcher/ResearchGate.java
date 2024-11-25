@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -24,6 +23,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;

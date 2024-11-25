@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -2,9 +2,9 @@ package org.jabref.logic.layout.format;
 
 import java.net.URI;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.preferences.DOIPreferences;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.identifier.DOI;
 
 /**

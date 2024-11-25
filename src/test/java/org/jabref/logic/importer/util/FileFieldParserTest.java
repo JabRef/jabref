@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,7 +65,7 @@ class FileFieldParserTest {
 
                 // parseCorrectOnlineInput
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile(URLUtil.create("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
+                        Collections.singletonList(new LinkedFile(org.jabref.logic.util.URLUtil.create("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
                         ":http\\://arxiv.org/pdf/2010.08497v1:PDF"
                 ),
 
@@ -164,19 +164,19 @@ class FileFieldParserTest {
 
                 // url
                 Arguments.of(
-                         Collections.singletonList(new LinkedFile(URLUtil.create("https://books.google.de/"), "")),
+                        Collections.singletonList(new LinkedFile(org.jabref.logic.util.URLUtil.create("https://books.google.de/"), "")),
                          "https://books.google.de/"
                 ),
 
                 // url with www
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile(URLUtil.create("https://www.google.de/"), "")),
+                        Collections.singletonList(new LinkedFile(org.jabref.logic.util.URLUtil.create("https://www.google.de/"), "")),
                              "https://www.google.de/"
                 ),
 
                 // url as file
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile("", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
+                        Collections.singletonList(new LinkedFile("", org.jabref.logic.util.URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // url as file with desc

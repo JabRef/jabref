@@ -3,7 +3,6 @@ package org.jabref.logic.util;
 import java.net.MalformedURLException;
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 

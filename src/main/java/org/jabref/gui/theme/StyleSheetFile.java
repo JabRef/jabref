@@ -10,7 +10,7 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.logic.util.URLUtil;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;

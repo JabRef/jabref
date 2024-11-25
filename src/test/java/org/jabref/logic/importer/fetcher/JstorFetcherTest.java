@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;

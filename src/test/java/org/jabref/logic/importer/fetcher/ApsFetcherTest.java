@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
@@ -25,7 +25,7 @@ class ApsFetcherTest {
     @Test
     void findFullTextFromDoi() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1103/PhysRevLett.116.061102");
-        assertEquals(Optional.of(URLUtil.create("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102")), finder.findFullText(entry));
+        assertEquals(Optional.of(org.jabref.logic.util.URLUtil.create("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102")), finder.findFullText(entry));
     }
 
     @Test

@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -15,6 +14,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
