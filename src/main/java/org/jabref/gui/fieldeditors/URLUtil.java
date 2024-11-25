@@ -29,7 +29,7 @@ public class URLUtil {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
-            URL url = URLUtil.create(link);
+            URL url = org.jabref.logic.util.URLUtil.create(link);
             if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
