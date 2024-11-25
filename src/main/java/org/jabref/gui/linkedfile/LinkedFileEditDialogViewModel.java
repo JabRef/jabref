@@ -2,7 +2,6 @@ package org.jabref.gui.linkedfile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
