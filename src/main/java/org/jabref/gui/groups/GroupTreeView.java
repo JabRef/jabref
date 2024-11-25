@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -71,7 +69,6 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
@@ -116,7 +113,6 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
 
         createNodes();
-        this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("/org/jabref/gui/Base.css")).toExternalForm());
         initialize();
     }
 
