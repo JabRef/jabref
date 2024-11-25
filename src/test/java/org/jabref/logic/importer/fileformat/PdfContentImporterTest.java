@@ -140,6 +140,7 @@ class PdfContentImporterTest {
     private static Stream<Arguments> providePdfData() {
         return Stream.of(
                 Arguments.of("Fundamentals of Distributed Computing: A Practical Tour of Vector Clock Systems", "/pdfs/PdfContentImporter/Baldoni2002.pdf"),
+                Arguments.of("JabRef Example for Reference Parsing", "/pdfs/IEEE/ieee-paper-cover.pdf"),
                 Arguments.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students", "/pdfs/PdfContentImporter/Kriha2018.pdf"),
                 Arguments.of("JabRef Example for Reference Parsing", "/pdfs/IEEE/ieee-paper.pdf"),
                 Arguments.of("Paper Title", "/org/jabref/logic/importer/util/LNCS-minimal.pdf"),
