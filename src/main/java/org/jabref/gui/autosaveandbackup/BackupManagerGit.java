@@ -71,7 +71,7 @@ public class BackupManagerGit {
         if (git.getRepository().getObjectDatabase().exists()) {
             LOGGER.info("Git repository already exists");
         } else {
-            git.init().call();
+            Git.init().call();
             LOGGER.info("Initialized new Git repository");
         }
     }
@@ -144,7 +144,7 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    private void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
+    protected void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         /*
         needsBackup must be initialized
          */
