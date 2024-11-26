@@ -139,7 +139,7 @@ public class SaveDatabaseAction {
 
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            // Close AutosaveManager, BackupManager, and IndexManager for original library
+            // Close AutosaveManager, BackupManagerGit, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
             libraryTab.closeIndexManger();
@@ -160,7 +160,7 @@ public class SaveDatabaseAction {
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
-            // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name
+            // Reset (here: uninstall and install again) AutosaveManager, BackupManagerGit and IndexManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
             libraryTab.createIndexManager();
@@ -251,7 +251,7 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
-        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
+        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManagerGit.performBackup
         SelfContainedSaveConfiguration saveConfiguration
                 = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
