@@ -21,7 +21,6 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
-import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -45,6 +44,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +88,18 @@ public class SaveDatabaseAction {
     /**
      * Asks the user for the path and saves afterward
      */
+
     public void saveAs() {
-        askForSavePath().ifPresent(this::saveAs);
+        askForSavePath().ifPresent(path -> {
+            try {
+                saveAs(path);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to save the database", e);
+            }
+        });
     }
 
-    public boolean saveAs(Path file) {
+    public boolean saveAs(Path file) throws GitAPIException, IOException {
         return this.saveAs(file, SaveDatabaseMode.NORMAL);
     }
 
@@ -135,7 +142,7 @@ public class SaveDatabaseAction {
      *             successful save.
      * @return true on successful save
      */
-    boolean saveAs(Path file, SaveDatabaseMode mode) {
+    boolean saveAs(Path file, SaveDatabaseMode mode) throws GitAPIException, IOException {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
         Optional<Path> databasePath = context.getDatabasePath();
@@ -205,7 +212,16 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            return savePath.filter(path -> saveAs(path, mode)).isPresent();
+            return savePath.filter(path -> {
+                try {
+                    return saveAs(path, mode);
+                } catch (
+                        GitAPIException |
+                        IOException e) {
+                    LOGGER.error("A problem occurred when trying to save the file %s".formatted(path), e);
+                    throw new RuntimeException(e);
+                }
+            }).isPresent();
         }
 
         return save(databasePath.get(), mode);

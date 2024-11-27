@@ -18,7 +18,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -73,15 +73,15 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
-                              GuiPreferences preferences,
-                              AiService aiService,
-                              DialogService dialogService,
-                              StateManager stateManager,
-                              FileUpdateMonitor fileUpdateMonitor,
-                              BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager,
-                              ClipBoardManager clipBoardManager,
-                              TaskExecutor taskExecutor) {
+                                 GuiPreferences preferences,
+                                 AiService aiService,
+                                 DialogService dialogService,
+                                 StateManager stateManager,
+                                 FileUpdateMonitor fileUpdateMonitor,
+                                 BibEntryTypesManager entryTypesManager,
+                                 CountingUndoManager undoManager,
+                                 ClipBoardManager clipBoardManager,
+                                 TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -250,7 +250,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
-        if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
+        if (BackupManagerGit.backupGitDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
             parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
@@ -277,18 +277,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-                         openSharedDatabase(
-                                 parserResult,
-                                 tabContainer,
-                                 dialogService,
-                                 preferences,
-                                 aiService,
-                                 stateManager,
-                                 entryTypesManager,
-                                 fileUpdateMonitor,
-                                 undoManager,
-                                 clipboardManager,
-                                 taskExecutor);
+            openSharedDatabase(
+                    parserResult,
+                    tabContainer,
+                    dialogService,
+                    preferences,
+                    aiService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager,
+                    clipboardManager,
+                    taskExecutor);
         }
         return parserResult;
     }

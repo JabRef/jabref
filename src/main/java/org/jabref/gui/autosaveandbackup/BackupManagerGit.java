@@ -89,11 +89,11 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
-        BackupManagerGit BackupManager = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
-        this.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
-        runningInstances.add(BackupManager);
-        return BackupManager;
+    public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
+        BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
+        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
+        runningInstances.add(backupManagerGit);
+        return backupManagerGit;
     }
 
     /**
