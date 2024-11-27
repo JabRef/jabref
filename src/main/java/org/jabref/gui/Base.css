@@ -2399,3 +2399,17 @@ journalInfo .grid-cell-b {
     -fx-icon-size: 17;
     -fx-icon-color:  -jr-theme-text;
 }
+
+/* Miscellaneous */
+
+.chatHistory {
+    -fx-border-color: black;
+}
+
+#styleSelectDialog .currentStyleLabel {
+    -fx-font-size: 1em;
+}
+
+#styleSelectDialog .currentStyleNameLabel {
+    -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
+}
