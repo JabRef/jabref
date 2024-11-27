@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +25,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
@@ -30,7 +33,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,19 +64,32 @@ public class BackupManagerGit {
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
 
+        // Ensure the backup directory exists
+        File backupDir = preferences.getFilePreferences().getBackupDirectory().toFile();
+        if (!backupDir.exists()) {
+            boolean dirCreated = backupDir.mkdirs();
+            if (dirCreated) {
+                LOGGER.info("Created backup directory: " + backupDir);
+            } else {
+                LOGGER.error("Failed to create backup directory: " + backupDir);
+            }
+        }
+
         // Initialize Git repository
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        git = new Git(builder.setGitDir(new File(preferences.getFilePreferences().getBackupDirectory().toFile(), ".git"))
+        git = new Git(builder.setGitDir(new File(backupDir, ".git"))
                              .readEnvironment()
                              .findGitDir()
                              .build());
+
         if (git.getRepository().getObjectDatabase().exists()) {
             LOGGER.info("Git repository already exists");
         } else {
-            Git.init().call();
+            Git.init().setDirectory(backupDir).call(); // Explicitly set the directory
             LOGGER.info("Initialized new Git repository");
         }
     }
+
 
     /**
      * Starts a new BackupManagerGit instance and begins the backup task.
@@ -107,7 +122,7 @@ public class BackupManagerGit {
 
     @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:WhitespaceAfter"})
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup, Path originalPath) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownJGit(backupDir, createBackup, originalPath));
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownGit(backupDir, createBackup, originalPath));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -145,9 +160,8 @@ public class BackupManagerGit {
      */
 
     protected void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
-        /*
-        needsBackup must be initialized
-         */
+        LOGGER.info("Starting backup process for file: {}", originalPath);
+
         needsBackup = BackupManagerGit.backupGitDiffers(backupDir, originalPath);
         if (!needsBackup) {
             return;
@@ -198,25 +212,42 @@ public class BackupManagerGit {
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
-
     public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
-
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
                 .setGitDir(new File(repoDir, ".git"))
                 .build();
+
         try (Git git = new Git(repository)) {
-            ObjectId headCommitId = repository.resolve("HEAD"); // to get the latest commit id
+            // Resolve HEAD commit
+            ObjectId headCommitId = repository.resolve("HEAD");
             if (headCommitId == null) {
-                // No commits in the repository, so there's no previous backup
-                return false;
+                // No commits in the repository; assume the file differs
+                return true;
             }
-            git.add().addFilepattern(originalPath.getFileName().toString()).call();
-            String relativePath = backupDir.relativize(originalPath).toString();
-            List<DiffEntry> diffs = git.diff()
-                                       .setPathFilter(PathFilter.create(relativePath)) // Utiliser PathFilter ici
-                                       .call();
-            return !diffs.isEmpty();
+
+            // Attempt to retrieve the file content from the last commit
+            ObjectLoader loader;
+            try {
+                loader = repository.open(repository.resolve("HEAD:" + originalPath.getFileName().toString()));
+            } catch (
+                    MissingObjectException e) {
+                // File not found in the last commit; assume it differs
+                return true;
+            }
+
+            // Read the content from the last commit
+            String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
+
+            // Read the current content of the file
+            if (!Files.exists(originalPath)) {
+                // If the file doesn't exist in the working directory, it differs
+                return true;
+            }
+            String currentContent = Files.readString(originalPath, StandardCharsets.UTF_8);
+
+            // Compare the current content to the committed content
+            return !currentContent.equals(committedContent);
         }
     }
 
@@ -230,7 +261,6 @@ public class BackupManagerGit {
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
-
     public List<DiffEntry> showDiffers(Path originalPath, Path backupDir, String commitId) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
@@ -347,7 +377,7 @@ public class BackupManagerGit {
      * @param originalPath the original path of the file to be backed up
      */
 
-    private void shutdownJGit(Path backupDir, boolean createBackup, Path originalPath) {
+    private void shutdownGit(Path backupDir, boolean createBackup, Path originalPath) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
