@@ -2,7 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -186,7 +186,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public boolean downloadFile(String urlText) {
         try {
-            URL url = URI.create(urlText).toURL();
+            URL url = URLUtil.create(urlText);
             addFromURLAndDownload(url);
             return true;
         } catch (MalformedURLException exception) {

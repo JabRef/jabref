@@ -1,6 +1,5 @@
 package org.jabref.logic.ai.chatting.model;
 
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.util.URLUtil;
 
 import com.google.gson.Gson;
 import dev.langchain4j.data.message.AiMessage;
@@ -62,7 +62,7 @@ public class Gpt4AllModel implements ChatLanguageModel {
             String baseUrl = aiPreferences.getSelectedApiBaseUrl();
             String fullUrl = baseUrl.endsWith("/") ? baseUrl + "chat/completions" : baseUrl + "/chat/completions";
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(fullUrl))
+                    .uri(URLUtil.createUri(fullUrl))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .timeout(Duration.ofSeconds(60))
