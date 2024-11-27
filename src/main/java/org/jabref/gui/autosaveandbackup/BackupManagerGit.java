@@ -170,7 +170,6 @@ public class BackupManagerGit {
      * @param objectId the commit ID to restore from
      */
 
-    @SuppressWarnings("checkstyle:TodoComment")
     public static void restoreBackup(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
             Git git = Git.open(backupDir.toFile());
