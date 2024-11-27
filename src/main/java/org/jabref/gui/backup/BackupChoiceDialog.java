@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
@@ -21,7 +20,7 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
     public static final ButtonType IGNORE_BACKUP = new ButtonType(Localization.lang("Ignore backup"), ButtonBar.ButtonData.CANCEL_CLOSE);
     public static final ButtonType REVIEW_BACKUP = new ButtonType(Localization.lang("Review backup"), ButtonBar.ButtonData.LEFT);
 
-    private static final int ROWS_PER_PAGE = 10;  // Define number of rows per page
+    private final ObservableList<BackupEntry> tableData = FXCollections.observableArrayList();
 
     @FXML
     private final TableView<BackupEntry> backupTableView;
@@ -32,38 +31,20 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
         getDialogPane().setMinHeight(150);
         getDialogPane().setMinWidth(450);
         getDialogPane().getButtonTypes().setAll(RESTORE_BACKUP, IGNORE_BACKUP, REVIEW_BACKUP);
+
         String content = Localization.lang("It looks like JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
                 Localization.lang("Do you want to recover the library from a backup file?");
 
-        backupTableView = new TableView<BackupEntry>();
+        backupTableView = new TableView<>();
         setupBackupTableView();
+        pushSampleData();
+        backupTableView.setItems(tableData);
 
-        // Sample data
-        ObservableList<BackupEntry> data = FXCollections.observableArrayList();
-        for (int i = 0; i < 100; i++) {  // Adjust 20 to however many entries you want
-            data.add(new BackupEntry("2023-11-01", i + " MB", i));
-        }
-        setContentText(content);
-
-        // Pagination control
-        int pageCount = (int) Math.ceil(data.size() / (double) ROWS_PER_PAGE);
-        Pagination pagination = new Pagination(pageCount, 0);
-        pagination.setPageFactory(pageIndex -> {
-            int start = pageIndex * ROWS_PER_PAGE;
-            int end = Math.min(start + ROWS_PER_PAGE, data.size());
-            backupTableView.setItems(FXCollections.observableArrayList(data.subList(start, end)));
-            backupTableView.getSelectionModel().selectFirst();
-            return new VBox(backupTableView);
-        });
-
-        // VBox content to hold the pagination and the label
-        VBox contentBox = new VBox(10);
-        contentBox.getChildren().addAll(new Label(content), pagination);
+        VBox contentBox = new VBox();
+        contentBox.getChildren().addAll(new Label(content), backupTableView);
         contentBox.setPrefWidth(380);
 
-        // Set the dialog content
         getDialogPane().setContent(contentBox);
-
         setResultConverter(dialogButton -> {
             if (dialogButton == RESTORE_BACKUP || dialogButton == REVIEW_BACKUP) {
                 return new BackupChoiceDialogRecord(backupTableView.getSelectionModel().getSelectedItem(), dialogButton);
@@ -84,5 +65,10 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
 
         backupTableView.getColumns().addAll(dateColumn, sizeColumn, entriesColumn);
     }
-}
 
+    private void pushSampleData() {
+        for (int i = 0; i < 50; i++) {
+            tableData.add(new BackupEntry("2023-11-" + (i + 1), i + " MB", i));
+        }
+    }
+}
