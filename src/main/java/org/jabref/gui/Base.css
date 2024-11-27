@@ -341,6 +341,10 @@ TextFlow > .hyperlink:visited,
     -fx-underline: true;
 }
 
+.TextFlow > .embeddedHyperlink {
+    -fx-padding: 0.166667em 0.25em 0.166667em 0.25em;
+}
+
 .glyph-icon {
     /* This adjusts text alignment within the bounds of text nodes so that
        the text is always vertically centered within the bounds. Based on
@@ -1887,7 +1891,16 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-background-color;
 }
 
-#entryEditor #gdpr-dialog {
+#entryEditor .ai-tab {
+    -fx-padding: 20 20 20 20;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor .ai-tab * {
+    -fx-fill: -fx-text-background-color;
+}
+
+#entryEditor .gdpr-notice {
     -fx-border-color: -jr-warn;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
@@ -1896,7 +1909,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.3em;
 }
 
-#entryEditor #gdpr-dialog * {
+#entryEditor .gdpr-notice * {
     -fx-fill: -fx-text-background-color;
 }
 

@@ -2,9 +2,12 @@ package org.jabref.gui.ai.components.privacynotice;
 
 import java.io.IOException;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -21,11 +24,8 @@ import org.slf4j.LoggerFactory;
 public class PrivacyNoticeComponent extends ScrollPane {
     private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);
 
-    @FXML private TextFlow openAiPrivacyTextFlow;
-    @FXML private TextFlow mistralAiPrivacyTextFlow;
-    @FXML private TextFlow geminiPrivacyTextFlow;
-    @FXML private TextFlow huggingFacePrivacyTextFlow;
-    @FXML private TextFlow gpt4AllTextFlow;
+    @FXML private VBox text;
+    @FXML private TextFlow aiPolicies;
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
@@ -46,11 +46,11 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     @FXML
     private void initialize() {
-        initPrivacyHyperlink(openAiPrivacyTextFlow, AiProvider.OPEN_AI);
-        initPrivacyHyperlink(mistralAiPrivacyTextFlow, AiProvider.MISTRAL_AI);
-        initPrivacyHyperlink(geminiPrivacyTextFlow, AiProvider.GEMINI);
-        initPrivacyHyperlink(huggingFacePrivacyTextFlow, AiProvider.HUGGING_FACE);
-        initPrivacyHyperlink(gpt4AllTextFlow, AiProvider.GPT4ALL);
+        addPrivacyHyperlink(aiPolicies, AiProvider.OPEN_AI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.MISTRAL_AI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.GEMINI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.HUGGING_FACE);
+        addPrivacyHyperlink(aiPolicies, AiProvider.GPT4ALL);
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);
@@ -58,35 +58,28 @@ public class PrivacyNoticeComponent extends ScrollPane {
         // Because of the https://bugs.openjdk.org/browse/JDK-8090400 bug, the text in the privacy policy cannot be
         // fully wrapped.
 
-        embeddingModelText.wrappingWidthProperty().bind(this.widthProperty());
+        DoubleBinding textWidth = Bindings.subtract(this.widthProperty(), 88d);
+        text.getChildren().forEach(child -> {
+            if (child instanceof Text line) {
+                line.wrappingWidthProperty().bind(textWidth);
+            }
+        });
+        aiPolicies.prefWidthProperty().bind(textWidth);
+        embeddingModelText.wrappingWidthProperty().bind(textWidth);
     }
 
-    private void initPrivacyHyperlink(TextFlow textFlow, AiProvider aiProvider) {
-        if (textFlow.getChildren().isEmpty() || !(textFlow.getChildren().getFirst() instanceof Text text)) {
-            return;
-        }
-
-        String replacedText = text.getText().replaceAll("%0", aiProvider.getLabel()).replace("%1", "");
-
-        replacedText = replacedText.endsWith(".") ? replacedText.substring(0, replacedText.length() - 1) : replacedText;
-
-        text.setText(replacedText);
+    private void addPrivacyHyperlink(TextFlow textFlow, AiProvider aiProvider) {
+        Text text = new Text(aiProvider.getLabel() + "\t");
         text.wrappingWidthProperty().bind(this.widthProperty());
+        textFlow.getChildren().addLast(text);
 
         Hyperlink hyperlink = new Hyperlink(aiProvider.getApiUrl());
         hyperlink.setWrapText(true);
         hyperlink.setFont(text.getFont());
-        hyperlink.setOnAction(event -> {
-            openBrowser(aiProvider.getApiUrl());
-        });
+        hyperlink.setOnAction(event -> openBrowser(aiProvider.getApiUrl()));
+        textFlow.getChildren().addLast(hyperlink);
 
-        textFlow.getChildren().add(hyperlink);
-
-        Text dot = new Text(".");
-        dot.setFont(text.getFont());
-        dot.wrappingWidthProperty().bind(this.widthProperty());
-
-        textFlow.getChildren().add(dot);
+        textFlow.getChildren().addLast(new Text("\n"));
     }
 
     @FXML
