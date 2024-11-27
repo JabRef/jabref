@@ -1227,8 +1227,8 @@ public class BracketedPattern {
      *         <li>null if content is null</li>
      *         </ul>
      */
-     @VisibleForTesting
-     static String generateInstitutionKey(String content) {
+    @VisibleForTesting
+    static String generateInstitutionKey(String content) {
         if (content == null) {
             return null;
         }

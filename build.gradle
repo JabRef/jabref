@@ -72,34 +72,34 @@ application {
     mainModule.set('org.jabref')
 
     applicationDefaultJvmArgs = [
-        // On a change here, also adapt
-        //   1. "run > moduleOptions"
-        //   2. "deployment.yml" (macOS part)
-        //   3. "deployment-arm64.yml"
+            // On a change here, also adapt
+            //   1. "run > moduleOptions"
+            //   2. "deployment.yml" (macOS part)
+            //   3. "deployment-arm64.yml"
 
-        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+            // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
-        // Fix for https://github.com/JabRef/jabref/issues/11188
-        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
-        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+            // Fix for https://github.com/JabRef/jabref/issues/11188
+            '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
+            '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
 
-        // Fix for https://github.com/JabRef/jabref/issues/11198
-        '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
-        '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
-        // fix for https://github.com/JabRef/jabref/issues/11426
-        '--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module',
+            // Fix for https://github.com/JabRef/jabref/issues/11198
+            '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
+            '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
+            '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+            // fix for https://github.com/JabRef/jabref/issues/11426
+            '--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module',
 
-        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
-        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
-        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref',
-        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
-        '--add-opens=javafx.graphics/javafx.scene=org.jabref',
-        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
+            '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+            '--add-exports=javafx.base/com.sun.javafx.event=org.jabref',
+            '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            '--add-opens=javafx.graphics/javafx.scene=org.jabref',
+            '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+            '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref',
 
-        '--add-opens=javafx.base/javafx.collections=org.jabref',
-        '--add-opens=javafx.base/javafx.collections.transformation=org.jabref'
+            '--add-opens=javafx.base/javafx.collections=org.jabref',
+            '--add-opens=javafx.base/javafx.collections.transformation=org.jabref'
     ]
 }
 
@@ -593,7 +593,7 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
+                'javafx.controls/com.sun.javafx.scene.control=org.jabref'
         ])
     }
 }
@@ -711,20 +711,20 @@ checkstyle {
 
 rewrite {
     activeRecipe(
-        'org.jabref.config.rewrite.cleanup'
+            'org.jabref.config.rewrite.cleanup'
     )
     exclusion (
-        "build.gradle",
-        "buildSrc/build.gradle",
-        "eclipse.gradle",
-        "settings.gradle",
-        "src-gen/**",
-        "src/main/resources/**",
-        "src/test/resources/**",
-        "**/module-info.java",
-        "**/*.py",
-        "**/*.xml",
-        "**/*.yml"
+            "build.gradle",
+            "buildSrc/build.gradle",
+            "eclipse.gradle",
+            "settings.gradle",
+            "src-gen/**",
+            "src/main/resources/**",
+            "src/test/resources/**",
+            "**/module-info.java",
+            "**/*.py",
+            "**/*.xml",
+            "**/*.yml"
     )
     plainTextMask("**/*.md")
     failOnDryRunResults = true
@@ -734,7 +734,7 @@ modernizer {
     failOnViolations = false
     includeTestClasses = true
     exclusions = [
-        'java/util/Optional.get:()Ljava/lang/Object;'
+            'java/util/Optional.get:()Ljava/lang/Object;'
     ]
 }
 
@@ -839,11 +839,11 @@ jlink {
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';
         provides 'ai.djl.repository.zoo.ZooProvider' with 'ai.djl.engine.rust.zoo.RsZooProvider',
-                                    'ai.djl.huggingface.zoo.HfZooProvider',
-                                    'ai.djl.pytorch.zoo.PtZooProvider',
-                                    'ai.djl.repository.zoo.DefaultZooProvider';
+                'ai.djl.huggingface.zoo.HfZooProvider',
+                'ai.djl.pytorch.zoo.PtZooProvider',
+                'ai.djl.repository.zoo.DefaultZooProvider';
         provides 'ai.djl.engine.EngineProvider' with 'ai.djl.engine.rust.RsEngineProvider',
-                                    'ai.djl.pytorch.engine.PtEngineProvider';
+                'ai.djl.pytorch.engine.PtEngineProvider';
     }
 
     jpackage {
