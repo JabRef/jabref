@@ -2314,13 +2314,17 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .journalInfo .info-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.5em;
     -fx-text-fill: -jr-theme;
 }
 
 .journalInfo .info-label {
-    -fx-font-size: 15;
+    -fx-font-size: 1.25em;
     -fx-text-fill: -jr-theme;
+}
+
+.journalInfo .hIndex {
+    -fx-font-size: 2em;
 }
 
 .journalInfo .grid-cell {
