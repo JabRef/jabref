@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -141,7 +142,7 @@ public class SaveDatabaseAction {
         if (databasePath.isPresent()) {
             // Close AutosaveManager, BackupManagerGit, and IndexManager for original library
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
+            BackupManagerGit.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup(), databasePath.get());
             libraryTab.closeIndexManger();
         }
 

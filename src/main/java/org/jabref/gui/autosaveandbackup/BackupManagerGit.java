@@ -91,7 +91,7 @@ public class BackupManagerGit {
 
     public BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
         BackupManagerGit BackupManager = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
-        BackupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
+        this.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
         runningInstances.add(BackupManager);
         return BackupManager;
     }
