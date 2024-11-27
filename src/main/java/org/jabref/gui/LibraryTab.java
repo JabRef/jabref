@@ -43,6 +43,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -105,6 +106,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -308,7 +310,7 @@ public class LibraryTab extends Tab {
         getMainTable().placeholderProperty().setValue(loadingLayout);
     }
 
-    private void onDatabaseLoadingSucceed(ParserResult result) {
+    private void onDatabaseLoadingSucceed(ParserResult result) throws GitAPIException, IOException {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         if (result.getChangedOnMigration()) {
             this.markBaseChanged();
@@ -343,7 +345,7 @@ public class LibraryTab extends Tab {
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) throws GitAPIException, IOException {
         TabPane tabPane = this.getTabPane();
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
@@ -367,13 +369,13 @@ public class LibraryTab extends Tab {
         installAutosaveManagerAndBackupManager();
     }
 
-    public void installAutosaveManagerAndBackupManager() {
+    public void installAutosaveManagerAndBackupManager() throws GitAPIException, IOException {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
             autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(this, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
+            BackupManagerGit.start(this, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences, bibDatabaseContext.getDatabasePath().get());
         }
     }
 
@@ -1082,7 +1084,15 @@ public class LibraryTab extends Tab {
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
-                       .onSuccess(newTab::onDatabaseLoadingSucceed)
+                       .onSuccess(result -> {
+                           try {
+                               newTab.onDatabaseLoadingSucceed(result);
+                           } catch (Exception e) {
+                               // We need to handle the exception.
+                               // Handle the exception, e.g., log it or show an error dialog
+                               LOGGER.error("An error occurred while loading the database", e);
+                           }
+                       })
                        .onFailure(newTab::onDatabaseLoadingFailed)
                        .executeWith(taskExecutor);
 

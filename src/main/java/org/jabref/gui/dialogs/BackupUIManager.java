@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.backup.BackupChoiceDialog;
 import org.jabref.gui.backup.BackupChoiceDialogRecord;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -38,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stores all user dialogs related to {@link BackupManager}.
+ * Stores all user dialogs related to {@link BackupManagerGit}.
  */
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
@@ -84,7 +85,7 @@ public class BackupUIManager {
         /*
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
                 var test = showBackupChoiceDialog(dialogService, originalPath, preferences);
