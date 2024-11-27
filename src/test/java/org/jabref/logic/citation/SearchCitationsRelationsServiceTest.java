@@ -95,6 +95,27 @@ class SearchCitationsRelationsServiceTest {
             assertEquals(citationsToReturn, citationsDatabase.get(cited));
             assertEquals(citationsToReturn, citations);
         }
+
+        @Test
+        void insertingAnEmptyCitationsShouldBePossible() {
+            var cited = new BibEntry();
+            var citationsDatabase = new HashMap<BibEntry, List<BibEntry>>();
+            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
+                entry -> List.of(), null
+            );
+            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+                citationsDatabase, null
+            );
+            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+
+            // WHEN
+            var citations = searchService.searchCitations(cited, false);
+
+            // THEN
+            assertTrue(citations.isEmpty());
+            assertTrue(citationsDatabase.containsKey(cited));
+            assertTrue(citationsDatabase.get(cited).isEmpty());
+        }
     }
 
     @Nested
@@ -117,7 +138,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldCallTheFetcherForReferencesIWhenForceUpdateIsTrue() {
+        void serviceShouldCallTheFetcherForReferencesWhenForceUpdateIsTrue() {
             // GIVEN
             var referencer = new BibEntry();
             var newReference = new BibEntry();
@@ -173,6 +194,27 @@ class SearchCitationsRelationsServiceTest {
             assertTrue(referencesDatabase.containsKey(reference));
             assertEquals(referencesToReturn, referencesDatabase.get(reference));
             assertEquals(referencesToReturn, references);
+        }
+
+        @Test
+        void insertingAnEmptyReferencesShouldBePossible() {
+            var referencer = new BibEntry();
+            var referenceDatabase = new HashMap<BibEntry, List<BibEntry>>();
+            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
+                null, entry -> List.of()
+            );
+            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+                null, referenceDatabase
+            );
+            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+
+            // WHEN
+            var citations = searchService.searchReferences(referencer, false);
+
+            // THEN
+            assertTrue(citations.isEmpty());
+            assertTrue(referenceDatabase.containsKey(referencer));
+            assertTrue(referenceDatabase.get(referencer).isEmpty());
         }
     }
 }

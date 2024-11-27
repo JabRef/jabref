@@ -53,11 +53,14 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             .orElse(List.of());
     }
 
+    /**
+     * Allows insertion of empty list in order to keep track of insertion date for an entry.
+     *
+     * @param entry should not be null
+     * @param relations should not be null
+     */
     @Override
     synchronized public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
-        if (relations.isEmpty()) {
-            return;
-        }
         entry.getDOI().ifPresent(doi -> {
             try (var store = this.storeConfiguration.open()) {
                 // Save the relations

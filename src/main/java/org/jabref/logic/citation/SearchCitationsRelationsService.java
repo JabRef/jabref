@@ -30,9 +30,7 @@ public class SearchCitationsRelationsService {
             || !this.relationsRepository.containsReferences(referencer)) {
             try {
                 var references = this.citationFetcher.searchCiting(referencer);
-                if (!references.isEmpty()) {
-                    this.relationsRepository.insertReferences(referencer, references);
-                }
+                this.relationsRepository.insertReferences(referencer, references);
             } catch (FetcherException e) {
                 LOGGER.error("Error while fetching references for entry {}", referencer.getTitle(), e);
             }
@@ -45,9 +43,7 @@ public class SearchCitationsRelationsService {
             || !this.relationsRepository.containsCitations(cited)) {
             try {
                 var citations = this.citationFetcher.searchCitedBy(cited);
-                if (!citations.isEmpty()) {
-                    this.relationsRepository.insertCitations(cited, citations);
-                }
+                this.relationsRepository.insertCitations(cited, citations);
             } catch (FetcherException e) {
                 LOGGER.error("Error while fetching citations for entry {}", cited.getTitle(), e);
             }

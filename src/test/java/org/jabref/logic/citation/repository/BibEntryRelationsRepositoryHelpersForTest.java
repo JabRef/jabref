@@ -33,7 +33,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isCitationsUpdatable(BibEntry entry) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -53,7 +53,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isReferencesUpdatable(BibEntry entry) {
-                    return false;
+                    return true;
                 }
             };
         }
@@ -79,7 +79,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isCitationsUpdatable(BibEntry entry) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -99,7 +99,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isReferencesUpdatable(BibEntry entry) {
-                    return false;
+                    return true;
                 }
             };
         }
