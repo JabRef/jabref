@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,8 +35,6 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,74 +96,7 @@ public class MetaDataParser {
     public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         return parse(new MetaData(), data, keywordSeparator);
     }
-
-    public MetaData parse(MetaData metaData, JsonObject data, Character keywordSeparator) throws ParseException {
-        CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
-        Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
-
-        // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
-        List<Map.Entry<String, String>> entryList = new ArrayList<>();
-        for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
-            // Add each entry to the list, converting JsonElement to String
-            entryList.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().getAsString()));
-        }
-
-        entryList.sort(groupsLast());
-
-        for (Map.Entry<String, String> entry : entryList) {
-            List<String> values = getAsList(entry.getValue());
-
-            if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
-                EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
-                nonDefaultCiteKeyPatterns.put(entryType, new CitationKeyPattern(getSingleItem(values)));
-            } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
-                metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
-            } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
-                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
-            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
-                // The user name starts directly after FILE_DIRECTORY + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
-                metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
-            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
-                Path path = Path.of(parseDirectory(entry.getValue())).normalize();
-                metaData.setLatexFileDirectory(user, path);
-            } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
-            } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
-                metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
-            } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
-                defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
-            } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
-                if (Boolean.parseBoolean(getSingleItem(values))) {
-                    metaData.markAsProtected();
-                } else {
-                    metaData.markAsNotProtected();
-                }
-            } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
-                metaData.setSaveOrder(SaveOrder.parse(values));
-            } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
-            } else if (entry.getKey().equals(MetaData.GROUPS_SEARCH_SYNTAX_VERSION)) {
-                Version version = Version.parse(getSingleItem(values));
-                metaData.setGroupSearchSyntaxVersion(version);
-            } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
-                metaData.setVersionDBStructure(getSingleItem(values));
-            } else {
-                // Keep meta data items that we do not know in the file
-                metaData.putUnknownMetaDataItem(entry.getKey(), values);
-            }
-        }
-
-        if (!defaultCiteKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
-            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
-        }
-
-        return metaData;
-    }
-
+    
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
      *
