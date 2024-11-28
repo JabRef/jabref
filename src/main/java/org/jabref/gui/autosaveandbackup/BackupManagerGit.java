@@ -105,6 +105,7 @@ public class BackupManagerGit {
      */
 
     public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
+        LOGGER.info("Starting backup manager for file: {}", originalPath);
         BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
         runningInstances.add(backupManagerGit);
@@ -137,10 +138,10 @@ public class BackupManagerGit {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
+                        LOGGER.info("Starting backup task for file: {}", originalPath);
                         performBackup(backupDir, originalPath);
-                    } catch (
-                            IOException |
-                            GitAPIException e) {
+                        LOGGER.info("Backup task completed for file: {}", originalPath);
+                    } catch (IOException | GitAPIException e) {
                         LOGGER.error("Error during backup", e);
                     }
                 },
