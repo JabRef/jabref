@@ -100,14 +100,6 @@ public class MetaDataParser {
         return parse(new MetaData(), data, keywordSeparator);
     }
 
-    /**
-     * Parses the given data JsonObject and returns a new resulting {@link MetaData} instance,
-     * we will use it in v6.x metadata (JSON) parse.
-     */
-    public MetaData parse(JsonObject data, Character keywordSeparator) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator);
-    }
-
     public MetaData parse(MetaData metaData, JsonObject data, Character keywordSeparator) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();

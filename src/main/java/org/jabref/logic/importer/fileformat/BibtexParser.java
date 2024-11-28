@@ -58,6 +58,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -386,12 +387,11 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(ex);
             }
-        } else if (comment.startsWith(MetaData.META_FLAG_VERSION_010)) {
-            parseCommentToJson(comment);
         }
     }
 
-    private Optional<JsonObject> parseCommentToJson(String comment) {
+    @VisibleForTesting
+    Optional<JsonObject> parseCommentToJson(String comment) {
         String content = comment.substring(comment.indexOf(MetaData.META_FLAG_VERSION_010) + MetaData.META_FLAG_VERSION_010.length());
         Gson gson = new Gson();
         return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
