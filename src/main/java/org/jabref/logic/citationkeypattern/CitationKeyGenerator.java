@@ -13,7 +13,8 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
@@ -112,9 +113,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         Objects.requireNonNull(entry);
 
         LatexCleanupFormatter formatter = new LatexCleanupFormatter();
-        String formattedTitle = formatter.format(entry.getField(StandardField.TITLE).orElse(""));
-        entry.setField(StandardField.TITLE, formattedTitle);
-
+//        String formattedTitle = formatter.format(entry.getField(StandardField.TITLE).orElse(""));
+//        entry.setField(StandardField.TITLE, formattedTitle);
         String currentKey = entry.getCitationKey().orElse(null);
 
         String newKey = createCitationKeyFromPattern(entry);
@@ -191,7 +191,16 @@ public class CitationKeyGenerator extends BracketedPattern {
         if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
             return "";
         }
-        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
+        LatexCleanupFormatter formatter = new LatexCleanupFormatter();
+        return expandBrackets(citationKeyPattern.stringRepresentation(),
+                fieldName -> {
+                    // Convert fieldName (String) to Field
+                    Field field = FieldFactory.parseField(fieldName);
+
+                    // Fetch field value and apply LaTeX cleanup
+                    return formatter.format(entry.getField(field).orElse(""));
+                }
+                );
     }
 
     /**
