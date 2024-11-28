@@ -419,25 +419,33 @@ class GitActionExecutorTest {
 
 
     /**
-     * Test stashing unstaged changes.
-     * Check that modifications not added to the staging area are stashed.
+     * commit a file
+     * -> change a file (file is now "modified")
+     * -> stash
+     * -> check that this file is no longer in "modified status
+     * -> apply stash
+     * -> check that the modifications are returned
      */
     @Test
-    void stashUnstagedChanges() throws IOException, GitException, GitAPIException {
+    void stashStagedChanges() throws IOException, GitException, GitAPIException {
         // comiting random file so that head is not null
         Path initialFile = Files.createFile(repositoryPath.resolve("initial.txt"));
-        Files.writeString(initialFile, "Initial commit");
         gitActionExecutor.add(initialFile);
         gitActionExecutor.commit("Initial commit", false);
 
+        // make new changes after commit that you want to stash, so now file should be modified
+        Files.writeString(initialFile, "Initial commit");
+
         // check that the working directory is clean
         Status statusBeforeStash = gitActionExecutor.getGit().status().call();
-        assertTrue(statusBeforeStash.isClean(), "Repository should have changes before stashing");
+        Set<String> set = statusBeforeStash.getModified();
+        assertFalse(set.isEmpty(), "Repository should have changes before stashing");
 
         gitActionExecutor.stash();
 
         Status statusAfterStash = gitActionExecutor.getGit().status().call();
-        assertTrue(statusAfterStash.isClean(), "Repository should be clean after stashing");
+        set = statusAfterStash.getModified();
+        assertTrue(set.isEmpty(), "Repository should be clean after stashing");
 
         gitActionExecutor.applyLatestStash();
 
@@ -445,7 +453,125 @@ class GitActionExecutorTest {
         Status statusAfterApply = gitActionExecutor.getGit().status().call();
         assertFalse(statusAfterApply.isClean(), "Repository should have unstaged changes after applying stash");
         assertTrue(Files.exists(initialFile), "Stashed file should exist after applying stash");
-        assertEquals("Unstaged changes", Files.readString(initialFile), "File content should match stashed changes");
+        assertEquals("Initial commit", Files.readString(initialFile), "File content should match stashed changes");
+    }
+
+
+
+    /**
+     * create a commit (dummy), otherwise head is null
+     * -> create untracked file
+     * -> stash
+     * -> check that the file is still there
+     */
+    @Test
+    void doNotStashUntrackedFiles() throws IOException, GitException, GitAPIException {
+        // comiting random file so that head is not null
+        Path dummyFile = Files.createFile(repositoryPath.resolve("initial.txt"));
+        Files.writeString(dummyFile, "Dummy commit");
+        gitActionExecutor.add(dummyFile);
+        gitActionExecutor.commit("Dummy commit", false);
+
+        Path untrackedFile = Files.createFile(repositoryPath.resolve("untracked.txt"));
+
+        Status statusBeforeStash = gitActionExecutor.getGit().status().call();
+        Set<String> set = statusBeforeStash.getUntracked();
+        assertFalse(set.isEmpty(), "Repository should have changes before stashing");
+
+        gitActionExecutor.stash();
+
+        Status statusAfterStash = gitActionExecutor.getGit().status().call();
+        set = statusAfterStash.getUntracked();
+        assertFalse(set.isEmpty(), "Repository should still have the unstaged file after stashing");
+        assertEquals(set.stream().toList().get(0), "untracked.txt");
+
+    }
+
+
+
+    @Test //technically dont really need this test, because stash is only for uncommitted changes..
+    void stashMixedChanges() throws IOException, GitException, GitAPIException {
+        Path unstagedFile = Files.createFile(repositoryPath.resolve("unstaged.txt"));
+        Files.writeString(unstagedFile, "Unstaged changes");
+
+        Path stagedFile = Files.createFile(repositoryPath.resolve("staged.txt"));
+        gitActionExecutor.add(stagedFile);
+        gitActionExecutor.commit("Initial commit", false);
+
+        Files.writeString(stagedFile, "adsfj;asdkfj;asdkj");
+
+        Status statusBeforeStash = gitActionExecutor.getGit().status().call();
+        assertFalse(statusBeforeStash.isClean(), "Repository should have both staged and unstaged changes before stashing");
+        assertTrue(statusBeforeStash.getUntracked().contains("unstaged.txt"), "unstaged.txt should be unstaged");
+        assertTrue(statusBeforeStash.getModified().contains("staged.txt"), "staged.txt should be modified");
+
+        gitActionExecutor.stash();
+
+        Status statusAfterStash = gitActionExecutor.getGit().status().call();
+        assertFalse(statusAfterStash.isClean(), "Repository should be clean after stashing (except untracked files)");
+        assertTrue(statusAfterStash.getUntracked().contains("unstaged.txt"), "unstaged.txt should be unstaged");
+        assertFalse(statusAfterStash.getModified().contains("staged.txt"), "staged.txt should not be modified after stash");
+
+        gitActionExecutor.applyLatestStash();
+
+        Status statusAfterApply = gitActionExecutor.getGit().status().call();
+        assertFalse(statusAfterApply.isClean(), "Repository should have changes after applying stash");
+        assertTrue(statusAfterApply.getModified().contains("staged.txt"), "staged.txt should be staged after applying stash");
+        assertTrue(Files.exists(unstagedFile), "unstaged.txt should exist after applying stash");
+        assertEquals("Unstaged changes", Files.readString(unstagedFile), "Unstaged file content should match stashed changes");
+        assertEquals("adsfj;asdkfj;asdkj", Files.readString(stagedFile), "Staged file content should match stashed changes");
+    }
+
+    @Test
+    void stashWithNoChanges() throws GitException, GitAPIException, IOException {
+
+        Path dummyFile = Files.createFile(repositoryPath.resolve("initial.txt"));
+        Files.writeString(dummyFile, "Dummy commit");
+        gitActionExecutor.add(dummyFile);
+        gitActionExecutor.commit("Dummy commit", false);
+
+        Status statusBeforeStash = gitActionExecutor.getGit().status().call();
+        assertTrue(statusBeforeStash.isClean(), "Repository should be clean before stashing");
+
+        gitActionExecutor.stash();
+
+        Status statusAfterStash = gitActionExecutor.getGit().status().call();
+        assertTrue(statusAfterStash.isClean(), "Repository should remain clean after stashing");
+
+        GitException exception = assertThrows(GitException.class, () -> gitActionExecutor.applyLatestStash());
+        assertTrue(exception.getMessage().contains("Unstash failed"), "Applying stash should fail when no stash exists");
+    }
+
+
+    @Test
+    void multipleStashesAndApplyLatest() throws IOException, GitException, GitAPIException {
+        Path file1 = Files.createFile(repositoryPath.resolve("file1.txt"));
+        gitActionExecutor.add(file1);
+        gitActionExecutor.commit("Add file1.", false);
+
+        Files.writeString(file1, "First file");
+
+        gitActionExecutor.stash();
+
+
+        Path file2 = Files.createFile(repositoryPath.resolve("file2.txt"));
+        gitActionExecutor.add(file2);
+        gitActionExecutor.commit("Add file2.", false);
+
+        Files.writeString(file2, "Second file");
+
+        gitActionExecutor.stash();
+
+
+        int stashCount = gitActionExecutor.getGit().stashList().call().size();
+        assertEquals(2, stashCount, "There should be two stashes");
+
+        gitActionExecutor.applyLatestStash();
+
+        Status statusAfterApply = gitActionExecutor.getGit().status().call();
+        assertTrue(statusAfterApply.getModified().contains("file2.txt"), "file2.txt should be modified after applying latest stash");
+        assertEquals("Second file", Files.readString(file2), "file2.txt content should match the latest stash");
+
     }
 
 
@@ -478,6 +604,8 @@ class GitActionExecutorTest {
             System.err.println("Error reading repository: " + e.getMessage());
         }
     }
+
+
 
     void deleteDirWithContent(Path path) throws IOException {
         Files.walk(path)
