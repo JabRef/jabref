@@ -79,6 +79,10 @@ public class GitManager {
         }
     }
 
+    void close() {
+        git.close();
+    }
+
     GitActionExecutor getGitActionExecutor() {
         return this.gitActionExecutor;
     }

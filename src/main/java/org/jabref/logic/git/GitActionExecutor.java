@@ -116,6 +116,10 @@ class GitActionExecutor {
                    .setRef(previousHead.getName())
                    .setMode(ResetCommand.ResetType.HARD)
                    .call();
+//                TODO: check if this is the correct way to reset
+//                git.reset()
+//                   .setMode(ResetCommand.ResetType.MERGE)
+//                   .call();
                 LOGGER.debug("Last pull undone (hard reset to previous HEAD).");
             } else {
                 throw new GitException("Cannot undo pull: previous HEAD not recorded.");

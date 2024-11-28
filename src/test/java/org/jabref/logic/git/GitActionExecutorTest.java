@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -46,6 +49,11 @@ class GitActionExecutorTest {
         this.repositoryPath = temporaryRepository;
         this.gitManager = GitManager.initGitRepository(repositoryPath);
         this.gitActionExecutor = this.gitManager.getGitActionExecutor();
+    }
+
+    @AfterEach
+    void close() {
+        gitManager.close();
     }
 
     @Test
@@ -218,7 +226,6 @@ class GitActionExecutorTest {
 
             URI remoteRepoURI = remoteRepoPath.toUri();
             URIish remoteRepoURIish = new URIish(remoteRepoURI.toString());
-            gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
 
             String remoteFileName = "";
             try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
@@ -233,6 +240,7 @@ class GitActionExecutorTest {
                 remoteGit.push();
             }
 
+            gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
             gitActionExecutor.pull(false, "origin", "main");
 
             listRepoContents(repositoryPath.toString());
@@ -240,11 +248,6 @@ class GitActionExecutorTest {
             Path pulledFile = repositoryPath.resolve(remoteFileName);
             assertTrue(pulledFile.toFile().exists(), "Pulled file does not exist in local repository");
             assertEquals("Remote content", Files.readString(pulledFile), "Pulled file content does not match remote content");
-        }finally {
-            remoteRepoPath.toFile().deleteOnExit();
-            repositoryPath.toFile().deleteOnExit();
-
-            //deleteTempDirectory(remoteRepoPath);
         }
     }
 
@@ -320,100 +323,97 @@ class GitActionExecutorTest {
 
     @Test
     void testUndoPull() throws IOException, GitException, GitAPIException, URISyntaxException {
-        Path remoteRepoPath = Files.createTempDirectory("remote-repo");
 
+        Path remoteRepoPath = Files.createTempDirectory("remote-repo");
         try (Repository remoteRepo = FileRepositoryBuilder.create(new File(remoteRepoPath.toFile(), ".git"))) {
             remoteRepo.create();
+        }
+//        GitManager remoteGitManager = GitManager.initGitRepository(remoteRepoPath);
 
-            URI remoteRepoURI = remoteRepoPath.toUri();
-            URIish remoteRepoURIish = new URIish(remoteRepoURI.toString());
-            gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
+        URI remoteRepoURI = remoteRepoPath.toUri();
+        URIish remoteRepoURIish = new URIish(remoteRepoURI.toString());
+        gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
+        Path remoteMergeConflictFile = Files.createTempFile(remoteRepoPath, "merge-conflict", ".txt");
+        Files.writeString(remoteMergeConflictFile, "merge conflict - remote");
+        Path remoteFile = Files.createTempFile(remoteRepoPath, "remote-file", ".txt");
+        Files.writeString(remoteFile, "Remote content");
+
+        try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
+
+            remoteGit.add().addFilepattern(remoteFile.getFileName().toString()).call();
+            remoteGit.add().addFilepattern(remoteMergeConflictFile.getFileName().toString()).call();
+            remoteGit.commit().setMessage("Initial commit in remote").call();
+            remoteGit.checkout().setCreateBranch(true).setName("main").call();
+            remoteGit.push();
+        }
+
+        Path untrackedLocalFile = Files.createTempFile(repositoryPath, "local-file", ".txt");
+        Files.writeString(untrackedLocalFile, "untracked Local file content");
+        Path localMergeConflictFile = Files.createFile(repositoryPath.resolve(remoteMergeConflictFile.getFileName().toString()));
+        Files.writeString(localMergeConflictFile, "merge conflict - local");
+        gitActionExecutor.add(localMergeConflictFile);
+        gitActionExecutor.commit("Add local-merge-conflict.txt", false);
 
 
-            Path localFile = Files.createTempFile(repositoryPath,"local-file", ".txt");
-            Files.writeString(localFile, "Local content");
-            gitActionExecutor.add(localFile);
-            gitActionExecutor.commit("Add local-file.txt", false);
-            gitActionExecutor.push();
-            try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
-                boolean commitExists = remoteGit.log()
-                                                .all()
-                                                .call()
-                                                .iterator()
-                                                .hasNext();
 
-                assertTrue(commitExists);
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(remoteRepoPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(repositoryPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
 
-                Iterable<RevCommit> commits = remoteGit.log().all().call();
-                LOGGER.info("-----------------------------------");
+//        TODO: remove this after debugging
+        gitActionExecutor.pull(true, "origin", "main");
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(remoteRepoPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(repositoryPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
+        System.out.println(Files.readString(localMergeConflictFile));
+        System.out.println(Files.readString(remoteMergeConflictFile));
 
-                String latestCommitMessageAccessedFromRemote = "";
-                for (RevCommit commit : commits) {
-                    LOGGER.info("Commit: {}", commit.getName());
-                    LOGGER.info("Author: {}", commit.getAuthorIdent().getName());
-                    LOGGER.info("Date: {}", commit.getAuthorIdent().getWhen());
-                    LOGGER.info("Message: {}", commit.getFullMessage());
-                    latestCommitMessageAccessedFromRemote = commit.getFullMessage();
+        Iterable<RevCommit> commits = gitManager.getGitActionExecutor().getGit().log().all().call();
+        LOGGER.info("-----------------------------------");
 
-                    LOGGER.info("-----------------------------------");
-                }
+        for (RevCommit commit : commits) {
+            LOGGER.info("Message: {}", commit.getFullMessage());
 
-            }
+            LOGGER.info("-----------------------------------");
+        }
+//        TODO: pull should throw an exception in case of a merge conflict
+//        GitException exception = assertThrows(GitException.class,
+//                () -> gitActionExecutor.pull(true, "origin", "main"));
+//        assertEquals("Pull failed", exception.getMessage());
+//        assertEquals(TransportException.class, exception.getCause().getClass());
+//        assertEquals("origin: not found.", exception.getCause().getMessage());
 
-            assertTrue(Files.exists(localFile), "Local file should exist after commit");
+        assertTrue(Files.exists(repositoryPath.resolve(remoteFile.getFileName().toString())),
+                "remote-file should exist in local repository after failed pull");
 
-            String remoteFileName = "";
-            try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
+        assertTrue(Files.exists(untrackedLocalFile));
+        gitActionExecutor.undoPull();
+        assertFalse(Files.exists(repositoryPath.resolve(remoteFile.getFileName().toString())),
+                "remote-file should not exist in local repository after undoing pull");
+        assertTrue(Files.exists(untrackedLocalFile), "Local file should still exist after undoing pull");
 
-                Path remoteFile = Files.createTempFile(remoteRepoPath, "remote-file", ".txt");
-                remoteFileName = remoteFile.getFileName().toString();
-                Files.writeString(remoteFile, "Remote content");
-                remoteGit.add().addFilepattern("remote-file.txt").call();
-                remoteGit.commit().setMessage("Add remote-file.txt").call();
+        assertEquals("merge conflict - local", Files.readString(localMergeConflictFile),
+                "Local file content should remain unchanged");
 
-                //remoteGit.checkout().setCreateBranch(true).setName("main").call();
+        // TODO: remove after debugging
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(remoteRepoPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
+        System.out.println(Arrays.toString(repositoryPath.toFile().listFiles()));
+        System.out.println("-------------------------------------------------");
+        System.out.println(Files.readString(localMergeConflictFile));
+        System.out.println(Files.readString(remoteMergeConflictFile));
 
-                remoteGit.push();
+        commits = gitManager.getGitActionExecutor().getGit().log().all().call();
+        LOGGER.info("-----------------------------------");
+        for (RevCommit commit : commits) {
+            LOGGER.info("Message: {}", commit.getFullMessage());
 
-                boolean commitExists = remoteGit.log()
-                                                .all()
-                                                .call()
-                                                .iterator()
-                                                .hasNext();
-
-                assertTrue(commitExists);
-
-                Iterable<RevCommit> commits = remoteGit.log().all().call();
-                LOGGER.info("-----------------------------------");
-
-                String latestCommitMessageAccessedFromRemote = "";
-                for (RevCommit commit : commits) {
-                    LOGGER.info("Commit: {}", commit.getName());
-                    LOGGER.info("Author: {}", commit.getAuthorIdent().getName());
-                    LOGGER.info("Date: {}", commit.getAuthorIdent().getWhen());
-                    LOGGER.info("Message: {}", commit.getFullMessage());
-                    latestCommitMessageAccessedFromRemote = commit.getFullMessage();
-
-                    LOGGER.info("-----------------------------------");
-                }
-            }
-
-            Path localRemoteFile = repositoryPath.resolve(remoteFileName);
-            assertFalse(Files.exists(localRemoteFile), "Remote file should not exist in local repository before pull");
-
-            gitActionExecutor.pull(false, "origin", "main");
-
-            listRepoContents(repositoryPath.toString());
-            listRepoContents(remoteRepoPath.toString());
-            assertTrue(Files.exists(localRemoteFile), "Remote file should exist in local repository after pull");
-            assertEquals("Remote content", Files.readString(localRemoteFile), "Remote file content should match");
-
-            gitActionExecutor.undoPull();
-
-            assertFalse(Files.exists(localRemoteFile), "Remote file should not exist in local repository after undoing pull");
-
-            assertTrue(Files.exists(localFile), "Local file should still exist after undoing pull");
-            assertEquals("Local content", Files.readString(localFile), "Local file content should remain unchanged");
+            LOGGER.info("-----------------------------------");
         }
     }
 
@@ -479,8 +479,11 @@ class GitActionExecutorTest {
         }
     }
 
-
-
-
+    void deleteDirWithContent(Path path) throws IOException {
+        Files.walk(path)
+             .sorted(Comparator.reverseOrder())
+             .map(Path::toFile)
+             .forEach(File::delete);
+    }
 }
 
