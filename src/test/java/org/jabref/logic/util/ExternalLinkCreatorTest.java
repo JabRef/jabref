@@ -1,8 +1,6 @@
 package org.jabref.logic.util;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
@@ -22,9 +20,9 @@ class ExternalLinkCreatorTest {
     private boolean urlIsValid(String url) {
         try {
             // This will throw on non-compliance to RFC2396.
-            URI.create(url).toURL().toURI();
+            URLUtil.create(url);
             return true;
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException e) {
             return false;
         }
     }

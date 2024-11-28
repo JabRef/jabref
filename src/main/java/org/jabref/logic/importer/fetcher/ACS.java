@@ -1,12 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -38,14 +38,14 @@ public class ACS implements FulltextFetcher {
             return Optional.empty();
         }
 
-        String source = SOURCE.formatted(doi.get().getDOI());
+        String source = SOURCE.formatted(doi.get().asString());
         // Retrieve PDF link
         Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
         Element link = html.select("a.button_primary").first();
 
         if (link != null) {
             LOGGER.info("Fulltext PDF found @ ACS.");
-            return Optional.of(URI.create(source.replaceFirst("/abs/", "/pdf/")).toURL());
+            return Optional.of(URLUtil.create(source.replaceFirst("/abs/", "/pdf/")));
         }
         return Optional.empty();
     }

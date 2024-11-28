@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -27,6 +26,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -122,7 +122,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
         URL doiURL;
         try {
-            doiURL = URI.create(doi.get().getURIAsASCIIString()).toURL();
+            doiURL = URLUtil.create(doi.get().getURIAsASCIIString());
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -219,7 +219,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
-            URLDownload download = getUrlDownload(URI.create(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()).toURL());
+            URLDownload download = getUrlDownload(URLUtil.create(DOI.AGENCY_RESOLVER + "/" + doi.asString()));
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));

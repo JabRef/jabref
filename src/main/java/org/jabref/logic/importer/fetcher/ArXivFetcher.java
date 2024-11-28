@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.integrity.BracesCorrector;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -200,7 +200,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @return ArXiv-issued DOI
      */
     private static String getAutomaticDoi(ArXivIdentifier arXivId) {
-        return getAutomaticDoi(arXivId.getNormalizedWithoutVersion());
+        return getAutomaticDoi(arXivId.asStringWithoutVersion());
     }
 
     /**
@@ -473,7 +473,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             String query;
             Optional<String> doiString = entry.getField(StandardField.DOI)
                                               .flatMap(DOI::parse)
-                                              .map(DOI::getNormalized);
+                                              .map(DOI::asString);
 
             // ArXiv-issued DOIs seem to be unsearchable from ArXiv API's "query string", so ignore it
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
@@ -543,7 +543,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
-                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+                        ids.stream().map(ArXivIdentifier::asString).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -710,7 +710,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     if (linkTitle.equals(Optional.of("pdf"))) {
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
-                                return URI.create(url).toURL();
+                                return URLUtil.create(url);
                             } catch (MalformedURLException e) {
                                 return null;
                             }
@@ -748,7 +748,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
              * Returns the arXiv identifier
              */
             public Optional<String> getIdString() {
-                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::getNormalizedWithoutVersion);
+                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::asStringWithoutVersion);
             }
 
             public Optional<ArXivIdentifier> getId() {

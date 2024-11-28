@@ -41,7 +41,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.importer.GrobidOptInDialogHelper;
+import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
@@ -236,7 +236,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(event -> {
-            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
+            GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
@@ -287,7 +287,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).ifPresent(newLinkedFile -> {
+        dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> {
             viewModel.addNewLinkedFile(newLinkedFile);
         });
     }

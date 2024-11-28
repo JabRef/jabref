@@ -50,7 +50,7 @@ class MoveFilesCleanupTest {
         Files.createFile(fileBefore);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
+        metaData.setLibrarySpecificFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
@@ -64,7 +64,7 @@ class MoveFilesCleanupTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
-        cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
+        cleanup = new MoveFilesCleanup(() -> databaseContext, filePreferences);
     }
 
     @Test

@@ -45,6 +45,8 @@ public class FileUtil {
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+    private static final String ELLIPSIS = "...";
+    private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -105,12 +107,14 @@ public class FileUtil {
     /**
      * Returns a valid filename for most operating systems.
      * <p>
-     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     * It uses {@link FileNameCleaner#cleanFileName(String)} to remove illegal characters.} and then truncates the length to 255 chars, see {@link #MAXIMUM_FILE_NAME_LENGTH}.
      * <p>
      * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
+
+        nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);
 
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
@@ -519,6 +523,63 @@ public class FileUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+     * with maxLength = 20 is shortened into verylo...isthis.pdf
+     *
+     * @param fileName  the given file name to be shortened
+     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
+     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+     */
+    public static String shortenFileName(String fileName, Integer maxLength) {
+        if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
+            return "";
+        }
+
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+
+        String name;
+        String extension;
+
+        extension = FileUtil.getFileExtension(fileName).map(fileExtension -> '.' + fileExtension).orElse("");
+        if (extension.isEmpty()) {
+            name = fileName;
+        } else {
+            name = fileName.substring(0, fileName.length() - extension.length());
+        }
+
+        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
+        if (maxLength <= totalNeededLength) {
+            return fileName.substring(0, maxLength - ELLIPSIS_LENGTH) + ELLIPSIS;
+        }
+
+        int charsForName = maxLength - totalNeededLength;
+        if (charsForName <= 0) {
+            return ELLIPSIS + extension;
+        }
+
+        int numCharsBeforeEllipsis;
+        int numCharsAfterEllipsis;
+        if (charsForName == 1) {
+            numCharsBeforeEllipsis = 1;
+            numCharsAfterEllipsis = 0;
+        } else {
+            // Allow the front part to have the extra in odd cases
+            numCharsBeforeEllipsis = (charsForName + 1) / 2;
+            numCharsAfterEllipsis = charsForName / 2;
+        }
+
+        numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());
+        numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
+
+        return name.substring(0, numCharsBeforeEllipsis) +
+               ELLIPSIS +
+               name.substring(name.length() - numCharsAfterEllipsis) +
+               extension;
     }
 
     public static boolean isCharLegal(char c) {

@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.query.SearchQuery;
 
 import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
@@ -24,15 +24,11 @@ public class SearchGroup extends AbstractGroup {
     @ADR(38)
     private final Set<String> matchedEntries = new HashSet<>();
 
-    private SearchQuery query;
+    private SearchQuery searchQuery;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
-        this.query = new SearchQuery(searchExpression, searchFlags);
-    }
-
-    public String getSearchExpression() {
-        return query.getSearchExpression();
+        this.searchQuery = new SearchQuery(searchExpression, searchFlags);
     }
 
     /**
@@ -41,15 +37,19 @@ public class SearchGroup extends AbstractGroup {
      */
     public void setSearchExpression(String searchExpression) {
         LOGGER.debug("Setting search expression {}", searchExpression);
-        this.query = new SearchQuery(searchExpression, query.getSearchFlags());
+        this.searchQuery = new SearchQuery(searchExpression, searchQuery.getSearchFlags());
     }
 
-    public SearchQuery getQuery() {
-        return query;
+    public String getSearchExpression() {
+        return searchQuery.getSearchExpression();
+    }
+
+    public SearchQuery getSearchQuery() {
+        return searchQuery;
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
-        return query.getSearchFlags();
+        return searchQuery.getSearchFlags();
     }
 
     public void setMatchedEntries(Collection<String> entriesId) {
@@ -98,7 +98,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String toString() {
-        return "SearchGroup [query=" + query + ", name=" + name + ", searchFlags=" + getSearchFlags() + ",  context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + "]";
+        return "SearchGroup [query=" + searchQuery + ", name=" + name + ", searchFlags=" + getSearchFlags() + ",  context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + "]";
     }
 
     @Override

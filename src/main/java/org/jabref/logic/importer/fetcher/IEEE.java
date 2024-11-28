@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -158,7 +158,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // If not, try DOI
         if (stampString.isEmpty()) {
             Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
+            if (doi.isPresent() && doi.get().asString().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = null;
                 try {
@@ -202,7 +202,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             LOGGER.debug("Full text document found on IEEE Xplore");
             URL value;
             try {
-                value = URI.create(matcher.group(1)).toURL();
+                value = URLUtil.create(matcher.group(1));
             } catch (MalformedURLException e) {
                 throw new FetcherException("Malformed URL", e);
             }
