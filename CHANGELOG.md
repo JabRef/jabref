@@ -123,6 +123,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
 - We fixed an issue when the preview was out of sync. [#9172](https://github.com/JabRef/jabref/issues/9172)
 - We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
+- We fixed an issue when click on entry at "Check Integrity" wasn't properly focusing the entry and field. [#11997](https://github.com/JabRef/jabref/issues/11997)
 
 ### Removed
 
