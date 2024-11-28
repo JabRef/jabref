@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +91,6 @@ public class BackupManagerGit {
         }
     }
 
-
     /**
      * Starts a new BackupManagerGit instance and begins the backup task.
      *
@@ -133,8 +133,7 @@ public class BackupManagerGit {
      * @param originalPath the original path of the file to be backed up
      */
 
-    @SuppressWarnings({"checkstyle:WhitespaceAfter", "checkstyle:LeftCurly"})
-    private void startBackupTask(Path backupDir, Path originalPath) {
+    void startBackupTask(Path backupDir, Path originalPath) {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
@@ -212,6 +211,7 @@ public class BackupManagerGit {
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
+
     public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
@@ -261,6 +261,7 @@ public class BackupManagerGit {
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
+
     public List<DiffEntry> showDiffers(Path originalPath, Path backupDir, String commitId) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
@@ -280,42 +281,40 @@ public class BackupManagerGit {
         return diffFr.scan(oldCommit, newCommit);
     }
 
-    // n is a counter incrementing by 1 when the user asks to see older versions (packs of 10)
-// and decrements by 1 when the user asks to see the pack of the 10 earlier versions
-// the scroll down: n->n+1 ; the scroll up: n->n-1
-    public List<RevCommit> retreiveCommits(Path backupDir, int n) throws IOException, GitAPIException {
+    /**
+     * Retrieves the last n commits from the Git repository.
+     *
+     * @param backupDir the backup directory
+     * @param n the number of commits to retrieve
+     * @return a list of RevCommit objects representing the commits
+     * @throws IOException if an I/O error occurs
+     * @throws GitAPIException if a Git API error occurs
+     */
+
+    public List<RevCommit> retrieveCommits(Path backupDir, int n) throws IOException, GitAPIException {
         List<RevCommit> retrievedCommits = new ArrayList<>();
-        // Open Git depository
+        // Open Git repository
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
-            //  Use RevWalk to go through all commits
+            // Use RevWalk to traverse commits
             try (RevWalk revWalk = new RevWalk(repository)) {
-                // Start from HEAD
                 RevCommit startCommit = revWalk.parseCommit(repository.resolve("HEAD"));
                 revWalk.markStart(startCommit);
 
                 int count = 0;
-                int startIndex = n * 10;
-                int endIndex = startIndex + 9;
-
                 for (RevCommit commit : revWalk) {
-                    // Ignore commits before starting index
-                    if (count < startIndex) {
-                        count++;
-                        continue;
-                    }
-                    if (count >= endIndex) {
-                        break;
-                    }
-                    // Add commits to the main list
                     retrievedCommits.add(commit);
                     count++;
+                    if (count == n) {
+                        break; // Stop after collecting the required number of commits
+                    }
                 }
             }
         }
 
+        // Reverse the list to have commits in the correct order
+        Collections.reverse(retrievedCommits);
         return retrievedCommits;
     }
-
 
     /**
      * Retrieves detailed information about the specified commits.
@@ -327,7 +326,6 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     public List<List<String>> retrieveCommitDetails(List<RevCommit> commits, Path backupDir) throws IOException, GitAPIException {
         List<List<String>> commitDetails;
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
