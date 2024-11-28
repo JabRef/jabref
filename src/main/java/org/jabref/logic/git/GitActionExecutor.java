@@ -1,6 +1,7 @@
 package org.jabref.logic.git;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -9,6 +10,8 @@ import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +22,19 @@ class GitActionExecutor {
     private final Git git;
     private final Path repository;
 
+    private ObjectId previousHead;
+
     GitActionExecutor(Git git) {
         this.git = git;
         File gitRepository = git.getRepository().getDirectory(); // this the file path including .git at the end
         this.repository = gitRepository.getParentFile().toPath();
     }
 
+    // TODO: test case for if path is not inside repo, test the first branch
     void add(Path path) throws GitException {
+        if(!path.startsWith(repository)){
+            throw new GitException("Given path not inside repository.");
+        }
         try {
             Path relativePath = repository.relativize(path);
             git.add().addFilepattern(relativePath.toString()).call();
@@ -65,13 +74,16 @@ class GitActionExecutor {
         }
     }
 
-    // TODO: test
+
     void push() throws GitException {
         push(null, null);
     }
 
     void pull(boolean withRebase, String remote, String branch) throws GitException {
         try {
+
+            previousHead = git.getRepository().resolve(Constants.HEAD);
+
             PullCommand pullCommand = git.pull();
             GitAuthenticator.authenticate(pullCommand);
             pullCommand.setRebase(withRebase)
@@ -79,11 +91,14 @@ class GitActionExecutor {
                        .setRemoteBranchName(branch)
                        .call();
             LOGGER.debug("Pulled from remote: {}, branch: {}", remote, branch);
-        } catch (GitAPIException e) {
+        } catch (
+                GitAPIException |
+                IOException e) {
             throw new GitException("Pull failed", e);
         }
     }
 
+    // TODO: test this
     void pull(boolean withRebase) throws GitException {
         pull(withRebase, null, null);
     }
@@ -92,19 +107,28 @@ class GitActionExecutor {
         return git;
     }
 
+
+    // TODO: test this
     void undoPull() throws GitException {
         try {
-            git.reset().setMode(ResetCommand.ResetType.HARD).call();
-            LOGGER.debug("Last pull undone (hard reset).");
+            if (previousHead != null) {
+                git.reset()
+                   .setRef(previousHead.getName())
+                   .setMode(ResetCommand.ResetType.HARD)
+                   .call();
+                LOGGER.debug("Last pull undone (hard reset to previous HEAD).");
+            } else {
+                throw new GitException("Cannot undo pull: previous HEAD not recorded.");
+            }
         } catch (GitAPIException e) {
             throw new GitException("Undo pull failed", e);
         }
     }
 
-    // TODO: test whether all changes are stashed or only the stages ones
+    // TODO: test whether all changes are stashed or only the staged ones
     void stash() throws GitException {
         try {
-            git.stashCreate().call();
+            git.stashCreate().setIncludeUntracked(false).call();
             LOGGER.debug("Current changes stashed.");
         } catch (GitAPIException e) {
             throw new GitException("Stash failed");
