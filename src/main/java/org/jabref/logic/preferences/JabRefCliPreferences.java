@@ -253,6 +253,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+    public static final String AUTO_RENAME_LINKED_FILES = "autoRenameLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
@@ -619,6 +620,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
+        // Default as false to auto rename files if entry changes
+        defaults.put(AUTO_RENAME_LINKED_FILES, false);
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
         // Create Fulltext-Index by default
@@ -673,6 +676,16 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
+    }
+
+    @Override
+    public boolean shouldAutoRenameLinkedFiles() {
+        return getBoolean(AUTO_RENAME_LINKED_FILES);
+    }
+
+    @Override
+    public void setAutoRenameLinkedFiles(boolean value) {
+        putBoolean(AUTO_RENAME_LINKED_FILES, value);
     }
 
     public void setLanguageDependentDefaultValues() {

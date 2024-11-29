@@ -585,4 +585,73 @@ public class FileUtil {
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
+
+    public static boolean renameLinkedFileToName(LinkedFile linkedFile,
+                                                 BibEntry entry,
+                                                 String targetFileName,
+                                                 boolean overwriteExistingFile,
+                                                 BibDatabaseContext databaseContext,
+                                                 List<Path> fileDirectories,
+                                                 FilePreferences filePreferences) throws IOException {
+        Objects.requireNonNull(linkedFile, "linkedFile cannot be null");
+        Objects.requireNonNull(entry, "entry cannot be null");
+        Objects.requireNonNull(targetFileName, "targetFileName cannot be null");
+        Objects.requireNonNull(databaseContext, "databaseContext cannot be null");
+        Objects.requireNonNull(fileDirectories, "fileDirectories cannot be null");
+        Objects.requireNonNull(filePreferences, "filePreferences cannot be null");
+
+        Optional<Path> oldFileOptional = linkedFile.findIn(fileDirectories);
+        if (oldFileOptional.isEmpty()) {
+            LOGGER.warn("File '{}' does not exist in specified directories. Skipping renaming.", linkedFile.getLink());
+            return false;
+        }
+        Path oldFilePath = oldFileOptional.get();
+
+        Optional<String> oldExtensionOptional = getFileExtension(oldFilePath);
+        Optional<String> newExtensionOptional = getFileExtension(targetFileName);
+
+        Path newFilePath;
+        if (newExtensionOptional.isPresent() || oldExtensionOptional.isEmpty()) {
+            newFilePath = oldFilePath.resolveSibling(targetFileName);
+        } else {
+            newFilePath = oldFilePath.resolveSibling(targetFileName + "." + oldExtensionOptional.get());
+        }
+
+        String newFileName = newFilePath.getFileName().toString();
+        newFileName = FileNameCleaner.cleanFileName(newFileName);
+        if (newFileName.isEmpty()) {
+            LOGGER.warn("Generated new file name is empty after cleaning. Skipping renaming.");
+            return false;
+        }
+
+        newFilePath = newFilePath.getParent().resolve(newFileName);
+
+        // check if the new file name is different from the current name
+        if (oldFilePath.getFileName().toString().equals(newFileName)) {
+            LOGGER.info("File '{}' is already named '{}'. Skipping renaming.", oldFilePath, newFileName);
+            return false;
+        }
+
+        String expandedOldFilePath = oldFilePath.toString();
+        boolean pathsDifferOnlyByCase = newFilePath.toString().equalsIgnoreCase(expandedOldFilePath)
+                && !newFilePath.toString().equals(expandedOldFilePath);
+
+        if (Files.exists(newFilePath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
+            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name, so we do nothing.", oldFilePath, newFilePath);
+            return false;
+        }
+
+        Files.createDirectories(newFilePath.getParent());
+        if (Files.exists(newFilePath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
+            LOGGER.debug("Overwriting existing file {}", newFilePath);
+            Files.move(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            Files.move(oldFilePath, newFilePath);
+        }
+
+        linkedFile.setLink(relativize(newFilePath, databaseContext, filePreferences).toString());
+        LOGGER.debug("Updated linked file path to '{}'", newFilePath.toAbsolutePath());
+
+        return true;
+    }
 }

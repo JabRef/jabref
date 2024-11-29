@@ -1121,7 +1121,7 @@ public class BracketedPattern {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    protected static List<String> parseFieldAndModifiers(String arg) {
+    public static List<String> parseFieldAndModifiers(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
