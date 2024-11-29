@@ -4,6 +4,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+
+import org.jabref.logic.shared.security.Password;
+
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,10 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GitManagerTest {
 
     private Path tempPath;
+    private GitPreferences preferences;
 
     @BeforeEach
-    void setUp(@TempDir Path tempDir) {
+    void setUp(@TempDir Path tempDir) throws GeneralSecurityException, UnsupportedEncodingException {
         this.tempPath = tempDir;
+        preferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
     }
 
     // Helper methods
@@ -54,16 +64,19 @@ class GitManagerTest {
     @Test
     void initGitRepositoryCreatesNewRepositoryWhenNoneExists() {
         assertFalse(GitManager.isGitRepository(tempPath));
-        assertThrows(GitException.class, () -> GitManager.openGitRepository(tempPath));
-        assertDoesNotThrow(() -> GitManager.initGitRepository(tempPath));
+        GitException exception = assertThrows(GitException.class, () -> GitManager.openGitRepository(this.tempPath, preferences));
+        assertEquals(tempPath.getFileName() + " is not in a git repository.", exception.getMessage());
+        assertDoesNotThrow(() -> GitManager.initGitRepository(tempPath, preferences));
         assertTrue(GitManager.isGitRepository(tempPath));
     }
 
     @Test
     void initGitRepositoryOpensExistingRepository() throws GitAPIException {
-        try (Git git = createRepository(tempPath)) {
-            assertThrows(GitException.class, () -> GitManager.initGitRepository(tempPath));
-            assertDoesNotThrow(() -> GitManager.openGitRepository(tempPath));
+        // manually create Git repository
+        try (Git git = Git.init().setDirectory(tempPath.toFile()).call()) {
+            GitException exception = assertThrows(GitException.class, () -> GitManager.initGitRepository(tempPath, preferences));
+            assertEquals(tempPath.getFileName() + " is already a git repository.", exception.getMessage());
+            assertDoesNotThrow(() -> GitManager.openGitRepository(tempPath, preferences));
             assertTrue(GitManager.isGitRepository(tempPath));
         }
     }
@@ -98,7 +111,7 @@ class GitManagerTest {
             Path newFile = localRepoPath.resolve("newFile.txt");
             Files.writeString(newFile, "This is a new test file.");
 
-            GitManager gitManager = new GitManager(localGit);
+            GitManager gitManager = new GitManager(localGit, preferences);
             assertDoesNotThrow(() -> gitManager.synchronize(newFile));
 
             try (Git clonedRemoteGit = Git.cloneRepository()
@@ -132,7 +145,7 @@ class GitManagerTest {
             Path newFile = localRepoPath.resolve("newFile.txt");
             Files.writeString(newFile, "This is a new test file.");
 
-            GitManager gitManager = new GitManager(localGit);
+            GitManager gitManager = new GitManager(localGit, preferences);
 //            TODO: adjust this after extending the GitManager class
 //            assertThrows(GitException.class, () -> gitManager.synchronize(newFile));
         }
@@ -152,7 +165,7 @@ class GitManagerTest {
 
             localGit.push().setRemote("origin").setRefSpecs(new RefSpec("master:master")).call();
 
-            GitManager gitManager = new GitManager(localGit);
+            GitManager gitManager = new GitManager(localGit, preferences);
             assertDoesNotThrow(gitManager::update);
         }
     }

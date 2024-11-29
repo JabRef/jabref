@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.PasswordField?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.preferences.git.AuthentifyDialogView">
+    <content>
+        <HBox>
+            <GridPane hgap="4.0" vgap="4.0" HBox.hgrow="ALWAYS">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="SOMETIMES" />
+                    <RowConstraints vgrow="SOMETIMES" />
+                    <RowConstraints vgrow="SOMETIMES" />
+                </rowConstraints>
+
+                <Label text="%Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="username" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="%Password:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="password" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+                </padding>
+
+            </GridPane>
+        </HBox>
+    </content>
+    <ButtonType fx:id="save" text="%Save"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

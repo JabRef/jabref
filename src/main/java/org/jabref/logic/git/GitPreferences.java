@@ -1,54 +1,135 @@
 package org.jabref.logic.git;
 
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 public class GitPreferences {
-    private BooleanProperty gitSupportEnabledProperty = new SimpleBooleanProperty();
-    private BooleanProperty frequencyLabelEnabledProperty = new SimpleBooleanProperty();
-    private ObjectProperty<AuthenticationViewMode> authenticationMethod = new SimpleObjectProperty<>();
+    private static String passwordEncryptionKey = null;
+    private static String sshPassphrase = null;
+    private final BooleanProperty gitEnabled;
+    private final SimpleStringProperty username;
+    private final SimpleStringProperty password;
+    private final BooleanProperty passwordEncrypted;
+    private final SimpleStringProperty sshDirPath;
+    private final BooleanProperty hostKeyCheckDisabled;
+    private final BooleanProperty pushFrequencyEnabled;
 
-    public GitPreferences(boolean gitSupportEnabledProperty, AuthenticationViewMode authenticationMethod, boolean frequencyLabelEnabledProperty) {
-        this.gitSupportEnabledProperty = new SimpleBooleanProperty(gitSupportEnabledProperty);
-        this.authenticationMethod = new SimpleObjectProperty<>(authenticationMethod);
-        this.frequencyLabelEnabledProperty = new SimpleBooleanProperty(frequencyLabelEnabledProperty);
+    public GitPreferences(boolean gitEnabled,
+                          String username,
+                          String password,
+                          boolean passwordEncrypted,
+                          String sshDirPath,
+                          boolean hostKeyCheckDisabled,
+                          boolean pushFrequencyEnabled) {
+        this.gitEnabled = new SimpleBooleanProperty(gitEnabled);
+        this.pushFrequencyEnabled = new SimpleBooleanProperty(pushFrequencyEnabled);
+        this.username = new SimpleStringProperty(username != null ? username : ""); // Default to empty if null
+        this.sshDirPath = new SimpleStringProperty(sshDirPath);
+        this.password = new SimpleStringProperty(password);
+        this.hostKeyCheckDisabled = new SimpleBooleanProperty(hostKeyCheckDisabled);
+        this.passwordEncrypted = new SimpleBooleanProperty(passwordEncrypted);
     }
 
-    public AuthenticationViewMode getAuthenticationMethod() {
-        return authenticationMethod.getValue();
+    public void setSshDirPath(String sshDirPath) {
+        this.sshDirPath.set(sshDirPath);
     }
 
-    public ObjectProperty<AuthenticationViewMode> getAuthenticationProperty() {
-        return authenticationMethod;
+    public SimpleStringProperty getSshPathProperty() {
+        return this.sshDirPath;
     }
 
-    public void setAuthenticationMethod(AuthenticationViewMode authenticationMethod) {
-        this.authenticationMethod.set(authenticationMethod);
+    public String getSshDirPath() {
+        return sshDirPath.get();
+    }
+
+    public void setPassword(String password) {
+        this.password.set(password);
+    }
+
+    public SimpleStringProperty getPasswordProperty() {
+        return this.password;
+    }
+
+    public String getPassword() {
+        return this.password.get();
+    }
+
+    public void setUsername(String username) {
+        this.username.set(username);
+    }
+
+    public SimpleStringProperty getUsernameProperty() {
+        return username;
+    }
+
+    public String getUsername() {
+        return username.get();
     }
 
     public boolean isGitEnabled() {
-        return gitSupportEnabledProperty.getValue();
+        return gitEnabled.getValue();
     }
 
-    public boolean isFrequencyLabelEnabled() {
-        return frequencyLabelEnabledProperty.getValue();
+    public BooleanProperty getGitEnabledProperty() {
+        return gitEnabled;
     }
 
-    public BooleanProperty getGitSupportEnabledProperty() {
-        return gitSupportEnabledProperty;
+    public void setGitEnabled(boolean gitEnabled) {
+        this.gitEnabled.set(gitEnabled);
     }
 
-    public BooleanProperty getFrequencyLabelEnabledProperty() {
-        return frequencyLabelEnabledProperty;
+    public boolean isHostKeyCheckDisabled() {
+        return hostKeyCheckDisabled.getValue();
     }
 
-    public void setGitSupportEnabledProperty(boolean gitSupportEnabledProperty) {
-        this.gitSupportEnabledProperty.set(gitSupportEnabledProperty);
+    public void setHostKeyCheckDisabled(boolean hostKeyCheckDisabled) {
+        this.hostKeyCheckDisabled.set(hostKeyCheckDisabled);
     }
 
-    public void setFrequencyLabelEnabledProperty(boolean frequencyLabelEnabledProperty) {
-        this.frequencyLabelEnabledProperty.set(frequencyLabelEnabledProperty);
+    public BooleanProperty getHostKeyCheckDisabledProperty() {
+        return hostKeyCheckDisabled;
+    }
+
+    public boolean isPushFrequencyEnabled() {
+        return pushFrequencyEnabled.getValue();
+    }
+
+    public BooleanProperty getPushFrequencyEnabledProperty() {
+        return pushFrequencyEnabled;
+    }
+
+    public void setPushFrequencyEnabled(boolean isPushFrequencySet) {
+        this.pushFrequencyEnabled.set(isPushFrequencySet);
+    }
+
+    public BooleanProperty getPasswordEncryptedProperty() {
+        return passwordEncrypted;
+    }
+
+    public boolean isPasswordEncrypted() {
+        return passwordEncrypted.getValue();
+    }
+
+    public void setPasswordEncrypted(boolean isPasswordEncrypted) {
+        this.passwordEncrypted.set(isPasswordEncrypted);
+    }
+
+    public static Optional<String> getPasswordEncryptionKey() {
+        return Optional.ofNullable(passwordEncryptionKey).filter(s -> !s.isBlank());
+    }
+
+    public static void setPasswordEncryptionKey(String key) {
+        passwordEncryptionKey = key;
+    }
+
+    public static Optional<String> getSshPassphrase() {
+        return Optional.ofNullable(sshPassphrase).filter(s -> !s.isBlank());
+    }
+
+    public static void setSshPassphrase(String sshPassphrase) {
+        GitPreferences.sshPassphrase = sshPassphrase;
     }
 }

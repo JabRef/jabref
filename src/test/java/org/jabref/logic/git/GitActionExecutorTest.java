@@ -5,13 +5,17 @@ package org.jabref.logic.git;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.jabref.logic.shared.security.Password;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -37,13 +41,17 @@ class GitActionExecutorTest {
     private Path repositoryPath;
     private GitManager gitManager;
     private GitActionExecutor gitActionExecutor;
+    private GitPreferences gitPreferences;
 
     private final Logger LOGGER = LoggerFactory.getLogger(GitActionExecutorTest.class);
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryRepository) throws GitException {
+    void setUp(@TempDir Path temporaryRepository) throws GitException, GeneralSecurityException, UnsupportedEncodingException {
+        gitPreferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
         this.repositoryPath = temporaryRepository;
-        this.gitManager = GitManager.initGitRepository(repositoryPath);
+        this.gitManager = GitManager.initGitRepository(repositoryPath, gitPreferences);
         this.gitActionExecutor = this.gitManager.getGitActionExecutor();
     }
 
@@ -197,7 +205,7 @@ class GitActionExecutorTest {
 
     @Test
     void pushWithoutSettingOrigin(@TempDir Path tempPath) throws GitException, IOException {
-        GitManager gitManager = GitManager.initGitRepository(tempPath);
+        GitManager gitManager = GitManager.initGitRepository(tempPath, gitPreferences);
         GitActionExecutor actionExecutor = gitManager.getGitActionExecutor();
         Path tempFile = Files.createTempFile(tempPath, "test", null);
         actionExecutor.add(tempFile);
