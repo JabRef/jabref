@@ -52,6 +52,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import jakarta.ws.rs.core.Link;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1141,6 +1142,16 @@ public class BibEntry implements Cloneable {
      */
     public Optional<LinkedFile> getCoverImageFile() {
         if (!isCoverable()) {
+            return Optional.empty();
+        }
+
+        List<LinkedFile> files = getFiles();
+
+        if (files == null) {
+            return Optional.empty();
+        }
+
+        if (files.isEmpty()) {
             return Optional.empty();
         }
 
