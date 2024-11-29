@@ -42,15 +42,8 @@ class GitStatus {
         return branchNames;
     }
 
-    // renaming these two methods to Untracked
     boolean hasUntrackedFiles() throws GitException {
-        Status status;
-        try {
-            status = this.git.status().call();
-        } catch (GitAPIException e) {
-            throw new GitException("Failed to get git status", e);
-        }
-        return status.getUntracked().isEmpty();
+        return !getUntrackedFiles().isEmpty();
     }
 
     Set<String> getUntrackedFiles() throws GitException {
@@ -63,16 +56,8 @@ class GitStatus {
         return status.getUntracked();
     }
 
-    // tracked files just means those files that are staged
-
     boolean hasTrackedFiles() throws GitException {
-        Status status;
-        try {
-            status = this.git.status().call();
-        } catch (GitAPIException e) {
-            throw new GitException("Failed to get git status", e);
-        }
-        return status.getAdded().isEmpty();
+        return !getTrackedFiles().isEmpty();
     }
 
     Set<String> getTrackedFiles() throws GitException {
