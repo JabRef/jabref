@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +16,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -63,7 +63,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
         URL url;
         try {
-            url = URI.create(CITATION_URL_PREFIX + validIdentifier).toURL();
+            url = URLUtil.create(CITATION_URL_PREFIX + validIdentifier);
         } catch (MalformedURLException e) {
             throw new FetcherException("Invalid URL", e);
         }
@@ -83,7 +83,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
         URL entryUrl;
         try {
-            entryUrl = URI.create(DESCRIPTION_URL_PREFIX + identifier).toURL();
+            entryUrl = URLUtil.create(DESCRIPTION_URL_PREFIX + identifier);
         } catch (MalformedURLException e) {
             throw new FetcherException("Invalid URL", e);
         }
@@ -96,7 +96,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         // Version information for entries after year 2000
         if (isFromOrAfterYear2000(entry)) {
             try {
-                entryUrl = URI.create(VERSION_URL_PREFIX + identifier).toURL();
+                entryUrl = URLUtil.create(VERSION_URL_PREFIX + identifier);
             } catch (MalformedURLException e) {
                 throw new FetcherException("Invalid URL", e);
             }
@@ -160,7 +160,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         if (urlField.isPresent()) {
             URL url;
             try {
-                url = URI.create(urlField.get()).toURL();
+                url = URLUtil.create(urlField.get());
             } catch (MalformedURLException e) {
                 LOGGER.warn("Invalid URL {}", urlField.get(), e);
                 return Optional.empty();
@@ -173,7 +173,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
             // getRequiredValueBetween refuses to match across the line break.
             fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
             String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
-            return Optional.of(URI.create(fulltextLink).toURL());
+            return Optional.of(URLUtil.create(fulltextLink));
         }
         return Optional.empty();
     }
