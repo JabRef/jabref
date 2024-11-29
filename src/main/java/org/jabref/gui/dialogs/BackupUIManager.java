@@ -12,7 +12,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.backup.BackupChoiceDialog;
 import org.jabref.gui.backup.BackupChoiceDialogRecord;
@@ -35,6 +34,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,7 @@ public class BackupUIManager {
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  UndoManager undoManager,
                                                                  StateManager stateManager) {
+        LOGGER.info("Show restore backup dialog");
         var actionOpt = showBackupResolverDialog(
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
@@ -60,7 +62,15 @@ public class BackupUIManager {
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                try {
+                    ObjectId commitId = BackupManagerGit.retrieveCommits(preferences.getFilePreferences().getBackupDirectory(), 1).getFirst().getId();
+                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
+                } catch (
+                        IOException |
+                        GitAPIException e
+                ) {
+                    throw new RuntimeException(e);
+                }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                 return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
@@ -71,7 +81,8 @@ public class BackupUIManager {
                 }
                 if (recordBackupChoice.get().action() == BackupChoiceDialog.RESTORE_BACKUP) {
                     LOGGER.warn(recordBackupChoice.get().entry().getSize());
-                    BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                    ObjectId commitId = recordBackupChoice.get().entry().getId();
+                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
                     return Optional.empty();
                 }
                 if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {
@@ -82,30 +93,7 @@ public class BackupUIManager {
             return Optional.empty();
         });
     }
-        /*
-        return actionOpt.flatMap(action -> {
-            if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
-                return Optional.empty();
-            } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
-                var test = showBackupChoiceDialog(dialogService, originalPath, preferences);
-                if (test.isPresent()) {
-                    LOGGER.warn(String.valueOf(test.get().getEntries()));
-                    showBackupResolverDialog(
-                            dialogService,
-                            preferences.getExternalApplicationsPreferences(),
-                            originalPath,
-                            preferences.getFilePreferences().getBackupDirectory());
-                } else {
-                    LOGGER.warn("Empty");
-                }
-            } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
-        }
-            return Optional.empty();
-        });
 
-        */
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
