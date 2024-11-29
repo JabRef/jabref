@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -61,6 +62,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -463,11 +465,26 @@ public class EntryEditor extends BorderPane {
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+        Field actualField = field;
+        boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
+                tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
-                        && fieldsEditorTab.getShownFields().contains(field)) {
+                        && fieldsEditorTab.getShownFields().contains(actualField)) {
                     tabbed.getSelectionModel().select(tab);
-                    fieldsEditorTab.requestFocus(field);
+                    Platform.runLater(() -> {
+                        fieldsEditorTab.requestFocus(actualField);
+                    });
+                    // This line explicitly brings focus back to the main window containing the Entry Editor.
+                    getScene().getWindow().requestFocus();
+                    fieldFound = true;
+                    break;
+                }
+            }
+            if (!fieldFound) {
+                Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                if (aliasField != null) {
+                    setFocusToField(aliasField);
                 }
             }
         });
