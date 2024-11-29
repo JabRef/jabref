@@ -213,7 +213,7 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
+    public static boolean backupGitDiffers(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
                 .setGitDir(new File(repoDir, ".git"))
@@ -292,7 +292,7 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public List<RevCommit> retrieveCommits(Path backupDir, int n) throws IOException, GitAPIException {
+    public static List<RevCommit> retrieveCommits(Path backupDir, int n) throws IOException, GitAPIException {
         List<RevCommit> retrievedCommits = new ArrayList<>();
         // Open Git repository
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
@@ -327,8 +327,8 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public List<List<String>> retrieveCommitDetails(List<RevCommit> commits, Path backupDir) throws IOException, GitAPIException {
-        List<List<String>> commitDetails;
+    public static List<BackupEntry> retrieveCommitDetails(List<RevCommit> commits, Path backupDir) throws IOException, GitAPIException {
+        List<BackupEntry> commitDetails;
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
             commitDetails = new ArrayList<>();
 
@@ -339,6 +339,7 @@ public class BackupManagerGit {
                 commitInfo.add(commit.getName()); // ID of commit
 
                 // Get the size of files changes by the commit
+                String sizeFormatted;
                 try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(commit.getTree());
                     treeWalk.setRecursive(true);
@@ -350,7 +351,7 @@ public class BackupManagerGit {
                     }
 
                     // Convert the size to Kb or Mb
-                    String sizeFormatted = (totalSize > 1024 * 1024)
+                    sizeFormatted = (totalSize > 1024 * 1024)
                             ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
                             : String.format("%.2f Ko", totalSize / 1024.0);
 
@@ -361,7 +362,8 @@ public class BackupManagerGit {
                 Date date = commit.getAuthorIdent().getWhen();
                 commitInfo.add(date.toString());
                 // Add list of details to the main list
-                commitDetails.add(commitInfo);
+                BackupEntry backupEntry = new BackupEntry(commit.getName(), date.toString(), sizeFormatted, 0);
+                commitDetails.add(backupEntry);
             }
         }
 
