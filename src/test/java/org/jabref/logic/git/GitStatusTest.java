@@ -31,7 +31,7 @@ public class GitStatusTest {
     }
 
     @Test
-    void testTrackedAndUntrackedFilesStatus() throws GitException, IOException {
+    void trackedAndUntrackedFilesStatus() throws GitException, IOException {
         assertFalse(gitStatus.hasUntrackedFiles());
         assertFalse(gitStatus.hasTrackedFiles());
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);

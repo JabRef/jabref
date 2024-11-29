@@ -101,12 +101,11 @@ public class GitManager {
      *
      * @return to git repository if found or an empty optional otherwise.
      */
-    private static Optional<Path> findGitRepository(Path path) {
+    static Optional<Path> findGitRepository(Path path) {
         Path currentPath = path;
 
         while (currentPath != null) {
             if (Files.isDirectory(currentPath.resolve(".git"))) {
-                LOGGER.warn(currentPath.toString());
                 return Optional.of(currentPath);
             }
             currentPath = currentPath.getParent();

@@ -56,7 +56,7 @@ class GitAuthenticator {
                     }
                 });
         if (disableStrictHostKeyChecking) {
-            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile((f) -> file));
+            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile(f -> file));
         }
         sshTransport.setSshSessionFactory(sshdSessionFactoryBuilder.build(null));
     }
