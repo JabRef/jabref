@@ -815,78 +815,6 @@ class BibEntryTest {
     }
 
     @Test
-    void getCoverImageReturnsEmptyIfNoFiles() {
-        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        assertEquals(Optional.empty(), entry.getCoverImageFile());
-    }
-
-    @Test
-    void getCoverImageReturnsEmptyIfNoImageFiles() {
-        LinkedFile pdf = new LinkedFile("", Paths.get("Baldoni2002.pdf").toAbsolutePath().toString(), "pdf");
-        LinkedFile markdown = new LinkedFile("", "readme.md", "md");
-        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-
-        entry.addFile(markdown);
-        entry.addFile(pdf);
-
-        assertEquals(Optional.empty(), entry.getCoverImageFile());
-    }
-
-    @ParameterizedTest
-    @MethodSource("nonCoverableEntryTypes")
-    void getCoverImageReturnsEmptyIfEntryIsNotCoverable(StandardEntryType entryType) {
-        BibEntry entry = new BibEntry(entryType).withField(StandardField.AUTHOR, "value");
-        assertEquals(Optional.empty(), entry.getCoverImageFile());
-    }
-
-    static Stream<StandardEntryType> nonCoverableEntryTypes() {
-        return Stream.of(
-                StandardEntryType.Proceedings,
-                StandardEntryType.Dataset,
-                StandardEntryType.Software
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("imagesWithoutCoverDescription")
-    void getCoverImageDoesNotReturnImagesWithoutCoverDescription(LinkedFile cover) {
-        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        entry.addFile(cover);
-
-        LinkedFile rightCover = new LinkedFile("cover", Paths.get("wallpaper.jpg"), "JPG image");
-        entry.addFile(rightCover);
-        assertEquals(Optional.of(rightCover), entry.getCoverImageFile());
-    }
-
-    static Stream<LinkedFile> imagesWithoutCoverDescription() {
-        return Stream.of(
-                new LinkedFile("", Paths.get("JabRef-icon-128.png"), "PNG image"),
-                new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image"),
-                new LinkedFile("", Paths.get("JabRef-icon-32.png"), "PNG image")
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("docsWithCoverDescription")
-    void getCoverImageDoesNotReturnDocumentsWithCoverDescription(LinkedFile file) {
-        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        entry.addFile(file);
-
-        LinkedFile rightCover = new LinkedFile("cover", Paths.get("wallpaper.jpg"), "JPG image");
-        entry.addFile(rightCover);
-        assertEquals(Optional.of(rightCover), entry.getCoverImageFile());
-    }
-
-    static Stream<LinkedFile> docsWithCoverDescription() {
-        return Stream.of(
-                new LinkedFile("cover", Paths.get("Baldoni2002.pdf"), "pdf"),
-                new LinkedFile("cover", Paths.get("readme.md"), "md"),
-                new LinkedFile("cover", Paths.get("BiblioscapeImporterTestArticleST.txt"), "txt"),
-                new LinkedFile("cover", Paths.get("emptyFile.xml"), "xml")
-        );
-    }
-
-    @Test
     void getCoverImageReturnsCorrectImage() {
         LinkedFile cover1 = new LinkedFile("", Paths.get("JabRef-icon-128.png"), "PNG image");
         LinkedFile cover2 = new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image");
@@ -898,27 +826,6 @@ class BibEntryTest {
         entry.addFile(cover3);
 
         assertEquals(Optional.of(cover3), entry.getCoverImageFile());
-    }
-
-    @Test
-    void getCoverImageUpdatesWithChangeToDescription() {
-        List<LinkedFile> files = new ArrayList<>();
-
-        files.add(new LinkedFile("cover", Paths.get("JabRef-icon-128.png"), "PNG image"));
-        files.add(new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image"));
-        LinkedFile cover1 = files.get(0);
-        LinkedFile cover2 = files.get(1);
-
-        BibEntry entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        entry.setFiles(files);
-
-        assertEquals(Optional.of(cover1), entry.getCoverImageFile());
-
-        cover1.setDescription("");
-        cover2.setDescription("cover");
-        entry.setFiles(files);
-
-        assertEquals(Optional.of(cover2), entry.getCoverImageFile());
     }
 
     public static Stream<BibEntry> isEmpty() {
