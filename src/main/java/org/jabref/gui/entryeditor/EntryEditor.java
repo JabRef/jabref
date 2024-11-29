@@ -1,31 +1,17 @@
 package org.jabref.gui.entryeditor;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.stream.Collectors;
-
+import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
+import jakarta.inject.Inject;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -61,17 +47,18 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
-import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
@@ -463,15 +450,30 @@ public class EntryEditor extends BorderPane {
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+        Field actualField = field;
+        boolean fieldFound = false;
+
             for (Tab tab : tabbed.getTabs()) {
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
-                        && fieldsEditorTab.getShownFields().contains(field)) {
+                        && fieldsEditorTab.getShownFields().contains(actualField)) {
                     tabbed.getSelectionModel().select(tab);
-                    fieldsEditorTab.requestFocus(field);
+                    Platform.runLater(() -> {
+                        fieldsEditorTab.requestFocus(actualField);
+                    });
                     // This line explicitly brings focus back to the main window containing the Entry Editor.
                     getScene().getWindow().requestFocus();
+                    fieldFound = true;
+                    break;
                 }
             }
+
+            if (!fieldFound) {
+                Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                if (aliasField != null) {
+                    setFocusToField(aliasField);
+                }
+            }
+
         });
     }
 
