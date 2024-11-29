@@ -19,6 +19,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -27,6 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -207,12 +209,14 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initResultTable() {
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withText(item -> item).withTooltip(item -> item)
+                .withGraphic(this::createEllipsisLabel)
+                .withTooltip(item -> item)
                 .install(colFile);
 
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withText(item -> item).withTooltip(item -> item)
+                .withGraphic(this::createEllipsisLabel)
+                .withTooltip(item -> item)
                 .install(colMessage);
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
@@ -271,6 +275,18 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void exportSelected() {
         viewModel.startExport();
+    }
+
+    /**
+     * Creates a Label with a maximum width and ellipsis for overflow.
+     * Truncates text if it exceeds two-thirds of the screen width.
+     */
+    private Label createEllipsisLabel(String text) {
+        Label label = new Label(text);
+        double maxWidth = Screen.getPrimary().getBounds().getWidth() * 2 / 3;
+        label.setMaxWidth(maxWidth);
+        label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
+        return label;
     }
 
     /**

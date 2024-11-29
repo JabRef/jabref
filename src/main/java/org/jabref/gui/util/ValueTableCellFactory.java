@@ -7,7 +7,6 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
@@ -123,7 +122,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         if (StringUtil.isNotBlank(tooltipText)) {
                             Screen currentScreen = Screen.getPrimary();
                             double maxWidth = currentScreen.getBounds().getWidth();
-                            setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
                             Tooltip tooltip = new Tooltip(tooltipText);
                             tooltip.setMaxWidth(maxWidth * 2 / 3);
                             tooltip.setWrapText(true);
