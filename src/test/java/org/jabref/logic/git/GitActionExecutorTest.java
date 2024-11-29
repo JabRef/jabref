@@ -98,7 +98,6 @@ class GitActionExecutorTest {
         }
     }
 
-    // don't really understand append completely, testing with false
     @Test
     void commitSingleFile() throws IOException, GitAPIException, GitException {
         Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
@@ -524,7 +523,6 @@ class GitActionExecutorTest {
 
     @Test
     void stashWithNoChanges() throws GitException, GitAPIException, IOException {
-
         Path dummyFile = Files.createFile(repositoryPath.resolve("initial.txt"));
         Files.writeString(dummyFile, "Dummy commit");
         gitActionExecutor.add(dummyFile);
@@ -604,7 +602,6 @@ class GitActionExecutorTest {
             System.err.println("Error reading repository: " + e.getMessage());
         }
     }
-
 
 
     void deleteDirWithContent(Path path) throws IOException {

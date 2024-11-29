@@ -50,7 +50,7 @@ class GitStatus {
         } catch (GitAPIException e) {
             throw new GitException("Failed to get git status", e);
         }
-        return status.getUntracked().isEmpty();
+        return !(status.getUntracked().isEmpty());
     }
 
     Set<String> getUntrackedFiles() throws GitException {
@@ -72,7 +72,7 @@ class GitStatus {
         } catch (GitAPIException e) {
             throw new GitException("Failed to get git status", e);
         }
-        return status.getAdded().isEmpty();
+        return !(status.getAdded().isEmpty());
     }
 
     Set<String> getTrackedFiles() throws GitException {
@@ -120,4 +120,6 @@ class GitStatus {
 
         return hasUnpushedCommits;
     }
+
+
 }
