@@ -468,6 +468,7 @@ public class EntryEditor extends BorderPane {
         Field actualField = field;
         boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
+                tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
                         && fieldsEditorTab.getShownFields().contains(actualField)) {
                     tabbed.getSelectionModel().select(tab);
