@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class GitManager {
     private final static Logger LOGGER = LoggerFactory.getLogger(GitManager.class);
     private final static String DEFAULT_COMMIT_MESSAGE = "Automatic update via JabRef";
-  
+
     private final Path path;
     private final Git git;
     private final GitPreferences preferences;
@@ -26,7 +26,6 @@ public class GitManager {
 
     private GitProtocol gitProtocol = GitProtocol.UNKNOWN;
     private boolean requiresAuthentication = false;
-
 
     public GitManager(Git git, GitPreferences preferences) {
         this.path = git.getRepository().getDirectory().getParentFile().toPath();
@@ -128,6 +127,7 @@ public class GitManager {
             currentPath = currentPath.getParent();
         }
         return Optional.empty();
+    }
 
     public boolean requiresAuthentication() {
         return requiresAuthentication;

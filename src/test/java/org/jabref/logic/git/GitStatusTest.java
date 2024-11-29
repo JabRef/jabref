@@ -1,8 +1,12 @@
 package org.jabref.logic.git;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+
+import org.jabref.logic.shared.security.Password;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GitStatusTest {
     private Path repositoryPath;
+    private GitPreferences gitPreferences;
     private GitManager gitManager;
     private GitStatus gitStatus;
     private GitActionExecutor gitActionExecutor;
@@ -23,9 +28,12 @@ public class GitStatusTest {
     private final Logger LOGGER = LoggerFactory.getLogger(GitStatusTest.class);
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryRepository) throws GitException {
+    void setUp(@TempDir Path temporaryRepository) throws GitException, GeneralSecurityException, UnsupportedEncodingException {
         this.repositoryPath = temporaryRepository;
-        this.gitManager = GitManager.initGitRepository(repositoryPath);
+        this.gitPreferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
+        this.gitManager = GitManager.initGitRepository(repositoryPath, gitPreferences);
         this.gitStatus = gitManager.getGitStatus();
         this.gitActionExecutor = gitManager.getGitActionExecutor();
     }

@@ -1,15 +1,13 @@
 package org.jabref.logic.git;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.util.Optional;
 
 import org.jabref.logic.shared.security.Password;
-
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

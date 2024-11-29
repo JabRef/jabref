@@ -215,7 +215,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (GitManager.isGitRepository(file)) {
             LOGGER.debug("File is in a git repository");
             try {
-                GitManager gitManager = GitManager.openGitRepository(file);
+                GitManager gitManager = GitManager.openGitRepository(file, preferences.getGitPreferences());
                 gitManager.update();
                 dialogService.notify(Localization.lang("Pulled the latest changes from the remote repository."));
             } catch (GitException e) {
