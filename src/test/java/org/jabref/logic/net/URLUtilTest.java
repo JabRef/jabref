@@ -1,6 +1,8 @@
 package org.jabref.logic.net;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
@@ -8,7 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class URLUtilTest {
 
@@ -86,5 +91,25 @@ class URLUtilTest {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
+    }
+
+    @Test
+    void testCreateWithAbsoluteURL() {
+        String absoluteUrl = "http://www.example.com";
+        try {
+            URL url = URLUtil.create(absoluteUrl);
+            assertNotNull(url);
+            assertEquals(absoluteUrl, url.toString());
+        } catch (MalformedURLException e) {
+            fail("MalformedURLException should not be thrown for an absolute URL");
+        }
+    }
+
+    @Test
+    void testCreateWithNonAbsoluteURL() {
+        String nonAbsoluteUrl = "www.example.com";
+        assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create(nonAbsoluteUrl);
+        });
     }
 }

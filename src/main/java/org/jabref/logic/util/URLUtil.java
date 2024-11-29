@@ -89,7 +89,11 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
+        URI uri = createUri(url);
+        if (!uri.isAbsolute()) {
+            throw new MalformedURLException("URI is not absolute: " + url);
+        }
+        return uri.toURL();
     }
 
     /**
