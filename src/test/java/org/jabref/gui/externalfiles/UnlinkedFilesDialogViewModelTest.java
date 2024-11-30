@@ -71,7 +71,7 @@ public class UnlinkedFilesDialogViewModelTest {
     }
 
     @Test
-    public void testStartImportWithValidFiles() throws Exception {
+    public void startImportWithValidFilesTest() throws Exception {
         // Create temporary test files
         tempDir = Files.createTempDirectory("testDir");
         subDir = tempDir.resolve("subdir");
@@ -99,8 +99,8 @@ public class UnlinkedFilesDialogViewModelTest {
 
         // Assert that the list contains 2 items
         assertEquals(2, checkedFileListProperty.get().size());
-        assertEquals(file1, checkedFileListProperty.get().get(0).getValue().getPath());
-        assertEquals(file2, checkedFileListProperty.get().get(1).getValue().getPath());
+        assertEquals(file1, checkedFileListProperty.get().getFirst().getValue().getPath());
+        assertEquals(file2, checkedFileListProperty.get().getLast().getValue().getPath());
 
         Path directory = tempDir; // Base directory for relativization
 

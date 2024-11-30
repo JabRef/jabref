@@ -28,7 +28,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -283,7 +282,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
      */
     private Label createEllipsisLabel(String text) {
         Label label = new Label(text);
-        double maxWidth = Screen.getPrimary().getBounds().getWidth() * 2 / 3;
+        double maxWidth = colFile.getMaxWidth();
         label.setMaxWidth(maxWidth);
         label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
         return label;
