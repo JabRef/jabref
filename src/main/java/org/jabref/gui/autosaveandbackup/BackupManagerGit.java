@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.backup.BackupEntry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -362,7 +363,7 @@ public class BackupManagerGit {
                 Date date = commit.getAuthorIdent().getWhen();
                 commitInfo.add(date.toString());
                 // Add list of details to the main list
-                BackupEntry backupEntry = new BackupEntry(commit.getName(), date.toString(), sizeFormatted, 0);
+                BackupEntry backupEntry = new BackupEntry(commit.getId(), commit.getName(), date.toString(), sizeFormatted, 0);
                 commitDetails.add(backupEntry);
             }
         }
