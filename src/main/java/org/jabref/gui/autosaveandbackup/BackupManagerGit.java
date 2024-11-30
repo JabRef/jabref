@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,34 +12,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.TableColumn;
-
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.backup.BackupEntry;
-import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
-import org.jabref.logic.util.io.BackupFileUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -182,100 +162,18 @@ public class BackupManagerGit {
     protected void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         LOGGER.info("Starting backup process for file: {}", originalPath);
 
-        needsBackup = BackupManagerGit.backupGitDiffers(originalPath, backupDir);
+        needsBackup = BackupManagerGit.backupGitDiffers(backupDir, originalPath);
         if (!needsBackup) {
-            LOGGER.info("No need for backup");
             return;
         }
 
-        // l'ordre dans lequel les entrées BibTeX doivent être écrites dans le fichier de sauvegarde.
-        // Si l'utilisateur a trié la table d'affichage des entrées dans JabRef, cet ordre est récupéré.
-        // Sinon, un ordre par défaut est utilisé.
-        // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
-        SelfContainedSaveOrder saveOrder = bibDatabaseContext
-                .getMetaData().getSaveOrder()
-                .map(so -> {
-                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
-                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
-                        return new SelfContainedSaveOrder(
-                                SaveOrder.OrderType.SPECIFIED,
-                                sortOrder.stream()
-                                         .filter(col -> col instanceof MainTableColumn<?>)
-                                         .map(column -> ((MainTableColumn<?>) column).getModel())
-                                         .flatMap(model -> model.getSortCriteria().stream())
-                                         .toList());
-                    } else {
-                        return SelfContainedSaveOrder.of(so);
-                    }
-                })
-                .orElse(SaveOrder.getDefaultSaveOrder());
+        // Add and commit changes
+        git.add().addFilepattern(".").call();
+        RevCommit commit = git.commit().setMessage("Backup at " + System.currentTimeMillis()).call();
+        LOGGER.info("Committed backup: {}", commit.getId());
 
-        // Elle configure la sauvegarde, en indiquant qu'aucune sauvegarde supplémentaire (backup) ne doit être créée,
-        // que l'ordre de sauvegarde doit être celui défini, et que les entrées doivent être formatées selon les préférences
-        // utilisateur.
-        SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
-                .withMakeBackup(false)
-                .withSaveOrder(saveOrder)
-                .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
-
-        // "Clone" the database context
-        // We "know" that "only" the BibEntries might be changed during writing (see [org.jabref.logic.exporter.BibDatabaseWriter.savePartOfDatabase])
-        // Chaque entrée BibTeX (comme un article, livre, etc.) est clonée en utilisant la méthode clone().
-        // Cela garantit que les modifications faites pendant la sauvegarde n'affecteront pas l'entrée originale.
-        List<BibEntry> list = bibDatabaseContext.getDatabase().getEntries().stream()
-                                                .map(BibEntry::clone)
-                                                .map(BibEntry.class::cast)
-                                                .toList();
-        BibDatabase bibDatabaseClone = new BibDatabase(list);
-        BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
-        // Elle définit l'encodage à utiliser pour écrire le fichier. Cela garantit que les caractères spéciaux sont bien sauvegardés.
-        Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
-        // We want to have successful backups only
-        // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
-        // Example: What happens if one hard powers off the machine (or kills the jabref process) during writing of the backup?
-        //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
-        try (Writer writer = new AtomicFileWriter(backupDir, encoding, false)) {
-            BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(
-                    bibWriter,
-                    saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager)
-                    // we save the clone to prevent the original database (and thus the UI) from being changed
-                    .saveDatabase(bibDatabaseContextClone);
-
-            // Add and commit changes
-            git.add().addFilepattern(".").call();
-            RevCommit commit = git.commit().setMessage("Backup at " + System.currentTimeMillis()).call();
-            LOGGER.info("Committed backup: {}", commit.getId());
-
-            // Reset the backup flag
-            this.needsBackup = false;
-        } catch (IOException e) {
-            logIfCritical(backupDir, e);
-        }
-    }
-
-    private void logIfCritical(Path backupPath, IOException e) {
-        Throwable innermostCause = e;
-        while (innermostCause.getCause() != null) {
-            innermostCause = innermostCause.getCause();
-        }
-        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
-
-        // do not print errors in field values into the log during autosave
-        if (!isErrorInField) {
-            LOGGER.error("Error while saving to file {}", backupPath, e);
-        }
-    }
-
-    /**
-     * Determines the most recent existing backup file name
-     */
-    static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
-        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
+        // Reset the backup flag
+        this.needsBackup = false;
     }
 
     /**
@@ -285,6 +183,7 @@ public class BackupManagerGit {
      * @param backupDir the backup directory
      * @param objectId the commit ID to restore from
      */
+
     public static void restoreBackup(Path originalPath, Path backupDir, ObjectId objectId) {
         try {
             Git git = Git.open(backupDir.toFile());
@@ -297,16 +196,6 @@ public class BackupManagerGit {
             git.commit().setMessage("Restored content from commit: " + objectId.getName()).call();
 
             LOGGER.info("Restored backup from Git repository and committed the changes");
-
-            try {
-                ObjectLoader loader = git.getRepository().open(objectId);
-                // Read the content from the last commit
-                String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
-                LOGGER.info(committedContent);
-                // Files.writeString(originalPath, committedContent, StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                LOGGER.error("Error while restoring the backup file.", e);
-            }
         } catch (
                 IOException |
                 GitAPIException e) {
@@ -324,33 +213,24 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static boolean backupGitDiffers(Path originalPath, Path backupDir) throws IOException, GitAPIException {
+    public static boolean backupGitDiffers(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
                 .setGitDir(new File(repoDir, ".git"))
                 .build();
 
-        LOGGER.info("ogPath : {}", originalPath.toString());
-        LOGGER.info("backupDir : {}", backupDir.toString());
-
         try (Git git = new Git(repository)) {
             // Resolve HEAD commit
             ObjectId headCommitId = repository.resolve("HEAD");
             if (headCommitId == null) {
-                // No commits in the repository; assume the file doesn't differ
-                return false;
+                // No commits in the repository; assume the file differs
+                return true;
             }
 
             // Attempt to retrieve the file content from the last commit
             ObjectLoader loader;
             try {
-                LOGGER.info("File to check in repo : {}", originalPath.getFileName().toString());
-                String fileToCheck = FilenameUtils.removeExtension(originalPath.getFileName().toString()) + ".bak";
-                ObjectId fileId = repository.resolve("HEAD:" + fileToCheck);
-                if (fileId == null) {
-                    return false;
-                }
-                loader = repository.open(fileId);
+                loader = repository.open(repository.resolve("HEAD:" + originalPath.getFileName().toString()));
             } catch (
                     MissingObjectException e) {
                 // File not found in the last commit; assume it differs
@@ -362,14 +242,11 @@ public class BackupManagerGit {
 
             // Read the current content of the file
             if (!Files.exists(originalPath)) {
-                LOGGER.warn("File doesn't exist: {}", originalPath);
                 // If the file doesn't exist in the working directory, it differs
                 return true;
             }
             String currentContent = Files.readString(originalPath, StandardCharsets.UTF_8);
 
-            LOGGER.info("Commited content : \n{}", committedContent);
-            LOGGER.info("Current content : \n{}", currentContent);
             // Compare the current content to the committed content
             return !currentContent.equals(committedContent);
         }
@@ -485,7 +362,7 @@ public class BackupManagerGit {
                 Date date = commit.getAuthorIdent().getWhen();
                 commitInfo.add(date.toString());
                 // Add list of details to the main list
-                BackupEntry backupEntry = new BackupEntry(commit.getId(), commit.getName(), date.toString(), sizeFormatted, 0);
+                BackupEntry backupEntry = new BackupEntry(commit.getName(), date.toString(), sizeFormatted, 0);
                 commitDetails.add(backupEntry);
             }
         }
@@ -508,7 +385,7 @@ public class BackupManagerGit {
 
         if (createBackup) {
             try {
-                performBackup(originalPath, backupDir);
+                performBackup(backupDir, originalPath);
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Error during shutdown backup", e);
             }

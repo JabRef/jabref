@@ -49,12 +49,4 @@ public class BackupEntry {
     public ObjectId getId() {
         return id;
     }
-
-    public String getName() {
-        return name.get();
-    }
-
-    public StringProperty nameProperty() {
-        return name;
-    }
 }
