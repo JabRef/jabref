@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -116,7 +117,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
 
-    private final List<EntryEditorTab> allPossibleTabs;
+    private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -133,21 +134,27 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 stateManager);
 
-        // FixMe: Observable
         this.previewPanel = new PreviewPanel(
                 dialogService,
                 preferences.getKeyBindingRepository(),
                 preferences,
                 themeManager,
                 taskExecutor,
-                stateManager,
-                tabSupplier.get().searchQueryProperty());
+                stateManager);
         this.previewPanel.setDatabase(tabSupplier.get().getBibDatabaseContext());
 
         setupKeyBindings();
 
-        // FixMe: Observable
-        this.allPossibleTabs = createTabs(tabSupplier.get());
+        EasyBind.subscribe(stateManager.activeTabProperty(), (tab) -> {
+            if (tab.isPresent()) {
+                this.allPossibleTabs.clear();
+                this.allPossibleTabs.addAll(createTabs(tab.get()));
+                adaptVisibleTabs();
+            } else {
+                this.allPossibleTabs.clear();
+            }
+        });
+        // this.allPossibleTabs = createTabs(tabSupplier.get());
 
         setupDragAndDrop();
 
