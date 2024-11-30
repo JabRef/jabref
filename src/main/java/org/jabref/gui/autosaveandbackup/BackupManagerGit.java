@@ -68,7 +68,7 @@ public class BackupManagerGit {
         changeFilter.registerListener(this);
 
         // Ensure the backup directory exists
-        Path backupDirPath = bibDatabaseContext.getDatabasePath().orElseThrow().getParent().resolve("backup");
+        Path backupDirPath = preferences.getFilePreferences().getBackupDirectory();
         File backupDir = backupDirPath.toFile();
         if (!backupDir.exists()) {
             boolean dirCreated = backupDir.mkdirs();
