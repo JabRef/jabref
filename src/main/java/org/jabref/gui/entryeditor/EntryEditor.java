@@ -141,20 +141,21 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 themeManager,
                 taskExecutor,
                 stateManager);
-        this.previewPanel.setDatabase(tabSupplier.get().getBibDatabaseContext());
 
         setupKeyBindings();
 
         EasyBind.subscribe(stateManager.activeTabProperty(), (tab) -> {
             if (tab.isPresent()) {
+                this.previewPanel.setDatabase(tab.get().getBibDatabaseContext());
+
                 this.allPossibleTabs.clear();
                 this.allPossibleTabs.addAll(createTabs(tab.get()));
                 adaptVisibleTabs();
             } else {
+                this.previewPanel.setDatabase(null);
                 this.allPossibleTabs.clear();
             }
         });
-        // this.allPossibleTabs = createTabs(tabSupplier.get());
 
         setupDragAndDrop();
 
