@@ -112,6 +112,10 @@ public class GitManager {
         }
     }
 
+    void close() {
+        git.close();
+    }
+
     /**
      * traverse up the directory tree until a .git directory is found or the root is reached.
      *
