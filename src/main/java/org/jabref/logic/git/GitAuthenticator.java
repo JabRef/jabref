@@ -1,10 +1,6 @@
 package org.jabref.logic.git;
 
-
-import java.io.File;
-import java.net.URL;
 import java.io.UnsupportedEncodingException;
-
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Optional;
@@ -35,8 +31,7 @@ class GitAuthenticator {
     GitAuthenticator(GitPreferences preferences) {
         this.preferences = preferences;
     }
-
-
+    
     <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
         transportCommand.setCredentialsProvider(getCredentialsProvider());
         transportCommand.setTransportConfigCallback(this::transportConfigCallback);
@@ -70,17 +65,19 @@ class GitAuthenticator {
                         return GitPreferences.getSshPassphrase().orElse("").toCharArray();
                     }
                 });
-        if (disableStrictHostKeyChecking) {
-            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile(f -> file));
-        }
+//        TODO: modify after resolving getResource issue
+//        if (disableStrictHostKeyChecking) {
+//            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile(f -> file));
+//        }
         sshTransport.setSshSessionFactory(sshdSessionFactoryBuilder.build(null));
     }
 
-    private static Optional<File> getSshConfigFile() {
-        URL sshConfigURL = GitAuthenticator.class.getResource("ssh-config");
-        if (sshConfigURL == null) {
-            return Optional.empty();
-        }
-        return Optional.of(new File(sshConfigURL.getFile()));
-    }
+//    TODO: using getResource is not allowed
+//    private Optional<File> getSshConfigFile() {
+//        URL sshConfigURL = this.getClass().getResource("ssh-config");
+//        if (sshConfigURL == null) {
+//            return Optional.empty();
+//        }
+//        return Optional.of(new File(sshConfigURL.getFile()));
+//    }
 }
