@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.backup.BackupEntry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -66,7 +68,8 @@ public class BackupManagerGit {
         changeFilter.registerListener(this);
 
         // Ensure the backup directory exists
-        File backupDir = preferences.getFilePreferences().getBackupDirectory().toFile();
+        Path backupDirPath = bibDatabaseContext.getDatabasePath().orElseThrow().getParent().resolve("backup");
+        File backupDir = backupDirPath.toFile();
         if (!backupDir.exists()) {
             boolean dirCreated = backupDir.mkdirs();
             if (dirCreated) {
@@ -76,7 +79,7 @@ public class BackupManagerGit {
             }
         }
 
-        // Initialize Git repository
+        // Initialize Git repository in the backup directory
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         git = new Git(builder.setGitDir(new File(backupDir, ".git"))
                              .readEnvironment()
@@ -116,14 +119,15 @@ public class BackupManagerGit {
      * Shuts down the BackupManagerGit instances associated with the given BibDatabaseContext.
      *
      * @param bibDatabaseContext the BibDatabaseContext
-     * @param backupDir the backup directory
      * @param createBackup whether to create a backup before shutting down
      * @param originalPath the original path of the file to be backed up
      */
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, boolean createBackup, Path originalPath) {
+        runningInstances.stream()
+                        .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
+                        .forEach(backupManager -> backupManager.shutdownGit(bibDatabaseContext.getDatabasePath().orElseThrow().getParent().resolve("backup"), createBackup, originalPath));
 
-    @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:WhitespaceAfter"})
-    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup, Path originalPath) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdownGit(backupDir, createBackup, originalPath));
+        // Remove the instances associated with the BibDatabaseContext after shutdown
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -162,18 +166,22 @@ public class BackupManagerGit {
     protected void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
         LOGGER.info("Starting backup process for file: {}", originalPath);
 
-        needsBackup = BackupManagerGit.backupGitDiffers(backupDir, originalPath);
+        // Check if the file needs a backup by comparing it to the last commit
+        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir, originalPath);
         if (!needsBackup) {
+            LOGGER.info("No changes detected. Backup not required for file: {}", originalPath);
             return;
         }
 
-        // Add and commit changes
-        git.add().addFilepattern(".").call();
-        RevCommit commit = git.commit().setMessage("Backup at " + System.currentTimeMillis()).call();
-        LOGGER.info("Committed backup: {}", commit.getId());
+        // Stage the file for commit
+        Path relativePath = backupDir.relativize(originalPath); // Ensure relative path for Git
+        git.add().addFilepattern(relativePath.toString().replace("\\", "/")).call();
 
-        // Reset the backup flag
-        this.needsBackup = false;
+        // Commit the staged changes
+        RevCommit commit = git.commit()
+                              .setMessage("Backup at " + Instant.now().toString())
+                              .call();
+        LOGGER.info("Backup committed with ID: {}", commit.getId().getName());
     }
 
     /**
@@ -214,6 +222,7 @@ public class BackupManagerGit {
      */
 
     public static boolean backupGitDiffers(Path backupDir, Path originalPath) throws IOException, GitAPIException {
+        // Ensure Git repository exists
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
                 .setGitDir(new File(repoDir, ".git"))
@@ -227,12 +236,14 @@ public class BackupManagerGit {
                 return true;
             }
 
+            // Determine the path relative to the Git repository
+            Path relativePath = backupDir.relativize(originalPath);
+
             // Attempt to retrieve the file content from the last commit
             ObjectLoader loader;
             try {
-                loader = repository.open(repository.resolve("HEAD:" + originalPath.getFileName().toString()));
-            } catch (
-                    MissingObjectException e) {
+                loader = repository.open(repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/")));
+            } catch (MissingObjectException e) {
                 // File not found in the last commit; assume it differs
                 return true;
             }
@@ -362,7 +373,7 @@ public class BackupManagerGit {
                 Date date = commit.getAuthorIdent().getWhen();
                 commitInfo.add(date.toString());
                 // Add list of details to the main list
-                BackupEntry backupEntry = new BackupEntry(commit.getName(), date.toString(), sizeFormatted, 0);
+                BackupEntry backupEntry = new BackupEntry(ObjectId.fromString(commit.getName()), commitInfo.get(0), commitInfo.get(2), commitInfo.get(1), 0);
                 commitDetails.add(backupEntry);
             }
         }
@@ -373,21 +384,29 @@ public class BackupManagerGit {
     /**
      * Shuts down the JGit components and optionally creates a backup.
      *
-     * @param backupDir the backup directory
      * @param createBackup whether to create a backup before shutting down
      * @param originalPath the original path of the file to be backed up
      */
 
     private void shutdownGit(Path backupDir, boolean createBackup, Path originalPath) {
-        changeFilter.unregisterListener(this);
-        changeFilter.shutdown();
-        executor.shutdown();
+        // Unregister the listener and shut down the change filter
+        if (changeFilter != null) {
+            changeFilter.unregisterListener(this);
+            changeFilter.shutdown();
+        }
 
+        // Shut down the executor if it's not already shut down
+        if (executor != null && !executor.isShutdown()) {
+            executor.shutdown();
+        }
+
+        // If backup is requested, ensure that we perform the Git-based backup
         if (createBackup) {
             try {
+                // Ensure the backup is a recent one by performing the Git commit
                 performBackup(backupDir, originalPath);
             } catch (IOException | GitAPIException e) {
-                LOGGER.error("Error during shutdown backup", e);
+                LOGGER.error("Error during Git backup on shutdown", e);
             }
         }
     }

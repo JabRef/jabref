@@ -10,6 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.backup.BackupEntry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -57,6 +59,14 @@ class BackupManagerGitTest {
         libraryTab = mock(LibraryTab.class);
 
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+
+        // Create a test file in the backup directory
+        Path testFile = backupDir.resolve("testfile.bib");
+        Files.writeString(testFile, "This is a test file.", StandardCharsets.UTF_8);
+
+        // Add and commit the test file to the repository
+        git.add().addFilepattern("testfile.bib").call();
+        git.commit().setMessage("Initial commit").call();
     }
 
     @Test
@@ -80,57 +90,20 @@ class BackupManagerGitTest {
 
     @Test
     void testBackupGitDiffers_NoDifferences() throws Exception {
-        // Create a file in the original directory
-        Path originalFile = tempDir.resolve("test.bib");
-        Files.writeString(originalFile, "Initial content");
-
-        // Create the backup directory if it doesn't exist
-        Files.createDirectories(backupDir);
-
-        // Copy the original file to the backup directory
-        Path fileInBackupDir = backupDir.resolve("test.bib");
-        Files.copy(originalFile, fileInBackupDir, StandardCopyOption.REPLACE_EXISTING);
-
-        // Initialize the Git repository if not already done
-        if (!Files.exists(backupDir.resolve(".git"))) {
-            Git.init().setDirectory(backupDir.toFile()).call();
-        }
-
-        // Add and commit the file to the Git repository
-        Git git = Git.open(backupDir.toFile());
-        git.add().addFilepattern("test.bib").call();
-        git.commit().setMessage("Initial commit").call();
-
-        // Check that no differences are detected between the backup file and Git repository
-        boolean differs = BackupManagerGit.backupGitDiffers(fileInBackupDir, backupDir);
-        assertFalse(differs, "Differences were detected when there should be none.");
-
-        // Clean up resources
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDir, false, originalFile);
+        // Verify that there is no difference between the file and the last commit
+        Path testFile = backupDir.resolve("testfile.bib");
+        boolean differs = BackupManagerGit.backupGitDiffers(backupDir, testFile);
+        assertFalse(differs, "Expected no difference between the file and the last commit");
     }
 
     @Test
     void testBackupGitDiffers_WithDifferences() throws Exception {
-        // Create a file in the backup directory
-        Path originalFile = tempDir.resolve("test.bib");
-        Files.writeString(originalFile, "Initial content");
+        // Modify the test file to create differences
+        Path testFile = backupDir.resolve("testfile.bib");
+        Files.writeString(testFile, "Modified content", StandardCharsets.UTF_8);
 
-        // Copy the file to the backup directory
-        Path fileInBackupDir = backupDir.resolve("test.bib");
-        Files.copy(originalFile, fileInBackupDir, StandardCopyOption.REPLACE_EXISTING);
-
-        // Add and commit the file in the Git repository
-        git.add().addFilepattern(".").call();
-        git.commit().setMessage("Initial commit").call();
-
-        // Modify the file in the backup directory
-        Files.writeString(fileInBackupDir, "Modified content");
-
-        // Check that differences are detected
-        boolean differs = BackupManagerGit.backupGitDiffers(fileInBackupDir, backupDir);
-        assertTrue(differs);
-
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDir, differs, originalFile);
+        boolean differs = BackupManagerGit.backupGitDiffers(backupDir, testFile);
+        assertTrue(differs, "Expected differences between the file and the last commit");
     }
 
     @Test
@@ -157,14 +130,14 @@ class BackupManagerGitTest {
         }
 
         // Shutdown the initial manager
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDir, createBackup, bibDatabaseContext.getDatabasePath().get());
+        BackupManagerGit.shutdown(bibDatabaseContext, createBackup, bibDatabaseContext.getDatabasePath().get());
 
         // Create another instance pointing to the same backup directory
         BackupManagerGit newManager = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         assertTrue(Files.exists(backupDir.resolve(".git"))); // Ensure no new repo is created
 
         // Shutdown the new manager
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDir, createBackup, bibDatabaseContext.getDatabasePath().get());
+        BackupManagerGit.shutdown(bibDatabaseContext, createBackup, bibDatabaseContext.getDatabasePath().get());
     }
 
     @Test
@@ -205,7 +178,7 @@ class BackupManagerGitTest {
         assertTrue(runningInstances.contains(backupManager), "Backup manager not added to running instances");
 
         // Clean up by shutting down the backup manager
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDirectory, false, databaseFile);
+        BackupManagerGit.shutdown(bibDatabaseContext, false, databaseFile);
     }
 
     @Test
@@ -247,7 +220,7 @@ class BackupManagerGitTest {
         assertTrue(runningInstances.contains(backupManager), "Backup manager not added to running instances");
 
         // Clean up
-        BackupManagerGit.shutdown(bibDatabaseContext, backupDirectory, false, databaseFile);
+        BackupManagerGit.shutdown(bibDatabaseContext, false, databaseFile);
     }
 
     @Test
@@ -383,14 +356,14 @@ class BackupManagerGitTest {
                 preferences,
                 databaseFile
         );
-        List<List<String>> commitDetails = backupManager.retrieveCommitDetails(commits, backupDir);
+        List<BackupEntry> commitDetails = BackupManagerGit.retrieveCommitDetails(commits, backupDir);
 
         // Assert: Verify the number of commits
         assertEquals(5, commitDetails.size(), "Should retrieve details for 5 commits");
 
         // Assert: Verify the content of the retrieved commit details
         for (int i = 0; i < 5; i++) {
-            List<String> commitInfo = commitDetails.get(i);
+            List<String> commitInfo = (List<String>) commitDetails.get(i);
             RevCommit commit = commits.get(i);
 
             // Verify commit ID
