@@ -2,6 +2,8 @@ package org.jabref.gui;
 
 import java.util.List;
 
+import javafx.collections.ObservableList;
+
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NonNull;
@@ -10,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public interface LibraryTabContainer {
-    List<LibraryTab> getLibraryTabs();
+    ObservableList<LibraryTab> getLibraryTabs();
 
     @Nullable
     LibraryTab getCurrentLibraryTab();

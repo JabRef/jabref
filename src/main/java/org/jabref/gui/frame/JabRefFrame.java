@@ -12,6 +12,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
@@ -454,11 +455,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Returns a list of all LibraryTabs in this frame.
      */
-    public @NonNull List<LibraryTab> getLibraryTabs() {
-        return tabbedPane.getTabs().stream()
-                         .filter(LibraryTab.class::isInstance)
-                         .map(LibraryTab.class::cast)
-                         .toList();
+    public @NonNull ObservableList<LibraryTab> getLibraryTabs() {
+        return EasyBind.map(tabbedPane.getTabs().filtered(LibraryTab.class::isInstance), LibraryTab.class::cast);
     }
 
     /**
