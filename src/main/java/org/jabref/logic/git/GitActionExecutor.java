@@ -21,18 +21,20 @@ class GitActionExecutor {
 
     private final Git git;
     private final Path repository;
+    private final GitAuthenticator gitAuthenticator;
 
     private ObjectId previousHead;
 
-    GitActionExecutor(Git git) {
+    GitActionExecutor(Git git, GitAuthenticator gitAuthenticator) {
         this.git = git;
         File gitRepository = git.getRepository().getDirectory(); // this the file path including .git at the end
         this.repository = gitRepository.getParentFile().toPath();
+        this.gitAuthenticator = gitAuthenticator;
     }
 
     // TODO: test case for if path is not inside repo, test the first branch
     void add(Path path) throws GitException {
-        if(!path.startsWith(repository)){
+        if (!path.startsWith(repository)) {
             throw new GitException("Given path not inside repository.");
         }
         try {
@@ -62,7 +64,7 @@ class GitActionExecutor {
     void push(String remote, String branch) throws GitException {
         try {
             PushCommand pushCommand = git.push();
-            GitAuthenticator.authenticate(pushCommand);
+            gitAuthenticator.authenticate(pushCommand);
             if (branch != null) {
                 pushCommand.add(branch);
             }
@@ -74,7 +76,6 @@ class GitActionExecutor {
         }
     }
 
-
     void push() throws GitException {
         push(null, null);
     }
@@ -85,7 +86,7 @@ class GitActionExecutor {
             previousHead = git.getRepository().resolve(Constants.HEAD);
 
             PullCommand pullCommand = git.pull();
-            GitAuthenticator.authenticate(pullCommand);
+            gitAuthenticator.authenticate(pullCommand);
             pullCommand.setRebase(withRebase)
                        .setRemote(remote)
                        .setRemoteBranchName(branch)
@@ -106,7 +107,6 @@ class GitActionExecutor {
     Git getGit() {
         return git;
     }
-
 
     // TODO: test this
     void undoPull() throws GitException {

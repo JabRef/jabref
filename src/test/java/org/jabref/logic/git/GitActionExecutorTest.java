@@ -2,15 +2,18 @@ package org.jabref.logic.git;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+
+import org.jabref.logic.shared.security.Password;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -41,13 +44,17 @@ class GitActionExecutorTest {
     private Path repositoryPath;
     private GitManager gitManager;
     private GitActionExecutor gitActionExecutor;
+    private GitPreferences gitPreferences;
 
     private final Logger LOGGER = LoggerFactory.getLogger(GitActionExecutorTest.class);
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryRepository) throws GitException {
+    void setUp(@TempDir Path temporaryRepository) throws GitException, GeneralSecurityException, UnsupportedEncodingException {
+        gitPreferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
         this.repositoryPath = temporaryRepository;
-        this.gitManager = GitManager.initGitRepository(repositoryPath);
+        this.gitManager = GitManager.initGitRepository(repositoryPath, gitPreferences);
         this.gitActionExecutor = this.gitManager.getGitActionExecutor();
     }
 
@@ -205,7 +212,7 @@ class GitActionExecutorTest {
 
     @Test
     void pushWithoutSettingOrigin(@TempDir Path tempPath) throws GitException, IOException {
-        GitManager gitManager = GitManager.initGitRepository(tempPath);
+        GitManager gitManager = GitManager.initGitRepository(tempPath, gitPreferences);
         GitActionExecutor actionExecutor = gitManager.getGitActionExecutor();
         Path tempFile = Files.createTempFile(tempPath, "test", null);
         actionExecutor.add(tempFile);
@@ -215,7 +222,6 @@ class GitActionExecutorTest {
         assertEquals(TransportException.class, exception.getCause().getClass());
         assertEquals("origin: not found.", exception.getCause().getMessage());
     }
-
 
     @Test
     void pullWithoutRebase() throws IOException, GitException, GitAPIException, URISyntaxException {
@@ -261,7 +267,6 @@ class GitActionExecutorTest {
             URIish remoteRepoURIish = new URIish(remoteRepoURI.toString());
             gitActionExecutor.getGit().remoteAdd().setName("origin").setUri(remoteRepoURIish).call();
 
-
             String A = "";
             String C = "";
             try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
@@ -276,11 +281,10 @@ class GitActionExecutorTest {
                 remoteGit.checkout().setCreateBranch(true).setName("main").call();
                 remoteGit.push();
             }
-            //replicated commits from remote
+            // replicated commits from remote
             gitActionExecutor.pull(false, "origin", "main");
 
-
-            //update remote repository
+            // update remote repository
             try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
                 Path remoteFile2 = Files.createTempFile(remoteRepoPath, "C", ".txt");
                 Files.writeString(remoteFile2, "Remote content v2");
@@ -300,9 +304,6 @@ class GitActionExecutorTest {
             gitActionExecutor.add(localFile2);
             gitActionExecutor.commit("Second commit to local repo", false);
             gitActionExecutor.push();
-
-
-
             gitActionExecutor.pull(true, "origin", "main");
 
             listRepoContents(repositoryPath.toString());
@@ -319,9 +320,8 @@ class GitActionExecutorTest {
         }
     }
 
-
     @Test
-    void testUndoPull() throws IOException, GitException, GitAPIException, URISyntaxException {
+    void undoPull() throws IOException, GitException, GitAPIException, URISyntaxException {
 
         Path remoteRepoPath = Files.createTempDirectory("remote-repo");
         try (Repository remoteRepo = FileRepositoryBuilder.create(new File(remoteRepoPath.toFile(), ".git"))) {
@@ -338,7 +338,6 @@ class GitActionExecutorTest {
         Files.writeString(remoteFile, "Remote content");
 
         try (Git remoteGit = Git.open(remoteRepoPath.toFile())) {
-
             remoteGit.add().addFilepattern(remoteFile.getFileName().toString()).call();
             remoteGit.add().addFilepattern(remoteMergeConflictFile.getFileName().toString()).call();
             remoteGit.commit().setMessage("Initial commit in remote").call();
@@ -352,8 +351,6 @@ class GitActionExecutorTest {
         Files.writeString(localMergeConflictFile, "merge conflict - local");
         gitActionExecutor.add(localMergeConflictFile);
         gitActionExecutor.commit("Add local-merge-conflict.txt", false);
-
-
 
         System.out.println("-------------------------------------------------");
         System.out.println(Arrays.toString(remoteRepoPath.toFile().listFiles()));
@@ -482,13 +479,10 @@ class GitActionExecutorTest {
         Status statusAfterStash = gitActionExecutor.getGit().status().call();
         set = statusAfterStash.getUntracked();
         assertFalse(set.isEmpty(), "Repository should still have the unstaged file after stashing");
-        assertEquals(set.stream().toList().get(0), "untracked.txt");
-
+        assertEquals("untracked.txt", set.stream().toList().getFirst());
     }
 
-
-
-    @Test //technically dont really need this test, because stash is only for uncommitted changes..
+    @Test
     void stashMixedChanges() throws IOException, GitException, GitAPIException {
         Path unstagedFile = Files.createFile(repositoryPath.resolve("unstaged.txt"));
         Files.writeString(unstagedFile, "Unstaged changes");
@@ -540,7 +534,6 @@ class GitActionExecutorTest {
         assertTrue(exception.getMessage().contains("Unstash failed"), "Applying stash should fail when no stash exists");
     }
 
-
     @Test
     void multipleStashesAndApplyLatest() throws IOException, GitException, GitAPIException {
         Path file1 = Files.createFile(repositoryPath.resolve("file1.txt"));
@@ -551,7 +544,6 @@ class GitActionExecutorTest {
 
         gitActionExecutor.stash();
 
-
         Path file2 = Files.createFile(repositoryPath.resolve("file2.txt"));
         gitActionExecutor.add(file2);
         gitActionExecutor.commit("Add file2.", false);
@@ -559,7 +551,6 @@ class GitActionExecutorTest {
         Files.writeString(file2, "Second file");
 
         gitActionExecutor.stash();
-
 
         int stashCount = gitActionExecutor.getGit().stashList().call().size();
         assertEquals(2, stashCount, "There should be two stashes");
@@ -569,10 +560,7 @@ class GitActionExecutorTest {
         Status statusAfterApply = gitActionExecutor.getGit().status().call();
         assertTrue(statusAfterApply.getModified().contains("file2.txt"), "file2.txt should be modified after applying latest stash");
         assertEquals("Second file", Files.readString(file2), "file2.txt content should match the latest stash");
-
     }
-
-
 
     private void listRepoContents(String repoPath) {
         try (Git git = Git.open(new File(repoPath))) {
@@ -601,14 +589,6 @@ class GitActionExecutorTest {
         } catch (IOException e) {
             System.err.println("Error reading repository: " + e.getMessage());
         }
-    }
-
-
-    void deleteDirWithContent(Path path) throws IOException {
-        Files.walk(path)
-             .sorted(Comparator.reverseOrder())
-             .map(Path::toFile)
-             .forEach(File::delete);
     }
 }
 

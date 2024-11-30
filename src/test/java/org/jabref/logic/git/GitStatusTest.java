@@ -1,17 +1,17 @@
 package org.jabref.logic.git;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Set;
 
+import org.jabref.logic.shared.security.Password;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,24 +25,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitStatusTest {
 
-    private Path repositoryPath;
     private Git git;
+    private Path repositoryPath;
     private GitStatus gitStatus;
+    private GitActionExecutor gitActionExecutor;
 
     private final Logger LOGGER = LoggerFactory.getLogger(GitStatusTest.class);
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryRepository) throws GitAPIException, GitException {
+    void setUp(@TempDir Path temporaryRepository) throws GitAPIException, GeneralSecurityException, UnsupportedEncodingException {
         git = Git.init().setDirectory(temporaryRepository.toFile()).call();
         repositoryPath = temporaryRepository;
+        GitPreferences gitPreferences = new GitPreferences(true, "username",
+                new Password("password".toCharArray(), "username").encrypt(), false,
+                "", false, false);
         gitStatus = new GitStatus(git);
+        gitActionExecutor = new GitActionExecutor(git, new GitAuthenticator(gitPreferences));
     }
 
     @AfterEach
     void tearDown() throws IOException {
         git.close();
     }
-
 
     @Test
     void hasUntrackedFiles_NoUntrackedFiles() throws GitAPIException, GitException {
@@ -54,7 +58,6 @@ class GitStatusTest {
         Path newFile = Files.createFile(repositoryPath.resolve("untracked.txt"));
         assertTrue(gitStatus.hasUntrackedFiles(), "Expected untracked files");
     }
-
 
     @Test
     void getUntrackedFiles_NoUntrackedFiles() throws GitAPIException, GitException {
@@ -69,7 +72,6 @@ class GitStatusTest {
         assertTrue(untrackedFiles.contains("untracked.txt"), "Expected 'untracked.txt' in untracked files");
     }
 
-
     @Test
     void hasTrackedFiles_NoTrackedFiles() throws GitAPIException, GitException {
         assertFalse(gitStatus.hasTrackedFiles(), "Expected no tracked files");
@@ -81,7 +83,6 @@ class GitStatusTest {
         git.add().addFilepattern("tracked.txt").call();
         assertTrue(gitStatus.hasTrackedFiles(), "Expected tracked files");
     }
-
 
     @Test
     void getTrackedFiles_NoTrackedFiles() throws GitAPIException, GitException {
@@ -96,7 +97,6 @@ class GitStatusTest {
         Set<String> trackedFiles = gitStatus.getTrackedFiles();
         assertTrue(trackedFiles.contains("tracked.txt"), "Expected 'tracked.txt' in tracked files");
     }
-
 
     @Test
     void getBranchNames_SingleBranch() throws GitAPIException, GitException, IOException {
@@ -114,7 +114,6 @@ class GitStatusTest {
         Path dummyFileBranch1 = Files.createFile(repositoryPath.resolve("dummy1.txt"));
         Path dummyFileBranch2 = Files.createFile(repositoryPath.resolve("dummy2.txt"));
 
-
         git.add().addFilepattern("dummy1.txt").addFilepattern("tracked.txt").call();
         git.commit().setMessage("Dummy commit").call();
 
@@ -129,34 +128,21 @@ class GitStatusTest {
         assertTrue(branchNames.contains("refs/heads/develop"), "Expected 'refs/heads/develop' branch");
     }
 
-
-
-    private void listRepoContents(String repoPath) {
-        try (Git git = Git.open(new File(repoPath))) {
-            Repository repository = git.getRepository();
-
-            ObjectId headId = repository.resolve("HEAD");
-            if (headId == null) {
-                System.out.println("Repository is empty or has no HEAD commit.");
-                return;
-            }
-
-            try (org.eclipse.jgit.revwalk.RevWalk revWalk = new org.eclipse.jgit.revwalk.RevWalk(repository)) {
-                RevCommit headCommit = revWalk.parseCommit(headId);
-
-                try (org.eclipse.jgit.treewalk.TreeWalk treeWalk = new org.eclipse.jgit.treewalk.TreeWalk(repository)) {
-                    treeWalk.addTree(headCommit.getTree());
-                    treeWalk.setRecursive(true);
-                    treeWalk.setFilter(org.eclipse.jgit.treewalk.filter.TreeFilter.ALL);
-
-                    System.out.println("Contents of the repository:");
-                    while (treeWalk.next()) {
-                        System.out.println(treeWalk.getPathString());
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading repository: " + e.getMessage());
-        }
+    @Test
+    void trackedAndUntrackedFilesStatus() throws GitException, IOException {
+        assertFalse(gitStatus.hasUntrackedFiles());
+        assertFalse(gitStatus.hasTrackedFiles());
+        Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
+        assertTrue(gitStatus.hasUntrackedFiles());
+        assertFalse(gitStatus.hasTrackedFiles());
+        gitActionExecutor.add(pathToTempFile);
+        assertFalse(gitStatus.hasUntrackedFiles());
+        assertTrue(gitStatus.hasTrackedFiles());
+        Path tempDir = Files.createTempDirectory(repositoryPath, null);
+        Files.createTempFile(tempDir, null, null);
+        assertTrue(gitStatus.hasUntrackedFiles());
+        assertTrue(gitStatus.hasTrackedFiles());
+        assertEquals(1, gitStatus.getUntrackedFiles().size());
+        assertEquals(1, gitStatus.getTrackedFiles().size());
     }
 }

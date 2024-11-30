@@ -32,6 +32,8 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.GitException;
+import org.jabref.logic.git.GitManager;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -237,6 +239,10 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
+
+                if (libraryTab.getBibDatabaseContext().isInGitRepository()) {
+                    pushToGit(targetPath);
+                }
             }
             dialogService.notify(Localization.lang("Library saved"));
             return success;
@@ -309,6 +315,22 @@ public class SaveDatabaseAction {
 
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);
             }
+        }
+    }
+
+    private void pushToGit(Path filaPath) {
+        if (!GitManager.isGitRepository(filaPath)) {
+            LOGGER.warn("{} is not in a git repository", filaPath);
+            return;
+        }
+        LOGGER.debug("File is in a git repository");
+
+        try {
+            GitManager.openGitRepository(filaPath, preferences.getGitPreferences()).synchronize(filaPath);
+            dialogService.notify(Localization.lang("Library saved and pushed to remote."));
+        } catch (GitException e) {
+            LOGGER.warn("Git error during save operation.", e);
+            dialogService.notify(Localization.lang("Error during Git operations."));
         }
     }
 }
