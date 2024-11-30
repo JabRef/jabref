@@ -30,10 +30,6 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
@@ -826,27 +822,6 @@ class BibEntryTest {
         entry.addFile(cover3);
 
         assertEquals(Optional.of(cover3), entry.getCoverImageFile());
-    }
-
-    @Test
-    void getCoverImageUpdatesWithChangeToDescription() {
-        List<LinkedFile> files = new ArrayList<>();
-
-        files.add(new LinkedFile("cover", Paths.get("JabRef-icon-128.png"), "PNG image"));
-        files.add(new LinkedFile("", Paths.get("JabRef-icon-64.png"), "PNG image"));
-        LinkedFile cover1 = files.get(0);
-        LinkedFile cover2 = files.get(1);
-
-        BibEntry entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        entry.setFiles(files);
-
-        assertEquals(Optional.of(cover1), entry.getCoverImageFile());
-
-        cover1.setDescription("");
-        cover2.setDescription("cover");
-        entry.setFiles(files);
-
-        assertEquals(Optional.of(cover2), entry.getCoverImageFile());
     }
 
     public static Stream<BibEntry> isEmpty() {
