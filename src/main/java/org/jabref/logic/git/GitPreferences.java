@@ -14,6 +14,7 @@ public class GitPreferences {
     private final SimpleStringProperty password;
     private final BooleanProperty passwordEncrypted;
     private final SimpleStringProperty sshDirPath;
+    private final BooleanProperty sshKeyEncrypted;
     private final BooleanProperty hostKeyCheckDisabled;
     private final BooleanProperty pushFrequencyEnabled;
 
@@ -22,6 +23,7 @@ public class GitPreferences {
                           String password,
                           boolean passwordEncrypted,
                           String sshDirPath,
+                          boolean sshKeyEncrypted,
                           boolean hostKeyCheckDisabled,
                           boolean pushFrequencyEnabled) {
         this.gitEnabled = new SimpleBooleanProperty(gitEnabled);
@@ -31,6 +33,7 @@ public class GitPreferences {
         this.password = new SimpleStringProperty(password);
         this.hostKeyCheckDisabled = new SimpleBooleanProperty(hostKeyCheckDisabled);
         this.passwordEncrypted = new SimpleBooleanProperty(passwordEncrypted);
+        this.sshKeyEncrypted = new SimpleBooleanProperty(sshKeyEncrypted);
     }
 
     public void setSshDirPath(String sshDirPath) {
@@ -116,6 +119,20 @@ public class GitPreferences {
     public void setPasswordEncrypted(boolean isPasswordEncrypted) {
         this.passwordEncrypted.set(isPasswordEncrypted);
     }
+
+    public BooleanProperty getSshKeyEncryptedProperty() {
+        return sshKeyEncrypted;
+    }
+
+    public boolean isSshKeyEncrypted() {
+        return sshKeyEncrypted.getValue();
+    }
+
+    public void setSshKeyEncrypted(boolean isSshKeyEncrypted) {
+        this.sshKeyEncrypted.set(isSshKeyEncrypted);
+    }
+
+//  -------------------
 
     public static Optional<String> getPasswordEncryptionKey() {
         return Optional.ofNullable(passwordEncryptionKey).filter(s -> !s.isBlank());

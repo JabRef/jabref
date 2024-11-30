@@ -33,7 +33,7 @@ class GitManagerTest {
         this.tempPath = tempDir;
         preferences = new GitPreferences(true, "username",
                 new Password("password".toCharArray(), "username").encrypt(), false,
-                "", false, false);
+                "", false, false, false);
     }
 
     // Helper methods

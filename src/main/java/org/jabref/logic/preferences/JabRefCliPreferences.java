@@ -375,6 +375,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String GIT_USERNAME = "gitUsername";
     private static final String GIT_PASSWORD = "gitPassword";
     private static final String GIT_PASSWORD_ENCRYPTED = "gitPasswordEncrypted";
+    private static final String GIT_SSH_KEY_ENCRYPTED = "gitSshKeyEncrypted";
     private static final String GIT_SSH_DIR_PATH = "gitSshPath";
     private static final String GIT_SHH_HOST_KEY_CHECK_DISABLED = "gitSshHostKeyCheckDisabled";
     private static final String GIT_PUSH_FREQUENCY_ENABLED = "gitPushFrequencyEnabled";
@@ -670,6 +671,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GIT_ENABLED, Boolean.FALSE);
         defaults.put(GIT_SHH_HOST_KEY_CHECK_DISABLED, Boolean.FALSE);
         defaults.put(GIT_PASSWORD_ENCRYPTED, Boolean.FALSE);
+        defaults.put(GIT_SSH_KEY_ENCRYPTED, Boolean.TRUE);
         defaults.put(GIT_PUSH_FREQUENCY_ENABLED, Boolean.FALSE);
         // endregion
     }
@@ -860,6 +862,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(GIT_PASSWORD),
                 getBoolean(GIT_PASSWORD_ENCRYPTED),
                 get(GIT_SSH_DIR_PATH),
+                getBoolean(GIT_SSH_KEY_ENCRYPTED),
                 getBoolean(GIT_SHH_HOST_KEY_CHECK_DISABLED),
                 getBoolean(GIT_PUSH_FREQUENCY_ENABLED)
         );
@@ -878,6 +881,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 (obs, oldValue, newValue) -> putBoolean(GIT_SHH_HOST_KEY_CHECK_DISABLED, newValue));
         EasyBind.listen(gitPreferences.getPasswordEncryptedProperty(),
                 (obs, oldValue, newValue) -> putBoolean(GIT_PASSWORD_ENCRYPTED, newValue));
+        // TODO: add gui element for this in form of a checkbox
+        EasyBind.listen(gitPreferences.getSshKeyEncryptedProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GIT_SSH_KEY_ENCRYPTED, newValue));
 
         return gitPreferences;
     }
