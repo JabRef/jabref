@@ -1,14 +1,5 @@
 package org.jabref.gui.autosaveandbackup;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
-
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,10 +10,20 @@ import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.backup.BackupEntry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -383,25 +384,25 @@ class BackupManagerGitTest {
                 preferences,
                 databaseFile
         );
-        List<List<String>> commitDetails = backupManager.retrieveCommitDetails(commits, backupDir);
+        List<BackupEntry> commitDetails = backupManager.retrieveCommitDetails(commits, backupDir);
 
         // Assert: Verify the number of commits
         assertEquals(5, commitDetails.size(), "Should retrieve details for 5 commits");
 
         // Assert: Verify the content of the retrieved commit details
         for (int i = 0; i < 5; i++) {
-            List<String> commitInfo = commitDetails.get(i);
+            BackupEntry commitInfo = commitDetails.get(i);
             RevCommit commit = commits.get(i);
 
             // Verify commit ID
-            assertEquals(commit.getName(), commitInfo.get(0), "Commit ID should match");
+            assertEquals(commit.getName(), commitInfo.getName(), "Commit ID should match");
 
             // Verify commit size (this is a bit tricky, so just check it's a valid size string)
-            String sizeFormatted = commitInfo.get(1);
+            String sizeFormatted = commitInfo.getSize();
             assertTrue(sizeFormatted.contains("Ko") || sizeFormatted.contains("Mo"), "Commit size should be properly formatted");
 
             // Verify commit date
-            String commitDate = commitInfo.get(2);
+            String commitDate = commitInfo.getDate();
             assertTrue(commitDate.contains(commit.getAuthorIdent().getWhen().toString()), "Commit date should match");
         }
     }
