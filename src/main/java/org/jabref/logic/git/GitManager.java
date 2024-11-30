@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
+import org.jabref.logic.l10n.Localization;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -16,7 +19,8 @@ import org.slf4j.LoggerFactory;
 public class GitManager {
     private final static Logger LOGGER = LoggerFactory.getLogger(GitManager.class);
     private final static String DEFAULT_COMMIT_MESSAGE = "Automatic update via JabRef";
-
+    private static boolean sshAuthenticationVerified = false;
+    private static boolean httpAuthenticationVerified = false;
     private final Path path;
     private final Git git;
     private final GitPreferences preferences;
@@ -25,7 +29,6 @@ public class GitManager {
     private final GitStatus gitStatus;
 
     private GitProtocol gitProtocol = GitProtocol.UNKNOWN;
-    private boolean requiresAuthentication = false;
 
     public GitManager(Git git, GitPreferences preferences) {
         this.path = git.getRepository().getDirectory().getParentFile().toPath();
@@ -35,7 +38,7 @@ public class GitManager {
         this.gitActionExecutor = new GitActionExecutor(this.git, this.gitAuthenticator);
         this.gitStatus = new GitStatus(this.git);
         this.preferences = preferences;
-        testConnection();
+        determineGitProtocol();
     }
 
     public void synchronize(Path filePath) throws GitException {
@@ -133,10 +136,6 @@ public class GitManager {
         return Optional.empty();
     }
 
-    public boolean requiresAuthentication() {
-        return requiresAuthentication;
-    }
-
     GitActionExecutor getGitActionExecutor() {
         return this.gitActionExecutor;
     }
@@ -145,11 +144,14 @@ public class GitManager {
         return this.gitStatus;
     }
 
-    Path getPath() {
+    public Path getPath() {
         return path;
     }
 
-    private void testConnection() {
+    /**
+     * determines the protocol of the current git repository.
+     */
+    private void determineGitProtocol() {
         LsRemoteCommand lsRemoteCommand = git.lsRemote();
         lsRemoteCommand.setTransportConfigCallback(transport -> {
             if (transport instanceof SshTransport) {
@@ -162,10 +164,45 @@ public class GitManager {
         });
         try {
             lsRemoteCommand.call();
-            requiresAuthentication = false;
         } catch (GitAPIException e) {
-            LOGGER.warn("Error while testing connection to origin for git repository", e);
-            requiresAuthentication = gitProtocol == GitProtocol.SSH || gitProtocol == GitProtocol.HTTPS;
+            LOGGER.debug("determined protocol of current git repository: {}", gitProtocol);
+        }
+    }
+
+    private void updateAuthenticationStatus() {
+        sshAuthenticationVerified = sshAuthenticationVerified || gitProtocol == GitProtocol.SSH;
+        httpAuthenticationVerified = httpAuthenticationVerified || gitProtocol == GitProtocol.HTTPS;
+    }
+
+    /**
+     * Prompts the user for the passphrase of the SSH key or the password encryption key based on the git protocol.
+     * The prompt is skipped if the passphrase or password encryption key is already provided and a connection was
+     * successfully established using it. It is also skipped if the user did not encrypt the SSH key or the password.
+     *
+     * @param dialogService the dialog service used to prompt the user
+     */
+    public void promptForPassphraseIfNeeded(DialogService dialogService) {
+        switch (this.gitProtocol) {
+            case SSH:
+                if (preferences.isSshKeyEncrypted() && !sshAuthenticationVerified) {
+                    GitPreferences.setSshPassphrase(dialogService.showPasswordDialogAndWait(
+                            "SSH passphrase",
+                            "Enter passphrase for your specified SSH key",
+                            "SSH passphrase"
+                    ).orElse(null));
+                }
+                return;
+            case HTTPS:
+                if (preferences.isPasswordEncrypted() && !httpAuthenticationVerified) {
+                    GitPreferences.setPasswordEncryptionKey(dialogService.showPasswordDialogAndWait(
+                            "password encryption key",
+                            "Enter password encryption key",
+                            ""
+                    ).orElse(null));
+                }
+                return;
+            default:
+                break;
         }
     }
 }
