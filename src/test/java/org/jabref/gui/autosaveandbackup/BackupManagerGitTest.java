@@ -1,5 +1,14 @@
 package org.jabref.gui.autosaveandbackup;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
+
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,15 +24,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -174,8 +174,8 @@ class BackupManagerGitTest {
         Set<BackupManagerGit> runningInstances = (Set<BackupManagerGit>) runningInstancesField.get(null);
 
         // Ensure the backup manager is added to the running instances
-// Assert: Verify the backup task is active
-        assertTrue(runningInstances.contains(backupManager), "Backup manager should be added to running instances");
+        assertTrue(runningInstances.contains(backupManager), "Backup manager not added to running instances");
+
         // Clean up by shutting down the backup manager
         BackupManagerGit.shutdown(bibDatabaseContext, false, databaseFile);
     }
@@ -216,8 +216,7 @@ class BackupManagerGitTest {
         Set<BackupManagerGit> runningInstances = (Set<BackupManagerGit>) runningInstancesField.get(null);
 
         // Assert: Verify the backup task is active
-        // Assert: Verify the backup task is active
-        assertTrue(runningInstances.contains(backupManager), "Backup manager should be added to running instances");
+        assertTrue(runningInstances.contains(backupManager), "Backup manager not added to running instances");
 
         // Clean up
         BackupManagerGit.shutdown(bibDatabaseContext, false, databaseFile);
@@ -228,7 +227,7 @@ class BackupManagerGitTest {
         // Create multiple commits
         ObjectId targetCommitId = null;
         for (int i = 1; i <= 3; i++) {
-            Path file = backupDir.resolve("file" + i + ".bib");
+            Path file = backupDir.resolve("file" + i + ".txt");
             Files.writeString(file, "Content of file " + i);
             git.add().addFilepattern(".").call();
             RevCommit commit = git.commit().setMessage("Commit " + i).call();
@@ -239,30 +238,34 @@ class BackupManagerGitTest {
         }
 
         // Act: Call restoreBackup
-        BackupManagerGit.restoreBackup(tempDir.resolve("restored.bib"), backupDir, targetCommitId);
-        git.add().addFilepattern("restored.bib").call();
-        git.commit().setMessage("Restored restored.bib from commit: " + targetCommitId.getName()).call();
+        BackupManagerGit.restoreBackup(tempDir.resolve("restored.txt"), backupDir, targetCommitId);
+
         // Assert: Verify the repository has a new commit after restoration
         try (RevWalk revWalk = new RevWalk(git.getRepository())) {
-
-            // Assert: Ensure the file from the restored commit exists
+            RevCommit headCommit = revWalk.parseCommit(git.getRepository().resolve("HEAD"));
             assertTrue(
-                    Files.exists(backupDir.resolve("file2.bib")),
-                    "File from the restored commit should be present"
-            );
-
-            // Assert: Ensure files from later commits still exist
-            assertTrue(
-                    Files.exists(backupDir.resolve("file3.bib")),
-                    "File from later commits should still exist after restoration"
-            );
-
-            // Assert: Ensure earlier files still exist
-            assertTrue(
-                    Files.exists(backupDir.resolve("file1.bib")),
-                    "File from earlier commits should still exist after restoration"
+                    headCommit.getShortMessage().contains("Restored content from commit: " + targetCommitId.getName()),
+                    "A new commit should indicate the restoration"
             );
         }
+
+        // Assert: Ensure the file from the restored commit exists
+        assertTrue(
+                Files.exists(backupDir.resolve("file2.txt")),
+                "File from the restored commit should be present"
+        );
+
+        // Assert: Ensure files from later commits still exist
+        assertTrue(
+                Files.exists(backupDir.resolve("file3.txt")),
+                "File from later commits should still exist after restoration"
+        );
+
+        // Assert: Ensure earlier files still exist
+        assertTrue(
+                Files.exists(backupDir.resolve("file1.txt")),
+                "File from earlier commits should still exist after restoration"
+        );
     }
 
     @Test
@@ -359,18 +362,18 @@ class BackupManagerGitTest {
 
         // Assert: Verify the content of the retrieved commit details
         for (int i = 0; i < 5; i++) {
-            BackupEntry commitInfo = commitDetails.get(i);
+            List<String> commitInfo = (List<String>) commitDetails.get(i);
             RevCommit commit = commits.get(i);
 
             // Verify commit ID
-            assertEquals(commit.getName(), commitInfo.getId().name(), "Commit ID should match");
+            assertEquals(commit.getName(), commitInfo.get(0), "Commit ID should match");
 
             // Verify commit size (this is a bit tricky, so just check it's a valid size string)
-            String sizeFormatted = commitInfo.getSize();
+            String sizeFormatted = commitInfo.get(1);
             assertTrue(sizeFormatted.contains("Ko") || sizeFormatted.contains("Mo"), "Commit size should be properly formatted");
 
             // Verify commit date
-            String commitDate = commitInfo.getDate();
+            String commitDate = commitInfo.get(2);
             assertTrue(commitDate.contains(commit.getAuthorIdent().getWhen().toString()), "Commit date should match");
         }
     }

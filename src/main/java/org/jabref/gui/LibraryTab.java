@@ -42,7 +42,6 @@ import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
-import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
@@ -755,7 +754,7 @@ public class LibraryTab extends Tab {
         }
 
         if (buttonType.equals(discardChanges)) {
-            BackupManager.discardBackup(bibDatabaseContext, preferences.getFilePreferences().getBackupDirectory());
+            LOGGER.debug("Discarding changes");
             return true;
         }
 
@@ -803,9 +802,9 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down autosave manager", e);
         }
         try {
-            BackupManager.shutdown(bibDatabaseContext,
-                    preferences.getFilePreferences().getBackupDirectory(),
-                    preferences.getFilePreferences().shouldCreateBackup());
+            BackupManagerGit.shutdown(bibDatabaseContext,
+                    preferences.getFilePreferences().shouldCreateBackup(),
+                    preferences.getFilePreferences().getBackupDirectory());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
