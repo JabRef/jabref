@@ -1,0 +1,3 @@
+# Global settings
+Host *
+    StrictHostKeyChecking no

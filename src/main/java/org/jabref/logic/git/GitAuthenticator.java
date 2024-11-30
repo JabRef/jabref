@@ -9,7 +9,6 @@ import org.jabref.logic.shared.security.Password;
 
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.URIish;
@@ -21,13 +20,18 @@ import org.slf4j.LoggerFactory;
 
 class GitAuthenticator {
     private final static Logger LOGGER = LoggerFactory.getLogger(GitAuthenticator.class);
+
+
+    // TODO: temp
+    private static boolean disableStrictHostKeyChecking = true;
+
     private static final Path HOME_DIRECTORY = Path.of(Optional.of(System.getProperty("user.home")).orElse(""));
     private final GitPreferences preferences;
 
     GitAuthenticator(GitPreferences preferences) {
         this.preferences = preferences;
     }
-
+    
     <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
         transportCommand.setCredentialsProvider(getCredentialsProvider());
         transportCommand.setTransportConfigCallback(this::transportConfigCallback);
@@ -51,7 +55,7 @@ class GitAuthenticator {
             LOGGER.debug("git repository does not use a SSH protocol");
             return;
         }
-        SshSessionFactory sshSessionFactory = new SshdSessionFactoryBuilder()
+        SshdSessionFactoryBuilder sshdSessionFactoryBuilder = new SshdSessionFactoryBuilder()
                 .setPreferredAuthentications("publickey")
                 .setHomeDirectory(HOME_DIRECTORY.toFile())
                 .setSshDirectory(Path.of(preferences.getSshDirPath()).toFile())
@@ -60,7 +64,20 @@ class GitAuthenticator {
                     protected char[] getPassword(URIish uri, String message) {
                         return GitPreferences.getSshPassphrase().orElse("").toCharArray();
                     }
-                }).build(null);
-        sshTransport.setSshSessionFactory(sshSessionFactory);
+                });
+//        TODO: modify after resolving getResource issue
+//        if (disableStrictHostKeyChecking) {
+//            getSshConfigFile().ifPresent(file -> sshdSessionFactoryBuilder.setConfigFile(f -> file));
+//        }
+        sshTransport.setSshSessionFactory(sshdSessionFactoryBuilder.build(null));
     }
+
+//    TODO: using getResource is not allowed
+//    private Optional<File> getSshConfigFile() {
+//        URL sshConfigURL = this.getClass().getResource("ssh-config");
+//        if (sshConfigURL == null) {
+//            return Optional.empty();
+//        }
+//        return Optional.of(new File(sshConfigURL.getFile()));
+//    }
 }
