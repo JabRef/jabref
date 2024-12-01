@@ -12,6 +12,8 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
+
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -212,16 +214,12 @@ public class OpenDatabaseAction extends SimpleCommand {
                 clipboardManager,
                 taskExecutor);
         tabContainer.addTab(newTab, true);
-        if (GitManager.isGitRepository(file)) {
-            LOGGER.debug("File is in a git repository");
-            try {
-                GitManager gitManager = GitManager.openGitRepository(file, preferences.getGitPreferences());
-                gitManager.update();
-                dialogService.notify(Localization.lang("Pulled the latest changes from the remote repository."));
-            } catch (GitException e) {
-                LOGGER.warn("Error performing git pull for git repo containing {}", file, e);
-                dialogService.notify(Localization.lang("Error during Git pull operation."));
-            }
+
+        if (newTab.getBibDatabaseContext().isInGitRepository()) {
+        // TODO: use git preferences to determine whether to call the update methode
+            Optional<GitManager> optionalGitManager = newTab.getGitManager();
+            // using run later to prevent the dialog window from being blocked by the main JabRef window
+            Platform.runLater(() -> optionalGitManager.ifPresent(this::updateGitRepo));
         }
     }
 
@@ -308,6 +306,24 @@ public class OpenDatabaseAction extends SimpleCommand {
             parserResult.getDatabase().clearSharedDatabaseID();
 
             throw e;
+        }
+    }
+
+    void updateGitRepo(GitManager gitManager) {
+        if (gitManager == null) {
+            LOGGER.warn("GitManager has not been initialized.");
+            return;
+        }
+        try {
+            gitManager.promptForPassphraseIfNeeded(dialogService);
+            // TODO: disable ChangeScanner? following exception is thrown even though no changes are made:
+            //  org.jabref.gui.collab.ChangeScanner.scanForChanges()
+            //  WARN: Error while parsing changed file.: java.nio.file.NoSuchFileException:
+            gitManager.update();
+            dialogService.notify(Localization.lang("Pulled the latest changes from the remote repository."));
+        } catch (GitException e) {
+            LOGGER.warn("Error performing git pull for git repo {}", gitManager.getPath(), e);
+            dialogService.notify(e.getLocalizedMessage());
         }
     }
 }

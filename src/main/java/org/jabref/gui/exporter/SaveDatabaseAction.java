@@ -318,19 +318,20 @@ public class SaveDatabaseAction {
         }
     }
 
-    private void pushToGit(Path filaPath) {
-        if (!GitManager.isGitRepository(filaPath)) {
-            LOGGER.warn("{} is not in a git repository", filaPath);
+    private void pushToGit(Path filePath) {
+        Optional<GitManager> optionalGitManager = libraryTab.getGitManager();
+        if (optionalGitManager.isEmpty()) {
+            LOGGER.debug("{} is not in a git repository", filePath);
             return;
         }
         LOGGER.debug("File is in a git repository");
-
         try {
-            GitManager.openGitRepository(filaPath, preferences.getGitPreferences()).synchronize(filaPath);
+            optionalGitManager.get().promptForPassphraseIfNeeded(dialogService);
+            optionalGitManager.get().synchronize(filePath);
             dialogService.notify(Localization.lang("Library saved and pushed to remote."));
         } catch (GitException e) {
             LOGGER.warn("Git error during save operation.", e);
-            dialogService.notify(Localization.lang("Error during Git operations."));
+            dialogService.notify(e.getLocalizedMessage());
         }
     }
 }

@@ -55,7 +55,7 @@ public class BibDatabaseContext {
      * The path where this database was last saved to.
      */
     private Path path;
-    private boolean isInGitRepository;
+    private boolean isInGitRepository = false;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -113,8 +113,7 @@ public class BibDatabaseContext {
     }
 
     public void clearDatabasePath() {
-        this.path = null;
-        this.isInGitRepository = false;
+        setDatabasePath(null);
     }
 
     public BibDatabase getDatabase() {

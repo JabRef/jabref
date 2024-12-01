@@ -66,6 +66,8 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.git.GitException;
+import org.jabref.logic.git.GitManager;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -169,6 +171,7 @@ public class LibraryTab extends Tab {
 
     private ImportHandler importHandler;
     private LuceneManager luceneManager;
+    private GitManager gitManager;
 
     private final AiService aiService;
 
@@ -256,11 +259,31 @@ public class LibraryTab extends Tab {
 
         aiService.setupDatabase(bibDatabaseContext);
 
+        initializeGitManager();
+
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+    }
+
+    private void initializeGitManager() {
+        if (!this.bibDatabaseContext.isInGitRepository()) {
+            LOGGER.debug("File is not in a git repository");
+            gitManager = null;
+            return;
+        }
+        LOGGER.debug("File is in a git repository");
+        try {
+            this.gitManager = GitManager.openGitRepository(
+                    this.bibDatabaseContext.getDatabasePath().orElse(null), preferences.getGitPreferences()
+            );
+        } catch (GitException e) {
+            LOGGER.warn("Error initializing Git manager for file contained within a git repository", e);
+            dialogService.notify(Localization.lang("git operations are disabled for this file."));
+            gitManager = null;
+        }
     }
 
     private EntryEditor createEntryEditor() {
@@ -851,6 +874,10 @@ public class LibraryTab extends Tab {
 
     public CountingUndoManager getUndoManager() {
         return undoManager;
+    }
+
+    public Optional<GitManager> getGitManager() {
+        return Optional.ofNullable(gitManager);
     }
 
     public MainTable getMainTable() {
