@@ -255,6 +255,16 @@ public class OpenDatabaseAction extends SimpleCommand {
         preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
+        // To debug
+        if (!Files.exists(backupDir)) {
+            LOGGER.error("Backup directory does not exist: {}", backupDir);
+            throw new IOException("Backup directory not found: " + backupDir);
+        }
+        if (!Files.isReadable(backupDir)) {
+            LOGGER.error("Backup directory is not readable: {}", backupDir);
+            throw new IOException("Cannot read from backup directory: " + backupDir);
+        }
+
         ParserResult parserResult = null;
         if (BackupManagerGit.backupGitDiffers(backupDir)) {
             // In case the backup differs, ask the user what to do.

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.gui.LibraryTab;
@@ -55,7 +54,7 @@ public class BackupManagerGit {
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
-    private final Git git;
+    private static Git git;
 
     private boolean needsBackup = false;
 
@@ -71,31 +70,44 @@ public class BackupManagerGit {
 
         // Ensure the backup directory exists
         Path backupDirPath = preferences.getFilePreferences().getBackupDirectory();
-        LOGGER.info("backupDirPath" + backupDirPath);
+        LOGGER.info("Backup directory path: {}", backupDirPath);
 
         File backupDir = backupDirPath.toFile();
-        if (!backupDir.exists()) {
-            boolean dirCreated = backupDir.mkdirs();
-            if (dirCreated) {
-                LOGGER.info("Created backup directory: " + backupDir);
-            } else {
-                LOGGER.error("Failed to create backup directory: " + backupDir);
-            }
+        if (!backupDir.exists() && !backupDir.mkdirs()) {
+            LOGGER.error("Failed to create backup directory: {}", backupDir);
+            throw new IOException("Unable to create backup directory: " + backupDir);
         }
 
-        // Initialize Git repository in the backup directory
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        git = new Git(builder.setGitDir(new File(backupDir, ".git"))
-                             .readEnvironment()
-                             .findGitDir()
-                             .build());
+        // Ensure Git is initialized
+        ensureGitInitialized(backupDirPath);
+    }
 
-        if (git.getRepository().getObjectDatabase().exists()) {
-            LOGGER.info("Git repository already exists");
+    private static void ensureGitInitialized(Path backupDir) throws IOException, GitAPIException {
+
+        // This method was created because the initialization of the Git object, when written in the constructor, was causing a NullPointerException
+        // because the first method called when loading the database is BackupGitdiffers
+
+        // Convert Path to File
+        File gitDir = new File(backupDir.toFile(), ".git");
+
+        // Check if the `.git` directory exists
+        if (!gitDir.exists() || !gitDir.isDirectory()) {
+            LOGGER.info(".git directory not found in {}, initializing new Git repository.", backupDir);
+
+            // Initialize a new Git repository
+            Git.init().setDirectory(backupDir.toFile()).call();
+            LOGGER.info("Git repository successfully initialized in {}", backupDir);
         } else {
-            Git.init().setDirectory(backupDir).call(); // Explicitly set the directory
-            LOGGER.info("Initialized new Git repository");
+            LOGGER.info("Existing Git repository found in {}", backupDir);
         }
+
+        // Build the Git object
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+        Repository repository = builder.setGitDir(gitDir)
+                                       .readEnvironment()
+                                       .findGitDir()
+                                       .build();
+        git = new Git(repository);
     }
 
     /**
@@ -178,7 +190,7 @@ public class BackupManagerGit {
         RevCommit commit = git.commit()
                               .setMessage("Backup at " + Instant.now().toString())
                               .call();
-        LOGGER.info("Backup committed with ID: {}", commit.getId().getName());
+        LOGGER.info("Backup committed in :" + backupDir + " with commit ID: " + commit.getName());
     }
 
     /**
@@ -219,64 +231,64 @@ public class BackupManagerGit {
     public static boolean backupGitDiffers(Path backupDir) throws IOException, GitAPIException {
         LOGGER.info("Checking if backup differs for directory: {}", backupDir);
 
-        // Ensure Git repository exists
-        File repoDir = backupDir.toFile();
-        Repository repository = new FileRepositoryBuilder()
-                .setGitDir(new File(repoDir, ".git"))
-                .build();
+        // Ensure the Git object is initialized
+        ensureGitInitialized(backupDir);
 
-        try (Git git = new Git(repository)) {
-            // Resolve HEAD commit
-            ObjectId headCommitId = repository.resolve("HEAD");
-            if (headCommitId == null) {
-                // No commits in the repository; assume the file differs
-                LOGGER.info("No commits found in the repository. Assuming the file differs.");
-                return true;
-            }
+        Repository repository = git.getRepository();
+        if (repository == null) {
+            LOGGER.error("Repository object is null. Cannot check for backup differences.");
+            throw new IllegalStateException("Repository object is not initialized.");
+        }
 
-            // Iterate over files in the backup directory
-            try (Stream<Path> paths = Files.walk(backupDir)) {
-                for (Path path : paths.filter(Files::isRegularFile).collect(Collectors.toList())) {
-                    // Exclude internal Git files (e.g., .git directory files)
-                    if (path.toString().contains(".git")) {
-                        continue; // Skip Git internals like .git/config
-                    }
+        // Resolve HEAD commit
+        ObjectId headCommitId = repository.resolve("HEAD");
+        if (headCommitId == null) {
+            LOGGER.info("No commits found in the repository. Assuming the file differs.");
+            return true;
+        }
 
-                    // Determine the path relative to the Git repository
-                    Path relativePath = backupDir.relativize(path);
-                    LOGGER.info("Relative path: {}", relativePath);
+        LOGGER.info("HEAD commit ID: {}", headCommitId.getName());
 
+        try (Stream<Path> paths = Files.walk(backupDir)) {
+            for (Path path : paths.filter(Files::isRegularFile).toList()) {
+                // Skip internal Git files
+                if (path.toString().contains(".git")) {
+                    continue;
+                }
+
+                // Determine relative path for Git
+                Path relativePath = backupDir.relativize(path);
+                String gitPath = relativePath.toString().replace("\\", "/");
+                LOGGER.info("Checking file: {}", gitPath);
+
+                try {
                     // Attempt to retrieve the file content from the last commit
-                    ObjectLoader loader;
-                    try {
-                        ObjectId objectId = repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/"));
-                        if (objectId == null) {
-                            LOGGER.info("Object ID for path {} is null. Assuming the file differs.", relativePath);
-                            return true;
-                        }
-                        loader = repository.open(objectId);
-                    } catch (MissingObjectException e) {
-                        // File not found in the last commit; assume it differs
-                        LOGGER.info("File not found in the last commit. Assuming the file differs.");
+                    ObjectId objectId = repository.resolve("HEAD:" + gitPath);
+                    if (objectId == null) {
+                        LOGGER.info("File '{}' not found in the last commit. Assuming it differs.", gitPath);
                         return true;
                     }
 
-                    // Read the content from the last commit
+                    // Load content from the Git object
+                    ObjectLoader loader = repository.open(objectId);
                     String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
 
-                    // Read the current content of the file
+                    // Load current file content
                     String currentContent = Files.readString(path, StandardCharsets.UTF_8);
 
-                    // Compare the current content to the committed content
+                    // Compare contents
                     if (!currentContent.equals(committedContent)) {
-                        LOGGER.info("Current content of file {} differs from the committed content.", path);
+                        LOGGER.info("Content differs for file: {}", path);
                         return true;
                     }
+                } catch (MissingObjectException e) {
+                    LOGGER.info("File '{}' not found in the last commit. Assuming it differs.", gitPath);
+                    return true;
                 }
             }
         }
 
-        // No differences found
+        LOGGER.info("No differences found in backup.");
         return false;
     }
 
