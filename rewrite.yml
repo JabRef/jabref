@@ -209,7 +209,7 @@ recipeList:
   - org.openrewrite.java.testing.junit5.RemoveDuplicateTestTemplates
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
   - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
-  - org.openrewrite.java.testing.junit5.StaticImports
+  # - org.openrewrite.java.testing.junit5.StaticImports -- kills all other assertions like assertNull or assertFalse and even assertEquals
 
   # Logging
   - org.openrewrite.java.logging.slf4j.Slf4jBestPractices
