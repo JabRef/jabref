@@ -101,16 +101,15 @@ public class BackupManagerGit {
      * @param bibDatabaseContext the BibDatabaseContext to be backed up
      * @param entryTypesManager the BibEntryTypesManager
      * @param preferences the CLI preferences
-     * @param originalPath the original path of the file to be backed up
      * @return the started BackupManagerGit instance
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences, Path originalPath) throws IOException, GitAPIException {
-        LOGGER.info("Starting backup manager for file: {}", originalPath);
+    public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+        LOGGER.info("Starting backup manager for file: {}", bibDatabaseContext.getDatabasePath());
         BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
-        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), originalPath);
+        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManagerGit);
         return backupManagerGit;
     }
@@ -135,16 +134,15 @@ public class BackupManagerGit {
      * Starts the backup task that periodically checks for changes and commits them to the Git repository.
      *
      * @param backupDir the backup directory
-     * @param originalPath the original path of the file to be backed up
      */
 
-    void startBackupTask(Path backupDir, Path originalPath) {
+    void startBackupTask(Path backupDir) {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
-                        LOGGER.info("Starting backup task for file: {}", originalPath);
-                        performBackup(backupDir, originalPath);
-                        LOGGER.info("Backup task completed for file: {}", originalPath);
+                        LOGGER.info("Starting backup task for file: {}", backupDir);
+                        performBackup(backupDir);
+                        LOGGER.info("Backup task completed for file: {}", backupDir);
                     } catch (IOException | GitAPIException e) {
                         LOGGER.error("Error during backup", e);
                     }
@@ -158,24 +156,23 @@ public class BackupManagerGit {
      * Performs the backup by checking for changes and committing them to the Git repository.
      *
      * @param backupDir the backup directory
-     * @param originalPath the original path of the file to be backed up
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
 
-    protected void performBackup(Path backupDir, Path originalPath) throws IOException, GitAPIException {
-        LOGGER.info("Starting backup process for file: {}", originalPath);
+    protected void performBackup(Path backupDir) throws IOException, GitAPIException {
+        LOGGER.info("Starting backup process for file: {}", backupDir);
 
         // Check if the file needs a backup by comparing it to the last commit
-        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir, originalPath);
+        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir);
         if (!needsBackup) {
-            LOGGER.info("No changes detected. Backup not required for file: {}", originalPath);
+            LOGGER.info("No changes detected. Backup not required for file: {}", backupDir);
             return;
         }
 
-        // Stage the file for commit
-        Path relativePath = backupDir.relativize(originalPath); // Ensure relative path for Git
-        git.add().addFilepattern(relativePath.toString().replace("\\", "/")).call();
+        // Stage the file for commit //Path relativePath = backupDir.relativize(originalPath); // Ensure relative path for Git
+
+        git.add().addFilepattern(backupDir.toString().replace("\\", "/")).call();
 
         // Commit the staged changes
         RevCommit commit = git.commit()
@@ -214,14 +211,13 @@ public class BackupManagerGit {
     /**
      * Checks if there are differences between the original file and the backup.
      *
-     * @param originalPath the original path of the file
      * @param backupDir the backup directory
      * @return true if there are differences, false otherwise
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static boolean backupGitDiffers(Path backupDir, Path originalPath) throws IOException, GitAPIException {
+    public static boolean backupGitDiffers(Path backupDir) throws IOException, GitAPIException {
         // Ensure Git repository exists
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
@@ -237,12 +233,12 @@ public class BackupManagerGit {
             }
 
             // Determine the path relative to the Git repository
-            Path relativePath = backupDir.relativize(originalPath);
+            // Path relativePath = backupDir.relativize(originalPath);
 
             // Attempt to retrieve the file content from the last commit
             ObjectLoader loader;
             try {
-                loader = repository.open(repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/")));
+                loader = repository.open(repository.resolve("HEAD:" + backupDir.toString().replace("\\", "/")));
             } catch (MissingObjectException e) {
                 // File not found in the last commit; assume it differs
                 return true;
@@ -252,11 +248,11 @@ public class BackupManagerGit {
             String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
 
             // Read the current content of the file
-            if (!Files.exists(originalPath)) {
+            if (!Files.exists(backupDir)) {
                 // If the file doesn't exist in the working directory, it differs
                 return true;
             }
-            String currentContent = Files.readString(originalPath, StandardCharsets.UTF_8);
+            String currentContent = Files.readString(backupDir, StandardCharsets.UTF_8);
 
             // Compare the current content to the committed content
             return !currentContent.equals(committedContent);
@@ -404,7 +400,7 @@ public class BackupManagerGit {
         if (createBackup) {
             try {
                 // Ensure the backup is a recent one by performing the Git commit
-                performBackup(backupDir, originalPath);
+                performBackup(backupDir);
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Error during Git backup on shutdown", e);
             }
