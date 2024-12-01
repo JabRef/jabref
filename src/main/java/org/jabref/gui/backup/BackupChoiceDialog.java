@@ -1,6 +1,5 @@
 package org.jabref.gui.backup;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -14,12 +13,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.autosaveandbackup.BackupManagerGit;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.revwalk.RevCommit;
 
 public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
     public static final ButtonType RESTORE_BACKUP = new ButtonType(Localization.lang("Restore from backup"), ButtonBar.ButtonData.OK_DONE);
@@ -32,7 +27,7 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
     @FXML
     private final TableView<BackupEntry> backupTableView;
 
-    public BackupChoiceDialog(Path originalPath, Path backupDir) {
+    public BackupChoiceDialog(Path backupDir, List<BackupEntry> backups) {
         this.backupDir = backupDir;
 
         setTitle(Localization.lang("Choose backup file"));
@@ -46,7 +41,7 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
 
         backupTableView = new TableView<>();
         setupBackupTableView();
-        fetchBackupData();
+        tableData.addAll(backups);
 
         backupTableView.setItems(tableData);
 
@@ -74,16 +69,5 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
         entriesColumn.setCellValueFactory(cellData -> cellData.getValue().entriesProperty().asObject());
 
         backupTableView.getColumns().addAll(dateColumn, sizeColumn, entriesColumn);
-    }
-
-    private void fetchBackupData() {
-        try {
-            List<RevCommit> commits = BackupManagerGit.retrieveCommits(backupDir, -1);
-            tableData.addAll(BackupManagerGit.retrieveCommitDetails(commits, backupDir));
-        } catch (
-                IOException |
-                GitAPIException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
