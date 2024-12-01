@@ -244,7 +244,12 @@ public class BackupManagerGit {
                     // Attempt to retrieve the file content from the last commit
                     ObjectLoader loader;
                     try {
-                        loader = repository.open(repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/")));
+                        ObjectId objectId = repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/"));
+                        if (objectId == null) {
+                            LOGGER.info("Object ID for path {} is null. Assuming the file differs.", relativePath);
+                            return true;
+                        }
+                        loader = repository.open(objectId);
                     } catch (MissingObjectException e) {
                         // File not found in the last commit; assume it differs
                         LOGGER.info("File not found in the last commit. Assuming the file differs.");
