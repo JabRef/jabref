@@ -44,8 +44,8 @@ public class GitPreferences {
         return this.sshDirPath;
     }
 
-    public String getSshDirPath() {
-        return sshDirPath.get();
+    public Optional<String> getSshDirPath() {
+        return Optional.ofNullable(sshDirPath.get()).filter(s -> !s.isBlank());
     }
 
     public void setPassword(String password) {
@@ -56,8 +56,8 @@ public class GitPreferences {
         return this.password;
     }
 
-    public String getPassword() {
-        return this.password.get();
+    public Optional<String> getPassword() {
+        return Optional.ofNullable(password.get()).filter(s -> !s.isBlank());
     }
 
     public void setUsername(String username) {
@@ -68,8 +68,8 @@ public class GitPreferences {
         return username;
     }
 
-    public String getUsername() {
-        return username.get();
+    public Optional<String> getUsername() {
+        return Optional.ofNullable(username.get()).filter(s -> !s.isBlank());
     }
 
     public boolean isGitEnabled() {

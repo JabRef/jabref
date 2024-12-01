@@ -31,23 +31,23 @@ class GitAuthenticator {
     GitAuthenticator(GitPreferences preferences) {
         this.preferences = preferences;
     }
-    
+
     <Command extends TransportCommand<Command, ?>> void authenticate(Command transportCommand) {
         transportCommand.setCredentialsProvider(getCredentialsProvider());
         transportCommand.setTransportConfigCallback(this::transportConfigCallback);
     }
 
     private CredentialsProvider getCredentialsProvider() {
-        String password = preferences.getPassword();
+        String password = preferences.getPassword().orElse("");
         try {
             password = new Password(
-                    preferences.getPassword().toCharArray(),
-                    GitPreferences.getPasswordEncryptionKey().orElse(preferences.getUsername())
+                    preferences.getPassword().orElse("").toCharArray(),
+                    GitPreferences.getPasswordEncryptionKey().orElse(preferences.getUsername().orElse(""))
             ).decrypt();
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            LOGGER.warn("Error while decrypting git password", e);
+            LOGGER.debug("Error while decrypting git password");
         }
-        return new UsernamePasswordCredentialsProvider(preferences.getUsername(), password);
+        return new UsernamePasswordCredentialsProvider(preferences.getUsername().orElse(""), password);
     }
 
     private void transportConfigCallback(Transport transport) {
@@ -58,7 +58,7 @@ class GitAuthenticator {
         SshdSessionFactoryBuilder sshdSessionFactoryBuilder = new SshdSessionFactoryBuilder()
                 .setPreferredAuthentications("publickey")
                 .setHomeDirectory(HOME_DIRECTORY.toFile())
-                .setSshDirectory(Path.of(preferences.getSshDirPath()).toFile())
+                .setSshDirectory(Path.of(preferences.getSshDirPath().orElse("")).toFile())
                 .setKeyPasswordProvider(cp -> new IdentityPasswordProvider(cp) {
                     @Override
                     protected char[] getPassword(URIish uri, String message) {
