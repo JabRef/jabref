@@ -209,6 +209,8 @@ recipeList:
   - org.openrewrite.java.testing.junit5.RemoveDuplicateTestTemplates
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
   - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
-  - org.openrewrite.java.testing.junit5.StaticImports
+  # Does not work on some JDK releases. See https://github.com/openrewrite/rewrite-logging-frameworks/issues/177.
+  # - org.openrewrite.java.testing.junit5.StaticImports
+
   # Logging
   - org.openrewrite.java.logging.slf4j.Slf4jBestPractices
