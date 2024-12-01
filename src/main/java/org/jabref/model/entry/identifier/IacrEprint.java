@@ -7,14 +7,17 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("Because URL utility is needed")
 public class IacrEprint implements Identifier {
-    public static final URI RESOLVER = URI.create("https://ia.cr");
+    public static final URI RESOLVER = URLUtil.createUri("https://ia.cr");
     private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprint.class);
 
     private static final String IACR_EPRINT_EXP = "\\d{4}\\/\\d{3,5}";

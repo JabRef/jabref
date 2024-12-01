@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -24,8 +25,8 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
 public class DOI implements Identifier {
 
-    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
-    public static final URI RESOLVER = URI.create("https://doi.org/");
+    public static final URI AGENCY_RESOLVER = URLUtil.createUri("https://doi.org/doiRA");
+    public static final URI RESOLVER = URLUtil.createUri("https://doi.org/");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
@@ -201,6 +202,7 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> findInText(String text) {
         Optional<DOI> result = Optional.empty();
+        text = text.replaceAll("[�]", "");
 
         Matcher matcher = FIND_DOI_PATT.matcher(text);
         if (matcher.find()) {
@@ -260,7 +262,7 @@ public class DOI implements Identifier {
     }
 
     public Optional<URI> getExternalURIWithCustomBase(String customBase) {
-        return getExternalURIFromBase(URI.create(customBase));
+        return getExternalURIFromBase(URLUtil.createUri(customBase));
     }
 
     public Optional<URI> getExternalURIFromBase(URI base) {

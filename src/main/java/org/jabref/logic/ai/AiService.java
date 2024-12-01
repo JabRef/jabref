@@ -17,6 +17,7 @@ import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
@@ -71,11 +72,12 @@ public class AiService implements AutoCloseable {
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
 
+        TemplatesService templatesService = new TemplatesService(aiPreferences);
         this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
 
-        this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
+        this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, templatesService);
 
         this.ingestionService = new IngestionService(
                 aiPreferences,
@@ -91,6 +93,7 @@ public class AiService implements AutoCloseable {
                 aiPreferences,
                 mvStoreSummariesStorage,
                 jabRefChatLanguageModel,
+                templatesService,
                 shutdownSignal,
                 filePreferences,
                 taskExecutor

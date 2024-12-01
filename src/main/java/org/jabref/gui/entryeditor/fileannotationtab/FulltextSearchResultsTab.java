@@ -77,6 +77,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
+
+        // Rebinding is necessary because of re-rendering of highlighting of matched text
         searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
@@ -89,9 +91,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (entry == null || !shouldShow(entry)) {
             return;
-        }
-        if (documentViewerView == null) {
-            documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
         content.getChildren().clear();
@@ -159,6 +158,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
+                if (documentViewerView == null) {
+                    documentViewerView = new DocumentViewerView();
+                }
                 documentViewerView.switchToFile(linkedFile);
                 documentViewerView.gotoPage(pageNumber);
                 documentViewerView.disableLiveMode();

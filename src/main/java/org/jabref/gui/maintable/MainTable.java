@@ -46,19 +46,16 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,11 +241,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 getSelectionModel().select(item);
                 scrollTo(item);
             });
-    }
-
-    @Subscribe
-    public void listen(EntriesAddedEvent event) {
-        UiTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
@@ -490,10 +482,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFilteredAndSorted()
-                    .stream()
-                    .filter(viewModel -> viewModel.getEntry().equals(entry))
-                    .findFirst();
+        return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

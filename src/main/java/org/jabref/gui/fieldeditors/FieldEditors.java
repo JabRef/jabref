@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -26,7 +25,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -46,8 +44,6 @@ public class FieldEditors {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
     public static FieldEditorFX getForField(final Field field,
-                                            final TaskExecutor taskExecutor,
-                                            final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
                                             final GuiPreferences preferences,
                                             final BibDatabaseContext databaseContext,

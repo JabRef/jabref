@@ -64,8 +64,7 @@ public class Update {
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             Logger.warn("Error while updating document", e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {

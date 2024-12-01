@@ -164,7 +164,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
         importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
-        grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
+        grobidPreferences.setGrobidUseAsked(grobidPreferences.isGrobidUseAsked());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());

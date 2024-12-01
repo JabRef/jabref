@@ -8,7 +8,7 @@ on:
 jobs:
   automerge:
     name: Auto Merge
-    if: "${{ github.event.label.name == 'automerge' }}"
+    if: "${{ github.event.label.name == 'automerge' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-latest
     steps:
       - name: Approve PR
