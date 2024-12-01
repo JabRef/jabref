@@ -41,7 +41,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,8 +336,7 @@ public class BackupManager {
         }
     }
 
-    @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+    public synchronized void listen(BibDatabaseContextChangedEvent event) {
         if (!event.isFilteredOut()) {
             this.needsBackup = true;
         }
@@ -356,7 +354,7 @@ public class BackupManager {
                 TimeUnit.SECONDS);
     }
     // La méthode fillQueue(backupDir) est définie dans le code et son rôle est de lister et d'ajouter
-// les fichiers de sauvegarde existants dans une file d'attente,
+    // les fichiers de sauvegarde existants dans une file d'attente,
 
     private void fillQueue(Path backupDir) {
         if (!Files.exists(backupDir)) {

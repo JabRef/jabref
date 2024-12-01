@@ -24,6 +24,7 @@ import org.jabref.gui.backup.BackupEntry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.eclipse.jgit.api.Git;
@@ -205,9 +206,6 @@ public class BackupManagerGit {
      */
 
     protected void performBackup(Path backupDir) throws IOException, GitAPIException {
-
-        // Check if the file needs a backup by comparing it to the last commit
-        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir);
         if (!needsBackup) {
             return;
         }
@@ -220,6 +218,12 @@ public class BackupManagerGit {
                               .setMessage("Backup at " + Instant.now().toString())
                               .call();
         LOGGER.info("Backup committed in :" + backupDir + " with commit ID: " + commit.getName());
+    }
+
+    public synchronized void listen(BibDatabaseContextChangedEvent event) {
+        if (!event.isFilteredOut()) {
+            this.needsBackup = true;
+        }
     }
 
     /**
@@ -249,7 +253,7 @@ public class BackupManagerGit {
     }
 
     /**
-     * Checks if there are differences between the original file and the backup.
+     * Checks if there are differences between the files in the directory and the last commit.
      *
      * @param backupDir the backup directory
      * @return true if there are differences, false otherwise
@@ -277,7 +281,6 @@ public class BackupManagerGit {
             for (Path path : paths.filter(Files::isRegularFile).toList()) {
                 // Ignore non-.bib files (e.g., .DS_Store)
                 if (!path.toString().endsWith(".bib")) {
-                    LOGGER.info("Ignoring non-.bib file: {}", path);
                     continue;  // Skip .bib files
                 }
 
