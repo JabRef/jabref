@@ -52,7 +52,7 @@ public class UnlinkedFilesDialogViewModelTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        // Mock file preferences to return a base directory
+        // Mock a base directory
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getWorkingDirectory()).thenReturn(Paths.get("C:/test/base"));
@@ -61,9 +61,9 @@ public class UnlinkedFilesDialogViewModelTest {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));
 
         viewModel = new UnlinkedFilesDialogViewModel(
-                null,  // dialogService, not used in this test
-                null,  // undoManager, not used in this test
-                null,  // fileUpdateMonitor, not used in this test
+                null,
+                null,
+                null,
                 guiPreferences,
                 stateManager,
                 taskExecutor
@@ -78,14 +78,13 @@ public class UnlinkedFilesDialogViewModelTest {
         Files.createDirectories(subDir);
 
         // Create test files: one in the main directory and one in the subdirectory
-        file1 = Files.createTempFile(tempDir, "file1", ".pdf"); // Main directory
+        file1 = Files.createTempFile(tempDir, "file1", ".pdf");
         file2 = Files.createTempFile(subDir, "file2", ".txt");
 
-        // Arrange: Mock file nodes with the absolute paths of the temporary files
+        // Mock file nodes with the absolute paths of the temporary files
         FileNodeViewModel fileNode1 = mock(FileNodeViewModel.class);
         FileNodeViewModel fileNode2 = mock(FileNodeViewModel.class);
 
-        // Mock the getPath method to return the expected paths
         when(fileNode1.getPath()).thenReturn(file1);
         when(fileNode2.getPath()).thenReturn(file2);
 
@@ -93,11 +92,9 @@ public class UnlinkedFilesDialogViewModelTest {
         TreeItem<FileNodeViewModel> treeItem1 = new TreeItem<>(fileNode1);
         TreeItem<FileNodeViewModel> treeItem2 = new TreeItem<>(fileNode2);
 
-        // Initialize SimpleListProperty and assign ObservableList
         SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty =
                 new SimpleListProperty<>(FXCollections.observableArrayList(treeItem1, treeItem2));
 
-        // Assert that the list contains 2 items
         assertEquals(2, checkedFileListProperty.get().size());
         assertEquals(file1, checkedFileListProperty.get().getFirst().getValue().getPath());
         assertEquals(file2, checkedFileListProperty.get().getLast().getValue().getPath());
