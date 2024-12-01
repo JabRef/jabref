@@ -125,7 +125,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             Tooltip tooltip = new Tooltip(tooltipText);
                             tooltip.setMaxWidth(maxWidth * 2 / 3);
                             tooltip.setWrapText(true);
-
                             setTooltip(tooltip);
                         }
                     }
