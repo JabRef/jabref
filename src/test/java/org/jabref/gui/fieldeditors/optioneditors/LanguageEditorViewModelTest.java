@@ -50,7 +50,7 @@ public class LanguageEditorViewModelTest {
     }
 
     @Test
-    void testStringConversion() {
+    void stringConversion() {
         String langidString = "bulgarian";
         Langid langid = languageEditorViewModel.getStringConverter().fromString(langidString);
         assertEquals(Langid.BULGARIAN, langid, "String should convert to the corresponding Langid");
@@ -60,7 +60,7 @@ public class LanguageEditorViewModelTest {
     }
 
     @Test
-    void testStringConversionWithHumanReadableName() {
+    void stringConversionWithHumanReadableName() {
         // Test conversion from human-readable name to Langid
         String langidString = "Basque";
         Langid langid = languageEditorViewModel.getStringConverter().fromString(langidString);
@@ -72,14 +72,14 @@ public class LanguageEditorViewModelTest {
     }
 
     @Test
-    void testHandlingNullValue() {
+    void handlingNullValue() {
         // Test the handling of a null value
         Langid result = languageEditorViewModel.getStringConverter().fromString(null);
         assertNull(result, "Null input should return null Langid");
     }
 
     @Test
-    void testHandlingBlankValue() {
+    void handlingBlankValue() {
         // Test the handling of a blank string
         Langid result = languageEditorViewModel.getStringConverter().fromString(" ");
         assertNull(result, "Blank input should return null Langid");
