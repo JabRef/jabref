@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.backup.BackupEntry;
@@ -29,7 +28,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
-import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
@@ -47,6 +45,7 @@ public class BackupManagerGit {
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
     private static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
+    private static Git git;
 
     private final BibDatabaseContext bibDatabaseContext;
     private final CliPreferences preferences;
@@ -54,7 +53,8 @@ public class BackupManagerGit {
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
-    private static Git git;
+
+
 
     private boolean needsBackup = false;
 
@@ -67,6 +67,7 @@ public class BackupManagerGit {
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
+        LOGGER.info("maysmm i l file: {}", bibDatabaseContext.getDatabasePath().orElseThrow());
 
         // Ensure the backup directory exists
         Path backupDirPath = preferences.getFilePreferences().getBackupDirectory();
@@ -124,7 +125,7 @@ public class BackupManagerGit {
 
     public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
         BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
-        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
+        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), bibDatabaseContext.getDatabasePath().orElseThrow());
         runningInstances.add(backupManagerGit);
         return backupManagerGit;
     }
@@ -152,12 +153,12 @@ public class BackupManagerGit {
      * @param backupDir the backup directory
      */
 
-    void startBackupTask(Path backupDir) {
-        LOGGER.info("Initializing backup task for directory: {} and file: {}", backupDir);
+    void startBackupTask(Path backupDir, Path bibPath) {
+        LOGGER.info("Initializing backup task for directory: {} and file: {}", backupDir, bibPath);
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
-                        performBackup(backupDir);
+                        performBackup(backupDir, bibPath);
                     } catch (IOException | GitAPIException e) {
                         LOGGER.error("Error during backup", e);
                     }
@@ -176,9 +177,9 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    protected void performBackup(Path backupDir) throws IOException, GitAPIException {
+    protected void performBackup(Path backupDir, Path bibPath) throws IOException, GitAPIException {
         // Check if the file needs a backup by comparing it to the last commit
-        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir);
+        boolean needsBackup = BackupManagerGit.backupGitDiffers(backupDir, bibPath);
         if (!needsBackup) {
             return;
         }
@@ -228,7 +229,8 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static boolean backupGitDiffers(Path backupDir) throws IOException, GitAPIException {
+    @SuppressWarnings("checkstyle:RegexpMultiline")
+    public static boolean backupGitDiffers(Path backupDir, Path bibPath) throws IOException, GitAPIException {
         LOGGER.info("Checking if backup differs for directory: {}", backupDir);
 
         // Ensure the Git object is initialized
@@ -239,57 +241,55 @@ public class BackupManagerGit {
             LOGGER.error("Repository object is null. Cannot check for backup differences.");
             throw new IllegalStateException("Repository object is not initialized.");
         }
+        try {
 
-        // Resolve HEAD commit
-        ObjectId headCommitId = repository.resolve("HEAD");
-        if (headCommitId == null) {
-            LOGGER.info("No commits found in the repository. Assuming the file differs.");
-            return true;
-        }
+            // Compute the relative path for the .bib file
+            Path gitWorkTree = repository.getWorkTree().toPath();
+            Path relativePath = gitWorkTree.relativize(bibPath);
+            String gitPath = relativePath.toString().replace("\\", "/");
 
-        LOGGER.info("HEAD commit ID: {}", headCommitId.getName());
+            LOGGER.info("Comparing file: {}", gitPath);
+            LOGGER.info("repository: {}", repository.getWorkTree().toPath());
 
-        try (Stream<Path> paths = Files.walk(backupDir)) {
-            for (Path path : paths.filter(Files::isRegularFile).toList()) {
-                // Skip internal Git files
-                if (path.toString().contains(".git")) {
-                    continue;
-                }
-
-                // Determine relative path for Git
-                Path relativePath = backupDir.relativize(path);
-                String gitPath = relativePath.toString().replace("\\", "/");
-                LOGGER.info("Checking file: {}", gitPath);
-
-                try {
-                    // Attempt to retrieve the file content from the last commit
-                    ObjectId objectId = repository.resolve("HEAD:" + gitPath);
-                    if (objectId == null) {
-                        LOGGER.info("File '{}' not found in the last commit. Assuming it differs.", gitPath);
-                        return true;
-                    }
-
-                    // Load content from the Git object
-                    ObjectLoader loader = repository.open(objectId);
-                    String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
-
-                    // Load current file content
-                    String currentContent = Files.readString(path, StandardCharsets.UTF_8);
-
-                    // Compare contents
-                    if (!currentContent.equals(committedContent)) {
-                        LOGGER.info("Content differs for file: {}", path);
-                        return true;
-                    }
-                } catch (MissingObjectException e) {
-                    LOGGER.info("File '{}' not found in the last commit. Assuming it differs.", gitPath);
-                    return true;
-                }
+            // Resolve the file in the latest commit
+            ObjectId objectId = repository.resolve("HEAD:" + gitPath);
+            if (objectId == null) {
+                LOGGER.info("File '{}' not found in the last commit. Assuming it differs.", gitPath);
+                return true;
             }
-        }
 
-        LOGGER.info("No differences found in backup.");
-        return false;
+            // Load content from the Git repository
+            ObjectLoader loader = repository.open(objectId);
+            String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
+            LOGGER.info(committedContent);
+
+            // Load current content from the filesystem
+            String currentContent = Files.readString(bibPath, StandardCharsets.UTF_8);
+            LOGGER.info(currentContent);
+            // Normalize whitespace and line endings
+            String normalizedCommittedContent = committedContent
+                    .trim()
+                    .replaceAll("\r\n", "\n")
+                    .replaceAll("[ \\t]+", " ") // Replace multiple spaces with single space
+                    .replaceAll("\n+", "\n");  // Remove multiple blank lines
+            LOGGER.info("normalizedCommittedContent: {} ", normalizedCommittedContent);
+            String normalizedCurrentContent = currentContent
+                    .trim()
+                    .replaceAll("\r\n", "\n")
+                    .replaceAll("[ \\t]+", " ")
+                    .replaceAll("\n+", "\n");
+            LOGGER.info("normalizedCurrentContent: {} ", normalizedCurrentContent);
+            if (!normalizedCurrentContent.equals(normalizedCommittedContent)) {
+                LOGGER.info("Content differs after normalization");
+                return true;
+            } else {
+                LOGGER.info("No differences found for file: {}", bibPath);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error while comparing file '{}': {}", bibPath, e.getMessage());
+            return true; // Assume the file differs if an error occurs
+        }
+        return false; // No differences found
     }
 
     /**
@@ -435,7 +435,7 @@ public class BackupManagerGit {
         if (createBackup) {
             try {
                 // Ensure the backup is a recent one by performing the Git commit
-                performBackup(backupDir);
+                performBackup(backupDir, originalPath);
                 LOGGER.info("Backup created on shutdown for file: {}", originalPath);
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Error during Git backup on shutdown", e);

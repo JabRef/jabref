@@ -91,7 +91,7 @@ class BackupManagerGitTest {
     void testBackupGitDiffers_NoDifferences() throws Exception {
         // Verify that there is no difference between the file and the last commit
         Path testFile = backupDir.resolve("testfile.bib");
-        boolean differs = BackupManagerGit.backupGitDiffers(backupDir);
+        boolean differs = BackupManagerGit.backupGitDiffers(backupDir, testFile);
         assertFalse(differs, "Expected no difference between the file and the last commit");
     }
 
@@ -101,7 +101,7 @@ class BackupManagerGitTest {
         Path testFile = backupDir.resolve("testfile.bib");
         Files.writeString(testFile, "Modified content", StandardCharsets.UTF_8);
 
-        boolean differs = BackupManagerGit.backupGitDiffers(backupDir);
+        boolean differs = BackupManagerGit.backupGitDiffers(backupDir, testFile);
         assertTrue(differs, "Expected differences between the file and the last commit");
     }
 
@@ -122,7 +122,7 @@ class BackupManagerGitTest {
         // Use backupGitDiffers to check if the backup differs
         boolean createBackup;
         if (bibDatabaseContext.getDatabasePath().isPresent()) {
-            createBackup = BackupManagerGit.backupGitDiffers(backupDir);
+            createBackup = BackupManagerGit.backupGitDiffers(backupDir, bibDatabaseContext.getDatabasePath().get());
         } else {
             fail("Database path is not present");
             return; // Avoid further execution if the path is missing
@@ -202,7 +202,7 @@ class BackupManagerGitTest {
 
         // Act: Start the backup task
         // private void startBackupTask(Path backupDir, Path originalPath)
-        backupManager.startBackupTask(backupDirectory);
+        backupManager.startBackupTask(backupDirectory, bibDatabaseContext.getDatabasePath().orElse());
 
         // Simulate passage of time
         Thread.sleep(100);
