@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.l10n.Localization;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.RebaseCommand;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
@@ -80,52 +83,70 @@ class GitActionExecutor {
         push(null, null);
     }
 
+    /**
+     * pulls from the remote repository after storing the current HEAD in case the pull operation results in conflicts
+     * and the pull operation needs to be undone.
+     *
+     * @param withRebase whether to rebase the pull operation. if true and a conflict occurs, a rebase --abort is
+     *                   performed to exit the rebase state which results in the HEAD being reset to the previous state.
+     *                   if false and a conflict occurs, the pull operation needs to be undone afterward.
+     * @param remote the remote repository to pull from. If null, the default remote is used.
+     * @param branch the branch to pull from. If null, the current branch is used.
+     * @throws GitConflictException if the pull operation results in conflicts
+     * @throws GitException if the pull operation fails for any other reason
+     */
     void pull(boolean withRebase, String remote, String branch) throws GitException {
         try {
 
             previousHead = git.getRepository().resolve(Constants.HEAD);
 
-            PullCommand pullCommand = git.pull();
+            PullCommand pullCommand = git.pull()
+                                         .setRebase(withRebase)
+                                         .setRemote(remote);
             gitAuthenticator.authenticate(pullCommand);
-            pullCommand.setRebase(withRebase)
-                       .setRemote(remote)
-                       .setRemoteBranchName(branch)
-                       .call();
-            LOGGER.debug("Pulled from remote: {}, branch: {}", remote, branch);
-        } catch (
-                GitAPIException |
-                IOException e) {
-            throw new GitException("Pull failed", e);
+            if (branch != null) {
+                pullCommand.setRemoteBranchName(branch);
+            }
+            pullCommand.call();
+            if (git.status().call().getConflicting().isEmpty()) {
+                LOGGER.warn("Pulled from remote: {}, branch: {}", remote, branch);
+                return;
+            }
+            if (withRebase) {
+                git.rebase().setOperation(RebaseCommand.Operation.ABORT).call();
+            }
+            throw new GitConflictException("Git pull resulted in conflicts.", Localization.lang("Git pull resulted in conflicts."));
+        } catch (GitAPIException | IOException e) {
+            throw new GitException("Failed to perform git pull operation", e);
         }
     }
 
     // TODO: test this
+    /**
+     * calls {@link #pull(boolean, String, String)} with default remote and current branch
+     */
     void pull(boolean withRebase) throws GitException {
         pull(withRebase, null, null);
     }
 
-    Git getGit() {
-        return git;
-    }
-
-    // TODO: test this
+    /**
+     * Undoes the latest pull operation by hard resetting the HEAD to the previous state. It only works if
+     * the pull operation was performed using the same instance as the one calling this method.
+     *
+     * @throws GitException if the undo operation fails for any reason
+     */
     void undoPull() throws GitException {
         try {
-            if (previousHead != null) {
-                git.reset()
-                   .setRef(previousHead.getName())
-                   .setMode(ResetCommand.ResetType.HARD)
-                   .call();
-//                TODO: check if this is the correct way to reset
-//                git.reset()
-//                   .setMode(ResetCommand.ResetType.MERGE)
-//                   .call();
-                LOGGER.debug("Last pull undone (hard reset to previous HEAD).");
-            } else {
+            if (previousHead == null) {
                 throw new GitException("Cannot undo pull: previous HEAD not recorded.");
             }
+            git.reset()
+               .setRef(previousHead.getName())
+               .setMode(ResetCommand.ResetType.HARD)
+               .call();
+            LOGGER.debug("Last pull undone (hard reset to previous HEAD).");
         } catch (GitAPIException e) {
-            throw new GitException("Undo pull failed", e);
+            throw new GitException("Failed to undo latest git pull", e);
         }
     }
 
@@ -148,5 +169,9 @@ class GitActionExecutor {
             // TODO: in this case the user must be informed
             throw new GitException("Unstash failed", e);
         }
+    }
+
+    Git getGit() {
+        return git;
     }
 }
