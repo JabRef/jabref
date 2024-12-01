@@ -30,14 +30,14 @@
 
         <CheckBox fx:id="enableGitSupport" text="%Autoperform git operations"
                   GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
-        <Button fx:id="authentifyButton" onAction="#authentify" text="HTTP Authentify"
+        <Button fx:id="authentifyButton" onAction="#authentify" text="HTTP Authentication"
                 GridPane.rowIndex="1" GridPane.columnIndex="0"
         />
         <padding>
             <Insets left="20.0"/>
         </padding>
 
-        <CheckBox text="Custom push frequency" visible="true" fx:id="pushFrequencyLabel"
+        <CheckBox text="Custom push frequency" visible="true" fx:id="setPushFrequency"
                   GridPane.rowIndex="3" GridPane.columnIndex="0" />
         <HBox spacing="10.0" GridPane.rowIndex="3" GridPane.columnIndex="1">
             <TextField fx:id="pushFrequencyInput" HBox.hgrow="ALWAYS" promptText="number of saves before a push [enter integer]"/>
@@ -63,12 +63,7 @@
             </CheckBox>
             <JabRefIconView glyph="INTEGRITY_INFO"/>
         </HBox>
-
-        <Button text="Synchronize" fx:id="synchronizeButton"
-                GridPane.rowIndex="6" GridPane.columnIndex="0"
-        />
-        <padding>
-            <Insets left="20.0"/>
-        </padding>
+        <CheckBox text="Git SHH encrypted" visible="true" fx:id="gitSSHEncrypted"
+                  GridPane.rowIndex="6" GridPane.columnIndex="0" />
     </GridPane>
 </fx:root>
