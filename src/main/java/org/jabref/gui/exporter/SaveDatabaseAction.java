@@ -327,6 +327,7 @@ public class SaveDatabaseAction {
         LOGGER.debug("File is in a git repository");
         try {
             optionalGitManager.get().promptForPassphraseIfNeeded(dialogService);
+            // TODO: disable file listener while synchronizing
             optionalGitManager.get().synchronize(filePath);
             dialogService.notify(Localization.lang("Library saved and pushed to remote."));
         } catch (GitException e) {

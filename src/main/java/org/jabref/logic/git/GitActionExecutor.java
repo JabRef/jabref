@@ -156,7 +156,6 @@ class GitActionExecutor {
         }
     }
 
-    // TODO: test whether all changes are stashed or only the staged ones
     void stash() throws GitException {
         try {
             git.stashCreate().setIncludeUntracked(false).call();
@@ -166,13 +165,11 @@ class GitActionExecutor {
         }
     }
 
-    // TODO: test that it applies the latest stash in case there are multiple
     void applyLatestStash() throws GitException {
         try {
             git.stashApply().call();
             LOGGER.debug("Stash applied.");
         } catch (GitAPIException e) {
-            // TODO: in this case the user must be informed
             throw new GitException("Unstash failed", e);
         }
     }

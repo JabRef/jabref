@@ -47,7 +47,8 @@ public class GitManager {
                     Localization.lang("No changes detected in bib file. Skipping git operations."));
         }
         if (gitStatus.hasTrackedFiles()) {
-            // TODO: stash tracked file and apply stash after commit (with error handling)
+//             TODO: stash tracked file and apply stash after commit (with error handling)
+//              or set them to untracked
             LOGGER.debug("Staging area is not empty.");
             throw new GitException("Staging area is not empty.", Localization.lang("Staging area is not empty."));
         }

@@ -319,6 +319,8 @@ public class OpenDatabaseAction extends SimpleCommand {
             // TODO: disable ChangeScanner? following exception is thrown even though no changes are made:
             //  org.jabref.gui.collab.ChangeScanner.scanForChanges()
             //  WARN: Error while parsing changed file.: java.nio.file.NoSuchFileException:
+            
+            // TODO: disable file listener and enable it after the update is done
             gitManager.update();
             dialogService.notify(Localization.lang("Pulled the latest changes from the remote repository."));
         } catch (GitException e) {
