@@ -66,6 +66,7 @@ sed -i -e 's/.*/%dir "&"/' %{package_filelist}
 %endif
 
 %post
+DESKTOP_COMMANDS_INSTALL
 # Install the native-messaging host script for firefox/chrome/chromium
 install -D -m0755 /opt/jabref/lib/native-messaging-host/firefox/org.jabref.jabref.json /usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 install -D -m0755 /opt/jabref/lib/native-messaging-host/chromium/org.jabref.jabref.json /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
@@ -73,13 +74,17 @@ install -D -m0755 /opt/jabref/lib/native-messaging-host/chromium/org.jabref.jabr
 # Trigger an auto-install of the browser addon for chrome/chromium browsers
 install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
 install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
-DESKTOP_COMMANDS_INSTALL
+
 
 %pre
 package_type=rpm
 COMMON_SCRIPTS
 
 %preun
+package_type=rpm
+COMMON_SCRIPTS
+DESKTOP_SCRIPTS
+DESKTOP_COMMANDS_UNINSTALL
 # Remove the native-messaging hosts script only if relative to the deb package
 for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
                      "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
@@ -91,8 +96,5 @@ done
 # Remove the auto-install triggers of the browser addon for chrom/chromium
 rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
 rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
-COMMON_SCRIPTS
-DESKTOP_SCRIPTS
-DESKTOP_COMMANDS_UNINSTALL
 
 %clean
