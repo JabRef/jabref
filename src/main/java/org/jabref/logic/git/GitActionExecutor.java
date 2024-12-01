@@ -35,7 +35,12 @@ class GitActionExecutor {
         this.gitAuthenticator = gitAuthenticator;
     }
 
-    // TODO: test case for if path is not inside repo, test the first branch
+//    TODO:
+//     when adding a file located in a new subdirectory this method fails silently
+//     adding the parent directory of the file seems to fix the issue:
+//     git.add().addFilepattern(relativePath.getParent().toString()).call();
+//     but this would add all files within to the staging area which is not the desired behavior
+//     fix and write tests for files in already existing and newly created subdirectories
     void add(Path path) throws GitException {
         if (!path.startsWith(repository)) {
             throw new GitException("Given path not inside repository.");

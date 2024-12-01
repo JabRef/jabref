@@ -28,6 +28,7 @@ class GitStatusTest {
     private Git git;
     private Path repositoryPath;
     private GitStatus gitStatus;
+    private GitPreferences gitPreferences;
     private GitActionExecutor gitActionExecutor;
 
     private final Logger LOGGER = LoggerFactory.getLogger(GitStatusTest.class);
@@ -36,7 +37,7 @@ class GitStatusTest {
     void setUp(@TempDir Path temporaryRepository) throws GitAPIException, GeneralSecurityException, UnsupportedEncodingException {
         git = Git.init().setDirectory(temporaryRepository.toFile()).call();
         repositoryPath = temporaryRepository;
-        GitPreferences gitPreferences = new GitPreferences(true, "username",
+        gitPreferences = new GitPreferences(true, "username",
                 new Password("password".toCharArray(), "username").encrypt(), false,
                 "", false, false, false);
         gitStatus = new GitStatus(git);
@@ -61,15 +62,15 @@ class GitStatusTest {
 
     @Test
     void getUntrackedFiles_NoUntrackedFiles() throws GitAPIException, GitException {
-        Set<String> untrackedFiles = gitStatus.getUntrackedFiles();
+        Set<Path> untrackedFiles = gitStatus.getUntrackedFiles();
         assertTrue(untrackedFiles.isEmpty(), "Expected no untracked files");
     }
 
     @Test
     void getUntrackedFiles_WithUntrackedFiles() throws IOException, GitAPIException, GitException {
         Path newFile = Files.createFile(repositoryPath.resolve("untracked.txt"));
-        Set<String> untrackedFiles = gitStatus.getUntrackedFiles();
-        assertTrue(untrackedFiles.contains("untracked.txt"), "Expected 'untracked.txt' in untracked files");
+        Set<Path> untrackedFiles = gitStatus.getUntrackedFiles();
+        assertTrue(untrackedFiles.contains(newFile), "Expected 'untracked.txt' in untracked files");
     }
 
     @Test
@@ -86,7 +87,7 @@ class GitStatusTest {
 
     @Test
     void getTrackedFiles_NoTrackedFiles() throws GitAPIException, GitException {
-        Set<String> trackedFiles = gitStatus.getTrackedFiles();
+        Set<Path> trackedFiles = gitStatus.getTrackedFiles();
         assertTrue(trackedFiles.isEmpty(), "Expected no tracked files");
     }
 
@@ -94,8 +95,8 @@ class GitStatusTest {
     void getTrackedFiles_WithTrackedFiles() throws IOException, GitAPIException, GitException {
         Path trackedFile = Files.createFile(repositoryPath.resolve("tracked.txt"));
         git.add().addFilepattern("tracked.txt").call();
-        Set<String> trackedFiles = gitStatus.getTrackedFiles();
-        assertTrue(trackedFiles.contains("tracked.txt"), "Expected 'tracked.txt' in tracked files");
+        Set<Path> trackedFiles = gitStatus.getTrackedFiles();
+        assertTrue(trackedFiles.contains(trackedFile), "Expected 'tracked.txt' in tracked files");
     }
 
     @Test
@@ -154,7 +155,7 @@ class GitStatusTest {
         assertTrue(gitStatus.hasUntrackedFiles());
         assertFalse(gitStatus.hasTrackedFiles());
         assertEquals(1, gitStatus.getUntrackedFiles().size());
-        assertTrue(gitStatus.getUntrackedFiles().contains(pathToTempFile.getFileName().toString()));
+        assertTrue(gitStatus.getUntrackedFiles().contains(pathToTempFile));
         gitActionExecutor.add(pathToTempFile);
         gitActionExecutor.commit("commit message", false);
         Files.writeString(pathToTempFile, "new content");
@@ -168,5 +169,22 @@ class GitStatusTest {
         gitActionExecutor.commit("commit message", false);
         assertFalse(gitStatus.hasUntrackedFiles());
         assertFalse(gitStatus.hasTrackedFiles());
+    }
+
+    @Test
+    void trackedAndUntrackedFilesInSubDirectories() throws IOException, GitException {
+
+        Path tempDir = Files.createTempDirectory(repositoryPath, null);
+        Path pathToFileInSubDir = Files.createTempFile(tempDir, null, null);
+        assertFalse(gitStatus.hasTrackedFiles());
+        assertEquals(1, gitStatus.getUntrackedFiles().size());
+        assertEquals(pathToFileInSubDir, gitStatus.getUntrackedFiles().iterator().next());
+
+        gitActionExecutor.add(pathToFileInSubDir);
+
+//        TODO: activate once gitActionExecutor.add(List<Path> paths) is fixed
+//        assertFalse(gitStatus.hasUntrackedFiles());
+//        assertEquals(1, gitStatus.getTrackedFiles().size());
+//        assertEquals(pathToFileInSubDir, gitStatus.getTrackedFiles().iterator().next());
     }
 }

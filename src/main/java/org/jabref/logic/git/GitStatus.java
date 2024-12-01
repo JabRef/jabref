@@ -1,6 +1,7 @@
 package org.jabref.logic.git;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,9 +24,11 @@ class GitStatus {
     private final static Logger LOGGER = LoggerFactory.getLogger(GitStatus.class);
 
     private final Git git;
+    private final Path repository;
 
     GitStatus(Git git) {
         this.git = git;
+        this.repository = git.getRepository().getDirectory().getParentFile().toPath();
     }
 
     // TODO: decide whether this is needed
@@ -47,7 +50,7 @@ class GitStatus {
         return !getUntrackedFiles().isEmpty();
     }
 
-    Set<String> getUntrackedFiles() throws GitException {
+    Set<Path> getUntrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -55,15 +58,21 @@ class GitStatus {
             throw new GitException("Failed to get git status", e);
         }
         Set<String> untrackedFiles = new HashSet<>(status.getUntracked());
+        LOGGER.error("Untracked files: {}", untrackedFiles);
         untrackedFiles.addAll(status.getModified());
-        return untrackedFiles;
+        LOGGER.error("Untracked files: {}", untrackedFiles);
+        Set<Path> untrackedFilesPaths = new HashSet<>();
+        for (String untrackedFile : untrackedFiles) {
+            untrackedFilesPaths.add(repository.resolve(untrackedFile));
+        }
+        return untrackedFilesPaths;
     }
 
     boolean hasTrackedFiles() throws GitException {
         return !getTrackedFiles().isEmpty();
     }
 
-    Set<String> getTrackedFiles() throws GitException {
+    Set<Path> getTrackedFiles() throws GitException {
         Status status;
         try {
             status = this.git.status().call();
@@ -72,7 +81,11 @@ class GitStatus {
         }
         Set<String> trackedFiles = new HashSet<>(status.getAdded());
         trackedFiles.addAll(status.getChanged());
-        return trackedFiles;
+        Set<Path> trackedFilesPaths = new HashSet<>();
+        for (String trackedFile : trackedFiles) {
+            trackedFilesPaths.add(repository.resolve(trackedFile));
+        }
+        return trackedFilesPaths;
     }
 
     // TODO: wouldn't it be sufficient to check whether the latest commit on the local branch
