@@ -671,6 +671,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GIT_ENABLED, Boolean.FALSE);
         defaults.put(GIT_SHH_HOST_KEY_CHECK_DISABLED, Boolean.FALSE);
         defaults.put(GIT_PASSWORD_ENCRYPTED, Boolean.FALSE);
+        // TODO: set to false after testing
         defaults.put(GIT_SSH_KEY_ENCRYPTED, Boolean.TRUE);
         defaults.put(GIT_PUSH_FREQUENCY_ENABLED, Boolean.FALSE);
         // endregion

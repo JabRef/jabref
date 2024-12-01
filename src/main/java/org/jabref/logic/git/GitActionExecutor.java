@@ -108,10 +108,11 @@ class GitActionExecutor {
                 pullCommand.setRemoteBranchName(branch);
             }
             pullCommand.call();
+            LOGGER.debug("Pulled from remote: {}, branch: {}", remote, branch);
             if (git.status().call().getConflicting().isEmpty()) {
-                LOGGER.warn("Pulled from remote: {}, branch: {}", remote, branch);
                 return;
             }
+            LOGGER.debug("Git pull resulted in conflicts.");
             if (withRebase) {
                 git.rebase().setOperation(RebaseCommand.Operation.ABORT).call();
             }

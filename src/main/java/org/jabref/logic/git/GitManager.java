@@ -24,7 +24,6 @@ public class GitManager {
     private final Path path;
     private final Git git;
     private final GitPreferences preferences;
-    private final GitAuthenticator gitAuthenticator;
     private final GitActionExecutor gitActionExecutor;
     private final GitStatus gitStatus;
 
@@ -34,23 +33,23 @@ public class GitManager {
         this.path = git.getRepository().getDirectory().getParentFile().toPath();
 
         this.git = git;
-        this.gitAuthenticator = new GitAuthenticator(preferences);
-        this.gitActionExecutor = new GitActionExecutor(this.git, this.gitAuthenticator);
+        this.gitActionExecutor = new GitActionExecutor(this.git, new GitAuthenticator(preferences));
         this.gitStatus = new GitStatus(this.git);
         this.preferences = preferences;
         determineGitProtocol();
     }
 
     public void synchronize(Path filePath) throws GitException {
+        // TODO: assert that the given filePath is in the untrackedFiles (getUntrackedFiles())
         if (!gitStatus.hasUntrackedFiles()) {
             LOGGER.debug("No changes detected in {}. Skipping git operations.", path);
-            return;
+            throw new GitException("No changes detected in bib file. Skipping git operations.",
+                    Localization.lang("No changes detected in bib file. Skipping git operations."));
         }
-        // TODO: when changes are detected check that given filePath are in untrackedFiles
         if (gitStatus.hasTrackedFiles()) {
             // TODO: stash tracked file and apply stash after commit (with error handling)
-            LOGGER.warn("Staging area is not empty.");
-            return;
+            LOGGER.debug("Staging area is not empty.");
+            throw new GitException("Staging area is not empty.", Localization.lang("Staging area is not empty."));
         }
         gitActionExecutor.add(filePath);
         LOGGER.debug("file was added to staging area successfully");
@@ -59,20 +58,30 @@ public class GitManager {
         update();
         gitActionExecutor.push();
         LOGGER.debug("{} was pushed successfully", filePath);
+        updateAuthenticationStatus();
     }
 
     public void update() throws GitException {
         try {
             gitActionExecutor.pull(true);
             LOGGER.debug("Git pull with rebase was successful.");
+            updateAuthenticationStatus();
             return;
-        } catch (GitException e) {
-            LOGGER.warn("Pull with rebase failed. Attempting to undo changes done by the pull operation...");
+        } catch (GitConflictException e) {
+            LOGGER.debug("Pull with rebase failed. Attempting to undo changes done by the pull operation...");
             gitActionExecutor.undoPull();
         }
-        LOGGER.debug("Attempting pull with merge strategy...");
-        gitActionExecutor.pull(false);
-        LOGGER.debug("Git pull with merge strategy was successful.");
+        updateAuthenticationStatus();
+        try {
+            LOGGER.debug("Attempting pull with merge strategy...");
+            gitActionExecutor.pull(false);
+            LOGGER.debug("Git pull with merge strategy was successful.");
+        } catch (GitConflictException e) {
+            LOGGER.debug("Pull with merge strategy failed. Please resolve conflicts manually.");
+            gitActionExecutor.undoPull();
+            throw new GitConflictException("Git pull resulted in conflicts. Please resolve manually.",
+                    Localization.lang("Git pull resulted in conflicts. Please resolve manually."));
+        }
     }
 
     /**
