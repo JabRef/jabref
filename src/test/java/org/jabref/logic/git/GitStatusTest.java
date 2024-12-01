@@ -145,4 +145,28 @@ class GitStatusTest {
         assertEquals(1, gitStatus.getUntrackedFiles().size());
         assertEquals(1, gitStatus.getTrackedFiles().size());
     }
+
+    @Test
+    void modifiedFilesStatus() throws GitException, IOException, GitAPIException {
+        assertFalse(gitStatus.hasUntrackedFiles());
+        assertFalse(gitStatus.hasTrackedFiles());
+        Path pathToTempFile = Files.createTempFile(repositoryPath, null, null);
+        assertTrue(gitStatus.hasUntrackedFiles());
+        assertFalse(gitStatus.hasTrackedFiles());
+        assertEquals(1, gitStatus.getUntrackedFiles().size());
+        assertTrue(gitStatus.getUntrackedFiles().contains(pathToTempFile.getFileName().toString()));
+        gitActionExecutor.add(pathToTempFile);
+        gitActionExecutor.commit("commit message", false);
+        Files.writeString(pathToTempFile, "new content");
+        assertFalse(gitStatus.hasTrackedFiles());
+        assertTrue(gitStatus.hasUntrackedFiles());
+        assertEquals(1, gitStatus.getUntrackedFiles().size());
+        gitActionExecutor.add(pathToTempFile);
+        assertTrue(gitStatus.hasTrackedFiles());
+        assertFalse(gitStatus.hasUntrackedFiles());
+        assertEquals(1, gitStatus.getTrackedFiles().size());
+        gitActionExecutor.commit("commit message", false);
+        assertFalse(gitStatus.hasUntrackedFiles());
+        assertFalse(gitStatus.hasTrackedFiles());
+    }
 }

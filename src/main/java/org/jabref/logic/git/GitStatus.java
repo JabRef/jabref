@@ -2,6 +2,7 @@ package org.jabref.logic.git;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +54,9 @@ class GitStatus {
         } catch (GitAPIException e) {
             throw new GitException("Failed to get git status", e);
         }
-        return status.getUntracked();
+        Set<String> untrackedFiles = new HashSet<>(status.getUntracked());
+        untrackedFiles.addAll(status.getModified());
+        return untrackedFiles;
     }
 
     boolean hasTrackedFiles() throws GitException {
@@ -67,7 +70,9 @@ class GitStatus {
         } catch (GitAPIException e) {
             throw new GitException("Failed to get git status", e);
         }
-        return status.getAdded();
+        Set<String> trackedFiles = new HashSet<>(status.getAdded());
+        trackedFiles.addAll(status.getChanged());
+        return trackedFiles;
     }
 
     // TODO: wouldn't it be sufficient to check whether the latest commit on the local branch
