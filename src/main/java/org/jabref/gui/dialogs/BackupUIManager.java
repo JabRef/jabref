@@ -125,6 +125,7 @@ public class BackupUIManager {
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
             Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            LOGGER.info("Ligne 127, BackupUIManager, Loading backup database from {}", backupPath);
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences);

@@ -237,6 +237,11 @@ public class BackupManagerGit {
             // Iterate over files in the backup directory
             try (Stream<Path> paths = Files.walk(backupDir)) {
                 for (Path path : paths.filter(Files::isRegularFile).collect(Collectors.toList())) {
+                    // Exclude internal Git files (e.g., .git directory files)
+                    if (path.toString().contains(".git")) {
+                        continue; // Skip Git internals like .git/config
+                    }
+
                     // Determine the path relative to the Git repository
                     Path relativePath = backupDir.relativize(path);
                     LOGGER.info("Relative path: {}", relativePath);
@@ -271,7 +276,7 @@ public class BackupManagerGit {
             }
         }
 
-        LOGGER.info("All files in the backup directory match the committed content.");
+        // No differences found
         return false;
     }
 
