@@ -159,8 +159,7 @@ class BackupManagerGitTest {
                 libraryTab,
                 bibDatabaseContext,
                 entryTypesManager,
-                preferences,
-                databaseFile
+                preferences
         );
 
         // Assert: Verify the outcomes
@@ -198,13 +197,12 @@ class BackupManagerGitTest {
                 libraryTab,
                 bibDatabaseContext,
                 entryTypesManager,
-                preferences,
-                databaseFile
+                preferences
         );
 
         // Act: Start the backup task
         // private void startBackupTask(Path backupDir, Path originalPath)
-        backupManager.startBackupTask(backupDirectory, databaseFile);
+        backupManager.startBackupTask(backupDirectory);
 
         // Simulate passage of time
         Thread.sleep(100);
@@ -297,8 +295,7 @@ class BackupManagerGitTest {
                 libraryTab,
                 bibDatabaseContext,
                 entryTypesManager,
-                preferences,
-                databaseFile
+                preferences
         );
 
         List<RevCommit> retrievedCommits = backupManager.retrieveCommits(backupDir, 5);
@@ -352,8 +349,7 @@ class BackupManagerGitTest {
                 libraryTab,
                 bibDatabaseContext,
                 entryTypesManager,
-                preferences,
-                databaseFile
+                preferences
         );
         List<BackupEntry> commitDetails = BackupManagerGit.retrieveCommitDetails(commits, backupDir);
 

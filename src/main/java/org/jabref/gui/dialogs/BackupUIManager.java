@@ -64,7 +64,7 @@ public class BackupUIManager {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 try {
                     ObjectId commitId = BackupManagerGit.retrieveCommits(preferences.getFilePreferences().getBackupDirectory(), 1).getFirst().getId();
-                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
+                    BackupManagerGit.restoreBackup(preferences.getFilePreferences().getBackupDirectory(), commitId);
                 } catch (
                         IOException |
                         GitAPIException e
@@ -82,7 +82,7 @@ public class BackupUIManager {
                 if (recordBackupChoice.get().action() == BackupChoiceDialog.RESTORE_BACKUP) {
                     LOGGER.warn(recordBackupChoice.get().entry().getSize());
                     ObjectId commitId = recordBackupChoice.get().entry().getId();
-                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
+                    BackupManagerGit.restoreBackup(preferences.getFilePreferences().getBackupDirectory(), commitId);
                     return Optional.empty();
                 }
                 if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {

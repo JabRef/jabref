@@ -96,7 +96,9 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
+            LOGGER.info("Performing post open action: {}", action.getClass().getSimpleName());
             if (action.isActionNecessary(result, dialogService, preferences)) {
+                LOGGER.info("Action is necessary");
                 action.performAction(result, dialogService, preferences);
             }
         }
@@ -104,6 +106,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        LOGGER.info("OpenDatabaseAction");
         List<Path> filesToOpen = getFilesToOpen();
         openFiles(new ArrayList<>(filesToOpen));
     }
@@ -118,6 +121,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         } catch (IllegalArgumentException e) {
             // See https://github.com/JabRef/jabref/issues/10548 for details
             // Rebuild a new config with the home directory
+            LOGGER.error("Error while opening file dialog", e);
             FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());
             filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(homeDirectoryConfig);
         }
@@ -242,16 +246,19 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
+        LOGGER.info("Opening {}", file);
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
+        LOGGER.info("Opening {}", fileToLoad);
 
         preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
-        if (BackupManagerGit.backupGitDiffers(fileToLoad, backupDir)) {
+        if (BackupManagerGit.backupGitDiffers(backupDir)) {
             // In case the backup differs, ask the user what to do.
+            LOGGER.info("Backup differs from saved file, ask the user what to do");
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
             parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
                                           .orElse(null);
@@ -260,6 +267,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         try {
             if (parserResult == null) {
                 // No backup was restored, do the "normal" loading
+                LOGGER.info("No backup was restored, do the \"normal\" loading");
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
