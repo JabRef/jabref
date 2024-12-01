@@ -50,13 +50,14 @@ public class BackupManagerGit {
 
     private static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
 
+    private static Git git;
+
     private final BibDatabaseContext bibDatabaseContext;
     private final CliPreferences preferences;
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
-    private static Git git;
 
     private boolean needsBackup = false;
 
@@ -206,12 +207,23 @@ public class BackupManagerGit {
      */
 
     protected void performBackup(Path backupDir) throws IOException, GitAPIException {
-        if (!needsBackup) {
+
+        boolean needsCommit = backupGitDiffers(backupDir);
+
+        if (!needsBackup && !needsCommit) {
+            LOGGER.info("No changes detected, beacuse needsBackup is :" + needsBackup + " and needsCommit is :" + needsCommit);
             return;
         }
 
+        if (needsBackup) {
+            LOGGER.info("Backup needed, because needsBackup is :" + needsBackup);
+        } else {
+        LOGGER.info("Backup needed, because needsCommit is :" + needsCommit);
+    }
+
         // Stage the file for commit
         git.add().addFilepattern(".").call();
+        LOGGER.info("Staged changes for backup in directory: {}", backupDir);
 
         // Commit the staged changes
         RevCommit commit = git.commit()
@@ -222,6 +234,7 @@ public class BackupManagerGit {
 
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
         if (!event.isFilteredOut()) {
+            LOGGER.info("Change detected/LISTENED in file: {}", bibDatabaseContext.getDatabasePath().orElseThrow());
             this.needsBackup = true;
         }
     }
@@ -238,6 +251,8 @@ public class BackupManagerGit {
             Git git = Git.open(backupDir.toFile());
 
             git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
+            LOGGER.info("checkout done");
+
             // Add commits to staging Area
             git.add().addFilepattern(".").call();
 
