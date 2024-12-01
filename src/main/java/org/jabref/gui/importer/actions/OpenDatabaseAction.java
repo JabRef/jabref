@@ -266,7 +266,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         ParserResult parserResult = null;
-        if (BackupManagerGit.backupGitDiffers(backupDir, fileToLoad)) {
+        if (BackupManagerGit.backupGitDiffers(backupDir)) {
             // In case the backup differs, ask the user what to do.
             LOGGER.info("Backup differs from saved file, ask the user what to do");
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
