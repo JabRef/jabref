@@ -175,7 +175,7 @@ class BibEntryTypesManagerTest {
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT), //added langid standard field
+                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
                                                            new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
                                                    Collections.emptySet());
 

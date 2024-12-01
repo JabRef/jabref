@@ -1,6 +1,9 @@
 package org.jabref.gui.fieldeditors.optioneditors;
 
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -18,7 +21,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class LanguageEditorViewModelTest {
 
@@ -26,33 +31,25 @@ public class LanguageEditorViewModelTest {
 
     @BeforeEach
     void setUp() {
-        // Mock dependencies
-        BibDatabaseContext databaseContext = Mockito.mock(BibDatabaseContext.class);
-        FilePreferences filePreferences = Mockito.mock(FilePreferences.class);
-        JournalAbbreviationRepository abbreviationRepository = Mockito.mock(JournalAbbreviationRepository.class);
-
-        // Initialize FieldCheckers with mocked instances
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
         FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, filePreferences, abbreviationRepository, false);
+        SuggestionProvider<?> suggestionProvider = mock(SuggestionProvider.class);
 
-        // Mock the SuggestionProvider
-        SuggestionProvider<?> suggestionProvider = Mockito.mock(SuggestionProvider.class);
-
-        // Initialize the LangidEditorViewModel
         languageEditorViewModel = new LanguageEditorViewModel(
-                StandardField.LANGUAGEID,  // Use the correct field
-                suggestionProvider,  // Mocked SuggestionProvider
-                BibDatabaseMode.BIBLATEX,  // Use the correct BibDatabaseMode
-                fieldCheckers,  // FieldCheckers instance
-                new UndoManager()  // UndoManager instance
+                StandardField.LANGUAGEID,
+                suggestionProvider,
+                BibDatabaseMode.BIBLATEX,
+                fieldCheckers,
+                new UndoManager()
         );
     }
 
     @Test
     void getItemsShouldReturnAllLangidValues() {
         Collection<Langid> items = languageEditorViewModel.getItems();
-        assertEquals(Langid.values().length, items.size());
-        assertTrue(items.contains(Langid.BASQUE)); // Check if it contains a specific Langid
-        assertTrue(items.contains(Langid.AMERICAN)); // Additional check for another Langid
+        assertEquals(EnumSet.allOf(Langid.class), items);
     }
 
     @Test
@@ -81,14 +78,14 @@ public class LanguageEditorViewModelTest {
     void testHandlingNullValue() {
         // Test the handling of a null value
         Langid result = languageEditorViewModel.getStringConverter().fromString(null);
-        assertEquals(null, result, "Null input should return null Langid");
+        assertNull(result, "Null input should return null Langid");
     }
 
     @Test
     void testHandlingBlankValue() {
         // Test the handling of a blank string
         Langid result = languageEditorViewModel.getStringConverter().fromString(" ");
-        assertEquals(null, result, "Blank input should return null Langid");
+        assertNull(result, "Blank input should return null Langid");
     }
 }
 
