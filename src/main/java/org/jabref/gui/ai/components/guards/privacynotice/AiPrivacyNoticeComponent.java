@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.privacynotice;
+package org.jabref.gui.ai.components.guards.privacynotice;
 
 import java.io.IOException;
 
@@ -18,8 +18,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PrivacyNoticeComponent extends ScrollPane {
-    private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);
+public class AiPrivacyNoticeComponent extends ScrollPane {
+    private final Logger LOGGER = LoggerFactory.getLogger(AiPrivacyNoticeComponent.class);
 
     @FXML private TextFlow openAiPrivacyTextFlow;
     @FXML private TextFlow mistralAiPrivacyTextFlow;
@@ -29,13 +29,11 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
-    private final Runnable onIAgreeButtonClickCallback;
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
+    public AiPrivacyNoticeComponent(AiPreferences aiPreferences, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-        this.onIAgreeButtonClickCallback = onIAgreeButtonClickCallback;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.dialogService = dialogService;
 
@@ -90,12 +88,6 @@ public class PrivacyNoticeComponent extends ScrollPane {
     }
 
     @FXML
-    private void onIAgreeButtonClick() {
-        aiPreferences.setEnableAi(true);
-        onIAgreeButtonClickCallback.run();
-    }
-
-    @FXML
     private void onDjlPrivacyPolicyClick() {
         openBrowser("https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632");
     }
@@ -107,5 +99,10 @@ public class PrivacyNoticeComponent extends ScrollPane {
             LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);
         }
+    }
+
+    @FXML
+    private void onIAgreeButtonClick() {
+        aiPreferences.setEnableAi(true);
     }
 }

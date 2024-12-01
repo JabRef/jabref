@@ -1,13 +1,20 @@
 package org.jabref.gui.ai.components.summary;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
-import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+import org.jabref.gui.ai.components.guards.EmbeddingModelGuard;
+import org.jabref.gui.ai.components.guards.privacynotice.AiPrivacyNoticeGuard;
+import org.jabref.gui.util.components.ErrorStateComponent;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.util.guards.BibDatabasePathPresentGuard;
+import org.jabref.gui.util.guards.CitationKeyGuard;
+import org.jabref.gui.util.guards.EntryFilesArePdfsGuard;
+import org.jabref.gui.util.guards.EntryFilesGuard;
+import org.jabref.gui.util.guards.GuardedComponent;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
@@ -24,7 +31,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
+public class SummaryComponent extends GuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -41,7 +48,14 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
                             DialogService dialogService
     ) {
-        super(aiPreferences, externalApplicationsPreferences, dialogService);
+        super(List.of(
+                new AiPrivacyNoticeGuard(aiPreferences, externalApplicationsPreferences, dialogService),
+                new EmbeddingModelGuard(aiService),
+                new BibDatabasePathPresentGuard(bibDatabaseContext),
+                new EntryFilesGuard(entry),
+                new EntryFilesArePdfsGuard(entry),
+                new CitationKeyGuard(bibDatabaseContext, entry)
+        ));
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
@@ -49,59 +63,13 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         this.aiService = aiService;
         this.aiPreferences = aiPreferences;
 
-        aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
+        aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> checkGuards());
 
-        rebuildUi();
+        checkGuards();
     }
 
     @Override
-    protected Node showPrivacyPolicyGuardedContent() {
-        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            return showErrorNoDatabasePath();
-        } else if (entry.getFiles().isEmpty()) {
-            return showErrorNoFiles();
-        } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
-            return showErrorNotPdfs();
-        } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
-            return tryToGenerateCitationKeyThenBind(entry);
-        } else {
-            return tryToShowSummary();
-        }
-    }
-
-    private Node showErrorNoDatabasePath() {
-        return new ErrorStateComponent(
-                Localization.lang("Unable to generate summary"),
-                Localization.lang("The path of the current library is not set, but it is required for summarization")
-        );
-    }
-
-    private Node showErrorNotPdfs() {
-        return new ErrorStateComponent(
-                Localization.lang("Unable to generate summary"),
-                Localization.lang("Only PDF files are supported.")
-        );
-    }
-
-    private Node showErrorNoFiles() {
-        return new ErrorStateComponent(
-                Localization.lang("Unable to generate summary"),
-                Localization.lang("Please attach at least one PDF file to enable summarization of PDF file(s).")
-        );
-    }
-
-    private Node tryToGenerateCitationKeyThenBind(BibEntry entry) {
-        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-            return new ErrorStateComponent(
-                    Localization.lang("Unable to generate summary"),
-                    Localization.lang("Please provide a non-empty and unique citation key for this entry.")
-            );
-        } else {
-            return showPrivacyPolicyGuardedContent();
-        }
-    }
-
-    private Node tryToShowSummary() {
+    protected Node showGuardedComponent() {
         ProcessingInfo<BibEntry, Summary> processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);
 
         return switch (processingInfo.getState()) {

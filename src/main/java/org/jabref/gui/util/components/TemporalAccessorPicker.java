@@ -1,4 +1,4 @@
-package org.jabref.gui.util.component;
+package org.jabref.gui.util.components;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;

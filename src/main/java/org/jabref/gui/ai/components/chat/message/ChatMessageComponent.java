@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.aichat.chatmessage;
+package org.jabref.gui.ai.components.chat.message;
 
 import java.util.function.Consumer;
 

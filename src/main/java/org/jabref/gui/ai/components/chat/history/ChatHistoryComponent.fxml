@@ -7,7 +7,7 @@
         type="javafx.scene.control.ScrollPane"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent"
+        fx:controller="org.jabref.gui.ai.components.chat.history.ChatHistoryComponent"
         style="-fx-border-color: black;">
     <VBox fx:id="vBox"
           spacing="10.0">

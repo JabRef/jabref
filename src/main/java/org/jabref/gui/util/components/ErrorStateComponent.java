@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.util.errorstate;
+package org.jabref.gui.util.components;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -7,6 +7,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -17,11 +19,15 @@ public class ErrorStateComponent extends BorderPane {
 
     public ErrorStateComponent(String title, String content) {
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         setTitle(title);
         setContent(content);
+    }
+
+    public static ErrorStateComponent error(String content) {
+        return new ErrorStateComponent(Localization.lang("Error"), content);
     }
 
     public static ErrorStateComponent withSpinner(String title, String content) {
