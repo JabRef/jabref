@@ -16,9 +16,10 @@ public class GitViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty gitSupportEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty frequencyLabelEnabledProperty = new SimpleBooleanProperty();
-
+    private final SimpleStringProperty pushFrequencyProperty = new SimpleStringProperty();
     private final BooleanProperty hostKeyCheckProperty = new SimpleBooleanProperty();
     private final SimpleStringProperty sshPath = new SimpleStringProperty("");
+    private final BooleanProperty sshEncryptedProperty = new SimpleBooleanProperty();
     private final DialogService dialogService;
     private final GitPreferences gitPreferences;
 
@@ -32,6 +33,8 @@ public class GitViewModel implements PreferenceTabViewModel {
         gitSupportEnabledProperty.setValue(gitPreferences.isGitEnabled());
         frequencyLabelEnabledProperty.setValue(gitPreferences.isPushFrequencyEnabled());
         hostKeyCheckProperty.setValue(gitPreferences.isHostKeyCheckDisabled());
+        sshEncryptedProperty.setValue(gitPreferences.isSshKeyEncrypted());
+        pushFrequencyProperty.setValue(gitPreferences.getPushFrequency().orElse(""));
     }
 
     /**
@@ -42,6 +45,8 @@ public class GitViewModel implements PreferenceTabViewModel {
         gitPreferences.setGitEnabled(gitSupportEnabledProperty.getValue());
         gitPreferences.setPushFrequencyEnabled(frequencyLabelEnabledProperty.getValue());
         gitPreferences.setHostKeyCheckDisabled(hostKeyCheckProperty.getValue());
+        gitPreferences.setSshKeyEncrypted(sshEncryptedProperty.getValue());
+        gitPreferences.setPushFrequency(pushFrequencyProperty.getValue());
     }
 
     public BooleanProperty gitSupportEnabledProperty() {
@@ -52,7 +57,11 @@ public class GitViewModel implements PreferenceTabViewModel {
         return hostKeyCheckProperty;
     }
 
-    public BooleanProperty frequencyLabelEnabledProperty() {
+    public BooleanProperty getSshEncryptedProperty() {
+        return sshEncryptedProperty;
+    }
+
+    public BooleanProperty getFrequencyLabelEnabledProperty() {
         return frequencyLabelEnabledProperty;
     }
 
@@ -69,7 +78,6 @@ public class GitViewModel implements PreferenceTabViewModel {
     public void authentify() {
         AuthentifyDialogView dialog = new AuthentifyDialogView(this.gitPreferences, this.dialogService);
         dialog.showAndWait();
-        // System.out.println("we made it to GitViewModel.authentify()");
     }
 
     public void sshBrowse() {
@@ -80,7 +88,10 @@ public class GitViewModel implements PreferenceTabViewModel {
     }
 
     public SimpleStringProperty sshPathProperty() {
-        // System.out.println("sshPathProperty() in GitViewModel: " + gitPreferences.getSshPathProperty());
         return gitPreferences.getSshPathProperty();
+    }
+
+    public SimpleStringProperty getPushFrequency() {
+        return pushFrequencyProperty;
     }
 }

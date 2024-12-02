@@ -3,10 +3,7 @@ package org.jabref.gui.preferences.git;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 
@@ -21,17 +18,11 @@ import jakarta.inject.Inject;
 public class GitTab extends AbstractPreferenceTabView<GitViewModel> implements PreferencesTab {
     @FXML private CheckBox enableGitSupport;
     @FXML private CheckBox hostKeyCheck;
-    @FXML private CheckBox frequencyLabel;
-    @FXML private ComboBox<String> setPushFrequency;
-    @FXML private Button authentifyButton;
-    @FXML private ComboBox<String> authenticationMethod;
-    @FXML private Button synchronizeButton;
+    @FXML private CheckBox pushFrequency;
     @FXML private TextField sshPath;
-    @FXML private Label authentificationLabel;
+    @FXML private TextField pushFrequencyInput;
+    @FXML private CheckBox sshEncrypted;
     @Inject private DialogService dialogService;
-
-    @FXML
-    private TextField pushFrequencyInput;
 
     public GitTab() {
         ViewLoader.view(this)
@@ -64,19 +55,20 @@ public class GitTab extends AbstractPreferenceTabView<GitViewModel> implements P
         this.viewModel = new GitViewModel(preferences.getGitPreferences(), dialogService);
         pushFrequencyInput.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            // Allow only digits
             if (newText.matches("\\d*")) {
-                return change; // Accept the change if it matches digits
+                return change;
             }
-            return null; // Reject the change
+            return null;
         }));
 
         enableGitSupport.selectedProperty().bindBidirectional(viewModel.gitSupportEnabledProperty());
-        synchronizeButton.disableProperty().bind(enableGitSupport.selectedProperty().not());
-        authentifyButton.disableProperty().bind(enableGitSupport.selectedProperty().not());
-        sshPath.disableProperty().bind(enableGitSupport.selectedProperty().not());
+        pushFrequency.disableProperty().bind(enableGitSupport.selectedProperty().not());
+        pushFrequencyInput.disableProperty().bind(enableGitSupport.selectedProperty().not());
+
         sshPath.textProperty().bindBidirectional(viewModel.sshPathProperty());
-        hostKeyCheck.disableProperty().bind(enableGitSupport.selectedProperty().not());
         hostKeyCheck.selectedProperty().bindBidirectional(viewModel.getHostKeyCheckProperty());
+        sshEncrypted.selectedProperty().bindBidirectional(viewModel.getSshEncryptedProperty());
+        pushFrequency.selectedProperty().bindBidirectional(viewModel.getFrequencyLabelEnabledProperty());
+        pushFrequencyInput.textProperty().bindBidirectional(viewModel.getPushFrequency());
     }
 }

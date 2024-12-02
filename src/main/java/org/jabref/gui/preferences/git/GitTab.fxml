@@ -37,7 +37,7 @@
             <Insets left="20.0"/>
         </padding>
 
-        <CheckBox text="Custom push frequency" visible="true" fx:id="setPushFrequency"
+        <CheckBox text="Custom push frequency" visible="true" fx:id="pushFrequency"
                   GridPane.rowIndex="3" GridPane.columnIndex="0" />
         <HBox spacing="10.0" GridPane.rowIndex="3" GridPane.columnIndex="1">
             <TextField fx:id="pushFrequencyInput" HBox.hgrow="ALWAYS" promptText="number of saves before a push [enter integer]"/>
@@ -63,7 +63,7 @@
             </CheckBox>
             <JabRefIconView glyph="INTEGRITY_INFO"/>
         </HBox>
-        <CheckBox text="Git SHH encrypted" visible="true" fx:id="gitSSHEncrypted"
+        <CheckBox text="Git SHH encrypted" visible="true" fx:id="sshEncrypted"
                   GridPane.rowIndex="6" GridPane.columnIndex="0" />
     </GridPane>
 </fx:root>

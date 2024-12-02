@@ -14,6 +14,7 @@ public class GitPreferences {
     private final SimpleStringProperty password;
     private final BooleanProperty passwordEncrypted;
     private final SimpleStringProperty sshDirPath;
+    private final SimpleStringProperty pushFrequency;
     private final BooleanProperty sshKeyEncrypted;
     private final BooleanProperty hostKeyCheckDisabled;
     private final BooleanProperty pushFrequencyEnabled;
@@ -25,7 +26,8 @@ public class GitPreferences {
                           String sshDirPath,
                           boolean sshKeyEncrypted,
                           boolean hostKeyCheckDisabled,
-                          boolean pushFrequencyEnabled) {
+                          boolean pushFrequencyEnabled,
+                          String pushFrequency) {
         this.gitEnabled = new SimpleBooleanProperty(gitEnabled);
         this.pushFrequencyEnabled = new SimpleBooleanProperty(pushFrequencyEnabled);
         this.username = new SimpleStringProperty(username != null ? username : ""); // Default to empty if null
@@ -34,6 +36,7 @@ public class GitPreferences {
         this.hostKeyCheckDisabled = new SimpleBooleanProperty(hostKeyCheckDisabled);
         this.passwordEncrypted = new SimpleBooleanProperty(passwordEncrypted);
         this.sshKeyEncrypted = new SimpleBooleanProperty(sshKeyEncrypted);
+        this.pushFrequency = new SimpleStringProperty(pushFrequency);
     }
 
     public void setSshDirPath(String sshDirPath) {
@@ -46,6 +49,18 @@ public class GitPreferences {
 
     public Optional<String> getSshDirPath() {
         return Optional.ofNullable(sshDirPath.get()).filter(s -> !s.isBlank());
+    }
+
+    public void setPushFrequency(String pushFrequency) {
+        this.pushFrequency.set(pushFrequency);
+    }
+
+    public SimpleStringProperty getPushFrequencyProperty() {
+        return this.pushFrequency;
+    }
+
+    public Optional<String> getPushFrequency() {
+        return Optional.ofNullable(pushFrequency.get()).filter(s -> !s.isBlank());
     }
 
     public void setPassword(String password) {
