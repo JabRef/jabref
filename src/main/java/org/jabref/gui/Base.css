@@ -1887,17 +1887,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -fx-control-inner-background;
 }
 
-#entryEditor #related-articles-tab * {
-    -fx-fill: -fx-text-background-color;
-}
-
 #entryEditor .ai-tab {
     -fx-padding: 20 20 20 20;
     -fx-background-color: -fx-control-inner-background;
-}
-
-#entryEditor .ai-tab * {
-    -fx-fill: -fx-text-background-color;
 }
 
 #entryEditor .gdpr-notice {
@@ -1907,10 +1899,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 2;
     -fx-padding: 12;
     -fx-font-size: 1.3em;
-}
-
-#entryEditor .gdpr-notice * {
-    -fx-fill: -fx-text-background-color;
 }
 
 #entryEditor .recommendation-item {

@@ -6,10 +6,11 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -25,7 +26,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
     private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);
 
     @FXML private VBox text;
-    @FXML private TextFlow aiPolicies;
+    @FXML private GridPane aiPolicies;
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
@@ -68,18 +69,16 @@ public class PrivacyNoticeComponent extends ScrollPane {
         embeddingModelText.wrappingWidthProperty().bind(textWidth);
     }
 
-    private void addPrivacyHyperlink(TextFlow textFlow, AiProvider aiProvider) {
-        Text text = new Text(aiProvider.getLabel() + "\t");
-        text.wrappingWidthProperty().bind(this.widthProperty());
-        textFlow.getChildren().addLast(text);
+    private void addPrivacyHyperlink(GridPane gridPane, AiProvider aiProvider) {
+        int row = gridPane.getRowCount();
+        Label aiName = new Label(aiProvider.getLabel());
+        gridPane.add(aiName, 0, row);
 
         Hyperlink hyperlink = new Hyperlink(aiProvider.getApiUrl());
         hyperlink.setWrapText(true);
-        hyperlink.setFont(text.getFont());
+        // hyperlink.setFont(aiName.getFont());
         hyperlink.setOnAction(event -> openBrowser(aiProvider.getApiUrl()));
-        textFlow.getChildren().addLast(hyperlink);
-
-        textFlow.getChildren().addLast(new Text("\n"));
+        gridPane.add(hyperlink, 1, row);
     }
 
     @FXML
