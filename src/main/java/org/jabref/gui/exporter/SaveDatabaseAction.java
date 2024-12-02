@@ -268,7 +268,7 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
-        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManagerGit.performBackup
+        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
         SelfContainedSaveConfiguration saveConfiguration
                 = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
