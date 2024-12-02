@@ -10,38 +10,34 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.Month;
+import org.jabref.model.entry.Langid;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
-public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
-    private final BibDatabaseMode databaseMode;
+public class LanguageEditorViewModel extends OptionEditorViewModel<Langid> {
+    private BibDatabaseMode databaseMode;
 
-    public MonthEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public LanguageEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.databaseMode = databaseMode;
     }
 
     @Override
-    public StringConverter<Month> getStringConverter() {
+    public StringConverter<Langid> getStringConverter() {
         return new StringConverter<>() {
             @Override
-            public String toString(Month object) {
+            public String toString(Langid object) {
                 if (object == null) {
                     return null;
                 } else {
-                    if (databaseMode == BibDatabaseMode.BIBLATEX) {
-                        return String.valueOf(object.getNumber());
-                    } else {
-                        return object.getJabRefFormat();
-                    }
+                    return object.getLangid();  // Langid used as both display and value
                 }
             }
 
             @Override
-            public Month fromString(String string) {
+            public Langid fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
-                    return Month.parse(string).orElse(null);
+                    return Langid.parse(string).orElse(null);
                 } else {
                     return null;
                 }
@@ -50,12 +46,12 @@ public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     }
 
     @Override
-    public Collection<Month> getItems() {
-        return Arrays.asList(Month.values());
+    public Collection<Langid> getItems() {
+        return Arrays.asList(Langid.values());
     }
 
     @Override
-    public String convertToDisplayText(Month object) {
-        return object.getFullName();
+    public String convertToDisplayText(Langid object) {
+        return object.getName();  // Langid and display text are the same
     }
 }
