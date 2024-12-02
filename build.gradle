@@ -368,7 +368,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0'
     // endregion
 
     implementation 'commons-io:commons-io:2.18.0'
