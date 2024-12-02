@@ -80,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 - We disabled the actions "Open Terminal here" and "Reveal in file explorer" for unsaved libraries. [#11920](https://github.com/JabRef/jabref/issues/11920)
 - JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
+- We enhanced the customizability of JabRef. [#12042](https://github.com/JabRef/jabref/pull/12042)
 
 ### Fixed
 
