@@ -101,9 +101,7 @@ public class CSLUpdateBibliography {
 
         // Use CSLCitationOOAdapter to insert the bibliography
         cslAdapter.insertBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-        LOGGER.debug("Bibliography inserted using CSLCitationOOAdapter");
 
-        cursor.collapseToEnd();
         LOGGER.debug("CSL bibliography section population completed");
     }
 }

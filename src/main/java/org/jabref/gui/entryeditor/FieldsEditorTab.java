@@ -251,7 +251,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     public void removePreviewPanelFromThisTab() {
         assert this.getContent() instanceof SplitPane;
-        if (this.getContent() instanceof SplitPane splitPane && splitPane.getItems().contains(previewPanel)) {
+        if (this.getContent() instanceof SplitPane splitPane) {
             splitPane.getItems().remove(previewPanel);
             // Needed to "redraw" the split pane with one item (because JavaFX does not readjust if it is shown)
             // splitPane.setDividerPositions(1.0);
@@ -260,10 +260,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     @Override
     protected void handleFocus() {
-        LOGGER.error("This is {}", preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
-        LOGGER.error("This is then {}", !preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
+        LOGGER.trace("This is {}", preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
+        LOGGER.trace("This is then {}", !preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
         if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
-            LOGGER.error("Focus on preview panel");
+            LOGGER.trace("Focus on preview panel");
 
             // We need to move the preview panel from the non-visible tab to the visible tab
             removePreviewPanelFromOtherTabs();

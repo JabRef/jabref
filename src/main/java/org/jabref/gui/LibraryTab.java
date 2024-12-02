@@ -941,8 +941,7 @@ public class LibraryTab extends Tab {
     private List<BibEntry> handleNonBibTeXStringData(String data) {
         try {
             return this.importHandler.handleStringData(data);
-        } catch (
-                FetcherException exception) {
+        } catch (FetcherException exception) {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
             } else if (exception instanceof FetcherServerException) {
