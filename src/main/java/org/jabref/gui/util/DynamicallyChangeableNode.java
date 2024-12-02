@@ -5,8 +5,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
-
 /**
  * A node that can change its content using a setContent(Node) method, similar to {@link Tab}.
  * <p>

@@ -7,8 +7,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent?>
-<?import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent?>
+<?import org.jabref.gui.ai.components.chat.history.ChatHistoryComponent?>
+<?import org.jabref.gui.ai.components.chat.prompt.ChatPromptComponent?>
 <?import org.jabref.gui.ai.components.util.Loadable?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root
@@ -17,7 +17,7 @@
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fillWidth="true"
-        fx:controller="org.jabref.gui.ai.components.aichat.AiChatComponent">
+        fx:controller="org.jabref.gui.ai.components.chat.RawAiChatComponent">
     <padding>
         <Insets bottom="10.0"
                 left="10.0"

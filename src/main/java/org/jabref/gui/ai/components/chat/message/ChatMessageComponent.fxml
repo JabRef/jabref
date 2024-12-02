@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import com.dlsc.gemsfx.ExpandingTextArea?>
-<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent">
+<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.chat.message.ChatMessageComponent">
     <children>
         <HBox fx:id="wrapperHBox" spacing="10.0">
             <VBox fx:id="vBox" spacing="10.0">

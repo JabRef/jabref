@@ -20,7 +20,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.ai.windows.AiChatWindow;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;

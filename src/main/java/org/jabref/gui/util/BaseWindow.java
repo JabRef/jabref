@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.jabref.gui.ai.windows.AiChatWindow;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -21,7 +22,7 @@ import com.airhacks.afterburner.injection.Injector;
  * {@link org.jabref.gui.DialogService#showCustomWindow(BaseWindow)} in order to show the window. All the JabRef styles
  * will be applied.
  * <p>
- * See {@link org.jabref.gui.ai.components.aichat.AiChatWindow} for example.
+ * See {@link AiChatWindow} for example.
  */
 public class BaseWindow extends Stage {
     private final ObservableList<String> stylesheets = FXCollections.observableArrayList();

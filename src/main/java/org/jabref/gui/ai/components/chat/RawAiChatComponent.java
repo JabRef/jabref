@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.aichat;
+package org.jabref.gui.ai.components.chat;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
-import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
+import org.jabref.gui.ai.components.chat.history.ChatHistoryComponent;
+import org.jabref.gui.ai.components.chat.prompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
@@ -43,8 +43,14 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AiChatComponent extends VBox {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
+/**
+ * Unguarded AI chat.
+ * <p>
+ * Must not be used across UI, except {@link org.jabref.gui.ai} package as it requires that user agrees with AI privacy
+ * policy and embedding model is built.
+ */
+public class RawAiChatComponent extends VBox {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RawAiChatComponent.class);
 
     private final AiService aiService;
     private final ObservableList<BibEntry> entries;
@@ -63,14 +69,14 @@ public class AiChatComponent extends VBox {
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
 
-    public AiChatComponent(AiService aiService,
-                           StringProperty name,
-                           ObservableList<ChatMessage> chatHistory,
-                           ObservableList<BibEntry> entries,
-                           BibDatabaseContext bibDatabaseContext,
-                           AiPreferences aiPreferences,
-                           DialogService dialogService,
-                           TaskExecutor taskExecutor
+    public RawAiChatComponent(AiService aiService,
+                              StringProperty name,
+                              ObservableList<ChatMessage> chatHistory,
+                              ObservableList<BibEntry> entries,
+                              BibDatabaseContext bibDatabaseContext,
+                              AiPreferences aiPreferences,
+                              DialogService dialogService,
+                              TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
         this.entries = entries;

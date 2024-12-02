@@ -1,10 +1,11 @@
-package org.jabref.gui.ai.components.aichat;
+package org.jabref.gui.ai.windows;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.ai.components.chat.AiChatComponent;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseWindow;
 import org.jabref.logic.ai.AiPreferences;
@@ -44,7 +45,7 @@ public class AiChatWindow extends BaseWindow {
         chatName = name.getValue();
         setScene(
                 new Scene(
-                        new AiChatGuardedComponent(
+                        new AiChatComponent(
                                 name,
                                 chatHistory,
                                 bibDatabaseContext,

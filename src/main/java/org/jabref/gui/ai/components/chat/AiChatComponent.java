@@ -1,12 +1,16 @@
-package org.jabref.gui.ai.components.aichat;
+package org.jabref.gui.ai.components.chat;
+
+import java.util.List;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
+import org.jabref.gui.ai.components.guards.EmbeddingModelGuard;
+import org.jabref.gui.ai.components.guards.privacynotice.AiPrivacyNoticeGuard;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.util.guards.GuardedComponent;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.TaskExecutor;
@@ -18,12 +22,7 @@ import dev.langchain4j.data.message.ChatMessage;
 /**
  * Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.
  */
-public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
-    /// This field is used for two purposes:
-    /// 1. Logging
-    /// 2. Title of group chat window
-    /// Thus, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
-    /// this parameter. However, for group chat window, you should.
+public class AiChatComponent extends GuardedComponent {
     private final StringProperty name;
 
     private final ObservableList<ChatMessage> chatHistory;
@@ -34,17 +33,20 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     private final AiPreferences aiPreferences;
     private final TaskExecutor taskExecutor;
 
-    public AiChatGuardedComponent(StringProperty name,
-                                  ObservableList<ChatMessage> chatHistory,
-                                  BibDatabaseContext bibDatabaseContext,
-                                  ObservableList<BibEntry> entries,
-                                  AiService aiService,
-                                  DialogService dialogService,
-                                  AiPreferences aiPreferences,
-                                  ExternalApplicationsPreferences externalApplicationsPreferences,
-                                  TaskExecutor taskExecutor
+    public AiChatComponent(StringProperty name,
+                           ObservableList<ChatMessage> chatHistory,
+                           BibDatabaseContext bibDatabaseContext,
+                           ObservableList<BibEntry> entries,
+                           AiService aiService,
+                           DialogService dialogService,
+                           AiPreferences aiPreferences,
+                           ExternalApplicationsPreferences externalApplicationsPreferences,
+                           TaskExecutor taskExecutor
     ) {
-        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService);
+        super(List.of(
+                new AiPrivacyNoticeGuard(aiPreferences, externalApplicationsPreferences, dialogService),
+                new EmbeddingModelGuard(aiService)
+        ));
 
         this.name = name;
         this.chatHistory = chatHistory;
@@ -55,12 +57,12 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
         this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
 
-        rebuildUi();
+        checkGuards();
     }
 
     @Override
-    protected Node showEmbeddingModelGuardedContent() {
-        return new AiChatComponent(
+    protected Node showGuardedComponent() {
+        return new RawAiChatComponent(
                 aiService,
                 name,
                 chatHistory,

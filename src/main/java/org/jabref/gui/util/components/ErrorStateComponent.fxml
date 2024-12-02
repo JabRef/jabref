@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<fx:root prefHeight="200.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent">
+<fx:root prefHeight="200.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.util.components.ErrorStateComponent">
    <center>
       <VBox fx:id="contentsVBox" alignment="CENTER" spacing="10.0">
          <children>
