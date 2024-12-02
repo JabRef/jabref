@@ -38,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- We added support for `langid` field for biblatex libraries. [#10868](https://github.com/JabRef/jabref/issues/10868)
 - We added support for modifier keys when dropping a file on an entry in the main table. [#12001](https://github.com/JabRef/jabref/pull/12001)
 - We added an importer for SSRN URLs. [#12021](https://github.com/JabRef/jabref/pull/12021)
 - We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
@@ -47,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added new modifiers `camel_case`, `camel_case_n`, `short_title`, and `very_short_title` for the [citation key generator](https://docs.jabref.org/setup/citationkeypatterns). [#11367](https://github.com/JabRef/jabref/issues/11367)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 - We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
+- The PDF content importer now supports importing title from upto the second page of the PDF. [#12139](https://github.com/JabRef/jabref/issues/12139)
 
 ### Changed
 
@@ -80,6 +82,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 - We disabled the actions "Open Terminal here" and "Reveal in file explorer" for unsaved libraries. [#11920](https://github.com/JabRef/jabref/issues/11920)
 - JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
+
 
 ### Fixed
 
@@ -122,6 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
 - We fixed an issue when the preview was out of sync. [#9172](https://github.com/JabRef/jabref/issues/9172)
 - We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
+- We fixed an issue when click on entry at "Check Integrity" wasn't properly focusing the entry and field. [#11997](https://github.com/JabRef/jabref/issues/11997)
 
 ### Removed
 
