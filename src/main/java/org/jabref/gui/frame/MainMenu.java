@@ -73,7 +73,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.git.SynchronizeCommand;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -155,6 +154,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
+
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
@@ -178,12 +178,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.QUIT, new JabRefFrame.CloseAction(frame)),
-
-                new SeparatorMenuItem(),
-
-                // change second argument
-                factory.createMenuItem(StandardActions.SYNCHRONIZE, new SynchronizeCommand())
+                factory.createMenuItem(StandardActions.QUIT, new JabRefFrame.CloseAction(frame))
         );
 
         edit.getItems().addAll(
