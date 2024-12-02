@@ -377,7 +377,7 @@ dependencies {
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
 
     implementation 'io.zonky.test:embedded-postgres:2.1.0'
-    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.0.0')
+    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.2.0')
 
     testImplementation 'io.github.classgraph:classgraph:4.8.177'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
