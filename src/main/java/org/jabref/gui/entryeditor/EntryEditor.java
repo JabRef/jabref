@@ -255,7 +255,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     @FXML
     private void close() {
-        tabSupplier.get().entryEditorClosing();
+        stateManager.getEditorShowing().set(false);
     }
 
     @FXML

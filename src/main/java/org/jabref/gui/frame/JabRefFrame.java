@@ -12,6 +12,9 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
@@ -50,6 +53,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -108,8 +112,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final SplitPane verticalSplit = new SplitPane();
     private final TabPane tabbedPane = new TabPane();
     private final EntryEditor entryEditor;
-
-    private PanelMode mode = PanelMode.MAIN_TABLE;
+    private ObjectProperty<PanelMode> panelMode = new SimpleObjectProperty<>(PanelMode.MAIN_TABLE);
 
     // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
     private Subscription horizontalDividerSubscription;
@@ -183,6 +186,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
                 new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
                 new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+        Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.pushToApplicationCommand = new PushToApplicationCommand(
                 stateManager,
@@ -274,7 +278,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateEditorPane() {
-        if (mode == PanelMode.MAIN_TABLE) {
+        if (panelMode.get() == PanelMode.MAIN_TABLE) {
             if (verticalDividerSubscription != null) {
                 verticalDividerSubscription.unsubscribe();
             }
@@ -297,7 +301,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateVerticalDividerPosition() {
-        if (mainStage.isShowing() && mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
+        if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             verticalSplit.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition() / verticalSplit.getHeight());
             // ToDo: Move DividerPosition to GuiPreferences
             verticalDividerSubscription = EasyBind.valueAt(verticalSplit.getDividers(), 0)
@@ -443,6 +447,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE, // not a minus, but codepoint 2013
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
+        });
+
+        BindingsHelper.bindBidirectional((ObservableValue<Boolean>) stateManager.getEditorShowing(), panelMode,
+                mode -> stateManager.getEditorShowing().setValue(mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR),
+                showing -> panelMode.setValue(showing ? PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR : PanelMode.MAIN_TABLE));
+        EasyBind.subscribe(panelMode, mode -> {
+            updateEditorPane();
+            if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
+                entryEditor.requestFocus();
+            }
         });
     }
 

@@ -8,8 +8,10 @@ import java.util.Optional;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -78,6 +80,7 @@ public class StateManager {
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
     private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
+    private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -230,5 +233,9 @@ public class StateManager {
 
     public List<AiChatWindow> getAiChatWindows() {
         return aiChatWindows;
+    }
+
+    public BooleanProperty getEditorShowing() {
+        return editorShowing;
     }
 }

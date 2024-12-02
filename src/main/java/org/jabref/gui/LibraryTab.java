@@ -85,7 +85,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
@@ -452,14 +451,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void editEntryAndFocusField(BibEntry entry, Field field) {
-        showAndEdit(entry);
-        Platform.runLater(() -> {
-            // Focus field and entry in main table (async to give entry editor time to load)
-            entryEditor.setFocusToField(field);
-        });
-    }
-
     private void createMainTable() {
         mainTable = new MainTable(tableModel,
                 this,
@@ -523,33 +514,10 @@ public class LibraryTab extends Tab {
         return searchAutoCompleter;
     }
 
-    /**
-     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure that the divider doesn't move. Updates the mode to {@link PanelMode#MAIN_TABLE_AND_ENTRY_EDITOR}.
-     * Then shows the given entry.
-     *
-     * Additionally, selects the entry in the main table - so that the selected entry in the main table always corresponds to the edited entry.
-     *
-     * @param entry The entry to edit.
-     */
     public void showAndEdit(BibEntry entry) {
         this.clearAndSelect(entry);
-        if (!splitPane.getItems().contains(entryEditor)) {
-            splitPane.getItems().addLast(entryEditor);
-            mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
-            splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition());
-        }
 
-        // We use != instead of equals because of performance reasons
-        if (entry != showing) {
-            entryEditor.setCurrentlyEditedEntry(entry);
-            showing = entry;
-        }
-        entryEditor.requestFocus();
-    }
-
-    public void closeBottomPane() {
-        mode = PanelMode.MAIN_TABLE;
-        splitPane.getItems().remove(entryEditor);
+        // entryEditor.requestFocus();
     }
 
     /**
@@ -565,14 +533,6 @@ public class LibraryTab extends Tab {
 
     public void selectNextEntry() {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
-    }
-
-    /**
-     * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which takes care of the rest.
-     */
-    public void entryEditorClosing() {
-        closeBottomPane();
-        mainTable.requestFocus();
     }
 
     /**
@@ -827,6 +787,7 @@ public class LibraryTab extends Tab {
         importHandler.importCleanedEntries(entries);
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
+        stateManager.setSelectedEntries(entries);
         if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
             showAndEdit(entries.getFirst());
         } else {
