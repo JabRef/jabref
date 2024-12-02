@@ -54,13 +54,14 @@ java {
 
     toolchain {
         // If this is updated, also update
-        // - .gitpod.Dockerfile
+        // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
         // - .devcontainer/devcontainer.json#L34 and
+        // - .gitpod.Dockerfile
+        // - .moderne/moderne.yml
         // - .github/workflows/deployment*.yml
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
         languageVersion = JavaLanguageVersion.of(23)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // vendor = JvmVendorSpec.AMAZON
@@ -255,7 +256,7 @@ dependencies {
         exclude group: 'tech.units'
     }
     // Required by gemsfx
-    implementation 'tech.units:indriya:2.2'
+    implementation 'tech.units:indriya:2.2.1'
     // Required by gemsfx and langchain4j
     implementation ('com.squareup.retrofit2:retrofit:2.11.0') {
         exclude group: 'com.squareup.okhttp3'
@@ -336,7 +337,7 @@ dependencies {
     // region AI
     implementation 'dev.langchain4j:langchain4j:0.36.0'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation('dev.langchain4j:langchain4j-open-ai:0.36.0') {
+    implementation('dev.langchain4j:langchain4j-open-ai:0.36.2') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
@@ -367,7 +368,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0'
     // endregion
 
     implementation 'commons-io:commons-io:2.18.0'
@@ -376,9 +377,9 @@ dependencies {
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
 
     implementation 'io.zonky.test:embedded-postgres:2.1.0'
-    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.0.0')
+    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.2.0')
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.177'
+    testImplementation 'io.github.classgraph:classgraph:4.8.179'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.11.3'
 
