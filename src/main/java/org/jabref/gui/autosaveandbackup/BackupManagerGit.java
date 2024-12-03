@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.gui.LibraryTab;
@@ -46,9 +47,9 @@ public class BackupManagerGit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerGit.class);
 
-    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 4;
 
-    private static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
+    static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
 
     private static Git git;
 
@@ -62,6 +63,14 @@ public class BackupManagerGit {
     private boolean needsBackup = false;
 
     BackupManagerGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+        // Get the path of the BibDatabase file
+        Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
+
+        if (!Files.exists(dbFile)) {
+            LOGGER.error("Database file does not exist: {}", dbFile);
+            throw new IOException("Database file not found: " + dbFile);
+        }
+
         this.bibDatabaseContext = bibDatabaseContext;
         LOGGER.info("Backup manager initialized for file: {}", bibDatabaseContext.getDatabasePath().orElseThrow());
         this.entryTypesManager = entryTypesManager;
@@ -86,7 +95,7 @@ public class BackupManagerGit {
         }
 
         // Get the path of the BibDatabase file
-        Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
+        Path dbFilePath = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
 
         // Copy the database file to the backup directory
         Path backupFilePath = backupDirPath.resolve(dbFile.getFileName());
@@ -99,7 +108,24 @@ public class BackupManagerGit {
         }
     }
 
-    private static void ensureGitInitialized(Path backupDir) throws IOException, GitAPIException {
+    private static String normalizeBibTeX(String input) {
+        if (input == null || input.isBlank()) {
+            return "";
+        }
+
+        // Diviser les lignes et traiter chaque ligne
+        Stream<String> lines = input.lines();
+
+        // Normalisation des lignes
+        String normalized = lines
+                .map(String::trim) // Supprimer les espaces en début et fin de ligne
+                .filter(line -> !line.isBlank()) // Supprimer les lignes vides
+                .collect(Collectors.joining("\n")); // Réassembler avec des sauts de ligne
+
+        return normalized;
+    }
+
+    static void ensureGitInitialized(Path backupDir) throws IOException, GitAPIException {
 
         // This method was created because the initialization of the Git object, when written in the constructor, was causing a NullPointerException
         // because the first method called when loading the database is BackupGitdiffers
@@ -140,6 +166,7 @@ public class BackupManagerGit {
      */
 
     public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+        LOGGER.info("In methode Start");
         BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), bibDatabaseContext);
         runningInstances.add(backupManagerGit);
@@ -170,7 +197,7 @@ public class BackupManagerGit {
      */
 
     void startBackupTask(Path backupDir, BibDatabaseContext bibDatabaseContext) {
-        LOGGER.info("Initializing backup task for directory: {} and file: {}", backupDir);
+        LOGGER.info("Initializing backup task for directory: {} and file: {}", backupDir, bibDatabaseContext.getDatabasePath().orElseThrow());
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
@@ -229,7 +256,8 @@ public class BackupManagerGit {
         RevCommit commit = git.commit()
                               .setMessage("Backup at " + Instant.now().toString())
                               .call();
-        LOGGER.info("Backup committed in :" + backupDir + " with commit ID: " + commit.getName());
+        LOGGER.info("Backup committed in :" + backupDir + " with commit ID: " + commit.getName()
+        + " for the file : {}", bibDatabaseContext.getDatabasePath().orElseThrow());
     }
 
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
@@ -309,6 +337,7 @@ public class BackupManagerGit {
                 LOGGER.info("Checking file: {}", relativePath);
 
                 try {
+
                     // Check if the file exists in the latest commit
                     ObjectId objectId = repository.resolve("HEAD:" + relativePath.toString().replace("\\", "/"));
                     if (objectId == null) {
@@ -318,8 +347,10 @@ public class BackupManagerGit {
 
                     // Compare the content of the file in the Git repository with the current file
                     ObjectLoader loader = repository.open(objectId);
-                    String committedContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
-                    String currentContent = Files.readString(path, StandardCharsets.UTF_8);
+                    String committedContent = normalizeBibTeX(new String(loader.getBytes(), StandardCharsets.UTF_8));
+                    String currentContent = normalizeBibTeX(Files.readString(path, StandardCharsets.UTF_8));
+                    LOGGER.info("Committed content: {}", committedContent);
+                    LOGGER.info("Current content: {}", currentContent);
 
                     // If the contents differ, return true
                     if (!currentContent.equals(committedContent)) {
