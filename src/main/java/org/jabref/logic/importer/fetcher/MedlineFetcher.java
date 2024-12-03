@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -144,6 +145,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("status"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("copyright"), new ClearFormatter()).cleanup(entry);
+
+        new AbbreviateJournalCleanup().cleanup(entry);
 
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);

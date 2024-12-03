@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
@@ -116,6 +117,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         if (entry.getField(StandardField.TITLE).equals(entry.getField(StandardField.SUBTITLE))) {
             new FieldFormatterCleanup(StandardField.SUBTITLE, new ClearFormatter()).cleanup(entry);
         }
+        new AbbreviateJournalCleanup().cleanup(entry);
     }
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {

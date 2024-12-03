@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
@@ -72,6 +73,8 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     public void doPostCleanup(BibEntry entry) {
         // Remove strange "SLACcitation" field
         new FieldFormatterCleanup(new UnknownField("SLACcitation"), new ClearFormatter()).cleanup(entry);
+
+        new AbbreviateJournalCleanup().cleanup(entry);
 
         // Remove braces around content of "title" field
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);

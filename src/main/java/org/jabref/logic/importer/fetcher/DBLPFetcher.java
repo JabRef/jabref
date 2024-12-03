@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -63,6 +64,8 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     public void doPostCleanup(BibEntry entry) {
         DoiCleanup doiCleaner = new DoiCleanup();
         doiCleaner.cleanup(entry);
+
+        new AbbreviateJournalCleanup().cleanup(entry);
 
         FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
                 List.of(

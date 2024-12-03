@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
@@ -262,6 +263,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         new FieldFormatterCleanup(new UnknownField("mrreviewer"), new ClearFormatter()).cleanup(entry);
         new DoiCleanup().cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
+        new AbbreviateJournalCleanup().cleanup(entry);
 
         // Remove comments: MathSciNet prepends a <pre> html tag
         entry.setCommentsBeforeEntry("");

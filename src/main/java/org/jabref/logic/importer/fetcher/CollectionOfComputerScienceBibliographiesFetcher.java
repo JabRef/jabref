@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
@@ -58,6 +59,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
         new FieldFormatterCleanup(StandardField.ABSTRACT, new ReplaceTabsBySpaceFormater()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveRedundantSpacesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
+
+        new AbbreviateJournalCleanup().cleanup(entry);
+
         // identifier fields is a key-value field
         // example: "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000505046100032; Scopus 2-s2.0-85037741580"
         // thus, key can contain multiple ":"; sometimes value separated by " " instead of ":"

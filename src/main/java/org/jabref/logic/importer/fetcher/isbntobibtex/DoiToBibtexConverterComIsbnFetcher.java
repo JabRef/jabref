@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -69,6 +70,7 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
 
     @Override
     public void doPostCleanup(BibEntry entry) {
+        new AbbreviateJournalCleanup().cleanup(entry);
     }
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
