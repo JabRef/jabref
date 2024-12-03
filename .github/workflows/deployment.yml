@@ -81,12 +81,12 @@ jobs:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3.0.2
+        uses: gittools/actions/gitversion/setup@v3.0.3
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3.0.2
+        uses: gittools/actions/gitversion/execute@v3.0.3
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:

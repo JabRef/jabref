@@ -585,6 +585,75 @@ class BracketedPatternTest {
     }
 
     /**
+     * Test the [:camel] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'CamelTitleFormatter', 'Camel Title Formatter'",
+            "'CamelTitleFormatter', 'CAMEL TITLE FORMATTER'",
+            "'CamelTitleFormatter', 'camel title formatter'",
+            "'CamelTitleFormatter', 'cAMEL tITLE fORMATTER'",
+            "'C', 'c'"
+    })
+
+    void expandBracketsCamelTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:camel]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:veryshorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very', 'A very short title'",
+            "'V', 'V'",
+            "'V', 'A v'"
+    })
+
+    void expandBracketsVeryShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:veryshorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:shorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very Short Title', 'A very short title'",
+            "'Short Title', 'Short title'",
+            "'Title', 'A title'",
+            "'Title', 'A Title'"
+    })
+
+    void expandBracketsShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:shorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:camelN] modifier
+     */
+    @Test
+    void expandBracketsCamelNModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, "Open Source Software And The Private Collective Innovation Model Issues");
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[title:camel1]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAnd",
+                BracketedPattern.expandBrackets("[title:camel4]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
+                BracketedPattern.expandBrackets("[title:camel10]", ';', bibEntry, null));
+    }
+
+    /**
      * Test the [camelN] title marker.
      */
     @Test

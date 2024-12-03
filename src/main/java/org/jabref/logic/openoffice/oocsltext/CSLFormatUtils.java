@@ -72,6 +72,15 @@ public class CSLFormatUtils {
         // Clean up any remaining span tags
         html = html.replaceAll("</?span[^>]*>", "");
 
+        // Convert line breaks to paragraph breaks
+        html = html.replaceAll("[\n\r]+", "<p></p>");
+
+        // Remove leading paragraph tags (preserving any whitespaces after them for indentation)
+        html = html.replaceAll("^\\s*<p>\\s*</p>", "");
+
+        // Remove extra trailing paragraph tags when there are multiple (keeping one)
+        html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+
         return html;
     }
 
@@ -113,9 +122,9 @@ public class CSLFormatUtils {
 
     /**
      * Method to update citation number of a bibliographic entry (to be inserted in the list of references).
-     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} always start the numbering of a list of citations with "1".
-     * If a citation doesn't correspond to the first cited entry, the number should be changed to the relevant current citation number.
-     * If an entries has been cited before, the colder number should be reused.
+     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} always starts the numbering of a list of citations with "1".
+     * If a citation doesn't correspond to the first cited entry, the number should be changed to the appropriate current citation number.
+     * The numbers should be globally unique. If an entry has been cited before, the older citation number corresponding to it should be reused.
      * The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
      * <p>
      * <b>Precondition:</b> Use ONLY with numeric citation styles.</p>
