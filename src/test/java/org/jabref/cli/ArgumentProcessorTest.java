@@ -1,5 +1,7 @@
 package org.jabref.cli;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -139,5 +141,34 @@ class ArgumentProcessorTest {
         processor.processArguments();
 
         assertTrue(Files.exists(outputHtml));
+    }
+
+    @Test
+    void checkConsistency(@TempDir Path tempDir) throws Exception {
+        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("test-entry.bib")).toURI());
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--check-consistency-output-format", "TXT");
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+
+        // Redirect System.out to capture output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        processor.processArguments();
+
+        // Check if the output contains the expected message
+        String output = outContent.toString();
+        assertTrue(output.contains("Consistency check completed"));
+        assertTrue(output.contains("_consistency_check.txt"));
+
+        // Reset System.out
+        System.setOut(System.out);
     }
 }
