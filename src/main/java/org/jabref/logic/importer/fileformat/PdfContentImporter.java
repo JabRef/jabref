@@ -24,6 +24,7 @@ import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -360,6 +361,7 @@ public class PdfContentImporter extends PdfImporter {
         String title;
         String conference = null;
         String doi = null;
+        String arxivId = null;
         String series = null;
         String volume = null;
         String number = null;
@@ -372,6 +374,7 @@ public class PdfContentImporter extends PdfImporter {
             // special case: possibly conference as first line on the page
             extractYear();
             doi = getDoi(null);
+            arxivId = getArxivId(null);
             if (curString.contains("Conference")) {
                 fillCurStringWithNonEmptyLines();
                 conference = curString;
@@ -507,6 +510,7 @@ public class PdfContentImporter extends PdfImporter {
                 }
             } else {
                 doi = getDoi(doi);
+                arxivId = getArxivId(arxivId);
 
                 if ((publisher == null) && curString.contains("IEEE")) {
                     // IEEE has the conference things at the end
@@ -557,6 +561,9 @@ public class PdfContentImporter extends PdfImporter {
         if (doi != null) {
             entry.setField(StandardField.DOI, doi);
         }
+        if (arxivId != null) {
+            entry.setField(StandardField.EPRINT, arxivId);
+        }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
         }
@@ -570,6 +577,9 @@ public class PdfContentImporter extends PdfImporter {
             entry.setField(StandardField.PAGES, pages);
         }
         if (year != null) {
+            if (arxivId != null) {
+                year = "20" + arxivId.substring(0, 2);
+            }
             entry.setField(StandardField.YEAR, year);
         }
         if (publisher != null) {
@@ -590,6 +600,21 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
         return doi;
+    }
+
+    private String getArxivId(String arxivId) {
+        int pos;
+        if (arxivId == null) {
+            pos = curString.indexOf("arxiv");
+            if (pos < 0) {
+                pos = curString.indexOf("arXiv");
+            }
+            if (pos >= 0) {
+                String arxivText = curString.substring(pos);
+                return ArXivIdentifier.parse(arxivText).map(ArXivIdentifier::asString).orElse(null);
+            }
+        }
+        return arxivId;
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {
