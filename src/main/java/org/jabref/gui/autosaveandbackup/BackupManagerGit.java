@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -45,11 +46,11 @@ import org.slf4j.LoggerFactory;
 
 public class BackupManagerGit {
 
+    static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerGit.class);
 
-    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 4;
-
-    static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
     private static Git git;
 
@@ -63,9 +64,7 @@ public class BackupManagerGit {
     private boolean needsBackup = false;
 
     BackupManagerGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
-        // Get the path of the BibDatabase file
         Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
-
         if (!Files.exists(dbFile)) {
             LOGGER.error("Database file does not exist: {}", dbFile);
             throw new IOException("Database file not found: " + dbFile);
@@ -81,11 +80,9 @@ public class BackupManagerGit {
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
 
-        // Ensure the backup directory exists
         Path backupDirPath = preferences.getFilePreferences().getBackupDirectory();
         LOGGER.info("Backup directory path: {}", backupDirPath);
 
-        // Ensure Git is initialized
         ensureGitInitialized(backupDirPath);
 
         File backupDir = backupDirPath.toFile();
@@ -94,20 +91,54 @@ public class BackupManagerGit {
             throw new IOException("Unable to create backup directory: " + backupDir);
         }
 
-        // Get the path of the BibDatabase file
-        Path dbFilePath = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
-
-        // Copy the database file to the backup directory
-        Path backupFilePath = backupDirPath.resolve(dbFile.getFileName());
-        try {
-            Files.copy(dbFile, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
-            LOGGER.info("Database file copied to backup directory: {}", backupFilePath);
-        } catch (IOException e) {
-            LOGGER.error("Failed to copy database file to backup directory", e);
-            throw new IOException("Error copying database file to backup directory", e);
-        }
+        copyDatabaseFileToBackupDir(dbFile, backupDirPath);
     }
 
+    /**
+     * Appends a UUID to a file name, keeping the original extension.
+     *
+     * @param originalFileName The original file name (e.g., library.bib).
+     * @param uuid             The UUID to append.
+     * @return The modified file name with the UUID (e.g., library_123e4567-e89b-12d3-a456-426614174000.bib).
+     */
+    private String appendUuidToFileName(String originalFileName, String uuid) {
+        int dotIndex = originalFileName.lastIndexOf('.');
+        if (dotIndex == -1) {
+            // If there's no extension, just append the UUID
+            return originalFileName + "_" + uuid;
+        }
+
+        // Insert the UUID before the extension
+        String baseName = originalFileName.substring(0, dotIndex);
+        String extension = originalFileName.substring(dotIndex);
+        return baseName + "_" + uuid + extension;
+    }
+
+    /**
+     * Retrieves or generates a persistent unique identifier (UUID) for the given file.
+     * The UUID is stored in an extended attribute or a metadata file alongside the original file.
+     *
+     * @param filePath The path to the file.
+     * @return The UUID associated with the file.
+     * @throws IOException If an error occurs while accessing or creating the UUID.
+     */
+    private String getOrGenerateFileUuid(Path filePath) throws IOException {
+        // Define a hidden metadata file to store the UUID
+        Path metadataFile = filePath.resolveSibling("." + filePath.getFileName().toString() + ".uuid");
+
+        // If the UUID metadata file exists, read it
+        if (Files.exists(metadataFile)) {
+            return Files.readString(metadataFile).trim();
+        }
+
+        // Otherwise, generate a new UUID and save it
+        String uuid = UUID.randomUUID().toString();
+        Files.writeString(metadataFile, uuid);
+        LOGGER.info("Generated new UUID for file {}: {}", filePath, uuid);
+        return uuid;
+    }
+
+    // Helper method to normalize BibTeX content
     private static String normalizeBibTeX(String input) {
         if (input == null || input.isBlank()) {
             return "";
@@ -125,6 +156,7 @@ public class BackupManagerGit {
         return normalized;
     }
 
+    // Helper method to ensure the Git repository is initialized
     static void ensureGitInitialized(Path backupDir) throws IOException, GitAPIException {
 
         // This method was created because the initialization of the Git object, when written in the constructor, was causing a NullPointerException
@@ -153,6 +185,19 @@ public class BackupManagerGit {
         git = new Git(repository);
     }
 
+    // Helper method to copy the database file to the backup directory
+    private void copyDatabaseFileToBackupDir(Path dbFile, Path backupDirPath) throws IOException {
+        String fileUuid = getOrGenerateFileUuid(dbFile);
+        String uniqueFileName = appendUuidToFileName(dbFile.getFileName().toString(), fileUuid);
+        Path backupFilePath = backupDirPath.resolve(uniqueFileName);
+        if (!Files.exists(backupFilePath) || Files.mismatch(dbFile, backupFilePath) != -1) {
+            Files.copy(dbFile, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("Database file uniquely copied to backup directory: {}", backupFilePath);
+        } else {
+            LOGGER.info("No changes detected; skipping backup for file: {}", uniqueFileName);
+        }
+    }
+
     /**
      * Starts a new BackupManagerGit instance and begins the backup task.
      *
@@ -178,16 +223,15 @@ public class BackupManagerGit {
      *
      * @param bibDatabaseContext the BibDatabaseContext
      * @param createBackup whether to create a backup before shutting down
-     * @param originalPath the original path of the file to be backed up
      */
-    public static void shutdown(BibDatabaseContext bibDatabaseContext, boolean createBackup, Path originalPath) {
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, boolean createBackup) {
         runningInstances.stream()
                         .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
-                        .forEach(backupManager -> backupManager.shutdownGit(bibDatabaseContext.getDatabasePath().orElseThrow().getParent().resolve("backup"), createBackup, originalPath));
+                        .forEach(backupManager -> backupManager.shutdownGit(bibDatabaseContext.getDatabasePath().orElseThrow().getParent().resolve("backup"), createBackup));
 
         // Remove the instances associated with the BibDatabaseContext after shutdown
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
-        LOGGER.info("Shut down backup manager for file: {}", originalPath);
+        LOGGER.info("Shut down backup manager for file: {}");
     }
 
     /**
@@ -201,19 +245,8 @@ public class BackupManagerGit {
         executor.scheduleAtFixedRate(
                 () -> {
                     try {
-                        // Copy the database file to the backup directory
                         Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
-
-                        // Copy the database file to the backup directory (overwriting any existing file)
-                        Path backupFilePath = backupDir.resolve(dbFile.getFileName());
-                        try {
-                            Files.copy(dbFile, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
-                            LOGGER.info("Database file copied to backup directory: {}", backupFilePath);
-                        } catch (IOException e) {
-                            LOGGER.error("Failed to copy database file to backup directory", e);
-                            throw new IOException("Error copying database file to backup directory", e);
-                        }
-
+                        copyDatabaseFileToBackupDir(dbFile, backupDir);
                         performBackup(backupDir);
                     } catch (IOException | GitAPIException e) {
                         LOGGER.error("Error during backup", e);
@@ -500,21 +533,20 @@ public class BackupManagerGit {
      * Shuts down the JGit components and optionally creates a backup.
      *
      * @param createBackup whether to create a backup before shutting down
-     * @param originalPath the original path of the file to be backed up
      */
 
-    private void shutdownGit(Path backupDir, boolean createBackup, Path originalPath) {
+    private void shutdownGit(Path backupDir, boolean createBackup) {
         // Unregister the listener and shut down the change filter
         if (changeFilter != null) {
             changeFilter.unregisterListener(this);
             changeFilter.shutdown();
-            LOGGER.info("Shut down change filter for file: {}", originalPath);
+            LOGGER.info("Shut down change filter");
         }
 
         // Shut down the executor if it's not already shut down
         if (executor != null && !executor.isShutdown()) {
             executor.shutdown();
-            LOGGER.info("Shut down backup task for file: {}", originalPath);
+            LOGGER.info("Shut down backup task for file: {}");
         }
 
         // If backup is requested, ensure that we perform the Git-based backup
@@ -522,9 +554,9 @@ public class BackupManagerGit {
             try {
                 // Ensure the backup is a recent one by performing the Git commit
                 performBackup(backupDir);
-                LOGGER.info("Backup created on shutdown for file: {}", originalPath);
+                LOGGER.info("Backup created on shutdown for file: {}");
             } catch (IOException | GitAPIException e) {
-                LOGGER.error("Error during Git backup on shutdown", e);
+                LOGGER.error("Error during Git backup on shutdown");
             }
         }
     }
