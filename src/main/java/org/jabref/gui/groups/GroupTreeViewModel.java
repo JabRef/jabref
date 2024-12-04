@@ -261,6 +261,50 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
+     * Opens "Rename Group Dialog" and change name of group
+     */
+    public void renameGroup(GroupNodeViewModel oldGroup) {
+        currentDatabase.ifPresent(database -> {
+            AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
+            String oldGroupName = oldGroupDef.getName();
+
+            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
+                    new RenameGroupView(database,
+                            oldGroup.getGroupNode().getGroup())
+            );
+
+            newGroup.ifPresent(group -> {
+
+                String newGroupName = group.getName();
+
+                if (newGroupName.trim().isEmpty()) {
+                    return;
+                }
+
+                if (newGroupName.contains(",")) {
+                    return;
+                }
+
+                if (oldGroupName.equals(newGroupName)) {
+                    return;
+                }
+
+                int groupsWithSameName = 0;
+                Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                if (databaseRootGroup.isPresent()) {
+                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(newGroupName)).size();
+                }
+
+                if (groupsWithSameName < 2) {
+                    oldGroup.getGroupNode().setGroup(group, true, true, database.getEntries());
+                    writeGroupChangesToMetaData();
+                    refresh();
+                }
+            });
+        });
+    }
+
+    /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
