@@ -429,6 +429,51 @@ public class BackupManagerGit {
         return false;  // No differences found
     }
 
+    public static Path getBackupFilePath(Path dbFile, Path backupDir) {
+        try {
+            String baseName = dbFile.getFileName().toString();
+            String uuid = getOrGenerateFileUuid(dbFile);
+            String relativeFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+            return backupDir.resolve(relativeFileName);
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeBackupFileToCommit(Path dbFile, Path backupDir, ObjectId objectId) {
+        try (Repository repository = openGitRepository(backupDir)) {
+            // Resolve the filename of dbFile in the repository
+            String baseName = dbFile.getFileName().toString();
+            String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
+            String relativeFilePath = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+            LOGGER.info("Relative file path TO RESTORE: {}", relativeFilePath);
+            String gitPath = backupDir.relativize(backupDir.resolve(relativeFilePath)).toString().replace("\\", "/");
+
+            LOGGER.info("Restoring file: {}", gitPath);
+
+            // Load the content of the file from the specified commit
+            ObjectId fileObjectId = repository.resolve(objectId.getName() + ":" + gitPath);
+            if (fileObjectId == null) { // File not found in the commit
+                performBackupNoCommits(dbFile, backupDir);
+            }
+
+            // Read the content of the file from the Git object
+            ObjectLoader loader = repository.open(fileObjectId);
+            String fileContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
+
+            Path backupFilePath = getBackupFilePath(dbFile, backupDir);
+            // Rewrite the original file at backupFilePath path
+            rewriteFile(backupFilePath, fileContent);
+            LOGGER.info("Restored content to: {}", dbFile);
+        } catch (
+                IOException |
+                IllegalArgumentException |
+                GitAPIException e) {
+            LOGGER.error("Error while restoring the backup: {}", e.getMessage(), e);
+        }
+    }
+
     private static Repository openGitRepository(Path backupDir) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         // Initialize Git repository from the backup directory
@@ -628,7 +673,6 @@ public class BackupManagerGit {
      * @param backupDir the backup directory
      * @param bibDatabaseContext the BibDatabaseContext
      */
-
     private void shutdownGit(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
         // Unregister the listener and shut down the change filter
         if (changeFilter != null) {

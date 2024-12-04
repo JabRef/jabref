@@ -29,8 +29,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -72,7 +70,8 @@ public class BackupUIManager {
                     BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
                     return Optional.empty();
                 } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                    return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                    ObjectId commitId = backups.getFirst().getId();
+                    return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, commitId, commitId);
                 } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
                     var recordBackupChoice = showBackupChoiceDialog(dialogService, originalPath, preferences, backups);
                     if (recordBackupChoice.isEmpty()) {
@@ -86,7 +85,9 @@ public class BackupUIManager {
                     }
                     if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {
                         LOGGER.warn(recordBackupChoice.get().entry().getSize());
-                        return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                        ObjectId latestCommitId = backups.getFirst().getId();
+                        ObjectId commitId = recordBackupChoice.get().entry().getId();
+                        return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, commitId, latestCommitId);
                     }
                 }
             } catch (
@@ -119,7 +120,9 @@ public class BackupUIManager {
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
             UndoManager undoManager,
-            StateManager stateManager) {
+            StateManager stateManager,
+            ObjectId commitIdToReview,
+            ObjectId latestCommitId) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
@@ -128,9 +131,13 @@ public class BackupUIManager {
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
-            LOGGER.info("Ligne 127, BackupUIManager, Loading backup database from {}", backupPath);
-            BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
+            Path backupPath = preferences.getFilePreferences().getBackupDirectory();
+
+            BackupManagerGit.writeBackupFileToCommit(originalPath, backupPath, commitIdToReview);
+
+            Path backupFilePath = BackupManagerGit.getBackupFilePath(originalPath, backupPath);
+
+            BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupFilePath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences);
 
@@ -159,6 +166,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
+                BackupManagerGit.writeBackupFileToCommit(originalPath, backupPath, latestCommitId);
                 return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             });
         } catch (IOException e) {
