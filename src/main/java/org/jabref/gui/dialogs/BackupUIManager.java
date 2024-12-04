@@ -65,8 +65,8 @@ public class BackupUIManager {
 
         return actionOpt.flatMap(action -> {
             try {
-                List<RevCommit> commits = BackupManagerGit.retrieveCommits(preferences.getFilePreferences().getBackupDirectory(), -1);
-                List<BackupEntry> backups = BackupManagerGit.retrieveCommitDetails(commits, preferences.getFilePreferences().getBackupDirectory()).reversed();
+                List<RevCommit> commits = BackupManagerGit.retrieveCommits(originalPath, preferences.getFilePreferences().getBackupDirectory(), -1);
+                List<BackupEntry> backups = BackupManagerGit.retrieveCommitDetails(commits, originalPath, preferences.getFilePreferences().getBackupDirectory()).reversed();
                 if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                     ObjectId commitId = backups.getFirst().getId();
                     BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);

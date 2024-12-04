@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -332,8 +331,7 @@ public class BackupManagerGit {
      */
 
     public static void restoreBackup(Path dbFile, Path backupDir, ObjectId objectId) {
-        try (Repository repository = openGitRepository(backupDir);
-             Git git = new Git(repository)) {
+        try (Repository repository = openGitRepository(backupDir)) {
             // Resolve the filename of dbFile in the repository
             String baseName = dbFile.getFileName().toString();
             String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
@@ -345,8 +343,8 @@ public class BackupManagerGit {
 
             // Load the content of the file from the specified commit
             ObjectId fileObjectId = repository.resolve(objectId.getName() + ":" + gitPath);
-            if (fileObjectId == null) {
-                throw new IllegalArgumentException("File not found in commit: " + objectId.getName());
+            if (fileObjectId == null) { // File not found in the commit
+                performBackupNoCommits(dbFile, backupDir);
             }
 
             // Read the content of the file from the Git object
@@ -356,7 +354,10 @@ public class BackupManagerGit {
             // Rewrite the original file at dbFile path
             rewriteFile(dbFile, fileContent);
             LOGGER.info("Restored content to: {}", dbFile);
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (
+                IOException |
+                IllegalArgumentException |
+                GitAPIException e) {
             LOGGER.error("Error while restoring the backup: {}", e.getMessage(), e);
         }
     }
@@ -385,7 +386,9 @@ public class BackupManagerGit {
         ObjectId headCommitId = repository.resolve("HEAD");
         if (headCommitId == null) {
             LOGGER.info("No commits found in the repository. Assuming the file differs.");
-            return true;
+            // perform a commit
+            performBackupNoCommits(dbFile, backupDir);
+            return false;
         }
         LOGGER.info("HEAD commit ID: {}", headCommitId.getName());
 
@@ -438,7 +441,7 @@ public class BackupManagerGit {
     /**
      * Shows the differences between the specified commit and the latest commit.
      *
-     * @param originalPath the original path of the file
+     * @param dbFile the path of the file
      * @param backupDir the backup directory
      * @param commitId the commit ID to compare with the latest commit
      * @return a list of DiffEntry objects representing the differences
@@ -446,7 +449,7 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public List<DiffEntry> showDiffers(Path originalPath, Path backupDir, String commitId) throws IOException, GitAPIException {
+    public List<DiffEntry> showDiffers(Path dbFile, Path backupDir, String commitId) throws IOException, GitAPIException {
 
         File repoDir = backupDir.toFile();
         Repository repository = new FileRepositoryBuilder()
@@ -468,6 +471,7 @@ public class BackupManagerGit {
     /**
      * Retrieves the last n commits from the Git repository.
      *
+     * @param dbFile the database file
      * @param backupDir the backup directory
      * @param n the number of commits to retrieve
      * @return a list of RevCommit objects representing the commits
@@ -475,8 +479,15 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static List<RevCommit> retrieveCommits(Path backupDir, int n) throws IOException, GitAPIException {
+    public static List<RevCommit> retrieveCommits(Path dbFile, Path backupDir, int n) throws IOException, GitAPIException {
         List<RevCommit> retrievedCommits = new ArrayList<>();
+
+        // Compute the repository file name using the naming convention (filename + UUID)
+        String baseName = dbFile.getFileName().toString();
+        String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
+        String repoFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+        String dbFileRelativePath = backupDir.relativize(backupDir.resolve(repoFileName)).toString().replace("\\", "/");
+
         // Open Git repository
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
             // Use RevWalk to traverse commits
@@ -486,71 +497,128 @@ public class BackupManagerGit {
 
                 int count = 0;
                 for (RevCommit commit : revWalk) {
-                    retrievedCommits.add(commit);
-                    count++;
-                    if (count == n) {
-                        break; // Stop after collecting the required number of commits
+                    // Check if this commit involves the dbFile
+                    try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                        treeWalk.addTree(commit.getTree());
+                        treeWalk.setRecursive(true);
+
+                        boolean fileFound = false;
+                        while (treeWalk.next()) {
+                            if (treeWalk.getPathString().equals(dbFileRelativePath)) {
+                                fileFound = true;
+                                break;
+                            }
+                        }
+
+                        if (fileFound) {
+                            retrievedCommits.add(commit);
+                            count++;
+                            if (count == n) {
+                                break; // Stop after collecting the required number of commits
+                            }
+                        }
                     }
                 }
             }
         }
 
-        // Reverse the list to have commits in the correct order
-        Collections.reverse(retrievedCommits);
         return retrievedCommits;
     }
 
     /**
-     * Retrieves detailed information about the specified commits.
+     * Retrieves detailed information about the specified commits, focusing on the target file.
      *
      * @param commits the list of commits to retrieve details for
+     * @param dbFile the target file to retrieve details about
      * @param backupDir the backup directory
-     * @return a list of lists, each containing details about a commit
+     * @return a list of BackupEntry objects containing details about each commit
      * @throws IOException if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
+    public static List<BackupEntry> retrieveCommitDetails(List<RevCommit> commits, Path dbFile, Path backupDir) throws IOException, GitAPIException {
+        List<BackupEntry> commitDetails = new ArrayList<>();
 
-    public static List<BackupEntry> retrieveCommitDetails(List<RevCommit> commits, Path backupDir) throws IOException, GitAPIException {
-        List<BackupEntry> commitDetails;
+        // Compute the repository file name using the naming convention (filename + UUID)
+        String baseName = dbFile.getFileName().toString();
+        String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
+        String repoFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+        String dbFileRelativePath = backupDir.relativize(backupDir.resolve(repoFileName)).toString().replace("\\", "/");
+
         try (Repository repository = Git.open(backupDir.toFile()).getRepository()) {
-            commitDetails = new ArrayList<>();
-
             // Browse the list of commits given as a parameter
             for (RevCommit commit : commits) {
-                // A list to stock details about the commit
-                List<String> commitInfo = new ArrayList<>();
-                commitInfo.add(commit.getName()); // ID of commit
+                // Variables to store commit-specific details
+                String sizeFormatted = "0 KB";
+                long fileSize = 0;
+                boolean fileFound = false;
 
-                // Get the size of files changes by the commit
-                String sizeFormatted;
+                // Use TreeWalk to find the target file in the commit
                 try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(commit.getTree());
                     treeWalk.setRecursive(true);
-                    long totalSize = 0;
 
                     while (treeWalk.next()) {
-                        ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
-                        totalSize += loader.getSize(); // size in bytes
+                        if (treeWalk.getPathString().equals(dbFileRelativePath)) {
+                            // Calculate size of the target file
+                            ObjectLoader loader = repository.open(treeWalk.getObjectId(0));
+                            fileSize = loader.getSize();
+                            fileFound = true;
+                            break;
+                        }
                     }
 
-                    // Convert the size to Kb or Mb
-                    sizeFormatted = (totalSize > 1024 * 1024)
-                            ? String.format("%.2f Mo", totalSize / (1024.0 * 1024.0))
-                            : String.format("%.2f Ko", totalSize / 1024.0);
-
-                    commitInfo.add(sizeFormatted); // Add Formatted size
+                    // Convert size to KB or MB
+                    sizeFormatted = (fileSize > 1024 * 1024)
+                            ? String.format("%.2f MB", fileSize / (1024.0 * 1024.0))
+                            : String.format("%.2f KB", fileSize / 1024.0);
                 }
 
-                // adding date detail
+                // Skip this commit if the file was not found
+                if (!fileFound) {
+                    continue;
+                }
+
+                // Add commit details
                 Date date = commit.getAuthorIdent().getWhen();
-                commitInfo.add(date.toString());
-                // Add list of details to the main list
-                BackupEntry backupEntry = new BackupEntry(ObjectId.fromString(commit.getName()), commitInfo.get(0), commitInfo.get(2), commitInfo.get(1), 0);
+                BackupEntry backupEntry = new BackupEntry(
+                        ObjectId.fromString(commit.getName()), // Commit ID
+                        commit.getName(),                      // Commit ID as string
+                        date.toString(),                       // Commit date
+                        sizeFormatted,                         // Formatted file size
+                        1                                      // Number of relevant .bib files (always 1 for dbFile)
+                );
                 commitDetails.add(backupEntry);
             }
         }
 
         return commitDetails;
+    }
+
+    public static void performBackupNoCommits(Path dbFile, Path backupDir) throws IOException, GitAPIException {
+
+        LOGGER.info("No commits found in the repository. We need a first commit.");
+        // Ensure the specific database file is copied to the backup directory
+        copyDatabaseFileToBackupDir(dbFile, backupDir);
+
+        // Ensure the Git repository exists
+        LOGGER.info("Checking if backup differs for file: {}", dbFile);
+        ensureGitInitialized(backupDir);
+
+        // Open the Git repository located in the backup directory
+        Repository repository = openGitRepository(backupDir);
+
+        // Get the file name of the database file
+        String baseName = dbFile.getFileName().toString();
+        String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
+        String repoFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+
+        // Stage the file for commit
+        git.add().addFilepattern(repoFileName).call();
+
+        // Commit the staged changes
+        RevCommit commit = git.commit()
+                              .setMessage("Backup at " + Instant.now().toString())
+                              .call();
     }
 
     /**
