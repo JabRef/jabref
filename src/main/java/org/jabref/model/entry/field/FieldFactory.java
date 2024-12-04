@@ -13,6 +13,7 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -28,6 +29,8 @@ public class FieldFactory {
      */
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
+    private static final String FIELD_PROPERTY_SEPARATOR = ",";
+    private static final String FIELD_NAME_PROPERTY_SEPARATOR = "|";
 
     public static String serializeOrFields(Field... fields) {
         return serializeOrFields(new OrFields(fields));
@@ -47,8 +50,43 @@ public class FieldFactory {
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
+    public static String serializeOrFieldsV2(OrFields fields) {
+        return fields.getFields().stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+    }
+
+    private static String serializeUnknownField(UnknownField unknownField) {
+        // In case a user has put a user-defined field, the casing of that field is kept
+        String displayName = unknownField.getDisplayName();
+        String fieldProperties = unknownField.getProperties().stream()
+                                             .map(Enum::name)
+                                             .collect(Collectors.joining(FIELD_PROPERTY_SEPARATOR));
+
+        if (fieldProperties.isBlank()) {
+            return displayName;
+        }
+
+        return displayName + FIELD_NAME_PROPERTY_SEPARATOR + fieldProperties;
+    }
+
     public static String serializeOrFieldsList(Set<OrFields> fields) {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
+    }
+
+    public static String serializeOrFieldsListV2(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFieldsV2).collect(Collectors.joining(DELIMITER));
+    }
+
+    public static List<Field> getNotTextFieldNames() {
+        return Arrays.asList(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
     }
 
     /**
@@ -109,6 +147,19 @@ public class FieldFactory {
                      .collect(Collectors.joining(DELIMITER));
     }
 
+    public static String serializeFieldsListV2(Collection<Field> fields) {
+        return fields.stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(DELIMITER));
+    }
+
     /**
      * Type T is an entry type and is used to direct the mapping to the Java field class.
      * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
@@ -119,6 +170,29 @@ public class FieldFactory {
             String username = fieldName.substring("comment-".length());
             return new UserSpecificCommentField(username);
         }
+
+        if (fieldName.contains(FIELD_NAME_PROPERTY_SEPARATOR)) {
+            String[] components = fieldName.split(Pattern.quote(FIELD_NAME_PROPERTY_SEPARATOR));
+
+            if (components.length == 2) {
+                String unknownFieldName = components[0];
+                String[] fieldProperties = components[1].split(Pattern.quote(FIELD_PROPERTY_SEPARATOR));
+
+                if (fieldProperties.length == 0) {
+                    return UnknownField.fromDisplayName(unknownFieldName);
+                } else if (fieldProperties.length == 1) {
+                    return new UnknownField(unknownFieldName, unknownFieldName, FieldProperty.valueOf(fieldProperties[0]));
+                } else {
+                    FieldProperty firstProperty = FieldProperty.valueOf(fieldProperties[0]);
+                    FieldProperty[] restProperties = Arrays.stream(fieldProperties, 1, fieldProperties.length)
+                                                           .map(FieldProperty::valueOf)
+                                                           .toArray(FieldProperty[]::new);
+
+                    return new UnknownField(unknownFieldName, unknownFieldName, firstProperty, restProperties);
+                }
+            }
+        }
+
         return OptionalUtil.<Field>orElse(
               OptionalUtil.<Field>orElse(
                OptionalUtil.<Field>orElse(
