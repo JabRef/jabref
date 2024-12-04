@@ -120,6 +120,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was not possible to select selecting content of other user's comments.[#11106](https://github.com/JabRef/jabref/issues/11106)
 - We fixed an issue when handling URLs containing a pipe (`|`) character. [#11876](https://github.com/JabRef/jabref/issues/11876)
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
+- We fixed an issue where multiline property from field was unable to be removed after adding it. [#11897](https://github.com/JabRef/jabref/issues/11897)
 - We fixed an issue when opening attached files in [extra file columns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#adding-additional-columns-to-entry-table-for-file-types). [#12005](https://github.com/JabRef/jabref/issues/12005)
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
 - We fixed an issue when the preview was out of sync. [#9172](https://github.com/JabRef/jabref/issues/9172)
