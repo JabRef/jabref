@@ -69,7 +69,7 @@ public class BackupUIManager {
                 List<BackupEntry> backups = BackupManagerGit.retrieveCommitDetails(commits, preferences.getFilePreferences().getBackupDirectory()).reversed();
                 if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                     ObjectId commitId = backups.getFirst().getId();
-                    BackupManagerGit.restoreBackup(preferences.getFilePreferences().getBackupDirectory(), commitId);
+                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
                     return Optional.empty();
                 } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
                     return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
@@ -81,7 +81,7 @@ public class BackupUIManager {
                     if (recordBackupChoice.get().action() == BackupChoiceDialog.RESTORE_BACKUP) {
                         LOGGER.warn(recordBackupChoice.get().entry().getSize());
                         ObjectId commitId = recordBackupChoice.get().entry().getId();
-                        BackupManagerGit.restoreBackup(preferences.getFilePreferences().getBackupDirectory(), commitId);
+                        BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
                         return Optional.empty();
                     }
                     if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {

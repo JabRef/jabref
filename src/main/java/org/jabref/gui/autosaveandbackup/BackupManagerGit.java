@@ -2,6 +2,7 @@ package org.jabref.gui.autosaveandbackup;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -135,6 +136,25 @@ public class BackupManagerGit {
         Files.writeString(metadataFile, uuid);
         LOGGER.info("Generated new UUID for file {}: {}", filePath, uuid);
         return uuid;
+    }
+
+    /**
+     * Rewrites the content of the file at the specified path with the given string.
+     *
+     * @param dbFile The path to the file to be rewritten.
+     * @param content The string content to write into the file.
+     * @throws IOException If an I/O error occurs during the write operation.
+     */
+    public static void rewriteFile(Path dbFile, String content) throws IOException {
+        // Ensure the file exists before rewriting
+        if (!Files.exists(dbFile)) {
+            throw new FileNotFoundException("The file at path " + dbFile + " does not exist.");
+        }
+
+        // Write the new content to the file (overwrite mode)
+        Files.writeString(dbFile, content, StandardCharsets.UTF_8);
+
+        LOGGER.info("Successfully rewrote the file at path: {}", dbFile);
     }
 
     // Helper method to normalize BibTeX content
@@ -311,24 +331,33 @@ public class BackupManagerGit {
      * @param objectId the commit ID to restore from
      */
 
-    public static void restoreBackup(Path backupDir, ObjectId objectId) {
-        try {
-            Git git = Git.open(backupDir.toFile());
+    public static void restoreBackup(Path dbFile, Path backupDir, ObjectId objectId) {
+        try (Repository repository = openGitRepository(backupDir);
+             Git git = new Git(repository)) {
+            // Resolve the filename of dbFile in the repository
+            String baseName = dbFile.getFileName().toString();
+            String uuid = getOrGenerateFileUuid(dbFile); // Generate or retrieve the UUID for this file
+            String relativeFilePath = baseName.replace(".bib", "") + "_" + uuid + ".bib";
+            LOGGER.info("Relative file path TO RESTORE: {}", relativeFilePath);
+            String gitPath = backupDir.relativize(backupDir.resolve(relativeFilePath)).toString().replace("\\", "/");
 
-            git.checkout().setStartPoint(objectId.getName()).setAllPaths(true).call();
-            LOGGER.info("checkout done");
+            LOGGER.info("Restoring file: {}", gitPath);
 
-            // Add commits to staging Area
-            git.add().addFilepattern(".").call();
+            // Load the content of the file from the specified commit
+            ObjectId fileObjectId = repository.resolve(objectId.getName() + ":" + gitPath);
+            if (fileObjectId == null) {
+                throw new IllegalArgumentException("File not found in commit: " + objectId.getName());
+            }
 
-            // Commit with a message
-            git.commit().setMessage("Restored content from commit: " + objectId.getName()).call();
+            // Read the content of the file from the Git object
+            ObjectLoader loader = repository.open(fileObjectId);
+            String fileContent = new String(loader.getBytes(), StandardCharsets.UTF_8);
 
-            LOGGER.info("Restored backup from Git repository and committed the changes");
-        } catch (
-                IOException |
-                GitAPIException e) {
-            LOGGER.error("Error while restoring the backup", e);
+            // Rewrite the original file at dbFile path
+            rewriteFile(dbFile, fileContent);
+            LOGGER.info("Restored content to: {}", dbFile);
+        } catch (IOException | IllegalArgumentException e) {
+            LOGGER.error("Error while restoring the backup: {}", e.getMessage(), e);
         }
     }
 
