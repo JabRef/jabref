@@ -20,7 +20,7 @@ public class BackupResolverDialog extends FXDialog {
         getDialogPane().setMinHeight(180);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP, COMPARE_OLDER_BACKUP);
 
-        String content = Localization.lang("A backup file for '%0' was found.", originalPath.getFileName().toString()) + "\n" +
+        String content = Localization.lang("A backup for '%0' was found.", originalPath.getFileName().toString()) + "\n" +
                 Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
                 Localization.lang("Do you want to recover the library from the backup file?");
         setContentText(content);
