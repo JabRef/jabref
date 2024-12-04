@@ -803,6 +803,7 @@ public class LibraryTab extends Tab {
         }
         try {
             BackupManagerGit.shutdown(bibDatabaseContext,
+                    preferences.getFilePreferences().getBackupDirectory(),
                     preferences.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);

@@ -149,7 +149,7 @@ public class SaveDatabaseAction {
         if (databasePath.isPresent()) {
             // Close AutosaveManager, BackupManagerGit, and IndexManager for original library
             AutosaveManager.shutdown(context);
-            BackupManagerGit.shutdown(context, preferences.getFilePreferences().shouldCreateBackup());
+            BackupManagerGit.shutdown(context, preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
             libraryTab.closeIndexManger();
         }
 
