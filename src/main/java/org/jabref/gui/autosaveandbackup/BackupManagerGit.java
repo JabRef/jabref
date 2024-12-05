@@ -48,6 +48,7 @@ public class BackupManagerGit {
 
     static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
 
+    private static final String LINE_BREAK = System.lineSeparator();
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerGit.class);
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
@@ -162,14 +163,14 @@ public class BackupManagerGit {
             return "";
         }
 
-        // Diviser les lignes et traiter chaque ligne
+        // Split lines and process each line
         Stream<String> lines = input.lines();
 
-        // Normalisation des lignes
+        // Normalize lines
         String normalized = lines
-                .map(String::trim) // Supprimer les espaces en début et fin de ligne
-                .filter(line -> !line.isBlank()) // Supprimer les lignes vides
-                .collect(Collectors.joining("\n")); // Réassembler avec des sauts de ligne
+                .map(String::trim) // Remove leading and trailing spaces
+                .filter(line -> !line.isBlank()) // Remove blank lines
+                .collect(Collectors.joining(LINE_BREAK)); // Reassemble with line breaks
 
         return normalized;
     }
