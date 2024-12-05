@@ -175,7 +175,7 @@ public class CffImporterTest {
         BibEntry expectedPreferred = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey(citeKey)
                 .withField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.")
-                .withField(StandardField.DOI, "10.0001/COMPARE_OLDER_BACKUP")
+                .withField(StandardField.DOI, "10.0001/TEST")
                 .withField(StandardField.URL, "www.github.com");
 
         assertEquals(mainEntry, expectedMain);
@@ -198,13 +198,13 @@ public class CffImporterTest {
                 .withCitationKey(citeKey1)
                 .withField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.")
                 .withField(StandardField.YEAR, "2007")
-                .withField(StandardField.DOI, "10.0001/COMPARE_OLDER_BACKUP")
+                .withField(StandardField.DOI, "10.0001/TEST")
                 .withField(StandardField.URL, "www.example.com");
 
         BibEntry expectedReference2 = new BibEntry(StandardEntryType.Manual)
                 .withCitationKey(citeKey2)
                 .withField(StandardField.AUTHOR, "Arthur Clark, Jr. and Luca von Diamond")
-                .withField(StandardField.DOI, "10.0002/COMPARE_OLDER_BACKUP")
+                .withField(StandardField.DOI, "10.0002/TEST")
                 .withField(StandardField.URL, "www.facebook.com");
 
         assertEquals(mainEntry, expectedMain);
@@ -218,7 +218,7 @@ public class CffImporterTest {
                 .withField(StandardField.TITLE, "Test")
                 .withField(StandardField.URL, "www.google.com")
                 .withField(BiblatexSoftwareField.REPOSITORY, "www.github.com")
-                .withField(StandardField.DOI, "10.0000/COMPARE_OLDER_BACKUP")
+                .withField(StandardField.DOI, "10.0000/TEST")
                 .withField(StandardField.DATE, "2000-07-02")
                 .withField(StandardField.COMMENT, "Test entry.")
                 .withField(StandardField.ABSTRACT, "Test abstract.")
