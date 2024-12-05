@@ -11,11 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Implemented version-control based backup management of .bib files using Git. [#2961](https://github.com/JabRef/jabref/issues/2961)
-- Added automatic copying of .bib files to a jabref/backups directory every 19 seconds with comprehensive commit history. [#2961](https://github.com/JabRef/jabref/issues/2961)
-- Added support for unique file naming using UUIDs to prevent overwriting files with identical names in the backup directory. [#2961](https://github.com/JabRef/jabref/issues/2961)
-- Introduced UI functionality (only during opening) for saving, restoring, reviewing and discarding changes with accurate commit details retrieval. [#2961](https://github.com/JabRef/jabref/issues/2961)
-- Enabled a "Restore" button to recover specific backup versions. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Enhanced backup and restore functionality. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - We added a Markdown export layout. [#12220](https://github.com/JabRef/jabref/pull/12220)
 - We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
@@ -57,7 +53,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- Refactored backup-related components to integrate with the new BackupManagerGit, replacing the older BackupManager logic. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - A search in "any" fields ignores the [groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups). [#7996](https://github.com/JabRef/jabref/issues/7996)
 - When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
