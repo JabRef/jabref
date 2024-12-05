@@ -4,6 +4,7 @@ package org.jabref.gui.autosaveandbackup;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
@@ -66,8 +67,8 @@ public class BackupManagerGitTest {
         Files.writeString(mockDatabasePath1, "Mock content for testing 1"); // Create the file
         Files.writeString(mockDatabasePath2, "Mock content for testing 2"); // Create the file
 
-        when(mockDatabaseContext1.getDatabasePath()).thenReturn(java.util.Optional.of(mockDatabasePath1));
-        when(mockDatabaseContext2.getDatabasePath()).thenReturn(java.util.Optional.of(mockDatabasePath2));
+        when(mockDatabaseContext1.getDatabasePath()).thenReturn(Optional.of(mockDatabasePath1));
+        when(mockDatabaseContext2.getDatabasePath()).thenReturn(Optional.of(mockDatabasePath2));
 
         when(filePreferences.getBackupDirectory()).thenReturn(tempDir);
 
@@ -99,7 +100,7 @@ public class BackupManagerGitTest {
     }
 
     @Test
-    void testInitializationCreatesBackupDirectory() throws IOException, GitAPIException {
+    void initializationCreatesBackupDirectory() throws IOException, GitAPIException {
         // Create BackupManagerGit
         BackupManagerGit manager1 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
@@ -110,7 +111,7 @@ public class BackupManagerGitTest {
     }
 
     @Test
-    void testGitInitialization() throws IOException, GitAPIException {
+    void gitInitialization() throws IOException, GitAPIException {
         // Initialize Git
         BackupManagerGit.ensureGitInitialized(tempDir);
 
@@ -120,7 +121,7 @@ public class BackupManagerGitTest {
     }
 
     @Test
-    void testBackupFileCopiedToDirectory() throws IOException, GitAPIException {
+    void backupFileCopiedToDirectory() throws IOException, GitAPIException {
         BackupManagerGit manager1 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
 
@@ -138,13 +139,13 @@ public class BackupManagerGitTest {
     }
 
     @Test
-    public void testStart() throws IOException, GitAPIException {
+    public void start() throws IOException, GitAPIException {
         BackupManagerGit startedManager = BackupManagerGit.start(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, mockPreferences);
         assertNotNull(startedManager);
     }
 
     @Test
-    void testPerformBackupCommitsChanges() throws IOException, GitAPIException {
+    void performBackupCommitsChanges() throws IOException, GitAPIException {
         // Initialize Git
         BackupManagerGit.ensureGitInitialized(tempDir);
 

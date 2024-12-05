@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 public class BackupManagerGit {
 
-    static Set<BackupManagerGit> runningInstances = new HashSet<BackupManagerGit>();
+    static Set<BackupManagerGit> runningInstances = new HashSet<>();
 
     private static final String LINE_BREAK = System.lineSeparator();
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerGit.class);
@@ -292,14 +292,14 @@ public class BackupManagerGit {
         boolean needsCommit = backupGitDiffers(dbfile, backupDir);
 
         if (!needsBackup && !needsCommit) {
-            LOGGER.info("No changes detected, beacuse needsBackup is :" + needsBackup + " and needsCommit is :" + needsCommit);
+            LOGGER.info("No changes detected, beacuse needsBackup is :{} and needsCommit is :{}", needsBackup, needsCommit);
             return;
         }
 
         if (needsBackup) {
-            LOGGER.info("Backup needed, because needsBackup is :" + needsBackup);
+            LOGGER.info("Backup needed, because needsBackup is :{}", needsBackup);
         } else {
-        LOGGER.info("Backup needed, because needsCommit is :" + needsCommit);
+        LOGGER.info("Backup needed, because needsCommit is :{}", needsCommit);
     }
 
         // Stage the file for commit
@@ -310,8 +310,7 @@ public class BackupManagerGit {
         RevCommit commit = git.commit()
                               .setMessage("Backup at " + Instant.now().toString())
                               .call();
-        LOGGER.info("Backup committed in :" + backupDir + " with commit ID: " + commit.getName()
-        + " for the file : {}", bibDatabaseContext.getDatabasePath().orElseThrow());
+        LOGGER.info("Backup committed in :{} with commit ID: {} for the file : {}", backupDir, commit.getName(), bibDatabaseContext.getDatabasePath().orElseThrow());
     }
 
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
@@ -604,9 +603,9 @@ public class BackupManagerGit {
                     }
 
                     // Convert size to KB or MB
-                    sizeFormatted = (fileSize > 1024 * 1024)
-                            ? String.format("%.2f MB", fileSize / (1024.0 * 1024.0))
-                            : String.format("%.2f KB", fileSize / 1024.0);
+                    sizeFormatted = fileSize > 1024 * 1024
+                            ? "%.2f MB".formatted(fileSize / (1024.0 * 1024.0))
+                            : "%.2f KB".formatted(fileSize / 1024.0);
                 }
 
                 // Skip this commit if the file was not found
