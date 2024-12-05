@@ -9,10 +9,9 @@ import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -63,13 +62,13 @@ class CommentsTabTest {
     @Mock
     private GuiPreferences preferences;
     @Mock
-    private ThemeManager themeManager;
-    @Mock
     private TaskExecutor taskExecutor;
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
     private OwnerPreferences ownerPreferences;
+    @Mock
+    private PreviewPanel previewPanel;
 
     @Mock
     private EntryEditorPreferences entryEditorPreferences;
@@ -93,11 +92,8 @@ class CommentsTabTest {
                 undoManager,
                 mock(UndoAction.class),
                 mock(RedoAction.class),
-                dialogService,
-                themeManager,
-                taskExecutor,
                 journalAbbreviationRepository,
-                OptionalObjectProperty.empty()
+                previewPanel
         );
     }
 

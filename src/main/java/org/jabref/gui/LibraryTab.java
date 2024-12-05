@@ -590,9 +590,6 @@ public class LibraryTab extends Tab {
         entryEditor.requestFocus();
     }
 
-    /**
-     * Removes the bottom component.
-     */
     public void closeBottomPane() {
         mode = PanelMode.MAIN_TABLE;
         splitPane.getItems().remove(entryEditor);
@@ -945,8 +942,7 @@ public class LibraryTab extends Tab {
     private List<BibEntry> handleNonBibTeXStringData(String data) {
         try {
             return this.importHandler.handleStringData(data);
-        } catch (
-                FetcherException exception) {
+        } catch (FetcherException exception) {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
             } else if (exception instanceof FetcherServerException) {

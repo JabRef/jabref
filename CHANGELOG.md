@@ -11,11 +11,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Implemented BackupManagerGit to handle automatic backups of .bib files using Git, ensuring centralized, version-controlled backup management. [#2961] (https://github.com/JabRef/jabref/issues/2961#event-14646591632)
-- Added automatic copying of .bib files to a jabref/backups directory every 19 seconds with comprehensive commit history. [#2961]
-- Added support for unique file naming using UUIDs to prevent overwriting files with identical names in the backup directory. [#2961]
-- Introduced UI functionality (only during opening) for saving, restoring, reviewing and discarding changes with accurate commit details retrieval. [#2961]
-- Enabled a "Restore" button to recover specific backup versions. [#2961]
+- Implemented BackupManagerGit to handle automatic backups of .bib files using Git, ensuring centralized, version-controlled backup management. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Added automatic copying of .bib files to a jabref/backups directory every 19 seconds with comprehensive commit history. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Added support for unique file naming using UUIDs to prevent overwriting files with identical names in the backup directory. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Introduced UI functionality (only during opening) for saving, restoring, reviewing and discarding changes with accurate commit details retrieval. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Enabled a "Restore" button to recover specific backup versions. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- We added a Markdown export layout. [#12220](https://github.com/JabRef/jabref/pull/12220)
 - We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
@@ -42,17 +43,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a different background color to the search bar to indicate when the search syntax is wrong. [#11658](https://github.com/JabRef/jabref/pull/11658)
 - We added a setting which always adds the literal "Cited on pages" text before each JStyle citation. [#11691](https://github.com/JabRef/jabref/pull/11732)
 - We added a new plain citation parser that uses LLMs. [#11825](https://github.com/JabRef/jabref/issues/11825)
+- We added support for `langid` field for biblatex libraries. [#10868](https://github.com/JabRef/jabref/issues/10868)
 - We added support for modifier keys when dropping a file on an entry in the main table. [#12001](https://github.com/JabRef/jabref/pull/12001)
 - We added an importer for SSRN URLs. [#12021](https://github.com/JabRef/jabref/pull/12021)
 - We added a compare button to the duplicates in the citation relations tab to open the "Possible duplicate entries" window. [#11192](https://github.com/JabRef/jabref/issues/11192)
 - We added automatic browser extension install on Windows for Chrome and Edge. [#6076](https://github.com/JabRef/jabref/issues/6076)
+- We added support to automatically open a `.bib` file in the current/parent folder if no other library is opened. [koppor#377](https://github.com/koppor/jabref/issues/377)
 - We added a search bar for filtering keyboard shortcuts. [#11686](https://github.com/JabRef/jabref/issues/11686)
+- We added new modifiers `camel_case`, `camel_case_n`, `short_title`, and `very_short_title` for the [citation key generator](https://docs.jabref.org/setup/citationkeypatterns). [#11367](https://github.com/JabRef/jabref/issues/11367)
 - By double clicking on a local citation in the Citation Relations Tab you can now jump the linked entry. [#11955](https://github.com/JabRef/jabref/pull/11955)
 - We use the menu icon for background tasks as a progress indicator to visualise an import's progress when dragging and dropping several PDF files into the main table. [#12072](https://github.com/JabRef/jabref/pull/12072)
+- The PDF content importer now supports importing title from upto the second page of the PDF. [#12139](https://github.com/JabRef/jabref/issues/12139)
 
 ### Changed
 
-- Refactored backup-related components to integrate with the new BackupManagerGit, replacing the older BackupManager logic. [#2961]
+- Refactored backup-related components to integrate with the new BackupManagerGit, replacing the older BackupManager logic. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - A search in "any" fields ignores the [groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups). [#7996](https://github.com/JabRef/jabref/issues/7996)
 - When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
@@ -79,7 +84,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When importing a file using "Find Unlinked Files", when one or more file directories are available, the file path will be relativized where possible [koppor#549](https://github.com/koppor/jabref/issues/549)
 - We added minimum window sizing for windows dedicated to creating new entries [#11944](https://github.com/JabRef/jabref/issues/11944)
 - We changed the name of the library-based file directory from 'General File Directory' to 'Library-specific File Directory' per issue. [#571](https://github.com/koppor/jabref/issues/571)
+- We changed the defualt [unwanted charachters](https://docs.jabref.org/setup/citationkeypatterns#removing-unwanted-characters) in the citation key generator and allow a dash (`-`) and colon (`:`) being part of a citation key. [#12144](https://github.com/JabRef/jabref/pull/12144)
 - The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
+- We disabled the actions "Open Terminal here" and "Reveal in file explorer" for unsaved libraries. [#11920](https://github.com/JabRef/jabref/issues/11920)
+- JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
 
 ### Fixed
 
@@ -116,10 +124,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Do not ask again" checkbox was not working, when asking for permission to use Grobid [koppor#556](https://github.com/koppor/jabref/issues/566).
 - We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
 - We fixed an issue where it was not possible to select selecting content of other user's comments.[#11106](https://github.com/JabRef/jabref/issues/11106)
+- We fixed an issue when handling URLs containing a pipe (`|`) character. [#11876](https://github.com/JabRef/jabref/issues/11876)
 - We fixed an issue where web search preferences "Custom API key" table modifications not discarded. [#11925](https://github.com/JabRef/jabref/issues/11925)
 - We fixed an issue when opening attached files in [extra file columns](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#adding-additional-columns-to-entry-table-for-file-types). [#12005](https://github.com/JabRef/jabref/issues/12005)
 - We fixed an issue where trying to open a library from a failed mounted directory on Mac would cause an error. [#10548](https://github.com/JabRef/jabref/issues/10548)
+- We fixed an issue when the preview was out of sync. [#9172](https://github.com/JabRef/jabref/issues/9172)
 - We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
+- We fixed an issue when click on entry at "Check Integrity" wasn't properly focusing the entry and field. [#11997](https://github.com/JabRef/jabref/issues/11997)
+- We fixed an issue with the ui not scaling when changing the font size [#11219](https://github.com/JabRef/jabref/issues/11219)
 
 ### Removed
 

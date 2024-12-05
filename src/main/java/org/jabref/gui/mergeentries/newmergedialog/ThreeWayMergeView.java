@@ -11,7 +11,6 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -20,7 +19,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 
-@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
 
@@ -47,7 +45,6 @@ public class ThreeWayMergeView extends VBox {
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, GuiPreferences preferences) {
         this.preferences = preferences;
 
-        getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
         this.fieldMergerFactory = new FieldMergerFactory(preferences.getBibEntryPreferences());
         this.keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator().toString();
@@ -67,6 +64,8 @@ public class ThreeWayMergeView extends VBox {
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.97);
 
         getChildren().addAll(toolbar, headerView, scrollPane);
+
+        getStyleClass().add("three-way-merge");
     }
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, GuiPreferences preferences) {
