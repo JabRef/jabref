@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Implemented BackupManagerGit to handle automatic backups of .bib files using Git, ensuring centralized, version-controlled backup management. [#2961](https://github.com/JabRef/jabref/issues/2961)
+- Implemented version-control based backup management of .bib files using Git. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - Added automatic copying of .bib files to a jabref/backups directory every 19 seconds with comprehensive commit history. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - Added support for unique file naming using UUIDs to prevent overwriting files with identical names in the backup directory. [#2961](https://github.com/JabRef/jabref/issues/2961)
 - Introduced UI functionality (only during opening) for saving, restoring, reviewing and discarding changes with accurate commit details retrieval. [#2961](https://github.com/JabRef/jabref/issues/2961)
