@@ -122,7 +122,7 @@ public class BackupManagerGit {
      * @return The UUID associated with the file.
      * @throws IOException If an error occurs while accessing or creating the UUID.
      */
-    private static String getOrGenerateFileUuid(Path filePath) throws IOException {
+    protected static String getOrGenerateFileUuid(Path filePath) throws IOException {
         // Define a hidden metadata file to store the UUID
         Path metadataFile = filePath.resolveSibling("." + filePath.getFileName().toString() + ".uuid");
 
@@ -205,16 +205,12 @@ public class BackupManagerGit {
     }
 
     // Helper method to copy the database file to the backup directory
-    private static void copyDatabaseFileToBackupDir(Path dbFile, Path backupDirPath) throws IOException {
+    protected static void copyDatabaseFileToBackupDir(Path dbFile, Path backupDirPath) throws IOException {
         String fileUuid = getOrGenerateFileUuid(dbFile);
         String uniqueFileName = appendUuidToFileName(dbFile.getFileName().toString(), fileUuid);
         Path backupFilePath = backupDirPath.resolve(uniqueFileName);
-        if (!Files.exists(backupFilePath) || Files.mismatch(dbFile, backupFilePath) != -1) {
-            Files.copy(dbFile, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
-            LOGGER.info("Database file uniquely copied to backup directory: {}", backupFilePath);
-        } else {
-            LOGGER.info("No changes detected; skipping backup for file: {}", uniqueFileName);
-        }
+        Files.copy(dbFile, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
+        LOGGER.info("Database file uniquely copied to backup directory: {}", backupFilePath);
     }
 
     // A method
@@ -641,7 +637,7 @@ public class BackupManagerGit {
         copyDatabaseFileToBackupDir(dbFile, backupDir);
 
         // Ensure the Git repository exists
-        LOGGER.info("Checking if backup differs for file: {}", dbFile);
+        LOGGER.info("Ensuring the .git is initialized");
         ensureGitInitialized(backupDir);
 
         // Open the Git repository located in the backup directory
@@ -653,9 +649,11 @@ public class BackupManagerGit {
         String repoFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
 
         // Stage the file for commit
+        LOGGER.info("Staging the file for commit");
         git.add().addFilepattern(repoFileName).call();
 
         // Commit the staged changes
+        LOGGER.info("Committing the file");
         RevCommit commit = git.commit()
                               .setMessage("Backup at " + Instant.now().toString())
                               .call();
