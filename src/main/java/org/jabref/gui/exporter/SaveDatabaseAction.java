@@ -215,9 +215,7 @@ public class SaveDatabaseAction {
             return savePath.filter(path -> {
                 try {
                     return saveAs(path, mode);
-                } catch (
-                        GitAPIException |
-                        IOException e) {
+                } catch (GitAPIException | IOException e) {
                     LOGGER.error("A problem occurred when trying to save the file %s".formatted(path), e);
                     throw new RuntimeException(e);
                 }
