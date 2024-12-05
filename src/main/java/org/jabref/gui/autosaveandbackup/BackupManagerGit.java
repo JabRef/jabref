@@ -55,7 +55,7 @@ public class BackupManagerGit {
     private static Git git;
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final CliPreferences preferences;
+    private final Path backupDirectory;
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
@@ -63,7 +63,7 @@ public class BackupManagerGit {
 
     private boolean needsBackup = false;
 
-    BackupManagerGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+    BackupManagerGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, Path backupDir) throws IOException, GitAPIException {
         Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
         if (!Files.exists(dbFile)) {
             LOGGER.error("Database file does not exist: {}", dbFile);
@@ -73,24 +73,24 @@ public class BackupManagerGit {
         this.bibDatabaseContext = bibDatabaseContext;
         LOGGER.info("Backup manager initialized for file: {}", bibDatabaseContext.getDatabasePath().orElseThrow());
         this.entryTypesManager = entryTypesManager;
-        this.preferences = preferences;
+        this.backupDirectory = backupDir;
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.libraryTab = libraryTab;
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
 
-        LOGGER.info("Backup directory path: {}", preferences.getFilePreferences().getBackupDirectory());
+        LOGGER.info("Backup directory path: {}", backupDirectory);
 
-        ensureGitInitialized(preferences.getFilePreferences().getBackupDirectory());
+        ensureGitInitialized(backupDirectory);
 
-        File backupDirFile = preferences.getFilePreferences().getBackupDirectory().toFile();
+        File backupDirFile = backupDirectory.toFile();
         if (!backupDirFile.exists() && !backupDirFile.mkdirs()) {
-            LOGGER.error("Failed to create backup directory: {}", preferences.getFilePreferences().getBackupDirectory());
-            throw new IOException("Unable to create backup directory: " + preferences.getFilePreferences().getBackupDirectory());
+            LOGGER.error("Failed to create backup directory: {}", backupDirectory);
+            throw new IOException("Unable to create backup directory: " + backupDirectory);
         }
 
-        copyDatabaseFileToBackupDir(dbFile, preferences.getFilePreferences().getBackupDirectory());
+        copyDatabaseFileToBackupDir(dbFile, backupDirectory);
     }
 
     /**
@@ -232,7 +232,8 @@ public class BackupManagerGit {
 
     public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
         LOGGER.info("In methode Start");
-        BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
+        Path backupDir = preferences.getFilePreferences().getBackupDirectory();
+        BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, backupDir);
         backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), bibDatabaseContext);
         runningInstances.add(backupManagerGit);
         return backupManagerGit;
@@ -354,10 +355,7 @@ public class BackupManagerGit {
             // Rewrite the original file at dbFile path
             rewriteFile(dbFile, fileContent);
             LOGGER.info("Restored content to: {}", dbFile);
-        } catch (
-                IOException |
-                IllegalArgumentException |
-                GitAPIException e) {
+        } catch (IOException | IllegalArgumentException | GitAPIException e) {
             LOGGER.error("Error while restoring the backup: {}", e.getMessage(), e);
         }
     }
@@ -435,8 +433,7 @@ public class BackupManagerGit {
             String uuid = getOrGenerateFileUuid(dbFile);
             String relativeFileName = baseName.replace(".bib", "") + "_" + uuid + ".bib";
             return backupDir.resolve(relativeFileName);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -466,10 +463,7 @@ public class BackupManagerGit {
             // Rewrite the original file at backupFilePath path
             rewriteFile(backupFilePath, fileContent);
             LOGGER.info("Restored content to: {}", dbFile);
-        } catch (
-                IOException |
-                IllegalArgumentException |
-                GitAPIException e) {
+        } catch (IOException | IllegalArgumentException | GitAPIException e) {
             LOGGER.error("Error while restoring the backup: {}", e.getMessage(), e);
         }
     }

@@ -1083,8 +1083,6 @@ public class LibraryTab extends Tab {
                            try {
                                newTab.onDatabaseLoadingSucceed(result);
                            } catch (Exception e) {
-                               // We need to handle the exception.
-                               // Handle the exception, e.g., log it or show an error dialog
                                LOGGER.error("An error occurred while loading the database", e);
                            }
                        })
