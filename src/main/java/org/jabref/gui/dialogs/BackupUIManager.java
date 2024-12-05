@@ -75,7 +75,7 @@ public class BackupUIManager {
 
                     return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, commitId, commitId);
                 } else if (action == BackupResolverDialog.COMPARE_OLDER_BACKUP) {
-                    var recordBackupChoice = showBackupChoiceDialog(dialogService, originalPath, preferences, backups);
+                    var recordBackupChoice = showBackupChoiceDialog(dialogService, preferences, backups);
 
                     if (recordBackupChoice.isEmpty()) {
                         return Optional.empty();
@@ -94,8 +94,7 @@ public class BackupUIManager {
                         return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, commitId, latestCommitId);
                     }
                 }
-            } catch (
-                    GitAPIException | IOException e) {
+            } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
             }
             return Optional.empty();
@@ -109,7 +108,6 @@ public class BackupUIManager {
     }
 
     private static Optional<BackupChoiceDialogRecord> showBackupChoiceDialog(DialogService dialogService,
-                                                                             Path originalPath,
                                                                              GuiPreferences preferences,
                                                                              List<BackupEntry> backups) {
         return UiTaskExecutor.runInJavaFXThread(
