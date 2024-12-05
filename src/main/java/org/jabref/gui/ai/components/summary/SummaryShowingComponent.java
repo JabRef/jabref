@@ -6,24 +6,31 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 
 import org.jabref.logic.ai.summarization.Summary;
+import org.jabref.logic.layout.format.MarkdownFormatter;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class SummaryShowingComponent extends VBox {
     @FXML private TextArea summaryTextArea;
     @FXML private Text summaryInfoText;
+    @FXML private WebView markdownWebView;
+    @FXML private CheckBox markdownCheckbox;
 
     private final Summary summary;
     private final Runnable regenerateCallback;
+    private final MarkdownFormatter markdownFormatter;
 
     public SummaryShowingComponent(Summary summary, Runnable regenerateCallback) {
         this.summary = summary;
         this.regenerateCallback = regenerateCallback;
+        this.markdownFormatter = new MarkdownFormatter();
 
         ViewLoader.view(this)
                   .root(this)
@@ -33,6 +40,8 @@ public class SummaryShowingComponent extends VBox {
     @FXML
     private void initialize() {
         summaryTextArea.setText(summary.content());
+        markdownWebView.setVisible(false);
+        markdownWebView.setManaged(false);
 
         String newInfo = summaryInfoText
                 .getText()
@@ -44,6 +53,29 @@ public class SummaryShowingComponent extends VBox {
 
     private static String formatTimestamp(LocalDateTime timestamp) {
         return timestamp.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault()));
+    }
+
+    @FXML
+    private void onMarkdownToggle() {
+        if (markdownCheckbox.isSelected()) {
+            String htmlContent = markdownFormatter.format(summaryTextArea.getText());
+            markdownWebView.getEngine().loadContent(htmlContent);
+
+            markdownWebView.setPrefHeight(summaryTextArea.getPrefHeight());
+            markdownWebView.setPrefWidth(summaryTextArea.getPrefWidth());
+
+            markdownWebView.setVisible(true);
+            markdownWebView.setManaged(true);
+
+            summaryTextArea.setVisible(false);
+            summaryTextArea.setManaged(false);
+        } else {
+            summaryTextArea.setVisible(true);
+            summaryTextArea.setManaged(true);
+
+            markdownWebView.setVisible(false);
+            markdownWebView.setManaged(false);
+        }
     }
 
     @FXML
