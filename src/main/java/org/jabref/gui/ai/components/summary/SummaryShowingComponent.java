@@ -8,6 +8,7 @@ import java.util.Locale;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
@@ -20,8 +21,9 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class SummaryShowingComponent extends VBox {
     @FXML private TextArea summaryTextArea;
     @FXML private Text summaryInfoText;
-    @FXML private WebView markdownWebView;
     @FXML private CheckBox markdownCheckbox;
+
+    private WebView markdownWebView;
 
     private final Summary summary;
     private final Runnable regenerateCallback;
@@ -39,9 +41,16 @@ public class SummaryShowingComponent extends VBox {
 
     @FXML
     private void initialize() {
-        summaryTextArea.setText(summary.content());
+        markdownWebView = new WebView();
         markdownWebView.setVisible(false);
         markdownWebView.setManaged(false);
+
+        VBox.setVgrow(markdownWebView, Priority.ALWAYS);
+
+        int indexOfTextArea = getChildren().indexOf(summaryTextArea);
+        getChildren().add(indexOfTextArea + 1, markdownWebView);
+
+        summaryTextArea.setText(summary.content());
 
         String newInfo = summaryInfoText
                 .getText()
