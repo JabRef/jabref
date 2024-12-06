@@ -3,7 +3,7 @@ nav_order: 0036
 parent: Decision Records
 ---
 
-# Use TextArea for Chat Message Content
+# Use `TextArea` for Chat Message Content
 
 ## Context and Problem Statement
 
@@ -41,7 +41,7 @@ which for now we value more than Markdown rendering.
 
 ### Use a third-party package
 
-There seems to be only one package for JavaFX that provides a ready-to-use UI node for Markdown rendering.
+There seems to be [only one package](https://github.com/JPro-one/markdown-javafx-renderer) for JavaFX that provides a ready-to-use UI node for Markdown rendering.
 
 * Good, because it is easy to implement
 * Good, because it renders Markdown
@@ -81,4 +81,4 @@ Actually we used an `ExpandingTextArea` from `GemsFX` package so the content can
 as much space as it needs in the `ScrollPane`.
 
 About the selection and copying, this goes down to fundamental issue from JavaFX.
-`Text` and `Label` cannot be selected by any means.
+`Text` and `Label` as a whole or a part [cannot be selected and/or copied](https://bugs.openjdk.org/browse/JDK-8091644).
