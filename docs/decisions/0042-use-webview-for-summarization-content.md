@@ -35,4 +35,3 @@ This ADR is highly linked to [ADR-0036](./0036-use-textarea-for-chat-content.md)
 
 About the selection and copying, this goes down to fundamental issue from JavaFX.
 `Text` and `Label` as a whole or a part [cannot be selected and/or copied](https://bugs.openjdk.org/browse/JDK-8091644).
-
