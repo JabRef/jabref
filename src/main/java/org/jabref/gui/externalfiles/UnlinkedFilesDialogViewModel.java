@@ -145,9 +145,11 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
+        Path directory = this.getSearchDirectory();
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
+                                                     .map(path -> directory.relativize(path))
                                                      .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
@@ -202,7 +204,7 @@ public class UnlinkedFilesDialogViewModel {
         } catch (IOException e) {
             LOGGER.error("Error exporting", e);
         }
-     }
+    }
 
     public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;
