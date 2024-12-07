@@ -77,6 +77,8 @@ There seems to be [only one package](https://github.com/JPro-one/markdown-javafx
 
 ## More Information
 
+This ADR is highly linked to [ADR-0042](./0042-use-webview-for-summarization-content.md).
+
 Actually we used an `ExpandingTextArea` from `GemsFX` package so the content can occupy
 as much space as it needs in the `ScrollPane`.
 
