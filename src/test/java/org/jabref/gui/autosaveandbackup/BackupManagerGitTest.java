@@ -16,7 +16,6 @@ import org.jabref.model.metadata.MetaData;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -43,6 +42,7 @@ public class BackupManagerGitTest {
     @BeforeEach
     public void setUp(@TempDir Path tempDir) throws IOException, GitAPIException {
         mockLibraryTab = mock(LibraryTab.class);
+
         mockDatabaseContext1 = mock(BibDatabaseContext.class);
         mockDatabaseContext2 = mock(BibDatabaseContext.class);
         mockEntryTypesManager = mock(BibEntryTypesManager.class);
@@ -85,18 +85,6 @@ public class BackupManagerGitTest {
 
         MetaData mockMetaData2 = mock(MetaData.class);
         when(mockDatabaseContext2.getMetaData()).thenReturn(mockMetaData2);
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        // Delete the temporary directory
-        Files.walk(tempDir)
-             .map(Path::toFile)
-             .forEach(file -> {
-                 if (!file.delete()) {
-                     file.deleteOnExit();
-                 }
-             });
     }
 
     @Test

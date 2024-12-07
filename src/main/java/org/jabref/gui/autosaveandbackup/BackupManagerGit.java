@@ -9,11 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -148,7 +151,10 @@ public class BackupManagerGit {
     public static void rewriteFile(Path dbFile, String content) throws IOException {
         // Ensure the file exists before rewriting
         if (!Files.exists(dbFile)) {
-            throw new FileNotFoundException("The file at path " + dbFile + " does not exist.");
+            Locale currentLocale = Locale.getDefault();
+            ResourceBundle messages = ResourceBundle.getBundle("messages", currentLocale);
+            String errorMessage = MessageFormat.format(messages.getString("file.not.found"), dbFile.toString());
+            throw new FileNotFoundException(errorMessage);
         }
 
         // Write the new content to the file (overwrite mode)
@@ -266,7 +272,7 @@ public class BackupManagerGit {
                 () -> {
                     try {
                         Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
-                        copyDatabaseFileToBackupDir(dbFile, backupDir);
+                        // copyDatabaseFileToBackupDir(dbFile, backupDir);
                         performBackup(dbFile, backupDir);
                     } catch (IOException | GitAPIException e) {
                         LOGGER.error("Error during backup", e);
@@ -633,14 +639,12 @@ public class BackupManagerGit {
 
         LOGGER.info("No commits found in the repository. We need a first commit.");
         // Ensure the specific database file is copied to the backup directory
-        copyDatabaseFileToBackupDir(dbFile, backupDir);
+        // no need of copying again !!
+        // copyDatabaseFileToBackupDir(dbFile, backupDir);
 
         // Ensure the Git repository exists
         LOGGER.info("Ensuring the .git is initialized");
         ensureGitInitialized(backupDir);
-
-        // Open the Git repository located in the backup directory
-        Repository repository = openGitRepository(backupDir);
 
         // Get the file name of the database file
         String baseName = dbFile.getFileName().toString();
