@@ -23,19 +23,19 @@ class SearchCitationsRelationsServiceTest {
             var cited = new BibEntry();
             var citationsToReturn = List.of(new BibEntry());
             var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
-                e -> citationsToReturn, null, null, null
+                e -> citationsToReturn, null, null, null, entry -> false, entry -> false
             );
             var searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitations(cited, false);
+            List<BibEntry> citations = searchService.searchCitations(cited);
 
             // THEN
             assertEquals(citationsToReturn, citations);
         }
 
         @Test
-        void serviceShouldForceCitationsUpdate() {
+        void serviceShouldCallTheFetcherForCitationsWhenRepositoryIsUpdatable() {
             // GiVEN
             var cited = new BibEntry();
             var newCitations = new BibEntry();
@@ -54,12 +54,14 @@ class SearchCitationsRelationsServiceTest {
                 e -> citationsToReturn,
                 citationsDatabase::put,
                 List::of,
-                (e, r) -> { }
+                (e, r) -> { },
+                e -> true,
+                e -> false
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited, true);
+            var citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -88,7 +90,7 @@ class SearchCitationsRelationsServiceTest {
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited, false);
+            var citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -109,7 +111,7 @@ class SearchCitationsRelationsServiceTest {
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited, false);
+            var citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citations.isEmpty());
@@ -126,19 +128,19 @@ class SearchCitationsRelationsServiceTest {
             var referencer = new BibEntry();
             var referencesToReturn = List.of(new BibEntry());
             var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
-                null, null, e -> referencesToReturn, null
+                null, null, e -> referencesToReturn, null, e -> false, e -> false
             );
             var searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchReferences(referencer, false);
+            List<BibEntry> references = searchService.searchReferences(referencer);
 
             // THEN
             assertEquals(referencesToReturn, references);
         }
 
         @Test
-        void serviceShouldCallTheFetcherForReferencesWhenForceUpdateIsTrue() {
+        void serviceShouldCallTheFetcherForReferencesWhenRepositoryIsUpdatable() {
             // GIVEN
             var referencer = new BibEntry();
             var newReference = new BibEntry();
@@ -154,12 +156,14 @@ class SearchCitationsRelationsServiceTest {
                 List::of,
                 (e, c) -> { },
                 e -> referencesToReturn,
-                referencesDatabase::put
+                referencesDatabase::put,
+                e -> false,
+                e -> true
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var references = searchService.searchReferences(referencer, true);
+            var references = searchService.searchReferences(referencer);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(referencer));
@@ -188,7 +192,7 @@ class SearchCitationsRelationsServiceTest {
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var references = searchService.searchReferences(reference, false);
+            var references = searchService.searchReferences(reference);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(reference));
@@ -209,7 +213,7 @@ class SearchCitationsRelationsServiceTest {
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchReferences(referencer, false);
+            var citations = searchService.searchReferences(referencer);
 
             // THEN
             assertTrue(citations.isEmpty());

@@ -18,7 +18,7 @@ public enum LRUCacheBibEntryRelationsDAO implements BibEntryRelationDAO {
     REFERENCES(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES));
 
     public static class Configuration {
-        public static final int MAX_CACHED_ENTRIES = 100;
+        public static final int MAX_CACHED_ENTRIES = 128; // Let's use a power of two for sizing
     }
 
     private final Map<DOI, Set<BibEntry>> relationsMap;

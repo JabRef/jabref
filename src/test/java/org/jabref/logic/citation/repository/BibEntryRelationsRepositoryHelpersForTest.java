@@ -13,7 +13,9 @@ public class BibEntryRelationsRepositoryHelpersForTest {
             Function<BibEntry, List<BibEntry>> retrieveCitations,
             BiConsumer<BibEntry, List<BibEntry>> insertCitations,
             Function<BibEntry, List<BibEntry>> retrieveReferences,
-            BiConsumer<BibEntry, List<BibEntry>> insertReferences
+            BiConsumer<BibEntry, List<BibEntry>> insertReferences,
+            Function<BibEntry, Boolean> isCitationsUpdatable,
+            Function<BibEntry, Boolean> isReferencesUpdatable
         ) {
             return new BibEntryRelationsRepository() {
                 @Override
@@ -33,7 +35,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isCitationsUpdatable(BibEntry entry) {
-                    return true;
+                    return isCitationsUpdatable.apply(entry);
                 }
 
                 @Override
@@ -53,7 +55,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
 
                 @Override
                 public boolean isReferencesUpdatable(BibEntry entry) {
-                    return true;
+                    return isReferencesUpdatable.apply(entry);
                 }
             };
         }

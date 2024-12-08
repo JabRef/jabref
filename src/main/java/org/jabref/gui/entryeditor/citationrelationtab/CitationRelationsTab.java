@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -213,11 +212,11 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         refreshCitingButton.setOnMouseClicked(event -> {
             searchForRelations(entry, citingListView, abortCitingButton,
-                    refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, true);
+                    refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress);
         });
 
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
-                refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, true));
+                refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
@@ -225,10 +224,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView);
 
         searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton,
-                CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, false);
+                CitationFetcher.SearchType.CITES, importCitingButton, citingProgress);
 
         searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton,
-                CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, false);
+                CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress);
 
         return container;
     }
@@ -411,7 +410,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abortButton,
                                     Button refreshButton, CitationFetcher.SearchType searchType, Button importButton,
-                                    ProgressIndicator progress, boolean shouldRefresh) {
+                                    ProgressIndicator progress) {
         if (entry.getDOI().isEmpty()) {
             hideNodes(abortButton, progress);
             showNodes(refreshButton);
@@ -432,7 +431,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask.cancel();
         }
 
-        this.createBackGroundTask(entry, searchType, shouldRefresh)
+        this.createBackGroundTask(entry, searchType)
             .consumeOnRunning(task -> prepareToSearchForRelations(
                 abortButton, refreshButton, importButton, progress, task
             ))
@@ -462,18 +461,18 @@ public class CitationRelationsTab extends EntryEditorTab {
      * TODO: Make the method return a callable and let the calling method create the background task.
      */
     private BackgroundTask<List<BibEntry>> createBackGroundTask(
-        BibEntry entry, CitationFetcher.SearchType searchType, boolean shouldRefresh
+        BibEntry entry, CitationFetcher.SearchType searchType
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchReferences(entry, shouldRefresh)
+                    () -> this.searchCitationsRelationsService.searchReferences(entry)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCitations(entry, shouldRefresh)
+                    () -> this.searchCitationsRelationsService.searchCitations(entry)
                 );
                 yield citedByTask;
             }

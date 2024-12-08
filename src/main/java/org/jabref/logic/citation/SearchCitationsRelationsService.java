@@ -25,9 +25,10 @@ public class SearchCitationsRelationsService {
         this.relationsRepository = repository;
     }
 
-    public List<BibEntry> searchReferences(BibEntry referencer, boolean forceUpdate) {
-        if ((forceUpdate && this.relationsRepository.isReferencesUpdatable(referencer))
-            || !this.relationsRepository.containsReferences(referencer)) {
+    public List<BibEntry> searchReferences(BibEntry referencer) {
+        boolean isFetchingAllowed = this.relationsRepository.isReferencesUpdatable(referencer)
+            || !this.relationsRepository.containsReferences(referencer);
+        if (isFetchingAllowed) {
             try {
                 var references = this.citationFetcher.searchCiting(referencer);
                 this.relationsRepository.insertReferences(referencer, references);
@@ -38,9 +39,10 @@ public class SearchCitationsRelationsService {
         return this.relationsRepository.readReferences(referencer);
     }
 
-    public List<BibEntry> searchCitations(BibEntry cited, boolean forceUpdate) {
-        if ((forceUpdate && this.relationsRepository.isCitationsUpdatable(cited))
-            || !this.relationsRepository.containsCitations(cited)) {
+    public List<BibEntry> searchCitations(BibEntry cited) {
+        boolean isFetchingAllowed = this.relationsRepository.isCitationsUpdatable(cited)
+            || !this.relationsRepository.containsCitations(cited);
+        if (isFetchingAllowed) {
             try {
                 var citations = this.citationFetcher.searchCitedBy(cited);
                 this.relationsRepository.insertCitations(cited, citations);
