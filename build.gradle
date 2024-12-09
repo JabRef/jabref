@@ -268,7 +268,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'com.konghq:unirest-java-core:4.4.5'
     implementation 'com.konghq:unirest-modules-gson:4.4.5'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
     // endregion
 
     implementation 'org.slf4j:slf4j-api:2.0.16'
