@@ -1,6 +1,6 @@
 package org.jabref.gui.importer;
 
-import java.util.List;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -40,7 +40,7 @@ class NewEntryActionTest {
     void executeOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
         newEntryAction = new NewEntryAction(() -> libraryTab, type, dialogService, preferences, stateManager);
-        when(tabContainer.getLibraryTabs()).thenReturn(List.of(libraryTab));
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(libraryTab));
 
         newEntryAction.execute();
         verify(libraryTab, times(1)).insertEntry(new BibEntry(type));
