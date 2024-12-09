@@ -4,8 +4,17 @@ Version: APPLICATION_VERSION
 Release: APPLICATION_RELEASE
 License: APPLICATION_LICENSE_TYPE
 Vendor: APPLICATION_VENDOR
-Prefix: %{dirname:APPLICATION_DIRECTORY}
+
+%if "xAPPLICATION_URL" != "x"
+URL: APPLICATION_URL
+%endif
+
+%if "xAPPLICATION_PREFIX" != "x"
+Prefix: APPLICATION_PREFIX
+%endif
+
 Provides: APPLICATION_PACKAGE
+
 %if "xAPPLICATION_GROUP" != "x"
 Group: APPLICATION_GROUP
 %endif
@@ -15,9 +24,6 @@ Autoreq: 0
 %if "xPACKAGE_DEFAULT_DEPENDENCIES" != "x" || "xPACKAGE_CUSTOM_DEPENDENCIES" != "x"
 Requires: PACKAGE_DEFAULT_DEPENDENCIES PACKAGE_CUSTOM_DEPENDENCIES
 %endif
-
-#avoid ARCH subfolder
-%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm
 
 #comment line below to enable effective jar compression
 #it could easily get your package size from 40 to 15Mb but
@@ -46,6 +52,10 @@ APPLICATION_DESCRIPTION
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}APPLICATION_DIRECTORY
 cp -r %{_sourcedir}APPLICATION_DIRECTORY/* %{buildroot}APPLICATION_DIRECTORY
+if [ "$(echo %{_sourcedir}/lib/systemd/system/*.service)" != '%{_sourcedir}/lib/systemd/system/*.service' ]; then
+  install -d -m 755 %{buildroot}/lib/systemd/system
+  cp %{_sourcedir}/lib/systemd/system/*.service %{buildroot}/lib/systemd/system
+fi
 %if "xAPPLICATION_LICENSE_FILE" != "x"
   %define license_install_file %{_defaultlicensedir}/%{name}-%{version}/%{basename:APPLICATION_LICENSE_FILE}
   install -d -m 755 "%{buildroot}%{dirname:%{license_install_file}}"
@@ -66,7 +76,10 @@ sed -i -e 's/.*/%dir "&"/' %{package_filelist}
 %endif
 
 %post
+package_type=rpm
+LAUNCHER_AS_SERVICE_SCRIPTS
 DESKTOP_COMMANDS_INSTALL
+LAUNCHER_AS_SERVICE_COMMANDS_INSTALL
 # Install the native-messaging host script for firefox/chrome/chromium
 install -D -m0755 /opt/jabref/lib/native-messaging-host/firefox/org.jabref.jabref.json /usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 install -D -m0755 /opt/jabref/lib/native-messaging-host/chromium/org.jabref.jabref.json /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
@@ -79,12 +92,18 @@ install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoe
 %pre
 package_type=rpm
 COMMON_SCRIPTS
+LAUNCHER_AS_SERVICE_SCRIPTS
+if [ "$1" -gt 1 ]; then
+  :; LAUNCHER_AS_SERVICE_COMMANDS_UNINSTALL
+fi
 
 %preun
 package_type=rpm
 COMMON_SCRIPTS
 DESKTOP_SCRIPTS
+LAUNCHER_AS_SERVICE_SCRIPTS
 DESKTOP_COMMANDS_UNINSTALL
+LAUNCHER_AS_SERVICE_COMMANDS_UNINSTALL
 # Remove the native-messaging hosts script only if relative to the deb package
 for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
                      "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
@@ -96,5 +115,6 @@ done
 # Remove the auto-install triggers of the browser addon for chrom/chromium
 rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
 rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
+
 
 %clean
