@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * IEEE BSTctl fields
@@ -23,7 +22,7 @@ public enum IEEEField implements Field {
     CTLUSE_URL("ctluse_url", FieldProperty.YES_NO);
 
     private final String name;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
 
     IEEEField(String name, FieldProperty first, FieldProperty... rest) {
         this.name = name;
@@ -47,7 +46,7 @@ public enum IEEEField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 }

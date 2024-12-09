@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.importer.AuthorListParser;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
@@ -115,7 +118,7 @@ import org.jabref.logic.importer.AuthorListParser;
  * </ol>
  */
 @AllowedToUseLogic("because it needs access to AuthorList parser")
-public class AuthorList {
+public class AuthorList implements Iterable<Author> {
 
     private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
     private final List<Author> authors;
@@ -155,8 +158,8 @@ public class AuthorList {
         int lastIndex = authors.size() - 1;
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0);
-            case 2 -> authors.get(0) + " and " + authors.get(1);
+            case 1 -> authors.getFirst();
+            case 2 -> authors.getFirst() + " and " + authors.get(1);
             default -> String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
         };
     }
@@ -169,16 +172,11 @@ public class AuthorList {
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList parse(final String authors) {
-        Objects.requireNonNull(authors);
-
-        AuthorList authorList = AUTHOR_CACHE.get(authors);
-        if (authorList == null) {
+    public static AuthorList parse(@NonNull final String authors) {
+        return AUTHOR_CACHE.computeIfAbsent(authors, string -> {
             AuthorListParser parser = new AuthorListParser();
-            authorList = parser.parse(authors);
-            AUTHOR_CACHE.put(authors, authorList);
-        }
-        return authorList;
+            return parser.parse(string);
+        });
     }
 
     /**
@@ -282,7 +280,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the a list of <CODE>Author</CODE> objects.
+     * Returns the list of <CODE>Author</CODE> objects.
      *
      * @return the <CODE>List&lt;Author></CODE> object.
      */
@@ -319,9 +317,9 @@ public class AuthorList {
         var authors = getAuthors();
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0).getLastOnly();
-            case 2 -> authors.get(0).getLastOnly() + " and " + authors.get(1).getLastOnly();
-            default -> authors.get(0).getLastOnly() + " et al.";
+            case 1 -> authors.getFirst().getNamePrefixAndFamilyName();
+            case 2 -> authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
+            default -> authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
         };
     }
 
@@ -341,7 +339,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), Author::getLastOnly, oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
     }
 
     /**
@@ -363,7 +361,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), auth -> auth.getLastFirst(abbreviate), oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), auth -> auth.getFamilyGiven(abbreviate), oxfordComma);
     }
 
     @Override
@@ -386,25 +384,25 @@ public class AuthorList {
      */
     public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
         return getAuthors().stream()
-                           .map(author -> author.getLastFirst(abbreviate))
+                           .map(author -> author.getFamilyGiven(abbreviate))
                            .collect(Collectors.joining(" and "));
     }
 
     /**
-     * Returns a list of authors separated with "and". The first author is formatted with {@link Author#getLastFirst(boolean)} and each subsequent author is formatted with {@link Author#getFirstLast(boolean)}.
+     * Returns a list of authors separated with "and". The first author is formatted with {@link Author#getFamilyGiven(boolean)} and each subsequent author is formatted with {@link Author#getGivenFamily(boolean)}.
      *
      * @param abbreviate first names.
      */
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0).getLastFirst(abbreviate);
+            case 1 -> authors.getFirst().getFamilyGiven(abbreviate);
             default -> authors.stream()
                               .skip(1)
-                              .map(author -> author.getFirstLast(abbreviate))
+                              .map(author -> author.getGivenFamily(abbreviate))
                               .collect(Collectors.joining(
                                       " and ",
-                                      authors.get(0).getLastFirst(abbreviate) + " and ",
+                                      authors.getFirst().getFamilyGiven(abbreviate) + " and ",
                                       ""));
         };
     }
@@ -428,7 +426,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), author -> author.getFirstLast(abbreviate), oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), author -> author.getGivenFamily(abbreviate), oxfordComma);
     }
 
     /**
@@ -469,7 +467,7 @@ public class AuthorList {
      */
     public String getAsFirstLastNamesWithAnd() {
         return getAuthors().stream()
-                           .map(author -> author.getFirstLast(false))
+                           .map(author -> author.getGivenFamily(false))
                            .collect(Collectors.joining(" and "));
     }
 
@@ -486,5 +484,10 @@ public class AuthorList {
         return getAuthors().stream()
                            .map(Author::getNameForAlphabetization)
                            .collect(Collectors.joining(" and "));
+    }
+
+    @Override
+    public Iterator<Author> iterator() {
+        return authors.iterator();
     }
 }

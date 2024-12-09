@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors.journalinfo;
 
-import java.util.Objects;
-
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
@@ -32,8 +30,6 @@ public class JournalInfoView extends VBox {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.getStylesheets().add(Objects.requireNonNull(JournalInfoView.class.getResource("JournalInfo.css")).toExternalForm());
 
         title.textProperty().bind(viewModel.titleProperty());
         categories.textProperty().bind(viewModel.categoriesProperty());

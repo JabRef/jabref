@@ -52,7 +52,7 @@
     -jr-scrollbar-thumb: -fx-light-text-color;
     -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
 
-    -fx-focused-text-base-color: -fx-dark-text-color;
+    -fx-focused-text-base-color: -fx-light-text-color;
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
 
@@ -61,6 +61,22 @@
 
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
+
+    -jr-match-1-odd: -jr-row-odd-background;
+    -jr-match-1-even: -jr-row-even-background;
+    -jr-match-1-text-color: -fx-mid-text-color;
+
+    -jr-match-2-odd: derive(-jr-theme, -60%);
+    -jr-match-2-even: derive(-jr-match-2, 4%);
+    -jr-match-2-text-color: -fx-mid-text-color;
+
+    -jr-match-3-odd: derive(-jr-theme, -70%);
+    -jr-match-3-even: derive(-jr-match-3, 4%);
+    -jr-match-3-text-color: derive(-jr-accent, 30%);
+
+    -jr-match-4-odd: derive(-jr-black, 10%);
+    -jr-match-4-even: -jr-background-alt;
+    -jr-match-4-text-color: derive(-jr-match-3-text-color, -15%);
 }
 
 .unchanged {
@@ -143,22 +159,8 @@
     -fx-background-color: -jr-background;
 }
 
-.mainToolbar .search-field .button .glyph-icon {
-    -fx-fill: derive(-fx-light-text-color, 80%);
-    -fx-text-fill: derive(-fx-light-text-color, 80%);
-    -fx-icon-color: derive(-fx-light-text-color, 80%);
-}
-
-.mainToolbar .search-field .toggle-button .glyph-icon {
-    -fx-fill: -jr-search-text;
-    -fx-text-fill: -jr-search-text;
-    -fx-icon-color:-jr-search-text;
-}
-
-.mainToolbar .search-field .toggle-button:selected .glyph-icon {
-    -fx-fill: derive(-fx-light-text-color, 80%);
-    -fx-text-fill: derive(-fx-light-text-color, 80%);
-    -fx-icon-color: derive(-fx-light-text-color, 80%);
+.global-search-bar .toggle-button .glyph-icon {
+    -fx-icon-color: derive(-jr-search-background, 50%);
 }
 
 .notification-bar > .pane {

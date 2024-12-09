@@ -8,13 +8,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EntryTypeFormatterTest {
+class EntryTypeFormatterTest {
 
     private EntryTypeFormatter formatter = new EntryTypeFormatter();
 
     @ParameterizedTest
     @MethodSource("formatTests")
-    void testCorrectFormat(String expectedString, String inputString) {
+    void correctFormat(String expectedString, String inputString) {
         assertEquals(expectedString, formatter.format(inputString));
     }
 

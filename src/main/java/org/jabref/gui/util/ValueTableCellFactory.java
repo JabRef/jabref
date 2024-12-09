@@ -28,9 +28,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseEnterEvent;
     private Function<T, BooleanExpression> toDisableExpression;
     private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
+    private BiFunction<S, T, Tooltip> tooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
 
@@ -51,6 +53,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
     public ValueTableCellFactory<S, T> withTooltip(BiFunction<S, T, String> toTooltip) {
         this.toTooltip = toTooltip;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> graphicTooltip(BiFunction<S, T, Tooltip> tooltip) {
+        this.tooltip = tooltip;
         return this;
     }
 
@@ -132,6 +139,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             event.consume();
                         });
                     }
+
+                    setOnMouseEntered(event -> {
+                        if (tooltip != null) {
+                            setTooltip(tooltip.apply(rowItem, item));
+                        }
+                    });
 
                     setOnMouseClicked(event -> {
                         if (toOnMouseClickedEvent != null) {

@@ -21,24 +21,24 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.InternalPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
@@ -58,7 +58,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
 
 
     private final ProxyPreferences proxyPreferences;
@@ -70,7 +70,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService,
-                               PreferencesService preferences) {
+                               CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.proxyPreferences = preferences.getProxyPreferences();
@@ -88,7 +88,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyHostnameValidator = new FunctionBasedValidator<>(
                 proxyHostnameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a hostname"))));
@@ -96,7 +96,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPortValidator = new FunctionBasedValidator<>(
                 proxyPortProperty,
                 input -> getPortAsInt(input).isPresent(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a port"))));
@@ -104,7 +104,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUsernameValidator = new FunctionBasedValidator<>(
                 proxyUsernameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a username"))));
@@ -112,7 +112,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPasswordValidator = new FunctionBasedValidator<>(
                 proxyPasswordProperty,
                 input -> !input.isBlank(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
@@ -146,11 +146,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             sslCertificatesChanged.set(true);
             while (c.next()) {
                 if (c.wasAdded()) {
-                    CustomCertificateViewModel certificate = c.getAddedSubList().get(0);
+                    CustomCertificateViewModel certificate = c.getAddedSubList().getFirst();
                     certificate.getPath().ifPresent(path -> trustStoreManager
                             .addCertificate(formatCustomAlias(certificate.getThumbprint()), Path.of(path)));
                 } else if (c.wasRemoved()) {
-                    CustomCertificateViewModel certificate = c.getRemoved().get(0);
+                    CustomCertificateViewModel certificate = c.getRemoved().getFirst();
                     trustStoreManager.deleteCertificate(formatCustomAlias(certificate.getThumbprint()));
                 }
             }
@@ -159,6 +159,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
         proxyPreferences.setUseProxy(proxyUseProperty.getValue());
         proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
         proxyPreferences.setPort(proxyPortProperty.getValue().trim());
@@ -322,6 +323,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private String formatCustomAlias(String thumbprint) {
-        return String.format("%s[custom]", thumbprint);
+        return "%s[custom]".formatted(thumbprint);
     }
 }

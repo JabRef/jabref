@@ -5,45 +5,50 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BracesCorrectorTest {
+class BracesCorrectorTest {
 
     @Test
-    public void inputIsNull() {
+    void inputIsNull() {
         assertNull(BracesCorrector.apply(null));
     }
 
     @Test
-    public void inputIsEmpty() {
+    void inputIsEmpty() {
         assertEquals("", BracesCorrector.apply(""));
     }
 
     @Test
-    public void inputWithoutBraces() {
+    void inputWithoutBraces() {
         assertEquals("banana", BracesCorrector.apply("banana"));
     }
 
     @Test
-    public void inputAlreadyCorrect() {
+    void inputAlreadyCorrect() {
         assertEquals("{banana}", BracesCorrector.apply("{banana}"));
     }
 
     @Test
-    public void inputMissingClosing() {
+    void inputMissingClosing() {
         assertEquals("{banana}", BracesCorrector.apply("{banana"));
     }
 
     @Test
-    public void inputMissingOpening() {
+    void inputMissingOpening() {
         assertEquals("{banana}", BracesCorrector.apply("banana}"));
     }
 
     @Test
-    public void inputWithMaskedBraces() {
+    void inputWithMaskedBraces() {
         assertEquals("\\\\\\{banana", BracesCorrector.apply("\\\\\\{banana"));
     }
 
     @Test
-    public void inputWithMixedBraces() {
+    void inputWithMixedBraces() {
         assertEquals("{b{anana\\\\\\}}}", BracesCorrector.apply("{b{anana\\\\\\}"));
+    }
+
+    @Test
+    void inputUnbalanced() {
+        assertEquals("{{ban}ana}", BracesCorrector.apply("ban}ana}"));
     }
 }

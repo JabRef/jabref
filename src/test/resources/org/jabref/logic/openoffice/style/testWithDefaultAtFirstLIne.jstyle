@@ -27,6 +27,7 @@ FormatCitations="false"
 CitationCharacterFormat="Default"
 PageInfoSeparator="; "
 OxfordComma=","
+SpaceBefore="true"
 
 LAYOUT
 

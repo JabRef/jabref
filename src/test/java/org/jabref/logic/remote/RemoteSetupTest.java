@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
-import org.jabref.logic.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testGoodCase() {
+    void goodCase() {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
@@ -50,7 +50,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testGoodCaseWithAllLifecycleMethods() {
+    void goodCaseWithAllLifecycleMethods() {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
@@ -76,7 +76,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testPortAlreadyInUse() throws IOException {
+    void portAlreadyInUse() throws IOException {
         assumeFalse(OS.OS_X);
 
         final int port = 34567;
@@ -94,7 +94,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testClientTimeout() {
+    void clientTimeout() {
         final int port = 34567;
         final String message = "MYMESSAGE";
 

@@ -33,8 +33,8 @@ public class ControlHelper {
 
     public static boolean childIsFocused(Parent node) {
         return node.isFocused() || node.getChildrenUnmodifiable().stream().anyMatch(child -> {
-            if (child instanceof Parent) {
-                return childIsFocused((Parent) child);
+            if (child instanceof Parent parent) {
+                return childIsFocused(parent);
             } else {
                 return child.isFocused();
             }

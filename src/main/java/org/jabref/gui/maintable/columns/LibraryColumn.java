@@ -15,7 +15,7 @@ public class LibraryColumn extends MainTableColumn<String> {
         setText(Localization.lang("Library"));
         new ValueTableCellFactory<BibEntryTableViewModel, String>().withText(FileUtil::getBaseName)
                                                                    .install(this);
-        setCellValueFactory(param -> param.getValue().bibDatabaseContextProperty());
+        setCellValueFactory(param -> param.getValue().bibDatabasePathProperty());
     }
 
     public LibraryColumn() {

@@ -10,6 +10,8 @@ exclude: [_config.yml, .dockerignore, .gitignore, CNAME, Dockerfile, Gemfile, Ge
 # Browse alternative themes at https://stylishthemes.github.io/Syntax-Themes/pygments/
 highlight_theme: jellybeans
 
+favicon_ico: "/images/favicon.ico"
+
 search_enabled: true
 button: true
 aux_links:

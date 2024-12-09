@@ -1,51 +1,58 @@
 package org.jabref.logic.net;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import kong.unirest.UnirestException;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-public class URLDownloadTest {
+class URLDownloadTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
-    public void testStringDownloadWithSetEncoding() throws IOException {
-        URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+    void stringDownloadWithSetEncoding() throws Exception {
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void testStringDownload() throws IOException {
-        URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+    void stringDownload() throws Exception {
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void testFileDownload() throws IOException {
+    void fileDownload() throws Exception {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
-            URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+            URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
             dl.toFile(destination.toPath());
             assertTrue(destination.exists(), "file must exist");
         } finally {
@@ -57,23 +64,23 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void testDetermineMimeType() throws IOException {
-        URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+    void determineMimeType() throws Exception {
+        URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
-        assertTrue(dl.getMimeType().startsWith("text/html"));
+        assertTrue(dl.getMimeType().get().startsWith("text/html"));
     }
 
     @Test
-    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
-        URLDownload google = new URLDownload(new URL("http://www.google.com"));
+    void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
+        URLDownload google = new URLDownload(URLUtil.create("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.endsWith(".tmp"), path);
     }
 
     @Test
-    public void downloadToTemporaryFileKeepsName() throws IOException {
-        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE"));
+    void downloadToTemporaryFileKeepsName() throws Exception {
+        URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.contains("LICENSE"), path);
@@ -81,46 +88,46 @@ public class URLDownloadTest {
 
     @Test
     @DisabledOnCIServer("CI Server is apparently blocked")
-    public void downloadOfFTPSucceeds() throws IOException {
-        URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
+    void downloadOfFTPSucceeds() throws Exception {
+        URLDownload ftp = new URLDownload(URLUtil.create("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
     }
 
     @Test
-    public void downloadOfHttpSucceeds() throws IOException {
-        URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
+    void downloadOfHttpSucceeds() throws Exception {
+        URLDownload ftp = new URLDownload(URLUtil.create("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
     }
 
     @Test
-    public void downloadOfHttpsSucceeds() throws IOException {
-        URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
+    void downloadOfHttpsSucceeds() throws Exception {
+        URLDownload ftp = new URLDownload(URLUtil.create("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
     }
 
     @Test
-    public void testCheckConnectionSuccess() throws MalformedURLException {
-        URLDownload google = new URLDownload(new URL("http://www.google.com"));
+    void checkConnectionSuccess() throws MalformedURLException {
+        URLDownload google = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(google.canBeReached());
     }
 
     @Test
-    public void testCheckConnectionFail() throws MalformedURLException {
-        URLDownload nonsense = new URLDownload(new URL("http://nonsenseadddress"));
+    void checkConnectionFail() throws MalformedURLException {
+        URLDownload nonsense = new URLDownload(URLUtil.create("http://nonsenseadddress"));
 
         assertThrows(UnirestException.class, nonsense::canBeReached);
     }
 
     @Test
-    public void connectTimeoutIsNeverNull() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(new URL("http://www.example.com"));
+    void connectTimeoutIsNeverNull() throws MalformedURLException {
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://www.example.com"));
         assertNotNull(urlDownload.getConnectTimeout(), "there's a non-null default by the constructor");
 
         urlDownload.setConnectTimeout(null);
@@ -128,18 +135,39 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
-        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
-
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherServerException.class, exception.getCause());
+    void test503ErrorThrowsFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
+        assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
-    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
-        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
+    void test429ErrorThrowsFetcherClientException() throws Exception {
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
+        assertThrows(FetcherClientException.class, urlDownload::asString);
+    }
 
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherClientException.class, exception.getCause());
+    @Test
+    void redirectWorks(@TempDir Path tempDir) throws Exception {
+        WireMockServer wireMockServer = new WireMockServer(2222);
+        wireMockServer.start();
+        configureFor("localhost", 2222);
+        stubFor(get("/redirect")
+                .willReturn(aResponse()
+                        .withStatus(302)
+                        .withHeader("Location", "/final")));
+        byte[] pdfContent = {0x00};
+        stubFor(get(urlEqualTo("/final"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/pdf")
+                        .withBody(pdfContent)));
+
+        URLDownload urlDownload = new URLDownload(URLUtil.create("http://localhost:2222/redirect"));
+        Path downloadedFile = tempDir.resolve("download.pdf");
+        urlDownload.toFile(downloadedFile);
+        byte[] actual = Files.readAllBytes(downloadedFile);
+        assertArrayEquals(pdfContent, actual);
+
+        wireMockServer.stop();
     }
 }

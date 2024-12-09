@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -25,7 +26,7 @@ class ImportFormatReaderParameterlessTest {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, fileMonitor);
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), fileMonitor);
     }
 
     @Test

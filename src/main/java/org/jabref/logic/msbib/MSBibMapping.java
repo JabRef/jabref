@@ -22,13 +22,13 @@ public class MSBibMapping {
 
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
-
-    private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
-
-    // see https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
     private static final BiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
+    private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
+    private static final Map<String, EntryType> MSBIB_ENTRYTYPE_MAPPING;
+    private static final Map<EntryType, MSBibEntryType> BIB_ENTRYTYPE_MAPPING = new HashMap<>();
 
     static {
+        // see https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
         LANG_TO_LCID.put("basque", 1609);
         LANG_TO_LCID.put("bulgarian", 1026);
         LANG_TO_LCID.put("catalan", 1027);
@@ -120,47 +120,49 @@ public class MSBibMapping {
         BIBLATEX_TO_MS_BIB.put(new UnknownField(MSBIB_PREFIX + "productioncompany"), "ProductionCompany");
     }
 
+    static {
+        MSBIB_ENTRYTYPE_MAPPING = Map.of(
+                "Book", StandardEntryType.Book,
+                "BookSection", StandardEntryType.Book,
+                "JournalArticle", StandardEntryType.Article,
+                "ArticleInAPeriodical", IEEETranEntryType.Periodical,
+                "ConferenceProceedings", StandardEntryType.InProceedings,
+                "Report", StandardEntryType.TechReport,
+                "Patent", IEEETranEntryType.Patent,
+                "InternetSite", StandardEntryType.Online);
+    }
+
+    static {
+        // We need to add the entries "manually", because Map.of does not allow that many entries
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Book, MSBibEntryType.Book);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.InBook, MSBibEntryType.BookSection);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Booklet, MSBibEntryType.BookSection);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.InCollection, MSBibEntryType.BookSection);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Article, MSBibEntryType.JournalArticle);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.InProceedings, MSBibEntryType.ConferenceProceedings);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Conference, MSBibEntryType.ConferenceProceedings);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Proceedings, MSBibEntryType.ConferenceProceedings);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Collection, MSBibEntryType.ConferenceProceedings);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.TechReport, MSBibEntryType.Report);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Manual, MSBibEntryType.Report);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.MastersThesis, MSBibEntryType.Report);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.PhdThesis, MSBibEntryType.Report);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Unpublished, MSBibEntryType.Report);
+        BIB_ENTRYTYPE_MAPPING.put(IEEETranEntryType.Patent, MSBibEntryType.Patent);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Misc, MSBibEntryType.Misc);
+        BIB_ENTRYTYPE_MAPPING.put(IEEETranEntryType.Electronic, MSBibEntryType.ElectronicSource);
+        BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Online, MSBibEntryType.InternetSite);
+    }
+
     private MSBibMapping() {
     }
 
     public static EntryType getBiblatexEntryType(String msbibType) {
-        Map<String, EntryType> entryTypeMapping = new HashMap<>();
-
-        entryTypeMapping.put("Book", StandardEntryType.Book);
-        entryTypeMapping.put("BookSection", StandardEntryType.Book);
-        entryTypeMapping.put("JournalArticle", StandardEntryType.Article);
-        entryTypeMapping.put("ArticleInAPeriodical", IEEETranEntryType.Periodical);
-        entryTypeMapping.put("ConferenceProceedings", StandardEntryType.InProceedings);
-        entryTypeMapping.put("Report", StandardEntryType.TechReport);
-        entryTypeMapping.put("Patent", IEEETranEntryType.Patent);
-        entryTypeMapping.put("InternetSite", StandardEntryType.Online);
-
-        return entryTypeMapping.getOrDefault(msbibType, StandardEntryType.Misc);
+        return MSBIB_ENTRYTYPE_MAPPING.getOrDefault(msbibType, StandardEntryType.Misc);
     }
 
     public static MSBibEntryType getMSBibEntryType(EntryType bibtexType) {
-        Map<EntryType, MSBibEntryType> entryTypeMapping = new HashMap<>();
-
-        entryTypeMapping.put(StandardEntryType.Book, MSBibEntryType.Book);
-        entryTypeMapping.put(StandardEntryType.InBook, MSBibEntryType.BookSection);
-        entryTypeMapping.put(StandardEntryType.Booklet, MSBibEntryType.BookSection);
-        entryTypeMapping.put(StandardEntryType.InCollection, MSBibEntryType.BookSection);
-        entryTypeMapping.put(StandardEntryType.Article, MSBibEntryType.JournalArticle);
-        entryTypeMapping.put(StandardEntryType.InProceedings, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(StandardEntryType.Conference, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(StandardEntryType.Proceedings, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(StandardEntryType.Collection, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(StandardEntryType.TechReport, MSBibEntryType.Report);
-        entryTypeMapping.put(StandardEntryType.Manual, MSBibEntryType.Report);
-        entryTypeMapping.put(StandardEntryType.MastersThesis, MSBibEntryType.Report);
-        entryTypeMapping.put(StandardEntryType.PhdThesis, MSBibEntryType.Report);
-        entryTypeMapping.put(StandardEntryType.Unpublished, MSBibEntryType.Report);
-        entryTypeMapping.put(IEEETranEntryType.Patent, MSBibEntryType.Patent);
-        entryTypeMapping.put(StandardEntryType.Misc, MSBibEntryType.Misc);
-        entryTypeMapping.put(IEEETranEntryType.Electronic, MSBibEntryType.ElectronicSource);
-        entryTypeMapping.put(StandardEntryType.Online, MSBibEntryType.InternetSite);
-
-        return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
+        return BIB_ENTRYTYPE_MAPPING.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }
 
     /**

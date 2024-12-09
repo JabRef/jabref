@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -79,7 +80,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void fetchPDF() throws Exception {
         Optional<URL> url = fetcher.findFullText(bibEntry);
-        assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
+        assertEquals(Optional.of(URLUtil.create("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }
 
     @Override

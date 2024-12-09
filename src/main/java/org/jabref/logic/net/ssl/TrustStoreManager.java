@@ -3,7 +3,6 @@ package org.jabref.logic.net.ssl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
@@ -28,6 +27,9 @@ import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @implNote SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+ */
 public class TrustStoreManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);
@@ -148,9 +150,10 @@ public class TrustStoreManager {
         try {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
             if (Files.notExists(storePath)) {
-                Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
                 Files.createDirectories(storePath.getParent());
-                Files.copy(storeResourcePath, storePath);
+                try (InputStream inputStream = TrustStoreManager.class.getResourceAsStream("/ssl/truststore.jks")) {
+                    Files.copy(inputStream, storePath);
+                }
             }
 
             try {
@@ -160,12 +163,12 @@ public class TrustStoreManager {
             }
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Bad resource path", e);
         }
     }
 
-    // based on https://stackoverflow.com/a/62586564/3450689
+    /**
+     * @implNote based on https://stackoverflow.com/a/62586564/3450689
+     */
     private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
         CertificateException, IOException {
         X509TrustManager jreTrustManager = getJreTrustManager();

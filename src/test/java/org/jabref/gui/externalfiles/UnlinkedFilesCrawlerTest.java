@@ -5,10 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,7 +25,7 @@ import static org.mockito.Mockito.when;
 class UnlinkedFilesCrawlerTest {
 
     @Test
-    public void minimalGitIgnore(@TempDir Path testRoot) throws Exception {
+    void minimalGitIgnore(@TempDir Path testRoot) throws Exception {
         Files.writeString(testRoot.resolve(".gitignore"), """
                 *.png
                 """);
@@ -41,7 +44,7 @@ class UnlinkedFilesCrawlerTest {
     }
 
     @Test
-    public void excludingTheCurrentLibraryTest(@TempDir Path testRoot) throws IOException {
+    void excludingTheCurrentLibraryTest(@TempDir Path testRoot) throws IOException {
         // Adding 3 files one of which is the database file
         Files.createFile(testRoot.resolve("unlinkedPdf.pdf"));
         Files.createFile(testRoot.resolve("another-unlinkedPdf.pdf"));
@@ -51,8 +54,9 @@ class UnlinkedFilesCrawlerTest {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setDatabasePath(databasePath);
 
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        Filter<Path> fileExtensionFilter = new FileExtensionViewModel(StandardFileType.ANY_FILE, externalApplicationsPreferences).dirFilter();
         FilePreferences filePreferences = mock(FilePreferences.class);
-        Filter<Path> fileExtensionFilter = new FileExtensionViewModel(StandardFileType.ANY_FILE, filePreferences).dirFilter();
         UnlinkedPDFFileFilter unlinkedPdfFileFilter = new UnlinkedPDFFileFilter(fileExtensionFilter, databaseContext, filePreferences);
 
         UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPdfFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, databaseContext, filePreferences);

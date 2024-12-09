@@ -31,7 +31,7 @@ public class OOFormatBibliography {
      */
     public static OOText formatBibliography(CitationGroups citationGroups,
                                             CitedKeys bibliography,
-                                            OOBibStyle style,
+                                            JStyle style,
                                             boolean alwaysAddCitedOnPages) {
 
         OOText title = style.getFormattedBibliographyTitle();
@@ -44,7 +44,7 @@ public class OOFormatBibliography {
      */
     public static OOText formatBibliographyBody(CitationGroups citationGroups,
                                                 CitedKeys bibliography,
-                                                OOBibStyle style,
+                                                JStyle style,
                                                 boolean alwaysAddCitedOnPages) {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -62,7 +62,7 @@ public class OOFormatBibliography {
      */
     public static OOText formatBibliographyEntry(CitationGroups citationGroups,
                                                  CitedKey citedKey,
-                                                 OOBibStyle style,
+                                                 JStyle style,
                                                  boolean alwaysAddCitedOnPages) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -91,10 +91,10 @@ public class OOFormatBibliography {
     /**
      * @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
      */
-    public static OOText formatBibliographyEntryBody(CitedKey citedKey, OOBibStyle style) {
+    public static OOText formatBibliographyEntryBody(CitedKey citedKey, JStyle style) {
         if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
-            return OOText.fromString(String.format("Unresolved(%s)", citedKey.citationKey));
+            return OOText.fromString("Unresolved(%s)".formatted(citedKey.citationKey));
         } else {
             // Resolved entry, use the layout engine
             BibEntry bibentry = citedKey.getLookupResult().get().entry;
@@ -161,7 +161,7 @@ public class OOFormatBibliography {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        final String prefix = String.format(" (%s: ", Localization.lang("Cited on pages"));
+        final String prefix = " (%s: ".formatted(Localization.lang("Cited on pages"));
         final String suffix = ")";
         stringBuilder.append(prefix);
 

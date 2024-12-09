@@ -17,7 +17,7 @@ How to implement special fields in BibTeX databases?
 
 ## Decision Outcome
 
-Chosen option: "Special fields as separate fields", because comes out best (see below)
+Chosen option: "Special fields as separate fields", because comes out best (see below).
 
 ## Pros and Cons of the Options
 

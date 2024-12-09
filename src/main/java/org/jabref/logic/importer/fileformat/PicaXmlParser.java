@@ -28,17 +28,15 @@ import org.xml.sax.SAXException;
 
 public class PicaXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (
-                ParserConfigurationException |
-                SAXException |
-                IOException exception) {
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
     }
@@ -100,7 +98,7 @@ public class PicaXmlParser implements Parser {
         List<Element> datafields = getChildren("datafield", e);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
-            LOGGER.debug("tag: " + tag);
+            LOGGER.debug("tag: {}", tag);
 
             // genre/type of the entry https://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&val=0500&katalog=Standard
             if ("002@".equals(tag)) {

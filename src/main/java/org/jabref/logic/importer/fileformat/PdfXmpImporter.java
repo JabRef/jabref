@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -16,7 +15,7 @@ import org.jabref.logic.xmp.XmpUtilShared;
 /**
  * Wraps the XMPUtility function to be used as an Importer.
  */
-public class PdfXmpImporter extends Importer {
+public class PdfXmpImporter extends PdfImporter {
 
     private final XmpPreferences xmpPreferences;
 
@@ -83,6 +82,6 @@ public class PdfXmpImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Wraps the XMPUtility function to be used as an Importer.";
+        return Localization.lang("Imports BibTeX data using XMP data of a PDF.");
     }
 }

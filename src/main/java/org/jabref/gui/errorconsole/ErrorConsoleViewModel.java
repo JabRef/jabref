@@ -13,16 +13,16 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +31,14 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ErrorConsoleViewModel(DialogService dialogService, PreferencesService preferencesService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public ErrorConsoleViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
         ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
@@ -79,6 +79,13 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     }
 
     /**
+     * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
+     */
+    public void copyLogEntry(LogEventViewModel logEvent) {
+        clipBoardManager.setContent(logEvent.getDetailedText());
+    }
+
+    /**
      * Clears the current log
      */
     public void clearLog() {
@@ -91,7 +98,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     public void reportIssue() {
         try {
             // System info
-            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
+            String systemInfo = "JabRef %s%n%s %s %s %nJava %s".formatted(buildInfo.version, BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
@@ -113,7 +120,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("body", issueBody);
-            JabRefDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferences.getExternalApplicationsPreferences());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Problem opening url", e);
         }

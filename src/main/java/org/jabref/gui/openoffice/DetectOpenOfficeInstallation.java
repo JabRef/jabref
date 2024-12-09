@@ -10,7 +10,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
 
@@ -32,12 +32,10 @@ public class DetectOpenOfficeInstallation {
     }
 
     public Optional<Path> selectInstallationPath() {
-        final NativeDesktop nativeDesktop = OS.getNativeDesktop();
-
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .withInitialDirectory(NativeDesktop.get().getApplicationDirectory())
                 .build();
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
     }
@@ -51,7 +49,7 @@ public class DetectOpenOfficeInstallation {
         if (OS.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
             executablePath = OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
         }
-        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Path.of(executablePath));
+        return !StringUtil.isNullOrEmpty(executablePath) && Files.isRegularFile(Path.of(executablePath));
     }
 
     public boolean setOpenOfficePreferences(Path installDir) {
@@ -79,7 +77,7 @@ public class DetectOpenOfficeInstallation {
         }
 
         if (installDirs.size() == 1) {
-            return Optional.of(installDirs.get(0).toAbsolutePath());
+            return Optional.of(installDirs.getFirst().toAbsolutePath());
         }
 
         return dialogService.showChoiceDialogAndWait(

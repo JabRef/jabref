@@ -4,10 +4,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.CleanupPreferences;
-import org.jabref.preferences.FilePreferences;
 
 public class CleanupDialog extends BaseDialog<CleanupPreferences> {
     public CleanupDialog(BibDatabaseContext databaseContext, CleanupPreferences initialPreset, FilePreferences filePreferences) {

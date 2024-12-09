@@ -28,6 +28,8 @@ import org.w3c.dom.Text;
 class OpenDocumentRepresentation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentRepresentation.class);
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+
     private final List<BibEntry> entries;
 
     private final BibDatabase database;
@@ -56,7 +58,7 @@ class OpenDocumentRepresentation {
     public Document getDOMrepresentation() {
         Document result = null;
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
             result = dbuild.newDocument();
             Element collection = result.createElement("office:document-content");
             // collection.setAttribute("xmlns", "http://openoffice.org/2000/office");

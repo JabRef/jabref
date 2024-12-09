@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
@@ -28,6 +29,7 @@ import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
+import org.jabref.logic.importer.fetcher.ISIDOREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.LOBIDFetcher;
@@ -52,7 +54,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
@@ -105,6 +106,7 @@ public class WebFetchers {
     public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(new CompositeSearchFirstComparator());
         set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new ISIDOREFetcher());
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
@@ -158,9 +160,6 @@ public class WebFetchers {
         return set;
     }
 
-    /**
-     * @return sorted set containing entry based fetchers
-     */
     public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences,
                                                                      ImportFormatPreferences importFormatPreferences,
                                                                      FilePreferences filePreferences,
@@ -176,9 +175,13 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
+
+        // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
+        // We list it here, because otherwise, it would be much more effort (other UI button, ...)
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
+
         return set;
     }
 
@@ -235,7 +238,7 @@ public class WebFetchers {
 }
 
 /**
- *  Places "Search Selected" to the first of the set
+ *  Places "Search pre-configured" to the first of the set
  */
 class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     @Override

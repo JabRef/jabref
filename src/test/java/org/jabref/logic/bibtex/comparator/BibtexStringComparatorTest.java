@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BibtexStringComparatorTest {
+class BibtexStringComparatorTest {
 
     private final BibtexStringComparator bsc1 = new BibtexStringComparator(false);
     private final BibtexStringComparator bsc2 = new BibtexStringComparator(true);
 
     @Test
-    public void test() {
+    void test() {
         BibtexString bs1 = new BibtexString("VLSI", "Very Large Scale Integration");
         BibtexString bs2 = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString bs3 = new BibtexString("DSP", "Digital Signal Processing");

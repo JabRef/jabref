@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -13,16 +14,22 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CiteSeerQueryTransformer;
 import org.jabref.logic.importer.fileformat.CiteSeerParser;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONElement;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONElement;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CiteSeer.class);
 
     private static final String BASE_URL = "citeseerx.ist.psu.edu";
 
@@ -50,21 +57,27 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         // ADR-0014
         try {
             JSONElement payload = getPayloadJSON(luceneQuery);
-            JsonNode requestResponse = Unirest.post(API_URL)
-                                              .header("authority", BASE_URL)
-                                              .header("accept", "application/json, text/plain, */*")
-                                              .header("content-type", "application/json;charset=UTF-8")
-                                              .header("origin", "https://" + BASE_URL)
-                                              .body(payload)
-                                              .asJson().getBody();
+            HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
+                                                         .header("authority", BASE_URL)
+                                                         .header("accept", "application/json, text/plain, */*")
+                                                         .header("content-type", "application/json;charset=UTF-8")
+                                                         .header("origin", "https://" + BASE_URL)
+                                                         .body(payload)
+                                                         .asJson();
+            if (!httpResponse.isSuccess()) {
+                LOGGER.debug("No success");
+                // TODO: body needs to be added to the exception, but we currently only have JSON available, but the error is most probably simple text (or HTML)
+                SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(httpResponse.getStatus(), httpResponse.getStatusText(), "");
+                throw new FetcherException(API_URL, simpleHttpResponse);
+            }
 
-            Optional<JSONArray> jsonResponse = Optional.of(requestResponse)
-                                                    .map(JsonNode::getObject)
-                                                    .filter(Objects::nonNull)
-                                                    .map(response -> response.optJSONArray("response"))
-                                                    .filter(Objects::nonNull);
+            JsonNode requestResponse = httpResponse.getBody();
+            Optional<JSONArray> jsonResponse = Optional.ofNullable(requestResponse)
+                                                       .map(JsonNode::getObject)
+                                                       .map(response -> response.optJSONArray("response"));
 
-            if (!jsonResponse.isPresent()) {
+            if (jsonResponse.isEmpty()) {
+                LOGGER.debug("No entries found for query: {}", luceneQuery);
                 return List.of();
             }
 
@@ -72,7 +85,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
             List<BibEntry> fetchedEntries = parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
             return fetchedEntries;
         } catch (ParseException ex) {
-            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, ", ex);
+            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries", ex);
         }
     }
 
@@ -89,16 +102,21 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         // does not use a valid DOI, but Cite Seer's id / hash available for each entry
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {
-            String source = String.format(PDF_URL, id.get());
-            return Optional.of(new URL(source));
+            String source = PDF_URL.formatted(id.get());
+            return Optional.of(URLUtil.create(source));
         }
 
         // if using id fails, we can try the source URL
         Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
-            return Optional.of(new URL(urlString.get()));
+            return Optional.of(URLUtil.create(urlString.get()));
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 }

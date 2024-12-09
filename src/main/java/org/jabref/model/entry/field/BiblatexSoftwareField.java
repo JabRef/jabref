@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
 
@@ -20,7 +19,7 @@ public enum BiblatexSoftwareField implements Field {
 
     private final String name;
     private final String displayName;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
 
     BiblatexSoftwareField(String name) {
         this.name = name;
@@ -56,7 +55,7 @@ public enum BiblatexSoftwareField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

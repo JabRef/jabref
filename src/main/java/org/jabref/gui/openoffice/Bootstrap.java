@@ -40,6 +40,7 @@ import com.sun.star.comp.helper.ComponentContext;
 import com.sun.star.comp.helper.ComponentContextEntry;
 import com.sun.star.comp.loader.JavaLoader;
 import com.sun.star.comp.servicemanager.ServiceManager;
+import com.sun.star.connection.NoConnectException;
 import com.sun.star.container.XSet;
 import com.sun.star.lang.XInitialization;
 import com.sun.star.lang.XMultiComponentFactory;
@@ -314,7 +315,7 @@ public class Bootstrap {
                         throw new BootstrapException("no component context!");
                     }
                     break;
-                } catch (com.sun.star.connection.NoConnectException ex) {
+                } catch (NoConnectException ex) {
                     // Wait 500 ms, then try to connect again, but do not wait
                     // longer than 5 min (= 600 * 500 ms) total:
                     if (i == 600) {

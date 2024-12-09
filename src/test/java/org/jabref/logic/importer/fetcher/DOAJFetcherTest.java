@@ -10,8 +10,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -54,7 +54,7 @@ class DOAJFetcherTest {
     }
 
     @Test
-    void testBibJSONConverter() {
+    void bibJSONConverter() {
         String jsonString = "{\"title\":\"Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain\",\"journal\":{\"publisher\":\"Hindawi Publishing Corporation\",\"language\":[\"English\"],\"title\":\"VLSI Design\",\"country\":\"US\",\"volume\":\"2014\"},\"author\":[{\"name\":\"Syed Asad Alam\"},{\"name\":\"Oscar Gustafsson\"}],\"link\":[{\"url\":\"http://dx.doi.org/10.1155/2014/217495\",\"type\":\"fulltext\"}],\"year\":\"2014\",\"identifier\":[{\"type\":\"pissn\",\"id\":\"1065-514X\"},{\"type\":\"eissn\",\"id\":\"1563-5171\"},{\"type\":\"doi\",\"id\":\"10.1155/2014/217495\"}],\"created_date\":\"2014-05-09T19:38:31Z\"}";
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = DOAJFetcher.parseBibJSONtoBibtex(jsonObject, ',');
@@ -68,7 +68,7 @@ class DOAJFetcherTest {
     }
 
     @Test
-    public void searchByEmptyQuery() throws Exception {
+    void searchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 

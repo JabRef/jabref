@@ -2,6 +2,9 @@ package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.util.List;
 
+/**
+ * Used for GSON
+ */
 public class CitationsResponse {
     private int offset;
     private int next;

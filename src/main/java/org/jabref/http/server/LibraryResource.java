@@ -5,17 +5,17 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.gui.Globals;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -34,7 +34,7 @@ public class LibraryResource {
     public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
-    PreferencesService preferences;
+    CliPreferences preferences;
 
     @Inject
     Gson gson;
@@ -43,9 +43,10 @@ public class LibraryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) {
         ParserResult parserResult = getParserResult(id);
+        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         List<BibEntryDTO> list = parserResult.getDatabase().getEntries().stream()
                                              .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
-                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), Globals.entryTypesManager))
+                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                              .toList();
         return gson.toJson(list);
     }
@@ -88,9 +89,8 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-        return preferences.getGuiPreferences().getLastFilesOpened()
+        return preferences.getLastFilesOpenedPreferences().getLastFilesOpened()
                           .stream()
-                          .map(java.nio.file.Path::of)
                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
                           .findAny()
                           .orElseThrow(NotFoundException::new);

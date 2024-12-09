@@ -8,14 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,8 @@ public class PushToLyx extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
-    public PushToLyx(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToLyx(DialogService dialogService, GuiPreferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToLyxSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
+        return new PushToLyxSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class PushToLyx extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
@@ -86,7 +85,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
         final File lyxpipe = lp;
 
-        JabRefExecutorService.INSTANCE.executeAndWait(() -> {
+        HeadlessExecutorService.INSTANCE.executeAndWait(() -> {
             try (FileWriter fw = new FileWriter(lyxpipe, StandardCharsets.UTF_8); BufferedWriter lyxOut = new BufferedWriter(fw)) {
                 String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ASCIICharacterCheckerTest {
+class ASCIICharacterCheckerTest {
 
     private final ASCIICharacterChecker checker = new ASCIICharacterChecker();
     private final BibEntry entry = new BibEntry();
@@ -35,11 +35,11 @@ public class ASCIICharacterCheckerTest {
 
     @Test
     void fieldAcceptsOnlyAsciiCharacters() {
-        String field = "";
+        StringBuilder field = new StringBuilder();
         for (int i = 32; i <= 127; i++) {
-            field += Character.toString(i);
+            field.append(Character.toString(i));
         }
-        entry.setField(StandardField.TITLE, field);
+        entry.setField(StandardField.TITLE, field.toString());
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 

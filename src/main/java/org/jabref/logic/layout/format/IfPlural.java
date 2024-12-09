@@ -27,7 +27,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         if (parts.size() < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
-        pluralText = parts.get(0);
+        pluralText = parts.getFirst();
         singularText = parts.get(1);
     }
 

@@ -5,19 +5,10 @@ gradlew text eol=lf
 # windows line endings at windows files
 *.bat text eol=crlf
 
-# ensure that line endings of *.fxml, *.java, and *.properties are normalized
+# ensure that line endings of *.bib, *.fxml, *.java, *.properties are normalized to LF
+*.bib text eol=lf
 *.fxml text eol=lf
 *.java text eol=lf
 *.properties text eol=lf
 
-# .bib files have to be written using OS specific line endings to enable our tests working
-*.bib text !eol
-# Exception: The files used for the http server test - they should have linux line endings
-src/test/resources/org/jabref/http/server/*.bib text eol=lf
-
-# Citavi needs to be LF line ending
-# This overwrites the setting of "*.bib"
-Citavi*.bib eol=lf
-
-# disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
-# CHANGELOG.md merge=union
+CHANGELOG.md merge=union

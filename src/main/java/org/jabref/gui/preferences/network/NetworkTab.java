@@ -71,7 +71,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
         versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 
@@ -139,7 +139,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     private String formatVersion(String version) {
-        return String.format("V%s", version);
+        return "V%s".formatted(version);
     }
 
     private void proxyPasswordReveal(MouseEvent event) {

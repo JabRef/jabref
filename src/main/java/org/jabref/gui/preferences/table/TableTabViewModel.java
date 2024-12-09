@@ -20,6 +20,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -28,7 +29,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -72,14 +72,14 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final Validator columnsNotEmptyValidator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
 
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final MainTablePreferences mainTablePreferences;
 
-    public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public TableTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
@@ -105,7 +105,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         columnsNotEmptyValidator = new FunctionBasedValidator<>(
                 columnsListProperty,
                 list -> !list.isEmpty(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Entry table columns"),
                         Localization.lang("Columns"),
                         Localization.lang("List must not be empty."))));
@@ -126,6 +126,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
+                new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS),
                 new MainTableColumnModel(MainTableColumnModel.Type.FILES),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.TIMESTAMP.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.OWNER.getName()),
@@ -172,24 +173,24 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         EnumSet.allOf(SpecialField.class).stream()
                .map(Field::getName)
                .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, name))
-               .forEach(item -> availableColumnsProperty.getValue().add(0, item));
+               .forEach(item -> availableColumnsProperty.getValue().addFirst(item));
     }
 
     private void removeSpecialFieldColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
-        availableColumnsProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
+        columnsListProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.SPECIALFIELD);
+        availableColumnsProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.SPECIALFIELD);
     }
 
     private void insertExtraFileColumns() {
-        preferences.getFilePreferences().getExternalFileTypes().stream()
+        preferences.getExternalApplicationsPreferences().getExternalFileTypes().stream()
                    .map(ExternalFileType::getName)
                    .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
                    .forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
-        availableColumnsProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
+        columnsListProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.EXTRAFILE);
+        availableColumnsProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.EXTRAFILE);
     }
 
     public void insertColumnInList() {

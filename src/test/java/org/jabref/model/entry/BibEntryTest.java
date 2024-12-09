@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.BibField;
@@ -42,7 +42,7 @@ class BibEntryTest {
     private BibEntry entry = new BibEntry();
 
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertNotNull(entry.getId());
         assertFalse(entry.getField(StandardField.AUTHOR).isPresent());
@@ -59,13 +59,13 @@ class BibEntryTest {
     }
 
     @Test
-    void getFieldIsCaseInsensitive() throws Exception {
+    void getFieldIsCaseInsensitive() {
         entry.setField(new UnknownField("TeSt"), "value");
         assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
     }
 
     @Test
-    void getFieldWorksWithBibFieldAsWell() throws Exception {
+    void getFieldWorksWithBibFieldAsWell() {
         entry.setField(StandardField.AUTHOR, "value");
         assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field()));
     }
@@ -76,80 +76,80 @@ class BibEntryTest {
     }
 
     @Test
-    void setFieldLeadsToAChangedEntry() throws Exception {
+    void setFieldLeadsToAChangedEntry() {
         entry.setField(StandardField.AUTHOR, "value");
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void setFieldWorksWithBibFieldAsWell() throws Exception {
+    void setFieldWorksWithBibFieldAsWell() {
         entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field(), "value");
         assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
     }
 
     @Test
-    void clonedBibEntryHasUniqueID() throws Exception {
+    void clonedBibEntryHasUniqueID() {
         BibEntry entryClone = (BibEntry) entry.clone();
         assertNotEquals(entry.getId(), entryClone.getId());
     }
 
     @Test
-    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() throws Exception {
+    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() {
         BibEntry entryClone = (BibEntry) entry.clone();
         assertFalse(entryClone.hasChanged());
     }
 
     @Test
-    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() throws Exception {
+    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() {
         entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
         BibEntry entryClone = (BibEntry) entry.clone();
         assertFalse(entryClone.hasChanged());
     }
 
     @Test
-    void setAndGetAreConsistentForMonth() throws Exception {
+    void setAndGetAreConsistentForMonth() {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of("may"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void setAndGetAreConsistentForCapitalizedMonth() throws Exception {
+    void setAndGetAreConsistentForCapitalizedMonth() {
         entry.setField(StandardField.MONTH, "May");
         assertEquals(Optional.of("May"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void setAndGetAreConsistentForMonthString() throws Exception {
+    void setAndGetAreConsistentForMonthString() {
         entry.setField(StandardField.MONTH, "#may#");
         assertEquals(Optional.of("#may#"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void monthCorrectlyReturnedForMonth() throws Exception {
+    void monthCorrectlyReturnedForMonth() {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForCapitalizedMonth() throws Exception {
+    void monthCorrectlyReturnedForCapitalizedMonth() {
         entry.setField(StandardField.MONTH, "May");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForMonthString() throws Exception {
+    void monthCorrectlyReturnedForMonthString() {
         entry.setField(StandardField.MONTH, "#may#");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForMonthMay() throws Exception {
+    void monthCorrectlyReturnedForMonthMay() {
         entry.setMonth(Month.MAY);
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthFieldCorrectlyReturnedForMonthMay() throws Exception {
+    void monthFieldCorrectlyReturnedForMonthMay() {
         entry.setMonth(Month.MAY);
         assertEquals(Optional.of("#may#"), entry.getField(StandardField.MONTH));
     }
@@ -248,7 +248,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetAndAddToLinkedFileList() {
+    void getAndAddToLinkedFileList() {
         List<LinkedFile> files = entry.getFiles();
         files.add(new LinkedFile("", Path.of(""), ""));
         entry.setFiles(files);
@@ -259,7 +259,7 @@ class BibEntryTest {
     void replaceOfLinkWorks() throws Exception {
         List<LinkedFile> files = new ArrayList<>();
         String urlAsString = "https://www.example.org/file.pdf";
-        files.add(new LinkedFile(new URL(urlAsString), ""));
+        files.add(new LinkedFile(URLUtil.create(urlAsString), ""));
         entry.setFiles(files);
 
         LinkedFile linkedFile = new LinkedFile("", Path.of("file.pdf", ""), "");
@@ -268,14 +268,14 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetEmptyKeywords() {
+    void getEmptyKeywords() {
         KeywordList actual = entry.getKeywords(',');
 
         assertEquals(new KeywordList(), actual);
     }
 
     @Test
-    void testGetSingleKeywords() {
+    void getSingleKeywords() {
         entry.addKeyword("kw", ',');
         KeywordList actual = entry.getKeywords(',');
 
@@ -362,23 +362,23 @@ class BibEntryTest {
     }
 
     @Test
-    void identicObjectsareEqual() throws Exception {
+    void identicObjectsareEqual() {
         BibEntry otherEntry = entry;
         assertEquals(entry, otherEntry);
     }
 
     @Test
-    void compareToNullObjectIsFalse() throws Exception {
+    void compareToNullObjectIsFalse() {
         assertNotEquals(null, entry);
     }
 
     @Test
-    void compareToDifferentClassIsFalse() throws Exception {
+    void compareToDifferentClassIsFalse() {
         assertNotEquals(entry, new Object());
     }
 
     @Test
-    void compareIsTrueWhenIdAndFieldsAreEqual() throws Exception {
+    void compareIsTrueWhenIdAndFieldsAreEqual() {
         entry.setId("1");
         entry.setField(new UnknownField("key"), "value");
         BibEntry otherEntry = new BibEntry();
@@ -407,27 +407,27 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetSeparatedKeywordsAreCorrect() {
+    void getSeparatedKeywordsAreCorrect() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordIsCorrect() {
+    void addKeywordIsCorrect() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         assertEquals(new KeywordList("Foo", "Bar", "FooBar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordHasChanged() {
+    void addKeywordHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testAddKeywordTwiceYiedsOnlyOne() {
+    void addKeywordTwiceYiedsOnlyOne() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         entry.addKeyword("FooBar", ',');
@@ -442,21 +442,21 @@ class BibEntryTest {
     }
 
     @Test
-    void testAddKeywordWithDifferentCapitalizationChanges() {
+    void addKeywordWithDifferentCapitalizationChanges() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FOO", ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testAddKeywordEmptyKeywordIsNotAdded() {
+    void addKeywordEmptyKeywordIsNotAdded() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("", ',');
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordEmptyKeywordNotChanged() {
+    void addKeywordEmptyKeywordNotChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.setChanged(false);
         entry.addKeyword("", ',');
@@ -481,47 +481,47 @@ class BibEntryTest {
     }
 
     @Test
-    void testAddKeywordsWorksAsExpected() {
+    void addKeywordsWorksAsExpected() {
         entry.addKeywords(Arrays.asList("Foo", "Bar"), ',');
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testPutKeywordsOverwritesOldKeywords() {
+    void putKeywordsOverwritesOldKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
         assertEquals(new KeywordList("Yin", "Yang"), entry.getKeywords(','));
     }
 
     @Test
-    void testPutKeywordsHasChanged() {
+    void putKeywordsHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
+    void putKeywordsPutEmpyListErasesPreviousKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListHasChanged() {
+    void putKeywordsPutEmpyListHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListToEmptyBibentry() {
+    void putKeywordsPutEmpyListToEmptyBibentry() {
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListToEmptyBibentryNotChanged() {
+    void putKeywordsPutEmpyListToEmptyBibentryNotChanged() {
         entry.putKeywords(Collections.emptyList(), ',');
         assertFalse(entry.hasChanged());
     }
@@ -602,7 +602,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetEmptyResolvedKeywords() {
+    void getEmptyResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
         database.insertEntry(entry);
@@ -617,7 +617,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetSingleResolvedKeywords() {
+    void getSingleResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
 
@@ -634,7 +634,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetResolvedKeywords() {
+    void getResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
 

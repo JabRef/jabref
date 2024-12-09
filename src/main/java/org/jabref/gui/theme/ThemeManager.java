@@ -5,22 +5,27 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
+import javafx.application.ColorScheme;
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.WorkspacePreferences;
 
-import com.jthemedetecor.OsThemeDetector;
-import com.tobiasdiez.easybind.EasyBind;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +44,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeManager {
 
+    public static Map<String, Node> getDownloadIconTitleMap = Map.of(
+            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
+    );
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
     private final WorkspacePreferences workspacePreferences;
@@ -50,7 +59,6 @@ public class ThemeManager {
 
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
-    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
     public ThemeManager(WorkspacePreferences workspacePreferences,
                         FileUpdateMonitor fileUpdateMonitor,
@@ -67,18 +75,19 @@ public class ThemeManager {
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        EasyBind.subscribe(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
-        EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
-        EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
-        EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
-        detector.registerListener(isDark -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+        BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), colorScheme -> updateThemeSettings());
+        updateThemeSettings();
     }
 
     private void updateThemeSettings() {
         Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
 
         if (workspacePreferences.themeSyncOsProperty().getValue()) {
-            if (detector.isDark()) {
+            if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {
                 newTheme = Theme.dark();
             } else {
                 newTheme = Theme.light();
@@ -98,10 +107,11 @@ public class ThemeManager {
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
 
         additionalCssLiveUpdate();
+        updateFontSettings();
     }
 
     private void updateFontSettings() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateFontStyle)));
+        UiTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> updateFontStyle(mainWindowScene)));
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
@@ -132,7 +142,7 @@ public class ThemeManager {
             LOGGER.debug("Updating base CSS for main window scene");
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
+        UiTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
     }
 
     private void additionalCssLiveUpdate() {
@@ -143,7 +153,7 @@ public class ThemeManager {
 
         LOGGER.debug("Updating additional CSS for main window scene and {} web engines", webEngines.size());
 
-        DefaultTaskExecutor.runInJavaFXThread(() ->
+        UiTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> {
                     updateAdditionalCss();
 
@@ -159,18 +169,24 @@ public class ThemeManager {
     }
 
     private void updateBaseCss() {
-        getMainWindowScene().ifPresent(scene -> {
-            List<String> stylesheets = scene.getStylesheets();
-            if (!stylesheets.isEmpty()) {
-                stylesheets.remove(0);
-            }
+        if (mainWindowScene == null) {
+            return;
+        }
 
-            stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
-        });
+        List<String> stylesheets = mainWindowScene.getStylesheets();
+        if (!stylesheets.isEmpty()) {
+            stylesheets.removeFirst();
+        }
+
+        stylesheets.addFirst(baseStyleSheet.getSceneStylesheet().toExternalForm());
     }
 
     private void updateAdditionalCss() {
-        getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
+        if (mainWindowScene == null) {
+            return;
+        }
+
+        mainWindowScene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
                 theme.getAdditionalStylesheet().map(styleSheet -> {
                          URL stylesheetUrl = styleSheet.getSceneStylesheet();
@@ -181,7 +197,7 @@ public class ThemeManager {
                          }
                      })
                      .orElse("")
-        )));
+        ));
     }
 
     /**
@@ -221,6 +237,10 @@ public class ThemeManager {
      * @param scene is the scene, the font size should be applied to
      */
     public void updateFontStyle(Scene scene) {
+        if (scene == null) {
+            return;
+        }
+
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
@@ -231,11 +251,8 @@ public class ThemeManager {
     /**
      * @return the currently active theme
      */
-    public Theme getActiveTheme() {
+    @VisibleForTesting
+    Theme getActiveTheme() {
         return this.theme;
-    }
-
-    public Optional<Scene> getMainWindowScene() {
-        return Optional.ofNullable(mainWindowScene);
     }
 }

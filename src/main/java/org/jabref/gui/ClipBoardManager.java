@@ -18,11 +18,13 @@ import javafx.scene.input.MouseButton;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.entry.BibtexString;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +38,13 @@ public class ClipBoardManager {
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
 
-    private final PreferencesService preferencesService;
-
-    public ClipBoardManager(PreferencesService preferencesService) {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), preferencesService);
+    public ClipBoardManager() {
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
     }
 
-    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, PreferencesService preferencesService) {
+    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
-        this.preferencesService = preferencesService;
     }
 
     /**
@@ -87,6 +86,18 @@ public class ClipBoardManager {
         return result;
     }
 
+    public static String getHtmlContents() {
+        String result = clipboard.getHtml();
+        if (result == null) {
+            return "";
+        }
+        return result;
+    }
+
+    public static boolean hasHtml() {
+        return clipboard.hasHtml();
+    }
+
     /**
      * Get the String residing on the primary clipboard (if it exists).
      *
@@ -99,7 +110,7 @@ public class ClipBoardManager {
                 try {
                     return (String) contents.getTransferData(DataFlavor.stringFlavor);
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LOGGER.warn(e.getMessage());
+                    LOGGER.warn("", e);
                 }
             }
         }
@@ -143,14 +154,24 @@ public class ClipBoardManager {
     }
 
     public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
-        final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
-        String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
+        String serializedEntries = serializeEntries(entries, entryTypesManager);
+        setContent(serializedEntries);
+    }
+
+    public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager, List<BibtexString> stringConstants) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        stringConstants.forEach(strConst -> builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization()));
+        String serializedEntries = serializeEntries(entries, entryTypesManager);
+        builder.append(serializedEntries);
+        setContent(builder.toString());
+    }
+
+    private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
+        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data
-        content.putString(serializedEntries);
-        clipboard.setContent(content);
-        setPrimaryClipboardContent(content);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
+        return writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
     }
 }

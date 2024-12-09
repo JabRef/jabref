@@ -14,13 +14,16 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
+ */
 @Execution(ExecutionMode.CONCURRENT)
 class MakeLabelWithDatabaseTest {
 
     private BibDatabase database;
     private CitationKeyPatternPreferences preferences;
-    private GlobalCitationKeyPattern pattern;
-    private DatabaseCitationKeyPattern bibtexKeyPattern;
+    private GlobalCitationKeyPatterns pattern;
+    private DatabaseCitationKeyPatterns bibtexKeyPattern;
     private BibEntry entry;
 
     @BeforeEach
@@ -32,8 +35,8 @@ class MakeLabelWithDatabaseTest {
         entry.setField(StandardField.YEAR, "2016");
         entry.setField(StandardField.TITLE, "An awesome paper on JabRef");
         database.insertEntry(entry);
-        pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
-        bibtexKeyPattern = new DatabaseCitationKeyPattern(pattern);
+        pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        bibtexKeyPattern = new DatabaseCitationKeyPatterns(pattern);
         preferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -267,7 +270,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCitationKey());
+        assertEquals(Optional.of("Problem:NoAuthorProvided"), entry.getCitationKey());
     }
 
     @Test
@@ -449,7 +452,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[authIni2]");
         entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("D+"), entry.getCitationKey());
+        assertEquals(Optional.of("DS"), entry.getCitationKey());
     }
 
     @Test
@@ -461,11 +464,22 @@ class MakeLabelWithDatabaseTest {
     }
 
     @Test
-    void generateKeyTitleRegexe() {
-        bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
+    void generateKeyTitleRegex() {
+        // Note that TITLE is written in upper case to have the verbatim value of the title field
+        // See https://github.com/JabRef/user-documentation/blob/main/en/setup/citationkeypatterns.md#bibentry-fields for information on that.
+        // We cannot use "-", because this is in the set of unwanted characters and removed after the RegEx is applied
+        bibtexKeyPattern.setDefaultValue("[TITLE:regex(\" \",\"X\")]"); // regex(" ", "-")
         entry.setField(StandardField.TITLE, "Please replace the spaces");
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("PleaseReplacetheSpaces"), entry.getCitationKey());
+        assertEquals(Optional.of("PleaseXreplaceXtheXspaces"), entry.getCitationKey());
+    }
+
+    @Test
+    void generateKeyTitleRegexFirstWord() {
+        bibtexKeyPattern.setDefaultValue("[TITLE:regex(\"(\\w+).*\",\"$1\")]");
+        entry.setField(StandardField.TITLE, "First Second Third");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("First"), entry.getCitationKey());
     }
 
     @Test

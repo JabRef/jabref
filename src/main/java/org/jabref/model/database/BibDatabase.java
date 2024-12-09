@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,12 @@ public class BibDatabase {
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
+
+    // BibEntryId to BibEntry
+    private final Map<String, BibEntry> entriesId = new HashMap<>();
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
+    // Not included in equals, because it is not relevant for the content of the database
     private final EventBus eventBus = new EventBus();
 
     private String preamble;
@@ -77,22 +82,6 @@ public class BibDatabase {
 
     public BibDatabase() {
         this.registerListener(new KeyChangeListener(this));
-    }
-
-    /**
-     * Returns a text with references resolved according to an optionally given database.
-     *
-     * @param toResolve maybenull The text to resolve.
-     * @param database  maybenull The database to use for resolving the text.
-     * @return The resolved text or the original text if either the text or the database are null
-     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     */
-    @Deprecated
-    public static String getText(String toResolve, BibDatabase database) {
-        if ((toResolve != null) && (database != null)) {
-            return database.resolveForStrings(toResolve);
-        }
-        return toResolve;
     }
 
     /**
@@ -148,12 +137,7 @@ public class BibDatabase {
      * Returns the entry with the given citation key.
      */
     public synchronized Optional<BibEntry> getEntryByCitationKey(String key) {
-        for (BibEntry entry : entries) {
-            if (key.equals(entry.getCitationKey().orElse(null))) {
-                return Optional.of(entry);
-            }
-        }
-        return Optional.empty();
+        return entries.stream().filter(entry -> Objects.equals(entry.getCitationKey().orElse(null), key)).findFirst();
     }
 
     /**
@@ -205,9 +189,10 @@ public class BibDatabase {
         if (newEntries.isEmpty()) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
         }
         entries.addAll(newEntries);
+        newEntries.forEach(entry -> entriesId.put(entry.getId(), entry));
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -244,6 +229,7 @@ public class BibDatabase {
         }
         boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
+            toBeDeleted.forEach(entry -> entriesId.remove(entry.getId()));
             eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
@@ -374,9 +360,13 @@ public class BibDatabase {
     /**
      * Get all strings used in the entries.
      */
-    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
-        List<BibtexString> result = new ArrayList<>();
+    public List<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
         Set<String> allUsedIds = new HashSet<>();
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
 
         // All entries
         for (BibEntry entry : entries) {
@@ -385,16 +375,7 @@ public class BibDatabase {
             }
         }
 
-        // Preamble
-        if (preamble != null) {
-            resolveContent(preamble, new HashSet<>(), allUsedIds);
-        }
-
-        for (String stringId : allUsedIds) {
-            result.add((BibtexString) bibtexStrings.get(stringId).clone());
-        }
-
-        return result;
+        return allUsedIds.stream().map(bibtexStrings::get).toList();
     }
 
     /**
@@ -402,9 +383,9 @@ public class BibDatabase {
      * references.
      *
      * @param entriesToResolve A collection of BibtexEntries in which all strings of the form
-     *                #xxx# will be resolved against the hash map of string
-     *                references stored in the database.
-     * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
+     *                         #xxx# will be resolved against the hash map of string
+     *                         references stored in the database.
+     * @param inPlace          If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
     public List<BibEntry> resolveForStrings(Collection<BibEntry> entriesToResolve, boolean inPlace) {
@@ -463,7 +444,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info("Stopped due to circular reference in strings: " + label);
+                    LOGGER.info("Stopped due to circular reference in strings: {}", label);
                     return label;
                 }
                 // If not, log this string's ID now.
@@ -548,7 +529,7 @@ public class BibDatabase {
     /**
      * Registers a listener object (subscriber) to the internal event bus.
      * The following events are posted:
-     *
+     * <p>
      * - {@link EntriesAddedEvent}
      * - {@link EntryChangedEvent}
      * - {@link EntriesRemovedEvent}
@@ -557,6 +538,10 @@ public class BibDatabase {
      */
     public void registerListener(Object listener) {
         this.eventBus.register(listener);
+    }
+
+    public void postEvent(Object event) {
+        this.eventBus.post(event);
     }
 
     /**
@@ -637,5 +622,50 @@ public class BibDatabase {
      */
     public String getNewLineSeparator() {
         return newLineSeparator;
+    }
+
+    /**
+     * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
+     *
+     * @implNote New entries are always added to the end of the list and always get a higher ID.
+     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+     *           {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     *           {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+     *           Therefore, using binary search to find the index.
+     *
+     * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
+     */
+    public int indexOf(BibEntry bibEntry) {
+        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
+        if (index >= 0) {
+            return index;
+        }
+        LOGGER.warn("Could not find entry with ID {} in the database", bibEntry.getId());
+        return -1;
+    }
+
+    public BibEntry getEntryById(String id) {
+        return entriesId.get(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabase that)) {
+            return false;
+        }
+        return Objects.equals(entries, that.entries)
+                && Objects.equals(bibtexStrings, that.bibtexStrings)
+                && Objects.equals(preamble, that.preamble)
+                && Objects.equals(epilog, that.epilog)
+                && Objects.equals(sharedDatabaseID, that.sharedDatabaseID)
+                && Objects.equals(newLineSeparator, that.newLineSeparator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entries, bibtexStrings, preamble, epilog, sharedDatabaseID, newLineSeparator);
     }
 }

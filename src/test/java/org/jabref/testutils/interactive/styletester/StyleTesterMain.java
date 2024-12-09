@@ -4,11 +4,11 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.jabref.gui.JabRefExecutorService;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.util.HeadlessExecutorService;
 
 /**
  * Useful for checking the display of different controls. Not needed inside of JabRef.
@@ -23,9 +23,9 @@ public class StyleTesterMain extends Application {
     public void start(Stage stage) throws JabRefException {
         StyleTesterView view = new StyleTesterView();
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         ThemeManager themeManager = new ThemeManager(
-                JabRefPreferences.getInstance().getWorkspacePreferences(),
+                JabRefGuiPreferences.getInstance().getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
 
@@ -37,6 +37,6 @@ public class StyleTesterMain extends Application {
 
     @Override
     public void stop() {
-        JabRefExecutorService.INSTANCE.shutdownEverything();
+        HeadlessExecutorService.INSTANCE.shutdownEverything();
     }
 }

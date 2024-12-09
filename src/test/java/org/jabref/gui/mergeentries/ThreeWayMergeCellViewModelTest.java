@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ThreeWayMergeCellViewModelTest {
+class ThreeWayMergeCellViewModelTest {
 
     ThreeWayMergeCellViewModel viewModel;
 
@@ -20,7 +20,7 @@ public class ThreeWayMergeCellViewModelTest {
         viewModel = new ThreeWayMergeCellViewModel("Hello", 0);
     }
 
-    private static Stream<Arguments> testOddEvenLogic() {
+    private static Stream<Arguments> oddEvenLogic() {
         return Stream.of(
                 Arguments.of(true, false, true, false),
                 Arguments.of(false, false, true, false),
@@ -65,7 +65,7 @@ public class ThreeWayMergeCellViewModelTest {
 
     @ParameterizedTest
     @MethodSource
-    void testOddEvenLogic(boolean setIsOdd, boolean setIsEven, boolean expectedIsOdd, boolean expectedIsEven) {
+    void oddEvenLogic(boolean setIsOdd, boolean setIsEven, boolean expectedIsOdd, boolean expectedIsEven) {
         viewModel.setOdd(setIsOdd);
         viewModel.setEven(setIsEven);
         assertEquals(expectedIsOdd, viewModel.isOdd());

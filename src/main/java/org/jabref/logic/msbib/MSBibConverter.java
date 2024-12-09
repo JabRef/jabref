@@ -2,8 +2,9 @@ package org.jabref.logic.msbib;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.jabref.model.entry.Author;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
@@ -17,6 +18,7 @@ public class MSBibConverter {
 
     private static final String MSBIB_PREFIX = "msbib-";
     private static final String BIBTEX_PREFIX = "BIBTEX_";
+    private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private MSBibConverter() {
     }
@@ -65,7 +67,7 @@ public class MSBibConverter {
         result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
         result.month = entry.getMonth().map(Month::getFullName).orElse(null);
 
-        if (!entry.getFieldLatexFree(StandardField.YEAR).isPresent()) {
+        if (entry.getFieldLatexFree(StandardField.YEAR).isEmpty()) {
             result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
         }
         result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
@@ -106,7 +108,7 @@ public class MSBibConverter {
         }
 
         // TODO: currently only Misc can happen
-        if ("ElectronicSource".equals(msBibType) || "Art".equals(msBibType) || "Misc".equals(msBibType)) {
+        if ("Art".equals(msBibType) || "Misc".equals(msBibType)) {
             result.publicationTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 
@@ -123,24 +125,26 @@ public class MSBibConverter {
 
     private static List<MsBibAuthor> getAuthors(BibEntry entry, String authors, Field field) {
         List<MsBibAuthor> result = new ArrayList<>();
-        boolean corporate = false;
+
         // Only one corporate author is supported
-        // We have the possible rare case that are multiple authors which start and end with latex , this is currently not considered
-        if (authors.startsWith("{") && authors.endsWith("}")) {
-            corporate = true;
+        // Heuristics: If the author is surrounded by curly braces, it is a corporate author
+        boolean corporate = !REMOVE_BRACES_FORMATTER.format(authors).equals(authors);
+
+        Optional<String> authorLatexFreeOpt = entry.getFieldLatexFree(field);
+        if (authorLatexFreeOpt.isEmpty()) {
+            return result;
         }
-        // FIXME: #4152 This is an ugly hack because the latex2unicode formatter kills of all curly braces, so no more corporate author parsing possible
-        String authorLatexFree = entry.getFieldLatexFree(field).orElse("");
+        String authorLatexFree = authorLatexFreeOpt.get();
+
+        // We re-add the curly braces to keep the corporate author as is.
+        // See https://github.com/JabRef/jabref-issue-melting-pot/issues/386 for details
         if (corporate) {
             authorLatexFree = "{" + authorLatexFree + "}";
         }
 
-        AuthorList authorList = AuthorList.parse(authorLatexFree);
-
-        for (Author author : authorList.getAuthors()) {
-            result.add(new MsBibAuthor(author, corporate));
-        }
-
-        return result;
+        return AuthorList.parse(authorLatexFree).getAuthors()
+                         .stream()
+                         .map(author -> new MsBibAuthor(author, corporate))
+                         .toList();
     }
 }

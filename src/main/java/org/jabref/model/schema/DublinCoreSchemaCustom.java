@@ -1,7 +1,6 @@
 package org.jabref.model.schema;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -28,7 +27,7 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
     }
 
     public static DublinCoreSchema copyDublinCoreSchema(DublinCoreSchema dcSchema) {
-        if (Objects.isNull(dcSchema)) {
+        if (dcSchema == null) {
             return null;
         }
 
@@ -51,15 +50,15 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
     @Override
     public List<String> getUnqualifiedSequenceValueList(String seqName) {
         AbstractField abstractProperty = getAbstractProperty(seqName);
-        if (abstractProperty instanceof ArrayProperty) {
+        if (abstractProperty instanceof ArrayProperty property) {
             if ("date".equals(seqName)) {
-                return ((ArrayProperty) abstractProperty).getContainer()
+                return property.getContainer()
                         .getAllProperties()
                         .stream()
                         .map(field -> (String) ((DateType) field).getRawValue())
                         .collect(Collectors.toList());
             }
-            return ((ArrayProperty) abstractProperty).getElementsAsString();
+            return property.getElementsAsString();
         }
         return null;
     }

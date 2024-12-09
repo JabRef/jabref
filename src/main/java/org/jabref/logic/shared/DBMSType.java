@@ -16,7 +16,7 @@ public enum DBMSType {
     private final String urlPattern;
     private final int defaultPort;
 
-    private DBMSType(String type, String driverPath, String urlPattern, int defaultPort) {
+    DBMSType(String type, String driverPath, String urlPattern, int defaultPort) {
         this.type = type;
         this.driverPath = driverPath;
         this.urlPattern = urlPattern;
@@ -43,7 +43,7 @@ public enum DBMSType {
      * @return prepared connection URL for appropriate system.
      */
     public String getUrl(String host, int port, String database) {
-        return String.format(urlPattern, host, port, database);
+        return urlPattern.formatted(host, port, database);
     }
 
     /**

@@ -15,7 +15,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preferences.table.TableTab;
@@ -27,19 +26,16 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     MainTable mainTable;
     MainTableColumnFactory factory;
     private final LibraryTabContainer tabContainer;
-    private final KeyBindingRepository keyBindingRepository;
     private final DialogService dialogService;
 
     public MainTableHeaderContextMenu(MainTable mainTable,
                                       MainTableColumnFactory factory,
                                       LibraryTabContainer tabContainer,
-                                      KeyBindingRepository keyBindingRepository,
                                       DialogService dialogService) {
         super();
         this.tabContainer = tabContainer;
         this.mainTable = mainTable;
         this.factory = factory;
-        this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
 
         constructItems();
@@ -71,6 +67,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Populate the menu with currently used fields
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
+            if (((MainTableColumn<?>) column).getModel().getType() == MainTableColumnModel.Type.MATCH_CATEGORY) {
+                continue;
+            }
             // Append only if the column has not already been added (a common column)
             RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
@@ -93,7 +92,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         }
 
         this.getItems().add(new SeparatorMenuItem());
-        ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
+        ActionFactory actionfactory = new ActionFactory();
         MenuItem showMoreItem = actionfactory.createMenuItem(
                 StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
                 new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));
@@ -154,8 +153,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Determines if a list of TableColumns contains the searched column.
      */
     private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
-        for (TableColumn<BibEntryTableViewModel, ?> column:
-        tableColumns) {
+        for (TableColumn<BibEntryTableViewModel, ?> column: tableColumns) {
             MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return true;
@@ -181,6 +179,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         // Create the MainTableColumn Models from qualifiers + types.
         List<MainTableColumnModel> commonColumns = new ArrayList<>();
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, entryTypeQualifier));

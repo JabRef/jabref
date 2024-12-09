@@ -79,12 +79,29 @@ public class BibtexString implements Cloneable {
     private String parsedSerialization;
     private boolean hasChanged;
 
+    /**
+     * Default constructor. Use this if in doubt.
+     *
+     * In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
+     */
     public BibtexString(String name, String content) {
         this.id = IdGenerator.next();
         this.name = name;
         this.content = content;
         hasChanged = true;
         type = Type.get(name);
+    }
+
+    /**
+     * This is used to set the parsed serialization of the string. This is used when the string is read from a BibTeX file.
+     * Do not use if not working with reading BibTeX files (or similar actions).     *
+     *
+     * @param parsedSerialization The serialization read during parsing
+     */
+    public BibtexString(String name, String content, String parsedSerialization) {
+        this(name, content);
+        this.parsedSerialization = parsedSerialization;
+        hasChanged = false;
     }
 
     public String getId() {
@@ -125,11 +142,6 @@ public class BibtexString implements Cloneable {
         return type;
     }
 
-    public void setParsedSerialization(String parsedSerialization) {
-        this.parsedSerialization = parsedSerialization;
-        hasChanged = false;
-    }
-
     public String getParsedSerialization() {
         return parsedSerialization;
     }
@@ -156,9 +168,13 @@ public class BibtexString implements Cloneable {
 
     @Override
     public Object clone() {
-        BibtexString clone = new BibtexString(name, content);
+        BibtexString clone;
+        if (parsedSerialization == null) {
+             clone = new BibtexString(name, content);
+        } else {
+            clone = new BibtexString(name, content, parsedSerialization);
+        }
         clone.setId(id);
-
         return clone;
     }
 

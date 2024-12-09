@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -33,7 +32,8 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
  * </p>
  */
-public interface SearchBasedParserFetcher extends SearchBasedFetcher {
+
+public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
     /**
      * This method is used to send queries with advanced URL parameters.
@@ -60,9 +60,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(urlForQuery, e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(urlForQuery, "An internal parser error occurred while fetching", e);
         }
     }
 
@@ -77,22 +79,4 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * @param luceneQuery the root node of the lucene query
      */
     URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException;
-
-    /**
-     * Performs a cleanup of the fetched entry.
-     * <p>
-     * Only systematic errors of the fetcher should be corrected here
-     * (i.e. if information is consistently contained in the wrong field or the wrong format)
-     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
-     * <p>
-     * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
-     * <p>
-     * By default, no cleanup is done.
-     *
-     * @param entry the entry to be cleaned-up
-     */
-    default void doPostCleanup(BibEntry entry) {
-        // Do nothing by default
-    }
 }

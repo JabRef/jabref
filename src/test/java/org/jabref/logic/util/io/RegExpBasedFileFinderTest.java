@@ -56,7 +56,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void testFindFiles() throws Exception {
+    void findFiles() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("pdfInDatabase");
 
@@ -71,7 +71,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void testYearAuthFirstPageFindFiles() throws Exception {
+    void yearAuthFirstPageFindFiles() throws Exception {
         // given
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
@@ -124,7 +124,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void testAuthorWithDiacritics() throws Exception {
+    void authorWithDiacritics() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("Grazulis2017");
         localEntry.setField(StandardField.YEAR, "2017");
@@ -142,7 +142,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void testFindFileInSubdirectory() throws Exception {
+    void findFileInSubdirectory() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCitationKey("pdfInSubdirectory");
@@ -159,7 +159,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void testFindFileNonRecursive() throws Exception {
+    void findFileNonRecursive() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCitationKey("pdfInSubdirectory");

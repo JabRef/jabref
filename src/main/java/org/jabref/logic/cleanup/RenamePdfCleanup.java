@@ -6,14 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,11 @@ import org.slf4j.LoggerFactory;
 public class RenamePdfCleanup implements CleanupJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(RenamePdfCleanup.class);
 
-    private final BibDatabaseContext databaseContext;
+    private final Supplier<BibDatabaseContext> databaseContext;
     private final boolean onlyRelativePaths;
     private final FilePreferences filePreferences;
 
-    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public RenamePdfCleanup(boolean onlyRelativePaths, Supplier<BibDatabaseContext> databaseContext, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.filePreferences = filePreferences;
@@ -41,7 +42,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext, filePreferences);
+            LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext.get(), filePreferences);
             try {
                 boolean changedFile = fileHandler.renameToSuggestedName();
                 if (changedFile) {

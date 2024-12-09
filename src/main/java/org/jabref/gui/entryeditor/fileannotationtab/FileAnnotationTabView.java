@@ -19,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -42,8 +43,8 @@ public class FileAnnotationTabView {
     private final FileAnnotationCache fileAnnotationCache;
     private FileAnnotationTabViewModel viewModel;
 
-    @Inject
-    private FileUpdateMonitor fileMonitor;
+    @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private ClipBoardManager clipBoardManager;
 
     public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
         this.entry = entry;
@@ -52,7 +53,7 @@ public class FileAnnotationTabView {
 
     @FXML
     public void initialize() {
-        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
+        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor, clipBoardManager);
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());

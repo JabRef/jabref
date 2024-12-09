@@ -40,8 +40,8 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         xmpFilterListValidator = new FunctionBasedValidator<>(
                 xmpFilterListProperty,
-                input -> input.size() > 0,
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                input -> !input.isEmpty(),
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("XMP metadata"),
                         Localization.lang("Filter List"),
                         Localization.lang("List must not be empty."))));

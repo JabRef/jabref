@@ -21,6 +21,9 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}.
  * Reading is done by {@link org.jabref.logic.importer.fileformat.BibtexImporter}.
@@ -29,11 +32,11 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     public static final String DATABASE_ID_PREFIX = "DBID:";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexDatabaseWriter.class);
+
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
     private static final String STRING_PREFIX = "@String";
-
-    private final FieldPreferences fieldPreferences;
 
     public BibtexDatabaseWriter(BibWriter bibWriter,
                                 SelfContainedSaveConfiguration saveConfiguration,
@@ -42,10 +45,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
                                 BibEntryTypesManager entryTypesManager) {
         super(bibWriter,
                 saveConfiguration,
+                fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
-
-        this.fieldPreferences = fieldPreferences;
     }
 
     public BibtexDatabaseWriter(Writer writer,
@@ -56,10 +58,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
                                 BibEntryTypesManager entryTypesManager) {
         super(new BibWriter(writer, newline),
                 saveConfiguration,
+                fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
-
-        this.fieldPreferences = fieldPreferences;
     }
 
     @Override
@@ -95,6 +96,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
         if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
+            LOGGER.debug("Writing parsed serialization {}.", bibtexString.getParsedSerialization());
             bibWriter.write(bibtexString.getParsedSerialization());
             return;
         }

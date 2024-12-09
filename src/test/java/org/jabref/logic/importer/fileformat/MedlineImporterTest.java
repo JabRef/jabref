@@ -17,32 +17,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *   <li>Press <strong>'Create File'</strong> to download your search results in a medline xml file.</li>
  * </ol>
  */
-public class MedlineImporterTest {
+class MedlineImporterTest {
 
     private MedlineImporter importer;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         this.importer = new MedlineImporter();
     }
 
     @Test
-    public void testGetFormatName() {
+    void getFormatName() {
         assertEquals("Medline/PubMed", importer.getName());
     }
 
     @Test
-    public void testGetCLIId() {
+    void getCLIId() {
         assertEquals("medline", importer.getId());
     }
 
     @Test
-    public void testsGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.MEDLINE, importer.getFileType());
-    }
-
-    @Test
-    public void testGetDescription() {
-        assertEquals("Importer for the Medline format.", importer.getDescription());
     }
 }

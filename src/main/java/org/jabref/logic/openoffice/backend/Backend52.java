@@ -109,7 +109,7 @@ public class Backend52 {
     private static void setPageInfoInDataInitial(List<Citation> citations, Optional<OOText> pageInfo) {
         // attribute to last citation (initially localOrder == storageOrder)
         if (!citations.isEmpty()) {
-            citations.get(citations.size() - 1).setPageInfo(pageInfo);
+            citations.getLast().setPageInfo(pageInfo);
         }
     }
 
@@ -118,7 +118,7 @@ public class Backend52 {
         if (citations.isEmpty()) {
             return Optional.empty();
         }
-        return citations.get(citations.size() - 1).getPageInfo();
+        return citations.getLast().getPageInfo();
     }
 
     /**
@@ -199,8 +199,7 @@ public class Backend52 {
                         cit.setPageInfo(pageInfo);
                     } else {
                         if (pageInfo.isPresent()) {
-                            LOGGER.warn("dataModel JabRef52"
-                                    + " only supports pageInfo for the last citation of a group");
+                            LOGGER.warn("dataModel JabRef52" + " only supports pageInfo for the last citation of a group");
                         }
                     }
                     break;

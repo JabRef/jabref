@@ -13,10 +13,15 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -35,7 +40,6 @@ import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
-
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
@@ -44,16 +48,22 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
+    private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
+    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);
+    private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
+    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
+    private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
+    private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
 
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
+        this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter = fieldValueFormatter;
 
         this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
-        this.bibDatabaseContext = bibDatabaseContext;
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -82,10 +92,10 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                groupTreeNode.getMatchingGroups(entry).stream()
-                                             .map(GroupTreeNode::getGroup)
-                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                             .collect(Collectors.toList()))
+                                        groupTreeNode.getMatchingGroups(entry).stream()
+                                                     .map(GroupTreeNode::getGroup)
+                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                                     .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList())));
     }
 
@@ -145,7 +155,53 @@ public class BibEntryTableViewModel {
         return value;
     }
 
-    public StringProperty bibDatabaseContextProperty() {
+    public StringProperty bibDatabasePathProperty() {
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
+    }
+
+    public BibDatabaseContext getBibDatabaseContext() {
+        return bibDatabaseContext;
+    }
+
+    public BooleanProperty hasFullTextResultsProperty() {
+        return hasFullTextResults;
+    }
+
+    public BooleanProperty isMatchedBySearch() {
+        return isMatchedBySearch;
+    }
+
+    public BooleanProperty isVisibleBySearch() {
+        return isVisibleBySearch;
+    }
+
+    public BooleanProperty isMatchedByGroup() {
+        return isMatchedByGroup;
+    }
+
+    public BooleanProperty isVisibleByGroup() {
+        return isVisibleByGroup;
+    }
+
+    public ObjectProperty<MatchCategory> matchCategory() {
+        return matchCategory;
+    }
+
+    public boolean isVisible() {
+        return isVisibleBySearch.get() && isVisibleByGroup.get();
+    }
+
+    public void updateMatchCategory() {
+        MatchCategory category = MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS;
+
+        if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
+            category = MatchCategory.MATCHING_SEARCH_AND_GROUPS;
+        } else if (isMatchedBySearch.get()) {
+            category = MatchCategory.MATCHING_SEARCH_NOT_GROUPS;
+        } else if (isMatchedByGroup.get()) {
+            category = MatchCategory.MATCHING_GROUPS_NOT_SEARCH;
+        }
+
+        matchCategory.set(category);
     }
 }

@@ -15,11 +15,8 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
             labelValue = Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName());
         }
         Label label = new Label(labelValue);
-        setLeftAnchor(label, 8d);
-        setTopAnchor(label, 8d);
-        setRightAnchor(label, 8d);
-        setBottomAnchor(label, 8d);
+        label.setWrapText(true);
 
-        getChildren().setAll(label);
+        this.setAllAnchorsAndAttachChild(label);
     }
 }

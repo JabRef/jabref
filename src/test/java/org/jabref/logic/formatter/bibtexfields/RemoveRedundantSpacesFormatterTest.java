@@ -5,32 +5,32 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveRedundantSpacesFormatterTest {
+class RemoveRedundantSpacesFormatterTest {
 
     private RemoveRedundantSpacesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveRedundantSpacesFormatter();
     }
 
     @Test
-    public void doNothingIfSingleSpace() {
+    void doNothingIfSingleSpace() {
         assertEquals("single space", formatter.format("single space"));
     }
 
     @Test
-    public void doNothingIfNoSpace() {
+    void doNothingIfNoSpace() {
         assertEquals("nospace", formatter.format("nospace"));
     }
 
     @Test
-    public void removeAllButOneSpacesIfTwo() {
+    void removeAllButOneSpacesIfTwo() {
         assertEquals("two spaces", formatter.format("two  spaces"));
     }
 
     @Test
-    public void removeAllButOneSpacesIfThree() {
+    void removeAllButOneSpacesIfThree() {
         assertEquals("three spaces", formatter.format("three   spaces"));
     }
 }

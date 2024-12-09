@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.strings.StringUtil;
 
 public class FileFieldWriter {
 
@@ -16,7 +17,11 @@ public class FileFieldWriter {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (LinkedFile entry : fields) {
-            array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
+            if (StringUtil.isNullOrEmpty(entry.getSourceUrl())) {
+                array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
+            } else {
+                array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType(), entry.getSourceUrl()};
+            }
             i++;
         }
         return encodeStringArray(array);

@@ -18,7 +18,9 @@ public class RemoteClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
 
-    private static final int TIMEOUT = 1000;
+    // Opening a library can take time, thus 2 minutes is a reasonable timeout.
+    private static final int TIMEOUT = 120_000;
+
     private final int port;
 
     public RemoteClient(int port) {

@@ -25,3 +25,7 @@ updates:
       interval: weekly
     labels:
       - "dependencies"
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: weekly

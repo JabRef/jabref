@@ -32,6 +32,8 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
+import org.jabref.logic.integrity.BracesCorrector;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -47,7 +49,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +94,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
-    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Collections.unmodifiableMap(Map.of(
+    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Map.of(
             "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
-            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing"));
+            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing");
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -198,7 +200,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @return ArXiv-issued DOI
      */
     private static String getAutomaticDoi(ArXivIdentifier arXivId) {
-        return getAutomaticDoi(arXivId.getNormalizedWithoutVersion());
+        return getAutomaticDoi(arXivId.asStringWithoutVersion());
     }
 
     /**
@@ -390,11 +392,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
      * <a href="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
      */
-    protected class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+    protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.ArXiv.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
+
+        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
         private final ImportFormatPreferences importFormatPreferences;
 
@@ -429,7 +433,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
             List<ArXivEntry> entries = queryApi(searchQuery, Collections.emptyList(), 0, 1);
             if (entries.size() == 1) {
-                return Optional.of(entries.get(0));
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -443,7 +447,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
             List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
             if (!entries.isEmpty()) {
-                return Optional.of(entries.get(0));
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -469,7 +473,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             String query;
             Optional<String> doiString = entry.getField(StandardField.DOI)
                                               .flatMap(DOI::parse)
-                                              .map(DOI::getNormalized);
+                                              .map(DOI::asString);
 
             // ArXiv-issued DOIs seem to be unsearchable from ArXiv API's "query string", so ignore it
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
@@ -527,22 +531,31 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 throw new IllegalArgumentException("The arXiv API limits the number of maximal results to be 2000");
             }
 
+            URIBuilder uriBuilder;
             try {
-                URIBuilder uriBuilder = new URIBuilder(API_URL);
-                // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
-                if (StringUtil.isNotBlank(searchQuery)) {
-                    uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
-                }
-                if (!ids.isEmpty()) {
-                    uriBuilder.addParameter("id_list",
-                            ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
-                }
-                uriBuilder.addParameter("start", String.valueOf(start));
-                uriBuilder.addParameter("max_results", String.valueOf(maxResults));
-                URL url = uriBuilder.build().toURL();
+                uriBuilder = new URIBuilder(API_URL);
+            } catch (URISyntaxException e) {
+                throw new FetcherException("Invalid URL", e);
+            }
+            // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
+            if (StringUtil.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
+            }
+            if (!ids.isEmpty()) {
+                uriBuilder.addParameter("id_list",
+                        ids.stream().map(ArXivIdentifier::asString).collect(Collectors.joining(",")));
+            }
+            uriBuilder.addParameter("start", String.valueOf(start));
+            uriBuilder.addParameter("max_results", String.valueOf(maxResults));
+            URL url;
+            try {
+                url = uriBuilder.build().toURL();
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new FetcherException("Invalid URL", e);
+            }
 
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
+            try {
+                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {
@@ -551,8 +564,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 } else {
                     return builder.parse(connection.getInputStream());
                 }
-            } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException exception) {
-                throw new FetcherException("arXiv API request failed", exception);
+            } catch (SAXException | ParserConfigurationException | IOException exception) {
+                throw new FetcherException(url, "arXiv API request failed", exception);
             }
         }
 
@@ -568,7 +581,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             //      <summary>incorrect id format for 0307015</summary>
             // </entry>
             if (entries.size() == 1) {
-                Node node = entries.get(0);
+                Node node = entries.getFirst();
                 Optional<String> id = XMLUtil.getNodeContent(node, "id");
                 Boolean isError = id.map(idContent -> idContent.startsWith("http://arxiv.org/api/errors")).orElse(false);
                 if (isError) {
@@ -603,6 +616,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .stream()
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
                     .collect(Collectors.toList());
+
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
 
@@ -673,7 +687,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
                 // Abstract of the article
                 abstractText = XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
-                                      .map(String::trim);
+                                      .map(String::trim).map(BracesCorrector::apply);
 
                 // Authors of the article
                 authorNames = new ArrayList<>();
@@ -696,7 +710,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     if (linkTitle.equals(Optional.of("pdf"))) {
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
-                                return new URL(url);
+                                return URLUtil.create(url);
                             } catch (MalformedURLException e) {
                                 return null;
                             }
@@ -734,7 +748,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
              * Returns the arXiv identifier
              */
             public Optional<String> getIdString() {
-                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::getNormalizedWithoutVersion);
+                return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::asStringWithoutVersion);
             }
 
             public Optional<ArXivIdentifier> getId() {

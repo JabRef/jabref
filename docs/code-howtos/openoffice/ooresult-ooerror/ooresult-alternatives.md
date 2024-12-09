@@ -1,5 +1,6 @@
 ---
-parent: About OOError, OOResult, and OOVoidResult
+parent: The LibreOffice Panel
+grand_parent: Code Howtos
 ---
 # Alternatives to using OOResult and OOVoidResult in OOBibBase
 

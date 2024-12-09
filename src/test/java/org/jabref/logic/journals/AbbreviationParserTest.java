@@ -12,7 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AbbreviationParserTest {
+class AbbreviationParserTest {
 
     private Path csvFile;
     private final AbbreviationParser parser = new AbbreviationParser();
@@ -25,7 +25,7 @@ public class AbbreviationParserTest {
     }
 
     @Test
-    void testReadingFileFromCSVWithSemicolon() throws Exception {
+    void readingFileFromCSVWithSemicolon() throws Exception {
         // String name, String abbreviation, String shortestUniqueAbbreviation
         String testAbbrev = "Long Name;L.N.;L.N.";
         try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
@@ -36,7 +36,7 @@ public class AbbreviationParserTest {
     }
 
     @Test
-    void testReadingFileFromCSVWithComma() throws Exception {
+    void readingFileFromCSVWithComma() throws Exception {
         String testAbbrev = "Long Name,L.N.,L.N.";
         try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
             writer.write(testAbbrev);

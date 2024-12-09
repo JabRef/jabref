@@ -19,14 +19,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -47,7 +46,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     private final ActionFactory factory;
 
@@ -59,11 +58,11 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(String text, int rowIndex, PreferencesService preferencesService) {
+    public FieldValueCell(String text, int rowIndex, GuiPreferences preferences) {
         super(text, rowIndex);
 
-        this.preferencesService = preferencesService;
-        this.factory = new ActionFactory(Globals.getKeyPrefs());
+        this.preferences = preferences;
+        this.factory = new ActionFactory();
         this.viewModel = new FieldValueCellViewModel(text);
 
         EasyBind.listen(viewModel.selectedProperty(), (observable, old, isSelected) -> {
@@ -131,7 +130,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
         copyIcon.getStyleClass().add("action-icon");
 
-        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(preferencesService, getText()));
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(getText()));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);
@@ -144,7 +143,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         Node openLinkIcon = IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode();
         openLinkIcon.getStyleClass().add("action-icon");
 
-        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferencesService.getFilePreferences()));
+        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferences.getExternalApplicationsPreferences()));
         openLinkButton.setGraphic(openLinkIcon);
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);

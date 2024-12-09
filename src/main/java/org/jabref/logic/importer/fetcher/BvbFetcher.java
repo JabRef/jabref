@@ -11,9 +11,12 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.MarcXmlParser;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
+/**
+ * Fetcher for <a href="Bibliotheksverbund Bayern (BVB)">https://www.bib-bvb.de/</a>.
+ */
 public class BvbFetcher implements SearchBasedParserFetcher {
 
     private static final String URL_PATTERN = "http://bvbr.bib-bvb.de:5661/bvb01sru?";

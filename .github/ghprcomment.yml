@@ -1,0 +1,40 @@
+- jobName: Checkstyle
+  message: |
+    Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+
+    In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
+    You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
+- jobName: OpenRewrite
+  message: |
+    Your code currently does not meet JabRef's code guidelines.
+    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    The issues found can be **automatically fixed**.
+    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+- jobName: Modernizer
+  message: |
+    Your code currently does not meet JabRef's code guidelines.
+    We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    Please fix the detected errors, commit, and push.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
+- jobName: Markdown
+  message: |
+    You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
+    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
+    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+- jobName: CHANGELOG.md
+  message: |
+    While the PR was in progress, a new version of JabRef has been released.
+    You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: 'Unit tests'
+  message: |
+    JUnit tests are failing. In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details". This brings you to the test output.
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally. We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.

@@ -53,6 +53,6 @@ class RecursiveTreeItemTest {
         assertEquals(Collections.singletonList(node.getParent().get()), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
         assertEquals(
                 Collections.singletonList(node),
-                rootTreeItem.getChildren().get(0).getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
+                rootTreeItem.getChildren().getFirst().getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
     }
 }

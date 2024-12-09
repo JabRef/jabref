@@ -6,16 +6,17 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
@@ -30,7 +31,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private TextField keyPatternReplacement;
     @FXML private TextField unwantedCharacters;
     @FXML private Button keyPatternHelp;
-    @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
 
     public CitationKeyPatternTab() {
         ViewLoader.view(this)
@@ -44,7 +45,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(preferencesService.getCitationKeyPatternPreferences());
+        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences());
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
@@ -59,16 +60,17 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
+        ActionFactory actionFactory = new ActionFactory();
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferences.getExternalApplicationsPreferences()), keyPatternHelp);
     }
 
     @Override
     public void setValues() {
         viewModel.setValues();
+        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         bibtexKeyPatternTable.setValues(
-                Globals.entryTypesManager.getAllTypes(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode()),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
+                entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
+                preferences.getCitationKeyPatternPreferences().getKeyPatterns());
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -26,20 +25,12 @@ public class EntryLinkChecker implements EntryChecker {
         List<IntegrityMessage> result = new ArrayList<>();
         for (Entry<Field, String> field : entry.getFieldMap().entrySet()) {
             Set<FieldProperty> properties = field.getKey().getProperties();
-            if (properties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                if (database.getEntryByCitationKey(field.getValue()).isEmpty()) {
-                    result.add(new IntegrityMessage(Localization.lang("Referenced citation key does not exist"), entry,
-                            field.getKey()));
-                }
-            } else if (properties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-                List<String> keys = new ArrayList<>(Arrays.asList(field.getValue().split(",")));
-                for (String key : keys) {
-                    if (database.getEntryByCitationKey(key).isEmpty()) {
-                        result.add(new IntegrityMessage(
-                                Localization.lang("Referenced citation key does not exist") + ": " + key, entry,
-                                field.getKey()));
-                    }
-                }
+            if (properties.contains(FieldProperty.MULTIPLE_ENTRY_LINK) || properties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+                entry.getEntryLinkList(field.getKey(), database).stream()
+                     .filter(parsedEntryLink -> parsedEntryLink.getLinkedEntry().isEmpty())
+                     .forEach(parsedEntryLink -> result.add(new IntegrityMessage(
+                             Localization.lang("Referenced citation key '%0' does not exist", parsedEntryLink.getKey()),
+                             entry, field.getKey())));
             }
         }
         return result;

@@ -23,7 +23,7 @@ public class ShowPreferencesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        dialogService.showCustomDialog(new PreferencesDialogView(preferencesTabToSelectClass));
+        dialogService.showCustomDialogAndWait(new PreferencesDialogView(preferencesTabToSelectClass));
         tabContainer.refresh();
     }
 }

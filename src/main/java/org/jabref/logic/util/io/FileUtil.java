@@ -7,7 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,12 +22,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,8 @@ public class FileUtil {
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+    private static final String ELLIPSIS = "...";
+    private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -103,17 +107,19 @@ public class FileUtil {
     /**
      * Returns a valid filename for most operating systems.
      * <p>
-     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     * It uses {@link FileNameCleaner#cleanFileName(String)} to remove illegal characters.} and then truncates the length to 255 chars, see {@link #MAXIMUM_FILE_NAME_LENGTH}.
      * <p>
      * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
 
+        nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);
+
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
             String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info(String.format("Truncated the too long filename '%s' (%d characters) to '%s'.", fileName, fileName.length(), shortName));
+            LOGGER.info("Truncated the too long filename '%s' (%d characters) to '%s'.".formatted(fileName, fileName.length(), shortName));
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
@@ -225,9 +231,8 @@ public class FileUtil {
             return false;
         }
         try {
-            // Preserve Hard Links with OpenOption defaults included for clarity
-            Files.write(pathToDestinationFile, Files.readAllBytes(pathToSourceFile),
-                        StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            // This should also preserve Hard Links
+            Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
@@ -256,6 +261,41 @@ public class FileUtil {
             }
         }
         return file;
+    }
+
+    /**
+     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+     * possible.
+     *
+     * @param path the file path to be shortened
+     */
+    public static Path relativize(Path path, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+        return relativize(path, fileDirectories);
+    }
+
+    /**
+     * Relativizes all BibEntries given to (!) the given database context
+     * <p>
+     * ⚠ Modifies the entries in the list ⚠
+     */
+    public static List<BibEntry> relativize(List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+
+        return entries.stream()
+                      .map(entry -> {
+                          if (entry.hasField(StandardField.FILE)) {
+                              List<LinkedFile> updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -> {
+                                  if (!linkedFile.isOnlineLink()) {
+                                      String newPath = FileUtil.relativize(Path.of(linkedFile.getLink()), fileDirectories).toString();
+                                      linkedFile.setLink(newPath);
+                                  }
+                                  return linkedFile;
+                              }).toList();
+                              entry.setFiles(updatedLinkedFiles);
+                          }
+                          return entry;
+                      }).toList();
     }
 
     /**
@@ -330,7 +370,7 @@ public class FileUtil {
                              .filter(f -> f.getFileName().toString().equals(filename))
                              .findFirst();
         } catch (UncheckedIOException | IOException ex) {
-            LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
+            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory);
         }
         return Optional.empty();
     }
@@ -376,7 +416,7 @@ public class FileUtil {
         Objects.requireNonNull(directory);
 
         if (detectBadFileName(fileName)) {
-            LOGGER.error("Invalid characters in path for file {} ", fileName);
+            LOGGER.error("Invalid characters in path for file {}", fileName);
             return Optional.empty();
         }
 
@@ -483,6 +523,63 @@ public class FileUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+     * with maxLength = 20 is shortened into verylo...isthis.pdf
+     *
+     * @param fileName  the given file name to be shortened
+     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
+     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+     */
+    public static String shortenFileName(String fileName, Integer maxLength) {
+        if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
+            return "";
+        }
+
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+
+        String name;
+        String extension;
+
+        extension = FileUtil.getFileExtension(fileName).map(fileExtension -> '.' + fileExtension).orElse("");
+        if (extension.isEmpty()) {
+            name = fileName;
+        } else {
+            name = fileName.substring(0, fileName.length() - extension.length());
+        }
+
+        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();
+        if (maxLength <= totalNeededLength) {
+            return fileName.substring(0, maxLength - ELLIPSIS_LENGTH) + ELLIPSIS;
+        }
+
+        int charsForName = maxLength - totalNeededLength;
+        if (charsForName <= 0) {
+            return ELLIPSIS + extension;
+        }
+
+        int numCharsBeforeEllipsis;
+        int numCharsAfterEllipsis;
+        if (charsForName == 1) {
+            numCharsBeforeEllipsis = 1;
+            numCharsAfterEllipsis = 0;
+        } else {
+            // Allow the front part to have the extra in odd cases
+            numCharsBeforeEllipsis = (charsForName + 1) / 2;
+            numCharsAfterEllipsis = charsForName / 2;
+        }
+
+        numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());
+        numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
+
+        return name.substring(0, numCharsBeforeEllipsis) +
+               ELLIPSIS +
+               name.substring(name.length() - numCharsAfterEllipsis) +
+               extension;
     }
 
     public static boolean isCharLegal(char c) {

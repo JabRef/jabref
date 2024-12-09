@@ -51,7 +51,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferencesService);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferences);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getDisplayName)
@@ -83,8 +83,8 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
             validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
         });
 
-        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
-        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferencesService.getFilePreferences()), autolinkExternalHelp);
+        ActionFactory actionFactory = new ActionFactory();
+        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferences.getExternalApplicationsPreferences()), autolinkExternalHelp);
     }
 
     @FXML

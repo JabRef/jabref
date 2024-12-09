@@ -11,14 +11,12 @@ import javafx.scene.control.TextFormatter;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
@@ -38,8 +36,6 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     @FXML private CheckBox addCreationDate;
     @FXML private CheckBox addModificationDate;
 
-    @Inject private KeyBindingRepository keyBindingRepository;
-
     public EntryTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -47,7 +43,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new EntryTabViewModel(preferencesService);
+        this.viewModel = new EntryTabViewModel(preferences);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
@@ -75,8 +71,8 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
-        ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferencesService.getFilePreferences()), markOwnerHelp);
+        ActionFactory actionFactory = new ActionFactory();
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
 
     @Override

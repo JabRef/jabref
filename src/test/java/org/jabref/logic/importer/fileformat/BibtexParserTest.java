@@ -14,9 +14,9 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -30,7 +30,9 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.model.TreeNode;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -56,6 +58,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -75,7 +78,7 @@ import static org.mockito.Mockito.when;
  * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
  */
 class BibtexParserTest {
-
+    private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
 
@@ -87,7 +90,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseWithNullThrowsNullPointerException() throws Exception {
+    void parseWithNullThrowsNullPointerException() {
         Executable toBeTested = () -> parser.parse(null);
         assertThrows(NullPointerException.class, toBeTested);
     }
@@ -301,7 +304,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertEquals(List.of(expected), parsed);
-        assertEquals(expected.getUserComments(), parsed.get(0).getUserComments());
+        assertEquals(expected.getUserComments(), parsed.getFirst().getUserComments());
     }
 
     @Test
@@ -329,7 +332,7 @@ class BibtexParserTest {
         String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
         List<BibEntry> parsedEntries = parser.parse(new StringReader(firstEntry + secondEntry))
                                              .getDatabase().getEntries();
-        assertEquals(firstEntry, parsedEntries.get(0).getParsedSerialization());
+        assertEquals(firstEntry, parsedEntries.getFirst().getParsedSerialization());
         assertEquals(secondEntry, parsedEntries.get(1).getParsedSerialization());
     }
 
@@ -424,22 +427,17 @@ class BibtexParserTest {
                           url = {http://james.howison.name/publications.html}
                         }))"""));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("CroAnnHow05")
+                .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H. and Howison, J. and Masango, C.")
+                .withField(StandardField.TITLE, "Effective work practices for floss development: A model and propositions")
+                .withField(StandardField.BOOKTITLE, "Hawaii International Conference On System Sciences (HICSS)")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.OWNER, "oezbek")
+                .withField(StandardField.TIMESTAMP, "2006.05.29")
+                .withField(StandardField.URL, "http://james.howison.name/publications.html");
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.InProceedings, entry.getType());
-        assertEquals(8, entry.getFields().size());
-        assertEquals(Optional.of("CroAnnHow05"), entry.getCitationKey());
-        assertEquals(Optional.of("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."), entry.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("Effective work practices for floss development: A model and propositions"),
-                entry.getField(StandardField.TITLE));
-        assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
-                entry.getField(StandardField.BOOKTITLE));
-        assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
-        assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -519,10 +517,8 @@ class BibtexParserTest {
                           timestamp = {2006.05.29},
                           url = {http://james.howison.name/publications.html}
                         }))"""));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(0, parsed.size());
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
     @Test
@@ -557,15 +553,12 @@ class BibtexParserTest {
     void parseAddsEscapedOpenBracketToFieldValue() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,review={escaped \\{ bracket}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(Optional.of("escaped \\{ bracket"), entry.getField(StandardField.REVIEW));
         assertFalse(result.hasWarnings());
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.REVIEW, "escaped \\{ bracket");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -573,14 +566,11 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,review={escaped \\} bracket}}"));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.REVIEW, "escaped \\} bracket");
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(Optional.of("escaped \\} bracket"), entry.getField(StandardField.REVIEW));
-        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -595,7 +585,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseIgnoresArbitraryContentAfterEntry() throws IOException {
+    void parseMovesArbitraryContentAfterEntryToEpilog() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={author bracket }}}"));
 
@@ -611,7 +601,7 @@ class BibtexParserTest {
 
         List<BibEntry> entries = result.getDatabase().getEntries();
 
-        assertEquals(Optional.of("author bracket #too##much#"), entries.get(0).getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("author bracket #too##much#"), entries.getFirst().getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -632,7 +622,7 @@ class BibtexParserTest {
         List<BibEntry> entries = result.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
-        assertEquals(Optional.of("author @ good"), entries.get(0).getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("author @ good"), entries.getFirst().getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -640,14 +630,11 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author=\"author @ good\"}"));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "author @ good");
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("author @ good"), entry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -655,14 +642,11 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author=\"Test {Ed {von} Test}\"}"));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Test {Ed {von} Test}");
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Test {Ed {von} Test}"), entry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -671,14 +655,23 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author=\"Test {\" Test}\"}"));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Test {\" Test}");
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Test {\" Test}"), entry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseRecognizesFieldsWithQuotationMarksInBrackets() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@article{test,title=\"Comments on {\"}Filenames and Fonts{\"}\"}"));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Comments on {\"}Filenames and Fonts{\"}");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -686,9 +679,7 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von Test} year=2005}"));
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(0, parsed.size());
+        assertEquals(List.of(), result.getDatabase().getEntries());
         assertTrue(result.hasWarnings());
     }
 
@@ -778,6 +769,18 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesStringWithQuotes() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@string{bourdieu = \"Bourdieu, Pierre\"}"));
+
+        BibtexString string = result.getDatabase().getStringValues().iterator().next();
+
+        assertEquals(1, result.getDatabase().getStringCount());
+        assertEquals("bourdieu", string.getName());
+        assertEquals("Bourdieu, Pierre", string.getContent());
+    }
+
+    @Test
     void parseSavesOneNewlineAfterStringInParsedSerialization() throws IOException {
         String string = "@string{bourdieu = {Bourdieu, Pierre}}" + OS.NEWLINE;
         ParserResult result = parser
@@ -838,7 +841,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesStringAndEntry() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("" + "@string{bourdieu = {Bourdieu, Pierre}}"
+                new StringReader("@string{bourdieu = {Bourdieu, Pierre}}"
                         + "@book{bourdieu-2002-questions-sociologie, " + "    Address = {Paris}," + "    Author = bourdieu,"
                         + "    Isbn = 2707318256," + "    Publisher = {Minuit}," + "    Title = {Questions de sociologie},"
                         + "    Year = 2002" + "}"));
@@ -875,30 +878,28 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@comment{some text and \\latex}"));
 
-        assertEquals(0, result.getDatabase().getEntries().size());
+        assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
+    // TODO: We should keep @comment if it is the only "thing" in the file
     @Test
-    void parseIgnoresUpercaseComments() throws IOException {
+    void parseIgnoresUppercaseComments() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@COMMENT{some text and \\latex}"));
-
-        assertEquals(0, result.getDatabase().getEntries().size());
+        assertFalse(result.hasWarnings()); // FIXME: We silently remove @COMMENT
+        assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
     @Test
-    void parseIgnoresCommentsBeforeEntry() throws IOException {
+    void parseKeepsCommentsAsUserComments() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@comment{some text and \\latex}" + "@article{test,author={Ed von Test}}"));
 
-        Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
-        BibEntry parsedEntry = parsedEntries.iterator().next();
-
-        assertEquals(1, parsedEntries.size());
-        assertEquals(StandardEntryType.Article, parsedEntry.getType());
-        assertEquals(Optional.of("test"), parsedEntry.getCitationKey());
-        assertEquals(2, parsedEntry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), parsedEntry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("test")
+                        .withField(StandardField.AUTHOR, "Ed von Test")
+                        .withUserComments("@comment{some text and \\latex}")),
+                result.getDatabase().getEntries());
     }
 
     @Test
@@ -906,14 +907,11 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von Test}}" + "@comment{some text and \\latex}"));
 
-        Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
-        BibEntry parsedEntry = parsedEntries.iterator().next();
-
-        assertEquals(1, parsedEntries.size());
-        assertEquals(StandardEntryType.Article, parsedEntry.getType());
-        assertEquals(Optional.of("test"), parsedEntry.getCitationKey());
-        assertEquals(2, parsedEntry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), parsedEntry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("test")
+                        .withField(StandardField.AUTHOR, "Ed von Test")),
+                result.getDatabase().getEntries());
+        assertEquals("@comment{some text and \\latex}", result.getDatabase().getEpilog());
     }
 
     @Test
@@ -955,51 +953,58 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseConvertsNewlineToSpace() throws IOException {
+    void parsKeesNewlines() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\nb}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\nb"), parsedEntry.getField(new UnknownField("a")));
     }
 
     @Test
-    void parseConvertsMultipleNewlinesToSpace() throws IOException {
+    void parsKeepsMultipleNewlines() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("@article{test,a = {a\n\nb}," + "b = {a\n \nb}," + "c = {a \n \n b}}"));
+                .parse(new StringReader("""
+                        @article{test,a = {a
+
+                        b},b = {a
+                        \s
+                        b},c = {a\s
+                        \s
+                         b}}"""));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("b")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("c")));
+        assertEquals(Optional.of("a\n\nb"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\n \nb"), parsedEntry.getField(new UnknownField("b")));
+        assertEquals(Optional.of("a \n \n b"), parsedEntry.getField(new UnknownField("c")));
     }
 
     @Test
-    void parseConvertsTabToSpace() throws IOException {
+    void parseKeepsTabs() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\tb}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\tb"), parsedEntry.getField(new UnknownField("a")));
     }
 
     @Test
-    void parseConvertsMultipleTabsToSpace() throws IOException {
+    void parsKeepsMultipleTabs() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\t\tb}," + "b = {a\t \tb}," + "c = {a \t \t b}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("b")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("c")));
+        assertEquals(Optional.of("a\t\tb"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\t \tb"), parsedEntry.getField(new UnknownField("b")));
+        assertEquals(Optional.of("a \t \t b"), parsedEntry.getField(new UnknownField("c")));
     }
 
     @Test
@@ -1261,26 +1266,36 @@ class BibtexParserTest {
     @Test
     void parseRecognizesCRLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("@InProceedings{6055279,\r\n" + "  Title                    = {Educational session 1},\r\n"
-                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r\n"
-                        + "  Year                     = {2011},\r\n" + "  Month                    = {Sept},\r\n"
-                        + "  Pages                    = {1-7},\r\n"
-                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r\n"
-                        + "  DOI                      = {10.1109/CICC.2011.6055279},\r\n"
-                        + "  ISSN                     = {0886-5930}\r\n" + "}\r\n"));
+                new StringReader("""
+                        @InProceedings{6055279,\r
+                          Title                    = {Educational session 1},\r
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r
+                          Year                     = {2011},\r
+                          Month                    = {Sept},\r
+                          Pages                    = {1-7},\r
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r
+                          DOI                      = {10.1109/CICC.2011.6055279},\r
+                          ISSN                     = {0886-5930}\r
+                        }\r
+                        """));
         assertEquals("\r\n", result.getDatabase().getNewLineSeparator());
     }
 
     @Test
     void parseRecognizesLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
-                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
-                        + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
-                        + "  Pages                    = {1-7},\n"
-                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
-                        + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
-                        + "  ISSN                     = {0886-5930}\n" + "}\n"));
+                new StringReader("""
+                        @InProceedings{6055279,
+                          Title                    = {Educational session 1},
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
+                          Year                     = {2011},
+                          Month                    = {Sept},
+                          Pages                    = {1-7},
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},
+                          DOI                      = {10.1109/CICC.2011.6055279},
+                          ISSN                     = {0886-5930}
+                        }
+                        """));
         assertEquals("\n", result.getDatabase().getNewLineSeparator());
     }
 
@@ -1337,13 +1352,13 @@ class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        GlobalCitationKeyPattern pattern = mock(GlobalCitationKeyPattern.class);
-        AbstractCitationKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractCitationKeyPattern expectedPattern = new DatabaseCitationKeyPattern(pattern);
-        expectedPattern.setDefaultValue("test");
-        expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
+        GlobalCitationKeyPatterns pattern = mock(GlobalCitationKeyPatterns.class);
+        AbstractCitationKeyPatterns bibtexKeyPatterns = result.getMetaData().getCiteKeyPatterns(pattern);
+        AbstractCitationKeyPatterns expectedPatterns = new DatabaseCitationKeyPatterns(pattern);
+        expectedPatterns.setDefaultValue("test");
+        expectedPatterns.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 
-        assertEquals(expectedPattern, bibtexKeyPattern);
+        assertEquals(expectedPatterns, bibtexKeyPatterns);
     }
 
     @Test
@@ -1357,7 +1372,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void integrationTestGroupTree() throws IOException, ParseException {
+    void integrationTestGroupTree() throws IOException {
         ParserResult result = parser.parse(new StringReader("""
                 @comment{jabref-meta: groupsversion:3;}
                 @comment{jabref-meta: groupstree:
@@ -1372,12 +1387,317 @@ class BibtexParserTest {
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "FrechetSpace", false),
-                root.getChildren().get(0).getGroup());
+                root.getChildren().getFirst().getGroup());
         assertEquals(
                 new WordKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "GIT", false, ',', false),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+    }
+
+    /**
+     * Checks that BibDesk Static Groups are available after parsing the library
+     */
+    @Test
+    void integrationTestBibDeskStaticGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Static Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>group name</key>
+                        <string>firstTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa,Heyl:2023aa</string>
+                    </dict>
+                    <dict>
+                        <key>group name</key>
+                        <string>secondTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(Optional.of(BIB_DESK_ROOT_GROUP_NAME), root.getFirstChild().map(GroupTreeNode::getName));
+
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(true);
+
+        assertEquals(Optional.of(firstTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getFirstChild).map(GroupTreeNode::getGroup));
+
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("secondTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(true);
+        assertEquals(Optional.of(secondTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getLastChild).map(GroupTreeNode::getGroup));
+
+        BibDatabase db = result.getDatabase();
+
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntries(), true).stream().map(GroupTreeNode::getGroup).toList());
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
+    }
+
+    /**
+     * Checks that BibDesk Smart Groups are available after parsing the library
+     */
+    @Test
+    @Disabled("Not yet supported")
+    void integrationTestBibDeskSmartGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kraljic:2023aa,
+                    author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
+                    date-added = {2023-09-14 20:09:10 +0200},
+                    date-modified = {2023-09-14 20:09:10 +0200},
+                    eprint = {2309.06485},
+                    month = {09},
+                    title = {Emergence and cosmic evolution of the Kennicutt-Schmidt relation driven by interstellar turbulence},
+                    url = {https://arxiv.org/pdf/2309.06485.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
+
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Smart Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>4</integer>
+                                <key>key</key>
+                                <string>BibTeX Type</string>
+                                <key>value</key>
+                                <string>article</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>2</integer>
+                                <key>key</key>
+                                <string>Title</string>
+                                <key>value</key>
+                                <string>the</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>article</string>
+                    </dict>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>3</integer>
+                                <key>key</key>
+                                <string>Author</string>
+                                <key>value</key>
+                                <string>Swain</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>Swain</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(2, root.getNumberOfChildren());
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(false);
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("Swain", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(false);
+        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+
+        BibDatabase db = result.getDatabase();
+        List<BibEntry> firstTestGroupEntriesExpected = new ArrayList<>();
+        firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
+        firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(firstTestGroupEntriesExpected));
+        assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
+    }
+
+    /**
+     * Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
+     */
+    @Test
+    @Disabled("Not yet supported")
+    void integrationTestBibDeskMultipleGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kraljic:2023aa,
+                    author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
+                    date-added = {2023-09-14 20:09:10 +0200},
+                    date-modified = {2023-09-14 20:09:10 +0200},
+                    eprint = {2309.06485},
+                    month = {09},
+                    title = {Emergence and cosmic evolution of the Kennicutt-Schmidt relation driven by interstellar turbulence},
+                    url = {https://arxiv.org/pdf/2309.06485.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
+
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Static Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>group name</key>
+                        <string>firstTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa,Heyl:2023aa</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+
+                @comment{BibDesk Smart Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>4</integer>
+                                <key>key</key>
+                                <string>BibTeX Type</string>
+                                <key>value</key>
+                                <string>article</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>2</integer>
+                                <key>key</key>
+                                <string>Title</string>
+                                <key>value</key>
+                                <string>the</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>article</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(2, root.getNumberOfChildren());
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(false);
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(false);
+        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+
+        BibDatabase db = result.getDatabase();
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(db.getEntries()));
+        List<BibEntry> smartGroupEntriesExpected = new ArrayList<>();
+        smartGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
+        smartGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(smartGroupEntriesExpected));
     }
 
     /**
@@ -1404,7 +1724,7 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(((TexGroup) root.getChildren().get(0).getGroup()).getFilePath(),
+        assertEquals(((TexGroup) root.getChildren().getFirst().getGroup()).getFilePath(),
                 Path.of("src/test/resources/org/jabref/model/groups/paper.aux"));
     }
 
@@ -1465,12 +1785,11 @@ class BibtexParserTest {
     @Test
     void parseRecognizesDatabaseID() throws Exception {
         String expectedDatabaseID = "q1w2e3r4t5z6";
-        StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("\\% DBID: ").append(expectedDatabaseID)
-                .append(OS.NEWLINE)
-                .append("@Article{a}");
+        String sharedDatabaseFileContent = "\\% DBID: " + expectedDatabaseID +
+                OS.NEWLINE +
+                "@Article{a}";
 
-        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent));
         String actualDatabaseID = parserResult.getDatabase().getSharedDatabaseID().get();
 
         assertEquals(expectedDatabaseID, actualDatabaseID);
@@ -1478,16 +1797,15 @@ class BibtexParserTest {
 
     @Test
     void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
-        StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("\\% Encoding: UTF-8").append(OS.NEWLINE)
-                .append("\\% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
-                .append("@Article{a}");
+        String sharedDatabaseFileContent = "\\% Encoding: UTF-8" + OS.NEWLINE +
+                "\\% DBID: q1w2e3r4t5z6" + OS.NEWLINE +
+                "@Article{a}";
 
-        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent));
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
-        assertEquals("", entries.get(0).getUserComments());
+        assertEquals("", entries.getFirst().getUserComments());
     }
 
     @Test
@@ -1497,7 +1815,7 @@ class BibtexParserTest {
                         + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                         + "@comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}"));
 
-        assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals("\\Literature\\", result.getMetaData().getLibrarySpecificFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
         assertEquals("D:\\Latex", result.getMetaData().getLatexFileDirectory("defaultOwner-user").get().toString());
     }
@@ -1512,7 +1830,7 @@ class BibtexParserTest {
     void fileDirectoriesUnmodified(String directory) throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory:" + directory + "}"));
-        assertEquals(directory, result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals(directory, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 
     @ParameterizedTest
@@ -1522,7 +1840,7 @@ class BibtexParserTest {
     void fileDirectoryWithDoubleEscapeIsRead(String expected, String provided) throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory: " + provided + "}"));
-        assertEquals(expected, result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals(expected, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 
     @Test
@@ -1601,10 +1919,9 @@ class BibtexParserTest {
 
     @Test
     void preserveEncodingPrefixInsideEntry() throws ParseException {
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Article);
-        expected.setCitationKey("test");
-        expected.setField(StandardField.AUTHOR, SaveConfiguration.ENCODING_PREFIX);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, SaveConfiguration.ENCODING_PREFIX);
 
         List<BibEntry> parsed = parser
                 .parseEntries("@article{test,author={" + SaveConfiguration.ENCODING_PREFIX + "}}");
@@ -1831,10 +2148,11 @@ class BibtexParserTest {
 
     @Test
     void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
-                + "Keywords={asdf,asdf,asdf},\n"
-                + "}\n"
-                + "");
+        Optional<BibEntry> result = parser.parseSingleEntry("""
+                @Article{,
+                Keywords={asdf,asdf,asdf},
+                }
+                """);
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
@@ -1862,5 +2180,62 @@ class BibtexParserTest {
                 """;
         ParserResult result = parser.parse(new StringReader(entries));
         assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseBibDeskLinkedFiles() throws IOException {
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+        expectedEntry.withCitationKey("Kovakkuni:2023aa")
+                     .withField(StandardField.AUTHOR, "Navyasree Kovakkuni and Federico Lelli and Pierre-alain Duc and M{\\'e}d{\\'e}ric Boquien and Jonathan Braine and Elias Brinks and Vassilis Charmandaris and Francoise Combes and Jeremy Fensch and Ute Lisenfeld and Stacy McGaugh and J. Chris Mihos and Marcel. S. Pawlowski and Yves. Revaz and Peter. M. Weilbacher")
+                     .withField(new UnknownField("date-added"), "2023-09-14 20:09:12 +0200")
+                     .withField(new UnknownField("date-modified"), "2023-09-14 20:09:12 +0200")
+                     .withField(StandardField.EPRINT, "2309.06478")
+                     .withField(StandardField.MONTH, "09")
+                     .withField(StandardField.TITLE, "Molecular and Ionized Gas in Tidal Dwarf Galaxies: The Spatially Resolved Star-Formation Relation")
+                     .withField(StandardField.URL, "https://arxiv.org/pdf/2309.06478.pdf")
+                     .withField(StandardField.YEAR, "2023")
+                     .withField(new UnknownField("bdsk-url-1"), "https://arxiv.org/abs/2309.06478")
+                     .withField(StandardField.FILE, ":../../Downloads/2309.06478.pdf:");
+
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kovakkuni:2023aa,
+                    author = {Navyasree Kovakkuni and Federico Lelli and Pierre-alain Duc and M{\\'e}d{\\'e}ric Boquien and Jonathan Braine and Elias Brinks and Vassilis Charmandaris and Francoise Combes and Jeremy Fensch and Ute Lisenfeld and Stacy McGaugh and J. Chris Mihos and Marcel. S. Pawlowski and Yves. Revaz and Peter. M. Weilbacher},
+                    date-added = {2023-09-14 20:09:12 +0200},
+                    date-modified = {2023-09-14 20:09:12 +0200},
+                    eprint = {2309.06478},
+                    month = {09},
+                    title = {Molecular and Ionized Gas in Tidal Dwarf Galaxies: The Spatially Resolved Star-Formation Relation},
+                    url = {https://arxiv.org/pdf/2309.06478.pdf},
+                    year = {2023},
+                    bdsk-file-1 = {YnBsaXN0MDDSAQIDBFxyZWxhdGl2ZVBhdGhZYWxpYXNEYXRhXxAeLi4vLi4vRG93bmxvYWRzLzIzMDkuMDY0NzgucGRmTxEBUgAAAAABUgACAAAMTWFjaW50b3NoIEhEAAAAAAAAAAAAAAAAAAAA4O/yLkJEAAH/////DjIzMDkuMDY0NzgucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/////hKRkeAAAAAAAAAAAAAgACAAAKIGN1AAAAAAAAAAAAAAAAAAlEb3dubG9hZHMAAAIAKy86VXNlcnM6Y2hyaXN0b3BoczpEb3dubG9hZHM6MjMwOS4wNjQ3OC5wZGYAAA4AHgAOADIAMwAwADkALgAwADYANAA3ADgALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAClVc2Vycy9jaHJpc3RvcGhzL0Rvd25sb2Fkcy8yMzA5LjA2NDc4LnBkZgAAEwABLwAAFQACABH//wAAAAgADQAaACQARQAAAAAAAAIBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAGb},
+                    bdsk-url-1 = {https://arxiv.org/abs/2309.06478}}
+                    }
+                """));
+        BibDatabase database = result.getDatabase();
+
+        assertEquals(Collections.singletonList(expectedEntry), database.getEntries());
+    }
+
+    @Test
+    void parseInvalidBibDeskFilesResultsInWarnings() throws IOException {
+        // the first entry is invalid base 64, the second entry is correct plist format but does not contain the key
+        String entries = """
+                @Article{Test2017,
+                    bdsk-file-1 = {////=},
+                }
+
+                @Article{Test2,
+                   bdsk-file-1 = {YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAFgAdccmVsYXRpdmVQYXRoWWFsaWFzRGF0YV8QVi4uLy4uLy4uL1BhcGVycy9Bc2hlaW0yMDA1IFRoZSBHZW9ncmFwaHkgb2YgSW5ub3ZhdGlvbiBSZWdpb25hbCBJbm5vdmF0aW9uIFN5c3RlbXMucGRm0hcLGBlXTlMuZGF0YU8RAkoAAAAAAkoAAgAADE1hY2ludG9zaCBIRAAAAAAAAAAAAAAAAAAAAM6T/wtIKwAAACI+9B9Bc2hlaW0yMDA1IFRoZSBHZW9nciMyMjQ4QzkucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIkjJw6jvRAAAAAAAAAAAAAMAAgAACSAAAAAAAAAAAAAAAAAAAAAGUGFwZXJzABAACAAAzpPw+wAAABEACAAAw6jhNAAAAAEAEAAiPvQAIjTXACHV2wAHw2AAAgBQTWFjaW50b3NoIEhEOlVzZXJzOgBpbGlwcGVydDoARG9jdW1lbnRzOgBQYXBlcnM6AEFzaGVpbTIwMDUgVGhlIEdlb2dyIzIyNDhDOS5wZGYADgCOAEYAQQBzAGgAZQBpAG0AMgAwADAANQAgAFQAaABlACAARwBlAG8AZwByAGEAcABoAHkAIABvAGYAIABJAG4AbgBvAHYAYQB0AGkAbwBuACAAUgBlAGcAaQBvAG4AYQBsACAASQBuAG4AbwB2AGEAdABpAG8AbgAgAFMAeQBzAHQAZQBtAHMALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAGZVc2Vycy9pbGlwcGVydC9Eb2N1bWVudHMvUGFwZXJzL0FzaGVpbTIwMDUgVGhlIEdlb2dyYXBoeSBvZiBJbm5vdmF0aW9uIFJlZ2lvbmFsIElubm92YXRpb24gU3lzdGVtcy5wZGYAEwABLwAAFQACAA///wAAgAbSGxwdHlokY2xhc3NuYW1lWCRjbGFzc2VzXU5TTXV0YWJsZURhdGGjHR8gVk5TRGF0YVhOU09iamVjdNIbHCIjXE5TRGljdGlvbmFyeaIiIF8QD05TS2V5ZWRBcmNoaXZlctEmJ1Ryb290gAEACAARABoAIwAtADIANwBAAEYATQBVAGAAZwBqAGwAbgBxAHMAdQB3AIQAjgDnAOwA9ANCA0QDSQNUA10DawNvA3YDfwOEA5EDlAOmA6kDrgAAAAAAAAIBAAAAAAAAACgAAAAAAAAAAAAAAAAAAAOw},
+                },
+                """;
+        ParserResult result = parser.parse(new StringReader(entries));
+
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Test2017");
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Test2");
+
+        assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }
 }

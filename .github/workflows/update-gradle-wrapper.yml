@@ -7,18 +7,19 @@ on:
 
 jobs:
   update-gradle-wrapper:
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
-   
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
 
       - name: Update Gradle Wrapper
-        uses: gradle-update/update-gradle-wrapper-action@v1
+        uses: gradle-update/update-gradle-wrapper-action@v2
         with:
           labels: dependencies
           repo-token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}

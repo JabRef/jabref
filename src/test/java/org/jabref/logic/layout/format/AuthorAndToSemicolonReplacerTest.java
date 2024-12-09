@@ -23,7 +23,7 @@ class AuthorAndToSemicolonReplacerTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testFormat(String input, String expected) {
+    void format(String input, String expected) {
         LayoutFormatter a = new AuthorAndToSemicolonReplacer();
 
         assertEquals(expected, a.format(input));

@@ -3,9 +3,11 @@ package org.jabref.logic.formatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
@@ -20,18 +22,24 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import org.jabref.logic.formatter.casechanger.CamelFormatter;
+import org.jabref.logic.formatter.casechanger.CamelNFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
+import org.jabref.logic.formatter.casechanger.ShortTitleFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
+import org.jabref.logic.formatter.casechanger.VeryShortTitleFormatter;
 import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
@@ -39,6 +47,12 @@ import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
+
+    private static Map<String, Formatter> keyToFormatterMap;
+
+    static {
+        keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -> f));
+    }
 
     private Formatters() {
     }
@@ -73,14 +87,24 @@ public class Formatters {
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
-                new RemoveBracesFormatter(),
+                new RemoveEnclosingBracesFormatter(),
+                new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
+                new NormalizeUnicodeFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
                 new UnprotectTermsFormatter()
+        );
+    }
+
+    public static List<Formatter> getTitleChangers() {
+        return Arrays.asList(
+                new VeryShortTitleFormatter(),
+                new ShortTitleFormatter(),
+                new CamelFormatter()
         );
     }
 
@@ -89,7 +113,13 @@ public class Formatters {
         all.addAll(getConverters());
         all.addAll(getCaseChangers());
         all.addAll(getOthers());
+        all.addAll(getTitleChangers());
         return all;
+    }
+
+    public static Optional<Formatter> getFormatterForKey(String name) {
+        Objects.requireNonNull(name);
+        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
@@ -106,16 +136,28 @@ public class Formatters {
                 return Optional.of(new TitleCaseFormatter());
             case "sentencecase":
                 return Optional.of(new SentenceCaseFormatter());
+            case "veryshorttitle":
+                return Optional.of(new VeryShortTitleFormatter());
+            case "shorttitle":
+                return Optional.of(new ShortTitleFormatter());
         }
 
-        if (modifier.startsWith(RegexFormatter.KEY)) {
+        if (modifier.contains("camel")) {
+            modifier = modifier.replace("camel", "");
+            if (modifier.isEmpty()) {
+                return Optional.of(new CamelFormatter());
+            } else {
+                int length = Integer.parseInt(modifier);
+                return Optional.of(new CamelNFormatter(length));
+            }
+        } else if (modifier.startsWith(RegexFormatter.KEY)) {
             String regex = modifier.substring(RegexFormatter.KEY.length());
             return Optional.of(new RegexFormatter(regex));
         } else if (TRUNCATE_PATTERN.matcher(modifier).matches()) {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
+            return getFormatterForKey(modifier);
         }
     }
 }

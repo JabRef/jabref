@@ -10,13 +10,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTMLParagraphsTest {
+class HTMLParagraphsTest {
 
     LayoutFormatter htmlFormatter = new HTMLParagraphs();
 
     @ParameterizedTest
     @MethodSource("htmlFormatTests")
-    void testCorrectFormat(String expectedString, String inputString) {
+    void correctFormat(String expectedString, String inputString) {
         assertEquals(expectedString, htmlFormatter.format(inputString));
     }
 

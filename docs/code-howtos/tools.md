@@ -10,7 +10,7 @@ This page lists some software we consider useful.
 * [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
 * [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
 * [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* [Sourcegraph Browser Extension](https://docs.sourcegraph.com/integration/browser\_extension) - Navigate through source on GitHub
+* [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
 
 ## git hints
 
@@ -37,7 +37,7 @@ See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github
 (As Administrator - one time)
 
 1. Install [chocolatey](https://chocolatey.org)
-2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal`
+2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal"`
 3. `choco install notepadplusplus`
 4. If you want to have your JDK also managed via chocolatey: `choco install temurin`
 

@@ -36,44 +36,46 @@ public class MSBibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);
 
-    private Set<MSBibEntry> entries;
+    private final DocumentBuilderFactory factory;
+
+    private Set<MSBibEntry> entriesForExport;
 
     /**
      * Creates a {@link MSBibDatabase} for <b>import</b>
      */
     public MSBibDatabase() {
-        entries = new HashSet<>();
+        entriesForExport = new HashSet<>();
+        factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
     }
 
-    // TODO: why an additonal entry list? entries are included inside database!
-
     /**
-     * Creates a new {@link MSBibDatabase} for <b>export</b>
+     * Creates a new {@link MSBibDatabase} for <b>export</b>.
+     * Directly converts the given entries.
      *
      * @param database The bib database
      * @param entries  List of {@link BibEntry}
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
+        this();
         if (entries == null) {
             var resolvedEntries = database.resolveForStrings(database.getEntries(), false);
-            addEntriesForExport(resolvedEntries);
+            setEntriesForExport(resolvedEntries);
         } else {
             var resolvedEntries = database.resolveForStrings(entries, false);
-            addEntriesForExport(resolvedEntries);
+            setEntriesForExport(resolvedEntries);
         }
     }
 
     /**
-     * Imports entries from an office xml file
+     * Imports entries from an office XML file
      *
      * @return List of {@link BibEntry}
      */
     public List<BibEntry> importEntriesFromXml(BufferedReader reader) {
-        entries = new HashSet<>();
+        entriesForExport = new HashSet<>();
         Document inputDocument;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -92,31 +94,24 @@ public class MSBibDatabase {
         NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));
-            entries.add(entry);
+            entriesForExport.add(entry);
             bibitems.add(BibTeXConverter.convert(entry));
         }
 
         return bibitems;
     }
 
-    private void addEntriesForExport(List<BibEntry> entriesToAdd) {
-        entries = new HashSet<>();
+    private void setEntriesForExport(List<BibEntry> entriesToAdd) {
+        entriesForExport = new HashSet<>();
         for (BibEntry entry : entriesToAdd) {
             MSBibEntry newMods = MSBibConverter.convert(entry);
-            entries.add(newMods);
+            entriesForExport.add(newMods);
         }
     }
 
-    /**
-     * Gets the assembled dom for export
-     *
-     * @return XML Document
-     */
     public Document getDomForExport() {
         Document document = null;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             document = documentBuilder.newDocument();
 
@@ -126,7 +121,7 @@ public class MSBibDatabase {
                     "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
             rootNode.setAttribute("SelectedStyle", "");
 
-            for (MSBibEntry entry : entries) {
+            for (MSBibEntry entry : entriesForExport) {
                 Node node = entry.getEntryDom(document);
                 rootNode.appendChild(node);
             }

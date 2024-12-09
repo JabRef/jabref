@@ -13,9 +13,9 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.preferences.BibEntryPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -55,7 +55,7 @@ public class ManageKeywordsViewModel {
             }
         } else if (type == ManageKeywordsDisplayType.CONTAINED_IN_ANY_ENTRY) {
             // all keywords from first entry have to be added
-            BibEntry firstEntry = entries.get(0);
+            BibEntry firstEntry = entries.getFirst();
             KeywordList separatedKeywords = firstEntry.getKeywords(keywordSeparator);
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 

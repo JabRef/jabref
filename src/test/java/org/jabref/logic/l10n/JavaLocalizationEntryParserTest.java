@@ -67,27 +67,27 @@ public class JavaLocalizationEntryParserTest {
 
     @ParameterizedTest
     @MethodSource("singleLineChecks")
-    public void testLocalizationKeyParsing(String code, String expectedLanguageKeys) {
-        testLocalizationKeyParsing(code, List.of(expectedLanguageKeys));
+    void localizationKeyParsing(String code, String expectedLanguageKeys) {
+        localizationKeyParsing(code, List.of(expectedLanguageKeys));
     }
 
     @ParameterizedTest
     @MethodSource("multiLineChecks")
-    public void testLocalizationKeyParsing(String code, List<String> expectedLanguageKeys) {
+    void localizationKeyParsing(String code, List<String> expectedLanguageKeys) {
         List<String> languageKeysInString = JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("singleLineParameterChecks")
-    public void testLocalizationParameterParsing(String code, String expectedParameter) {
+    void localizationParameterParsing(String code, String expectedParameter) {
         List<String> languageKeysInString = JavaLocalizationEntryParser.getLocalizationParameter(code, LocalizationBundleForTest.LANG);
         assertEquals(List.of(expectedParameter), languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("causesRuntimeExceptions")
-    public void throwsRuntimeException(String code) {
+    void throwsRuntimeException(String code) {
         assertThrows(RuntimeException.class, () -> JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
     }
 }

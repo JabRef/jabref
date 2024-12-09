@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,7 +16,7 @@ import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -31,17 +30,16 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
@@ -49,11 +47,11 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  */
 public class AstrophysicsDataSystem
         implements IdBasedParserFetcher, PagedSearchBasedParserFetcher, EntryBasedParserFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "SAO/NASA ADS";
 
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
     private final ImportFormatPreferences preferences;
     private final ImporterPreferences importerPreferences;
 
@@ -80,7 +78,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public String getName() {
-        return "SAO/NASA ADS";
+        return FETCHER_NAME;
     }
 
     /**
@@ -88,7 +86,7 @@ public class AstrophysicsDataSystem
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         builder.addParameter("fl", "bibcode");
@@ -129,7 +127,7 @@ public class AstrophysicsDataSystem
      * @return URL which points to a search URL for given identifier
      */
     @Override
-    public URL getUrlForIdentifier(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
@@ -149,9 +147,9 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
 
@@ -178,14 +176,15 @@ public class AstrophysicsDataSystem
             return Collections.emptyList();
         }
 
+        URL urlForEntry = null;
         try {
-            List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
-            return performSearchByIds(bibcodes);
-        } catch (URISyntaxException e) {
+            urlForEntry = getURLForEntry(entry);
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
+
+        List<String> bibcodes = fetchBibcodes(urlForEntry);
+        return performSearchByIds(bibcodes);
     }
 
     /**
@@ -203,9 +202,8 @@ public class AstrophysicsDataSystem
                 bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
             }
             return bibcodes;
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         } catch (JSONException e) {
+            LOGGER.error("Error while parsing JSON", e);
             return Collections.emptyList();
         }
     }
@@ -216,24 +214,24 @@ public class AstrophysicsDataSystem
             return Optional.empty();
         }
 
+        URL urlForIdentifier;
         try {
-            List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
-            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
-
-            if (fetchedEntries.isEmpty()) {
-                return Optional.empty();
-            }
-            if (fetchedEntries.size() > 1) {
-                LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                        + ". We will use the first entry.");
-            }
-            BibEntry entry = fetchedEntries.get(0);
-            return Optional.of(entry);
-        } catch (URISyntaxException e) {
+            urlForIdentifier = getUrlForIdentifier(identifier);
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
+
+        List<String> bibcodes = fetchBibcodes(urlForIdentifier);
+        List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
+
+        if (fetchedEntries.isEmpty()) {
+            return Optional.empty();
+        }
+        if (fetchedEntries.size() > 1) {
+            LOGGER.info("Fetcher {} found more than one result for identifier {}. We will use the first entry.", getName(), identifier);
+        }
+        BibEntry entry = fetchedEntries.getFirst();
+        return Optional.of(entry);
     }
 
     /**
@@ -245,10 +243,18 @@ public class AstrophysicsDataSystem
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }
+
+        URL urLforExport;
+        try {
+            urLforExport = getURLforExport();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+
         try {
             String postData = buildPostData(ids);
-            URLDownload download = new URLDownload(getURLforExport());
-            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+            URLDownload download = new URLDownload(urLforExport);
+            importerPreferences.getApiKey(getName()).ifPresent(key -> download.addHeader("Authorization", "Bearer " + key));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
             String content = download.asString();
@@ -264,14 +270,11 @@ public class AstrophysicsDataSystem
 
                 return fetchedEntries;
             } catch (JSONException e) {
+                LOGGER.error("Error while parsing JSON", e);
                 return Collections.emptyList();
             }
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urLforExport, "An internal parser error occurred", e);
         }
     }
 
@@ -280,10 +283,8 @@ public class AstrophysicsDataSystem
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
         List<String> bibCodes = fetchBibcodes(urlForQuery);
         return performSearchByIds(bibCodes);
@@ -294,10 +295,8 @@ public class AstrophysicsDataSystem
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery, pageNumber);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
         // This is currently just interpreting the complex query as a default string query
         List<String> bibCodes = fetchBibcodes(urlForQuery);
@@ -308,7 +307,7 @@ public class AstrophysicsDataSystem
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload urlDownload = new URLDownload(url);
-        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
+        importerPreferences.getApiKey(getName()).ifPresent(key -> urlDownload.addHeader("Authorization", "Bearer " + key));
         return urlDownload;
     }
 }

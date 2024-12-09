@@ -34,6 +34,7 @@ import com.sun.star.beans.XMultiPropertyStates;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
 import com.sun.star.beans.XPropertyState;
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.style.CaseMap;
@@ -217,12 +218,12 @@ public class OOTextIntoOO {
                                 } else {
                                     if (setParagraphStyle(cursor, value)) {
                                         // Presumably tested already:
-                                        LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
+                                        LOGGER.debug("oo:ParaStyleName=\"%s\" failed".formatted(value));
                                     }
                                 }
                                 break;
                             default:
-                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                                LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                                 break;
                         }
                     }
@@ -233,7 +234,7 @@ public class OOTextIntoOO {
                         String value = pair.b;
                         switch (key) {
                             case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                         }
                     }
                     break;
@@ -261,10 +262,10 @@ public class OOTextIntoOO {
                                     settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
                                     break;
                                 }
-                                LOGGER.warn(String.format("Unexpected value %s for attribute '%s' for <%s>",
+                                LOGGER.warn("Unexpected value %s for attribute '%s' for <%s>".formatted(
                                         value, key, tagName));
                             }
-                            default -> LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                         }
                     }
                     formatStack.pushLayer(settings);
@@ -283,14 +284,14 @@ public class OOTextIntoOO {
                     formatStack.popLayer();
                     String expected = expectEnd.pop();
                     if (!tagName.equals(expected)) {
-                        LOGGER.warn(String.format("expected '<%s>', found '<%s>' after '%s'",
+                        LOGGER.warn("expected '<%s>', found '<%s>' after '%s'".formatted(
                                 expected,
                                 tagName,
                                 currentSubstring));
                     }
                     break;
                 default:
-                    LOGGER.warn(String.format("ignoring unknown tag '<%s>'", tagName));
+                    LOGGER.warn("ignoring unknown tag '<%s>'".formatted(tagName));
                     break;
             }
 
@@ -306,9 +307,9 @@ public class OOTextIntoOO {
         if (!expectEnd.isEmpty()) {
             StringBuilder rest = new StringBuilder();
             for (String s : expectEnd) {
-                rest.insert(0, String.format("<%s>", s));
+                rest.insert(0, "<%s>".formatted(s));
             }
-            LOGGER.warn(String.format("OOTextIntoOO.write: expectEnd stack is not empty at the end: %s%n", rest));
+            LOGGER.warn("OOTextIntoOO.write: expectEnd stack is not empty at the end: %s%n".formatted(rest));
         }
     }
 
@@ -372,7 +373,7 @@ public class OOTextIntoOO {
             if (knownToFail.contains(p.Name)) {
                 continue;
             }
-            LOGGER.warn(String.format("OOTextIntoOO.removeDirectFormatting failed on '%s'", p.Name));
+            LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '%s'".formatted(p.Name));
         }
     }
 
@@ -510,7 +511,7 @@ public class OOTextIntoOO {
                 String name = pair.a;
                 Integer index = goodNameToIndex.get(name);
                 if (index == null) {
-                    LOGGER.warn(String.format("pushLayer: '%s' is not in goodNameToIndex", name));
+                    LOGGER.warn("pushLayer: '%s' is not in goodNameToIndex".formatted(name));
                     continue;
                 }
                 Object newValue = pair.b;
@@ -749,7 +750,7 @@ public class OOTextIntoOO {
             return PASS;
         } catch (UnknownPropertyException
                 | PropertyVetoException
-                | com.sun.star.lang.IllegalArgumentException
+                | IllegalArgumentException
                 | WrappedTargetException ex) {
             return FAIL;
         }
@@ -758,7 +759,7 @@ public class OOTextIntoOO {
     private static void insertParagraphBreak(XText text, XTextCursor cursor) {
         try {
             text.insertControlCharacter(cursor, ControlCharacter.PARAGRAPH_BREAK, true);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // Assuming it means wrong code for ControlCharacter.
             // https://api.libreoffice.org/docs/idl/ref/  does not tell.
             // If my assumption is correct, we never get here.

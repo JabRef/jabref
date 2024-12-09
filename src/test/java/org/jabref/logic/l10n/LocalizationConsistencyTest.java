@@ -39,7 +39,7 @@ class LocalizationConsistencyTest {
     void allFilesMustBeInLanguages() throws IOException {
         String bundle = "JabRef";
         // e.g., "<bundle>_en.properties", where <bundle> is [JabRef, Menu]
-        Pattern propertiesFile = Pattern.compile(String.format("%s_.{2,}.properties", bundle));
+        Pattern propertiesFile = Pattern.compile("%s_.{2,}.properties".formatted(bundle));
         Set<String> localizationFiles = new HashSet<>();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of("src/main/resources/l10n"))) {
             for (Path fullPath : directoryStream) {
@@ -60,13 +60,15 @@ class LocalizationConsistencyTest {
     void ensureNoDuplicates() {
         String bundle = "JabRef";
         for (Language lang : Language.values()) {
-            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
+            String propertyFilePath = "/l10n/%s_%s.properties".formatted(bundle, lang.getId());
 
             // read in
             DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
-            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
-                 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                properties.load(reader);
+            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath)) {
+                assert is != null;
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -79,10 +81,10 @@ class LocalizationConsistencyTest {
 
     @Test
     void keyValueShouldBeEqualForEnglishPropertiesMessages() {
-        Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
+        Properties englishKeys = LocalizationParser.getProperties("/l10n/%s_%s.properties".formatted("JabRef", "en"));
         for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
-            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
+            String expectedKeyEqualsKey = "%s=%s".formatted(entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
+            String actualKeyEqualsValue = "%s=%s".formatted(entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
@@ -99,7 +101,7 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         quotedEntries
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> "\n%s (%s)\n".formatted(key.getKey(), key.getPath()))
                                 .toList());
     }
 
@@ -115,7 +117,7 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         entriesWithHtml
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> "\n%s (%s)\n".formatted(key.getKey(), key.getPath()))
                                 .toList());
     }
 
@@ -125,14 +127,16 @@ class LocalizationConsistencyTest {
         assertEquals(Collections.emptyList(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
-                           .map(key -> String.format("%s=%s",
+                           .map(key -> "%s=%s".formatted(
                                    key.getEscapedPropertiesKey(),
                                    key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",
                                    """
 
-                                           DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
-                                           PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+                                           DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE.
+                                           PASTE THESE INTO THE ENGLISH LANGUAGE FILE "JabRef_en.properties".
+                                           Search for a proper place; typically related keys are grouped together.
+                                           If a similar key is already present, please adapt your language instead of adding load to translators by adding a new key.
 
                                            """,
                                    "\n\n")));
@@ -146,8 +150,8 @@ class LocalizationConsistencyTest {
                         "Obsolete keys found in language properties file: \n\n",
                         """
 
-                                1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE
-                                2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE
+                                1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE.
+                                2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE "JabRef_en.properties".
 
                                 """))
         );
@@ -155,18 +159,22 @@ class LocalizationConsistencyTest {
 
     @Test
     void localizationParameterMustIncludeAString() throws IOException {
-        // Must start or end with "
-        // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
-        // TODO: Localization.lang(var1 + "test" + var2) not covered
-        // Localization.lang("Problem downloading from %1", address)
+        // Must start with "
+        // - Localization.lang("test")
+        // - Localization.lang("test %1", var)
+        // - Localization.lang("Problem downloading from %1", address)
+        // - Localization.lang("test %1 %2", var1, var2)
         Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            // TODO: Forbidden Localization.lang("test" + var2) not covered by the test
+            //       In case this kind of code is found, an error should be reported
+            //       JabRef's infrastructure only supports Localization.lang("Some Message"); and not something else.
+            assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
 
         keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
         for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+            assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
     }
 

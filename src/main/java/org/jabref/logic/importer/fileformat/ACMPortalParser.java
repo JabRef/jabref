@@ -30,7 +30,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -83,16 +83,16 @@ public class ACMPortalParser implements Parser {
         return doiList;
     }
 
-    /**
-     * Obtain BibEntry according to DOI
-     *
-     * @param doiList DOI List
-     * @return BibEntry List
-     */
     public List<BibEntry> getBibEntriesFromDoiList(List<String> doiList) throws FetcherException {
         List<BibEntry> bibEntries = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
-        try (InputStream stream = new URLDownload(getUrlFromDoiList(doiList)).asInputStream()) {
+        URL urlFromDoiList;
+        try {
+            urlFromDoiList = getUrlFromDoiList(doiList);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Wrong URL", e);
+        }
+        try (InputStream stream = new URLDownload(urlFromDoiList).asInputStream()) {
             String jsonString = new String((stream.readAllBytes()), StandardCharsets.UTF_8);
 
             JsonElement jsonElement = JsonParser.parseString(jsonString);
@@ -104,8 +104,8 @@ public class ACMPortalParser implements Parser {
                     }
                 }
             }
-        } catch (IOException | URISyntaxException e) {
-            throw new FetcherException("A network error occurred while fetching from ", e);
+        } catch (IOException e) {
+            throw new FetcherException(urlFromDoiList, e);
         }
 
         return bibEntries;

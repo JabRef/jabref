@@ -12,12 +12,15 @@
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.integrity.IntegrityCheckDialog">
     <content>
         <VBox spacing="4.0">
-            <TableView fx:id="messagesTable" prefHeight="550" prefWidth="700.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="messagesTable" prefHeight="550" prefWidth="700.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="keyColumn" prefWidth="150.0" text="%Citation key"/>
-                    <TableColumn fx:id="fieldColumn" prefWidth="110.0" text="%Field"/>
+                    <TableColumn fx:id="keyColumn" prefWidth="150.0" maxWidth="200"  text="%Citation key"/>
+                    <TableColumn fx:id="fieldColumn" prefWidth="110.0" maxWidth="200" text="%Field"/>
                     <TableColumn fx:id="messageColumn" prefWidth="400" text="%Message"/>
                 </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN"/>
+                </columnResizePolicy>
             </TableView>
             <HBox maxHeight="30" spacing="4.0">
                 <MenuButton fx:id="keyFilterButton" prefHeight="30.0" maxHeight="30.0" text="%Citation key filters"/>

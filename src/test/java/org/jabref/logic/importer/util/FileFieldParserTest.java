@@ -1,12 +1,12 @@
 package org.jabref.logic.importer.util;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,7 +32,7 @@ class FileFieldParserTest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    public void check(LinkedFile expected, List<String> input) {
+    void check(LinkedFile expected, List<String> input) {
         // we need to convert the unmodifiable list to a modifiable because of the side effect of "convert"
         assertEquals(expected, FileFieldParser.convert(new ArrayList<>(input)));
     }
@@ -65,7 +65,7 @@ class FileFieldParserTest {
 
                 // parseCorrectOnlineInput
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile(new URL("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
+                        Collections.singletonList(new LinkedFile(URLUtil.create("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
                         ":http\\://arxiv.org/pdf/2010.08497v1:PDF"
                 ),
 
@@ -152,8 +152,8 @@ class FileFieldParserTest {
 
                 // tooManySeparators
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF")),
-                        "desc:file.pdf:PDF:asdf"
+                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF", "qwer")),
+                        "desc:file.pdf:PDF:qwer:asdf:uiop"
                 ),
 
                 // www inside filename
@@ -164,32 +164,62 @@ class FileFieldParserTest {
 
                 // url
                 Arguments.of(
-                         Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
+                        Collections.singletonList(new LinkedFile(URLUtil.create("https://books.google.de/"), "")),
                          "https://books.google.de/"
                 ),
 
                 // url with www
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
+                        Collections.singletonList(new LinkedFile(URLUtil.create("https://www.google.de/"), "")),
                              "https://www.google.de/"
                 ),
 
                 // url as file
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                        Collections.singletonList(new LinkedFile("", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // url as file with desc
                 Arguments.of(
-                             Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             Collections.singletonList(new LinkedFile("desc", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
                              "desc:http\\://ceur-ws.org/Vol-438:URL"
-               )
+                ),
+                // link with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF:matheus.ea explicit.pdf:PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // link without description and with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        ":matheus.ea explicit.pdf:PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // no link but with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF::PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // No description or file type but with sourceURL
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        ":matheus.ea explicit.pdf::https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // Absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        ":A:\\Zotero\\storage\\test.pdf"
+                ),
+                // zotero absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        "A:\\Zotero\\storage\\test.pdf"
+                )
         );
     }
 
     @ParameterizedTest
     @MethodSource
-    public void stringsToParseTest(List<LinkedFile> expected, String input) {
+    void stringsToParseTest(List<LinkedFile> expected, String input) {
         assertEquals(expected, FileFieldParser.parse(input));
     }
 }

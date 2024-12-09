@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ThreeWayMergeViewModelTest {
+class ThreeWayMergeViewModelTest {
 
     ThreeWayMergeViewModel viewModel;
     BibEntry leftEntry;
@@ -56,7 +56,7 @@ public class ThreeWayMergeViewModelTest {
 
     @Test
     void getVisibleFieldsShouldHaveEntryTypeFieldAtTheHeadOfTheList() {
-        assertEquals(InternalField.TYPE_HEADER, visibleFields.get(0));
+        assertEquals(InternalField.TYPE_HEADER, visibleFields.getFirst());
     }
 
     @Test

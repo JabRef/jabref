@@ -22,6 +22,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -29,10 +30,10 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -72,7 +73,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         if (doi.isPresent()) {
             try {
                 // Retrieve PDF link
-                String source = SOURCE_ID_SEARCH + doi.get().getDOI();
+                String source = SOURCE_ID_SEARCH + doi.get().asString();
                 var jsoupRequest = Jsoup.connect(getURLBySource(source))
                                         .userAgent(URLDownload.USER_AGENT)
                                         .header("Accept", "text/html; charset=utf-8")
@@ -114,7 +115,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             return Optional.empty();
         }
         LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
-        return Optional.of(new URL(link));
+        return Optional.of(URLUtil.create(link));
     }
 
     @Override
@@ -133,15 +134,16 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified
         uriBuilder.addParameter("fields", "paperId,externalIds,url,title,abstract,venue,year,authors");
-        LOGGER.debug("URL for query: {}", uriBuilder.build().toURL());
-        return uriBuilder.build().toURL();
+        URL result = uriBuilder.build().toURL();
+        LOGGER.debug("URL for query: {}", result);
+        return result;
     }
 
     /**

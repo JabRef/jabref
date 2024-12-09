@@ -12,6 +12,8 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
+import com.airhacks.afterburner.injection.Injector;
+
 /**
  * This class provides a super class for all dialogs implemented in JavaFX.
  * <p>
@@ -58,7 +60,7 @@ public class FXDialog extends Alert {
         }
 
         dialogWindow.getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 dialogWindow.close();
             }

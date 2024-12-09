@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +12,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
@@ -35,10 +43,19 @@ import org.slf4j.LoggerFactory;
  */
 public class MetaDataParser {
 
+    public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
-
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+
+    static {
+        DEFAULT_SAVE_ACTIONS = List.of(
+                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
+                        new ReplaceUnicodeLigaturesFormatter()));
+    }
 
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
@@ -66,6 +83,10 @@ public class MetaDataParser {
                 // Important fields are optional fields, but displayed first. Thus, they do not need to be separated by "/".
                 // See org.jabref.model.entry.field.FieldPriority for details on important optional fields.
                 .withImportantFields(FieldFactory.parseFieldList(optFields));
+        if (entryTypeBuilder.hasWarnings()) {
+            LOGGER.warn("Following custom entry type definition has duplicate fields: {}", comment);
+            return Optional.empty();
+        }
         return Optional.of(entryTypeBuilder.build());
     }
 
@@ -78,10 +99,12 @@ public class MetaDataParser {
 
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
+     *
+     * @return the given metaData instance (which is modified, too)
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
-        List<String> defaultCiteKeyPattern = new ArrayList<>();
-        Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
+        CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
+        Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
         List<Map.Entry<String, String>> entryList = new ArrayList<>(data.entrySet());
@@ -92,27 +115,27 @@ public class MetaDataParser {
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
-                nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(values)));
+                nonDefaultCiteKeyPatterns.put(entryType, new CitationKeyPattern(getSingleItem(values)));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
-                metaData.setDefaultFileDirectory(parseDirectory(entry.getValue()));
+                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX" + '-'
+                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 metaData.setLatexFileDirectory(user, path);
             } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(FieldFormatterCleanups.parse(values));
+                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
-                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(values));
+                defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
                 if (Boolean.parseBoolean(getSingleItem(values))) {
                     metaData.markAsProtected();
@@ -123,6 +146,9 @@ public class MetaDataParser {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
+            } else if (entry.getKey().equals(MetaData.GROUPS_SEARCH_SYNTAX_VERSION)) {
+                Version version = Version.parse(getSingleItem(values));
+                metaData.setGroupSearchSyntaxVersion(version);
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
                 metaData.setVersionDBStructure(getSingleItem(values));
             } else {
@@ -131,7 +157,7 @@ public class MetaDataParser {
             }
         }
 
-        if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
+        if (!defaultCiteKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
             metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 
@@ -144,7 +170,7 @@ public class MetaDataParser {
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
      *
-     * No normalization is done - the general file directory could be passed as Mac OS X path, but the user could sit on Windows.
+     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
      */
@@ -173,7 +199,7 @@ public class MetaDataParser {
      */
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
-            return value.get(0);
+            return value.getFirst();
         } else {
             throw new ParseException("Expected a single item but received " + value);
         }
@@ -226,5 +252,17 @@ public class MetaDataParser {
             return Optional.of(res.toString());
         }
         return Optional.empty();
+    }
+
+    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List<String> formatterMetaList) {
+        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
+            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
+            String formatterString = formatterMetaList.get(1);
+
+            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));
+        } else {
+            // return default actions
+            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+        }
     }
 }

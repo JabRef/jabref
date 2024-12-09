@@ -1,21 +1,22 @@
 package org.jabref.model.database;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithEmptyDbParent() {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
-        assertEquals(Collections.singletonList(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
+        assertEquals(List.of(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -46,7 +47,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
+        assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -55,7 +56,16 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
+        assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
+    }
+
+    @Test
+    void getFileDirectoriesWithDotAsDirectory() {
+        Path file = Path.of("biblio.bib");
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(currentWorkingDir.resolve(file));
+        database.getMetaData().setLibrarySpecificFileDirectory(".");
+        assertEquals(List.of(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -64,7 +74,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
+        assertEquals(List.of(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -73,10 +83,12 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        database.getMetaData().setDefaultFileDirectory("../Literature");
-        // first directory is the metadata
-        // the bib file location is not included, because only the library-configured directories should be searched and the fallback should be the global directory.
-        assertEquals(List.of(Path.of("/absolute/Literature").toAbsolutePath()),
+        database.getMetaData().setLibrarySpecificFileDirectory("../Literature");
+        assertEquals(List.of(
+                        // first directory originates from the metadata
+                        Path.of("/absolute/Literature").toAbsolutePath(),
+                        Path.of("/absolute/subdir").toAbsolutePath()
+                ),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -86,26 +98,28 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        database.getMetaData().setDefaultFileDirectory("Literature");
-        // first directory is the metadata
-        // the bib file location is not included, because only the library-configured directories should be searched and the fallback should be the global directory.
-        assertEquals(List.of(Path.of("/absolute/subdir/Literature").toAbsolutePath()),
+        database.getMetaData().setLibrarySpecificFileDirectory("Literature");
+        assertEquals(List.of(
+                        // first directory originates from the metadata
+                        Path.of("/absolute/subdir/Literature").toAbsolutePath(),
+                        Path.of("/absolute/subdir").toAbsolutePath()
+                ),
                 database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-        Path userDirJabRef = OS.getNativeDesktop().getDefaultFileChooserDirectory();
+        Path userDirJabRef = NativeDesktop.get().getDefaultFileChooserDirectory();
 
         when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
-        assertEquals(Collections.singletonList(userDirJabRef), database.getFileDirectories(fileDirPrefs));
+        assertEquals(List.of(userDirJabRef), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
-    void testTypeBasedOnDefaultBiblatex() {
+    void typeBasedOnDefaultBiblatex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -114,7 +128,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnDefaultBibtex() {
+    void typeBasedOnDefaultBibtex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -123,7 +137,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnInferredModeBiblatex() {
+    void typeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
         db.insertEntry(e1);
@@ -133,26 +147,28 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNull() {
+    void getFullTextIndexPathWhenPathIsNull() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(null);
 
-        Path expectedPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory().resolve("unsaved");
+        Path expectedPath = Directories.getFulltextIndexBaseDirectory().resolve("unsaved");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
 
         assertEquals(expectedPath, actualPath);
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNotNull() {
+    void getFullTextIndexPathWhenPathIsNotNull() {
         Path existingPath = Path.of("some_path.bib");
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(existingPath);
 
-        Path expectedPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory().resolve(existingPath.hashCode() + "");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+        assertNotNull(actualPath);
 
-        assertEquals(expectedPath, actualPath);
+        String fulltextIndexBaseDirectory = Directories.getFulltextIndexBaseDirectory().toString();
+        String actualPathStart = actualPath.toString().substring(0, fulltextIndexBaseDirectory.length());
+        assertEquals(fulltextIndexBaseDirectory, actualPathStart);
     }
 }

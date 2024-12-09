@@ -3,16 +3,19 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -48,12 +51,26 @@ public class FieldFactory {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
-    public static List<Field> getNotTextFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
+    /**
+     * Checks whether the given field contains LaTeX code or something else
+     */
+    public static boolean isLatexField(Field field) {
+        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.SINGLE_ENTRY_LINK, FieldProperty.MULTIPLE_ENTRY_LINK));
     }
 
-    public static List<Field> getIdentifierFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
+    /**
+     * Returns a collection of StandardFields where the content should not be interpreted as "plain" text, but something else (such as links to other fields, numbers, ...)
+     */
+    public static Collection<Field> getNotTextFields() {
+        Set<Field> result = Arrays.stream(StandardField.values())
+              .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+                .collect(Collectors.toSet());
+
+        // These fields are not marked as verbatim, because they could include LaTeX code
+        result.add(StandardField.MONTH);
+        result.add(StandardField.DATE);
+        result.add(StandardField.LANGUAGEID);
+        return result;
     }
 
     public static OrFields parseOrFields(String fieldNames) {
@@ -64,14 +81,14 @@ public class FieldFactory {
         return new OrFields(fields);
     }
 
-    public static Set<OrFields> parseOrFieldsList(String fieldNames) {
+    public static SequencedSet<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseOrFields)
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public static Set<Field> parseFieldList(String fieldNames) {
+    public static SequencedSet<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
@@ -122,10 +139,6 @@ public class FieldFactory {
         return parseField(null, fieldName);
     }
 
-    public static Set<Field> getKeyFields() {
-        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK));
-    }
-
     public static boolean isInternalField(Field field) {
         return field.getName().startsWith("__");
     }
@@ -161,9 +174,9 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a  List with all standard fields and the citation key field
+     * Returns a list with all standard fields and the citation key field
      */
-    public static Set<Field> getStandardFieldsWithCitationKey() {
+    public static SequencedSet<Field> getStandardFieldsWithCitationKey() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
         LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
@@ -195,12 +208,11 @@ public class FieldFactory {
         fields.addAll(EnumSet.allOf(InternalField.class));
         fields.addAll(EnumSet.allOf(SpecialField.class));
         fields.addAll(EnumSet.allOf(StandardField.class));
-        fields.removeIf(field -> field instanceof UserSpecificCommentField);
         return fields;
     }
 
     /**
-     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     * These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
      * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
@@ -211,7 +223,11 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
-    // TODO: This should ideally be user configurable! (https://github.com/JabRef/jabref/issues/9840)
+    /**
+     * Note: User configurability is discussed at <a href="https://github.com/JabRef/jabref/issues/9840">#9840</a>.
+     *
+     * @param nonWrappableFields This comes from the preferences - and introduces user configuration.
+     */
     // TODO: Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         return field.getProperties().contains(FieldProperty.MULTILINE_TEXT) || nonWrappableFields.contains(field);

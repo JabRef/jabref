@@ -6,57 +6,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ISSNTest {
+class ISSNTest {
 
     @Test
-    public void testIsCanBeCleaned() {
+    void isCanBeCleaned() {
         assertTrue(new ISSN("00279633").isCanBeCleaned());
     }
 
     @Test
-    public void testIsCanBeCleanedIncorrectRubbish() {
+    void isCanBeCleanedIncorrectRubbish() {
         assertFalse(new ISSN("A brown fox").isCanBeCleaned());
     }
 
     @Test
-    public void testIsCanBeCleanedDashAlreadyThere() {
+    void isCanBeCleanedDashAlreadyThere() {
         assertFalse(new ISSN("0027-9633").isCanBeCleaned());
     }
 
     @Test
-    public void testGetCleanedISSN() {
+    void getCleanedISSN() {
         assertEquals("0027-9633", new ISSN("00279633").getCleanedISSN());
     }
 
     @Test
-    public void testGetCleanedISSNDashAlreadyThere() {
+    void getCleanedISSNDashAlreadyThere() {
         assertEquals("0027-9633", new ISSN("0027-9633").getCleanedISSN());
     }
 
     @Test
-    public void testGetCleanedISSNDashRubbish() {
+    void getCleanedISSNDashRubbish() {
         assertEquals("A brown fox", new ISSN("A brown fox").getCleanedISSN());
     }
 
     @Test
-    public void testIsValidChecksumCorrect() {
+    void isValidChecksumCorrect() {
         assertTrue(new ISSN("0027-9633").isValidChecksum());
         assertTrue(new ISSN("2434-561X").isValidChecksum());
         assertTrue(new ISSN("2434-561x").isValidChecksum());
     }
 
     @Test
-    public void testIsValidChecksumIncorrect() {
+    void isValidChecksumIncorrect() {
         assertFalse(new ISSN("0027-9634").isValidChecksum());
     }
 
     @Test
-    public void testIsValidFormatCorrect() {
+    void isValidFormatCorrect() {
         assertTrue(new ISSN("0027-963X").isValidFormat());
     }
 
     @Test
-    public void testIsValidFormatIncorrect() {
+    void isValidFormatIncorrect() {
         assertFalse(new ISSN("00279634").isValidFormat());
     }
 }

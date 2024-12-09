@@ -1,15 +1,17 @@
 package org.jabref.logic.importer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
@@ -17,8 +19,9 @@ import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
+import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
+import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -35,7 +38,10 @@ import static org.mockito.Mockito.mock;
 class WebFetchersTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebFetchersTest.class);
-    private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of("ArXivFetcher$ArXiv");
+
+    private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of(
+            "org.jabref.logic.importer.fetcher.ArXivFetcher$ArXiv",
+            "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel");
 
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
@@ -49,7 +55,7 @@ class WebFetchersTest {
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
         return IGNORED_INACCESSIBLE_FETCHERS.stream()
-                     .map(className -> "org.jabref.logic.importer.fetcher." + className)
+                     .map(className -> "" + className)
                      .map(classPath -> {
                          try {
                              return Class.forName(classPath);
@@ -113,7 +119,9 @@ class WebFetchersTest {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            Set<Class<?>> expected = new TreeSet<>(Comparator.comparing(Class::getName));
+            expected.addAll(controlClasses.loadClasses());
 
             // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -129,8 +137,9 @@ class WebFetchersTest {
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
 
-            // Remove GROBID, because we don't want to show this to the user
-            expected.remove(GrobidCitationFetcher.class);
+            // Remove GROBID and LLM, because we don't want to show this to the user (since they convert text to BibTeX)
+            expected.remove(GrobidPlainCitationParser.class);
+            expected.remove(LlmPlainCitationParser.class);
 
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
@@ -175,6 +184,8 @@ class WebFetchersTest {
     }
 
     private Set<? extends Class<?>> getClasses(Collection<?> objects) {
-        return objects.stream().map(Object::getClass).collect(Collectors.toSet());
+        return objects.stream()
+                      .map(Object::getClass)
+                      .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Class::getName))));
     }
 }

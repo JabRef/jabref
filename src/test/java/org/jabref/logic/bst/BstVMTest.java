@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,7 +31,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testAbbrv() throws RecognitionException, IOException {
+    void abbrv() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
@@ -43,7 +44,22 @@ public class BstVMTest {
     }
 
     @Test
-    public void testSimple() throws RecognitionException {
+    void ieeetran() throws RecognitionException, IOException {
+        BstVM vm = new BstVM(Path.of("src/main/resources/bst/IEEEtran.bst"));
+        List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
+
+        String expected = """
+                %GeneratedbyIEEEtran.bst,version:1.14(2015/08/26)\\begin{thebibliography}{1}\\providecommand{\\url}[1]{#1}\\csnameurl@samestyle\\endcsname\\providecommand{\\newblock}{\\relax}\\providecommand{\\bibinfo}[2]{#2}\\providecommand{\\BIBentrySTDinterwordspacing}{\\spaceskip=0pt\\relax}\\providecommand{\\BIBentryALTinterwordstretchfactor}{4}\\providecommand{\\BIBentryALTinterwordspacing}{\\spaceskip=\\fontdimen2\\fontplus\\BIBentryALTinterwordstretchfactor\\fontdimen3\\fontminus\\fontdimen4\\font\\relax}\\providecommand{\\BIBforeignlanguage}[2]{{%\\expandafter\\ifx\\csnamel@#1\\endcsname\\relax\\typeout{**WARNING:IEEEtran.bst:Nohyphenationpatternhasbeen}%\\typeout{**loadedforthelanguage`#1'.Usingthepatternfor}%\\typeout{**thedefaultlanguageinstead.}%\\else\\language=\\csnamel@#1\\endcsname\\fi#2}}\\providecommand{\\BIBdecl}{\\relax}\\BIBdecl\\bibitem{Smith2016}\\BIBentryALTinterwordspacingB.~Smith,B.~Jones,andJ.~Williams,``Titleofthetestentry''\\emph{BibTeXJournal},vol.~34,no.~3,pp.45--67,July2016.[Online].Available:\\url{https://github.com/JabRef}\\BIBentrySTDinterwordspacing\\end{thebibliography}
+                """;
+        String result = vm.render(testEntries);
+
+        assertEquals(
+                expected.replaceAll("\\s", ""),
+                result.replaceAll("\\s", ""));
+    }
+
+    @Test
+    void simple() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { address author title type } { } { label }
                 INTEGERS { output.state before.all mid.sentence after.sentence after.block }
@@ -63,12 +79,12 @@ public class BstVMTest {
         assertEquals(2, vm.latestContext.strings().size());
         assertEquals(7, vm.latestContext.integers().size());
         assertEquals(1, vm.latestContext.entries().size());
-        assertEquals(5, vm.latestContext.entries().get(0).fields.size());
+        assertEquals(5, vm.latestContext.entries().getFirst().fields.size());
         assertEquals(38, vm.latestContext.functions().size());
     }
 
     @Test
-    public void testLabel() throws RecognitionException {
+    void label() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } {} { label }
                 FUNCTION { test } {
@@ -88,7 +104,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testQuote() throws RecognitionException {
+    void quote() throws RecognitionException {
         BstVM vm = new BstVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
 
         vm.render(Collections.emptyList());
@@ -96,7 +112,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testBuildIn() throws RecognitionException {
+    void buildIn() throws RecognitionException {
         BstVM vm = new BstVM("EXECUTE { global.max$ }");
 
         vm.render(Collections.emptyList());
@@ -106,7 +122,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testVariables() throws RecognitionException {
+    void variables() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { not } {
@@ -125,7 +141,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testHypthenatedName() throws RecognitionException, IOException {
+    void hyphenatedName() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)
@@ -139,7 +155,7 @@ public class BstVMTest {
     }
 
     @Test
-    void testAbbrevStyleChopWord() {
+    void abbrevStyleChopWord() {
         BstVM vm = new BstVM("""
                 STRINGS { s }
                 INTEGERS { len }
@@ -175,7 +191,7 @@ public class BstVMTest {
     }
 
     @Test
-    void testAbbrevStyleSortFormatTitle() {
+    void abbrevStyleSortFormatTitle() {
         BstVM vm = new BstVM("""
                 STRINGS { s t }
                 INTEGERS { len }

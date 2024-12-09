@@ -6,9 +6,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.ParseException;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * Converts an {@link InputStream} into a {@link JSONObject}.

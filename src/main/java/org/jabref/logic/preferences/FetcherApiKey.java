@@ -20,6 +20,10 @@ public class FetcherApiKey {
         return name.getValue();
     }
 
+    public StringProperty nameProperty() {
+        return name;
+    }
+
     public boolean shouldUse() {
         return use.getValue();
     }

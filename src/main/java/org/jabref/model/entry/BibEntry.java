@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,7 +17,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -45,34 +48,34 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
  * <p>
- *     Example:
+ * Example:
  *
- *     <pre>{@code
+ * <pre>{@code
  * Some commment
  * @misc{key,
  *   fieldName = {fieldValue},
- *   otherFieldName = {otherVieldValue}
+ *   otherFieldName = {otherFieldValue}
  * }
- *     }</pre>
- *
- *     Then,
+ * }</pre>
+ * <p>
+ * Then,
  *     <ul>
  *         <li>"Some comment" is the comment before the entry,</li>
  *         <li>"misc" is the entry type</li>
  *         <li>"key" the citation key</li>
  *         <li>"fieldName" and "otherFieldName" the fields of the BibEntry</li>
  *     </ul>
- * </p>
- * <p>
  * A BibTeX entry has following properties:
  * <ul>
  *     <li>comments before entry</li>
@@ -89,7 +92,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </p>
  * <p>
- * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}.
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}. All these methods set {@link #hasChanged()} to <code>false</code>. In case <code>changed</code>, use {@link #withChanged(boolean)}.
  * </p>
  */
 @AllowedToUseLogic("because it needs access to parser and writers")
@@ -146,6 +149,11 @@ public class BibEntry implements Cloneable {
         this(DEFAULT_TYPE);
     }
 
+    public BibEntry(String citationKey) {
+        this();
+        this.setCitationKey(citationKey);
+    }
+
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -155,8 +163,17 @@ public class BibEntry implements Cloneable {
         this.sharedBibEntryData = new SharedBibEntryData();
     }
 
+    public BibEntry(EntryType type, String citationKey) {
+        this(type);
+        this.setCitationKey(citationKey);
+    }
+
     public Optional<FieldChange> setMonth(Month parsedMonth) {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
+    }
+
+    public Optional<FieldChange> setLangid(Langid parsedLangid) {
+        return setField(StandardField.LANGUAGEID, parsedLangid.getJabRefFormat());
     }
 
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
@@ -299,22 +316,21 @@ public class BibEntry implements Cloneable {
      * If a database is given, this function will try to resolve any string
      * references in the field-value.
      * Also, if a database is given, this function will try to find values for
-     * unset fields in the entry linked by the "crossref" field, if any.
+     * unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
      *
      * @param field    The field to return the value of.
-     * @param database maybenull
-     *                 The database of the bibtex entry.
+     * @param database The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
 
-    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);
     }
 
-    private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
+    private Optional<String> genericGetResolvedFieldOrAlias(Field field, @Nullable BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
         if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {
             return Optional.of(type.get().getDisplayName());
         }
@@ -345,19 +361,22 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns this entry's ID.
+     * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
+     * <p>
+     * It is <emph>not</emph> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the citation key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
+     * Sets this entry's identifier (ID).
      * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
      */
+    @VisibleForTesting
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
@@ -384,6 +403,9 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /**
+     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
+     */
     public Optional<String> getCitationKey() {
         String key = fields.get(InternalField.KEY_FIELD);
         if (StringUtil.isBlank(key)) {
@@ -443,6 +465,13 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
+     */
+    public SequencedSet<Field> getFields(Predicate<Field> selector) {
+        return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /**
      * Returns the contents of the given field as an Optional.
      */
     public Optional<String> getField(Field field) {
@@ -460,6 +489,7 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
+                // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
                 String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
                 latexFreeFields.put(field, latexFreeValue);
                 return Optional.of(latexFreeValue);
@@ -564,7 +594,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     * Return the LaTeX-free contents of the given field or its alias an Optional
      * <p>
      * For details see also {@link #getFieldOrAlias(Field)}
      *
@@ -594,7 +624,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value must not be null");
+        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
         Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
         if (value.isEmpty()) {
@@ -602,11 +632,11 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(field).orElse(null);
-        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
 
+        boolean isNewField = oldValue == null;
         changed = true;
 
         invalidateFieldCache(field);
@@ -680,6 +710,7 @@ public class BibEntry implements Cloneable {
     /**
      * Returns a clone of this entry. Useful for copying.
      * This will set a new ID for the cloned entry to be able to distinguish both copies.
+     * Does <em>not</em> port the listeners.
      */
     @Override
     public Object clone() {
@@ -698,13 +729,23 @@ public class BibEntry implements Cloneable {
      * to a) enable debugging the internal representation and b) save time at this method.
      * <p>
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
+     * <p>
+     * Alternative for some more readable output: {@link #getAuthorTitleYear(int)}
      */
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
+    public String getAuthorTitleYear() {
+        return getAuthorTitleYear(0);
+    }
+
     /**
+     * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
+     *
+     * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
+     *
      * @param maxCharacters The maximum number of characters (additional
      *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:
@@ -918,7 +959,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(commentsBeforeEntry, type.getValue(), fields);
+        return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
     }
 
     public void registerListener(Object object) {
@@ -945,6 +986,7 @@ public class BibEntry implements Cloneable {
      */
     public BibEntry withFields(Map<Field, String> content) {
         this.fields = FXCollections.observableMap(new HashMap<>(content));
+        this.setChanged(false);
         return this;
     }
 
@@ -969,6 +1011,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withUserComments(String commentsBeforeEntry) {
         this.commentsBeforeEntry = commentsBeforeEntry;
+        this.setChanged(false);
         return this;
     }
 
@@ -1028,6 +1071,7 @@ public class BibEntry implements Cloneable {
         }
     }
 
+    // region files
     public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(StandardField.FILE);
         String newValue = FileFieldWriter.getStringRepresentation(files);
@@ -1039,20 +1083,71 @@ public class BibEntry implements Cloneable {
         return this.setField(StandardField.FILE, newValue);
     }
 
+    public BibEntry withFiles(List<LinkedFile> files) {
+        setFiles(files);
+        this.setChanged(false);
+        return this;
+    }
+
     /**
      * Gets a list of linked files.
      *
      * @return the list of linked files, is never null but can be empty.
-     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
      */
     public List<LinkedFile> getFiles() {
-        // Extract the path
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
             return new ArrayList<>(); // Return new ArrayList because emptyList is immutable
         }
 
+        // Extract the path
         return FileFieldParser.parse(oldValue.get());
+    }
+
+    public Optional<FieldChange> addFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFile(int index, LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(index, file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFiles(List<LinkedFile> filesToAdd) {
+        if (filesToAdd.isEmpty()) {
+            return Optional.empty();
+        }
+        if (this.getField(StandardField.FILE).isEmpty()) {
+            return setFiles(filesToAdd);
+        }
+        List<LinkedFile> currentFiles = getFiles();
+        currentFiles.addAll(filesToAdd);
+        return setFiles(currentFiles);
+    }
+    // endregion
+
+    /**
+     * Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+     * <p>
+     * Empty citation keys are not returned. There is no consistency check made.
+     *
+     * @return List of citation keys; empty list if field is empty or not available.
+     */
+    public SequencedSet<String> getCites() {
+        return this.getField(StandardField.CITES)
+                   .map(content -> Arrays.stream(content.split(",")))
+                   .orElseGet(Stream::empty)
+                   .map(String::trim)
+                   .filter(key -> !key.isEmpty())
+                   .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public Optional<FieldChange> setCites(SequencedSet<String> keys) {
+        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
     }
 
     public void setDate(Date date) {
@@ -1074,18 +1169,6 @@ public class BibEntry implements Cloneable {
 
     public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
-    }
-
-    public Optional<FieldChange> addFile(LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(file);
-        return setFiles(linkedFiles);
-    }
-
-    public Optional<FieldChange> addFile(int index, LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(index, file);
-        return setFiles(linkedFiles);
     }
 
     public ObservableMap<Field, String> getFieldsObservable() {
@@ -1122,7 +1205,7 @@ public class BibEntry implements Cloneable {
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, downloadedFile);
+            linkedFiles.addFirst(downloadedFile);
         } else {
             linkedFiles.set(oldFileIndex, downloadedFile);
         }

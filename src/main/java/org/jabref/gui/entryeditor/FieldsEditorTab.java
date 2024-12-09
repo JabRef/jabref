@@ -24,66 +24,63 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab {
-    protected final BibDatabaseContext databaseContext;
+abstract class FieldsEditorTab extends TabWithPreviewPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
+
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
-    private final DialogService dialogService;
-    private final PreferencesService preferences;
-    private final ThemeManager themeManager;
-    private final TaskExecutor taskExecutor;
+    private final UndoAction undoAction;
+    private final RedoAction redoAction;
+    private final GuiPreferences preferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final StateManager stateManager;
-    private final IndexingTaskManager indexingTaskManager;
-    private PreviewPanel previewPanel;
     private final UndoManager undoManager;
+
     private Collection<Field> fields = new ArrayList<>();
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
                            BibDatabaseContext databaseContext,
                            SuggestionProviders suggestionProviders,
                            UndoManager undoManager,
-                           DialogService dialogService,
-                           PreferencesService preferences,
-                           StateManager stateManager,
-                           ThemeManager themeManager,
-                           TaskExecutor taskExecutor,
+                           UndoAction undoAction,
+                           RedoAction redoAction,
+                           GuiPreferences preferences,
                            JournalAbbreviationRepository journalAbbreviationRepository,
-                           IndexingTaskManager indexingTaskManager) {
+                           PreviewPanel previewPanel) {
+        super(databaseContext, previewPanel);
         this.isCompressed = compressed;
-        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
         this.undoManager = Objects.requireNonNull(undoManager);
-        this.dialogService = Objects.requireNonNull(dialogService);
+        this.undoAction = undoAction;
+        this.redoAction = redoAction;
         this.preferences = Objects.requireNonNull(preferences);
-        this.themeManager = themeManager;
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.stateManager = stateManager;
-        this.indexingTaskManager = indexingTaskManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -144,14 +141,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     protected Label createLabelAndEditor(BibEntry entry, Field field) {
         FieldEditorFX fieldEditor = FieldEditors.getForField(
                 field,
-                taskExecutor,
-                dialogService,
                 journalAbbreviationRepository,
                 preferences,
                 databaseContext,
                 entry.getType(),
                 suggestionProviders,
-                undoManager);
+                undoManager,
+                undoAction,
+                redoAction);
         fieldEditor.bindToEntry(entry);
         editors.put(field, fieldEditor);
         return new FieldNameLabel(field);
@@ -205,23 +202,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         initPanel();
         setupPanel(entry, isCompressed);
-        if (previewPanel != null) {
-            previewPanel.setEntry(entry);
-        }
-    }
-
-    @Override
-    protected void nextPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.nextPreviewStyle();
-        }
-    }
-
-    @Override
-    protected void previousPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.previousPreviewStyle();
-        }
+        super.bindToEntry(entry);
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
@@ -244,23 +225,59 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            previewPanel = new PreviewPanel(
-                    databaseContext,
-                    dialogService,
-                    preferences.getKeyBindingRepository(),
-                    preferences,
-                    stateManager,
-                    themeManager,
-                    indexingTaskManager,
-                    taskExecutor);
-            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
-                if (show) {
-                    container.getItems().remove(previewPanel);
-                } else {
-                    container.getItems().add(1, previewPanel);
-                }
-            });
             setContent(container);
+
+            // Adaption of visible tabs done in {@link org.jabref.gui.entryeditor.EntryEditor.EntryEditor}, where the subscription to
+            // preferences.getPreviewPreferences().showPreviewAsExtraTabProperty() is established
+
+            // save divider position
+            dividerPositionSubscription = EasyBind.valueAt(container.getDividers(), 0)
+                                                  .mapObservable(SplitPane.Divider::positionProperty)
+                                                  .subscribeToValues(this::savePreviewWidthDividerPosition);
+        }
+    }
+
+    private void addPreviewPanel() {
+        assert this.getContent() instanceof SplitPane;
+
+        // Really ensure it is not already there
+        removePreviewPanelFromThisTab();
+
+        if ((this.getContent() instanceof SplitPane splitPane) && !splitPane.getItems().contains(previewPanel) && this.getContent().isVisible()) {
+            splitPane.getItems().add(1, previewPanel);
+            splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
+        }
+    }
+
+    public void removePreviewPanelFromThisTab() {
+        assert this.getContent() instanceof SplitPane;
+        if (this.getContent() instanceof SplitPane splitPane) {
+            splitPane.getItems().remove(previewPanel);
+            // Needed to "redraw" the split pane with one item (because JavaFX does not readjust if it is shown)
+            // splitPane.setDividerPositions(1.0);
+        }
+    }
+
+    @Override
+    protected void handleFocus() {
+        LOGGER.trace("This is {}", preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
+        LOGGER.trace("This is then {}", !preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get());
+        if (!preferences.getPreviewPreferences().showPreviewAsExtraTabProperty().get()) {
+            LOGGER.trace("Focus on preview panel");
+
+            // We need to move the preview panel from the non-visible tab to the visible tab
+            removePreviewPanelFromOtherTabs();
+            addPreviewPanel();
+        }
+    }
+
+    private void savePreviewWidthDividerPosition(Number position) {
+        if (position.doubleValue() == 1.0) {
+            return;
+        }
+        if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
+            preferences.getEntryEditorPreferences().setPreviewWidthDividerPosition(position.doubleValue());
         }
     }
 }
+

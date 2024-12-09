@@ -38,7 +38,7 @@ class DatabaseFileLookupTest {
      * Tests the prerequisites of this test-class itself.
      */
     @Test
-    void testTestDatabase() {
+    void prerequisitesFulfilled() {
         assertEquals(2, database.getEntryCount());
         assertEquals(2, entries.size());
         assertNotNull(entry1);

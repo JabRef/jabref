@@ -9,6 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class PersistenceVisualStateTable {
     /**
      * Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
      * The conversion to the "real" string in the preferences is made at
-     * {@link org.jabref.preferences.JabRefPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
+     * {@link JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
      */
     private void updateColumns() {
         List<MainTableColumnModel> list = toList(table.getColumns());
@@ -67,8 +68,9 @@ public class PersistenceVisualStateTable {
 
     private List<MainTableColumnModel> toList(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
         return columns.stream()
-                .filter(col -> col instanceof MainTableColumn<?>)
-                .map(column -> ((MainTableColumn<?>) column).getModel())
-                .collect(Collectors.toList());
+                      .filter(col -> col instanceof MainTableColumn<?>)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .filter(model -> model.getType() != MainTableColumnModel.Type.MATCH_CATEGORY)
+                      .collect(Collectors.toList());
     }
 }

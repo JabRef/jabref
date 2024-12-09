@@ -2,9 +2,9 @@ package org.jabref.gui.help;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.preferences.FilePreferences;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
@@ -14,18 +14,19 @@ public class HelpAction extends SimpleCommand {
 
     private final HelpFile helpPage;
     private final DialogService dialogService;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationPreferences;
 
-    public HelpAction(HelpFile helpPage, DialogService dialogService, FilePreferences filePreferences) {
+    public HelpAction(HelpFile helpPage, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.helpPage = helpPage;
         this.dialogService = dialogService;
-        this.filePreferences = filePreferences;
+        this.externalApplicationPreferences = externalApplicationsPreferences;
     }
 
     void openHelpPage(HelpFile helpPage) {
         StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
         sb.append(helpPage.getPageName());
-        JabRefDesktop.openBrowserShowPopup(sb.toString(), dialogService, filePreferences);
+        NativeDesktop.openBrowserShowPopup(sb.toString(), dialogService, externalApplicationPreferences
+        );
     }
 
     @Override

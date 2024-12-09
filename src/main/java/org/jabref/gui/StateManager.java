@@ -4,34 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyListProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.util.OptionalUtil;
+import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
  *   <li>dialog window sizes/positions</li>
+ *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
  * </ul>
  */
 public class StateManager {
@@ -56,26 +58,26 @@ public class StateManager {
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
-    private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
+    private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
-    private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, IndexManager> indexManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
-    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
+    private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
+    private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.getValue().progressProperty(), task.getValue().runningProperty()});
-    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
-    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
+    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(() -> !runningBackgroundTasks.isEmpty(), runningBackgroundTasks);
+    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
-
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
-
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-
-    public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
-    }
+    private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -93,20 +95,16 @@ public class StateManager {
         return activeDatabase;
     }
 
-    public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
-        return activeSearchQuery;
+    public OptionalObjectProperty<LibraryTab> activeTabProperty() {
+        return activeTab;
     }
 
-    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database, resultSize);
+    public OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;
     }
 
-    public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
-    }
-
-    public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
-        return activeGroups.getReadOnlyProperty();
+    public IntegerProperty searchResultSize(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
     }
 
     public ObservableList<BibEntry> getSelectedEntries() {
@@ -117,18 +115,25 @@ public class StateManager {
         selectedEntries.setAll(newSelectedEntries);
     }
 
-    public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
+    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
-        selectedGroups.put(database, FXCollections.observableArrayList(newSelectedGroups));
+        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
-    public ObservableList<GroupTreeNode> getSelectedGroup(BibDatabaseContext database) {
-        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(database);
-        return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
+    public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
+        return selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList());
     }
 
-    public void clearSelectedGroups(BibDatabaseContext database) {
-        selectedGroups.remove(database);
+    public void clearSelectedGroups(BibDatabaseContext context) {
+        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
+    }
+
+    public void setIndexManager(BibDatabaseContext database, IndexManager indexManager) {
+        indexManagers.put(database.getUid(), indexManager);
+    }
+
+    public Optional<IndexManager> getIndexManager(BibDatabaseContext database) {
+        return Optional.ofNullable(indexManagers.get(database.getUid()));
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
@@ -144,19 +149,6 @@ public class StateManager {
         }
     }
 
-    public List<BibEntry> getEntriesInCurrentDatabase() {
-        return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
-                           .collect(Collectors.toList());
-    }
-
-    public void clearSearchQuery() {
-        activeSearchQuery.setValue(Optional.empty());
-    }
-
-    public void setSearchQuery(SearchQuery searchQuery) {
-        activeSearchQuery.setValue(Optional.of(searchQuery));
-    }
-
     public OptionalObjectProperty<Node> focusOwnerProperty() {
         return focusOwner;
     }
@@ -166,14 +158,18 @@ public class StateManager {
     }
 
     public ObservableList<Task<?>> getBackgroundTasks() {
-        return EasyBind.map(backgroundTasks, Pair::getValue);
+        return backgroundTasks;
+    }
+
+    public ObservableList<Task<?>> getRunningBackgroundTasks() {
+        return runningBackgroundTasks;
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
+        this.backgroundTasksPairs.addFirst(new Pair<>(backgroundTask, task));
     }
 
-    public EasyBinding<Boolean> getAnyTaskRunning() {
+    public BooleanBinding getAnyTaskRunning() {
         return anyTaskRunning;
     }
 
@@ -195,10 +191,6 @@ public class StateManager {
 
     public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
         return lastAutomaticFieldEditorEdit;
-    }
-
-    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
-        return lastAutomaticFieldEditorEditProperty().get();
     }
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
@@ -234,5 +226,9 @@ public class StateManager {
 
     public void clearSearchHistory() {
         searchHistory.clear();
+    }
+
+    public List<AiChatWindow> getAiChatWindows() {
+        return aiChatWindows;
     }
 }

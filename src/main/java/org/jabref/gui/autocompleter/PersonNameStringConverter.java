@@ -2,6 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import javafx.util.StringConverter;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
@@ -42,11 +43,11 @@ public class PersonNameStringConverter extends StringConverter<Author> {
         if (autoCompLF) {
             switch (autoCompleteFirstNameMode) {
                 case ONLY_ABBREVIATED:
-                    return author.getLastFirst(true);
+                    return author.getFamilyGiven(true);
                 case ONLY_FULL:
-                    return author.getLastFirst(false);
+                    return author.getFamilyGiven(false);
                 case BOTH:
-                    return author.getLastFirst(true);
+                    return author.getFamilyGiven(true);
                 default:
                     break;
             }
@@ -54,16 +55,16 @@ public class PersonNameStringConverter extends StringConverter<Author> {
         if (autoCompFF) {
             switch (autoCompleteFirstNameMode) {
                 case ONLY_ABBREVIATED:
-                    return author.getFirstLast(true);
+                    return author.getGivenFamily(true);
                 case ONLY_FULL:
-                    return author.getFirstLast(false);
+                    return author.getGivenFamily(false);
                 case BOTH:
-                    return author.getFirstLast(true);
+                    return author.getGivenFamily(true);
                 default:
                     break;
             }
         }
-        return author.getLastOnly();
+        return author.getNamePrefixAndFamilyName();
     }
 
     @Override

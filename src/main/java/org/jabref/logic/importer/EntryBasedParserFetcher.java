@@ -10,8 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:
@@ -19,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
  * 2. Parse the response to get a list of {@link BibEntry}
  * 3. Post-process fetched entries
  */
-public interface EntryBasedParserFetcher extends EntryBasedFetcher {
+public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetcher {
 
     /**
      * Constructs a URL based on the {@link BibEntry}.
@@ -33,38 +34,20 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
      */
     Parser getParser();
 
-    /**
-     * Performs a cleanup of the fetched entry.
-     *
-     * Only systematic errors of the fetcher should be corrected here
-     * (i.e. if information is consistently contained in the wrong field or the wrong format)
-     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
-     *
-     * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
-     *
-     * By default, no cleanup is done.
-     *
-     * @param entry the entry to be cleaned-up
-     */
-    default void doPostCleanup(BibEntry entry) {
-        // Do nothing by default
-    }
-
     @Override
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        URL UrlForEntry;
+        URL urlForEntry;
         try {
-            if ((UrlForEntry = getURLForEntry(entry)) == null) {
+            if ((urlForEntry = getURLForEntry(entry)) == null) {
                 return Collections.emptyList();
             }
         } catch (MalformedURLException | URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
+        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
@@ -73,9 +56,11 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
             return fetchedEntries;
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("A network error occurred", e);
+            //       Same TODO as in org.jabref.logic.net.URLDownload.openConnection. Code should be reused.
+            LoggerFactory.getLogger(EntryBasedParserFetcher.class).error("Could not fetch from URL {}", urlForEntry, e);
+            throw new FetcherException(urlForEntry, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urlForEntry, "An internal parser error occurred", e);
         }
     }
 }

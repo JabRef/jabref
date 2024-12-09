@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.backend;
 
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.backend.NamedRange;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
@@ -17,7 +18,7 @@ import com.sun.star.text.XTextRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class NamedRangeReferenceMark implements NamedRange {
+public class NamedRangeReferenceMark implements NamedRange {
 
     private static final String ZERO_WIDTH_SPACE = "\u200b";
 
@@ -57,7 +58,7 @@ class NamedRangeReferenceMark implements NamedRange {
      * @param numSpaces Number of spaces to insert.
      * @return a new cursor, covering the just-inserted spaces.
      */
-    private static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
+    public static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
         // Start with an empty cursor at position.getStart();
         XText text = position.getText();
         XTextCursor cursor = text.createTextCursorByRange(position.getStart());
@@ -101,8 +102,8 @@ class NamedRangeReferenceMark implements NamedRange {
                 : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
-
-        UnoReferenceMark.create(doc, refMarkName, cursor, true /* absorb */);
+        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
+        UnoReferenceMark.create(documentAnnotation);
 
         // eat the first inserted space
         cursorBefore.goRight((short) 1, true);
@@ -214,13 +215,13 @@ class NamedRangeReferenceMark implements NamedRange {
             Optional<XTextContent> markAsTextContent = UnoReferenceMark.getAsTextContent(doc, name);
 
             if (markAsTextContent.isEmpty()) {
-                String msg = String.format("getFillCursor: markAsTextContent(%s).isEmpty (attempt %d)", name, i);
+                String msg = "getFillCursor: markAsTextContent(%s).isEmpty (attempt %d)".formatted(name, i);
                 throw new IllegalStateException(msg);
             }
 
             full = UnoCursor.getTextCursorOfTextContentAnchor(markAsTextContent.get()).orElse(null);
             if (full == null) {
-                String msg = String.format("getFillCursor: full == null (attempt %d)", i);
+                String msg = "getFillCursor: full == null (attempt %d)".formatted(i);
                 throw new IllegalStateException(msg);
             }
 
@@ -234,7 +235,7 @@ class NamedRangeReferenceMark implements NamedRange {
             } else {
                 // (fullText.length() < 2)
                 if (i == 2) {
-                    String msg = String.format("getFillCursor: (fullText.length() < 2) (attempt %d)", i);
+                    String msg = "getFillCursor: (fullText.length() < 2) (attempt %d)".formatted(i);
                     throw new IllegalStateException(msg);
                 }
                 // too short, recreate
@@ -345,8 +346,8 @@ class NamedRangeReferenceMark implements NamedRange {
         if (leftLength > 0) {
             alpha.goLeft(leftLength, true);
             if (!left.equals(alpha.getString())) {
-                String msg = String.format("checkFillCursor:"
-                                + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'",
+                String msg = ("checkFillCursor:"
+                        + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'").formatted(
                         cursor.getString(), alpha.getString());
                 throw new IllegalStateException(msg);
             }
@@ -357,8 +358,8 @@ class NamedRangeReferenceMark implements NamedRange {
         if (rightLength > 0) {
             omega.goRight(rightLength, true);
             if (!right.equals(omega.getString())) {
-                String msg = String.format("checkFillCursor:"
-                                + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'",
+                String msg = ("checkFillCursor:"
+                        + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'").formatted(
                         cursor.getString(), omega.getString());
                 throw new IllegalStateException(msg);
             }
@@ -390,13 +391,13 @@ class NamedRangeReferenceMark implements NamedRange {
 
         final String left = REFERENCE_MARK_LEFT_BRACKET;
         if (!fullText.startsWith(left)) {
-            String msg = String.format("cleanFillCursor: (%s) does not start with REFERENCE_MARK_LEFT_BRACKET", name);
+            String msg = "cleanFillCursor: (%s) does not start with REFERENCE_MARK_LEFT_BRACKET".formatted(name);
             throw new IllegalStateException(msg);
         }
 
         final String right = REFERENCE_MARK_RIGHT_BRACKET;
         if (!fullText.endsWith(right)) {
-            String msg = String.format("cleanFillCursor: (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET", name);
+            String msg = "cleanFillCursor: (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET".formatted(name);
             throw new IllegalStateException(msg);
         }
 
@@ -405,7 +406,7 @@ class NamedRangeReferenceMark implements NamedRange {
         final short rightLength = (short) right.length();
         final int contentLength = fullTextLength - (leftLength + rightLength);
         if (contentLength < 0) {
-            String msg = String.format("cleanFillCursor: length(%s) < 0", name);
+            String msg = "cleanFillCursor: length(%s) < 0".formatted(name);
             throw new IllegalStateException(msg);
         }
 

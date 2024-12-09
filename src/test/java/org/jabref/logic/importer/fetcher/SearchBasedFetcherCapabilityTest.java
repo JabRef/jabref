@@ -6,18 +6,22 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Defines the set of capability tests that each tests a given search capability, e.g. author based search.
@@ -36,14 +40,16 @@ interface SearchBasedFetcherCapabilityTest {
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
 
             // The co-authors differ, thus we check for the author present at all papers
-            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+            getTestAuthors().forEach(expectedAuthor -> assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
         });
     }
 
@@ -53,7 +59,9 @@ interface SearchBasedFetcherCapabilityTest {
     @Test
     default void supportsYearSearch() throws Exception {
         List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -72,7 +80,9 @@ interface SearchBasedFetcherCapabilityTest {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
         List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -92,7 +102,9 @@ interface SearchBasedFetcherCapabilityTest {
     @Test
     default void supportsJournalSearch() throws Exception {
         List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {

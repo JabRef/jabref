@@ -20,7 +20,7 @@ Style-checks are done for each pull request and installing this code style confi
 # Eclipse:
 
 The Eclipse code formatter style is stored in the `eclipse.gradle` file and gets imported automatically.
-In case the formatter style needs to be adapted, configure it and export in in eclipse.
+In case the formatter style needs to be adapted, configure it and export in eclipse.
 
 1. Right click on the eclipse project "JabRef"
 2. Select "Export > General > Preferences"

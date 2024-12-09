@@ -65,14 +65,14 @@ public class DatabaseChangeList {
     }
 
     private static DatabaseChange createBibEntryDiff(BibDatabaseContext originalDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory, BibEntryDiff diff) {
-        if (diff.getOriginalEntry() == null) {
-            return new EntryAdd(diff.getNewEntry(), originalDatabase, databaseChangeResolverFactory);
+        if (diff.originalEntry() == null) {
+            return new EntryAdd(diff.newEntry(), originalDatabase, databaseChangeResolverFactory);
         }
 
-        if (diff.getNewEntry() == null) {
-            return new EntryDelete(diff.getOriginalEntry(), originalDatabase, databaseChangeResolverFactory);
+        if (diff.newEntry() == null) {
+            return new EntryDelete(diff.originalEntry(), originalDatabase, databaseChangeResolverFactory);
         }
 
-        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), originalDatabase, databaseChangeResolverFactory);
+        return new EntryChange(diff.originalEntry(), diff.newEntry(), originalDatabase, databaseChangeResolverFactory);
     }
 }

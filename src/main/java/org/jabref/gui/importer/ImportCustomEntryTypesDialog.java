@@ -10,9 +10,9 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -22,7 +22,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     private final List<BibEntryType> customEntryTypes;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
     @FXML private VBox boxDifferentCustomization;
 
     @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;
@@ -55,7 +55,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
+        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferences);
         boxDifferentCustomization.visibleProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());

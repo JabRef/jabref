@@ -73,6 +73,10 @@ public class KeywordList implements Iterable<Keyword> {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
+    public static String serialize(List<Keyword> keywords, Character delimiter) {
+        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+    }
+
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
         KeywordList keywordListA = parse(keywordStringA, delimiter);
         KeywordList keywordListB = parse(keywordStringB, delimiter);

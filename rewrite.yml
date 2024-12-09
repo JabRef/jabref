@@ -94,17 +94,20 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UseAsBuilder
   # "Upgrades" too much, deletes fields
   #  - org.openrewrite.staticanalysis.UseCollectionInterfaces
-  # Does not work at TreeNode
-  #  - org.openrewrite.staticanalysis.UseDiamondOperator
   # States that it gains performance, but the code is more unreable
   #  - org.openrewrite.staticanalysis.UseForEachRemoveInsteadOfSetRemoveAll
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
+  - org.openrewrite.java.migrate.net.JavaNetAPIs
+  - org.openrewrite.java.migrate.net.URLConstructorsToURIRecipes
+  - org.openrewrite.java.migrate.util.OptionalNotEmptyToIsPresent
+  - org.openrewrite.java.migrate.util.OptionalNotPresentToIsEmpty
+  - org.openrewrite.java.migrate.util.SequencedCollection
+  - org.openrewrite.java.migrate.lang.StringFormatted
 
-  - org.openrewrite.java.recipes.UseJavaParserBuilderInJavaTemplate
-
+  - org.openrewrite.java.RemoveObjectsIsNull
   - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
@@ -170,7 +173,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
 #  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
 #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
-  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
+  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrToString
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
   - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
   - org.openrewrite.staticanalysis.ReplaceWeekYearWithYear
@@ -186,6 +189,7 @@ recipeList:
   - org.openrewrite.staticanalysis.TypecastParenPad
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
   - org.openrewrite.staticanalysis.UpperCaseLiteralSuffixes
+  - org.openrewrite.staticanalysis.UseDiamondOperator
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
@@ -196,5 +200,17 @@ recipeList:
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
+  # - org.openrewrite.java.testing.junit5.JUnit5BestPractices -- cannot be used directly, because one recipe is not working (see below)
+  - org.openrewrite.java.testing.cleanup.AssertLiteralBooleanToFailRecipe
+  - org.openrewrite.java.testing.cleanup.RemoveTestPrefix
+  # - org.openrewrite.java.testing.cleanup.TestsShouldNotBePublic -- does not work due to https://github.com/openrewrite/rewrite-testing-frameworks/issues/458
   - org.openrewrite.java.testing.junit5.CleanupAssertions
-#  - org.openrewrite.java.testing.junit5.JUnit5BestPractices
+  - org.openrewrite.java.testing.junit5.AddParameterizedTestAnnotation
+  - org.openrewrite.java.testing.junit5.RemoveDuplicateTestTemplates
+  - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
+  - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
+  # Does not work on some JDK releases. See https://github.com/openrewrite/rewrite-logging-frameworks/issues/177.
+  # - org.openrewrite.java.testing.junit5.StaticImports
+
+  # Logging
+  - org.openrewrite.java.logging.slf4j.Slf4jBestPractices

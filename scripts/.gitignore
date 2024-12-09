@@ -1,5 +1,4 @@
-jq
-jq.exe
+*.bib
 
 # python
 *.pyc

@@ -29,23 +29,23 @@ class EntryLinkCheckerTest {
     }
 
     @Test
-    void testEntryLinkChecker() {
+    void entryLinkChecker() {
         assertThrows(NullPointerException.class, () -> new EntryLinkChecker(null));
     }
 
     @Test
-    void testCheckNoFields() {
+    void checkNoFields() {
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void testCheckNonRelatedFieldsOnly() {
+    void checkNonRelatedFieldsOnly() {
         entry.setField(StandardField.YEAR, "2016");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void testCheckNonExistingCrossref() {
+    void checkNonExistingCrossref() {
         entry.setField(StandardField.CROSSREF, "banana");
 
         List<IntegrityMessage> message = checker.check(entry);
@@ -53,7 +53,7 @@ class EntryLinkCheckerTest {
     }
 
     @Test
-    void testCheckExistingCrossref() {
+    void checkExistingCrossref() {
         entry.setField(StandardField.CROSSREF, "banana");
 
         BibEntry entry2 = new BibEntry();
@@ -65,7 +65,7 @@ class EntryLinkCheckerTest {
     }
 
     @Test
-    void testCheckExistingRelated() {
+    void checkExistingRelated() {
         entry.setField(StandardField.RELATED, "banana,pineapple");
 
         BibEntry entry2 = new BibEntry();
@@ -81,7 +81,7 @@ class EntryLinkCheckerTest {
     }
 
     @Test
-    void testCheckNonExistingRelated() {
+    void checkNonExistingRelated() {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.RELATED, "banana,pineapple,strawberry");
         database.insertEntry(entry1);

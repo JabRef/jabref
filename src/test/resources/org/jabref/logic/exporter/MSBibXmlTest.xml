@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xml>
+    <Publication>
+        <SourceType>Journal Article</SourceType>
+        <Title>Sample Article Title</Title>
+        <Year>2023</Year>
+    </Publication>
+    <Publication>
+        <SourceType>Miscellaneous</SourceType>
+        <Title>Miscellaneous Entry Title</Title>
+        <Year>2022</Year>
+    </Publication>
+</xml>

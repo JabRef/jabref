@@ -22,10 +22,11 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.JstorQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,14 +49,14 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
         uriBuilder.addParameter("Query", new JstorQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws MalformedURLException {
         String start = "https://www.jstor.org/citation/text/";
         if (identifier.startsWith("http")) {
             identifier = identifier.replace("https://www.jstor.org/stable", "");
@@ -63,16 +64,12 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
         identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
 
-        try {
-            if (identifier.contains("/")) {
-                // if identifier links to a entry with a valid doi
-                return new URL(start + identifier);
-            }
-            // else use default doi start.
-            return new URL(start + "10.2307/" + identifier);
-        } catch (IOException e) {
-            throw new FetcherException("could not construct url for jstor", e);
+        if (identifier.contains("/")) {
+            // if identifier links to a entry with a valid doi
+            return URLUtil.create(start + identifier);
         }
+        // else use default doi start.
+        return URLUtil.create(start + "10.2307/" + identifier);
     }
 
     @Override
@@ -86,7 +83,8 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             if (text.startsWith("@")) {
                 return parser.parseEntries(text);
             }
-            // input stream contains html
+            // otherwise: input stream contains html
+
             List<BibEntry> entries;
             try {
                 Document doc = Jsoup.parse(inputStream, null, HOST);
@@ -100,7 +98,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
                     stringBuilder.append(data);
                 }
                 entries = new ArrayList<>(parser.parseEntries(stringBuilder.toString()));
-            } catch (IOException e) {
+            } catch (IOException | FetcherException e) {
                 throw new ParseException("Could not download data from jstor.org", e);
             }
             return entries;
@@ -113,7 +111,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws FetcherException, IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }
@@ -127,17 +125,12 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             return Optional.empty();
         }
 
-        String url = elements.get(0).attr("href");
-        return Optional.of(new URL(url));
+        String url = elements.getFirst().attr("href");
+        return Optional.of(URLUtil.create(url));
     }
 
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
-    }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-        // do nothing
     }
 }

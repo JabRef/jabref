@@ -31,7 +31,7 @@ public abstract class AbstractQueryTransformer {
      * Transforms a and b and c to (a AND b AND c), where
      * a, b, and c can be complex expressions.
      */
-    private Optional<String> transform(BooleanQueryNode query) {
+    protected Optional<String> transform(BooleanQueryNode query) {
         String delimiter;
         if (query instanceof OrQueryNode) {
             delimiter = getLogicalOrOperator();
@@ -151,14 +151,12 @@ public abstract class AbstractQueryTransformer {
         String[] split = yearRange.split("-");
         int parsedStartYear = Integer.parseInt(split[0]);
         startYear = parsedStartYear;
-        if (split.length >= 1) {
-            int parsedEndYear = Integer.parseInt(split[1]);
-            if (parsedEndYear >= parsedStartYear) {
-                endYear = parsedEndYear;
-            } else {
-                startYear = parsedEndYear;
-                endYear = parsedStartYear;
-            }
+        int parsedEndYear = Integer.parseInt(split[1]);
+        if (parsedEndYear >= parsedStartYear) {
+            endYear = parsedEndYear;
+        } else {
+            startYear = parsedEndYear;
+            endYear = parsedStartYear;
         }
     }
 
@@ -183,7 +181,7 @@ public abstract class AbstractQueryTransformer {
 
     /**
      * Return a string representation of the un-fielded (default fielded) term
-     *
+     * <p>
      * Default implementation: just return the term (in quotes if a space is contained)
      */
     protected Optional<String> handleUnFieldedTerm(String term) {
@@ -195,7 +193,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     protected String createKeyValuePair(String fieldAsString, String term, String separator) {
-        return String.format("%s%s%s", fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
+        return "%s%s%s".formatted(fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
     }
 
     /**
@@ -206,18 +204,24 @@ public abstract class AbstractQueryTransformer {
         return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
-    private Optional<String> transform(QueryNode query) {
-        if (query instanceof BooleanQueryNode) {
-            return transform((BooleanQueryNode) query);
-        } else if (query instanceof FieldQueryNode) {
-            return transform((FieldQueryNode) query);
-        } else if (query instanceof GroupQueryNode) {
-            return transform(((GroupQueryNode) query).getChild());
-        } else if (query instanceof ModifierQueryNode) {
-            return transform((ModifierQueryNode) query);
-        } else {
-            LOGGER.error("Unsupported case when transforming the query:\n {}", query);
-            return Optional.empty();
+    protected Optional<String> transform(QueryNode query) {
+        switch (query) {
+            case BooleanQueryNode booleanQueryNode -> {
+                return transform(booleanQueryNode);
+            }
+            case FieldQueryNode fieldQueryNode -> {
+                return transform(fieldQueryNode);
+            }
+            case GroupQueryNode groupQueryNode -> {
+                return transform(groupQueryNode.getChild());
+            }
+            case ModifierQueryNode modifierQueryNode -> {
+                return transform(modifierQueryNode);
+            }
+            case null, default -> {
+                LOGGER.error("Unsupported case when transforming the query:\n {}", query);
+                return Optional.empty();
+            }
         }
     }
 

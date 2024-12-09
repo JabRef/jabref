@@ -1,8 +1,6 @@
 package org.jabref.logic.util;
 
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
@@ -22,9 +20,9 @@ class ExternalLinkCreatorTest {
     private boolean urlIsValid(String url) {
         try {
             // This will throw on non-compliance to RFC2396.
-            new URL(url).toURI();
+            URLUtil.create(url);
             return true;
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException e) {
             return false;
         }
     }
@@ -51,6 +49,6 @@ class ExternalLinkCreatorTest {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "JabRef bibliography management");
         Optional<String> url = getShortScienceSearchURL(entry);
         // Expected behaviour is to link to the search results page, /internalsearch
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef+bibliography+management"), url);
+        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management"), url);
     }
 }

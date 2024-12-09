@@ -11,23 +11,35 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
+
+    @TempDir
+    static Path bibTempDir;
+
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
@@ -61,7 +73,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameDefaultFullTitle() {
+    void getLinkedFileNameDefaultFullTitle() {
         String fileNamePattern = "[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -72,7 +84,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameDefaultWithLowercaseTitle() {
+    void getLinkedFileNameDefaultWithLowercaseTitle() {
         String fileNamePattern = "[citationkey] - [title:lower]";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -83,7 +95,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameBibTeXKey() {
+    void getLinkedFileNameBibTeXKey() {
         String fileNamePattern = "[citationkey]";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -94,7 +106,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameNoPattern() {
+    void getLinkedFileNameNoPattern() {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -104,7 +116,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetDefaultFileNameNoPatternNoBibTeXKey() {
+    void getDefaultFileNameNoPatternNoBibTeXKey() {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
@@ -113,7 +125,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameGetKeyIfEmptyField() {
+    void getLinkedFileNameGetKeyIfEmptyField() {
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -122,7 +134,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
+    void getLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
 
@@ -130,7 +142,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedFileNameByYearAuthorFirstpage() {
+    void getLinkedFileNameByYearAuthorFirstpage() {
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "O. Kitsune");
@@ -141,22 +153,22 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetFileExtensionSimpleFile() {
+    void getFileExtensionSimpleFile() {
         assertEquals("pdf", FileUtil.getFileExtension(Path.of("test.pdf")).get());
     }
 
     @Test
-    void testGetFileExtensionMultipleDotsFile() {
+    void getFileExtensionMultipleDotsFile() {
         assertEquals("pdf", FileUtil.getFileExtension(Path.of("te.st.PdF")).get());
     }
 
     @Test
-    void testGetFileExtensionNoExtensionFile() {
+    void getFileExtensionNoExtensionFile() {
         assertFalse(FileUtil.getFileExtension(Path.of("JustTextNotASingleDot")).isPresent());
     }
 
     @Test
-    void testGetFileExtensionNoExtension2File() {
+    void getFileExtensionNoExtension2File() {
         assertFalse(FileUtil.getFileExtension(Path.of(".StartsWithADotIsNotAnExtension")).isPresent());
     }
 
@@ -213,59 +225,59 @@ class FileUtilTest {
     }
 
     @Test
-    void testUniquePathFragmentWithSameSuffix() {
+    void uniquePathFragmentWithSameSuffix() {
         List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliograsphy.bib");
         assertEquals(Optional.of("bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib")));
     }
 
     @Test
-    void testUniquePathFragmentWithSameSuffixAndLongerName() {
-        List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
-        assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/koppor-bibliography.bib")));
+    void uniquePathFragmentWithSameSuffixAndLongerName() {
+        List<String> paths = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
+        assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(paths, Path.of("/users/jabref/koppor-bibliography.bib")));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() {
+    void copyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, true));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile() {
+    void copyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, false));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile() {
+    void copyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile() {
+    void copyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, false));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToExistDestinationPathWithOverrideExistFile() {
+    void copyFileFromExistSourcePathToExistDestinationPathWithOverrideExistFile() {
         assertTrue(FileUtil.copyFile(existingTestFile, existingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile() {
+    void copyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(existingTestFile, existingTestFile, false));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithOverrideExistFile() {
+    void copyFileFromExistSourcePathToOtherExistDestinationPathWithOverrideExistFile() {
         assertTrue(FileUtil.copyFile(existingTestFile, otherExistingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithoutOverrideExistFile() {
+    void copyFileFromExistSourcePathToOtherExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(existingTestFile, otherExistingTestFile, false));
     }
 
     @Test
-    void testCopyFileSuccessfulWithOverrideExistFile() throws IOException {
+    void copyFileSuccessfulWithOverrideExistFile() throws IOException {
         Path subDir = rootDir.resolve("2");
         Files.createDirectory(subDir);
         Path temp = subDir.resolve("existingTestFile.txt");
@@ -275,7 +287,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testCopyFileSuccessfulWithoutOverrideExistFile() throws IOException {
+    void copyFileSuccessfulWithoutOverrideExistFile() throws IOException {
         Path subDir = rootDir.resolve("2");
         Files.createDirectory(subDir);
         Path temp = subDir.resolve("existingTestFile.txt");
@@ -309,7 +321,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedDirNameDefaultFullTitle() {
+    void getLinkedDirNameDefaultFullTitle() {
         String fileDirPattern = "PDF/[year]/[auth]/[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
@@ -321,7 +333,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedDirNamePatternEmpty() {
+    void getLinkedDirNamePatternEmpty() {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
@@ -332,26 +344,25 @@ class FileUtilTest {
     }
 
     @Test
-    void testIsBibFile() throws IOException {
+    void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
-
         assertTrue(FileUtil.isBibFile(bibFile));
     }
 
     @Test
-    void testIsNotBibFile() throws IOException {
+    void isNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
     }
 
     @Test
-    void testFindinPath() {
+    void findInPath() {
         Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
     }
 
     @Test
-    void testFindInListOfPath() {
+    void findInListOfPath() {
         // due to the added workaround for old JabRef behavior as both path starts with the same name they are considered equal
         List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
         List<Path> resultPaths = List.of(existingTestFile);
@@ -360,32 +371,32 @@ class FileUtilTest {
     }
 
     @Test
-    public void extractFileExtension() {
+    void extractFileExtension() {
         final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void fileExtensionFromUrl() {
+    void fileExtensionFromUrl() {
         final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void testFileNameEmpty() {
+    void fileNameEmpty() {
         Path path = Path.of("/");
         assertEquals(Optional.of(path), FileUtil.find("", path));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"*", "?", ">", "\""})
-    public void testFileNameIllegal(String fileName) {
+    void fileNameIllegal(String fileName) {
         Path path = Path.of("/");
         assertEquals(Optional.empty(), FileUtil.find(fileName, path));
     }
 
     @Test
-    public void testFindsFileInDirectory(@TempDir Path temp) throws Exception {
+    void findsFileInDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -394,7 +405,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void testFindsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+    void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -403,7 +414,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void testDoesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+    void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
         Path firstFilesPath = temp.resolve("files");
         Path secondFilesPath = firstFilesPath.resolve("files");
         Files.createDirectories(secondFilesPath);
@@ -421,15 +432,74 @@ class FileUtilTest {
         }
     }
 
+    /**
+     * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
+     */
+    public static Stream<Arguments> relativize() {
+        Path bibPath = bibTempDir.resolve("bibliography.bib");
+        Path filesPath = bibTempDir.resolve("files").resolve("pdfs");
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(bibPath);
+        database.getMetaData().setLibrarySpecificFileDirectory(filesPath.toString());
+
+        FilePreferences fileDirPrefs = mock(FilePreferences.class);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        Path testPdf = filesPath.resolve("test.pdf");
+        BibEntry source1 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target1 = new BibEntry().withFiles(List.of(new LinkedFile(filesPath.relativize(testPdf))));
+
+        testPdf = bibPath.resolve("test.pdf");
+        BibEntry source2 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target2 = new BibEntry().withFiles(List.of(new LinkedFile(bibTempDir.relativize(testPdf))));
+
+        return Stream.of(
+                Arguments.of(List.of(target1), List.of(source1), database, fileDirPrefs),
+                Arguments.of(List.of(target2), List.of(source2), database, fileDirPrefs)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void relativize(List<BibEntry> expected, List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<BibEntry> actual = FileUtil.relativize(entries, databaseContext, filePreferences);
+        assertEquals(expected, actual);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"/mnt/tmp/test.pdf"})
-    public void legalPaths(String fileName) {
+    void legalPaths(String fileName) {
         assertFalse(FileUtil.detectBadFileName(fileName));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"te{}mp.pdf"})
-    public void illegalPaths(String fileName) {
+    void illegalPaths(String fileName) {
         assertTrue(FileUtil.detectBadFileName(fileName));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "''                             ,                                     ,   ",
+            "''                             ,                                     , -3",
+            "''                             ,                                     ,  0",
+            "''                             ,                                     ,  3",
+            "''                             ,                                     ,  5",
+            "''                             ,                                     , 10",
+            "''                             , thisisatestfile.pdf                 ,   ",
+            "''                             , thisisatestfile.pdf                 , -5",
+            "''                             , thisisatestfile.pdf                 ,  0",
+            "...                            , thisisatestfile.pdf                 ,  3",
+            "th...                          , thisisatestfile.pdf                 ,  5",
+            "th...e.pdf                     , thisisatestfile.pdf                 , 10",
+            "thisisatestfile.pdf            , thisisatestfile.pdf                 , 20",
+            "lo...                          , longfilename.extremelylongextension ,  5",
+            "longfil...                     , longfilename.extremelylongextension , 10",
+            "longfilename.extr...           , longfilename.extremelylongextension , 20",
+            "lo...me.extremelylongextension , longfilename.extremelylongextension , 30",
+    })
+    void shortenFileName(String expected, String fileName, Integer maxLength) {
+        assertEquals(expected, FileUtil.shortenFileName(fileName, maxLength));
     }
 }

@@ -2,22 +2,26 @@ package org.jabref.gui.preferences.autocompletion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty enableAutoCompleteProperty = new SimpleBooleanProperty();
-    private final StringProperty autoCompleteFieldsProperty = new SimpleStringProperty();
+    private final ListProperty<Field> autoCompleteFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty autoCompleteFirstLastProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoCompleteLastFirstProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoCompleteBothProperty = new SimpleBooleanProperty();
@@ -36,8 +40,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
-        autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
-
+        autoCompleteFieldsProperty.setValue(FXCollections.observableArrayList(autoCompletePreferences.getCompleteFields()));
         if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
             autoCompleteFirstLastProperty.setValue(true);
         } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
@@ -82,7 +85,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
         }
 
         autoCompletePreferences.getCompleteFields().clear();
-        autoCompletePreferences.getCompleteFields().addAll(FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()));
+        autoCompletePreferences.getCompleteFields().addAll(autoCompleteFieldsProperty.getValue());
     }
 
     @Override
@@ -94,7 +97,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
         return enableAutoCompleteProperty;
     }
 
-    public StringProperty autoCompleteFieldsProperty() {
+    public ListProperty<Field> autoCompleteFieldsProperty() {
         return autoCompleteFieldsProperty;
     }
 
@@ -120,5 +123,25 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty firstNameModeBothProperty() {
         return firstNameModeBothProperty;
+    }
+
+    public StringConverter<Field> getFieldStringConverter() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(Field field) {
+                return field.getDisplayName();
+            }
+
+            @Override
+            public Field fromString(String string) {
+                return FieldFactory.parseField(string);
+            }
+        };
+    }
+
+    public List<Field> getSuggestions(String request) {
+        return FieldFactory.getAllFieldsWithOutInternal().stream()
+                           .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
+                           .collect(Collectors.toList());
     }
 }

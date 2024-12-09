@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CitaviXmlImporterFilesTest {
+class CitaviXmlImporterFilesTest {
 
     private static final String FILE_ENDING = ".ctv6bak";
     private final CitaviXmlImporter citaviXmlImporter = new CitaviXmlImporter();
@@ -24,19 +24,19 @@ public class CitaviXmlImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testIsRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(citaviXmlImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    void testIsNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(citaviXmlImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testImportEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(citaviXmlImporter, fileName, FILE_ENDING);
     }
 }

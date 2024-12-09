@@ -3,17 +3,19 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements an API to a GROBID server, as described at
@@ -26,6 +28,8 @@ import org.jsoup.Jsoup;
  * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
  */
 public class GrobidService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidService.class);
 
     public enum ConsolidateCitations {
         NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);
@@ -65,6 +69,7 @@ public class GrobidService {
                 .timeout(100_000)
                 .execute();
         String httpResponse = response.body();
+        LOGGER.debug("raw citation -> response: {}, {}", rawCitation, httpResponse);
 
         if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
@@ -84,6 +89,34 @@ public class GrobidService {
 
         String httpResponse = response.body();
 
+        return getBibEntries(importFormatPreferences, httpResponse);
+    }
+
+    public List<BibEntry> processReferences(List<Path> pathList, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        List<BibEntry> entries = new ArrayList<>();
+        for (Path filePath: pathList) {
+            entries.addAll(processReferences(filePath, importFormatPreferences));
+        }
+
+        return entries;
+    }
+
+    public List<BibEntry> processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processReferences")
+                                            .header("Accept", MediaTypes.APPLICATION_BIBTEX)
+                                            .data("input", filePath.toString(), Files.newInputStream(filePath))
+                                            .data("consolidateCitations", String.valueOf(ConsolidateCitations.WITH_METADATA))
+                                            .method(Connection.Method.POST)
+                                            .ignoreContentType(true)
+                                            .timeout(20000)
+                                            .execute();
+
+        String httpResponse = response.body();
+
+        return getBibEntries(importFormatPreferences, httpResponse);
+    }
+
+    private static List<BibEntry> getBibEntries(ImportFormatPreferences importFormatPreferences, String httpResponse) throws IOException, ParseException {
         if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse)) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }

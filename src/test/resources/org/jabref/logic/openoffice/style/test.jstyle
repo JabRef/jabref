@@ -27,6 +27,7 @@ FormatCitations="false"
 CitationCharacterFormat="Default"
 PageInfoSeparator="; "
 OxfordComma=","
+SpaceBefore="true"
 
 LAYOUT
 article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.

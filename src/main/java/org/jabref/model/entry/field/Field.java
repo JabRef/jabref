@@ -1,7 +1,7 @@
 package org.jabref.model.entry.field;
 
+import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.model.strings.StringUtil;
 
@@ -10,10 +10,10 @@ public interface Field {
     /**
      * properties contains mappings to tell the EntryEditor to add a specific function to this field,
      * for instance a dropdown for selecting the month for the month field.
-     *
+     * <p>
      * Note that this set needs to be mutable. This is required, because we allow standard fields to be modifiable via the UI.
      */
-    Set<FieldProperty> getProperties();
+    EnumSet<FieldProperty> getProperties();
 
     /**
      * @return A version of the field name more suitable for display

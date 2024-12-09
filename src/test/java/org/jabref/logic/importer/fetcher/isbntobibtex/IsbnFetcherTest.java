@@ -45,7 +45,7 @@ class IsbnFetcherTest {
     }
 
     @Test
-    void testName() {
+    void name() {
         assertEquals("ISBN", fetcher.getName());
     }
 

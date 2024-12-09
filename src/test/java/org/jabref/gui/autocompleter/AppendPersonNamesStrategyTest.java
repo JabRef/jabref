@@ -6,10 +6,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AppendPersonNamesStrategyTest {
+class AppendPersonNamesStrategyTest {
 
     @Test
-    void testWithoutParam() {
+    void withoutParam() {
         AppendPersonNamesStrategy strategy = new AppendPersonNamesStrategy();
         assertEquals(" and ", strategy.getDelimiter());
     }
@@ -19,7 +19,7 @@ public class AppendPersonNamesStrategyTest {
             "TRUE, ' '",
             "FALSE, ' and '",
     })
-    void testWithParam(boolean separationBySpace, String expectedResult) {
+    void withParam(boolean separationBySpace, String expectedResult) {
         AppendPersonNamesStrategy strategy = new AppendPersonNamesStrategy(separationBySpace);
         assertEquals(expectedResult, strategy.getDelimiter());
     }

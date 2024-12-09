@@ -3,6 +3,8 @@ package org.jabref.gui.commonfxcontrols;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -23,9 +25,11 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class SaveOrderConfigPanel extends VBox {
 
@@ -34,6 +38,9 @@ public class SaveOrderConfigPanel extends VBox {
     @FXML private RadioButton exportInOriginalOrder;
     @FXML private GridPane sortCriterionList;
     @FXML private Button addButton;
+
+    @Inject private CliPreferences preferences;
+    @Inject private UndoManager undoManager;
 
     private SaveOrderConfigPanelViewModel viewModel;
 
@@ -55,7 +62,7 @@ public class SaveOrderConfigPanel extends VBox {
             while (change.next()) {
                 if (change.wasReplaced()) {
                         clearCriterionRow(change.getFrom());
-                        createCriterionRow(change.getAddedSubList().get(0), change.getFrom());
+                        createCriterionRow(change.getAddedSubList().getFirst(), change.getFrom());
                 } else if (change.wasAdded()) {
                     for (SortCriterionViewModel criterionViewModel : change.getAddedSubList()) {
                         int row = change.getFrom() + change.getAddedSubList().indexOf(criterionViewModel);
@@ -85,8 +92,9 @@ public class SaveOrderConfigPanel extends VBox {
 
         ComboBox<Field> field = new ComboBox<>(viewModel.sortableFieldsProperty());
         field.setMaxWidth(Double.MAX_VALUE);
+
         new ViewModelListCellFactory<Field>()
-                .withText(FieldsUtil::getNameWithType)
+                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
                 .install(field);
         field.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         field.itemsProperty().bindBidirectional(viewModel.sortableFieldsProperty());

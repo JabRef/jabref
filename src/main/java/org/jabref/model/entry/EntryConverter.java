@@ -8,7 +8,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
- * Converts Entry models from BibTex to biblatex and back.
+ * Converts Entry models from BibTeX to biblatex and back.
  */
 public class EntryConverter {
 

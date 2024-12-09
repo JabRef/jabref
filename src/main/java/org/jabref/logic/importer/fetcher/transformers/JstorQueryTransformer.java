@@ -33,7 +33,7 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        return "sd:" + year + getLogicalAndOperator() + "ed: " + year;
+        return "sd:" + year + getLogicalAndOperator() + "ed:" + year;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
         if (endYear == Integer.MAX_VALUE) {
             return yearRange;
         }
-        return "sd:" + Integer.toString(startYear) + getLogicalAndOperator() + "ed:" + Integer.toString(endYear);
+        return "sd:" + startYear + getLogicalAndOperator() + "ed:" + endYear;
     }
 }

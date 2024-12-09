@@ -2,15 +2,15 @@ package org.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.cli.Launcher;
+import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.util.Directories;
 
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
@@ -26,11 +26,9 @@ import org.slf4j.LoggerFactory;
  **/
 public class Windows extends NativeDesktop {
 
-    private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
-
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
@@ -42,46 +40,13 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        String progFiles = System.getenv("ProgramFiles(x86)");
-        String programPath;
-        if (progFiles != null) {
-            programPath = getProgramPath(programName, directoryName, progFiles);
-            if (programPath != null) {
-                return programPath;
-            }
-        }
-
-        progFiles = System.getenv("ProgramFiles");
-        programPath = getProgramPath(programName, directoryName, progFiles);
-        if (programPath != null) {
-            return programPath;
-        }
-
-        return "";
-    }
-
-    private String getProgramPath(String programName, String directoryName, String progFiles) {
-        Path programPath;
-        if ((directoryName != null) && !directoryName.isEmpty()) {
-            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);
-        } else {
-            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
-        }
-        if (Files.exists(programPath)) {
-            return programPath.toString();
-        }
-        return null;
-    }
-
-    @Override
     public Path getApplicationDirectory() {
         String programDir = System.getenv("ProgramFiles");
 
         if (programDir != null) {
             return Path.of(programDir);
         }
-        return getUserDirectory();
+        return Directories.getUserDirectory();
     }
 
     @Override
@@ -94,7 +59,7 @@ public class Windows extends NativeDesktop {
                 return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
             }
         } catch (Win32Exception e) {
-            // needs to be non-static because of org.jabref.cli.Launcher.addLogToDisk
+            // needs to be non-static because of org.jabref.Launcher.addLogToDisk
             LoggerFactory.getLogger(Windows.class).error("Error accessing folder", e);
             return Path.of(System.getProperty("user.home"));
         }

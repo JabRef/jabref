@@ -9,17 +9,19 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.frame.SidePanePreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SidePanePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +37,15 @@ import static org.mockito.Mockito.when;
 class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
-    PreferencesService preferencesService = mock(PreferencesService.class);
+    GuiPreferences preferences = mock(GuiPreferences.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
     DialogService dialogService = mock(DialogService.class);
+    AiService aiService = mock(AiService.class);
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+    ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     UndoManager undoManager = mock(UndoManager.class);
 
     SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0);
@@ -53,7 +57,7 @@ class SidePaneViewModelTest {
         when(stateManager.getVisibleSidePaneComponents()).thenReturn(sidePaneComponents);
         when(stateManager.getLocalDragboard()).thenReturn(mock(CustomLocalDragboard.class));
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
-        when(preferencesService.getSidePanePreferences()).thenReturn(sidePanePreferences);
+        when(preferences.getSidePanePreferences()).thenReturn(sidePanePreferences);
 
         sidePanePreferences.visiblePanes().addAll(EnumSet.allOf(SidePaneType.class));
         sidePanePreferences.getPreferredPositions().put(SidePaneType.GROUPS, 0);
@@ -62,13 +66,15 @@ class SidePaneViewModelTest {
 
         sidePaneViewModel = new SidePaneViewModel(
                 tabContainer,
-                preferencesService,
+                preferences,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
                 dialogService,
+                aiService,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
     }
 
@@ -76,7 +82,7 @@ class SidePaneViewModelTest {
     void moveUp() {
         sidePaneViewModel.moveUp(SidePaneType.WEB_SEARCH);
 
-        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.get(0));
+        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.getFirst());
         assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(1));
     }
 
@@ -84,7 +90,7 @@ class SidePaneViewModelTest {
     void moveUpFromFirstPosition() {
         sidePaneViewModel.moveUp(SidePaneType.GROUPS);
 
-        assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(0));
+        assertEquals(SidePaneType.GROUPS, sidePaneComponents.getFirst());
     }
 
     @Test
@@ -109,6 +115,6 @@ class SidePaneViewModelTest {
 
         sidePaneComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
 
-        assertTrue(sidePaneComponents.get(0) == SidePaneType.OPEN_OFFICE && sidePaneComponents.get(2) == SidePaneType.GROUPS);
+        assertTrue(sidePaneComponents.getFirst() == SidePaneType.OPEN_OFFICE && sidePaneComponents.get(2) == SidePaneType.GROUPS);
     }
 }

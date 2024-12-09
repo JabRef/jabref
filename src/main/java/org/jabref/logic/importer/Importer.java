@@ -36,7 +36,7 @@ public abstract class Importer implements Comparable<Importer> {
      * The effect of this method is primarily to avoid unnecessary processing of files when searching for a suitable
      * import format. If this method returns false, the import routine will move on to the next import format.
      * <p>
-     * Thus the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
+     * Thus, the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
      * true otherwise. Returning true is the safe choice if not certain.
      */
     public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
@@ -96,10 +96,7 @@ public abstract class Importer implements Comparable<Importer> {
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, charset));
             ParserResult parserResult = importDatabase(bufferedReader);
-
-            // store the detected encoding
             parserResult.getMetaData().setEncoding(charset);
-
             parserResult.setPath(filePath);
 
             // Make sure the mode is always set
@@ -172,22 +169,6 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
-     * Returns the name of this import format.
-     *
-     * <p>The name must be unique.</p>
-     *
-     * @return format name, must be unique and not <code>null</code>
-     */
-    public abstract String getName();
-
-    /**
-     * Returns the type of files that this importer can read
-     *
-     * @return {@link FileType} corresponding to the importer
-     */
-    public abstract FileType getFileType();
-
-    /**
      * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
      * the command line.
      *
@@ -206,6 +187,15 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
+     * Returns the name of this import format.
+     *
+     * <p>The name must be unique.</p>
+     *
+     * @return format name, must be unique and not <code>null</code>
+     */
+    public abstract String getName();
+
+    /**
      * Returns the description of the import format.
      * <p>
      * The description should specify
@@ -218,6 +208,13 @@ public abstract class Importer implements Comparable<Importer> {
      * @return description of the import format
      */
     public abstract String getDescription();
+
+    /**
+     * Returns the type of files that this importer can read
+     *
+     * @return {@link FileType} corresponding to the importer
+     */
+    public abstract FileType getFileType();
 
     @Override
     public int hashCode() {

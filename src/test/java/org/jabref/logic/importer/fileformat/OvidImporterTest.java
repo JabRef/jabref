@@ -11,13 +11,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -25,10 +23,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class OvidImporterTest {
+class OvidImporterTest {
 
     private static final String FILE_ENDING = ".txt";
-    private OvidImporter importer;
+    private OvidImporter importer = new OvidImporter();
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("OvidImporterTest")
@@ -42,57 +40,32 @@ public class OvidImporterTest {
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @BeforeEach
-    public void setUp() {
-        importer = new OvidImporter();
-    }
-
-    @Test
-    public void testGetFormatName() {
-        assertEquals("Ovid", importer.getName());
-    }
-
-    @Test
-    public void testGetCLIId() {
-        assertEquals("ovid", importer.getId());
-    }
-
-    @Test
-    public void testsGetExtensions() {
-        assertEquals(StandardFileType.TXT, importer.getFileType());
-    }
-
-    @Test
-    public void testGetDescription() {
-        assertEquals("Imports an Ovid file.", importer.getDescription());
-    }
-
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void testImportEmpty() throws IOException, URISyntaxException {
+    void importEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public void testImportEntries1() throws IOException, URISyntaxException {
+    void importEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(5, entries.size());
 
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Short abstract"), entry.getField(StandardField.ABSTRACT));
@@ -140,14 +113,14 @@ public class OvidImporterTest {
     }
 
     @Test
-    public void testImportEntries2() throws IOException, URISyntaxException {
+    void importEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public void testImportSingleEntries() throws IOException, URISyntaxException {
+    void importSingleEntries() throws IOException, URISyntaxException {
 
         for (int n = 3; n <= 7; n++) {
             Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
@@ -156,7 +129,7 @@ public class OvidImporterTest {
                                                  .getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
-                BibEntryAssert.assertEquals(nis, entries.get(0));
+                BibEntryAssert.assertEquals(nis, entries.getFirst());
             }
         }
     }

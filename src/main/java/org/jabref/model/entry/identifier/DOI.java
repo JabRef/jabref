@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -24,8 +25,8 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
 public class DOI implements Identifier {
 
-    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
-    public static final URI RESOLVER = URI.create("https://doi.org/");
+    public static final URI AGENCY_RESOLVER = URLUtil.createUri("https://doi.org/doiRA");
+    public static final URI RESOLVER = URLUtil.createUri("https://doi.org/");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
@@ -47,7 +48,7 @@ public class DOI implements Identifier {
             + "10"                              // directory indicator
             + "(?:\\.[0-9]+)+"                  // registrant codes
             + "[/:]"                            // divider
-            + "(?:[^\\s,;]+[^,;(\\.\\s)])"      // suffix alphanumeric without " "/","/";" and not ending on "."/","/";"
+            + "(?:[^\\s,]+[^,;(\\.\\s)])"       // suffix alphanumeric without " "/"," and not ending on "."/","/";"
             + ")";                              // end group \1
 
     // Regex (Short DOI)
@@ -98,6 +99,9 @@ public class DOI implements Identifier {
     // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
     // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
     private static final String CHARS_TO_REMOVE = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
+            + "\\\\" // remove backslashes
+            + "{}" // remove curly brackets
+            + "\\[\\]`|" // remove square brackets, backticks, and pipes
             + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
             + "]";
 
@@ -121,13 +125,8 @@ public class DOI implements Identifier {
 
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
-            try {
-                // decodes path segment
-                URI url = new URI(trimmedDoi);
-                trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
-            }
+            // decodes path segment
+            trimmedDoi = URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8);
         }
 
         // Extract DOI/Short DOI
@@ -167,6 +166,8 @@ public class DOI implements Identifier {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
             String cleanedDOI = doi;
             cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
+            // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
+            cleanedDOI = cleanedDOI.replaceAll("\\^", "");
             cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
@@ -201,6 +202,7 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> findInText(String text) {
         Optional<DOI> result = Optional.empty();
+        text = text.replaceAll("[�]", "");
 
         Matcher matcher = FIND_DOI_PATT.matcher(text);
         if (matcher.find()) {
@@ -233,7 +235,8 @@ public class DOI implements Identifier {
      *
      * @return the plain DOI/Short DOI value.
      */
-    public String getDOI() {
+    @Override
+    public String asString() {
         return doi;
     }
 
@@ -259,16 +262,16 @@ public class DOI implements Identifier {
     }
 
     public Optional<URI> getExternalURIWithCustomBase(String customBase) {
-        return getExternalURIFromBase(URI.create(customBase));
+        return getExternalURIFromBase(URLUtil.createUri(customBase));
     }
 
-    private Optional<URI> getExternalURIFromBase(URI base) {
+    public Optional<URI> getExternalURIFromBase(URI base) {
         try {
             URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen
-            LOGGER.error(doi + " could not be encoded as URI.", e);
+            LOGGER.error("{} could not be encoded as URI.", doi, e);
             return Optional.empty();
         }
     }
@@ -285,11 +288,6 @@ public class DOI implements Identifier {
     @Override
     public Field getDefaultField() {
         return StandardField.DOI;
-    }
-
-    @Override
-    public String getNormalized() {
-        return doi;
     }
 
     /**

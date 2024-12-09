@@ -9,11 +9,13 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 public class GroupEditor extends SimpleEditor {
 
@@ -22,10 +24,12 @@ public class GroupEditor extends SimpleEditor {
     public GroupEditor(final Field field,
                        final SuggestionProvider<?> suggestionProvider,
                        final FieldCheckers fieldCheckers,
-                       final PreferencesService preferences,
+                       final GuiPreferences preferences,
                        final boolean isMultiLine,
-                       final UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+                       final UndoManager undoManager,
+                       final UndoAction undoAction,
+                       final RedoAction redoAction) {
+        super(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
 
         this.setOnDragOver(event -> {
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
@@ -38,10 +42,10 @@ public class GroupEditor extends SimpleEditor {
             boolean success = false;
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                 List<String> draggedGroups = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-                if (bibEntry.isPresent() && draggedGroups.get(0) != null) {
+                if (bibEntry.isPresent() && draggedGroups.getFirst() != null) {
                     String newGroup = bibEntry.map(entry -> entry.getField(StandardField.GROUPS)
-                                                                     .map(oldGroups -> oldGroups + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroups.get(0)))
-                                                                     .orElse(draggedGroups.get(0)))
+                                                                     .map(oldGroups -> oldGroups + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroups.getFirst()))
+                                                                     .orElse(draggedGroups.getFirst()))
                                                   .orElse(null);
                     bibEntry.map(entry -> entry.setField(StandardField.GROUPS, newGroup));
                     success = true;

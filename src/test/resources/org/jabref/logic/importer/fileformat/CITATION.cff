@@ -1,0 +1,58 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: JabRef
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Oliver
+    family-names: Kopp
+    orcid: 'https://orcid.org/0000-0001-6962-4290'
+  - given-names: Tobias
+    family-names: Diez
+    orcid: 'https://orcid.org/0000-0002-1407-7696'
+  - given-names: Christoph
+    family-names: Schwentker
+  - given-names: Carl Christian
+    family-names: Snethlage
+  - given-names: Jonatan
+    family-names: Asketorp
+  - given-names: Benedikt
+    family-names: Tutzer
+  - given-names: Thilo
+    family-names: Ertel
+  - given-names: Houssem
+    family-names: Nasri
+repository-code: 'https://github.com/jabref/jabref/'
+url: 'https://www.jabref.org'
+abstract: >-
+  JabRef is an open-source, cross-platform citation and
+  reference management tool.
+keywords:
+  - reference manager
+  - bibtex
+  - biblatex
+license: MIT
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Kopp"
+    given-names: "Oliver"
+    orcid: "https://orcid.org/0000-0001-6962-4290"
+  - family-names: "Snethlage"
+    given-names: "Carl Christian"
+  - family-names: "Schwentker"
+    given-names: "Christoph"
+  doi: "10.47397/tb/44-3/tb138kopp-jabref"
+  journal: "TUGboat"
+  month: 11
+  start: 441
+  end: 447
+  title: "JabRef: BibTeX-based literature management software"
+  issue: 138
+  volume: 44
+  number: 3
+  year: 2023

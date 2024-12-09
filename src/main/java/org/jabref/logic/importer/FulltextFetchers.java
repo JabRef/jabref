@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -15,10 +14,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -65,13 +63,13 @@ public class FulltextFetchers {
             findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result = JabRefExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
         return result.stream()
                      .map(FulltextFetchers::getResults)
                      .filter(Optional::isPresent)
                      .map(Optional::get)
-                     .filter(res -> Objects.nonNull(res.getSource()))
+                     .filter(res -> (res.getSource()) != null)
                      .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
                      .map(FetcherResult::getSource)
                      .findFirst();
@@ -81,7 +79,7 @@ public class FulltextFetchers {
         try {
             WebFetchers.getIdFetcherForIdentifier(DOI.class)
                        .findIdentifier(clonedEntry)
-                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.getDOI()));
+                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.asString()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }
@@ -114,6 +112,6 @@ public class FulltextFetchers {
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {
         return fetchers.stream()
                        .map(f -> getCallable(entry, f))
-                       .collect(Collectors.toList());
+                       .toList();
     }
 }

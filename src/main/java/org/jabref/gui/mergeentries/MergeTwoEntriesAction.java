@@ -3,7 +3,8 @@ package org.jabref.gui.mergeentries;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.gui.Globals;
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
@@ -16,10 +17,12 @@ import org.jabref.model.entry.BibEntry;
 public class MergeTwoEntriesAction extends SimpleCommand {
     private final EntriesMergeResult entriesMergeResult;
     private final StateManager stateManager;
+    private final UndoManager undoManager;
 
-    public MergeTwoEntriesAction(EntriesMergeResult entriesMergeResult, StateManager stateManager) {
+    public MergeTwoEntriesAction(EntriesMergeResult entriesMergeResult, StateManager stateManager, UndoManager undoManager) {
         this.entriesMergeResult = entriesMergeResult;
         this.stateManager = stateManager;
+        this.undoManager = undoManager;
     }
 
     @Override
@@ -39,6 +42,6 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         ce.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
         ce.end();
 
-        Globals.undoManager.addEdit(ce);
+        undoManager.addEdit(ce);
     }
 }

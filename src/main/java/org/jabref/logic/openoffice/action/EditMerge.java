@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -39,7 +39,7 @@ public class EditMerge {
     /**
      * @return true if modified document
      */
-    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
+    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
             CreationException,
             IllegalArgumentException,
@@ -63,7 +63,7 @@ public class EditMerge {
                                                      .flatMap(group -> group.citationsInStorageOrder.stream())
                                                      .collect(Collectors.toList());
 
-                CitationType citationType = groups.get(0).citationType;
+                CitationType citationType = groups.getFirst().citationType;
                 List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
 
                 frontend.removeCitationGroups(groups, doc);
@@ -93,21 +93,11 @@ public class EditMerge {
         return madeModifications;
     }
 
-    private static class JoinableGroupData {
-        /**
-         * A list of consecutive citation groups only separated by spaces.
-         */
-        List<CitationGroup> group;
-
-        /**
-         * A cursor covering the XTextRange of each entry in group (and the spaces between them)
-         */
-        XTextCursor groupCursor;
-
-        JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
-            this.group = group;
-            this.groupCursor = groupCursor;
-        }
+    /**
+     * @param group       A list of consecutive citation groups only separated by spaces.
+     * @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
+     */
+    private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
     }
 
     private static class ScanState {
@@ -181,9 +171,9 @@ public class EditMerge {
             int textOrder = UnoTextRange.compareStarts(state.prevRange, currentRange);
             if (textOrder != -1) {
                 String msg =
-                        String.format("MergeCitationGroups:"
-                                        + " \"%s\" supposed to be followed by \"%s\","
-                                        + " but %s",
+                        ("MergeCitationGroups:"
+                                + " \"%s\" supposed to be followed by \"%s\","
+                                + " but %s").formatted(
                                 state.prevRange.getString(),
                                 currentRange.getString(),
                                 (textOrder == 0

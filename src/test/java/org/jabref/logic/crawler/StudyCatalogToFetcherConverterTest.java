@@ -12,24 +12,24 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class StudyCatalogToFetcherConverterTest {
     SaveConfiguration saveConfiguration;
-    PreferencesService preferencesService;
+    CliPreferences preferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler;
     @TempDir
@@ -37,25 +37,25 @@ class StudyCatalogToFetcherConverterTest {
 
     @BeforeEach
     void setUpMocks() {
-        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     }
 
     @Test
-    public void getActiveFetcherInstances() throws Exception {
+    void getActiveFetcherInstances() throws Exception {
         Path studyDefinition = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
         StudyRepository studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager);
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
@@ -64,7 +64,7 @@ class StudyCatalogToFetcherConverterTest {
                 mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
-        Assertions.assertEquals(
+        assertEquals(
                 List.of("Springer", "ArXiv", "Medline/PubMed"),
                 result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
         );

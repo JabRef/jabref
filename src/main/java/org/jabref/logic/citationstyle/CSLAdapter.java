@@ -12,16 +12,17 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.DefaultAbbreviationProvider;
 import de.undercouch.citeproc.output.Bibliography;
+import de.undercouch.citeproc.output.Citation;
 
 /**
  * Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
  * the style changes.
- *
+ * <p>
  * Note on the API: The first call to {@link #makeBibliography} is expensive since the
  * CSL instance will be created. As long as the style stays the same, we can reuse this instance. On style-change, the
  * engine is re-instantiated. Therefore, the use-case of this class is many calls to {@link #makeBibliography} with the
  * same style. Changing the output format is cheap.
- *
+ * <p>
  * Note on the implementation:
  * The main function {@link #makeBibliography} will enforce
  * synchronized calling. The main CSL engine under the hood is not thread-safe. Since this class is usually called from
@@ -48,6 +49,13 @@ public class CSLAdapter {
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
         return Arrays.asList(bibliography.getEntries());
+    }
+
+    public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
+        initialize(style, outputFormat);
+        cslInstance.registerCitationItems(dataProvider.getIds());
+        return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList()).getFirst();
     }
 
     /**

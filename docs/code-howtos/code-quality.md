@@ -8,8 +8,12 @@ parent: Code Howtos
 JabRef has three code style checkers in place:
 
 * [Checkstyle](https://checkstyle.sourceforge.io/) for basic checks, such as wrong import order.
-* [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) for Java library usage checks. It ensures that "modern" Java concepts are used (e.g., [one should use `Deque` instead of `Stack`](https://stackoverflow.com/a/73021741/873282)).
-* [OpenRewrite](https://docs.openrewrite.org/) for advanced rules. OpenRewrite can also automatically fix issues. JabRef's CI toolchain does NOT automatically rewrite the source code, but checks whether OpenRewrite would rewrite something. As developer, one can execute `./gradlew rewriteRun` to fix the issues.
+* [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) for Java library usage checks.
+  It ensures that "modern" Java concepts are used (e.g., [one should use `Deque` instead of `Stack`](https://stackoverflow.com/a/73021741/873282)).
+* [OpenRewrite](https://docs.openrewrite.org/) for advanced rules. OpenRewrite can also automatically fix issues.
+  JabRef's CI toolchain does NOT automatically rewrite the source code, but checks whether OpenRewrite would rewrite something.
+  As developer, one can execute `./gradlew rewriteRun` to fix the issues.
+  Note that [JabRef is available on the Moderne platform](https://app.moderne.io/organizations/JabRef/jabref?branch=main&origin=github.com), too.
 
 In case a check fails, [the CI](https://github.com/JabRef/jabref/blob/main/.github/workflows/tests.yml#L24C6-L24C6) automatically adds a comment on the pull request.
 
@@ -20,6 +24,14 @@ We monitor the general source code quality at three places:
 * [codacy](https://www.codacy.com) is a hosted service to monitor code quality. It thereby combines the results of available open source code quality checkers such as [Checkstyle](https://checkstyle.sourceforge.io) or [PMD](https://pmd.github.io). The code quality analysis for JabRef is available at [https://app.codacy.com/gh/JabRef/jabref/dashboard](https://app.codacy.com/gh/JabRef/jabref/dashboard), especially the [list of open issues](https://app.codacy.com/gh/JabRef/jabref/issues/index). In case a rule feels wrong, it is most likely a PMD rule. The JabRef team can change the configuration at [https://app.codacy.com/p/306789/patterns/list?engine=9ed24812-b6ee-4a58-9004-0ed183c45b8f](https://app.codacy.com/p/306789/patterns/list?engine=9ed24812-b6ee-4a58-9004-0ed183c45b8f).
 * [codecov](https://codecov.io) is a solution to check code coverage of test cases. The code coverage metrics for JabRef are available at [https://codecov.io/github/JabRef/jabref](https://codecov.io/github/JabRef/jabref).
 * [Teamscale](https://www.cqse.eu/en/teamscale/overview/) is a popular German product analyzing code quality. The analysis results are available at <https://demo.teamscale.com/findings.html#/jabref/?>.
+
+## Up to date dependencies
+
+We believe that updated dependencies are a sign of maintained code and thus an indidcator of good quality.
+We use [GitHub's dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to keep our versions up to date.
+
+Moreover, we try to test JabRef with the latest Java Development Kit (JDK) builds.
+Our results can be seen at the [Quality Outreach page](https://wiki.openjdk.org/display/quality/Quality+Outreach).
 
 ## Background literature
 

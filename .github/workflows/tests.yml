@@ -37,19 +37,22 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Run checkstyle reporter
-        uses: nikitasavinov/checkstyle-action@master
+        uses: dbelyaev/action-checkstyle@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
-          checkstyle_version: '10.3'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+
+
   openrewrite:
     name: OpenRewrite
     runs-on: ubuntu-latest
@@ -62,13 +65,16 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -81,15 +87,18 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+
   markdown:
     name: Markdown
     runs-on: ubuntu-latest
@@ -100,11 +109,12 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v14
+        uses: DavidAnson/markdownlint-cli2-action@v18
         with:
           globs: |
             *.md
             docs/**/*.md
+
   changelog:
     name: CHANGELOG.md
     runs-on: ubuntu-latest
@@ -121,7 +131,7 @@ jobs:
           export PATH=$PATH:$HOME/.jbang/bin
 
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.7.2:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.9.2:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
@@ -131,6 +141,7 @@ jobs:
           # exit 1 in case of error
           # We have 1 "valid" issue in CHANGELOG.md
           grep -q "1 problem" heylogs.txt || exit 1
+
   changelog-unreleased-only:
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
@@ -151,6 +162,7 @@ jobs:
           diff \
             <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
+
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -163,19 +175,26 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+      - name: Prepare format failed test results
+        if: failure()
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: xml-twig-tools xsltproc
+          version: 1.0
       - name: Format failed test results
         if: failure()
-        run: |
-          sudo apt-get install -qq -y xml-twig-tools xsltproc
-          scripts/after-failure.sh
+        run: scripts/after-failure.sh
+
   databasetests:
     name: Database tests
     runs-on: ubuntu-latest
@@ -199,10 +218,12 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -225,6 +246,7 @@ jobs:
         env:
           CI: "true"
           DBMS: "mysql"
+
   guitests:
     name: GUI tests
     runs-on: ubuntu-latest
@@ -237,14 +259,17 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
           CI: "true"
+
   codecoverage:
     name: Code coverage
     runs-on: ubuntu-latest
@@ -267,8 +292,10 @@ jobs:
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret CODECOV_TOKEN not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret CODECOV_TOKEN present"
           fi
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -282,10 +309,12 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 23.0.1
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -293,10 +322,34 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v5
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload Codacy report
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+  requirements_coverage:
+    name: "Validate requirement coverage"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 23.0.1
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew traceRequirements
+      - if: failure()
+        run: cat build/reports/tracing.txt
+
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
   # It ensures that the jar file is from gradle and not by a strange third party.
   gradlevalidation:
@@ -306,7 +359,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/actions/wrapper-validation@v4
+
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
@@ -317,3 +371,23 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
+
+  other_than_main:
+    name: Source branch is other than "main"
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.head_ref == 'main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt

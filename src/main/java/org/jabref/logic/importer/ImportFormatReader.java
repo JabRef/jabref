@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -27,11 +28,10 @@ import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.importer.fileformat.PdfVerbatimBibTextImporter;
+import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
@@ -50,13 +50,16 @@ public class ImportFormatReader {
     private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
+                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                               FileUpdateMonitor fileUpdateMonitor) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         reset();
     }
 
@@ -67,12 +70,12 @@ public class ImportFormatReader {
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
-        formats.add(new MedlinePlainImporter());
+        formats.add(new MedlinePlainImporter(importFormatPreferences));
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
+        formats.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
         formats.add(new PdfContentImporter());
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
@@ -81,8 +84,7 @@ public class ImportFormatReader {
         formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
-        formats.add(new SilverPlatterImporter());
-        formats.add(new CffImporter());
+        formats.add(new CffImporter(citationKeyPatternPreferences));
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());

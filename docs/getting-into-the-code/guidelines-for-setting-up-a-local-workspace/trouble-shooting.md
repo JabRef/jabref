@@ -6,6 +6,12 @@ nav_order: 99
 
 # Trouble shooting
 
+## Changes in `src/main/resources/csl-styles` are shown
+
+You need to remove these directories from the "Directory Mappings" in IntelliJ.
+Look for the setting in preferences.
+A long how-to is contained in [Step 1: Get the code into IntelliJ](intellij-11-code-into-ide.md).
+
 ## Issues with `buildSrc`
 
 1. Open the context menu of `buildSrc`.
@@ -58,35 +64,9 @@ If that does not help:
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
 
-## Hints for IntelliJ 2021
-
-In older IntelliJ setups, more things were necessary:
-
-Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
-
-![Ignore the Gradle project "buildSrc"](intellij-gradle-config-ignore-buildSrc.png)
-
-Add `src-gen` as root:
-
-1. Right click on the project "jabref".
-2. Select "Open Module Settings"
-3. Expand "JabRef"
-4. Select "main"
-5. Select tab "Sources"
-6. Click "+ Add Content Root"
-7. Select the `src-gen` directory
-8. Click "OK". When expanding "main", "java" should have been selected as source
-9. Click "OK" to save the changes
-
-In case the above step does not work, run with gradle, import gradle project again, and try again.
-
-~~Note that the above steps might not work on IntelliJ 2020.x.\*\*. You have to keep using gradle for executing tasks. See~~ [~~IDEA-249391~~](https://youtrack.jetbrains.com/issue/IDEA-249391) ~~for details.~~
-
-In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
-
 ## Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 20 is installed in the IDE is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 21 is installed in the IDE is following error message:
 
 ```text
 compileJava FAILED
@@ -103,3 +83,15 @@ Another indication is following output
 ```text
 java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 ```
+
+## Attempts to open preferences panel freezes application
+
+This is likely caused by improper integration of your OS or Desktop Environment with your password prompting program or password manager. Ensure that these are working properly, then restart your machine and attempt to run the program.
+
+In an ideal scenario, a password prompt should appear when the program starts, provided the keyring your OS uses has not already been unlocked. However, the implementation details vary depending on the operating system, which makes troubleshooting more complex.
+
+For Windows and macOS users, specific configurations may differ based on the password management tools and settings used, so ensure your OS's password management system is properly set up and functioning.
+
+For Linux users, ensure that your [xdg-desktop-portal](https://wiki.archlinux.org/title/XDG_Desktop_Portal) settings refer to active and valid portal implementations installed on your system. However, there might be other factors involved, so additional research or guidance specific to your distribution may be necessary.
+
+For reference, see the discussion at issue [#11766](https://github.com/JabRef/jabref/issues/11766).

@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class FieldFactoryTest {
     @Test
-    void testOrFieldsTwoTerms() {
+    void orFieldsTwoTerms() {
         assertEquals("Aaa/Bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
     }
 
     @Test
-    void testOrFieldsThreeTerms() {
+    void orFieldsThreeTerms() {
         assertEquals("Aaa/Bbb/Ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
     }
 
@@ -40,12 +40,12 @@ class FieldFactoryTest {
     }
 
     @Test
-    void testDoesNotParseApaFieldWithoutEntryType() {
+    void doesNotParseApaFieldWithoutEntryType() {
         assertNotEquals(BiblatexApaField.ARTICLE, FieldFactory.parseField("article"));
     }
 
     @Test
-    void testDoesParseApaFieldWithEntryType() {
+    void doesParseApaFieldWithEntryType() {
         assertEquals(BiblatexApaField.ARTICLE, FieldFactory.parseField(BiblatexApaEntryType.Constitution, "article"));
     }
 }

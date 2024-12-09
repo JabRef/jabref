@@ -187,7 +187,7 @@ public class OOBibBaseConnect {
         if (textDocumentList.isEmpty()) {
             throw new NoDocumentFoundException("No Writer documents found");
         } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
-            selected = textDocumentList.get(0); // Get the only one
+            selected = textDocumentList.getFirst(); // Get the only one
         } else { // Bring up a dialog
             selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
                     this.dialogService);

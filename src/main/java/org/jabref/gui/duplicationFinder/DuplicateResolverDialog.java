@@ -13,17 +13,15 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
-    private final BibDatabaseContext database;
     private final StateManager stateManager;
 
     public enum DuplicateResolverType {
@@ -33,32 +31,48 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public enum DuplicateResolverResult {
-        KEEP_BOTH,
-        KEEP_LEFT,
-        KEEP_RIGHT,
-        AUTOREMOVE_EXACT,
-        KEEP_MERGE,
-        BREAK
+        KEEP_BOTH(Localization.lang("Keep both")),
+        KEEP_LEFT(Localization.lang("Keep existing entry")),
+        KEEP_RIGHT(Localization.lang("Keep from import")),
+        AUTOREMOVE_EXACT(Localization.lang("Automatically remove exact duplicates")),
+        KEEP_MERGE(Localization.lang("Keep merged")),
+        BREAK(Localization.lang("Ask every time"));
+
+        final String defaultTranslationForImport;
+
+        DuplicateResolverResult(String defaultTranslationForImport) {
+            this.defaultTranslationForImport = defaultTranslationForImport;
+        }
+
+        public String getDefaultTranslationForImport() {
+            return defaultTranslationForImport;
+        }
+
+        public static DuplicateResolverResult parse(String name) {
+            try {
+                return DuplicateResolverResult.valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return BREAK; // default
+            }
+        }
     }
 
     private ThreeWayMergeView threeWayMerge;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
 
     public DuplicateResolverDialog(BibEntry one,
                                    BibEntry two,
                                    DuplicateResolverType type,
-                                   BibDatabaseContext database,
                                    StateManager stateManager,
                                    DialogService dialogService,
-                                   PreferencesService preferencesService) {
+                                   GuiPreferences preferences) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
-        this.database = database;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
-        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.preferences = preferences;
+        this.actionFactory = new ActionFactory();
         init(one, two, type);
     }
 
@@ -77,21 +91,21 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences);
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences);
             }
             case IMPORT_CHECK -> {
-                first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                first = new ButtonType(Localization.lang("Keep existing entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), preferencesService);
+                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Existing entry"),
+                        Localization.lang("From import"), preferences);
             }
             default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
@@ -134,11 +148,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 return DuplicateResolverResult.KEEP_MERGE;
             } else if (button.equals(removeExact)) {
                 return DuplicateResolverResult.AUTOREMOVE_EXACT;
+            } else if (button.equals(cancel)) {
+                return DuplicateResolverResult.KEEP_LEFT;
             }
             return null;
         });
 
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferencesService.getFilePreferences());
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferences.getExternalApplicationsPreferences());
         Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 

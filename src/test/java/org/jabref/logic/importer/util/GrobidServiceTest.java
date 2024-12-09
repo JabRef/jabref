@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.GrobidPreferences;
-import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -27,13 +26,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class GrobidServiceTest {
+class GrobidServiceTest {
 
     private static GrobidService grobidService;
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -45,7 +44,7 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processValidCitationTest() throws IOException, ParseException {
+    void processValidCitationTest() throws IOException, ParseException {
         BibEntry exampleBibEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("-1")
                 .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
@@ -67,14 +66,14 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processEmptyStringTest() throws IOException, ParseException {
+    void processEmptyStringTest() throws IOException, ParseException {
         Optional<BibEntry> response = grobidService.processCitation(" ", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         assertNotNull(response);
         assertEquals(Optional.empty(), response);
     }
 
     @Test
-    public void processInvalidCitationTest() {
+    void processInvalidCitationTest() {
         assertThrows(IOException.class, () -> grobidService.processCitation(
                 "Iiiiiiiiiiiiiiiiiiiiiiii",
                 importFormatPreferences,
@@ -82,7 +81,7 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void failsWhenGrobidDisabled() {
+    void failsWhenGrobidDisabled() {
         GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
                 false,
                 false,
@@ -91,13 +90,31 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processPdfTest() throws IOException, ParseException, URISyntaxException {
-        Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+    void processPdfTest() throws IOException, ParseException, URISyntaxException {
+        Path file = Path.of(GrobidServiceTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
-        BibEntry be0 = response.get(0);
+        BibEntry be0 = response.getFirst();
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         // assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         // assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
+    }
+
+    @Test
+    void extractsReferencesFromPdf() throws IOException, ParseException, URISyntaxException {
+        BibEntry ref1 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Kopp, O")
+                .withField(StandardField.ADDRESS, "Berlin; Heidelberg")
+                .withField(StandardField.DATE, "2013")
+                .withField(StandardField.JOURNAL, "All links were last followed on October")
+                .withField(StandardField.PAGES, "700--704")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Winery -A Modeling Tool for TOSCA-based Cloud Applications")
+                .withField(StandardField.VOLUME, "8274")
+                .withField(StandardField.YEAR, "2013");
+
+        Path file = Path.of(Objects.requireNonNull(GrobidServiceTest.class.getResource("LNCS-minimal.pdf")).toURI());
+        List<BibEntry> extractedReferences = grobidService.processReferences(file, importFormatPreferences);
+        assertEquals(List.of(ref1), extractedReferences);
     }
 }

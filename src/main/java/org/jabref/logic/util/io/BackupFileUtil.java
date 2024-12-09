@@ -40,7 +40,7 @@ public class BackupFileUtil {
      */
 
     public static Path getPathForNewBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType, Path backupDir) {
-        String extension = "." + fileType.getExtensions().get(0);
+        String extension = "." + fileType.getExtensions().getFirst();
         String timeSuffix = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
 
         // We choose the data directory, because a ".bak" file should survive cache cleanups
@@ -60,7 +60,7 @@ public class BackupFileUtil {
     public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType, Path backupDir) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
-        String extension = "." + fileType.getExtensions().get(0);
+        String extension = "." + fileType.getExtensions().getFirst();
 
         if (Files.notExists(backupDir)) {
             // In case there is no app directory, we search in the directory of the bib file

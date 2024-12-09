@@ -21,35 +21,37 @@ import org.slf4j.LoggerFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
+
     /**
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
 
-    /**
-     * List of unwanted characters. These will be removed at the end.
-     * Note that <code>+</code> is a wanted character to indicate "et al." in authorsAlpha.
-     * Example: "ABC+". See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
-     */
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^";
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";
+
+    /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
+    /// These characters are disallowed in BibTeX keys.
+    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 
-    // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
-    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
-
-    private final AbstractCitationKeyPattern citeKeyPattern;
+    private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
+        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 citationKeyPatternPreferences);
     }
 
-    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
@@ -172,12 +174,11 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String createCitationKeyFromPattern(BibEntry entry) {
         // get the type of entry
         EntryType entryType = entry.getType();
-        // Get the arrayList corresponding to the type
-        List<String> citationKeyPattern = citeKeyPattern.getValue(entryType);
-        if (citationKeyPattern.isEmpty()) {
+        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
+        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
             return "";
         }
-        return expandBrackets(citationKeyPattern.get(0), expandBracketContent(entry));
+        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
     }
 
     /**
@@ -193,7 +194,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
 
-            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database), unwantedCharacters);
+            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);
             // check whether there is a modifier on the end such as
             // ":lower":
             if (fieldParts.size() > 1) {

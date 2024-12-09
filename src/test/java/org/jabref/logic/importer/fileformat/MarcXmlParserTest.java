@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MarcXmlParserTest {
+class MarcXmlParserTest {
 
     private static final String FILE_ENDING = ".xml";
 
@@ -29,13 +29,13 @@ public class MarcXmlParserTest {
             MarcXmlParser parser = new MarcXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
-            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.get(0));
+            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.getFirst());
         }
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
     }

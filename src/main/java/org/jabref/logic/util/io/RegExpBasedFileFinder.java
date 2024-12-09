@@ -60,7 +60,7 @@ class RegExpBasedFileFinder implements FileFinder {
         try {
             return Pattern.compile('^' + fileNamePattern + '$', Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException e) {
-            throw new IOException(String.format("There is a syntax error in the regular expression %s used to search for files", fileNamePattern), e);
+            throw new IOException("There is a syntax error in the regular expression %s used to search for files".formatted(fileNamePattern), e);
         }
     }
 

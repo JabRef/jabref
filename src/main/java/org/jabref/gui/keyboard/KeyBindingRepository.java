@@ -6,33 +6,41 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
+/**
+ * Handles keyboard shortcuts. Including checking whether a keybinding matches.
+ * See {@link #matches}.
+ */
 public class KeyBindingRepository {
 
     /**
      * sorted by localization
      */
-    private final SortedMap<KeyBinding, String> bindings;
+    private final MapProperty<KeyBinding, String> bindings;
 
     public KeyBindingRepository() {
         this(Collections.emptyList(), Collections.emptyList());
     }
 
     public KeyBindingRepository(SortedMap<KeyBinding, String> bindings) {
-        this.bindings = bindings;
+        this.bindings = new SimpleMapProperty<>(FXCollections.observableMap(bindings));
     }
 
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
-        this.bindings = new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization));
+        this.bindings = new SimpleMapProperty<>(FXCollections.observableMap(new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization))));
 
         if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Use default key bindings
@@ -110,6 +118,11 @@ public class KeyBindingRepository {
         return this.bindings.size();
     }
 
+    /**
+     * Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
+     * <p>
+     * If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
+     */
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
             if (checkKeyCombinationEquality(binding, keyEvent)) {
@@ -117,6 +130,26 @@ public class KeyBindingRepository {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Used if the same key could be used by multiple actions
+     */
+    private Set<KeyBinding> mapToKeyBindings(KeyEvent keyEvent) {
+        return Arrays.stream(KeyBinding.values())
+                     .filter(binding -> checkKeyCombinationEquality(binding, keyEvent))
+                     .collect(Collectors.toSet());
+    }
+
+    /**
+     * Checks if the given KeyEvent matches the given KeyBinding.
+     * <p>
+     * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
+     */
+    public boolean matches(KeyEvent event, KeyBinding keyBinding) {
+        return mapToKeyBindings(event)
+                .stream()
+                .anyMatch(binding -> binding == keyBinding);
     }
 
     public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
@@ -148,6 +181,10 @@ public class KeyBindingRepository {
 
     public List<String> getBindings() {
         return new ArrayList<>(bindings.values());
+    }
+
+    public MapProperty<KeyBinding, String> getBindingsProperty() {
+        return bindings;
     }
 
     @Override

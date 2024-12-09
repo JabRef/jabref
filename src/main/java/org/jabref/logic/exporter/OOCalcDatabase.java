@@ -30,6 +30,7 @@ class OOCalcDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOCalcDatabase.class);
     private static final Field REPORT_TYPE_FIELD = new UnknownField("reporttype");
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
     private final List<BibEntry> entries = new ArrayList<>();
     private final List<Field> toExportFields = Stream.concat(FieldFactory.getStandardFieldsWithCitationKey().stream(), Stream.of(REPORT_TYPE_FIELD))
@@ -53,7 +54,7 @@ class OOCalcDatabase {
     public Document getDOMrepresentation() {
         Document document = null;
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            document = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().newDocument();
             Element root = createRootElement(document);
             Element body = document.createElement("office:body");
             Element table = createTableElement(document);

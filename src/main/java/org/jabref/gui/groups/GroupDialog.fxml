@@ -66,7 +66,7 @@
                     </VBox>
                 </VBox>
             </HBox>
-            <Label text="%Collect by" styleClass="sectionHeader" style="-fx-padding: 0 10 0 0;"/>
+            <Label text="%Collect by" styleClass="sectionHeader"/>
             <HBox>
                 <VBox spacing="10.0">
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
@@ -122,8 +122,16 @@
                             <TextField fx:id="searchGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive"/>
-                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression"/>
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive">
+                                <tooltip>
+                                    <Tooltip text="%This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator."/>
+                                </tooltip>
+                            </CheckBox>
+                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression">
+                                <tooltip>
+                                    <Tooltip text="%This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator."/>
+                                </tooltip>
+                            </CheckBox>
                         </HBox>
                     </VBox>
                     <VBox visible="${autoRadioButton.selected}" spacing="10.0">

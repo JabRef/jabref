@@ -27,31 +27,31 @@ Examples:
 
 ## Technically
 
-In LibreOffice, a document has a main text that supports the [XText](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XText.html) interface.\
-This allows several types of [XTextContent](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextContent.html) to be inserted.
+In LibreOffice, a document has a main text that supports the [XText](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XText.html) interface.\
+This allows several types of [XTextContent](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextContent.html) to be inserted.
 
 * Some of these allow text inside with further insertions.
 
 ### Anchors
 
-* Many, but not all XTextContent types support getting a "technical" insertion point or text range through [getAnchor](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextContent.html#ae82a8b42f6b2578549b68b4483a877d3).
+* Many, but not all XTextContent types support getting a "technical" insertion point or text range through [getAnchor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextContent.html#ae82a8b42f6b2578549b68b4483a877d3).
 * In Libreoffice positioning both a frame and its anchor seems hard: moving the frame tends to also move the anchor.
 * Consequence: producing an order of appearance for the citation groups based solely on `getAnchor` calls may be impossible.
   * Allowing or requiring the user to insert "logical anchors" for frames and other "floating" parts might help to alleviate these problems.
 
 ### Sorting within a `Text`
 
-The text ranges occupied by the citation markers support the [XTextRange](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextRange.html) interface.
+The text ranges occupied by the citation markers support the [XTextRange](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRange.html) interface.
 
 * These provide access to the XText they are contained in.
-* The [Text](https://api.libreoffice.org/docs/idl/ref/servicecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1Text.html) service may support (optional) the [XTextRangeCompare](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextRangeCompare.html) interface, that allows two XTextRange values to be compared if both belong to this `Text`
+* The [Text](https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1text_1_1Text.html) service may support (optional) the [XTextRangeCompare](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRangeCompare.html) interface, that allows two XTextRange values to be compared if both belong to this `Text`
 
 ### Visual ordering
 
-* The cursor used by the user is available as an [XTextViewCursor](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextViewCursor.html)
-* If we can get it and can set its position in the document to each XTextRange to be sorted, and ask its [getPosition](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1text\_1\_1XTextViewCursor.html#a9b2bafd342ef75b5d504a9313dbb1389) to provide coordinates "relative to the top left position of the first page of the document.", then we can sort by these coordinates in top-to-bottom left-to-right order.
+* The cursor used by the user is available as an [XTextViewCursor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextViewCursor.html)
+* If we can get it and can set its position in the document to each XTextRange to be sorted, and ask its [getPosition](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextViewCursor.html#a9b2bafd342ef75b5d504a9313dbb1389) to provide coordinates "relative to the top left position of the first page of the document.", then we can sort by these coordinates in top-to-bottom left-to-right order.
 * Note: in some cases, for example when the cursor is in a comment (as in `Libreoffice:[menu:Insert]/[Comment]`), the XTextViewCursor is not available (I know of no way to get it).
-* In some other cases, for example when an image is selected, the XTextViewCursor we normally receive is not 'functional': we cannot position it for getting coordinates for the citation marks. The [FunctionalTextViewCursor](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java) class can solve this case by accessing and manipulating the cursor through [XSelectionSupplier](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1view\_1\_1XSelectionSupplier.html)
+* In some other cases, for example when an image is selected, the XTextViewCursor we normally receive is not 'functional': we cannot position it for getting coordinates for the citation marks. The [FunctionalTextViewCursor](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java) class can solve this case by accessing and manipulating the cursor through [XSelectionSupplier](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1view_1_1XSelectionSupplier.html)
 
 Consequences of getting these visual coordinates and using them to order the citation markers
 
@@ -63,11 +63,11 @@ Consequences of getting these visual coordinates and using them to order the cit
 
 ## JabRef
 
-Jabref uses the following steps for sorting sorting citation markers (providing `globalOrder`):
+Jabref uses the following steps for sorting citation markers (providing `globalOrder`):
 
 1. the textranges of citation marks in footnotes are replaced by the textranges of the footnote marks.
 2. get the positions (coordinates) of these marks
-3. sort in top-to-botton left-to-right order
+3. sort in top-to-bottom left-to-right order
 
 `(problem)` In JabRef5.2 the positions of citation marks within the same footnote become indistinguishable, thus their order after sorting may differ from their order in the footnote text.\
 This caused problems for

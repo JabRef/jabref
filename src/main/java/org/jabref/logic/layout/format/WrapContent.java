@@ -24,7 +24,7 @@ public class WrapContent extends AbstractParamLayoutFormatter {
         if (parts.size() < 2) {
             return;
         }
-        before = parts.get(0);
+        before = parts.getFirst();
         after = parts.get(1);
     }
 

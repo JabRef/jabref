@@ -6,10 +6,11 @@ on:
 
 jobs:
   cleanup:
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     steps:
       - name: Cancel deployment run
-        uses: styfle/cancel-workflow-action@0.12.0
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
           ignore_sha: true
           workflow_id: 9813 # workflow "Deployment"
@@ -19,14 +20,16 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Delete folder on builds.jabref.org
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: appleboy/ssh-action@v1.0.2
+        uses: appleboy/ssh-action@v1.2.0
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
           host: build-upload.jabref.org
@@ -35,8 +38,8 @@ jobs:
           key: ${{ secrets.buildJabRefPrivateKey }}
       - name: Update PR comment
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
-          comment_tag: download-link
+          comment-tag: download-link
           message: The build for this PR is no longer available. Please visit <https://builds.jabref.org/main/> for the latest build.
           mode: upsert

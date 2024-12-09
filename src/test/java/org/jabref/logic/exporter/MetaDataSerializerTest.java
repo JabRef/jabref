@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.BibField;
@@ -38,13 +38,13 @@ public class MetaDataSerializerTest {
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
 
     private MetaData metaData;
-    private GlobalCitationKeyPattern pattern;
+    private GlobalCitationKeyPatterns pattern;
     private BibEntryType newCustomType;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         metaData = new MetaData();
-        pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+        pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
@@ -52,12 +52,12 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeNewMetadataReturnsEmptyMap() {
+    void serializeNewMetadataReturnsEmptyMap() {
         assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
     @Test
-    public void serializeSingleSaveAction() {
+    void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
@@ -69,7 +69,7 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeSingleContentSelectors() {
+    void serializeSingleContentSelectors() {
         List<String> values = List.of(
                 "approved",
                 "captured",
@@ -84,14 +84,14 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    void testParsingEmptyOrFieldsReturnsEmptyCollections() {
+    void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getRequiredFields());
     }
 
     @Test
-    void testParsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
+    void parsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 Collections.emptySet(),

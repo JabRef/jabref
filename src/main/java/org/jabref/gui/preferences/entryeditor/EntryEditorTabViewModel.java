@@ -11,19 +11,21 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.MrDlibPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openOnNewEntryProperty = new SimpleBooleanProperty();
     private final BooleanProperty defaultSourceProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableRelatedArticlesTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableAiSummaryTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableAiChatTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
@@ -37,15 +39,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
 
-    public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
+    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferencesService.getMrDlibPreferences();
+        this.preferences = preferences;
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+        this.mrDlibPreferences = preferences.getMrDlibPreferences();
     }
 
     @Override
@@ -56,6 +58,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
         enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
+        enableAiSummaryTabProperty.setValue(entryEditorPreferences.shouldShowAiSummaryTab());
+        enableAiChatTabProperty.setValue(entryEditorPreferences.shouldShowAiChatTab());
         acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
@@ -69,7 +73,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetToDefaults() {
-        setFields(preferencesService.getEntryEditorPreferences().getDefaultEntryEditorTabs());
+        setFields(preferences.getEntryEditorPreferences().getDefaultEntryEditorTabs());
     }
 
     private void setFields(Map<String, Set<Field>> tabNamesAndFields) {
@@ -90,6 +94,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
         entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
+        entryEditorPreferences.setShouldShowAiSummaryTab(enableAiSummaryTabProperty.getValue());
+        entryEditorPreferences.setShouldShowAiChatTab(enableAiChatTabProperty.getValue());
         mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
@@ -144,6 +150,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableRelatedArticlesTabProperty() {
         return enableRelatedArticlesTabProperty;
+    }
+
+    public BooleanProperty enableAiSummaryTabProperty() {
+        return enableAiSummaryTabProperty;
+    }
+
+    public BooleanProperty enableAiChatTabProperty() {
+        return enableAiChatTabProperty;
     }
 
     public BooleanProperty acceptRecommendationsProperty() {

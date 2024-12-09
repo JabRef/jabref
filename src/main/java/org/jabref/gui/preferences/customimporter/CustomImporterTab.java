@@ -37,7 +37,7 @@ public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterT
 
     @FXML
     private void initialize() {
-        viewModel = new CustomImporterTabViewModel(preferencesService, dialogService);
+        viewModel = new CustomImporterTabViewModel(preferences, dialogService);
 
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());

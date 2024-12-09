@@ -13,11 +13,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -28,14 +31,17 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
 
     public CitationKeyEditor(Field field,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             BibDatabaseContext databaseContext) {
+                             BibDatabaseContext databaseContext,
+                             UndoAction undoAction,
+                             RedoAction redoAction) {
 
         ViewLoader.view(this)
                   .root(this)
@@ -45,16 +51,14 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                preferencesService,
+                preferences,
                 databaseContext,
                 undoManager,
                 dialogService);
 
-        textField.textProperty().bindBidirectional(viewModel.textProperty());
-
-        textField.initContextMenu(Collections::emptyList);
-
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(Collections::emptyList, keyBindingRepository);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public CitationKeyEditorViewModel getViewModel() {
@@ -66,11 +70,10 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
         viewModel.bindToEntry(entry);
 
         // Configure button to generate citation key
-        new ActionFactory(preferencesService.getKeyBindingRepository())
-                .configureIconButton(
-                        StandardActions.GENERATE_CITE_KEY,
-                        viewModel.getGenerateCiteKeyCommand(),
-                        generateCitationKeyButton);
+        new ActionFactory().configureIconButton(
+                StandardActions.GENERATE_CITE_KEY,
+                viewModel.getGenerateCiteKeyCommand(),
+                generateCitationKeyButton);
     }
 
     @Override

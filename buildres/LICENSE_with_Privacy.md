@@ -1,6 +1,6 @@
 MIT License
 
-Copyright © 2003-2021 JabRef Authors
+Copyright © 2003-2024 JabRef Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ Service;Privacy Policy
 [ResearchGate](https://www.researchgate.net/);<https://www.researchgate.net/privacy-policy>
 [IETF Datatracker](https://datatracker.ietf.org/);<https://www.ietf.org/privacy-statement/>
 [Semantic Scholar](https://www.semanticscholar.org/), powered by [Allen Institute for AI](https://allenai.org/);<https://allenai.org/privacy-policy>
-[Springer Nature](https://dev.springernature.com/);<https://dev.springernature.com/privacypolicy>
+[Springer Nature](https://dev.springernature.com/);<https://dev.springernature.com/privacy-policy/>
 [The SAO/NASA Astrophysics Data System](https://ui.adsabs.harvard.edu/);<https://ui.adsabs.harvard.edu/help/privacy/>
 [Unpaywall](https://unpaywall.org/);<https://unpaywall.org/legal/privacy>
 [zbMATH Open](https://www.zbmath.org);<https://zbmath.org/privacy-policy/>

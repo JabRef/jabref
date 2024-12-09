@@ -133,7 +133,7 @@ public class DatabaseMerger {
     }
 
     private void mergeContentSelectors(MetaData target, MetaData other) {
-        for (ContentSelector selector : other.getContentSelectorList()) {
+        for (ContentSelector selector : other.getContentSelectorsSorted()) {
             target.addContentSelector(selector);
         }
     }

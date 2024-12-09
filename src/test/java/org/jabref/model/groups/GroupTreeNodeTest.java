@@ -10,10 +10,9 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.matchers.AndMatcher;
 import org.jabref.model.search.matchers.OrMatcher;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,7 +83,7 @@ public class GroupTreeNodeTest {
     }
 
     private static AbstractGroup getSearchGroup(String name) {
-        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE));
+        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE));
     }
 
     private static AbstractGroup getExplict(String name) {
@@ -334,7 +333,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void addEntriesToGroupWorksNotForGroupsNotSupportingExplicitAddingOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.addEntriesToGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);
@@ -342,7 +341,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void removeEntriesFromGroupWorksNotForGroupsNotSupportingExplicitRemovalOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);

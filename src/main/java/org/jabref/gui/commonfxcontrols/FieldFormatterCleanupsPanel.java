@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
@@ -24,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
@@ -35,6 +37,8 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML private ComboBox<Field> addableFields;
     @FXML private ComboBox<Formatter> addableFormatters;
 
+    @Inject private StateManager stateManager;
+
     private FieldFormatterCleanupsPanelViewModel viewModel;
 
     public FieldFormatterCleanupsPanel() {
@@ -45,7 +49,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
     @FXML
     private void initialize() {
-        this.viewModel = new FieldFormatterCleanupsPanelViewModel();
+        this.viewModel = new FieldFormatterCleanupsPanelViewModel(stateManager);
 
         setupTable();
         setupCombos();

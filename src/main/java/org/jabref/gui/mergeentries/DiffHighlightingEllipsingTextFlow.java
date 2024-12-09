@@ -55,7 +55,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     private void adjustText() {
-        if (allChildren.size() == 0) {
+        if (allChildren.isEmpty()) {
             return;
         }
         // remove listeners
@@ -85,12 +85,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     private boolean fillUntilOverflowing() {
         while (getHeight() <= getMaxHeight() && getWidth() <= getMaxWidth()) {
             if (super.getChildren().size() == allChildren.size()) {
-                if (allChildren.size() > 0) {
+                if (!allChildren.isEmpty()) {
                     // all Texts are displayed, let's make sure all chars are as well
                     Node lastChildAsShown = super.getChildren().get(super.getChildren().size() - 1);
-                    Node lastChild = allChildren.get(allChildren.size() - 1);
-                    if (lastChildAsShown instanceof Text && ((Text) lastChildAsShown).getText().length() < ((Text) lastChild).getText().length()) {
-                        ((Text) lastChildAsShown).setText(((Text) lastChild).getText());
+                    Node lastChild = allChildren.getLast();
+                    if (lastChildAsShown instanceof Text text && text.getText().length() < ((Text) lastChild).getText().length()) {
+                        text.setText(((Text) lastChild).getText());
                     } else {
                         // nothing to fill the space with
                         return false;

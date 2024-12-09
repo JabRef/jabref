@@ -49,11 +49,11 @@ class XmpUtilReaderTest {
      * Tests reading of dublinCore metadata.
      */
     @Test
-    void testReadArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException {
+    void readArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException {
         Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.pdf").toURI());
         List<XMPMetadata> meta = xmpUtilReader.readRawXmp(path);
 
-        DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.get(0).getDublinCoreSchema());
+        DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.getFirst().getDublinCoreSchema());
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
 
@@ -67,7 +67,7 @@ class XmpUtilReaderTest {
      * Tests reading of dublinCore metadata.
      */
     @Test
-    void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException {
+    void readArticleDublinCoreReadXmp() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<BibEntry> entries = xmpUtilReader.readXmp(pathPdf, xmpPreferences);
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore.bib").toURI());
@@ -82,7 +82,7 @@ class XmpUtilReaderTest {
     }
 
     @Test
-    void testReadArticleDublinCoreReadXmpPartialDate() throws IOException, URISyntaxException {
+    void readArticleDublinCoreReadXmpPartialDate() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.pdf").toURI());
         List<BibEntry> entries = xmpUtilReader.readXmp(pathPdf, xmpPreferences);
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.bib").toURI());
@@ -99,7 +99,7 @@ class XmpUtilReaderTest {
      * Tests an pdf file with an empty metadata section.
      */
     @Test
-    void testReadEmtpyMetadata() throws IOException, URISyntaxException {
+    void readEmtpyMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
         assertEquals(Collections.emptyList(), entries);
     }
@@ -108,7 +108,7 @@ class XmpUtilReaderTest {
      * Test non XMP metadata. Metadata are included in the PDInformation
      */
     @Test
-    void testReadPDMetadata() throws IOException, URISyntaxException {
+    void readPDMetadata() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
         List<BibEntry> entries = xmpUtilReader.readXmp(pathPdf, xmpPreferences);
 
@@ -126,7 +126,7 @@ class XmpUtilReaderTest {
      * Tests an pdf file with metadata which has no description section.
      */
     @Test
-    void testReadNoDescriptionMetadata() throws IOException, URISyntaxException {
+    void readNoDescriptionMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
         assertEquals(Collections.emptyList(), entries);
     }

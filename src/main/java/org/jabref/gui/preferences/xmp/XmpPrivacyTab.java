@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.xmp;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,10 +21,12 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
 
@@ -32,6 +36,9 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     @FXML private TableColumn<Field, Field> actionsColumn;
     @FXML private ComboBox<Field> addFieldName;
     @FXML private Button addField;
+
+    @Inject private CliPreferences preferences;
+    @Inject private UndoManager undoManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -47,7 +54,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService.getXmpPreferences());
+        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences.getXmpPreferences());
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
@@ -58,7 +65,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         fieldColumn.setReorderable(false);
         fieldColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
         new ValueTableCellFactory<Field, Field>()
-                .withText(FieldsUtil::getNameWithType)
+                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
                 .install(fieldColumn);
 
         actionsColumn.setSortable(false);
@@ -82,7 +89,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
 
         addFieldName.setEditable(true);
         new ViewModelListCellFactory<Field>()
-                .withText(FieldsUtil::getNameWithType)
+                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());

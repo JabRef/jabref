@@ -7,11 +7,12 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
-import org.jabref.logic.util.OS;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.os.OS;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class for the keybindings dialog view model
@@ -33,14 +35,16 @@ class KeyBindingsTabModelTest {
     @BeforeEach
     void setUp() {
         keyBindingRepository = new KeyBindingRepository();
-        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), mock(PreferencesService.class));
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+        Injector.setModelOrService(KeyBindingRepository.class, keyBindingRepository);
+        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
     }
 
     @Test
-    void testInvalidKeyBindingIsNotSaved() {
+    void invalidKeyBindingIsNotSaved() {
         setKeyBindingViewModel(KeyBinding.COPY);
-        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "Q", "Q", KeyCode.Q, false, false, false,
-                false);
+        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "Q", "Q", KeyCode.Q, false, false, false, false);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
         KeyCombination combination = KeyCombination.keyCombination(keyBindingRepository.get(KeyBinding.COPY).get());
@@ -50,27 +54,23 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSpecialKeysValidKeyBindingIsSaved() {
+    void specialKeysValidKeyBindingIsSaved() {
         setKeyBindingViewModel(KeyBinding.IMPORT_INTO_NEW_DATABASE);
-        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "F1", "F1", KeyCode.F1, false, false, false,
-                false);
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE,
-                shortcutKeyEvent));
+        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "F1", "F1", KeyCode.F1, false, false, false, false);
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
-        KeyCombination combination = KeyCombination
-                .keyCombination(keyBindingRepository.get(KeyBinding.IMPORT_INTO_NEW_DATABASE).get());
+        KeyCombination combination = KeyCombination.keyCombination(model.getKeyBindingRepository().get(KeyBinding.IMPORT_INTO_NEW_DATABASE).get());
 
         assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE,
-                                                                    shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE, shortcutKeyEvent));
     }
 
     @Test
-    void testKeyBindingCategory() {
+    void keyBindingCategory() {
         KeyBindingViewModel bindViewModel = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
         model.selectedKeyBindingProperty().set(Optional.of(bindViewModel));
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "M", "M", KeyCode.M, true, true, true, false);
@@ -80,13 +80,13 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testRandomNewKeyKeyBindingInRepository() {
+    void randomNewKeyKeyBindingInRepository() {
         setKeyBindingViewModel(KeyBinding.CLEANUP);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, true, true, false);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
-        KeyCombination combination = KeyCombination.keyCombination(keyBindingRepository.get(KeyBinding.CLEANUP).get());
+        KeyCombination combination = KeyCombination.keyCombination(model.getKeyBindingRepository().get(KeyBinding.CLEANUP).get());
 
         assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
@@ -94,7 +94,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSaveNewKeyBindingsToPreferences() {
+    void saveNewKeyBindingsToPreferences() {
         assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
@@ -108,10 +108,9 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSaveNewSpecialKeysKeyBindingsToPreferences() {
+    void saveNewSpecialKeysKeyBindingsToPreferences() {
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
-        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false,
-                false);
+        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false, false);
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
@@ -122,7 +121,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSetAllKeyBindingsToDefault() {
+    void setAllKeyBindingsToDefault() {
         assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
@@ -142,9 +141,8 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testCloseEntryEditorCloseEntryKeybinding() {
-        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.CLOSE);
-        model.selectedKeyBindingProperty().set(Optional.of(viewModel));
+    void closeEntryEditorCloseEntryKeybinding() {
+        setKeyBindingViewModel(KeyBinding.CLOSE);
         KeyEvent closeEditorEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false);
 
         assertEquals(KeyBinding.CLOSE.getDefaultKeyBinding(), KeyCode.ESCAPE.getName());
@@ -156,11 +154,10 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSetSingleKeyBindingToDefault() {
+    void setSingleKeyBindingToDefault() {
         assumeFalse(OS.OS_X);
 
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
-        model.selectedKeyBindingProperty().set(Optional.of(viewModel));
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));

@@ -14,18 +14,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 isFileRemovable.set(!newValue.isBuiltInListProperty().get());
                 abbreviations.bindBidirectional(newValue.abbreviationsProperty());
                 if (!abbreviations.isEmpty()) {
-                    currentAbbreviation.set(abbreviations.get(abbreviations.size() - 1));
+                    currentAbbreviation.set(abbreviations.getLast());
                 }
             } else {
                 isFileRemovable.set(false);
@@ -90,15 +90,15 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     currentAbbreviation.set(null);
                     abbreviations.clear();
                 } else {
-                    currentFile.set(journalFiles.get(0));
+                    currentFile.set(journalFiles.getFirst());
                 }
             }
         });
         journalFiles.addListener((ListChangeListener<AbbreviationsFileViewModel>) lcl -> {
             if (lcl.next()) {
                 if (!lcl.wasReplaced()) {
-                    if (lcl.wasAdded() && !lcl.getAddedSubList().get(0).isBuiltInListProperty().get()) {
-                        currentFile.set(lcl.getAddedSubList().get(0));
+                    if (lcl.wasAdded() && !lcl.getAddedSubList().getFirst().isBuiltInListProperty().get()) {
+                        currentFile.set(lcl.getAddedSubList().getFirst());
                     }
                 }
             }
@@ -341,8 +341,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> Globals.journalAbbreviationRepository =
-                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences))
+                .onSuccess(success -> Injector.setModelOrService(
+                        JournalAbbreviationRepository.class,
+                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
     }

@@ -3,7 +3,10 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,15 +26,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
-public class SynchronizationSimulatorTest {
+class SynchronizationSimulatorTest {
 
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
-    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)
@@ -43,17 +48,20 @@ public class SynchronizationSimulatorTest {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
         TestManager.clearTables(dbmsConnection);
 
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+
         clientContextA = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
+        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
         clientContextB = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', pattern, new DummyFileUpdateMonitor());
+        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor());
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
         clientContextB.getDBMSSynchronizer().openSharedDatabase(ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter()));
@@ -62,13 +70,13 @@ public class SynchronizationSimulatorTest {
     }
 
     @AfterEach
-    public void clear() throws SQLException {
+    void clear() throws SQLException {
         clientContextA.getDBMSSynchronizer().closeSharedDatabase();
         clientContextB.getDBMSSynchronizer().closeSharedDatabase();
     }
 
     @Test
-    public void simulateEntryInsertionAndManualPull() throws Exception {
+    void simulateEntryInsertionAndManualPull() throws Exception {
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
         // client A inserts another entry
@@ -80,7 +88,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateEntryUpdateAndManualPull() throws Exception {
+    void simulateEntryUpdateAndManualPull() throws Exception {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -95,7 +103,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateEntryDelitionAndManualPull() throws Exception {
+    void simulateEntryDelitionAndManualPull() throws Exception {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -116,7 +124,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateUpdateOnNoLongerExistingEntry() throws Exception {
+    void simulateUpdateOnNoLongerExistingEntry() throws Exception {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -133,16 +141,16 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
         // client B tries to update the entry
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
         assertNotNull(eventListenerB.getSharedEntriesNotPresentEvent());
-        assertEquals(List.of(bibEntryOfClientB), eventListenerB.getSharedEntriesNotPresentEvent().getBibEntries());
+        assertEquals(List.of(bibEntryOfClientB), eventListenerB.getSharedEntriesNotPresentEvent().bibEntries());
     }
 
     @Test
-    public void simulateEntryChangeConflicts() {
+    void simulateEntryChangeConflicts() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -156,7 +164,7 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getUpdateRefusedEvent());
 
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
         // B also tries to change something
         bibEntryOfClientB.setField(StandardField.YEAR, "2016");
 

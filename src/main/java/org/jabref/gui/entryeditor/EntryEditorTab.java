@@ -5,7 +5,12 @@ import javafx.scene.control.Tab;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class EntryEditorTab extends Tab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
     protected BibEntry currentEntry;
 
@@ -37,24 +42,14 @@ public abstract class EntryEditorTab extends Tab {
      */
     public void notifyAboutFocus(BibEntry entry) {
         if (!entry.equals(currentEntry) || !entry.getType().equals(currentEntryType)) {
+            // TODO: Shouldn't "bindToEntry" called when changing the entry?
+            LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
+            LOGGER.trace("Different entry: {}", entry.equals(currentEntry));
+            LOGGER.trace("Different entry type: {}", !entry.getType().equals(currentEntryType));
             currentEntry = entry;
             currentEntryType = entry.getType();
             bindToEntry(entry);
         }
         handleFocus();
-    }
-
-    /**
-     * Switch to next Preview style - should be overriden if a EntryEditorTab is actually showing a preview
-     */
-    protected void nextPreviewStyle() {
-        // do nothing by default
-    }
-
-    /**
-     * Switch to previous Preview style - should be overriden if a EntryEditorTab is actually showing a preview
-     */
-    protected void previousPreviewStyle() {
-        // do nothing by default
     }
 }

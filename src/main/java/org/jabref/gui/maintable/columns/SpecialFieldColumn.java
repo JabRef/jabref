@@ -22,11 +22,11 @@ import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.SpecialFieldComparator;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
@@ -36,16 +36,16 @@ import org.controlsfx.control.Rating;
  */
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, PreferencesService preferencesService, UndoManager undoManager) {
+    public SpecialFieldColumn(MainTableColumnModel model, CliPreferences preferences, UndoManager undoManager) {
         super(model);
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
 
         SpecialField specialField = (SpecialField) FieldFactory.parseField(model.getQualifier());
-        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferencesService, undoManager);
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferences, undoManager);
 
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
@@ -100,16 +100,16 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         }
 
         ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 ranking.setRating(0);
                 event.consume();
-            } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+            } else if (event.getButton() == MouseButton.SECONDARY) {
                 event.consume();
             }
         });
 
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
-                new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
+                new SpecialFieldViewModel(SpecialField.RANKING, preferences, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
 
         return ranking;

@@ -41,10 +41,13 @@ public class Date {
                 "M/uu",                                 // covers 9/15
                 "MMMM d, uuuu",                         // covers September 1, 2015
                 "MMMM, uuuu",                           // covers September, 2015
+                "MMMM  uuuu",                           // covers September 2015
                 "d.M.uuuu",                             // covers 15.1.2015
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
+                "MMM. uuuu",                            // covers Oct. 2020
+                "MMM uuuu",                             // covers Jan 2020
                 "uuuu.MM.d",                            // covers 2015.10.15
                 "d MMMM u/d MMMM u",                    // covers 20 January 2015/20 February 2015
                 "d MMMM u",                             // covers 20 January 2015
@@ -141,7 +144,7 @@ public class Date {
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format for range", e);
+                LOGGER.warn("Invalid Date format for range", e);
                 return Optional.empty();
             }
         } else if (dateString.matches(
@@ -162,7 +165,7 @@ public class Date {
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format range", e);
+                LOGGER.warn("Invalid Date format range", e);
                 return Optional.empty();
             }
         } else if (dateString.matches(
@@ -179,7 +182,7 @@ public class Date {
                 TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format range", e);
+                LOGGER.warn("Invalid Date format range", e);
                 return Optional.empty();
             }
         } else if (dateString.matches(
@@ -196,13 +199,13 @@ public class Date {
                 TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format range", e);
+                LOGGER.warn("Invalid Date format range", e);
                 return Optional.empty();
             }
         }
 
         // if dateString is single year
-        if (dateString.matches("\\d{4}-|" + "\\d{4}\\?")) {
+        if (dateString.matches("\\d{4}-|\\d{4}\\?")) {
             try {
                 String year = dateString.substring(0, dateString.length() - 1);
                 TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(year);
@@ -225,7 +228,7 @@ public class Date {
                 TemporalAccessor date = parseDateWithEraIndicator(dateString);
                 return Optional.of(new Date(date));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format with era indicator", e);
+                LOGGER.warn("Invalid Date format with era indicator", e);
                 return Optional.empty();
             }
         }

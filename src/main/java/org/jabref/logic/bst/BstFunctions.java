@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.slf4j.Logger;
@@ -163,7 +164,7 @@ public class BstFunctions {
     }
 
     /**
-     *  Pops the top two (integer) literals and pushes their sum.
+     * Pops the top two (integer) literals and pushes their sum.
      */
     private void bstAdd(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
@@ -305,14 +306,14 @@ public class BstFunctions {
     }
 
     /**
-     * Executes the function whose name is the entry type of an entry.
+     * Executes the function whose name is the entry type of entry.
      * For example if an entry is of type book, this function executes
      * the book function. When given as an argument to the ITERATE
      * command, call.type$ actually produces the output for the entries.
      * For an entry with an unknown type, it executes the function
-     * default.type. Thus you should define (before the READ command)
+     * default.type. Thus, you should define (before the READ command)
      * one function for each standard entry type as well as a
-     * default.type function.
+     * <code>default.type</code> function.
      */
     public class BstCallTypeFunction implements BstFunction {
         @Override
@@ -325,7 +326,13 @@ public class BstFunctions {
             if (bstEntry == null) {
                 this.execute(visitor, ctx); // Throw error
             } else {
-                functions.get(bstEntry.entry.getType().getName()).execute(visitor, ctx, bstEntry);
+                String entryType = bstEntry.entry.getType().getName();
+                LOGGER.trace("Handling {}", entryType);
+                if (!functions.containsKey(entryType)) {
+                    LOGGER.error("Function for {} not found ", entryType);
+                    return;
+                }
+                functions.get(entryType).execute(visitor, ctx, bstEntry);
             }
         }
     }
@@ -431,6 +438,7 @@ public class BstFunctions {
         Object o1 = stack.pop();
 
         if (o1 == null) {
+            LOGGER.trace("null is empty");
             stack.push(BstVM.TRUE);
             return;
         }
@@ -439,7 +447,9 @@ public class BstFunctions {
             throw new BstVMException("Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        stack.push("".equals(s.trim()) ? BstVM.TRUE : BstVM.FALSE);
+        boolean result = s.trim().isEmpty();
+        LOGGER.trace("empty$({}) result: {}", s, result);
+        stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -679,12 +689,13 @@ public class BstFunctions {
      * Pops the top three literals (they are the two integers literals
      * len and start, and a string literal, in that order). It pushes
      * the substring of the (at most) len consecutive characters
-     * starting at the startth character (assuming 1-based indexing) if
+     * starting at the start-th character (assuming 1-based indexing) if
      * start is positive, and ending at the start-th character
      * (including) from the end if start is negative (where the first
      * character from the end is the last character).
      */
-    private void bstSubstring(BstVMVisitor visitor, ParserRuleContext ctx) {
+    @VisibleForTesting
+    void bstSubstring(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException("Not enough operands on stack for operation substring$ (line %d)".formatted(ctx.start.getLine()));
         }
@@ -692,30 +703,35 @@ public class BstFunctions {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
-        if (!((o1 instanceof Integer len) && (o2 instanceof Integer start) && (o3 instanceof String s))) {
+        if (!((o1 instanceof Integer length) && (o2 instanceof Integer start) && (o3 instanceof String string))) {
             throw new BstVMException("Expecting two integers and a string for substring$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        int lenI = len;
-        int startI = start;
-
-        if (lenI > (Integer.MAX_VALUE / 2)) {
-            lenI = Integer.MAX_VALUE / 2;
+        if (length > (Integer.MAX_VALUE / 2)) {
+            length = Integer.MAX_VALUE / 2;
         }
 
-        if (startI > (Integer.MAX_VALUE / 2)) {
-            startI = Integer.MAX_VALUE / 2;
+        if ((start > string.length()) || (start < -string.length())) {
+            stack.push("");
+            return;
         }
 
-        if (startI < (Integer.MIN_VALUE / 2)) {
-            startI = -Integer.MIN_VALUE / 2;
+        if (start < 0) {
+            int endOneBased = string.length() + start + 1;
+            start = Math.max(1, endOneBased - length + 1);
+            length = endOneBased - start + 1;
         }
 
-        if (startI < 0) {
-            startI += s.length() + 1;
-            startI = Math.max(1, (startI + 1) - lenI);
-        }
-        stack.push(s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length())));
+        int zeroBasedStart = start - 1;
+        int zeroBasedEnd = Math.min(zeroBasedStart + length, string.length());
+
+        // Sanitize too large start values
+        zeroBasedStart = Math.min(zeroBasedStart, zeroBasedEnd);
+
+        String result = string.substring(zeroBasedStart, zeroBasedEnd);
+
+        LOGGER.trace("substring$(s, start, len): ({}, {}, {})={}", string, start, length, result);
+        stack.push(result);
     }
 
     /**
@@ -743,7 +759,7 @@ public class BstFunctions {
      * precisely, a "special character", defined in Section 4) counts as
      * a single text character, even if it's missing its matching right
      * brace, and where braces don't count as text characters.
-     *
+     * <p>
      * From BibTeXing: For the purposes of counting letters in labels,
      * BibTEX considers everything contained inside the braces as a
      * single letter.

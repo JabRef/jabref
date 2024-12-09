@@ -25,7 +25,7 @@ public final class Title {
         if (getWords().isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(getWords().get(0));
+        return Optional.of(getWords().getFirst());
     }
 
     public Optional<Word> getLastWord() {

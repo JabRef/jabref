@@ -31,7 +31,7 @@ public class UnoStyle {
         try {
             xFamily = UnoCast.cast(XNameContainer.class, families.getByName(familyName)).get();
         } catch (NoSuchElementException ex) {
-            String msg = String.format("Style family name '%s' is not recognized", familyName);
+            String msg = "Style family name '%s' is not recognized".formatted(familyName);
             throw new java.lang.IllegalArgumentException(msg, ex);
         }
 

@@ -1,124 +1,88 @@
 package org.jabref.logic.search;
 
-import java.util.Collections;
-import java.util.EnumSet;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.jabref.model.database.BibDatabase;
+import javafx.beans.property.BooleanProperty;
+
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class DatabaseSearcherTest {
-
-    public static final SearchQuery INVALID_SEARCH_QUERY = new SearchQuery("\\asd123{}asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-
-    private BibDatabase database;
+    private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
+    private BibDatabaseContext databaseContext;
+    private final CliPreferences preferences = mock(CliPreferences.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+    @TempDir
+    private Path indexDir;
 
     @BeforeEach
-    public void setUp() {
-        database = new BibDatabase();
+    void setUp() {
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(false);
+        when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        databaseContext = spy(new BibDatabaseContext());
+        when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
     }
 
-    @Test
-    public void testNoMatchesFromEmptyDatabase() {
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
-        assertEquals(Collections.emptyList(), matches);
+    @ParameterizedTest
+    @MethodSource
+    void databaseSearcher(List<BibEntry> expectedMatches, SearchQuery query, List<BibEntry> entries) throws IOException {
+        for (BibEntry entry : entries) {
+            databaseContext.getDatabase().insertEntry(entry);
+        }
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences).getMatches();
+        assertEquals(expectedMatches, matches);
     }
 
-    @Test
-    public void testNoMatchesFromEmptyDatabaseWithInvalidSearchExpression() {
-        List<BibEntry> matches = new DatabaseSearcher(INVALID_SEARCH_QUERY, database).getMatches();
-        assertEquals(Collections.emptyList(), matches);
-    }
+    private static Stream<Arguments> databaseSearcher() {
+        BibEntry emptyEntry = new BibEntry();
 
-    @Test
-    public void testGetDatabaseFromMatchesDatabaseWithEmptyEntries() {
-        database.insertEntry(new BibEntry());
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
-        assertEquals(Collections.emptyList(), matches);
-    }
+        BibEntry articleEntry = new BibEntry(StandardEntryType.Article);
+        articleEntry.setField(StandardField.AUTHOR, "harrer");
 
-    @Test
-    public void testNoMatchesFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "harrer");
-        database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
-        assertEquals(Collections.emptyList(), matches);
-    }
+        BibEntry inCollectionEntry = new BibEntry(StandardEntryType.InCollection);
+        inCollectionEntry.setField(StandardField.AUTHOR, "tonho");
 
-    @Test
-    public void testCorrectMatchFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "harrer");
-        database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
-        assertEquals(Collections.singletonList(entry), matches);
-    }
+        return Stream.of(
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of()),
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of(emptyEntry)),
+                Arguments.of(List.of(), new SearchQuery("whatever"), List.of(emptyEntry, articleEntry, inCollectionEntry)),
 
-    @Test
-    public void testNoMatchesFromEmptyDatabaseWithInvalidQuery() {
-        SearchQuery query = new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+                // invalid search syntax
+                Arguments.of(List.of(), new SearchQuery("author="), List.of(articleEntry)),
 
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
+                Arguments.of(List.of(articleEntry), new SearchQuery("harrer"), List.of(articleEntry)),
+                Arguments.of(List.of(), new SearchQuery("title= harrer"), List.of(articleEntry)),
 
-        assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
-    }
-
-    @Test
-    public void testCorrectMatchFromDatabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
-        entry.setField(StandardField.AUTHOR, "tonho");
-        database.insertEntry(entry);
-
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        List<BibEntry> matches = new DatabaseSearcher(query, database).getMatches();
-
-        assertEquals(Collections.singletonList(entry), matches);
-    }
-
-    @Test
-    public void testNoMatchesFromDatabaseWithTwoEntries() {
-        BibEntry entry = new BibEntry();
-        database.insertEntry(entry);
-
-        entry = new BibEntry(StandardEntryType.InCollection);
-        entry.setField(StandardField.AUTHOR, "tonho");
-        database.insertEntry(entry);
-
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
-
-        assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
-    }
-
-    @Test
-    public void testNoMatchesFromDabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
-        entry.setField(StandardField.AUTHOR, "tonho");
-        database.insertEntry(entry);
-
-        SearchQuery query = new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
-
-        assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
-    }
-
-    @Test
-    public void testNoMatchFromDatabaseWithEmptyEntry() {
-        BibEntry entry = new BibEntry();
-        database.insertEntry(entry);
-
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
-
-        assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
+                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(inCollectionEntry)),
+                Arguments.of(List.of(inCollectionEntry), new SearchQuery("tonho"), List.of(articleEntry, inCollectionEntry))
+        );
     }
 }

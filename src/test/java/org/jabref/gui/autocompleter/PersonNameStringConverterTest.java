@@ -2,6 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Collections;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PersonNameStringConverterTest {
+class PersonNameStringConverterTest {
 
     /** The author. **/
     private Author author;
@@ -38,7 +39,7 @@ public class PersonNameStringConverterTest {
             "FALSE, TRUE, BOTH, 'Reagle, Jr., J. M.'",
             "FALSE, FALSE, BOTH, 'Reagle'"
     })
-    void testToStringWithoutAutoCompletePreferences(boolean autoCompFF, boolean autoCompLF, AutoCompleteFirstNameMode autoCompleteFirstNameMode, String expectedResult) {
+    void toStringWithoutAutoCompletePreferences(boolean autoCompFF, boolean autoCompLF, AutoCompleteFirstNameMode autoCompleteFirstNameMode, String expectedResult) {
         PersonNameStringConverter converter = new PersonNameStringConverter(autoCompFF, autoCompLF, autoCompleteFirstNameMode);
         String formattedStr = converter.toString(author);
         assertEquals(expectedResult, formattedStr);
@@ -58,7 +59,7 @@ public class PersonNameStringConverterTest {
             "TRUE, ONLY_ABBREVIATED, BOTH, 'Reagle, Jr., J. M.'",
             "TRUE, BOTH, BOTH, 'Reagle, Jr., J. M.'"
     })
-    void testToStringWithAutoCompletePreferences(boolean shouldAutoComplete,
+    void toStringWithAutoCompletePreferences(boolean shouldAutoComplete,
                                                  AutoCompleteFirstNameMode firstNameMode,
                                                  AutoCompletePreferences.NameFormat nameFormat,
                                                  String expectedResult) {

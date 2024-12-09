@@ -9,8 +9,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
@@ -79,9 +79,5 @@ public class AutoCompletePreferences {
      */
     public ObservableSet<Field> getCompleteFields() {
         return completeFields;
-    }
-
-    public String getCompleteNamesAsString() {
-        return FieldFactory.serializeFieldsList(completeFields);
     }
 }

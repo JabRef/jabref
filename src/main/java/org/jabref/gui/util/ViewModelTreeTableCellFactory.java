@@ -51,7 +51,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
 
     @Override
     public TreeTableCell<S, S> call(TreeTableColumn<S, S> param) {
-        return new TreeTableCell<S, S>() {
+        return new TreeTableCell<>() {
             @Override
             protected void updateItem(S viewModel, boolean empty) {
                 super.updateItem(viewModel, empty);

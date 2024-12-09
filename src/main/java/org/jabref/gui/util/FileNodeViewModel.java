@@ -64,8 +64,7 @@ public class FileNodeViewModel {
      */
     public String getDisplayText() {
         if (path.toFile().isDirectory()) {
-            return String.format("%s (%s %s)", path.getFileName(), fileCount,
-                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
+            return "%s (%s)".formatted(path.getFileName(), Localization.lang("%0 file(s)", fileCount));
         }
         return path.getFileName().toString();
     }
@@ -76,21 +75,20 @@ public class FileNodeViewModel {
      */
     public String getDisplayTextWithEditDate() {
         if (path.toFile().isDirectory()) {
-            return String.format("%s (%s %s)", path.getFileName(), fileCount,
-                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
+            return "%s (%s)".formatted(path.getFileName(), Localization.lang("%0 file(s)", fileCount));
         }
         FileTime lastEditedTime = null;
         try {
             lastEditedTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
-            LOGGER.error("Exception Caught", e);
+            LOGGER.error("Could not get last modified time", e);
         }
-        return String.format("%s (%s: %s)", path.getFileName().toString(), Localization.lang("last edited"), formatDateTime(lastEditedTime));
+        return "%s (%s: %s)".formatted(path.getFileName(), Localization.lang("last edited"), formatDateTime(lastEditedTime));
     }
 
     @Override
     public String toString() {
-        return String.format("FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
+        return "FileNodeViewModel{path=%s, children=%s, fileCount=%s}".formatted(
                 this.path,
                 this.children,
                 this.fileCount);
@@ -106,10 +104,9 @@ public class FileNodeViewModel {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof FileNodeViewModel)) {
+        if (!(obj instanceof FileNodeViewModel other)) {
             return false;
         }
-        FileNodeViewModel other = (FileNodeViewModel) obj;
         return Objects.equals(children, other.children) && (fileCount == other.fileCount) && Objects.equals(path, other.path);
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HtmlToUnicodeFormatterTest {
+class HtmlToUnicodeFormatterTest {
 
     private HtmlToUnicodeFormatter formatter;
 
@@ -28,13 +28,13 @@ public class HtmlToUnicodeFormatterTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new HtmlToUnicodeFormatter();
     }
 
     @ParameterizedTest
     @MethodSource("data")
-    void testFormatterWorksCorrectly(String expected, String input) {
+    void formatterWorksCorrectly(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }

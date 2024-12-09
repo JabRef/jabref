@@ -1,7 +1,6 @@
 package org.jabref.gui.collab;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
@@ -21,64 +20,75 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final ThemeManager themeManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
     private final TaskExecutor taskExecutor;
 
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
-                                            StateManager stateManager,
                                             ThemeManager themeManager,
-                                            PreferencesService preferencesService,
+                                            GuiPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
                                             TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.themeManager = themeManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.previewViewer = previewViewer;
         this.taskExecutor = taskExecutor;
     }
 
     public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
-        // TODO: Use Pattern Matching for switch once it's out of preview
-        if (databaseChange instanceof EntryChange entryChange) {
-            return new EntryChangeDetailsView(entryChange.getOldEntry(), entryChange.getNewEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
-        } else if (databaseChange instanceof EntryAdd entryAdd) {
-            return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
-        } else if (databaseChange instanceof EntryDelete entryDelete) {
-            return new EntryWithPreviewAndSourceDetailsView(entryDelete.getDeletedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
-        } else if (databaseChange instanceof BibTexStringAdd stringAdd) {
-            return new BibTexStringAddDetailsView(stringAdd);
-        } else if (databaseChange instanceof BibTexStringDelete stringDelete) {
-            return new BibTexStringDeleteDetailsView(stringDelete);
-        } else if (databaseChange instanceof BibTexStringChange stringChange) {
-            return new BibTexStringChangeDetailsView(stringChange);
-        } else if (databaseChange instanceof BibTexStringRename stringRename) {
-            return new BibTexStringRenameDetailsView(stringRename);
-        } else if (databaseChange instanceof MetadataChange metadataChange) {
-            return new MetadataChangeDetailsView(metadataChange, preferencesService);
-        } else if (databaseChange instanceof GroupChange groupChange) {
-            return new GroupChangeDetailsView(groupChange);
-        } else if (databaseChange instanceof PreambleChange preambleChange) {
-            return new PreambleChangeDetailsView(preambleChange);
-        }
-        throw new UnsupportedOperationException("Cannot preview the given change: " + databaseChange.getName());
+        return switch (databaseChange) {
+            case EntryChange entryChange -> new EntryChangeDetailsView(
+                entryChange.getOldEntry(),
+                entryChange.getNewEntry(),
+                databaseContext,
+                dialogService,
+                themeManager,
+                preferences,
+                entryTypesManager,
+                previewViewer,
+                taskExecutor
+            );
+            case EntryAdd entryAdd -> new EntryWithPreviewAndSourceDetailsView(
+                entryAdd.getAddedEntry(),
+                databaseContext,
+                preferences,
+                entryTypesManager,
+                previewViewer
+            );
+            case EntryDelete entryDelete -> new EntryWithPreviewAndSourceDetailsView(
+                entryDelete.getDeletedEntry(),
+                databaseContext,
+                preferences,
+                entryTypesManager,
+                previewViewer
+            );
+            case BibTexStringAdd stringAdd -> new BibTexStringAddDetailsView(stringAdd);
+            case BibTexStringDelete stringDelete -> new BibTexStringDeleteDetailsView(stringDelete);
+            case BibTexStringChange stringChange -> new BibTexStringChangeDetailsView(stringChange);
+            case BibTexStringRename stringRename -> new BibTexStringRenameDetailsView(stringRename);
+            case MetadataChange metadataChange -> new MetadataChangeDetailsView(
+                metadataChange,
+                preferences.getCitationKeyPatternPreferences().getKeyPatterns()
+            );
+            case GroupChange groupChange -> new GroupChangeDetailsView(groupChange);
+            case PreambleChange preambleChange -> new PreambleChangeDetailsView(preambleChange);
+        };
     }
 }

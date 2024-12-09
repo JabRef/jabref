@@ -23,11 +23,11 @@ public class DOABFetcherTest {
     private final DOABFetcher fetcher = new DOABFetcher();
 
     @Test
-    public void testGetName() {
+    void getName() {
         assertEquals("DOAB", fetcher.getName());
     }
 
-    public static Stream<Arguments> testPerformSearch() {
+    public static Stream<Arguments> performSearch() {
         return Stream.of(
                 Arguments.of(
                         new BibEntry(StandardEntryType.Book)
@@ -97,7 +97,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/30652")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/38792")
                                 .withField(StandardField.LANGUAGE, "English")
-                                .withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa")
+                                .withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa, thema EDItEUR::U Computing and Information Technology::UB Information technology: general topics")
                                 .withField(StandardField.PUBLISHER, "AOSIS"),
                         "The symbiosis between information system project complexity and information system project success"
                 )
@@ -106,7 +106,7 @@ public class DOABFetcherTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testPerformSearch(BibEntry expected, String query) throws FetcherException {
+    void performSearch(BibEntry expected, String query) throws FetcherException {
         List<BibEntry> entries = fetcher.performSearch(query);
         // We must not contain abstracts in our code base; thus we remove the abstracts from the fetched results
         entries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));

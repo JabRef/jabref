@@ -111,6 +111,6 @@ public class ThreeWayMergeViewModel extends AbstractViewModel {
         visibleFields.sort(Comparator.comparing(Field::getName));
 
         // Add the entry type field as the first field to display
-        visibleFields.add(0, InternalField.TYPE_HEADER);
+        visibleFields.addFirst(InternalField.TYPE_HEADER);
     }
 }

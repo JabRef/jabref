@@ -37,23 +37,23 @@ import static org.mockito.Mockito.mock;
  * Tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}.
  * Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
  */
-public class BibtexImporterTest {
+class BibtexImporterTest {
 
     private BibtexImporter importer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testImportEntries() throws IOException, URISyntaxException {
+    void importEntries() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -63,8 +63,10 @@ public class BibtexImporterTest {
             if ("aksin".equals(entry.getCitationKey().get())) {
                 assertEquals(
                         Optional.of(
-                                "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
-                                        + "Bekir and Ni, Chaoying and B{\\\"u}y{\\\"u}kg{\\\"u}ng{\\\"o}r, Orhan and {\\\"O}zkal, Erhan"),
+                                """
+                                        Aks{\\i}n, {\\"O}zge and T{\\"u}rkmen, Hayati and Artok, Levent
+                                                          and {\\c{C}}etinkaya, Bekir and Ni, Chaoying and
+                                                          B{\\"u}y{\\"u}kg{\\"u}ng{\\"o}r, Orhan and {\\"O}zkal, Erhan"""),
                         entry.getField(StandardField.AUTHOR));
                 assertEquals(Optional.of("aksin"), entry.getCitationKey());
                 assertEquals(Optional.of("2006"), entry.getField(StandardField.DATE));
@@ -73,23 +75,30 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("13"), entry.getField(StandardField.NUMBER));
                 assertEquals(Optional.of("3027-3036"), entry.getField(StandardField.PAGES));
                 assertEquals(Optional
-                                .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
-                                        + "carbenes in {Mizoroki-Heck} reactions"),
+                                .of("""
+                                        Effect of immobilization on catalytic characteristics of
+                                                          saturated {Pd-N}-heterocyclic carbenes in {Mizoroki-Heck}
+                                                          reactions"""),
                         entry.getField(StandardField.TITLE));
                 assertEquals(Optional.of("691"), entry.getField(StandardField.VOLUME));
             } else if ("stdmodel".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
-                                .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
-                                        + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
-                                        + "each set member entry is needed only when using BibTeX as the backend"),
+                                .of("""
+                                        A \\texttt{set} with three members discussing the standard
+                                                          model of particle physics. The \\texttt{crossref} field
+                                                          in the \\texttt{@set} entry and the \\texttt{entryset} field in
+                                                          each set member entry is needed only when using BibTeX as the
+                                                          backend"""),
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("stdmodel"), entry.getCitationKey());
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField(StandardField.ENTRYSET));
             } else if ("set".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
-                                .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
-                                        + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
-                                        + "BibTeX as the backend"),
+                                .of("""
+                                        A \\texttt{set} with three members. The \\texttt{crossref} field
+                                                          in the \\texttt{@set} entry and the \\texttt{entryset} field in
+                                                          each set member entry is needed only when using BibTeX as the
+                                                          backend"""),
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("set"), entry.getCitationKey());
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField(StandardField.ENTRYSET));
@@ -112,30 +121,23 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    void getFormatName() {
         assertEquals("BibTeX", importer.getName());
     }
 
     @Test
-    public void testsGetExtensions() {
+    void getExtensions() {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
-        assertEquals(
-                "This importer enables `--importToOpen someEntry.bib`",
-                importer.getDescription());
-    }
-
-    @Test
-    public void testRecognizesDatabaseID() throws Exception {
+    void recognizesDatabaseID() throws Exception {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 
-    static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
+    static Stream<Arguments> parsingOfEncodedFileWithHeader() {
         return Stream.of(
                 Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
                 Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
@@ -147,7 +149,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testParsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
+    void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
         assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
@@ -155,7 +157,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
-    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
+    void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -165,8 +167,8 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
-                "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
-    public void testParsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
+            "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -185,14 +187,14 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
+    void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(encodingExplicitlySupplied, parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 
     @Test
-    public void wrongEncodingSupplied() throws Exception {
+    void wrongEncodingSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
 
@@ -203,7 +205,7 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void encodingNotSupplied() throws Exception {
+    void encodingNotSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
         assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());

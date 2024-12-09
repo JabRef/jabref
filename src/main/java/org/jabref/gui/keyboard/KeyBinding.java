@@ -2,6 +2,9 @@ package org.jabref.gui.keyboard;
 
 import org.jabref.logic.l10n.Localization;
 
+/**
+ * @implNote Cannot be sorted alphabetically, as {@link KeyBindingRepository#getKeyCombination(KeyBinding)} iterates over the enum in order and returns the first match.
+ */
 public enum KeyBinding {
     EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
@@ -46,7 +49,7 @@ public enum KeyBinding {
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Download full text documents", Localization.lang("Download full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
-    EDIT_ENTRY("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
+    OPEN_CLOSE_ENTRY_EDITOR("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
     EXPORT("Export", Localization.lang("Export"), "ctrl+alt+e", KeyBindingCategory.FILE),
     EXPORT_SELECTED("Export Selected", Localization.lang("Export selected entries"), "ctrl+shift+e", KeyBindingCategory.FILE),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
@@ -68,7 +71,7 @@ public enum KeyBinding {
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl+shift+A", KeyBindingCategory.BIBTEX),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl+shift+B", KeyBindingCategory.BIBTEX),
     NEW_ENTRY("New entry", Localization.lang("New entry"), "ctrl+N", KeyBindingCategory.BIBTEX),
-    NEW_ENTRY_FROM_PLAIN_TEXT("New entry from plain text", Localization.lang("New entry from plain text"), "ctrl+shift+N", KeyBindingCategory.BIBTEX),
+    NEW_ENTRY_FROM_PLAIN_TEXT_ONLINE("New entry from plain text", Localization.lang("New entry from plain text (online)"), "ctrl+shift+N", KeyBindingCategory.BIBTEX),
     NEW_INBOOK("New inbook", Localization.lang("New inbook"), "ctrl+shift+I", KeyBindingCategory.BIBTEX),
     NEW_MASTERSTHESIS("New mastersthesis", Localization.lang("New mastersthesis"), "ctrl+shift+M", KeyBindingCategory.BIBTEX),
     NEW_PHDTHESIS("New phdthesis", Localization.lang("New phdthesis"), "ctrl+shift+T", KeyBindingCategory.BIBTEX),
@@ -84,11 +87,14 @@ public enum KeyBinding {
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4", KeyBindingCategory.TOOLS),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl+shift+O", KeyBindingCategory.TOOLS),
     OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt+0", KeyBindingCategory.TOOLS),
+    SHOW_PREFS("Preferences", Localization.lang("Preferences"), "ctrl+,", KeyBindingCategory.FILE),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl+V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift+F9", KeyBindingCategory.VIEW),
     PREVIOUS_LIBRARY("Previous library", Localization.lang("Previous library"), "ctrl+PAGE_UP", KeyBindingCategory.VIEW),
+    SCROLL_TO_NEXT_MATCH_CATEGORY("Scroll to next match category", Localization.lang("Scroll to next match category"), "right", KeyBindingCategory.VIEW),
+    SCROLL_TO_PREVIOUS_MATCH_CATEGORY("Scroll to previous match category", Localization.lang("Scroll to previous match category"), "left", KeyBindingCategory.VIEW),
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl+L", KeyBindingCategory.TOOLS),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl+Q", KeyBindingCategory.FILE),
     REDO("Redo", Localization.lang("Redo"), "ctrl+Y", KeyBindingCategory.EDIT),
@@ -99,6 +105,7 @@ public enum KeyBinding {
     SAVE_DATABASE("Save library", Localization.lang("Save library"), "ctrl+S", KeyBindingCategory.FILE),
     SAVE_DATABASE_AS("Save library as ...", Localization.lang("Save library as..."), "ctrl+shift+S", KeyBindingCategory.FILE),
     SEARCH("Search", Localization.lang("Search"), "ctrl+F", KeyBindingCategory.SEARCH),
+    OPEN_GLOBAL_SEARCH_DIALOG("Open global search window", Localization.lang("Open global search window"), "ctrl+shift+F", KeyBindingCategory.SEARCH),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl+A", KeyBindingCategory.EDIT),
     SELECT_FIRST_ENTRY("Select first entry", Localization.lang("Select first entry"), "HOME", KeyBindingCategory.EDIT),
     SELECT_LAST_ENTRY("Select last entry", Localization.lang("Select last entry"), "END", KeyBindingCategory.EDIT),
@@ -110,7 +117,7 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
     WRITE_METADATA_TO_PDF("Write metadata to PDF files", Localization.lang("Write metadata to PDF files"), "F6", KeyBindingCategory.TOOLS),
-    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "Esc", KeyBindingCategory.SEARCH),
     CLEAR_READ_STATUS("Clear read status", Localization.lang("Clear read status"), "", KeyBindingCategory.EDIT),
     READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),
     SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT);

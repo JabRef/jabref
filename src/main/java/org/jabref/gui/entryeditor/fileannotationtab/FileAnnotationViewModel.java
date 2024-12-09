@@ -10,7 +10,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel {
 
-    private static final String NEWLINE = String.format("%n");
+    private static final String NEWLINE = "%n".formatted();
     private final FileAnnotation annotation;
     private StringProperty author = new SimpleStringProperty();
     private StringProperty page = new SimpleStringProperty();

@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
@@ -18,6 +19,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -33,19 +35,22 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -76,7 +81,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private TitledPane filePane;
     @FXML private TitledPane resultPane;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private UndoManager undoManager;
@@ -102,6 +107,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             if (button == ButtonType.CANCEL) {
                 viewModel.cancelTasks();
             }
+            saveConfiguration();
             return null;
         });
 
@@ -114,7 +120,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 dialogService,
                 undoManager,
                 fileUpdateMonitor,
-                preferencesService,
+                preferences,
                 stateManager,
                 taskExecutor);
 
@@ -158,21 +164,21 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 .install(fileTypeCombo);
         fileTypeCombo.setItems(viewModel.getFileFilters());
         fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
-        fileTypeCombo.getSelectionModel().selectFirst();
+
         new ViewModelListCellFactory<DateRange>()
             .withText(DateRange::getDateRange)
             .install(fileDateCombo);
         fileDateCombo.setItems(viewModel.getDateFilters());
         fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
-        fileDateCombo.getSelectionModel().selectFirst();
+
         new ViewModelListCellFactory<ExternalFileSorter>()
                 .withText(ExternalFileSorter::getSorter)
                 .install(fileSortCombo);
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
-        fileSortCombo.getSelectionModel().selectFirst();
 
-        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
+        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(Path::toString).orElse(""));
+        loadSavedConfiguration();
     }
 
     private void initUnlinkedFilesList() {
@@ -202,19 +208,23 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initResultTable() {
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withText(item -> item).withTooltip(item -> item)
+                .withGraphic(this::createEllipsisLabel)
+                .withTooltip(item -> item)
                 .install(colFile);
 
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withText(item -> item).withTooltip(item -> item)
+                .withGraphic(this::createEllipsisLabel)
+                .withTooltip(item -> item)
                 .install(colMessage);
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
         colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(JabRefIcon::getGraphicNode));
-        importResultTable.setColumnResizePolicy(param -> true);
-
+        colFile.setResizable(true);
+        colStatus.setResizable(true);
+        colMessage.setResizable(true);
         importResultTable.setItems(viewModel.resultTableItems());
+        importResultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void initButtons() {
@@ -225,6 +235,25 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         scanButton.setDefaultButton(true);
         scanButton.disableProperty().bind(viewModel.taskActiveProperty().or(viewModel.directoryPathValidationStatus().validProperty().not()));
+    }
+
+    private void loadSavedConfiguration() {
+        UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferences.getUnlinkedFilesDialogPreferences();
+
+        FileExtensionViewModel selectedExtension = fileTypeCombo.getItems()
+                                                                .stream()
+                                                                .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
+                                                                .findFirst()
+                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()));
+        fileTypeCombo.getSelectionModel().select(selectedExtension);
+        fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());
+        fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());
+    }
+
+    public void saveConfiguration() {
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
+        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
     }
 
     @FXML
@@ -248,6 +277,18 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     /**
+     * Creates a Label with a maximum width and ellipsis for overflow.
+     * Truncates text if it exceeds two-thirds of the screen width.
+     */
+    private Label createEllipsisLabel(String text) {
+        Label label = new Label(text);
+        double maxWidth = colFile.getMaxWidth();
+        label.setMaxWidth(maxWidth);
+        label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
+        return label;
+    }
+
+    /**
      * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
      */
     private void expandTree(TreeItem<?> item, boolean expand) {
@@ -261,7 +302,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     private ContextMenu createSearchContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory factory = new ActionFactory();
 
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.SELECT_ALL, new SearchContextAction(StandardActions.SELECT_ALL)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.UNSELECT_ALL, new SearchContextAction(StandardActions.UNSELECT_ALL)));

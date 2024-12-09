@@ -11,10 +11,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StringManipulatorTest {
+class StringManipulatorTest {
 
     @Test
-    public void testCapitalizePreservesNewlines() {
+    void capitalizePreservesNewlines() {
         int caretPosition = 5; // Position of the caret, between the two ll in the first hellO"
         String input = "hello\n\nhELLO";
         String expectedResult = "hello\n\nHello";
@@ -23,7 +23,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercasePreservesSpace() {
+    void uppercasePreservesSpace() {
         int caretPosition = 3; // Position of the caret, between the two ll in the first hello
         String input = "hello hello";
         String expectedResult = "helLO hello";
@@ -32,7 +32,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercasePreservesNewlines() {
+    void uppercasePreservesNewlines() {
         int caretPosition = 3; // Position of the caret, between the two ll in the first hello
         String input = "hello\nhello";
         String expectedResult = "helLO\nhello";
@@ -41,7 +41,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercasePreservesTab() {
+    void uppercasePreservesTab() {
         int caretPosition = 3; // Position of the caret, between the two ll in the first hello
         String input = "hello\thello";
         String expectedResult = "helLO\thello";
@@ -50,7 +50,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercasePreservesDoubleSpace() {
+    void uppercasePreservesDoubleSpace() {
         int caretPosition = 5; // Position of the caret, at the first space
         String input = "hello  hello";
         String expectedResult = "hello  HELLO";
@@ -59,7 +59,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercaseIgnoresTrailingWhitespace() {
+    void uppercaseIgnoresTrailingWhitespace() {
         int caretPosition = 5; // First space
         String input = "hello  ";
         String expectedResult = "hello  ";
@@ -70,7 +70,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testKillWordTrimsTrailingWhitespace() {
+    void killWordTrimsTrailingWhitespace() {
         int caretPosition = 5; // First space
         String input = "hello  ";
         String expectedResult = "hello";
@@ -80,7 +80,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testBackwardsKillWordTrimsPreceedingWhitespace() {
+    void backwardsKillWordTrimsPreceedingWhitespace() {
         int caretPosition = 1; // Second space
         String input = "  hello";
         // One space should be preserved since we are deleting everything preceding the second space.
@@ -92,7 +92,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testUppercasePreservesMixedSpaceNewLineTab() {
+    void uppercasePreservesMixedSpaceNewLineTab() {
         int caretPosition = 5; // Position of the caret, after first hello
         String input = "hello \n\thello";
         String expectedResult = "hello \n\tHELLO";
@@ -101,7 +101,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testLowercaseEditsTheNextWord() {
+    void lowercaseEditsTheNextWord() {
         int caretPosition = 5; // Position of the caret, right at the space
         String input = "hello HELLO";
         String expectedResult = "hello hello";
@@ -110,7 +110,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testKillWordRemovesFromPositionUpToNextWord() {
+    void killWordRemovesFromPositionUpToNextWord() {
         int caretPosition = 3; // Position of the caret, between the two "ll in the first hello"
         String input = "hello hello";
         String expectedResult = "hel hello";
@@ -119,7 +119,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testKillWordRemovesNextWordIfPositionIsInSpace() {
+    void killWordRemovesNextWordIfPositionIsInSpace() {
         int caretPosition = 5; // Position of the caret, after the first hello"
         String input = "hello person";
         String expectedResult = "hello";
@@ -128,7 +128,7 @@ public class StringManipulatorTest {
     }
 
     @Test
-    public void testKillPreviousWord() {
+    void killPreviousWord() {
         int caretPosition = 8;
         int expectedPosition = 6;
         String input = "hello person";
@@ -140,7 +140,7 @@ public class StringManipulatorTest {
 
     @ParameterizedTest
     @MethodSource("wordBoundaryTestData")
-    void testGetNextWordBoundary(String text, int caretPosition, int expectedPosition, StringManipulator.Direction direction) {
+    void getNextWordBoundary(String text, int caretPosition, int expectedPosition, StringManipulator.Direction direction) {
         int result = StringManipulator.getNextWordBoundary(caretPosition, text, direction);
         assertEquals(expectedPosition, result);
     }

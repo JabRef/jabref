@@ -62,7 +62,7 @@ public class IEEETranEntryTypeDefinitions {
             .withType(IEEETranEntryType.Patent)
             .withRequiredFields(new OrFields(StandardField.YEAR, StandardField.YEARFILED), StandardField.NATIONALITY, StandardField.NUMBER)
             .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.LANGUAGE, StandardField.ASSIGNEE, StandardField.ADDRESS,
-                    StandardField.TYPE, StandardField.NUMBER, StandardField.DAY, StandardField.DAYFILED, StandardField.MONTH,
+                    StandardField.TYPE, StandardField.DAY, StandardField.DAYFILED, StandardField.MONTH,
                     StandardField.MONTHFILED, StandardField.NOTE, StandardField.URL)
             .build();
 

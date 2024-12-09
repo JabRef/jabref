@@ -8,21 +8,31 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
+@Disabled("Server not working as of 2024-05-20")
 @FetcherTest
 class CiteSeerTest {
 
     private CiteSeer fetcher = new CiteSeer();
+
+    @BeforeAll
+    static void ensureCiteSeerIsAvailable() throws Exception {
+        assumeFalse(List.of().equals(new CiteSeer().performSearch("title:\"Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory\" AND pageSize:1")));
+    }
 
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
@@ -73,6 +83,7 @@ class CiteSeerTest {
     @Test
     void searchWithSortingByYearAndYearRange() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year-range:2002-2012 AND sortBy:Year");
+        assertNotEquals(List.of(), fetchedEntries);
         Iterator<BibEntry> fetchedEntriesIter = fetchedEntries.iterator();
         BibEntry recentEntry = fetchedEntriesIter.next();
         while (fetchedEntriesIter.hasNext()) {
@@ -90,7 +101,7 @@ class CiteSeerTest {
     void findByIdAsDOI() throws FetcherException, IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e");
-        Optional<URL> expected = Optional.of(new URL("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
+        Optional<URL> expected = Optional.of(URLUtil.create("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
         assertEquals(expected, fetcher.findFullText(entry));
     }
 
@@ -99,7 +110,7 @@ class CiteSeerTest {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "")
                 .withField(StandardField.URL, "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf");
-        Optional<URL> expected = Optional.of(new URL("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"));
+        Optional<URL> expected = Optional.of(URLUtil.create("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"));
         assertEquals(expected, fetcher.findFullText(entry));
     }
 

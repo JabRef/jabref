@@ -10,7 +10,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,8 +23,7 @@ public class DuplicateCheckTest {
 
     private BibEntry simpleArticle;
     private BibEntry unrelatedArticle;
-    private BibEntry simpleInbook;
-    private BibEntry simpleIncollection;
+    private BibEntry simpleInBook;
     private DuplicateCheck duplicateChecker;
 
     private static BibEntry getSimpleArticle() {
@@ -35,7 +33,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.YEAR, "2017");
     }
 
-    private static BibEntry getSimpleIncollection() {
+    private static BibEntry getSimpleInCollection() {
         return new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.TITLE, "Innovation and Intellectual Property Rights")
                 .withField(StandardField.AUTHOR, "Ove Grandstrand")
@@ -44,7 +42,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.YEAR, "2004");
     }
 
-    private static BibEntry getSimpleInbook() {
+    private static BibEntry getSimpleInBook() {
         return new BibEntry(StandardEntryType.InBook)
                 .withField(StandardField.TITLE, "Alice in Wonderland")
                 .withField(StandardField.AUTHOR, "Charles Lutwidge Dodgson")
@@ -62,16 +60,15 @@ public class DuplicateCheckTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         simpleArticle = getSimpleArticle();
         unrelatedArticle = getUnrelatedArticle();
-        simpleInbook = getSimpleInbook();
-        simpleIncollection = getSimpleIncollection();
+        simpleInBook = getSimpleInBook();
         duplicateChecker = new DuplicateCheck(new BibEntryTypesManager());
     }
 
     @Test
-    public void testDuplicateDetectionWithSameAuthor() {
+    void duplicateDetectionWithSameAuthor() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
         BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
 
@@ -79,7 +76,15 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithDifferentAuthors() {
+    void duplicateDetectionWithSameAuthorAndUmlauts() {
+        BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bobä");
+        BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Bill{\\\"{a}} Bob{\\\"{a}}");
+
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void duplicateDetectionWithDifferentAuthors() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
         BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "James Joyce");
 
@@ -87,7 +92,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithDifferentTypes() {
+    void duplicateDetectionWithDifferentTypes() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
         BibEntry two = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "Billy Bob");
 
@@ -95,7 +100,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithSameYearTitleJournal() {
+    void duplicateDetectionWithSameYearTitleJournal() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -113,7 +118,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithDifferentJournal() {
+    void duplicateDetectionWithDifferentJournal() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -131,7 +136,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithDifferentVolume() {
+    void duplicateDetectionWithDifferentVolume() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -152,7 +157,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithDifferentTitleSameVolume() {
+    void duplicateDetectionWithDifferentTitleSameVolume() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -173,7 +178,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithSamePages() {
+    void duplicateDetectionWithSamePages() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -196,7 +201,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionWithSamePagesOneEntryNoVolume() {
+    void duplicateDetectionWithSamePagesOneEntryNoVolume() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -218,7 +223,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionDifferentVolumeNoJournal() {
+    void duplicateDetectionDifferentVolumeNoJournal() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -239,7 +244,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionDifferentTitleNoJournal() {
+    void duplicateDetectionDifferentTitleNoJournal() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -260,7 +265,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionDifferentVolumeAllOthersEqual() {
+    void duplicateDetectionDifferentVolumeAllOthersEqual() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -283,7 +288,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testDuplicateDetectionDifferentVolumeDifferentJournalAllOthersEqual() {
+    void duplicateDetectionDifferentVolumeDifferentJournalAllOthersEqual() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Billy Bob")
                 .withField(StandardField.YEAR, "2005")
@@ -306,7 +311,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testWordCorrelation() {
+    void wordCorrelation() {
         String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
         String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
         String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
@@ -317,12 +322,12 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoUnrelatedEntriesAreNoDuplicates() {
+    void twoUnrelatedEntriesAreNoDuplicates() {
         assertFalse(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    public void twoUnrelatedEntriesWithDifferentDoisAreNoDuplicates() {
+    void twoUnrelatedEntriesWithDifferentDoisAreNoDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.00X");
 
@@ -330,7 +335,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoUnrelatedEntriesWithEqualDoisAreDuplicates() {
+    void twoUnrelatedEntriesWithEqualDoisAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
 
@@ -338,7 +343,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoUnrelatedEntriesWithEqualPmidAreDuplicates() {
+    void twoUnrelatedEntriesWithEqualPmidAreDuplicates() {
         simpleArticle.setField(StandardField.PMID, "12345678");
         unrelatedArticle.setField(StandardField.PMID, "12345678");
 
@@ -346,7 +351,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoUnrelatedEntriesWithEqualEprintAreDuplicates() {
+    void twoUnrelatedEntriesWithEqualEprintAreDuplicates() {
         simpleArticle.setField(StandardField.EPRINT, "12345678");
         unrelatedArticle.setField(StandardField.EPRINT, "12345678");
 
@@ -354,7 +359,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates() {
+    void twoEntriesWithSameDoiButDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         BibEntry duplicateWithDifferentType = (BibEntry) simpleArticle.clone();
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
@@ -363,7 +368,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
+    void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         // An underscore in a DOI can indicate a totally different DOI
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0_02");
@@ -374,27 +379,27 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoEntriesWithSameISBNButDifferentTypesAreDuplicates() {
+    void twoEntriesWithSameISBNButDifferentTypesAreNotDuplicates() {
         simpleArticle.setField(StandardField.ISBN, "0-123456-47-9");
         unrelatedArticle.setField(StandardField.ISBN, "0-123456-47-9");
         BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
-        assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
+        assertFalse(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
     public static Stream<Arguments> twoEntriesWithDifferentSpecificFieldsAreNotDuplicates() {
         return Stream.of(
                 // twoInbooksWithDifferentChaptersAreNotDuplicates
-                Arguments.of(getSimpleInbook(), StandardField.CHAPTER,
+                Arguments.of(getSimpleInBook(), StandardField.CHAPTER,
                         "Chapter One – Down the Rabbit Hole",
                         "Chapter Two – The Pool of Tears"),
                 // twoInbooksWithDifferentPagesAreNotDuplicates
-                Arguments.of(getSimpleInbook(), StandardField.PAGES, "1-20", "21-40"),
+                Arguments.of(getSimpleInBook(), StandardField.PAGES, "1-20", "21-40"),
                 // twoIncollectionsWithDifferentChaptersAreNotDuplicates
-                Arguments.of(getSimpleIncollection(), StandardField.CHAPTER, "10", "9"),
+                Arguments.of(getSimpleInCollection(), StandardField.CHAPTER, "10", "9"),
                 // twoEntriesWithDifferentSpecificFieldsAreNotDuplicates
-                Arguments.of(getSimpleIncollection(), StandardField.PAGES, "1-20", "21-40")
+                Arguments.of(getSimpleInCollection(), StandardField.PAGES, "1-20", "21-40")
         );
     }
 
@@ -410,14 +415,14 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
-        final BibEntry inbook2 = ((BibEntry) simpleInbook.clone()).withField(StandardField.CHAPTER, "");
+    void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
+        final BibEntry inbook2 = ((BibEntry) simpleInBook.clone()).withField(StandardField.CHAPTER, "");
 
-        assertTrue(duplicateChecker.isDuplicate(simpleInbook, inbook2, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(simpleInBook, inbook2, BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    public void twoBooksWithDifferentEditionsAreNotDuplicates() {
+    void twoBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
@@ -436,7 +441,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void sameBooksWithMissingEditionAreDuplicates() {
+    void sameBooksWithMissingEditionAreDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
@@ -453,7 +458,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void sameBooksWithPartiallyMissingEditionAreDuplicates() {
+    void sameBooksWithPartiallyMissingEditionAreDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
@@ -471,7 +476,7 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void sameBooksWithDifferentEditionsAreNotDuplicates() {
+    void sameBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionTwo = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("Sutton17reinfLrnIntroBook")
                 .withField(StandardField.TITLE, "Reinforcement learning:An introduction")
@@ -517,7 +522,9 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    @Disabled("Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.")
+    /**
+     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
+     */
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)
@@ -543,6 +550,32 @@ public class DuplicateCheckTest {
                 .withField(StandardField.PUBLISHER, "ABC")
                 .withField(StandardField.ISBN, "978-1-4684-8585-1")
                 .withField(StandardField.YEAR, "1993");
+
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void differentInbooksWithTheSameISBNAreNotDuplicates() {
+        BibEntry entryOne = new BibEntry(StandardEntryType.InBook)
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        BibEntry entryTwo = new BibEntry(StandardEntryType.InBook)
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void differentInCollectionWithTheSameISBNAreNotDuplicates() {
+        BibEntry entryOne = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        BibEntry entryTwo = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
 
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }

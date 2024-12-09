@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
@@ -19,7 +19,7 @@ import org.jabref.model.entry.LinkedFile;
 /**
  * Wraps the GrobidService function to be used as an Importer.
  */
-public class PdfGrobidImporter extends Importer {
+public class PdfGrobidImporter extends PdfImporter {
 
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
@@ -91,6 +91,6 @@ public class PdfGrobidImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Wraps the GrobidService function to be used as an Importer.";
+        return Localization.lang("Imports BibTeX data of a PDF using Grobid.");
     }
 }

@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
@@ -14,11 +13,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTextFieldTableCellVisualizationFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -30,9 +29,8 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     @FXML private TableColumn<ConstantsItemModel, String> contentColumn;
     @FXML private TableColumn<ConstantsItemModel, String> actionsColumn;
     @FXML private Button addStringButton;
-    @FXML private ButtonType saveButton;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
 
     public ConstantsPropertiesView(BibDatabaseContext databaseContext) {
@@ -49,7 +47,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     }
 
     public void initialize() {
-        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService, preferencesService.getFilePreferences());
+        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService, preferences.getExternalApplicationsPreferences());
 
         addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 

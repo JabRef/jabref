@@ -39,6 +39,6 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        return String.format("date:%s*", year);
+        return "date:%s*".formatted(year);
     }
 }

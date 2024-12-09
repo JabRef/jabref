@@ -47,7 +47,7 @@ public enum FileAnnotationType {
         try {
             return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            LOGGER.info(String.format("FileAnnotationType %s is not supported and was converted into 'Unknown'!", annotation.getSubtype()));
+            LOGGER.info("FileAnnotationType %s is not supported and was converted into 'Unknown'!".formatted(annotation.getSubtype()));
             return UNKNOWN;
         }
     }

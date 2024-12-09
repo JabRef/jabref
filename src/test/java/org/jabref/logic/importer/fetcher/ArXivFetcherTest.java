@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -11,11 +9,13 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -25,7 +25,6 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -107,29 +106,6 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.PUBLISHER, "arXiv")
                 .withField(StandardField.DOI, "10.48550/ARXIV.1811.10364");
 
-        // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
-        // FixMe: Test this BibEntry
-        BibEntry completePaper = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
-                .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
-                .withField(StandardField.DATE, "2020-03-10")
-                .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.MONTH, "aug")
-                .withField(StandardField.NUMBER, "8")
-                .withField(StandardField.VOLUME, "22")
-                .withField(StandardField.PAGES, "083005")
-                .withField(StandardField.PUBLISHER, "{IOP} Publishing")
-                .withField(StandardField.JOURNAL, "New Journal of Physics")
-                .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
-                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
-                .withField(StandardField.EPRINT, "2003.04601")
-                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
-                .withField(StandardField.EPRINTTYPE, "arXiv")
-                .withField(StandardField.EPRINTCLASS, "q-bio.TO")
-                .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
-                .withField(InternalField.KEY_FIELD, "B_scher_2020")
-                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
-
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Diez, Tobias")
                 .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
@@ -180,24 +156,29 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
 
             // The co-authors differ, thus we check for the author present at all papers
-            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+            getTestAuthors().forEach(expectedAuthor -> assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
         });
     }
 
     @Test
-    public void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
+    void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
         StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertEquals(List.of(), result);
     }
@@ -217,19 +198,19 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprint() throws IOException {
         entry.setField(StandardField.EPRINT, "1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByEprintWithPrefix() throws IOException {
         entry.setField(StandardField.EPRINT, "arXiv:1603.06570");
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -237,21 +218,21 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.DOI, "10.1529/unknown");
         entry.setField(StandardField.EPRINT, "1603.06570");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/1603.06570v1")), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitle() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
     }
 
     @Test
     void findFullTextByTitleWithCurlyBracket() throws IOException {
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -259,7 +240,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.JOURNAL, "arXiv:2002.10248v4 [cs]");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -267,7 +248,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
         entry.setField(StandardField.URL, "http://arxiv.org/abs/2002.10248v4");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -275,7 +256,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -283,7 +264,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
         entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -318,13 +299,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void searchEntryByPartOfTitle() throws Exception {
-        assertEquals(Collections.singletonList(mainResultPaper),
+        assertEquals(List.of(mainResultPaper),
                 fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
-        assertEquals(Collections.singletonList(sliceTheoremPaper),
+        assertEquals(List.of(sliceTheoremPaper),
                 fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
@@ -431,7 +412,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    public void supportsPhraseSearch() throws Exception {
+    void supportsPhraseSearch() throws Exception {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
         List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
         // Phrase search result has to be subset of the default search result
@@ -443,7 +424,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    public void supportsPhraseSearchAndMatchesExact() throws Exception {
+    void supportsPhraseSearchAndMatchesExact() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Rafrastara, Fauzi Adi and Deyu, Qi")
                 .withField(StandardField.TITLE, "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review")
@@ -463,11 +444,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+        assertEquals(List.of(expected), resultWithPhraseSearch);
     }
 
     @Test
-    public void supportsBooleanANDSearch() throws Exception {
+    void supportsBooleanANDSearch() throws Exception {
+        // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
@@ -479,7 +461,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.ISSN, "1367-2630")
                 .withField(StandardField.PAGES, "083005")
                 .withField(StandardField.PUBLISHER, "IOP Publishing")
-                .withField(StandardField.JOURNAL, "New Journal of Physics")
+                .withField(StandardField.JOURNAL, "New J. Phys., 22, 083005 (2020)")
                 .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
                 .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
                 .withField(StandardField.EPRINT, "2003.04601")
@@ -493,11 +475,11 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 
     @Test
-    public void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
+    void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -520,7 +502,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
+    void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -539,7 +521,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void retrievePartialResultWhenCannotGetInformationFromUserAssignedDOI() throws FetcherException {
+    void retrievePartialResultWhenCannotGetInformationFromUserAssignedDOI() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Zheng, Hai and Ho, Po-Yi and Jiang, Meiling and Tang, Bin and Liu, Weirong and Li, Dengjin and Yu, Xuefeng and Kleckner, Nancy E. and Amir, Ariel and Liu, Chenli")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -565,7 +547,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    public void retrievePartialResultWhenCannotGetInformationFromArXivAssignedDOI() throws FetcherException {
+    void retrievePartialResultWhenCannotGetInformationFromArXivAssignedDOI() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
                 .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
@@ -592,5 +574,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
         assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    void abstractIsCleanedUp() throws Exception {
+        Optional<BibEntry> entry = fetcher.performSearchById("2407.02238");
+        String escaped = "{One of the primary areas of interest in High Performance Computing is the improvement of performance of parallel workloads. Nowadays, compilable source code-based optimization tasks that employ deep learning often exploit LLVM Intermediate Representations (IRs) for extracting features from source code. Most such works target specific tasks, or are designed with a pre-defined set of heuristics. So far, pre-trained models are rare in this domain, but the possibilities have been widely discussed. Especially approaches mimicking large-language models (LLMs) have been proposed. But these have prohibitively large training costs. In this paper, we propose MIREncoder, a M}ulti-modal IR-based Auto-Encoder that can be pre-trained to generate a learned embedding space to be used for downstream tasks by machine learning-based approaches. A multi-modal approach enables us to better extract features from compilable programs. It allows us to better model code syntax, semantics and structure. For code-based performance optimizations, these features are very important while making optimization decisions. A pre-trained model/embedding implicitly enables the usage of transfer learning, and helps move away from task-specific trained models. Additionally, a pre-trained model used for downstream performance optimization should itself have reduced overhead, and be easily usable. These considerations have led us to propose a modeling approach that i) understands code semantics and structure, ii) enables use of transfer learning, and iii) is small and simple enough to be easily re-purposed or reused even with low resource availability. Our evaluations will show that our proposed approach can outperform the state of the art while reducing overhead.";
+        assertEquals(Optional.of(escaped), entry.get().getField(StandardField.ABSTRACT));
     }
 }

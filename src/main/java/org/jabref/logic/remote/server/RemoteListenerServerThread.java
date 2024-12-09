@@ -21,7 +21,7 @@ public class RemoteListenerServerThread extends Thread {
 
     @Override
     public void interrupt() {
-        LOGGER.debug("Interrupting " + this.getName());
+        LOGGER.debug("Interrupting {}", this.getName());
         this.server.closeServerSocket();
         super.interrupt();
     }

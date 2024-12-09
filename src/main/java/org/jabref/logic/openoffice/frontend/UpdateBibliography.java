@@ -1,9 +1,11 @@
 package org.jabref.logic.openoffice.frontend;
 
+import java.io.IOException;
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOFormatBibliography;
+import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.style.CitedKeys;
@@ -38,12 +40,12 @@ public class UpdateBibliography {
     public static void rebuildBibTextSection(XTextDocument doc,
                                              OOFrontend frontend,
                                              CitedKeys bibliography,
-                                             OOBibStyle style,
+                                             JStyle style,
                                              boolean alwaysAddCitedOnPages)
             throws
             WrappedTargetException,
             CreationException,
-            NoDocumentException {
+            NoDocumentException, IOException {
 
         clearBibTextSectionContent2(doc);
 
@@ -67,7 +69,8 @@ public class UpdateBibliography {
         // Alternatively, we could receive a cursor.
         XTextCursor textCursor = doc.getText().createTextCursor();
         textCursor.gotoEnd(false);
-        UnoTextSection.create(doc, BIB_SECTION_NAME, textCursor, false);
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIB_SECTION_NAME, textCursor, false);
+        UnoTextSection.create(annotation);
     }
 
     /**
@@ -100,13 +103,13 @@ public class UpdateBibliography {
     private static void populateBibTextSection(XTextDocument doc,
                                                OOFrontend frontend,
                                                CitedKeys bibliography,
-                                               OOBibStyle style,
+                                               JStyle style,
                                                boolean alwaysAddCitedOnPages)
             throws
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException {
+            WrappedTargetException, IOException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
@@ -129,7 +132,8 @@ public class UpdateBibliography {
         initialParagraph.setString("");
 
         UnoBookmark.removeIfExists(doc, BIB_SECTION_END_NAME);
-        UnoBookmark.create(doc, BIB_SECTION_END_NAME, cursor, true);
+        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, BIB_SECTION_END_NAME, cursor, true);
+        UnoBookmark.create(documentAnnotation);
 
         cursor.collapseToEnd();
     }

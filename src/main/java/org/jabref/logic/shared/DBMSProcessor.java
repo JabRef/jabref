@@ -483,7 +483,7 @@ public abstract class DBMSProcessor {
         if (sharedEntries.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(sharedEntries.get(0));
+            return Optional.of(sharedEntries.getFirst());
         }
     }
 

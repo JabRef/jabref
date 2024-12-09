@@ -44,18 +44,16 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             .withField(StandardField.VENUE, "International Conference on Software Engineering");
 
     private SemanticScholar fetcher;
-    private BibEntry entry;
 
     @BeforeEach
     void setUp() {
         fetcher = new SemanticScholar(importerPreferences);
-        entry = new BibEntry();
     }
 
     @Test
     void getDocument() throws IOException, FetcherException {
         String source = fetcher.getURLBySource(
-                String.format("https://api.semanticscholar.org/v1/paper/%s", DOI));
+                "https://api.semanticscholar.org/v1/paper/%s".formatted(DOI));
 
         assertEquals("https://www.semanticscholar.org/paper/7f7b38604a2c167f6d5fb1c5dffcbb127d0525c0", source);
     }
@@ -64,7 +62,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Disabled("Returns a DOI instead of the required link")
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByDOI() throws Exception {
-        entry.setField(StandardField.DOI, "10.1038/nrn3241");
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
                 Optional.of(new URI("https://europepmc.org/articles/pmc4907333?pdf=render").toURL()),
                 fetcher.findFullText(entry)
@@ -73,6 +71,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
+    @Disabled("Sometimes, does not find any thing")
     void fullTextFindByDOIAlternate() throws Exception {
         assertEquals(
                 Optional.of(new URI("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf").toURL()),
@@ -89,8 +88,8 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextNotFoundByDOI() throws IOException, FetcherException {
-        entry = new BibEntry().withField(StandardField.DOI, DOI);
-        entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, DOI)
+                                       .withField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
@@ -98,7 +97,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByArXiv() throws Exception {
-        entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
+        BibEntry entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
                               .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
                 Optional.of(new URI("https://arxiv.org/pdf/1407.3561.pdf").toURL()),
@@ -126,10 +125,11 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         String query = "Software engineering";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(query, "default"), 0);
-        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software+engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
+        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
     }
 
     @Test
+    @Disabled("We seem to be blocked")
     void searchByQueryFindsEntry() throws Exception {
         BibEntry master = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Diez")
@@ -145,6 +145,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
+    @Disabled("We seem to be blocked")
     void searchByPlainQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         // Abstract should not be included in JabRef tests
@@ -153,6 +154,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
+    @Disabled("We seem to be blocked")
     void searchByQuotedQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
@@ -161,12 +163,13 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void performSearchByEmptyQuery() throws Exception {
+    void performSearchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
     @Test
-    public void findByEntry() throws Exception {
+    @Disabled("We seem to be blocked")
+    void findByEntry() throws Exception {
         BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
                 .withField(StandardField.AUTHOR, "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi")
@@ -175,8 +178,8 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 .withField(StandardField.URL, "https://www.semanticscholar.org/paper/3bb026fd67db7d8e0e25de3189d6b7031b12783e")
                 .withField(StandardField.VENUE, "The Practice of Enterprise Modeling");
 
-        entry.withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
-        BibEntry actual = fetcher.performSearch(entry).get(0);
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
+        BibEntry actual = fetcher.performSearch(entry).getFirst();
         // Abstract should not be included in JabRef tests
         actual.clearField(StandardField.ABSTRACT);
         assertEquals(barrosEntry, actual);

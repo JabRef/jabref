@@ -48,7 +48,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
 
     @Override
     protected Equivalence<Author> getEquivalence() {
-        return Equivalence.equals().onResultOf(Author::getLastOnly);
+        return Equivalence.equals().onResultOf(Author::getNamePrefixAndFamilyName);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
 
     @Override
     protected boolean isMatch(Author candidate, AutoCompletionBinding.ISuggestionRequest request) {
-        return StringUtil.containsIgnoreCase(candidate.getLastFirst(false), request.getUserText());
+        return StringUtil.containsIgnoreCase(candidate.getFamilyGiven(false), request.getUserText());
     }
 
     @Override

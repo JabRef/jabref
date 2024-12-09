@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
-    public static final String FETCHER_NAME = "Search Selected";
+    public static final String FETCHER_NAME = "Search pre-configured";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
@@ -59,7 +59,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            try {
                                return searchBasedFetcher.performSearch(luceneQuery).stream();
                            } catch (FetcherException e) {
-                               LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
+                               LOGGER.warn("%s API request failed".formatted(searchBasedFetcher.getName()), e);
                                return Stream.empty();
                            }
                        })

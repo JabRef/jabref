@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements the preview based JabRef's <a href="https://docs.jabref.org/import-export/export/customexports">Custom export filters</a>.
  */
-public class TextBasedPreviewLayout implements PreviewLayout {
+public final class TextBasedPreviewLayout implements PreviewLayout {
     public static final String NAME = "PREVIEW";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
@@ -54,8 +54,9 @@ public class TextBasedPreviewLayout implements PreviewLayout {
         }
     }
 
+    @Override
     public String getText() {
-        return text;
+        return text.replace("__NEWLINE__", "\n");
     }
 
     @Override

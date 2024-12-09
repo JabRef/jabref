@@ -1,17 +1,21 @@
 package org.jabref.gui.theme;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.architecture.AllowedToUseClassGetResource;
+import org.jabref.gui.JabRefGUI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 abstract class StyleSheet {
 
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
@@ -29,23 +33,24 @@ abstract class StyleSheet {
 
     abstract void reload();
 
+    // TODO: How to solve this? without jabref gui
     static Optional<StyleSheet> create(String name) {
-        Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefFrame.class.getResource(name));
+        Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefGUI.class.getResource(name));
 
         if (styleSheetUrl.isEmpty()) {
             try {
                 styleSheetUrl = Optional.of(Path.of(name).toUri().toURL());
             } catch (InvalidPathException e) {
-                LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage());
+                LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage(), e);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
+                LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage(), e);
             }
         }
 
         if (styleSheetUrl.isEmpty()) {
             try {
-                return Optional.of(new StyleSheetDataUrl(new URL(EMPTY_WEBENGINE_CSS)));
-            } catch (MalformedURLException e) {
+                return Optional.of(new StyleSheetDataUrl(new URI(EMPTY_WEBENGINE_CSS).toURL()));
+            } catch (URISyntaxException | MalformedURLException e) {
                 return Optional.empty();
             }
         } else if ("file".equals(styleSheetUrl.get().getProtocol())) {

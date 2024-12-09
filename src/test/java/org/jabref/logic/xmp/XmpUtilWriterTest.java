@@ -3,7 +3,6 @@ package org.jabref.logic.xmp;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.logic.exporter.XmpExporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to {@link XmpExporterTest}
+ * This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to {@link org.jabref.logic.exporter.XmpExporterTest}
  */
 class XmpUtilWriterTest {
 
@@ -94,7 +93,7 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
 
-        BibEntry entryWritten = entriesWritten.get(0);
+        BibEntry entryWritten = entriesWritten.getFirst();
         entryWritten.clearField(StandardField.FILE);
         entry.clearField(StandardField.FILE);
 
@@ -117,7 +116,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void testWriteTwoBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeTwoBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
@@ -132,7 +131,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void testWriteThreeBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeThreeBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);

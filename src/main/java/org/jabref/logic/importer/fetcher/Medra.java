@@ -8,13 +8,13 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -22,9 +22,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * A class for fetching DOIs from Medra
@@ -103,8 +103,8 @@ public class Medra implements IdBasedParserFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        return new URL(API_URL + "/" + identifier);
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+        return URLUtil.create(API_URL + "/" + identifier);
     }
 
     @Override

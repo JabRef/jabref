@@ -4,69 +4,83 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.AddUndoableActionEvent;
-import org.jabref.logic.undo.UndoRedoEvent;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
-import com.google.common.eventbus.EventBus;
+import org.jabref.gui.util.UiTaskExecutor;
 
 public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
-    private int current;
 
-    private final EventBus eventBus = new EventBus();
+    /**
+     * Indicates the number of edits aka balance of edits on the stack +1 when an edit is added/redone and -1 when an edit is undoed.
+     */
+    private final IntegerProperty balanceProperty = new SimpleIntegerProperty(0);
+    private final BooleanProperty undoableProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty redoableProperty = new SimpleBooleanProperty(false);
 
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
-        current++;
-        boolean returnvalue = super.addEdit(edit);
-        postAddUndoEvent();
-        return returnvalue;
+        boolean editAdded = super.addEdit(edit);
+        if (editAdded) {
+            incrementBalance();
+            updateUndoableStatus();
+            updateRedoableStatus();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public synchronized void undo() throws CannotUndoException {
         super.undo();
-        current--;
-        postUndoRedoEvent();
+        decrementBalance();
+        updateUndoableStatus();
+        updateRedoableStatus();
     }
 
     @Override
     public synchronized void redo() throws CannotUndoException {
         super.redo();
-        current++;
-        postUndoRedoEvent();
+        incrementBalance();
+        updateUndoableStatus();
+        updateRedoableStatus();
     }
 
     public synchronized void markUnchanged() {
-        unchangedPoint = current;
+        unchangedPoint = balanceProperty.get();
     }
 
     public synchronized boolean hasChanged() {
-        return current != unchangedPoint;
+        return balanceProperty.get() != unchangedPoint;
     }
 
-    public void registerListener(Object object) {
-        this.eventBus.register(object);
-        postUndoRedoEvent(); // Send event to trigger changes
+    private void incrementBalance() {
+        balanceProperty.setValue(balanceProperty.getValue() + 1);
     }
 
-    public void unregisterListener(Object object) {
-        this.eventBus.unregister(object);
+    private void decrementBalance() {
+        balanceProperty.setValue(balanceProperty.getValue() - 1);
     }
 
-    public void postUndoRedoEvent() {
-        boolean canRedo = this.canRedo();
-        boolean canUndo = this.canUndo();
-        eventBus.post(new UndoRedoEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
-                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
+    private void updateUndoableStatus() {
+        UiTaskExecutor.runInJavaFXThread(() -> undoableProperty.setValue(canUndo()));
     }
 
-    private void postAddUndoEvent() {
-        boolean canRedo = this.canRedo();
-        boolean canUndo = this.canUndo();
-        eventBus.post(new AddUndoableActionEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
-                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
+    private void updateRedoableStatus() {
+        UiTaskExecutor.runInJavaFXThread(() -> redoableProperty.setValue(canRedo()));
+    }
+
+    public ReadOnlyBooleanProperty getUndoableProperty() {
+        return undoableProperty;
+    }
+
+    public ReadOnlyBooleanProperty getRedoableProperty() {
+        return redoableProperty;
     }
 }

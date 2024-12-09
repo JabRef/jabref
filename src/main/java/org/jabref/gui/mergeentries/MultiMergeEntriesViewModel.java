@@ -15,8 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
