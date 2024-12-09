@@ -197,7 +197,7 @@ dependencies {
     implementation 'io.github.thibaultmeyer:cuid:2.0.3'
     // endregion
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.15'
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'com.github.javakeyring:java-keyring:1.0.4'
 
