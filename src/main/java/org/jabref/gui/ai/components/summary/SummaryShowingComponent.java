@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
@@ -22,17 +23,17 @@ public class SummaryShowingComponent extends VBox {
     @FXML private TextArea summaryTextArea;
     @FXML private Text summaryInfoText;
     @FXML private CheckBox markdownCheckbox;
+    @FXML private StackPane contentStackPane;
 
     private WebView markdownWebView;
 
     private final Summary summary;
     private final Runnable regenerateCallback;
-    private final MarkdownFormatter markdownFormatter;
+    private final MarkdownFormatter markdownFormatter = new MarkdownFormatter();
 
     public SummaryShowingComponent(Summary summary, Runnable regenerateCallback) {
         this.summary = summary;
         this.regenerateCallback = regenerateCallback;
-        this.markdownFormatter = new MarkdownFormatter();
 
         ViewLoader.view(this)
                   .root(this)
@@ -41,14 +42,9 @@ public class SummaryShowingComponent extends VBox {
 
     @FXML
     private void initialize() {
-        markdownWebView = new WebView();
-        markdownWebView.setVisible(false);
-        markdownWebView.setManaged(false);
-
-        VBox.setVgrow(markdownWebView, Priority.ALWAYS);
-
-        int indexOfTextArea = getChildren().indexOf(summaryTextArea);
-        getChildren().add(indexOfTextArea + 1, markdownWebView);
+        if (!contentStackPane.getChildren().contains(summaryTextArea)) {
+            contentStackPane.getChildren().add(summaryTextArea);
+        }
 
         summaryTextArea.setText(summary.content());
 
@@ -64,14 +60,27 @@ public class SummaryShowingComponent extends VBox {
         return timestamp.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault()));
     }
 
+    private void initializeMarkdownWebView() {
+        if (markdownWebView == null) {
+            markdownWebView = new WebView();
+            VBox.setVgrow(markdownWebView, Priority.ALWAYS);
+
+            markdownWebView.prefWidthProperty().bind(summaryTextArea.widthProperty());
+            markdownWebView.prefHeightProperty().bind(summaryTextArea.heightProperty());
+
+            markdownWebView.setVisible(false);
+            markdownWebView.setManaged(false);
+            contentStackPane.getChildren().add(markdownWebView);
+        }
+    }
+
     @FXML
     private void onMarkdownToggle() {
+        initializeMarkdownWebView();
+
         if (markdownCheckbox.isSelected()) {
             String htmlContent = markdownFormatter.format(summaryTextArea.getText());
             markdownWebView.getEngine().loadContent(htmlContent);
-
-            markdownWebView.setPrefHeight(summaryTextArea.getPrefHeight());
-            markdownWebView.setPrefWidth(summaryTextArea.getPrefWidth());
 
             markdownWebView.setVisible(true);
             markdownWebView.setManaged(true);
