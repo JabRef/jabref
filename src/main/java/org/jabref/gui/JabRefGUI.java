@@ -30,6 +30,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.PostgreServer;
@@ -290,13 +291,19 @@ public class JabRefGUI extends Application {
 
     private void saveWindowState() {
         CoreGuiPreferences preferences = JabRefGUI.preferences.getGuiPreferences();
-        if (!mainStage.isMaximized()) {
+        // workaround for mac, maximize will always report true
+        if (!mainStage.isMaximized() || OS.OS_X) {
             preferences.setPositionX(mainStage.getX());
             preferences.setPositionY(mainStage.getY());
             preferences.setSizeX(mainStage.getWidth());
             preferences.setSizeY(mainStage.getHeight());
         }
-        preferences.setWindowMaximised(mainStage.isMaximized());
+        // maximize does not correctly work on OSX, reports true, although the window was resized!
+        if (OS.OS_X) {
+            preferences.setWindowMaximised(false);
+        } else {
+            preferences.setWindowMaximised(mainStage.isMaximized());
+        }
         debugLogWindowState(mainStage);
     }
 
