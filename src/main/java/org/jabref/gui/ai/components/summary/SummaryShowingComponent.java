@@ -12,15 +12,19 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.util.WebViewStore;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class SummaryShowingComponent extends VBox {
     @FXML private Text summaryInfoText;
     @FXML private CheckBox markdownCheckbox;
+
+    @Inject private ThemeManager themeManager;
 
     private WebView contentWebView;
     private final Summary summary;
@@ -45,12 +49,10 @@ public class SummaryShowingComponent extends VBox {
 
     private void initializeWebView() {
         contentWebView = WebViewStore.get();
-        contentWebView.setMinHeight(100);
-        contentWebView.setPrefHeight(300);
-
-        // Apply styles directly to the WebView
-
         VBox.setVgrow(contentWebView, Priority.ALWAYS);
+
+        themeManager.installCss(contentWebView.getEngine());
+
         getChildren().addFirst(contentWebView);
     }
 
