@@ -18,11 +18,7 @@
                 <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" translateX="-40" />
             </center>
         </BorderPane>
-        <TextFlow textAlignment="CENTER">
-            <children>
-                <Text fx:id="summaryInfoText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Generated at %0 by %1" />
-            </children>
-        </TextFlow>
+        <Text fx:id="summaryInfoText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Generated at %0 by %1" />
     </children>
     <padding>
         <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
