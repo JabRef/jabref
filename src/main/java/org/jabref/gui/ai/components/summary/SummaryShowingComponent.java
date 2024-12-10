@@ -49,7 +49,6 @@ public class SummaryShowingComponent extends VBox {
         contentWebView.setPrefHeight(300);
 
         // Apply styles directly to the WebView
-        contentWebView.setStyle("-fx-font-family: Sans;");
 
         VBox.setVgrow(contentWebView, Priority.ALWAYS);
         getChildren().addFirst(contentWebView);
@@ -60,7 +59,12 @@ public class SummaryShowingComponent extends VBox {
         if (isMarkdown) {
             contentWebView.getEngine().loadContent(markdownFormatter.format(content));
         } else {
-            contentWebView.getEngine().loadContent("<pre>" + content + "</pre>");
+            contentWebView.getEngine().loadContent(
+                    "<body style='margin: 0; padding: 0; width: 100vw'>" +
+                            "<div style='white-space: pre-wrap; word-wrap: break-word; width: 100vw'>" +
+                            content +
+                            "</div></body>"
+            );
         }
     }
 
