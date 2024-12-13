@@ -4,13 +4,15 @@ package org.jabref.gui.autosaveandbackup;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.MetaData;
 
@@ -36,55 +38,53 @@ public class BackupManagerGitTest {
     private BibDatabaseContext mockDatabaseContext2;
     private BibEntryTypesManager mockEntryTypesManager;
     private CliPreferences mockPreferences;
-    private Path mockDatabasePath1;
-    private Path mockDatabasePath2;
+    private Path dataBasePath1;
+    private Path dataBasePath2;
 
     @BeforeEach
     public void setUp(@TempDir Path tempDir) throws IOException, GitAPIException {
-        mockLibraryTab = mock(LibraryTab.class);
 
-        mockDatabaseContext1 = mock(BibDatabaseContext.class);
-        mockDatabaseContext2 = mock(BibDatabaseContext.class);
-        mockEntryTypesManager = mock(BibEntryTypesManager.class);
-        mockPreferences = mock(CliPreferences.class);
+        // creating Entries
+        List<BibEntry> entries1 = new ArrayList<>();
+        entries1.add(new BibEntry("this"));
+        entries1.add(new BibEntry("is"));
+        List<BibEntry> entries2 = new ArrayList<>();
+        entries2.add(new BibEntry("BackupManagerGitTest"));
+        entries2.add(new BibEntry("test"));
 
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        when(mockPreferences.getFilePreferences()).thenReturn(filePreferences);
+        // Initializing BibDatabases
+        BibDatabase bibDatabase1 = new BibDatabase(entries1);
+        BibDatabase bibDatabase2 = new BibDatabase(entries2);
 
-        // Create temporary backup directories
-
+        // Create temporary backup directories and .bib files
         this.tempDir = tempDir.resolve("");
         this.tempDir1 = tempDir.resolve("backup1");
         this.tempDir2 = tempDir.resolve("backup2");
-        Files.createDirectories(this.tempDir); // Ensure the directory exists
-        Files.createDirectories(this.tempDir1); // Ensure the directory exists
-        Files.createDirectories(this.tempDir2); // Ensure the directory exists
+        dataBasePath1 = tempDir1.resolve("test1.bib");
+        dataBasePath2 = tempDir2.resolve("test2.bib");
 
-        // Mock the database paths and create the actual files
-         mockDatabasePath1 = tempDir1.resolve("test1.bib");
-         mockDatabasePath2 = tempDir2.resolve("test2.bib");
+        // Ensure the directories exists
+        Files.createDirectories(this.tempDir);
+        Files.createDirectories(this.tempDir1);
+        Files.createDirectories(this.tempDir2);
 
-        Files.writeString(mockDatabasePath1, "Mock content for testing 1"); // Create the file
-        Files.writeString(mockDatabasePath2, "Mock content for testing 2"); // Create the file
+        // creating the bibDatabaseContexts
+        mockDatabaseContext1 = new BibDatabaseContext(bibDatabase1, new MetaData(), dataBasePath1);
+        mockDatabaseContext2 = new BibDatabaseContext(bibDatabase2, new MetaData(), dataBasePath2);
+        mockEntryTypesManager = mock(BibEntryTypesManager.class);
 
-        when(mockDatabaseContext1.getDatabasePath()).thenReturn(Optional.of(mockDatabasePath1));
-        when(mockDatabaseContext2.getDatabasePath()).thenReturn(Optional.of(mockDatabasePath2));
+        // creating the mockLibraryTab
+        mockLibraryTab = mock(LibraryTab.class);
 
+        // creating the mockPreferences
+        mockPreferences = mock(CliPreferences.class);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(mockPreferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(tempDir);
 
-        // Mock BibDatabase for all contexts
-        BibDatabase mockDatabase1 = mock(BibDatabase.class);
-        when(mockDatabaseContext1.getDatabase()).thenReturn(mockDatabase1);
-
-        BibDatabase mockDatabase2 = mock(BibDatabase.class);
-        when(mockDatabaseContext2.getDatabase()).thenReturn(mockDatabase2);
-
-        // Mock MetaData for all contexts (if needed elsewhere)
-        MetaData mockMetaData1 = mock(MetaData.class);
-        when(mockDatabaseContext1.getMetaData()).thenReturn(mockMetaData1);
-
-        MetaData mockMetaData2 = mock(MetaData.class);
-        when(mockDatabaseContext2.getMetaData()).thenReturn(mockMetaData2);
+        // creating the content of the .bib files
+        Files.writeString(dataBasePath1, "Mock content for testing 1"); // Create the file
+        Files.writeString(dataBasePath2, "Mock content for testing 2"); // Create the file
     }
 
     @Test
@@ -102,7 +102,6 @@ public class BackupManagerGitTest {
     void gitInitialization() throws IOException, GitAPIException {
         // Initialize Git
         BackupManagerGit.ensureGitInitialized(tempDir);
-
         // Verify that the .git directory is created
         Path gitDir = tempDir.resolve(".git");
         assertTrue(Files.exists(gitDir), ".git directory should be created during Git initialization.");
@@ -114,10 +113,11 @@ public class BackupManagerGitTest {
         BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
 
         // Generate the expected backup file names
-        String uuid1 = BackupManagerGit.getOrGenerateFileUuid(mockDatabasePath1);
-        String uuid2 = BackupManagerGit.getOrGenerateFileUuid(mockDatabasePath2);
-        String backupFileName1 = mockDatabasePath1.getFileName().toString().replace(".bib", "") + "_" + uuid1 + ".bib";
-        String backupFileName2 = mockDatabasePath2.getFileName().toString().replace(".bib", "") + "_" + uuid2 + ".bib";
+        String uuid1 = BackupManagerGit.getOrGenerateFileUuid(dataBasePath1);
+        String uuid2 = BackupManagerGit.getOrGenerateFileUuid(dataBasePath2);
+
+        String backupFileName1 = dataBasePath1.getFileName().toString().replace(".bib", "") + "_" + uuid1 + ".bib";
+        String backupFileName2 = dataBasePath2.getFileName().toString().replace(".bib", "") + "_" + uuid2 + ".bib";
 
         // Verify the file is copied to the backup directory
         Path backupFile1 = tempDir.resolve(backupFileName1);
