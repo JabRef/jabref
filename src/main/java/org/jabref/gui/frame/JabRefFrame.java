@@ -112,7 +112,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final SplitPane verticalSplit = new SplitPane();
     private final TabPane tabbedPane = new TabPane();
     private final EntryEditor entryEditor;
-    private ObjectProperty<PanelMode> panelMode = new SimpleObjectProperty<>(PanelMode.MAIN_TABLE);
+    private final ObjectProperty<PanelMode> panelMode = new SimpleObjectProperty<>(PanelMode.MAIN_TABLE);
 
     // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
     private Subscription horizontalDividerSubscription;

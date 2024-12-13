@@ -516,8 +516,7 @@ public class LibraryTab extends Tab {
 
     public void showAndEdit(BibEntry entry) {
         this.clearAndSelect(entry);
-
-        // entryEditor.requestFocus();
+        stateManager.getEditorShowing().setValue(true);
     }
 
     /**
