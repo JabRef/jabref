@@ -376,6 +376,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         // the tabs give an ugly animation the looks like all tabs are shifting in from the right. In other words:
         // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
 
+        if (currentlyEditedEntry == null) {
+            return;
+        }
+
         // First, remove tabs that we do not want to show
         List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow(currentlyEditedEntry)).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
