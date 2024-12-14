@@ -21,6 +21,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class SummaryShowingComponent extends VBox {
+    private static final MarkdownFormatter MARKDOWN_FORMATTER = new MarkdownFormatter();
     @FXML private Text summaryInfoText;
     @FXML private CheckBox markdownCheckbox;
 
@@ -29,7 +30,6 @@ public class SummaryShowingComponent extends VBox {
     private WebView contentWebView;
     private final Summary summary;
     private final Runnable regenerateCallback;
-    private final MarkdownFormatter markdownFormatter = new MarkdownFormatter();
 
     public SummaryShowingComponent(Summary summary, Runnable regenerateCallback) {
         this.summary = summary;
@@ -59,10 +59,10 @@ public class SummaryShowingComponent extends VBox {
     private void updateContent(boolean isMarkdown) {
         String content = summary.content();
         if (isMarkdown) {
-            contentWebView.getEngine().loadContent(markdownFormatter.format(content));
+            contentWebView.getEngine().loadContent(MARKDOWN_FORMATTER.format(content));
         } else {
             contentWebView.getEngine().loadContent(
-                    "<body style='margin: 0; padding: 0; width: 100vw'>" +
+                    "<body style='margin: 0; padding: 5px; width: 100vw'>" +
                             "<div style='white-space: pre-wrap; word-wrap: break-word; width: 100vw'>" +
                             content +
                             "</div></body>"
