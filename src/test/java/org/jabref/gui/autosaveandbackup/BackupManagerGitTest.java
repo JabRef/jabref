@@ -14,6 +14,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 
 import org.eclipse.jgit.api.Git;
@@ -45,12 +47,46 @@ public class BackupManagerGitTest {
     public void setUp(@TempDir Path tempDir) throws IOException, GitAPIException {
 
         // creating Entries
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Garcia, Maria and Lee, David")
+                .withField(StandardField.JOURNAL, "International Review of Physics")
+                .withField(StandardField.NUMBER, "6")
+                .withField(StandardField.PAGES, "789--810")
+                .withField(StandardField.TITLE, "Quantum Entanglement in Superconductors")
+                .withField(StandardField.VOLUME, "28")
+                .withField(StandardField.ISSUE, "3")
+                .withField(StandardField.YEAR, "2021")
+                .withCitationKey("Garcia_2021");
+        BibEntry entry2 = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.AUTHOR, "Smith, John")
+                .withField(StandardField.TITLE, "Advanced Quantum Mechanics")
+                .withField(StandardField.PUBLISHER, "Physics Press")
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.ISBN, "978-3-16-148410-0")
+                .withCitationKey("Smith_2019");
+
+        BibEntry entry3 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Doe, Jane and Brown, Alice")
+                .withField(StandardField.TITLE, "Machine Learning in Quantum Computing")
+                .withField(StandardField.BOOKTITLE, "Proceedings of the International Conference on Quantum Computing")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.PAGES, "123-130")
+                .withCitationKey("Doe_2020");
+
+        BibEntry entry4 = new BibEntry(StandardEntryType.Thesis)
+                .withField(StandardField.AUTHOR, "Johnson, Emily")
+                .withField(StandardField.TITLE, "Quantum Algorithms for Data Analysis")
+                .withField(StandardField.SCHOOL, "University of Quantum Studies")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TYPE, "PhD Thesis")
+                .withCitationKey("Johnson_2022");
+
         List<BibEntry> entries1 = new ArrayList<>();
-        entries1.add(new BibEntry("this"));
-        entries1.add(new BibEntry("is"));
+        entries1.add(entry1);
+        entries1.add(entry2);
         List<BibEntry> entries2 = new ArrayList<>();
-        entries2.add(new BibEntry("BackupManagerGitTest"));
-        entries2.add(new BibEntry("test"));
+        entries2.add(entry3);
+        entries2.add(entry4);
 
         // Initializing BibDatabases
         BibDatabase bibDatabase1 = new BibDatabase(entries1);
