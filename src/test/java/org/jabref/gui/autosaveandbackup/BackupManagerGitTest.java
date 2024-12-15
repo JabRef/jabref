@@ -129,7 +129,7 @@ public class BackupManagerGitTest {
         BackupManagerGit manager1 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
         // Check if the backup directory exists
-        assertTrue(Files.exists(tempDir), " directory should be created wich contains .git and single copies og .bib");
+        assertTrue(Files.exists(tempDir), " directory should be created which contains .git and single copies og .bib");
         assertTrue(Files.exists(tempDir1), "Backup directory should be created during initialization.");
         assertTrue(Files.exists(tempDir2), "Backup directory should be created during initialization.");
     }

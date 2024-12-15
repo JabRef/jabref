@@ -110,8 +110,9 @@ public class BackupUIManager {
     private static Optional<BackupChoiceDialogRecord> showBackupChoiceDialog(DialogService dialogService,
                                                                              GuiPreferences preferences,
                                                                              List<BackupEntry> backups) {
+        Path backupDirectory = preferences.getFilePreferences().getBackupDirectory();
         return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(preferences.getFilePreferences().getBackupDirectory(), backups)));
+                () -> dialogService.showCustomDialogAndWait(new BackupChoiceDialog(backupDirectory, backups)));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(

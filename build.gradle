@@ -197,7 +197,7 @@ dependencies {
     implementation 'io.github.thibaultmeyer:cuid:2.0.3'
     // endregion
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.15'
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'com.github.javakeyring:java-keyring:1.0.4'
 
@@ -268,7 +268,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'com.konghq:unirest-java-core:4.4.5'
     implementation 'com.konghq:unirest-modules-gson:4.4.5'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
     // endregion
 
     implementation 'org.slf4j:slf4j-api:2.0.16'
@@ -347,11 +347,11 @@ dependencies {
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.36.0') {
+    implementation('dev.langchain4j:langchain4j-google-ai-gemini:0.36.2') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
     }
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.36.0') {
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.36.2') {
         exclude group: 'com.squareup.okhttp3'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'org.jetbrains.kotlin'
