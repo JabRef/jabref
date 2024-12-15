@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,25 +26,24 @@ import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileNameCleaner;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +56,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
 
     public LinkedFilesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
-                                      PreferencesService preferences,
+                                      GuiPreferences preferences,
                                       UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
@@ -98,25 +96,12 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      *
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
-    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, FilePreferences filePreferences) {
+    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
-        ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
+        ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
         return new LinkedFile("", relativePath, suggestedFileType.getName());
-    }
-
-    public LinkedFileViewModel fromFile(Path file, FilePreferences filePreferences) {
-        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-
-        LinkedFile linkedFile = fromFile(file, fileDirectories, filePreferences);
-        return new LinkedFileViewModel(
-                linkedFile,
-                entry,
-                databaseContext,
-                taskExecutor,
-                dialogService,
-                preferences);
     }
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
@@ -139,41 +124,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return files;
     }
 
-    public void addNewFile() {
-        Path workingDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
-                                               .orElse(preferences.getFilePreferences().getWorkingDirectory());
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDirectory)
-                .build();
-
-        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-
-        for (Path fileToAdd : selectedFiles) {
-            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
-                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
-
-                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
-                        Localization.lang("Rename and add"));
-
-                if (correctButtonPressed) {
-                    Path correctPath = fileToAdd.resolveSibling(newFilename);
-                    try {
-                        Files.move(fileToAdd, correctPath);
-                        addNewLinkedFile(correctPath, fileDirectories);
-                    } catch (IOException ex) {
-                        LOGGER.error("Error moving file", ex);
-                        dialogService.showErrorDialogAndWait(ex);
-                    }
-                }
-            } else {
-                addNewLinkedFile(fileToAdd, fileDirectories);
-            }
-        }
-    }
-
     public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(new LinkedFileViewModel(
                 linkedFile,
@@ -184,22 +134,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences));
     }
 
-    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
-        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
-        addNewLinkedFile(newLinkedFile);
-    }
-
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
-        if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+        if (preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             LOGGER.debug("Auto-linking files for entry {}", entry);
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(list -> {
                         if (!list.isEmpty()) {
-                            LOGGER.debug("Found non-associated files:", list);
+                            LOGGER.debug("Found non-associated files: {}", list);
                             files.addAll(list);
                         }
                     });
@@ -215,6 +160,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 databaseContext,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         try {
@@ -240,7 +186,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public boolean downloadFile(String urlText) {
         try {
-            URL url = new URL(urlText);
+            URL url = URLUtil.create(urlText);
             addFromURLAndDownload(url);
             return true;
         } catch (MalformedURLException exception) {

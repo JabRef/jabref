@@ -9,7 +9,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

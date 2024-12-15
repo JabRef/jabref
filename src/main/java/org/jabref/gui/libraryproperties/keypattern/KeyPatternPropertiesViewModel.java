@@ -10,8 +10,8 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -21,13 +21,13 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
 
     private final BibDatabaseContext databaseContext;
 
-    public KeyPatternPropertiesViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
+    public KeyPatternPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        DatabaseCitationKeyPatterns newKeyPattern = new DatabaseCitationKeyPatterns(preferencesService.getCitationKeyPatternPreferences().getKeyPatterns());
+        DatabaseCitationKeyPatterns newKeyPattern = new DatabaseCitationKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns());
 
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();

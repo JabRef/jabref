@@ -41,7 +41,7 @@ public class ShortDOIService {
 
         try {
             uriBuilder = new URIBuilder(BASIC_URL);
-            uriBuilder.setPath(uriBuilder.getPath() + doi.getDOI());
+            uriBuilder.setPath(uriBuilder.getPath() + doi.asString());
             uriBuilder.addParameter("format", "json");
 
             URI uri = uriBuilder.build();

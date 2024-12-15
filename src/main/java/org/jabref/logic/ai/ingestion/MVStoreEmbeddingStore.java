@@ -14,9 +14,9 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -51,7 +51,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
 
     private final Map<String, EmbeddingRecord> embeddingsMap;
 
-    public MVStoreEmbeddingStore(Path path, DialogService dialogService) {
+    public MVStoreEmbeddingStore(Path path, NotificationService dialogService) {
         super(path, dialogService);
 
         this.embeddingsMap = this.mvStore.openMap(EMBEDDINGS_MAP_NAME);

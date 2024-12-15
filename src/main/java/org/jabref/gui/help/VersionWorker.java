@@ -7,13 +7,13 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.InternalPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +38,17 @@ public class VersionWorker {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final InternalPreferences internalPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     public VersionWorker(Version installedVersion,
                          DialogService dialogService,
                          TaskExecutor taskExecutor,
-                         PreferencesService preferencesService) {
+                         GuiPreferences preferences) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.internalPreferences = preferencesService.getInternalPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.internalPreferences = preferences.getInternalPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
     }
 
     /**
@@ -98,7 +98,8 @@ public class VersionWorker {
             }
         } else {
             // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, filePreferences))
+            if (dialogService.showCustomDialogAndWait(
+                    new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
                              .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }

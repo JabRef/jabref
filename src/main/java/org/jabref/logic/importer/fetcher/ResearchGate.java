@@ -22,7 +22,8 @@ import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -68,7 +69,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             html = getHTML(entry);
         } catch (FetcherException | NullPointerException e) {
-            LOGGER.debug("ResearchGate server is not available");
+            LOGGER.debug("ResearchGate server is not available", e);
             return Optional.empty();
         }
         Elements eLink = html.getElementsByTag("section");
@@ -76,7 +77,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         LOGGER.debug("PDF link: {}", link);
 
         if (link.contains("researchgate.net")) {
-            return Optional.of(new URL(link));
+            return Optional.of(URLUtil.create(link));
         }
         return Optional.empty();
     }
@@ -151,9 +152,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             URIBuilder source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
-            source.addParameter("query", doi.getDOI());
+            source.addParameter("query", doi.asString());
 
-            source = new URIBuilder(GOOGLE_SEARCH + doi.getDOI() + GOOGLE_SITE);
+            source = new URIBuilder(GOOGLE_SEARCH + doi.asString() + GOOGLE_SITE);
             Connection connection = Jsoup.connect(source.toString());
             Document html = connection
                     .cookieStore(connection.cookieStore())
@@ -253,7 +254,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     private BufferedReader getInputStream(String urlString) {
         try {
-            URL url = new URL(urlString);
+            URL url = URLUtil.create(urlString);
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL", e);

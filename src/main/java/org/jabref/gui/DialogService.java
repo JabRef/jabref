@@ -22,6 +22,7 @@ import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.NotificationService;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
@@ -29,7 +30,7 @@ import org.controlsfx.dialog.ProgressDialog;
 /**
  * This interface provides methods to create dialogs and show them to the user.
  */
-public interface DialogService {
+public interface DialogService extends NotificationService {
 
     /**
      * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
@@ -250,13 +251,6 @@ public interface DialogService {
      * @param stateManager The {@link StateManager} which contains the background tasks
      */
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
-
-    /**
-     * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
-     *
-     * @param message the message to show.
-     */
-    void notify(String message);
 
     /**
      * Shows a new file save dialog. The method doesn't return until the

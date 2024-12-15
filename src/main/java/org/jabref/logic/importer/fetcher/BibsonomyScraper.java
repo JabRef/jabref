@@ -9,6 +9,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class BibsonomyScraper {
             String cleanURL = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
                                       .replace("&", "%26").replace("=", "%3D");
 
-            URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
+            URL url = URLUtil.create(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).asString();
             return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException | FetcherException ex) {

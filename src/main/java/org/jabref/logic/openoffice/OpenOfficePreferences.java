@@ -31,19 +31,22 @@ public class OpenOfficePreferences {
     private final ObservableList<String> externalStyles;
     private final StringProperty currentJStyle;
     private final ObjectProperty<OOStyle> currentStyle;
+    private final BooleanProperty alwaysAddCitedOnPages;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
                                  List<String> externalStyles,
                                  String currentJStyle,
-                                 OOStyle currentStyle) {
+                                 OOStyle currentStyle,
+                                 boolean alwaysAddCitedOnPages) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
         this.externalStyles = FXCollections.observableArrayList(externalStyles);
         this.currentJStyle = new SimpleStringProperty(currentJStyle);
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
+        this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
     }
 
     public void clearConnectionSettings() {
@@ -136,5 +139,17 @@ public class OpenOfficePreferences {
 
     public void setCurrentStyle(OOStyle style) {
         this.currentStyle.set(style);
+    }
+
+    public boolean getAlwaysAddCitedOnPages() {
+        return this.alwaysAddCitedOnPages.get();
+    }
+
+    public BooleanProperty alwaysAddCitedOnPagesProperty() {
+        return this.alwaysAddCitedOnPages;
+    }
+
+    public void setAlwaysAddCitedOnPages(boolean alwaysAddCitedOnPages) {
+        this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);
     }
 }

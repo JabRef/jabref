@@ -7,10 +7,10 @@ import java.util.List;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -34,19 +34,19 @@ public class Crawler {
      */
     public Crawler(Path studyRepositoryRoot,
                    SlrGitHandler gitHandler,
-                   PreferencesService preferencesService,
+                   CliPreferences preferences,
                    BibEntryTypesManager bibEntryTypesManager,
                    FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
         this.studyRepository = new StudyRepository(
                 studyRepositoryRoot,
                 gitHandler,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 bibEntryTypesManager);
         StudyCatalogToFetcherConverter studyCatalogToFetcherConverter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         this.studyFetcher = new StudyFetcher(
                 studyCatalogToFetcherConverter.getActiveFetchers(),
                 studyRepository.getSearchQueryStrings());

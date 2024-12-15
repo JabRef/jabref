@@ -9,7 +9,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 /**
  * This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods <br>
@@ -21,8 +21,8 @@ import org.jabref.preferences.FilePreferences;
 public class OSX extends NativeDesktop {
 
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
@@ -48,11 +48,6 @@ public class OSX extends NativeDesktop {
     @Override
     public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
          new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
-    }
-
-    @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        return programName;
     }
 
     @Override

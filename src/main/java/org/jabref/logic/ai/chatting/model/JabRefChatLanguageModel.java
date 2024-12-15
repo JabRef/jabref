@@ -7,15 +7,17 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
@@ -53,7 +55,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      */
     private void rebuild() {
         String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());
-        if (!aiPreferences.getEnableAi() || apiKey.isEmpty()) {
+        if (!aiPreferences.getEnableAi() || (apiKey.isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL)) {
             langchainChatModel = Optional.empty();
             return;
         }
@@ -61,6 +63,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+            }
+
+            case GPT4ALL-> {
+                langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {
@@ -76,8 +82,20 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 );
             }
 
+            case GEMINI -> {
+                // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
+                langchainChatModel = Optional.of(GoogleAiGeminiChatModel
+                        .builder()
+                        .apiKey(apiKey)
+                        .modelName(aiPreferences.getSelectedChatModel())
+                        .temperature(aiPreferences.getTemperature())
+                        .logRequestsAndResponses(true)
+                        .build()
+                );
+            }
+
             case HUGGING_FACE -> {
-                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
+                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
                         .accessToken(apiKey)
@@ -116,7 +134,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
+            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set an API key inside JabRef preferences (AI tab)."));
             } else {
                 rebuild();

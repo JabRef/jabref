@@ -7,14 +7,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class NewLibraryFromPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
 
-    protected final PreferencesService preferencesService;
+    protected final CliPreferences preferences;
 
     private final LibraryTabContainer libraryTabContainer;
     private final StateManager stateManager;
@@ -41,12 +41,12 @@ public abstract class NewLibraryFromPdfAction extends SimpleCommand {
             LibraryTabContainer libraryTabContainer,
             StateManager stateManager,
             DialogService dialogService,
-            PreferencesService preferencesService,
+            CliPreferences preferences,
             TaskExecutor taskExecutor) {
         this.libraryTabContainer = libraryTabContainer;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
     }
 

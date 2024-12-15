@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -92,7 +93,7 @@ public class FieldFactory {
      * Checks whether the given field contains LaTeX code or something else
      */
     public static boolean isLatexField(Field field) {
-        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN));
+        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.SINGLE_ENTRY_LINK, FieldProperty.MULTIPLE_ENTRY_LINK));
     }
 
     /**
@@ -106,6 +107,7 @@ public class FieldFactory {
         // These fields are not marked as verbatim, because they could include LaTeX code
         result.add(StandardField.MONTH);
         result.add(StandardField.DATE);
+        result.add(StandardField.LANGUAGEID);
         return result;
     }
 
@@ -284,7 +286,7 @@ public class FieldFactory {
     }
 
     /**
-     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     * These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
      * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
@@ -295,7 +297,11 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
-    // TODO: This should ideally be user configurable! (https://github.com/JabRef/jabref/issues/9840)
+    /**
+     * Note: User configurability is discussed at <a href="https://github.com/JabRef/jabref/issues/9840">#9840</a>.
+     *
+     * @param nonWrappableFields This comes from the preferences - and introduces user configuration.
+     */
     // TODO: Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         return field.getProperties().contains(FieldProperty.MULTILINE_TEXT) || nonWrappableFields.contains(field);

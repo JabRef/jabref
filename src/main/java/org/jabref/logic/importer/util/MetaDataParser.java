@@ -13,13 +13,20 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
@@ -36,10 +43,19 @@ import org.slf4j.LoggerFactory;
  */
 public class MetaDataParser {
 
+    public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
-
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+
+    static {
+        DEFAULT_SAVE_ACTIONS = List.of(
+                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
+                        new ReplaceUnicodeLigaturesFormatter()));
+    }
 
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
@@ -107,7 +123,7 @@ public class MetaDataParser {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
-                metaData.setDefaultFileDirectory(parseDirectory(entry.getValue()));
+                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
@@ -118,7 +134,7 @@ public class MetaDataParser {
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 metaData.setLatexFileDirectory(user, path);
             } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(FieldFormatterCleanups.parse(values));
+                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
@@ -157,7 +173,7 @@ public class MetaDataParser {
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
      *
-     * No normalization is done - the general file directory could be passed as Mac OS X path, but the user could sit on Windows.
+     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
      */
@@ -239,5 +255,17 @@ public class MetaDataParser {
             return Optional.of(res.toString());
         }
         return Optional.empty();
+    }
+
+    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List<String> formatterMetaList) {
+        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
+            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
+            String formatterString = formatterMetaList.get(1);
+
+            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));
+        } else {
+            // return default actions
+            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+        }
     }
 }

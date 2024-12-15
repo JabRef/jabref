@@ -19,24 +19,24 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.SearchQuery;
-import org.jabref.model.search.SearchResult;
-import org.jabref.model.search.SearchResults;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResult;
+import org.jabref.model.search.query.SearchResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final BibDatabaseContext databaseContext;
@@ -58,13 +58,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
-                                    PreferencesService preferencesService,
+                                    GuiPreferences preferences,
                                     DialogService dialogService,
                                     BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,
                                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
@@ -77,6 +77,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
+
+        // Rebinding is necessary because of re-rendering of highlighting of matched text
         searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
@@ -89,9 +91,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (entry == null || !shouldShow(entry)) {
             return;
-        }
-        if (documentViewerView == null) {
-            documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
         content.getChildren().clear();
@@ -136,13 +135,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setStyle("-fx-font-weight: bold;");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
-        Path resolvedPath = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
+        Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
                 try {
-                    JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
+                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath, e);
                 }
@@ -159,6 +158,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
+                if (documentViewerView == null) {
+                    documentViewerView = new DocumentViewerView();
+                }
                 documentViewerView.switchToFile(linkedFile);
                 documentViewerView.gotoPage(pageNumber);
                 documentViewerView.disableLiveMode();
@@ -171,9 +173,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private ContextMenu getFileContextMenu(LinkedFile file) {
         ContextMenu fileContextMenu = new ContextMenu();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         return fileContextMenu;
     }
 

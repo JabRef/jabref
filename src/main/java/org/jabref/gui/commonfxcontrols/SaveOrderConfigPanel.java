@@ -25,8 +25,8 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -39,7 +39,7 @@ public class SaveOrderConfigPanel extends VBox {
     @FXML private GridPane sortCriterionList;
     @FXML private Button addButton;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private CliPreferences preferences;
     @Inject private UndoManager undoManager;
 
     private SaveOrderConfigPanelViewModel viewModel;
@@ -94,7 +94,7 @@ public class SaveOrderConfigPanel extends VBox {
         field.setMaxWidth(Double.MAX_VALUE);
 
         new ViewModelListCellFactory<Field>()
-                .withText(item -> FieldsUtil.getNameWithType(item, preferencesService, undoManager))
+                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
                 .install(field);
         field.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         field.itemsProperty().bindBidirectional(viewModel.sortableFieldsProperty());

@@ -22,6 +22,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.JstorQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -65,10 +66,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
 
         if (identifier.contains("/")) {
             // if identifier links to a entry with a valid doi
-            return new URL(start + identifier);
+            return URLUtil.create(start + identifier);
         }
         // else use default doi start.
-        return new URL(start + "10.2307/" + identifier);
+        return URLUtil.create(start + "10.2307/" + identifier);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
 
         String url = elements.getFirst().attr("href");
-        return Optional.of(new URL(url));
+        return Optional.of(URLUtil.create(url));
     }
 
     @Override

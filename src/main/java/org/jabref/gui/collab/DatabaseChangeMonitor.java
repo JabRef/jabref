@@ -12,14 +12,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final List<DatabaseChangeListener> listeners;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final LibraryTab.DatabaseNotification notificationPane;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -44,7 +44,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
-                                 PreferencesService preferencesService,
+                                 GuiPreferences preferences,
                                  LibraryTab.DatabaseNotification notificationPane,
                                  UndoManager undoManager,
                                  StateManager stateManager) {
@@ -52,7 +52,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.notificationPane = notificationPane;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -101,7 +101,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void fileUpdated() {
         synchronized (database) {
             // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService);
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences);
             BackgroundTask.wrap(scanner::scanForChanges)
                           .onSuccess(changes -> {
                               if (!changes.isEmpty()) {

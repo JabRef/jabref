@@ -7,9 +7,9 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,49 +48,49 @@ class ExternalFileTypesTest {
             "MHT:REMOVED;" +
             "ePUB:REMOVED";
 
-    private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
     @BeforeEach
     void setUp() {
-        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(TEST_LIST));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(TEST_LIST));
     }
 
     @Test
     void getExternalFileTypeByName() {
-        assertEquals(Optional.of(StandardExternalFileType.PDF), ExternalFileTypes.getExternalFileTypeByName("PDF", filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.PDF), ExternalFileTypes.getExternalFileTypeByName("PDF", externalApplicationsPreferences));
     }
 
     @Test
     void getExternalFileTypeByExt() {
-        assertEquals(Optional.of(StandardExternalFileType.URL), ExternalFileTypes.getExternalFileTypeByExt("html", filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.URL), ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences));
     }
 
     @Test
     void isExternalFileTypeByExt() {
-        assertTrue(ExternalFileTypes.isExternalFileTypeByExt("html", filePreferences));
-        assertFalse(ExternalFileTypes.isExternalFileTypeByExt("tst", filePreferences));
+        assertTrue(ExternalFileTypes.isExternalFileTypeByExt("html", externalApplicationsPreferences));
+        assertFalse(ExternalFileTypes.isExternalFileTypeByExt("tst", externalApplicationsPreferences));
     }
 
     @Test
     void getExternalFileTypeForName() {
-        assertEquals(Optional.of(StandardExternalFileType.JPG), ExternalFileTypes.getExternalFileTypeForName("testfile.jpg", filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.JPG), ExternalFileTypes.getExternalFileTypeForName("testfile.jpg", externalApplicationsPreferences));
     }
 
     @Test
     void getExternalFileTypeByMimeType() {
-        assertEquals(Optional.of(StandardExternalFileType.TXT), ExternalFileTypes.getExternalFileTypeByMimeType("text/plain", filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.TXT), ExternalFileTypes.getExternalFileTypeByMimeType("text/plain", externalApplicationsPreferences));
     }
 
     @Test
     void getExternalFileTypeByFile() {
         Path testfile = Path.of("testfile.txt");
-        assertEquals(Optional.of(StandardExternalFileType.TXT), ExternalFileTypes.getExternalFileTypeByFile(testfile, filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.TXT), ExternalFileTypes.getExternalFileTypeByFile(testfile, externalApplicationsPreferences));
     }
 
     @Test
     void getExternalFileTypeByLinkedFile() {
         LinkedFile testfile = new LinkedFile("A testfile", "https://testserver.com/testfile.pdf", "PDF");
-        assertEquals(Optional.of(StandardExternalFileType.PDF), ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, false, filePreferences));
+        assertEquals(Optional.of(StandardExternalFileType.PDF), ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, false, externalApplicationsPreferences));
     }
 
     @Test

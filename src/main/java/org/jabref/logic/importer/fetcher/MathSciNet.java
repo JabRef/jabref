@@ -27,7 +27,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
@@ -183,7 +183,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             String doi = item.optString("articleUrl");
             if (!doi.isEmpty()) {
                 try {
-                    DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.getNormalized()));
+                    DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.asString()));
                 } catch (IllegalArgumentException e) {
                     // If DOI parsing fails, use the original DOI string
                     entry.setField(StandardField.DOI, doi);

@@ -24,12 +24,15 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -40,7 +43,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
@@ -52,7 +54,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final AiService aiService;
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -75,11 +77,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, AiService aiService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager,
+                              DialogService dialogService,
+                              AiService aiService,
+                              GuiPreferences preferences,
+                              TaskExecutor taskExecutor,
+                              CustomLocalDragboard localDragboard
+    ) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.aiService = Objects.requireNonNull(aiService);
-        this.preferences = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
@@ -383,11 +391,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void chatWithGroup(GroupNodeViewModel group) {
-        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
-        if (currentDatabase.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
-            return;
-        }
+        assert currentDatabase.isPresent();
 
         StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
 
@@ -396,10 +400,80 @@ public class GroupTreeViewModel extends AbstractViewModel {
         StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
         groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
 
-        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode());
+        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(currentDatabase.get(), group.getGroupNode());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
 
-        aiService.openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
+        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
+    }
+
+    private void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
+        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+
+        if (existingWindow.isPresent()) {
+            existingWindow.get().requestFocus();
+        } else {
+            AiChatWindow aiChatWindow = new AiChatWindow(
+                    aiService,
+                    dialogService,
+                    preferences.getAiPreferences(),
+                    preferences.getExternalApplicationsPreferences(),
+                    taskExecutor
+            );
+
+            aiChatWindow.setOnCloseRequest(event ->
+                    stateManager.getAiChatWindows().remove(aiChatWindow)
+            );
+
+            stateManager.getAiChatWindows().add(aiChatWindow);
+            dialogService.showCustomWindow(aiChatWindow);
+            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
+            aiChatWindow.requestFocus();
+        }
+    }
+
+    public void generateEmbeddings(GroupNodeViewModel groupNode) {
+        assert currentDatabase.isPresent();
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<LinkedFile> linkedFiles = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .flatMap(entry -> entry.getFiles().stream())
+                .toList();
+
+        aiService.getIngestionService().ingest(
+                group.nameProperty(),
+                linkedFiles,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
+    }
+
+    public void generateSummaries(GroupNodeViewModel groupNode) {
+        assert currentDatabase.isPresent();
+
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+
+        List<BibEntry> entries = currentDatabase
+                .get()
+                .getDatabase()
+                .getEntries()
+                .stream()
+                .filter(group::isMatch)
+                .toList();
+
+        aiService.getSummariesService().summarize(
+                group.nameProperty(),
+                entries,
+                currentDatabase.get()
+        );
+
+        dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

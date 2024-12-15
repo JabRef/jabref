@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -34,11 +35,11 @@ public class ApsFetcher implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
-        Optional<String> id = getId(doi.get().getDOI());
+        Optional<String> id = getId(doi.get().asString());
 
         if (id.isPresent()) {
             String pdfRequestUrl = PDF_URL + id.get();
@@ -47,7 +48,7 @@ public class ApsFetcher implements FulltextFetcher {
             if (code == 200) {
                 LOGGER.info("Fulltext PDF found @ APS.");
                 try {
-                    return Optional.of(new URL(pdfRequestUrl));
+                    return Optional.of(URLUtil.create(pdfRequestUrl));
                 } catch (MalformedURLException e) {
                     LOGGER.warn("APS returned malformed URL, cannot find PDF.");
                 }
@@ -76,7 +77,7 @@ public class ApsFetcher implements FulltextFetcher {
 
         URLConnection con;
         try {
-            con = new URL(doiRequest).openConnection();
+            con = URLUtil.create(doiRequest).openConnection();
             con.connect();
             con.getInputStream();
             String[] urlParts = con.getURL().toString().split("abstract/");

@@ -13,19 +13,19 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
+ * Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
  */
 public class DownloadFullTextAction extends SimpleCommand {
 
@@ -35,13 +35,13 @@ public class DownloadFullTextAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
-    private final TaskExecutor taskExecutor;
+    private final GuiPreferences preferences;
+    private final UiTaskExecutor taskExecutor;
 
     public DownloadFullTextAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  PreferencesService preferences,
-                                  TaskExecutor taskExecutor) {
+                                  GuiPreferences preferences,
+                                  UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -68,11 +68,9 @@ public class DownloadFullTextAction extends SimpleCommand {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Download full text documents"),
                     Localization.lang(
-                            "You are about to download full text documents for %0 entries.",
-                            String.valueOf(stateManager.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
+                            "You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.",
+                            String.valueOf(stateManager.getSelectedEntries().size())),
+                    // [impl->req~ui.dialogs.confirmation.naming~1]
                     Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
 

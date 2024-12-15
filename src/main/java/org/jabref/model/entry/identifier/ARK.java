@@ -3,6 +3,9 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.URLUtil;
+
 /**
  * Archival Resource Key (ARK) identifiers are URLs that support long-term access to information. They are similar to DOIs
  * only that we don't know of any service that can extract bibliography information from ARKs. For this reason, if an ARK
@@ -15,6 +18,7 @@ import java.util.Optional;
  * and to provide them with ability to copy/paste the ark as is, we support arks with or without the prefix.
  * </p>
  */
+@AllowedToUseLogic("Because URL utility is needed")
 public class ARK extends EprintIdentifier {
     private final String ark;
 
@@ -28,13 +32,13 @@ public class ARK extends EprintIdentifier {
     }
 
     @Override
-    public String getNormalized() {
+    public String asString() {
         String cleanARK = ark.strip();
         return cleanARK.replaceFirst("^ark:/", "");
     }
 
     @Override
     public Optional<URI> getExternalURI() {
-        return Optional.of(URI.create("https://n2t.net/ark:/" + getNormalized()));
+        return Optional.of(URLUtil.createUri("https://n2t.net/ark:/" + asString()));
     }
 }

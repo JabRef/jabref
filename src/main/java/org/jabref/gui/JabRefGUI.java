@@ -20,26 +20,29 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GuiPreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -55,7 +58,7 @@ public class JabRefGUI extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static List<UiCommand> uiCommands;
-    private static JabRefPreferences preferencesService;
+    private static GuiPreferences preferences;
     private static FileUpdateMonitor fileUpdateMonitor;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
@@ -74,10 +77,10 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             JabRefPreferences preferencesService,
+                             GuiPreferences preferences,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
-        JabRefGUI.preferencesService = preferencesService;
+        JabRefGUI.preferences = preferences;
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
     }
 
@@ -85,7 +88,12 @@ public class JabRefGUI extends Application {
     public void start(Stage stage) {
         this.mainStage = stage;
 
-        FallbackExceptionHandler.installExceptionHandler();
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> {
+            UiTaskExecutor.runInJavaFXThread(() -> {
+                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+                dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+            });
+        });
 
         initialize();
 
@@ -93,7 +101,7 @@ public class JabRefGUI extends Application {
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
-                preferencesService,
+                preferences,
                 aiService,
                 stateManager,
                 countingUndoManager,
@@ -113,12 +121,12 @@ public class JabRefGUI extends Application {
         }
 
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
+        EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
                 new VersionWorker(buildInfo.version,
                         dialogService,
                         taskExecutor,
-                        preferencesService)
+                        preferences)
                         .checkForNewVersionDelayed();
             }
         });
@@ -129,16 +137,19 @@ public class JabRefGUI extends Application {
     public void initialize() {
         WebViewStore.init();
 
+        DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+        Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
+
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
 
         JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
-        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
+        Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
-                preferencesService.getWorkspacePreferences(),
+                preferences.getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
         Injector.setModelOrService(ThemeManager.class, themeManager);
@@ -147,6 +158,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
+        // our Default task executor is the UITaskExecutor which can use the fx thread
         JabRefGUI.taskExecutor = new UiTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
@@ -157,23 +169,23 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         JabRefGUI.aiService = new AiService(
-                preferencesService.getAiPreferences(),
-                preferencesService.getFilePreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
     }
 
     private void setupProxy() {
-        if (!preferencesService.getProxyPreferences().shouldUseProxy()
-                || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()
+                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 
-        if (preferencesService.getProxyPreferences().shouldPersistPassword()
-                && StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
-            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+        if (preferences.getProxyPreferences().shouldPersistPassword()
+                && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
+            ProxyRegisterer.register(preferences.getProxyPreferences());
             return;
         }
 
@@ -183,8 +195,8 @@ public class JabRefGUI extends Application {
                 Localization.lang("Password"));
 
         if (password.isPresent()) {
-            preferencesService.getProxyPreferences().setPassword(password.get());
-            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+            preferences.getProxyPreferences().setPassword(password.get());
+            ProxyRegisterer.register(preferences.getProxyPreferences());
         } else {
             LOGGER.warn("No proxy password specified");
         }
@@ -193,24 +205,24 @@ public class JabRefGUI extends Application {
     private void openWindow() {
         LOGGER.debug("Initializing frame");
 
-        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
-        LOGGER.debug("Reading from prefs: isMaximized {}", guiPreferences.isWindowMaximised());
+        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
+        LOGGER.debug("Reading from prefs: isMaximized {}", coreGuiPreferences.isWindowMaximised());
 
         mainStage.setMinWidth(580);
         mainStage.setMinHeight(330);
 
         // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
-        boolean windowMaximised = guiPreferences.isWindowMaximised();
+        boolean windowMaximised = coreGuiPreferences.isWindowMaximised();
 
         LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
 
         if (isWindowPositionInBounds()) {
             LOGGER.debug("The JabRef window is inside screen bounds.");
-            mainStage.setX(guiPreferences.getPositionX());
-            mainStage.setY(guiPreferences.getPositionY());
-            mainStage.setWidth(guiPreferences.getSizeX());
-            mainStage.setHeight(guiPreferences.getSizeY());
+            mainStage.setX(coreGuiPreferences.getPositionX());
+            mainStage.setY(coreGuiPreferences.getPositionY());
+            mainStage.setWidth(coreGuiPreferences.getSizeX());
+            mainStage.setHeight(coreGuiPreferences.getSizeY());
             LOGGER.debug("NOT saving window positions");
         } else {
             LOGGER.info("The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
@@ -235,7 +247,7 @@ public class JabRefGUI extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
                 scene,
                 event,
-                preferencesService.getKeyBindingRepository()));
+                preferences.getKeyBindingRepository()));
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
@@ -257,7 +269,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
     }
@@ -270,19 +282,25 @@ public class JabRefGUI extends Application {
 
     public void onHiding(WindowEvent event) {
         saveWindowState();
-        preferencesService.flush();
+        preferences.flush();
         Platform.exit();
     }
 
     private void saveWindowState() {
-        GuiPreferences preferences = preferencesService.getGuiPreferences();
-        if (!mainStage.isMaximized()) {
+        CoreGuiPreferences preferences = JabRefGUI.preferences.getGuiPreferences();
+        // workaround for mac, maximize will always report true
+        if (!mainStage.isMaximized() || OS.OS_X) {
             preferences.setPositionX(mainStage.getX());
             preferences.setPositionY(mainStage.getY());
             preferences.setSizeX(mainStage.getWidth());
             preferences.setSizeY(mainStage.getHeight());
         }
-        preferences.setWindowMaximised(mainStage.isMaximized());
+        // maximize does not correctly work on OSX, reports true, although the window was resized!
+        if (OS.OS_X) {
+            preferences.setWindowMaximised(false);
+        } else {
+            preferences.setWindowMaximised(mainStage.isMaximized());
+        }
         debugLogWindowState(mainStage);
     }
 
@@ -307,19 +325,19 @@ public class JabRefGUI extends Application {
      * Tests if the window coordinates are inside any screen
      */
     private boolean isWindowPositionInBounds() {
-        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
 
         if (LOGGER.isDebugEnabled()) {
             Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
         }
 
-        return lowerLeftIsInBounds(guiPreferences) && upperRightIsInBounds(guiPreferences);
+        return lowerLeftIsInBounds(coreGuiPreferences) && upperRightIsInBounds(coreGuiPreferences);
     }
 
-    private boolean lowerLeftIsInBounds(GuiPreferences guiPreferences) {
+    private boolean lowerLeftIsInBounds(CoreGuiPreferences coreGuiPreferences) {
         // Windows/PowerToys somehow removes 10 pixels to the left; they are re-added
-        double leftX = guiPreferences.getPositionX() + 10.0;
-        double bottomY = guiPreferences.getPositionY() + guiPreferences.getSizeY();
+        double leftX = coreGuiPreferences.getPositionX() + 10.0;
+        double bottomY = coreGuiPreferences.getPositionY() + coreGuiPreferences.getSizeY();
         LOGGER.debug("left x: {}, bottom y: {}", leftX, bottomY);
 
         boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(leftX, bottomY)));
@@ -327,11 +345,11 @@ public class JabRefGUI extends Application {
         return inBounds;
     }
 
-    private boolean upperRightIsInBounds(GuiPreferences guiPreferences) {
+    private boolean upperRightIsInBounds(CoreGuiPreferences coreGuiPreferences) {
         // The upper right corner is checked as there are most probably the window controls.
         // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
-        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX() - 10.0;
-        double topY = guiPreferences.getPositionY();
+        double rightX = coreGuiPreferences.getPositionX() + coreGuiPreferences.getSizeX() - 10.0;
+        double topY = coreGuiPreferences.getPositionY();
         LOGGER.debug("right x: {}, top y: {}", rightX, topY);
 
         boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(rightX, topY)));
@@ -341,13 +359,13 @@ public class JabRefGUI extends Application {
 
     // Background tasks
     public void startBackgroundTasks() {
-        RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
         BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
-                            preferencesService,
+                            preferences,
                             fileUpdateMonitor,
                             bibEntryTypesManager),
                     remotePreferences.getPort());
@@ -377,12 +395,17 @@ public class JabRefGUI extends Application {
 
     public static void shutdownThreadPools() {
         LOGGER.trace("Shutting down taskExecutor");
-        taskExecutor.shutdown();
+        if (taskExecutor != null) {
+            taskExecutor.shutdown();
+        }
         LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
         LOGGER.trace("Shutting down directoryMonitor");
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
+        LOGGER.trace("Shutting down postgreServer");
+        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+        postgreServer.shutdown();
         LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
         LOGGER.trace("Finished shutdownThreadPools");

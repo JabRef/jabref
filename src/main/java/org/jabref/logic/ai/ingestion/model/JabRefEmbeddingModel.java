@@ -8,10 +8,10 @@ import java.util.concurrent.Executors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -31,7 +31,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 
     private final AiPreferences aiPreferences;
-    private final DialogService dialogService;
+    private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(
@@ -50,9 +50,9 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";
 
-    public JabRefEmbeddingModel(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
+    public JabRefEmbeddingModel(AiPreferences aiPreferences, NotificationService notificationService, TaskExecutor taskExecutor) {
         this.aiPreferences = aiPreferences;
-        this.dialogService = dialogService;
+        this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
 
         startRebuildingTask();
@@ -79,7 +79,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
                 })
                 .onFailure(e -> {
                     LOGGER.error("An error occurred while building the embedding model", e);
-                    dialogService.notify(Localization.lang("An error occurred while building the embedding model"));
+                    notificationService.notify(Localization.lang("An error occurred while building the embedding model"));
                     errorWhileBuildingModel = e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 })

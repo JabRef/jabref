@@ -15,10 +15,10 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighl
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -43,12 +43,12 @@ public class FieldRowView {
 
     private GridPane parent;
 
-    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, PreferencesService preferencesService, int rowIndex) {
+    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
-        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferencesService);
-        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferencesService);
+        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences);
+        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.

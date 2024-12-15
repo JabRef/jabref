@@ -17,10 +17,11 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +57,8 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         String viewer;
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
@@ -173,11 +174,6 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        return programName;
-    }
-
-    @Override
     public Path getApplicationDirectory() {
         return Path.of("/usr/lib/");
     }
@@ -197,13 +193,13 @@ public class Linux extends NativeDesktop {
                     .lines().toList();
             if (strings.isEmpty()) {
                 LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned nothing");
-                return getUserDirectory();
+                return Directories.getUserDirectory();
             }
             String documentsDirectory = strings.getFirst();
             Path documentsPath = Path.of(documentsDirectory);
             if (!Files.exists(documentsPath)) {
                 LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existant directory {}", documentsDirectory);
-                return getUserDirectory();
+                return Directories.getUserDirectory();
             }
             LoggerFactory.getLogger(Linux.class).debug("Got documents path {}", documentsPath);
             return documentsPath;
@@ -212,6 +208,6 @@ public class Linux extends NativeDesktop {
         }
 
         // Fallback
-        return getUserDirectory();
+        return Directories.getUserDirectory();
     }
 }

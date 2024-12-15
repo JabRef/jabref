@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,13 +10,12 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -34,11 +34,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
 
     protected final DialogService dialogService;
-    protected final PreferencesService preferencesService;
+    protected final GuiPreferences preferences;
 
-    public AbstractPushToApplication(DialogService dialogService, PreferencesService preferencesService) {
+    public AbstractPushToApplication(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
     }
 
     @Override
@@ -67,7 +67,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -150,20 +150,20 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getCitePrefix() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().prefix();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().prefix();
     }
 
     public String getDelimiter() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().delimiter();
     }
 
     protected String getCiteSuffix() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().suffix();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().suffix();
     }
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
+        return new PushToApplicationSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     protected class PushToApplicationAction implements Action {
@@ -181,5 +181,29 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         public Optional<KeyBinding> getKeyBinding() {
             return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
         }
+    }
+
+    public void jumpToLine(Path fileName, int line, int column) {
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+
+        if (StringUtil.isNullOrEmpty(commandPath)) {
+            notDefined = true;
+            return;
+        }
+
+        String[] command = jumpToLineCommandlineArguments(fileName, line, column);
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        try {
+            processBuilder.command(command);
+            processBuilder.start();
+        } catch (IOException excep) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
+            couldNotCall = true;
+        }
+    }
+
+    protected String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
+        LOGGER.error("Not yet implemented");
+        return new String[0];
     }
 }

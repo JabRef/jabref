@@ -7,24 +7,24 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.preferences.FilePreferences;
 
 public class FileExtensionViewModel {
 
     private final String name;
     private final String description;
     private final List<String> extensions;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    FileExtensionViewModel(FileType fileType, FilePreferences filePreferences) {
+    FileExtensionViewModel(FileType fileType, ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.name = fileType.getName();
         this.description = Localization.lang("%0 file", fileType.getName());
         this.extensions = fileType.getExtensionsWithAsteriskAndDot();
-        this.filePreferences = filePreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
     }
 
     public String getName() {
@@ -36,7 +36,7 @@ public class FileExtensionViewModel {
     }
 
     public JabRefIcon getIcon() {
-        return ExternalFileTypes.getExternalFileTypeByExt(extensions.getFirst(), filePreferences)
+        return ExternalFileTypes.getExternalFileTypeByExt(extensions.getFirst(), externalApplicationsPreferences)
                                 .map(ExternalFileType::getIcon)
                                 .orElse(null);
     }

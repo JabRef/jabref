@@ -16,17 +16,18 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.search.LuceneIndexer;
-import org.jabref.model.search.SearchFieldConstants;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.model.search.LinkedFilesConstants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -65,7 +66,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.indexedFiles = new ConcurrentHashMap<>();
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LINKED_FILES_ANALYZER);
+        IndexWriterConfig config = new IndexWriterConfig(LinkedFilesConstants.LINKED_FILES_ANALYZER);
         if ("unsaved".equals(indexDirectoryPath.getFileName().toString())) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);
@@ -133,17 +134,18 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             return;
         }
 
-        task.setTitle(Localization.lang("Indexing PDF files for %0", libraryName));
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
         for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Adding files to index canceled");
                 return;
             }
             addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
+            task.setTitle(Localization.lang("Indexing files for %1 | %2 of %0 file(s) indexed.", linkedFiles.size(), libraryName, i));
             task.updateProgress(i, linkedFiles.size());
-            task.updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
+            task.updateMessage(Localization.lang("Indexing %0", FileUtil.shortenFileName(entry.getValue().getValue().getFileName().toString(), 68)));
+            task.showToUser(true);
             i++;
         }
         LOGGER.debug("Added {} files to index", linkedFiles.size());
@@ -191,7 +193,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         for (String fileLink : links) {
             try {
                 LOGGER.debug("Removing file {} from index.", fileLink);
-                indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH.toString(), fileLink));
+                indexWriter.deleteDocuments(new Term(LinkedFilesConstants.PATH.toString(), fileLink));
                 indexedFiles.remove(fileLink);
             } catch (IOException e) {
                 LOGGER.warn("Could not remove linked file {} from index.", fileLink, e);
@@ -235,15 +237,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         LOGGER.debug("Getting all linked files from index.");
         Map<String, Long> linkedFiles = new HashMap<>();
         try {
-            TermQuery query = new TermQuery(new Term(SearchFieldConstants.PAGE_NUMBER.toString(), "1"));
+            TermQuery query = new TermQuery(new Term(LinkedFilesConstants.PAGE_NUMBER.toString(), "1"));
             searcherManager.maybeRefresh();
             IndexSearcher searcher = searcherManager.acquire();
             StoredFields storedFields = searcher.storedFields();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = storedFields.document(scoreDoc.doc);
-                var pathField = doc.getField(SearchFieldConstants.PATH.toString());
-                var modifiedField = doc.getField(SearchFieldConstants.MODIFIED.toString());
+                var pathField = doc.getField(LinkedFilesConstants.PATH.toString());
+                var modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());
                 if (pathField != null && modifiedField != null) {
                     linkedFiles.put(pathField.stringValue(), Long.valueOf(modifiedField.stringValue()));
                 }
@@ -313,6 +315,11 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     @Override
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
     }
 
     private void closeIndex() {

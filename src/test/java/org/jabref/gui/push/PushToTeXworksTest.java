@@ -7,10 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.push.CitationCommandString;
-import org.jabref.preferences.ExternalApplicationsPreferences;
-import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +31,14 @@ class PushToTeXworksTest {
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
-        PreferencesService preferencesService = mock(PreferencesService.class);
+        GuiPreferences preferences = mock(GuiPreferences.class);
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
         // Mock the command path
         Map<String, String> commandPaths = Map.of(DISPLAY_NAME, TEXWORKS_CLIENT_PATH);
         ObservableMap<String, String> observableCommandPaths = FXCollections.observableMap(commandPaths);
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(observableCommandPaths));
-        when(preferencesService.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Mock the return value for getCiteCommand()
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
@@ -47,10 +46,10 @@ class PushToTeXworksTest {
         when(mockCiteCommand.prefix()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
         when(externalApplicationsPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
-        when(preferencesService.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
         // Create a new instance of PushToTeXworks
-        pushToTeXworks = new PushToTeXworks(dialogService, preferencesService);
+        pushToTeXworks = new PushToTeXworks(dialogService, preferences);
     }
 
     /**

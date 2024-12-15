@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CiteSeerQueryTransformer;
 import org.jabref.logic.importer.fileformat.CiteSeerParser;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -102,13 +103,13 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {
             String source = PDF_URL.formatted(id.get());
-            return Optional.of(new URL(source));
+            return Optional.of(URLUtil.create(source));
         }
 
         // if using id fails, we can try the source URL
         Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
-            return Optional.of(new URL(urlString.get()));
+            return Optional.of(URLUtil.create(urlString.get()));
         }
 
         return Optional.empty();

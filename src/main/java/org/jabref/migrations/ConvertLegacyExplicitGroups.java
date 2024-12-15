@@ -18,7 +18,7 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
     @Override
     public void performMigration(ParserResult parserResult) {
         Objects.requireNonNull(parserResult);
-        if (!parserResult.getMetaData().getGroups().isPresent()) {
+        if (parserResult.getMetaData().getGroups().isEmpty()) {
             return;
         }
 
@@ -36,8 +36,7 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
         Objects.requireNonNull(node);
         List<ExplicitGroup> findings = new ArrayList<>();
 
-        if (node.getGroup() instanceof ExplicitGroup) {
-            ExplicitGroup group = (ExplicitGroup) node.getGroup();
+        if (node.getGroup() instanceof ExplicitGroup group) {
             if (!group.getLegacyEntryKeys().isEmpty()) {
                 findings.add(group);
             }

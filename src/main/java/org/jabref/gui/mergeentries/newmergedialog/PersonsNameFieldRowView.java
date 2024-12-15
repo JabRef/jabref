@@ -2,20 +2,20 @@ package org.jabref.gui.mergeentries.newmergedialog;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.InfoButton;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.preferences.PreferencesService;
 
 public class PersonsNameFieldRowView extends FieldRowView {
     private final AuthorList leftEntryNames;
     private final AuthorList rightEntryNames;
 
-    public PersonsNameFieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, PreferencesService preferencesService, int rowIndex) {
-        super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, preferencesService, rowIndex);
+    public PersonsNameFieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, int rowIndex) {
+        super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, preferences, rowIndex);
         assert field.getProperties().contains(FieldProperty.PERSON_NAMES);
 
         var authorsParser = new AuthorListParser();

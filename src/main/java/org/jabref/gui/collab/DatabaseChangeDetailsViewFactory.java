@@ -20,18 +20,18 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
 
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final ThemeManager themeManager;
-    private final PreferencesService preferencesService;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
     private final TaskExecutor taskExecutor;
@@ -39,14 +39,14 @@ public class DatabaseChangeDetailsViewFactory {
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
                                             ThemeManager themeManager,
-                                            PreferencesService preferencesService,
+                                            GuiPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
                                             TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.themeManager = themeManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.previewViewer = previewViewer;
         this.taskExecutor = taskExecutor;
@@ -60,7 +60,7 @@ public class DatabaseChangeDetailsViewFactory {
                 databaseContext,
                 dialogService,
                 themeManager,
-                preferencesService,
+                preferences,
                 entryTypesManager,
                 previewViewer,
                 taskExecutor
@@ -68,14 +68,14 @@ public class DatabaseChangeDetailsViewFactory {
             case EntryAdd entryAdd -> new EntryWithPreviewAndSourceDetailsView(
                 entryAdd.getAddedEntry(),
                 databaseContext,
-                preferencesService,
+                preferences,
                 entryTypesManager,
                 previewViewer
             );
             case EntryDelete entryDelete -> new EntryWithPreviewAndSourceDetailsView(
                 entryDelete.getDeletedEntry(),
                 databaseContext,
-                preferencesService,
+                preferences,
                 entryTypesManager,
                 previewViewer
             );
@@ -85,7 +85,7 @@ public class DatabaseChangeDetailsViewFactory {
             case BibTexStringRename stringRename -> new BibTexStringRenameDetailsView(stringRename);
             case MetadataChange metadataChange -> new MetadataChangeDetailsView(
                 metadataChange,
-                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns()
+                preferences.getCitationKeyPatternPreferences().getKeyPatterns()
             );
             case GroupChange groupChange -> new GroupChangeDetailsView(groupChange);
             case PreambleChange preambleChange -> new PreambleChangeDetailsView(preambleChange);

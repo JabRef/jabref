@@ -1,5 +1,8 @@
 package org.jabref.gui.frame;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,29 +28,34 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
+import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
-    private final PreferencesService preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -58,7 +66,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrameViewModel(PreferencesService preferencesService,
+    public JabRefFrameViewModel(GuiPreferences preferences,
                                 AiService aiService,
                                 StateManager stateManager,
                                 DialogService dialogService,
@@ -68,7 +76,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 UndoManager undoManager,
                                 ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
-        this.preferences = preferencesService;
+        this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
@@ -85,10 +93,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                preferences.getGuiPreferences().getLastFilesOpened().clear();
+                preferences.getLastFilesOpenedPreferences().getLastFilesOpened().clear();
             } else {
-                preferences.getGuiPreferences().setLastFilesOpened(filenames);
-                preferences.getGuiPreferences().setLastFocusedFile(focusedDatabase);
+                preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
+                preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
     }
@@ -145,8 +153,11 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
+            checkForBibInUpperDir();
             return;
         }
+
+        assert !uiCommands.isEmpty();
 
         // Handle blank workspace
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
@@ -179,6 +190,85 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                   });
     }
 
+    private void checkForBibInUpperDir() {
+        // "Open last edited databases" happened before this call
+        // Moreover, there is not any CLI command (especially, not opening any new tab)
+        // Thus, we check if there are any tabs open.
+        if (tabContainer.getLibraryTabs().isEmpty()) {
+            Optional<Path> firstBibFile = firstBibFile();
+            if (firstBibFile.isPresent()) {
+                ParserResult parserResult;
+                try {
+                    parserResult = OpenDatabase.loadDatabase(
+                            firstBibFile.get(),
+                            preferences.getImportFormatPreferences(),
+                            fileUpdateMonitor);
+                } catch (IOException e) {
+                    LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
+                    return;
+                }
+                List<ParserResult> librariesToOpen = new ArrayList<>(1);
+                librariesToOpen.add(parserResult);
+                openDatabases(librariesToOpen);
+            }
+        }
+    }
+
+    /// Use case: User starts `JabRef.bat` or `JabRef.exe`. JabRef should open a "close by" bib file.
+    /// By "close by" a `.bib` file in the current folder or one level up of `JabRef.exe`is meant.
+    ///
+    /// Paths:
+    ///   - `...\{example-dir}\JabRef\JabRef.exe` (Windows)
+    ///   - `.../{example-dir}/JabRef/bin/JabRef` (Linux)
+    ///   - `...\{example-dir}\JabRef\runtime\bin\JabRef.bat` (Windows)
+    ///
+    /// In the example, `...\{example-dir}\example.bib` should be found.
+    ///
+    /// We do NOT go up another level (i.e., everything in `...` is not found)
+    private Optional<Path> firstBibFile() {
+        Path absolutePath = Path.of(".").toAbsolutePath();
+        if (OS.LINUX && absolutePath.startsWith("/usr")) {
+            return Optional.empty();
+        }
+        if (OS.OS_X && absolutePath.startsWith("/Applications")) {
+            return Optional.empty();
+        }
+        if (OS.WINDOWS && absolutePath.startsWith("C:\\Program Files")) {
+            return Optional.empty();
+        }
+
+        boolean isJabRefExe = Files.exists(Path.of("JabRef.exe"));
+        boolean isJabRefBat = Files.exists(Path.of("JabRef.bat"));
+        boolean isJabRef = Files.exists(Path.of("JabRef"));
+
+        ArrayList<Path> dirsToCheck = new ArrayList<>(2);
+        dirsToCheck.add(Path.of(""));
+        if (isJabRefExe) {
+            dirsToCheck.add(Path.of("../"));       // directory above `JabRef.exe` directory
+        } else if (isJabRefBat) {
+            dirsToCheck.add(Path.of("../../../")); // directory above `runtime\bin\JabRef.bat`
+        } else if (isJabRef) {
+            dirsToCheck.add(Path.of("../..(/"));   // directory above `bin/JabRef` directory
+        }
+
+        // We want to check dirsToCheck only, not all subdirs (due to unnecessary disk i/o)
+        try {
+            return dirsToCheck.stream()
+                              .map(Path::toAbsolutePath)
+                              .flatMap(Unchecked.function(dir -> Files.list(dir)))
+                              .filter(path -> FileUtil.getFileExtension(path).equals(Optional.of("bib")))
+                              .findFirst();
+        } catch (UncheckedIOException ex) {
+            // Could be access denied exception - when this is started from the application directory
+            // Therefore log level "debug"
+            LOGGER.debug("Could not check for existing bib file {}", dirsToCheck, ex);
+            return Optional.empty();
+        }
+    }
+
+    /// Opens the libraries given in `parserResults`. This list needs to be modifiable, because invalidDatabases are removed.
+    ///
+    /// @param parserResults A modifiable list of parser results
     private void openDatabases(List<ParserResult> parserResults) {
         final List<ParserResult> toOpenTab = new ArrayList<>();
 
@@ -193,7 +283,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         Path focusedFile = parserResults.stream()
                                         .findFirst()
                                         .flatMap(ParserResult::getPath)
-                                        .orElse(preferences.getGuiPreferences()
+                                        .orElse(preferences.getLastFilesOpenedPreferences()
                                                            .getLastFocusedFile())
                                         .toAbsolutePath();
 
@@ -219,11 +309,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                             undoManager,
                             clipBoardManager,
                             taskExecutor);
-                } catch (
-                        SQLException |
-                        DatabaseNotSupportedException |
-                        InvalidDBMSConnectionPropertiesException |
-                        NotASharedDatabaseException e) {
+                } catch (SQLException
+                         | DatabaseNotSupportedException
+                         | InvalidDBMSConnectionPropertiesException
+                         | NotASharedDatabaseException e) {
                     LOGGER.error("Connection error", e);
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Connection error"),
@@ -407,7 +496,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     void autoSetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
-            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, taskExecutor).execute();
+            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor).execute();
         }
     }
 }

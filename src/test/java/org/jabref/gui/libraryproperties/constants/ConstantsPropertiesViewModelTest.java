@@ -5,10 +5,10 @@ import java.util.List;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 class ConstantsPropertiesViewModelTest {
 
     private DialogService service = mock(DialogService.class);
-    private FilePreferences filePreferences = mock(FilePreferences.class);
+    private ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
     /**
      * Check that the list of strings is sorted according to their keys
@@ -32,7 +32,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
         model.setValues();
 
         List<String> actual = model.stringsListProperty().stream()
@@ -52,7 +52,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of("ICSE", "TSE");
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
         var stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));
@@ -72,7 +72,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
 
         var stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));

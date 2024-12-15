@@ -18,11 +18,11 @@ import javafx.scene.input.MouseButton;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -167,11 +167,11 @@ public class ClipBoardManager {
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
-        PreferencesService preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
+        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
         return writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
     }
 }

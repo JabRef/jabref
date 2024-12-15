@@ -2,7 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.gui.preferences.GuiPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,18 +14,18 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 class WebSearchPaneViewModelTest {
 
-    private PreferencesService preferencesService;
+    private GuiPreferences preferences;
     private DialogService dialogService;
     private StateManager stateManager;
     private WebSearchPaneViewModel viewModel;
 
     @BeforeEach
     void setUp() {
-        preferencesService = Mockito.mock(PreferencesService.class, RETURNS_DEEP_STUBS);
+        preferences = Mockito.mock(GuiPreferences.class, RETURNS_DEEP_STUBS);
         dialogService = Mockito.mock(DialogService.class);
         stateManager = Mockito.mock(StateManager.class);
 
-        viewModel = new WebSearchPaneViewModel(preferencesService, dialogService, stateManager);
+        viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
     }
 
     @Test

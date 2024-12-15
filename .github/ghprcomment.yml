@@ -2,12 +2,11 @@
   message: |
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-    The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
     Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
 
-
-    You can check review dog's comments at the tab "Files changed" of your pull request.
+    In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
+    You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
 - jobName: OpenRewrite
   message: |
     Your code currently does not meet JabRef's code guidelines.
@@ -34,3 +33,8 @@
   message: |
     While the PR was in progress, a new version of JabRef has been released.
     You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: 'Unit tests'
+  message: |
+    JUnit tests are failing. In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details". This brings you to the test output.
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally. We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.

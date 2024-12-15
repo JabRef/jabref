@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.dlsc.unitfx.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.controlsfx.control.textfield.*?>
-
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import org.controlsfx.control.SearchableComboBox?>
-
 <?import com.dlsc.gemsfx.ResizableTextArea?>
+<?import com.dlsc.unitfx.IntegerInputField?>
+<?import org.controlsfx.control.SearchableComboBox?>
+<?import org.controlsfx.control.textfield.CustomPasswordField?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TextArea?>
 <fx:root
         spacing="10.0"
         type="VBox"
@@ -21,26 +29,38 @@
         <Label styleClass="titleHeader"
                text="%AI"/>
 
-        <Label styleClass="sectionHeader"
-               text="%General"/>
-
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <CheckBox
-                        fx:id="enableAi"
-                        mnemonicParsing="false"
-                        text="%Enable AI functionality (summary generation and chatting) in JabRef"
-                        HBox.hgrow="ALWAYS"
-                        maxWidth="Infinity"/>
-                <Button fx:id="enableAiHelp"
-                        prefWidth="20.0"/>
-            </children>
+        <HBox alignment="BASELINE_CENTER">
+            <Label styleClass="sectionHeader"
+                   text="%General"
+                   maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+            <Button fx:id="generalSettingsHelp"
+                    prefWidth="20.0"/>
         </HBox>
 
+        <CheckBox
+                fx:id="enableAi"
+                mnemonicParsing="false"
+                text="%Enable AI functionality (summary generation and chatting) in JabRef"
+                HBox.hgrow="ALWAYS"
+                maxWidth="Infinity"/>
+
+        <CheckBox fx:id="autoGenerateEmbeddings"
+                  mnemonicParsing="false"
+                  text="%Automatically generate embeddings for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <CheckBox fx:id="autoGenerateSummaries"
+                  mnemonicParsing="false"
+                  text="%Automatically generate summaries for new entries"
+                  HBox.hgrow="ALWAYS"
+                  maxWidth="Infinity"/>
+
+        <Label styleClass="sectionHeader"
+               text="%Connection"/>
+
         <HBox alignment="CENTER_LEFT"
-              layoutX="10.0"
-              layoutY="306.0"
               spacing="10.0">
             <children>
                 <Label alignment="BASELINE_CENTER"
@@ -49,8 +69,6 @@
                         fx:id="aiProviderComboBox"
                         maxWidth="1.7976931348623157E308"
                         HBox.hgrow="ALWAYS"/>
-                <Button fx:id="aiProviderHelp"
-                        prefWidth="20.0"/>
             </children>
         </HBox>
 
@@ -64,8 +82,6 @@
                         editable="true"
                         maxWidth="1.7976931348623157E308"
                         HBox.hgrow="ALWAYS"/>
-                <Button fx:id="chatModelHelp"
-                        prefWidth="20.0"/>
             </children>
             <padding>
                 <Insets left="20.0"/>
@@ -80,16 +96,21 @@
                 <CustomPasswordField
                         fx:id="apiKeyTextField"
                         HBox.hgrow="ALWAYS"/>
-                <Button fx:id="apiKeyHelp"
-                        prefWidth="20.0"/>
             </children>
             <padding>
                 <Insets left="20.0"/>
             </padding>
         </HBox>
 
-        <Label styleClass="sectionHeader"
-               text="%Expert settings"/>
+        <HBox alignment="BASELINE_LEFT">
+            <Label styleClass="sectionHeader"
+                   text="%Expert settings"
+                   maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+            <Button fx:id="expertSettingsHelp"
+                    prefWidth="20.0"/>
+        </HBox>
+
         <VBox>
             <children>
                 <Label text="%These parameters affect how the AI will answer your questions."/>
@@ -113,8 +134,6 @@
                         disable="true"
                         maxWidth="1.7976931348623157E308"
                         HBox.hgrow="ALWAYS"/>
-                <Button fx:id="apiBaseUrlHelp"
-                        prefWidth="20.0"/>
             </children>
         </HBox>
 
@@ -127,8 +146,6 @@
                         fx:id="embeddingModelComboBox"
                         maxWidth="1.7976931348623157E308"
                         HBox.hgrow="ALWAYS"/>
-                <Button fx:id="embeddingModelHelp"
-                        prefWidth="20.0"/>
             </children>
         </HBox>
 
@@ -145,14 +162,8 @@
                 <Label maxWidth="1.7976931348623157E308"
                        text="%Instruction for AI (also known as prompt or system message)"
                        HBox.hgrow="ALWAYS"/>
-                <Button fx:id="instructionHelp"
-                        prefWidth="20.0"/>
             </children>
         </HBox>
-
-        <ResizableTextArea
-                fx:id="instructionTextArea"
-                wrapText="true"/>
 
         <GridPane hgap="10" vgap="10">
             <columnConstraints>
@@ -160,85 +171,55 @@
                 <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
             </columnConstraints>
 
-            <!-- Context Window Size -->
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%Context window size"/>
-                    <Button fx:id="contextWindowSizeHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%Context window size"/>
                 <IntegerInputField
                         fx:id="contextWindowSizeTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <!-- Temperature -->
             <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <HBox spacing="10">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%Temperature"/>
-                    <Button fx:id="temperatureHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%Temperature"/>
                 <TextField
                         fx:id="temperatureTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <!-- RAG - Maximum Results Count -->
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%RAG - maximum results count"/>
-                    <Button fx:id="ragMaxResultsCountHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%RAG - maximum results count"/>
                 <IntegerInputField
                         fx:id="ragMaxResultsCountTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <!-- RAG - Minimum Score -->
             <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%RAG - minimum score"/>
-                    <Button fx:id="ragMinScoreHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%RAG - minimum score"/>
                 <TextField
                         fx:id="ragMinScoreTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <!-- Document Splitter - Chunk Size -->
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%Document splitter - chunk size"/>
-                    <Button fx:id="documentSplitterChunkSizeHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+            <Label HBox.hgrow="ALWAYS"
+                   maxWidth="Infinity"
+                   text="%Document splitter - chunk size"/>
                 <IntegerInputField
                         fx:id="documentSplitterChunkSizeTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <!-- Document Splitter - Overlap Size -->
             <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label HBox.hgrow="ALWAYS"
-                           maxWidth="Infinity"
-                           text="%Document splitter - overlap size"/>
-                    <Button fx:id="documentSplitterOverlapSizeHelp"
-                            prefWidth="20.0"/>
-                </HBox>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%Document splitter - overlap size"/>
                 <IntegerInputField
                         fx:id="documentSplitterOverlapSizeTextField"
                         HBox.hgrow="ALWAYS"/>
@@ -248,6 +229,38 @@
 
         <Button onAction="#onResetExpertSettingsButtonClick"
                 text="%Reset expert settings to default">
+            <graphic>
+                <JabRefIconView
+                        glyph="REFRESH"/>
+            </graphic>
+        </Button>
+
+        <HBox alignment="BASELINE_CENTER">
+            <Label styleClass="sectionHeader"
+                   text="%Templates"
+                   maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+            <Button fx:id="templatesHelp"
+                    prefWidth="20.0"/>
+        </HBox>
+
+        <TabPane>
+            <Tab text="%System message for chatting" closable="false">
+                <TextArea fx:id="systemMessageTextArea"/>
+            </Tab>
+            <Tab text="User message for chatting" closable="false">
+                <TextArea fx:id="userMessageTextArea"/>
+            </Tab>
+            <Tab text="Completion text for summarization of a chunk" closable="false">
+                <TextArea fx:id="summarizationChunkTextArea"/>
+            </Tab>
+            <Tab text="Completion text for summarization of several chunks" closable="false">
+                <TextArea fx:id="summarizationCombineTextArea"/>
+            </Tab>
+        </TabPane>
+
+        <Button onAction="#onResetTemplatesButtonClick"
+                text="%Reset templates to default">
             <graphic>
                 <JabRefIconView
                         glyph="REFRESH"/>

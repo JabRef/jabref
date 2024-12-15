@@ -12,19 +12,19 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -40,14 +40,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
-    protected PreferencesService preferences;
+    protected GuiPreferences preferences;
 
     public BaseIdentifierEditorViewModel(Field field,
                                          SuggestionProvider<?> suggestionProvider,
                                          FieldCheckers fieldCheckers,
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,
-                                         PreferencesService preferences,
+                                         GuiPreferences preferences,
                                          UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
@@ -132,7 +132,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void openExternalLink() {
         identifier.get().flatMap(Identifier::getExternalURI).ifPresent(url -> {
                     try {
-                        JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
+                        NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

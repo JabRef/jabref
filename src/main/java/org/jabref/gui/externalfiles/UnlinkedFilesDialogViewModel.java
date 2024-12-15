@@ -27,19 +27,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -70,7 +74,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final CliPreferences preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -82,7 +86,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
-                                        PreferencesService preferences,
+                                        GuiPreferences preferences,
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -99,10 +103,10 @@ public class UnlinkedFilesDialogViewModel {
                 taskExecutor);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.HTML, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.MARKDOWN, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.PDF, preferences.getFilePreferences()));
+                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.HTML, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.MARKDOWN, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.PDF, preferences.getExternalApplicationsPreferences()));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
@@ -141,9 +145,11 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
+        Path directory = this.getSearchDirectory();
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
+                                                     .map(path -> directory.relativize(path))
                                                      .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
@@ -151,7 +157,7 @@ public class UnlinkedFilesDialogViewModel {
         }
         resultList.clear();
 
-        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences())
+        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
                                                  .onRunning(() -> {
                                                      progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                                                      progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
@@ -198,7 +204,7 @@ public class UnlinkedFilesDialogViewModel {
         } catch (IOException e) {
             LOGGER.error("Error exporting", e);
         }
-     }
+    }
 
     public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;

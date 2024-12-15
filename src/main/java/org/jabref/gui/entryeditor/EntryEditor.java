@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,6 +13,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -37,16 +37,18 @@ import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.importer.GrobidOptInDialogHelper;
+import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
@@ -56,18 +58,20 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +94,7 @@ public class EntryEditor extends BorderPane {
     private final BibDatabaseContext databaseContext;
     private final EntryEditorPreferences entryEditorPreferences;
     private final ExternalFilesEntryLinker fileLinker;
+    private final PreviewPanel previewPanel;
     private final DirectoryMonitorManager directoryMonitorManager;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
@@ -109,7 +114,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BuildInfo buildInfo;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
@@ -120,7 +125,6 @@ public class EntryEditor extends BorderPane {
     @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
-    private final Collection<OffersPreview> previewTabs;
 
     public EntryEditor(LibraryTab libraryTab, UndoAction undoAction, RedoAction redoAction) {
         this.libraryTab = libraryTab;
@@ -133,15 +137,23 @@ public class EntryEditor extends BorderPane {
                   .root(this)
                   .load();
 
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);
+        this.previewPanel = new PreviewPanel(
+                dialogService,
+                preferences.getKeyBindingRepository(),
+                preferences,
+                themeManager,
+                taskExecutor,
+                stateManager,
+                libraryTab.searchQueryProperty());
+        this.previewPanel.setDatabase(databaseContext);
 
         setupKeyBindings();
 
         this.allPossibleTabs = createTabs();
-        this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList();
 
-        setupDragAndDrop(libraryTab);
+        setupDragAndDrop();
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -150,15 +162,22 @@ public class EntryEditor extends BorderPane {
             }
         });
 
-        EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
+        EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (obs, oldValue, newValue) -> {
                     if (currentlyEditedEntry != null) {
                         adaptVisibleTabs();
+                        Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
+                        if (newValue && tab instanceof FieldsEditorTab fieldsEditorTab) {
+                            fieldsEditorTab.removePreviewPanelFromThisTab();
+                        }
+                        if (tab instanceof TabWithPreviewPanel previewTab) {
+                            previewTab.handleFocus();
+                        }
                     }
                 });
     }
 
-    private void setupDragAndDrop(LibraryTab libraryTab) {
+    private void setupDragAndDrop() {
         this.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
@@ -171,21 +190,11 @@ public class EntryEditor extends BorderPane {
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                switch (event.getTransferMode()) {
-                    case COPY -> {
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case MOVE -> {
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
-                    }
-                    case LINK -> {
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, draggedFiles);
-                    }
-                }
+                TransferMode transferMode = event.getTransferMode();
+                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+                // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
+                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                 success = true;
             }
 
@@ -221,7 +230,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case HELP:
-                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferencesService.getFilePreferences()).execute();
+                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
                         break;
                     case CLOSE:
@@ -253,13 +262,13 @@ public class EntryEditor extends BorderPane {
     @FXML
     void generateCiteKeyButton() {
         GenerateCitationKeySingleAction action = new GenerateCitationKeySingleAction(getCurrentlyEditedEntry(), databaseContext,
-                dialogService, preferencesService, undoManager);
+                dialogService, preferences, undoManager);
         action.execute();
     }
 
     @FXML
     void generateCleanupButton() {
-        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferencesService, dialogService, stateManager, undoManager);
+        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager);
         action.execute();
     }
 
@@ -276,44 +285,44 @@ public class EntryEditor extends BorderPane {
     private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, themeManager, taskExecutor, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new PreviewTab(databaseContext, preferences, previewPanel));
 
         // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
-        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
+        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
+        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
+        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
+        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new CommentsTab(preferences, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, journalAbbreviationRepository, previewPanel));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, previewPanel));
         }
 
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
-        tabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
+        tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
-        tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferencesService, dialogService, taskExecutor));
+                undoManager, stateManager, fileMonitor, preferences, libraryTab, taskExecutor, bibEntryTypesManager));
+        tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferences, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
-                preferencesService.getFieldPreferences(),
-                preferencesService.getImportFormatPreferences(),
+                preferences.getFieldPreferences(),
+                preferences.getImportFormatPreferences(),
                 fileMonitor,
                 dialogService,
                 bibEntryTypesManager,
                 keyBindingRepository,
                 libraryTab.searchQueryProperty());
         tabs.add(sourceTab);
-        tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, databaseContext, taskExecutor, libraryTab.searchQueryProperty()));
-        tabs.add(new AiSummaryTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferencesService));
-        tabs.add(new AiChatTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferencesService, taskExecutor));
+        tabs.add(new LatexCitationsTab(databaseContext, preferences, dialogService, directoryMonitorManager));
+        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, databaseContext, taskExecutor, libraryTab.searchQueryProperty()));
+        tabs.add(new AiSummaryTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferences));
+        tabs.add(new AiChatTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferences, taskExecutor));
 
         return tabs;
     }
@@ -383,8 +392,12 @@ public class EntryEditor extends BorderPane {
         return currentlyEditedEntry;
     }
 
-    public void setCurrentlyEditedEntry(BibEntry currentlyEditedEntry) {
-        this.currentlyEditedEntry = Objects.requireNonNull(currentlyEditedEntry);
+    public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
+        if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
+            return;
+        }
+
+        this.currentlyEditedEntry = currentlyEditedEntry;
 
         // Subscribe to type changes for rebuilding the currently visible tab
         if (typeSubscription != null) {
@@ -394,16 +407,13 @@ public class EntryEditor extends BorderPane {
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), type -> {
             typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, databaseContext.getMode()).getTypeForDisplay());
             adaptVisibleTabs();
+            setupToolBar();
             getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
         });
-
-        adaptVisibleTabs();
-        setupToolBar();
 
         if (entryEditorPreferences.showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
         }
-        getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
     }
 
     private EntryEditorTab getSelectedTab() {
@@ -423,20 +433,20 @@ public class EntryEditor extends BorderPane {
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getFilePreferences(),
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getFilePreferences(),
                 databaseContext);
         for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
-                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences());
+                    GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
                     PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
                             new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                                    preferencesService.getImportFormatPreferences(),
-                                    preferencesService.getFilePreferences(),
+                                    preferences.getImportFormatPreferences(),
+                                    preferences.getFilePreferences(),
                                     databaseContext);
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
@@ -450,26 +460,41 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(libraryTab.getBibDatabaseContext(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+        new FetchAndMergeEntry(libraryTab.getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
     }
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+        Field actualField = field;
+        boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
+                tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
-                        && fieldsEditorTab.getShownFields().contains(field)) {
+                        && fieldsEditorTab.getShownFields().contains(actualField)) {
                     tabbed.getSelectionModel().select(tab);
-                    fieldsEditorTab.requestFocus(field);
+                    Platform.runLater(() -> {
+                        fieldsEditorTab.requestFocus(actualField);
+                    });
+                    // This line explicitly brings focus back to the main window containing the Entry Editor.
+                    getScene().getWindow().requestFocus();
+                    fieldFound = true;
+                    break;
+                }
+            }
+            if (!fieldFound) {
+                Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                if (aliasField != null) {
+                    setFocusToField(aliasField);
                 }
             }
         });
     }
 
     public void nextPreviewStyle() {
-        this.previewTabs.forEach(OffersPreview::nextPreviewStyle);
+        this.previewPanel.nextPreviewStyle();
     }
 
     public void previousPreviewStyle() {
-        this.previewTabs.forEach(OffersPreview::previousPreviewStyle);
+        this.previewPanel.previousPreviewStyle();
     }
 }

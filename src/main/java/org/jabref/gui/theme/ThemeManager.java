@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -12,14 +13,17 @@ import java.util.function.Consumer;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
+import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.WorkspacePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -39,6 +43,10 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in the Jabref documentation.
  */
 public class ThemeManager {
+
+    public static Map<String, Node> getDownloadIconTitleMap = Map.of(
+            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
+    );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 

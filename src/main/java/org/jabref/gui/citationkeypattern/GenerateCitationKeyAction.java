@@ -13,13 +13,13 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
@@ -31,20 +31,20 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private boolean isCanceled;
 
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
     public GenerateCitationKeyAction(Supplier<LibraryTab> tabSupplier,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      TaskExecutor taskExecutor,
-                                     PreferencesService preferencesService,
+                                     CliPreferences preferences,
                                      UndoManager undoManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -73,15 +73,15 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    public static boolean confirmOverwriteKeys(DialogService dialogService, PreferencesService preferencesService) {
-        if (preferencesService.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
+    public static boolean confirmOverwriteKeys(DialogService dialogService, CliPreferences preferences) {
+        if (preferences.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Overwrite keys"),
                     Localization.lang("One or more keys will be overwritten. Continue?"),
                     Localization.lang("Overwrite keys"),
                     Localization.lang("Cancel"),
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.getCitationKeyPatternPreferences().setWarnBeforeOverwriteCiteKey(!optOut));
+                    optOut -> preferences.getCitationKeyPatternPreferences().setWarnBeforeOverwriteCiteKey(!optOut));
         } else {
             // Always overwrite keys by default
             return true;
@@ -90,11 +90,11 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
-        if (this.preferencesService.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
+        if (this.preferences.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             entries.removeIf(BibEntry::hasCitationKey);
             // if we're going to override some citation keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
-            boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferencesService);
+            boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferences);
 
             // The user doesn't want to override citation keys
             if (!overwriteKeys) {
@@ -108,7 +108,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             private NamedCompound compound;
 
             @Override
-            protected Void call() {
+            public Void call() {
                     if (isCanceled) {
                         return null;
                     }
@@ -120,7 +120,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         // generate the new citation keys for each entry
                         compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
                         CitationKeyGenerator keyGenerator =
-                                new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences());
+                                new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
                         int entriesDone = 0;
                         for (BibEntry entry : entries) {
                             keyGenerator.generateAndSetKey(entry)

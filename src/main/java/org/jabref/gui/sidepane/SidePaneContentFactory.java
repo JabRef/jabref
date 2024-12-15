@@ -11,20 +11,21 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
-    private final PreferencesService preferences;
-    private final AiService aiService;
+    private final GuiPreferences preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -32,11 +33,11 @@ public class SidePaneContentFactory {
     private final UndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
-                                  PreferencesService preferences,
-                                  AiService aiService,
+                                  GuiPreferences preferences,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
+                                  AiService aiService,
                                   StateManager stateManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
@@ -44,10 +45,10 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
-        this.aiService = aiService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -66,10 +67,14 @@ public class SidePaneContentFactory {
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
-                    preferences.getKeyBindingRepository(),
+                    preferences.getOpenOfficePreferences(),
+                    preferences.getExternalApplicationsPreferences(),
+                    preferences.getLayoutFormatterPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
                     abbreviationRepository,
-                    taskExecutor,
+                    (UiTaskExecutor) taskExecutor,
                     dialogService,
+                    aiService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

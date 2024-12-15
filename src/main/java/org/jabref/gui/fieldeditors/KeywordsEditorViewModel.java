@@ -13,10 +13,10 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import org.tinylog.Logger;
 
@@ -29,13 +29,13 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
     public KeywordsEditorViewModel(Field field,
                                    SuggestionProvider<?> suggestionProvider,
                                    FieldCheckers fieldCheckers,
-                                   PreferencesService preferencesService,
+                                   CliPreferences preferences,
                                    UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         keywordListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator();
+        this.keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
         this.suggestionProvider = suggestionProvider;
 
         BindingsHelper.bindContentBidirectional(

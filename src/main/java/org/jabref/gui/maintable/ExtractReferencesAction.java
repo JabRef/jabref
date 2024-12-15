@@ -14,17 +14,17 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -44,7 +44,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final CliPreferences preferences;
     private final BibEntry entry;
     private final LinkedFile linkedFile;
 
@@ -52,8 +52,8 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     public ExtractReferencesAction(DialogService dialogService,
                                    StateManager stateManager,
-                                   PreferencesService preferencesService) {
-        this(dialogService, stateManager, preferencesService, null, null);
+                                   CliPreferences preferences) {
+        this(dialogService, stateManager, preferences, null, null);
     }
 
     /**
@@ -64,15 +64,15 @@ public class ExtractReferencesAction extends SimpleCommand {
      */
     private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
-                                    @NonNull PreferencesService preferencesService,
+                                    @NonNull CliPreferences preferences,
                                     @Nullable BibEntry entry,
                                     @Nullable LinkedFile linkedFile) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entry = entry;
         this.linkedFile = linkedFile;
-        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
+        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferences.getCitationKeyPatternPreferences());
 
         if (this.linkedFile == null) {
             this.executable.bind(
@@ -98,7 +98,7 @@ public class ExtractReferencesAction extends SimpleCommand {
                 selectedEntries = List.of(entry);
             }
 
-            boolean online = this.preferencesService.getGrobidPreferences().isGrobidEnabled();
+            boolean online = this.preferences.getGrobidPreferences().isGrobidEnabled();
             Callable<ParserResult> parserResultCallable;
             if (online) {
                 Optional<Callable<ParserResult>> parserResultCallableOnline = getParserResultCallableOnline(databaseContext, selectedEntries);
@@ -129,7 +129,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     private @NonNull Callable<ParserResult> getParserResultCallableOffline(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
         return () -> {
             BibEntry currentEntry = selectedEntries.getFirst();
-            List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+            List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferences.getFilePreferences()));
 
             // We need to have ParserResult handled at the importer, because it imports the meta data (library type, encoding, ...)
             ParserResult result = bibliographyFromPdfImporter.importDatabase(fileList.getFirst());
@@ -144,7 +144,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             selectedEntriesIterator.next(); // skip first entry
             while (selectedEntriesIterator.hasNext()) {
                 currentEntry = selectedEntriesIterator.next();
-                fileList = FileUtil.getListOfLinkedFiles(List.of(currentEntry), databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+                fileList = FileUtil.getListOfLinkedFiles(List.of(currentEntry), databaseContext.getFileDirectories(preferences.getFilePreferences()));
                 fileListIterator = fileList.iterator();
                 extractReferences(fileListIterator, result, currentEntry);
             }
@@ -203,7 +203,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     }
 
     private Optional<Callable<ParserResult>> getParserResultCallableOnline(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferences.getFilePreferences()));
         if (fileList.size() > FILES_LIMIT) {
             boolean continueOpening = dialogService.showConfirmationDialogAndWait(Localization.lang("Processing a large number of files"),
                     Localization.lang("You are about to process %0 files. Continue?", fileList.size()),
@@ -213,7 +213,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             }
         }
         return Optional.of(() -> new ParserResult(
-                new GrobidService(this.preferencesService.getGrobidPreferences()).processReferences(fileList, preferencesService.getImportFormatPreferences())
+                new GrobidService(this.preferences.getGrobidPreferences()).processReferences(fileList, preferences.getImportFormatPreferences())
         ));
     }
 }

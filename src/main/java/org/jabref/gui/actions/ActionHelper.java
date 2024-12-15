@@ -12,13 +12,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -27,6 +27,11 @@ public class ActionHelper {
 
     public static BooleanExpression needsDatabase(StateManager stateManager) {
         return stateManager.activeDatabaseProperty().isPresent();
+    }
+
+    public static BooleanExpression needsSavedLocalDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.LOCAL && c.getDatabasePath().isPresent()).isPresent());
+        return BooleanExpression.booleanExpression(binding);
     }
 
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
@@ -49,7 +54,7 @@ public class ActionHelper {
 
     public static BooleanExpression needsEntriesSelected(int numberOfEntries, StateManager stateManager) {
         return Bindings.createBooleanBinding(() -> stateManager.getSelectedEntries().size() == numberOfEntries,
-                                             stateManager.getSelectedEntries());
+                stateManager.getSelectedEntries());
     }
 
     public static BooleanExpression isFieldSetForSelectedEntry(Field field, StateManager stateManager) {
@@ -66,7 +71,7 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
-    public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
+    public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry -> {
             List<LinkedFile> files = entry.getFiles();
@@ -79,7 +84,7 @@ public class ActionHelper {
                 Optional<Path> filename = FileUtil.find(
                         stateManager.getActiveDatabase().get(),
                         files.getFirst().getLink(),
-                        preferencesService.getFilePreferences());
+                        preferences.getFilePreferences());
                 return filename.isPresent();
             } else {
                 return false;
