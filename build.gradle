@@ -394,7 +394,7 @@ dependencies {
     testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.2"
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation 'org.wiremock:wiremock-standalone:3.9.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.20.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
