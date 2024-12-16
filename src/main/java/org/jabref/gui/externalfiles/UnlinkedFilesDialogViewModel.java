@@ -149,7 +149,6 @@ public class UnlinkedFilesDialogViewModel {
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
-                                                     .map(path -> directory.relativize(path))
                                                      .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
