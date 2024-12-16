@@ -392,7 +392,7 @@ public class AiPreferences {
             return contextWindowSize.get();
         } else {
             return switch (aiProvider.get()) {
-                case OPEN_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                case OPEN_AI_COMPATIBLE -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI_COMPATIBLE, openAiChatModel.get());
                 case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
                 case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
                 case GEMINI -> AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
@@ -516,7 +516,7 @@ public class AiPreferences {
 
     public String getSelectedChatModel() {
         return switch (aiProvider.get()) {
-            case OPEN_AI ->
+            case OPEN_AI_COMPATIBLE ->
                     openAiChatModel.get();
             case MISTRAL_AI ->
                     mistralAiChatModel.get();
@@ -532,7 +532,7 @@ public class AiPreferences {
     public String getSelectedApiBaseUrl() {
         if (customizeExpertSettings.get()) {
             return switch (aiProvider.get()) {
-                case OPEN_AI ->
+                case OPEN_AI_COMPATIBLE ->
                         openAiApiBaseUrl.get();
                 case MISTRAL_AI ->
                         mistralAiApiBaseUrl.get();
@@ -569,5 +569,26 @@ public class AiPreferences {
 
     public StringProperty templateProperty(AiTemplate aiTemplate) {
         return templates.get(aiTemplate);
+    }
+
+    /**
+     * Returns whether the selected model is "not safe" to use. By "safe" it is meant that the model is remote model from
+     * reputable companies.
+     * <p>
+     * This function is made for <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj">EU act on AI</a>. LLMs are high-risk systems and may generate harmful content.
+     * If user connects to a reputable remote model (OpenAI, Gemini, Mistral AI, etc.), then they are safe to use, as they
+     * are subject to the EU AI act. However, when user selects a local model or models from Hugging Face, then any model
+     * can be used in JabRef, including uncensored and harmful ones.
+     */
+    public boolean isUnsafeModelSelected() {
+        // Any model can be chosen in GPT4All.
+        boolean localProvider = getAiProvider() == AiProvider.GPT4ALL;
+        // Any model can be chosen on HuggingFace.
+        boolean huggingFace = getAiProvider() == AiProvider.HUGGING_FACE;
+        // If user changed API base URL from default one, then probably user has connected to a local model provider,
+        // like `ollama` or `llama.cpp`.
+        boolean customApiBaseUrl = !getSelectedApiBaseUrl().equals(getAiProvider().getApiUrl());
+
+        return localProvider || huggingFace || customApiBaseUrl;
     }
 }

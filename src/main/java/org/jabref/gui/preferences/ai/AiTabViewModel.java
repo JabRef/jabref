@@ -141,7 +141,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
             if (oldValue != null) {
                 switch (oldValue) {
-                    case OPEN_AI -> {
+                    case OPEN_AI_COMPATIBLE -> {
                         openAiChatModel.set(oldChatModel);
                         openAiApiKey.set(currentApiKey.get());
                         openAiApiBaseUrl.set(currentApiBaseUrl.get());
@@ -170,7 +170,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
 
             switch (newValue) {
-                case OPEN_AI -> {
+                case OPEN_AI_COMPATIBLE -> {
                     currentChatModel.set(openAiChatModel.get());
                     currentApiKey.set(openAiApiKey.get());
                     currentApiBaseUrl.set(openAiApiBaseUrl.get());
@@ -204,7 +204,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
 
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiChatModel.set(newValue);
+                case OPEN_AI_COMPATIBLE -> openAiChatModel.set(newValue);
                 case MISTRAL_AI -> mistralAiChatModel.set(newValue);
                 case GEMINI -> geminiChatModel.set(newValue);
                 case HUGGING_FACE -> huggingFaceChatModel.set(newValue);
@@ -216,7 +216,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.currentApiKey.addListener((observable, oldValue, newValue) -> {
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiApiKey.set(newValue);
+                case OPEN_AI_COMPATIBLE -> openAiApiKey.set(newValue);
                 case MISTRAL_AI -> mistralAiApiKey.set(newValue);
                 case GEMINI -> geminiAiApiKey.set(newValue);
                 case HUGGING_FACE -> huggingFaceApiKey.set(newValue);
@@ -226,7 +226,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.currentApiBaseUrl.addListener((observable, oldValue, newValue) -> {
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiApiBaseUrl.set(newValue);
+                case OPEN_AI_COMPATIBLE -> openAiApiBaseUrl.set(newValue);
                 case MISTRAL_AI -> mistralAiApiBaseUrl.set(newValue);
                 case GEMINI -> geminiApiBaseUrl.set(newValue);
                 case HUGGING_FACE -> huggingFaceApiBaseUrl.set(newValue);
@@ -298,7 +298,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+        openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI_COMPATIBLE));
         mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
         geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));
         huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
@@ -351,7 +351,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
         aiPreferences.setGpt4AllChatModel(gpt4AllChatModel.get() == null ? "" : gpt4AllChatModel.get());
 
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? "" : openAiApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI_COMPATIBLE, openAiApiKey.get() == null ? "" : openAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? "" : geminiAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());

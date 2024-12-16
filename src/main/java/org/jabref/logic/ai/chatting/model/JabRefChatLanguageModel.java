@@ -61,7 +61,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         }
 
         switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> {
+            case OPEN_AI_COMPATIBLE -> {
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
 

@@ -47,7 +47,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     @FXML
     private void initialize() {
-        addPrivacyHyperlink(aiPolicies, AiProvider.OPEN_AI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.OPEN_AI_COMPATIBLE);
         addPrivacyHyperlink(aiPolicies, AiProvider.MISTRAL_AI);
         addPrivacyHyperlink(aiPolicies, AiProvider.GEMINI);
         addPrivacyHyperlink(aiPolicies, AiProvider.HUGGING_FACE);
