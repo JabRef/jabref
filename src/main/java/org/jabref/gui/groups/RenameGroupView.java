@@ -17,14 +17,10 @@ import org.jabref.model.groups.AbstractGroup;
 import jakarta.inject.Inject;
 
 public class RenameGroupView extends BaseDialog<AbstractGroup> {
-
     @FXML
     private TextField nameField;
-
     @Inject
     private DialogService dialogService;
-
-
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
 
@@ -37,7 +33,6 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         setHeight(150);
 
         setTitle(Localization.lang("Rename group"));
-
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         nameField = new TextField();
@@ -59,15 +54,12 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         if (button != ButtonType.OK) {
             return Optional.empty();
         }
-
         try {
             String newGroupName = nameField.getText().trim();
-
             if (editedGroup != null) {
                 editedGroup.nameProperty().setValue(newGroupName);
                 return Optional.of(editedGroup);
             }
-
             return Optional.empty();
         } catch (Exception exception) {
             dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
@@ -75,4 +67,3 @@ public class RenameGroupView extends BaseDialog<AbstractGroup> {
         }
     }
 }
-
