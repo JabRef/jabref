@@ -380,7 +380,7 @@ dependencies {
     implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.2.0')
 
     testImplementation 'io.github.classgraph:classgraph:4.8.179'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.11.3'
 
     testImplementation 'org.mockito:mockito-core:5.14.2'
