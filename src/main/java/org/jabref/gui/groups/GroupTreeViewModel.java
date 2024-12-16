@@ -267,43 +267,47 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
             String oldGroupName = oldGroupDef.getName();
-
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
                     new RenameGroupView(database,
                             oldGroup.getGroupNode().getGroup())
             );
 
             newGroup.ifPresent(group -> {
-
                 String newGroupName = group.getName();
+                if (oldGroupName.equals(newGroupName)) {
+                    dialogService.notify(Localization.lang("Same name as old group"));
+                    renameGroup(oldGroup);
+                    return;
+                }
 
                 if (newGroupName.trim().isEmpty()) {
+                    dialogService.notify(Localization.lang("Empty name for group"));
+                    renameGroup(oldGroup);
                     return;
                 }
 
-                if (newGroupName.contains(",")) {
+                if (newGroupName.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator()))) {
+                    dialogService.notify(Localization.lang("You had some special symbol in name of group"));
+                    renameGroup(oldGroup);
                     return;
                 }
-
-                if (oldGroupName.equals(newGroupName)) {
-                    return;
-                }
-
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                 if (databaseRootGroup.isPresent()) {
                     groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(newGroupName)).size();
                 }
-
                 if (groupsWithSameName < 2) {
                     oldGroup.getGroupNode().setGroup(group, true, true, database.getEntries());
                     writeGroupChangesToMetaData();
                     refresh();
+                } else {
+                    dialogService.notify(Localization.lang("Some group have this name"));
+                    renameGroup(oldGroup);
                 }
             });
         });
     }
-
+    
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
