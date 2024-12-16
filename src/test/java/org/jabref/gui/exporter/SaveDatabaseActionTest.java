@@ -33,6 +33,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +68,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveAsShouldSetWorkingDirectory() {
+    void saveAsShouldSetWorkingDirectory() throws GitAPIException, IOException {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
@@ -77,7 +78,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
+    void saveAsShouldNotSetWorkingDirectoryIfNotSelected() throws GitAPIException, IOException {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
@@ -87,7 +88,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveShouldShowSaveAsIfDatabaseNotSelected() {
+    void saveShouldShowSaveAsIfDatabaseNotSelected() throws GitAPIException, IOException {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
