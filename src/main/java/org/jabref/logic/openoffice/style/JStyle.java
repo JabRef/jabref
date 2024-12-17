@@ -21,6 +21,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
@@ -57,6 +58,7 @@ import org.slf4j.LoggerFactory;
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
  * operation is performed for each JabRef BibEntry.
  */
+@AllowedToUseClassGetResource("Required for jstyle loading")
 public class JStyle implements Comparable<JStyle>, OOStyle {
 
     public static final String ITALIC_ET_AL = "ItalicEtAl";
