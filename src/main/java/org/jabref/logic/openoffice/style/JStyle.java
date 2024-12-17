@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -160,7 +162,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         setDefaultProperties();
         // we need to distinguish if it's a style from the local resources or a file on disk
         InputStream stream = JStyle.class.getResourceAsStream(resourcePath);
-        styleFile = Path.of(resourcePath);
+        styleFile = Path.of(resourcePath).toAbsolutePath();
         fromResource = true;
         if (stream == null) {
             stream = Files.newInputStream(styleFile);
@@ -274,8 +276,19 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
      */
     private void reload() throws IOException {
         if (styleFile != null) {
-            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
-            try (InputStream stream = Files.newInputStream(styleFile)) {
+            Path resourcePath = styleFile;
+            if (fromResource) {
+                try {
+                    URL resUrl = JStyle.class.getResource(path);
+                    if (resUrl != null) {
+                        resourcePath = Path.of(resUrl.toURI());
+                    }
+                } catch (URISyntaxException ex) {
+                    LOGGER.error("Couldn't resolve resource path for style  {}", path, ex);
+                }
+            }
+            this.styleFileModificationTime = Files.getLastModifiedTime(resourcePath).toMillis();
+            try (InputStream stream = Files.newInputStream(resourcePath)) {
                 initialize(stream);
             }
         }
