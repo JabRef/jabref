@@ -480,9 +480,12 @@ class CSLFormatUtilsTest {
      * The numeric index should change to the provided "current number".
      * The rest of the citation should stay as it is (other numbers in the body shouldn't be affected).
      *
-     * @implSpec 1. Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.<br>
-     *           2. Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.<br>
-     *           3. Run this test ONLY on numeric Citation Styles.</p>
+     * @implSpec
+     * <ol>
+     * <li>Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.</li>
+     * <li>Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.</li>
+     * <li>Run this test ONLY on numeric Citation Styles.</li>
+     * </ol>
      */
     @ParameterizedTest
     @MethodSource
