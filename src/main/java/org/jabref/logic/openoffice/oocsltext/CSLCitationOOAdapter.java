@@ -54,14 +54,14 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
-        String inTextCitation;
+        String citation;
         if (isAlphanumeric) {
-            inTextCitation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
+            citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            inTextCitation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
         }
 
-        String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
+        String formattedCitation = CSLFormatUtils.transformHTML(citation);
 
         if (selectedStyle.isNumericStyle()) {
             formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
@@ -75,7 +75,7 @@ public class CSLCitationOOAdapter {
      * Inserts in-text citations for a group of entries.
      * Comparable to LaTeX's \citet command.
      *
-     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
+     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, CreationException, Exception {
