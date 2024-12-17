@@ -594,7 +594,8 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
     }
 }
