@@ -645,14 +645,14 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
         defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
-        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
+        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI_COMPATIBLE).getName());
         defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
         defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());
         defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE).getName());
         defaults.put(AI_GPT_4_ALL_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GPT4ALL).getName());
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());
+        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI_COMPATIBLE.getApiUrl());
         defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());
         defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());
         defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());
