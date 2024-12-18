@@ -861,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages); // TODO: Provide option to user: this is always false
+                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
