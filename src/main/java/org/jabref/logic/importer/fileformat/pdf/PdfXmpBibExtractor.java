@@ -1,0 +1,27 @@
+package org.jabref.logic.importer.fileformat.pdf;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.model.entry.BibEntry;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+
+/**
+ * Wraps the XMPUtility function to be used as an Importer.
+ */
+public class PdfXmpBibExtractor implements PdfBibExtractor {
+
+    private final XmpPreferences xmpPreferences;
+
+    public PdfXmpBibExtractor(XmpPreferences xmpPreferences) {
+        this.xmpPreferences = xmpPreferences;
+    }
+
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
+        return new XmpUtilReader().readXmp(filePath, xmpPreferences);
+    }
+}

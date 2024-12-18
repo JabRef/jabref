@@ -24,12 +24,7 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.PdfImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.l10n.Localization;
@@ -74,14 +69,7 @@ public class ImportFormatReader {
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
-        formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
-        formats.add(new PdfContentImporter());
-        formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            formats.add(new PdfGrobidImporter(importFormatPreferences));
-        }
-        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
+        formats.add(new PdfImporter(importFormatPreferences));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));

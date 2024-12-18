@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -20,18 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PdfContentImporterTest {
 
-    private final PdfContentImporter importer = new PdfContentImporter();
+    private final PdfFirstPageBibExtractor importer = new PdfFirstPageBibExtractor();
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfFirstPageBibExtractor.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(List.of(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path file = Path.of(PdfFirstPageBibExtractor.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
@@ -132,7 +133,7 @@ class PdfContentImporterTest {
     @ParameterizedTest
     @MethodSource("providePdfData")
     void pdfTitleExtraction(String expectedTitle, String filePath) throws Exception {
-        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
+        Path file = Path.of(Objects.requireNonNull(PdfFirstPageBibExtractor.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Optional.of(expectedTitle), result.getFirst().getTitle());
     }

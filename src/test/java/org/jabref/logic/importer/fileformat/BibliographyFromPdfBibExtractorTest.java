@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BibliographyFromPdfImporterTest {
+class BibliographyFromPdfBibExtractorTest {
 
     private static final BibEntry KNASTER_2017 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("1")
@@ -144,7 +144,7 @@ class BibliographyFromPdfImporterTest {
 
     @Test
     void tua3i2refpage() throws Exception {
-        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
+        Path file = Path.of(BibliographyFromPdfBibExtractorTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
         ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         BibEntry entry02 = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("2")
@@ -263,7 +263,7 @@ class BibliographyFromPdfImporterTest {
 
     @Test
     void ieeePaper() throws Exception {
-        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
+        Path file = Path.of(BibliographyFromPdfBibExtractorTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
         ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         assertEquals(List.of(ALVER2007, ALVER2007A, KOPP2012, KOPPP2018, KOENIG2023), parserResult.getDatabase().getEntries());
     }

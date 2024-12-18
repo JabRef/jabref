@@ -1,21 +1,15 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -29,52 +23,21 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachment;
 
 /**
- * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
+ * Imports an embedded Bib-File from the PDF.
  */
-public class PdfEmbeddedBibFileImporter extends PdfImporter {
+public class PdfEmbeddedBibExtractor implements PdfBibExtractor {
 
     private final BibtexParser bibtexParser;
 
-    public PdfEmbeddedBibFileImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfEmbeddedBibExtractor(ImportFormatPreferences importFormatPreferences) {
         bibtexParser = new BibtexParser(importFormatPreferences);
-    }
-
-    @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
-    }
-
-    @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(BufferedReader reader). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
-    public ParserResult importDatabase(String data) throws IOException {
-        Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(String data). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
-    public ParserResult importDatabase(Path filePath) {
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            return new ParserResult(getEmbeddedBibFileEntries(document));
-        } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException | ParseException e) {
-            return ParserResult.fromError(e);
-        }
     }
 
     /**
      * Extraction of embedded files in pdfs adapted from:
-     * Adapted from <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
+     * <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
      */
-
-    private List<BibEntry> getEmbeddedBibFileEntries(PDDocument document) throws IOException, ParseException {
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
         if (nameDictionary != null) {
@@ -142,20 +105,5 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
             }
         }
         return embeddedFile;
-    }
-
-    @Override
-    public String getName() {
-        return "PDFembeddedbibfile";
-    }
-
-    @Override
-    public StandardFileType getFileType() {
-        return StandardFileType.PDF;
-    }
-
-    @Override
-    public String getDescription() {
-        return Localization.lang("Imports a BibTeX file found inside a PDF.");
     }
 }

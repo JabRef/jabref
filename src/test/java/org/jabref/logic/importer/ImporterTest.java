@@ -16,8 +16,9 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -119,8 +120,7 @@ public class ImporterTest {
                 new ModsImporter(importFormatPreferences),
                 new MsBibImporter(),
                 new OvidImporter(),
-                new PdfContentImporter(),
-                new PdfXmpImporter(xmpPreferences),
+                new PdfImporter(importFormatPreferences),
                 new RepecNepImporter(importFormatPreferences),
                 new RisImporter()
         );
