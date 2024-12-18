@@ -218,12 +218,33 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         layoutText = """
                 <html>
                     <body id="previewBody">
-                        <div id="content"> %s </div>
+                        <div style="display: flex;">
+                            <div id="content" style="flex: 1;">
+                                %s
+                            </div>
+                            <div id="bookCover" style="flex: 1;">
+                                <img
+                                    src="%s"
+                                    style="width: 75vh; height: auto; max-height: 100vh;"
+                                    align="right";
+                                >
+                            </div>
+                        </div>
                     </body>
                 </html>
-                """.formatted(text);
+                """.formatted(text, getBookCoverURI());
         highlightLayoutText();
         this.setHvalue(0);
+    }
+
+    private String getBookCoverURI() {
+        if (entry != null) {
+            if (entry.getCoverImageFile().isPresent()) {
+                return "file:///" + entry.getCoverImageFile().get().getLink();
+            }
+        }
+
+        return "";
     }
 
     private void highlightLayoutText() {
