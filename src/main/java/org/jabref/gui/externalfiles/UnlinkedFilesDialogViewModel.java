@@ -10,7 +10,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -145,30 +144,32 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        Path directory = this.getSearchDirectory();
-        List<Path> fileList = checkedFileListProperty.stream()
-                                                     .map(item -> item.getValue().getPath())
-                                                     .filter(path -> path.toFile().isFile())
-                                                     .map(path -> directory.relativize(path))
-                                                     .collect(Collectors.toList());
+        List<Path> fileList = checkedFileListProperty
+                .stream()
+                .map(TreeItem::getValue)
+                .map(FileNodeViewModel::getPath)
+                .filter(Files::isRegularFile)
+                .toList();
+
         if (fileList.isEmpty()) {
-            LOGGER.warn("There are no valid files checked");
+            LOGGER.warn("There are no valid files checked for import");
             return;
         }
         resultList.clear();
 
-        importFilesBackgroundTask = importHandler.importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
-                                                 .onRunning(() -> {
-                                                     progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
-                                                     progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
-                                                     taskActiveProperty.setValue(true);
-                                                 })
-                                                 .onFinished(() -> {
-                                                     progressValueProperty.unbind();
-                                                     progressTextProperty.unbind();
-                                                     taskActiveProperty.setValue(false);
-                                                 })
-                                                 .onSuccess(resultList::addAll);
+        importFilesBackgroundTask = importHandler
+                .importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
+                .onRunning(() -> {
+                    progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
+                    progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
+                    taskActiveProperty.setValue(true);
+                })
+                .onFinished(() -> {
+                    progressValueProperty.unbind();
+                    progressTextProperty.unbind();
+                    taskActiveProperty.setValue(false);
+                })
+                .onSuccess(resultList::addAll);
         importFilesBackgroundTask.executeWith(taskExecutor);
     }
 
@@ -176,12 +177,13 @@ public class UnlinkedFilesDialogViewModel {
      * This starts the export of all files of all selected nodes in the file tree view.
      */
     public void startExport() {
-        List<Path> fileList = checkedFileListProperty.stream()
-                                                     .map(item -> item.getValue().getPath())
-                                                     .filter(path -> path.toFile().isFile())
-                                                     .toList();
+        List<Path> fileList = checkedFileListProperty
+                .stream()
+                .map(item -> item.getValue().getPath())
+                .filter(Files::isRegularFile)
+                .toList();
         if (fileList.isEmpty()) {
-            LOGGER.warn("There are no valid files checked");
+            LOGGER.warn("There are no valid files checked for export");
             return;
         }
 
