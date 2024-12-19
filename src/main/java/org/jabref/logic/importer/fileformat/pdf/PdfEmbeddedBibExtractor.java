@@ -9,6 +9,7 @@ import java.util.Map;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,7 +26,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachme
 /**
  * Imports an embedded Bib-File from the PDF.
  */
-public class PdfEmbeddedBibExtractor implements PdfBibExtractor {
+public class PdfEmbeddedBibExtractor extends PdfBibExtractor {
 
     private final BibtexParser bibtexParser;
 
@@ -105,5 +106,15 @@ public class PdfEmbeddedBibExtractor implements PdfBibExtractor {
             }
         }
         return embeddedFile;
+    }
+
+    @Override
+    public String getName() {
+        return "PDFembeddedbibfile";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Imports a BibTeX file found inside a PDF.");
     }
 }

@@ -27,10 +27,17 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.PdfImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import org.apache.pdfbox.pdmodel.PDFormContentStream;
 
 public class ImportFormatReader {
 
@@ -70,6 +77,13 @@ public class ImportFormatReader {
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfImporter(importFormatPreferences));
+        formats.add(new PdfVerbatimBibExtractor(importFormatPreferences));
+        formats.add(new PdfFirstPageBibExtractor());
+        formats.add(new PdfEmbeddedBibExtractor(importFormatPreferences));
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
+            formats.add(new PdfGrobidBibExtractor(importFormatPreferences));
+        }
+        formats.add(new PdfXmpBibExtractor(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));

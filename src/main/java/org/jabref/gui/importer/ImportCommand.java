@@ -24,6 +24,7 @@ import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -152,7 +153,7 @@ public class ImportCommand extends SimpleCommand {
                     imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (importer.get() instanceof PdfImporter
+                        if (((importer.get() instanceof PdfGrobidBibExtractor) || (importer.get() instanceof PdfImporter))
                                 && GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }

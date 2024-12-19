@@ -30,6 +30,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
+import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
@@ -37,6 +38,11 @@ import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -450,25 +456,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return fileExistsValidator.getValidationStatus();
     }
 
-    public void parsePdfMetadata() {
+    public void parsePdfMetadataAndShowMergeDialog() {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
-            try {
-                PdfImporter importer = new PdfImporter(preferences.getImportFormatPreferences());
-                ParserResult result = importer.importDatabase(filePath);
-
-                // This code duplication is the result of mixing 2 idioms: exceptions in method specification
-                // vs exceptions in return type.
-                if (result.isInvalid()) {
-                    LOGGER.error("Unable to extract PDF metadata: {}", result.getErrorMessage());
-                    dialogService.notify(Localization.lang("Unable to extract PDF metadata: %0", result.getErrorMessage()));
-                }
-
-                databaseContext.getDatabase().removeEntry(entry);
-                databaseContext.getDatabase().insertEntries(result.getDatabase().getEntries());
-            } catch (Exception e) {
-                LOGGER.error("Unable to extract PDF metadata", e);
-                dialogService.notify(Localization.lang("Unable to extract PDF metadata: %0", e.getMessage()));
+            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
+            dialog.setTitle(Localization.lang("Merge PDF metadata"));
+            dialog.addSource(Localization.lang("Entry"), entry);
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibExtractor(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibExtractor(preferences.getImportFormatPreferences()), filePath));
+            if (preferences.getGrobidPreferences().isGrobidEnabled()) {
+                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidBibExtractor(preferences.getImportFormatPreferences()), filePath));
             }
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpBibExtractor(preferences.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfFirstPageBibExtractor(), filePath));
+            dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
+                databaseContext.getDatabase().removeEntry(entry);
+                databaseContext.getDatabase().insertEntry(newEntry);
+            });
         });
     }
 

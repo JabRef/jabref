@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +43,7 @@ import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
  * <p>
  * If several PDF importers should be tried, use {@link PdfImporter}.
  */
-public class PdfFirstPageBibExtractor implements PdfBibExtractor {
+public class PdfFirstPageBibExtractor extends PdfBibExtractor {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 
@@ -648,5 +649,15 @@ public class PdfFirstPageBibExtractor implements PdfBibExtractor {
                 curString = curString.concat(" ");
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return "PDFcontent";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("This importer parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.");
     }
 }

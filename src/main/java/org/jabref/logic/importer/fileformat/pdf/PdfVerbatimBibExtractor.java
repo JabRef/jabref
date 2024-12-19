@@ -7,6 +7,7 @@ import java.util.List;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
 
@@ -15,7 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 /**
  * This importer imports a verbatim BibTeX entry from the first page of the PDF.
  */
-public class PdfVerbatimBibExtractor implements PdfBibExtractor {
+public class PdfVerbatimBibExtractor extends PdfBibExtractor {
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -34,5 +35,15 @@ public class PdfVerbatimBibExtractor implements PdfBibExtractor {
         result.forEach(entry -> entry.setCommentsBeforeEntry(""));
 
         return result;
+    }
+
+    @Override
+    public String getName() {
+        return "PdfVerbatimBibText";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Scrapes the first page of a PDF for BibTeX information.");
     }
 }
