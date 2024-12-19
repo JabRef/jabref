@@ -48,7 +48,7 @@ import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.PdfImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -180,7 +180,7 @@ public class WebFetchers {
 
         // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
         // We list it here, because otherwise, it would be much more effort (other UI button, ...)
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
+        set.add(new PdfImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
 
         return set;
     }

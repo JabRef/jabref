@@ -37,11 +37,12 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -460,13 +461,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.setTitle(Localization.lang("Merge PDF metadata"));
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
-            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibExtractor(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibExtractor(preferences.getImportFormatPreferences()), filePath));
             if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
+                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidBibExtractor(preferences.getImportFormatPreferences()), filePath));
             }
-            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
-            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpBibExtractor(preferences.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfFirstPageBibExtractor(), filePath));
             dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);
