@@ -876,7 +876,7 @@ dev.langchain4j:langchain4j-google-ai-gemini:0.36.2
 dev.langchain4j:langchain4j-hugging-face:0.36.2
 dev.langchain4j:langchain4j-mistral-ai:0.36.2
 dev.langchain4j:langchain4j-open-ai:0.36.2
-dev.langchain4j:langchain4j:0.36.0
+dev.langchain4j:langchain4j:0.36.2
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.adr:e-adr:2.0.0-SNAPSHOT
@@ -902,7 +902,7 @@ org.antlr:antlr4-runtime:4.13.2
 org.apache.commons:commons-compress:1.27.1
 org.apache.commons:commons-csv:1.12.0
 org.apache.commons:commons-lang3:3.17.0
-org.apache.commons:commons-text:1.12.0
+org.apache.commons:commons-text:1.13.0
 org.apache.httpcomponents.client5:httpclient5:5.4.1
 org.apache.httpcomponents.core5:httpcore5-h2:5.3.1
 org.apache.httpcomponents.core5:httpcore5:5.3.1
