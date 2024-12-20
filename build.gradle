@@ -181,7 +181,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.12.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
     implementation 'commons-logging:commons-logging:1.3.4'
     implementation 'com.h2database:h2-mvstore:2.3.232'
 
