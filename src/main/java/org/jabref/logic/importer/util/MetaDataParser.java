@@ -63,6 +63,9 @@ public class MetaDataParser {
 
     public static Optional<BibEntryType> parseCustomEntryType(String comment) {
         String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());
+        if (comment.startsWith(MetaData.ENTRYTYPE_FLAG_V2)) {
+            rest = comment.substring(MetaData.ENTRYTYPE_FLAG_V2.length());
+        }
         int indexEndOfName = rest.indexOf(':');
         if (indexEndOfName < 0) {
             return Optional.empty();
