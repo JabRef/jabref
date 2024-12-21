@@ -220,6 +220,14 @@ public class LinkedFile implements Serializable {
         return isOnlineLink(link.get());
     }
 
+    /**
+     * @return <code>true</code> if <code>fileType</code> contains the string "image"
+     */
+    public boolean isImage() {
+        // Cannot compare fileType to StandardExternalFileType enum since it is a StringProperty
+        return getFileType().toLowerCase().contains("image");
+    }
+
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return findIn(dirs);

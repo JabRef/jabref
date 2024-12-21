@@ -99,6 +99,16 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+
+    private static final HashSet<EntryType> COVERABLE_TYPES = new HashSet<>();
+    static {
+        COVERABLE_TYPES.add(StandardEntryType.Book);
+        COVERABLE_TYPES.add(StandardEntryType.InBook);
+        COVERABLE_TYPES.add(StandardEntryType.Booklet);
+    }
+
+    private static final String COVER_TAG = "cover";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
 
@@ -1128,6 +1138,36 @@ public class BibEntry implements Cloneable {
         currentFiles.addAll(filesToAdd);
         return setFiles(currentFiles);
     }
+
+    /**
+     * @return <code>LinkedFile</code> that contains the cover image
+     * if the <code>BibEntry</code> is a Book or other <code>COVERABLE_TYPES</code>
+     */
+    public Optional<LinkedFile> getCoverImageFile() {
+        if (!isCoverable()) {
+            return Optional.empty();
+        }
+
+        List<LinkedFile> files = getFiles();
+
+        if (files == null) {
+            return Optional.empty();
+        }
+
+        if (files.isEmpty()) {
+            return Optional.empty();
+        }
+
+        for (LinkedFile file : getFiles()) {
+            if (file.getDescription().equalsIgnoreCase(COVER_TAG)) {
+                if (file.isImage()) {
+                    return Optional.of(file);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
     // endregion
 
     /**
@@ -1256,5 +1296,12 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    /**
+     * @return <code>true</code> if this entry's <code>type</code> is a Book or one of <code>COVERABLE_TYPES</code>
+     */
+    private boolean isCoverable() {
+        return COVERABLE_TYPES.contains(getType());
     }
 }
