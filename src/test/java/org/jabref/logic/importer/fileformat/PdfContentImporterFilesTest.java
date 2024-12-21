@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,13 +23,13 @@ class PdfContentImporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void isRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new PdfContentImporter(), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(new PdfFirstPageBibExtractor(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     @Disabled("bib file does not contain linked file")
     void importEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new PdfContentImporter(), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(new PdfFirstPageBibExtractor(), fileName, FILE_ENDING);
     }
 }
