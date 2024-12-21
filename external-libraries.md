@@ -219,6 +219,27 @@ License: Oracle Free Use Terms and Conditions (FUTC)
 ```
 
 ```yaml
+Id:      com.squareup.okhttp3:okhttp
+Project: OkHttp
+URL:     https://github.com/square/okhttp
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.okio:okio
+Project: Okio
+URL:     https://github.com/square/okio
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.retrofit2:retrofit
+Project: Retrofit
+URL:     https://github.com/square/retrofit
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.sun.istack:istack-commons-runtime
 Project: iStack Common Utility Code
 URL:     https://github.com/eclipse-ee4j/jaxb-istack-commons
@@ -294,27 +315,6 @@ URL:     https://commons.apache.org/proper/commons-io/
 ```
 
 ```yaml
-Id:      org.jetbrains.kotlin:kotlin-stdlib
-Project: Kotlin Standard Library
-URL:     https://kotlinlang.org/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.velocity:velocity-engine-core
-Project: Apache Velocity
-URL:     https://velocity.apache.org/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.opennlp:opennlp-tools
-Project: Apache OpenNLP
-URL:     https://opennlp.apache.org/
-License: Apache-2.0
-```
-
-```yaml
 Id:      de.rototor.jeuclid:jeuclid-core
 Project: JEuclid
 URL:     https://github.com/rototor/jeuclid
@@ -332,27 +332,6 @@ License: BSD
 Id:      de.saxsys:mvvmfx
 Project: mvvm(fx)
 URL:     https://github.com/sialcasa/mvvmFX
-License: Apache-2.0
-```
-
-```yaml
-Id:      com.squareup.okhttp3:okhttp
-Project: OkHttp
-URL:     https://github.com/square/okhttp
-License: Apache-2.0
-```
-
-```yaml
-Id:      com.squareup.okio:okio
-Project: Okio
-URL:     https://github.com/square/okio
-License: Apache-2.0
-```
-
-```yaml
-Id:      com.squareup.retrofit2:retrofit
-Project: Retrofit
-URL:     https://github.com/square/retrofit
 License: Apache-2.0
 ```
 
@@ -392,20 +371,6 @@ Licence: Apache-2.0
 ```
 
 ```yaml
-Id:      io.github.stefanbratanov:jvm-openai
-Project: JVM OpenAI
-URL:     https://github.com/StefanBratanov/jvm-openai
-Licence: Apache-2.0
-```
-
-```yaml
-Id:      io.github.thibaultmeyer:cuid
-Project: CUID Java
-URL:     https://github.com/thibaultmeyer/cuid-java
-Licence: MIT
-```
-
-```yaml
 Id:      eu.lestard:doc-annotations
 Project: doc annotations
 URL:     https://github.com/lestard/doc-annotations
@@ -431,6 +396,20 @@ Id:      io.github.java-diff-utils:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
 License: Apache-2.0
+```
+
+```yaml
+Id:      io.github.stefanbratanov:jvm-openai
+Project: JVM OpenAI
+URL:     https://github.com/StefanBratanov/jvm-openai
+Licence: Apache-2.0
+```
+
+```yaml
+Id:      io.github.thibaultmeyer:cuid
+Project: CUID Java
+URL:     https://github.com/thibaultmeyer/cuid-java
+Licence: MIT
 ```
 
 ```yaml
@@ -532,6 +511,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      org.apache.opennlp:opennlp-tools
+Project: Apache OpenNLP
+URL:     https://opennlp.apache.org/
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
@@ -549,6 +535,13 @@ License: Apache-2.0
 Id:      org.apache.pdfbox:pdfbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
+License: Apache-2.0
+```
+
+```yaml
+Id:      org.apache.velocity:velocity-engine-core
+Project: Apache Velocity
+URL:     https://velocity.apache.org/
 License: Apache-2.0
 ```
 
@@ -623,6 +616,13 @@ Id:      org.jabref:easybind
 Project: EasyBind
 URL:     https://github.com/JabRef/EasyBind
 License: BSD-2-Clause
+```
+
+```yaml
+Id:      org.jetbrains.kotlin:kotlin-stdlib
+Project: Kotlin Standard Library
+URL:     https://kotlinlang.org/
+License: Apache-2.0
 ```
 
 ```yaml
