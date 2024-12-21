@@ -57,6 +57,8 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -2237,5 +2239,43 @@ class BibtexParserTest {
                 .withCitationKey("Test2");
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseCommentToJson() {
+        String entries =
+                """
+                    @Comment{jabref-meta-0.1.0
+                        {
+                            "saveActions" :
+                            {
+                                "state": true,
+                                "date": ["normalize_date", "action2"],
+                                "pages" : ["normalize_page_numbers"],
+                                "month" : ["normalize_month"]
+                            }
+                        }
+                """;
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        Optional<JsonObject> actualJson = parser.parseCommentToJson(entries);
+        assertEquals(actualJson, Optional.of(getExpectedJson()));
+    }
+
+    private JsonObject getExpectedJson() {
+        JsonObject saveActions = new JsonObject();
+        saveActions.addProperty("state", true);
+        JsonArray dateArray = new JsonArray();
+        dateArray.add("normalize_date");
+        dateArray.add("action2");
+        saveActions.add("date", dateArray);
+        JsonArray pagesArray = new JsonArray();
+        pagesArray.add("normalize_page_numbers");
+        saveActions.add("pages", pagesArray);
+        JsonArray monthArray = new JsonArray();
+        monthArray.add("normalize_month");
+        saveActions.add("month", monthArray);
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.add("saveActions", saveActions);
+        return expectedJson;
     }
 }
