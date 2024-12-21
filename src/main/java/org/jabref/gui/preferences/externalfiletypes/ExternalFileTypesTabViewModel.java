@@ -83,7 +83,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         showEditDialog(typeToModify, Localization.lang("Edit file type"));
 
         if (type.extensionProperty().get().equals(typeToModify.extensionProperty().get())) {
-            if (withEmptyValue(typeToModify)) {
+            if (hasEmptyValue(typeToModify)) {
                 LOGGER.warn("One of the fields is empty or invalid. Not saving.");
                 return false;
             }
@@ -101,7 +101,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
-        if (withEmptyValue(item)) {
+        if (hasEmptyValue(item)) {
             LOGGER.warn("One of the fields is empty or invalid. Not saving.");
             return false;
         }
@@ -114,7 +114,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    private boolean withEmptyValue(ExternalFileTypeItemViewModel item) {
+    private boolean hasEmptyValue(ExternalFileTypeItemViewModel item) {
         return item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty();
     }
 
