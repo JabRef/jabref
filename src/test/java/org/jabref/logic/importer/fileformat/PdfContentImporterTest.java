@@ -70,7 +70,7 @@ class PdfContentImporterTest {
                 Corpus linguistics investigates human language by starting out from large
                 """;
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
     @Test
@@ -93,7 +93,7 @@ class PdfContentImporterTest {
                 UNSPECIFIED
                 Master of Research (MRes) thesis, University of Kent,.""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
     @Test
@@ -126,7 +126,7 @@ class PdfContentImporterTest {
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
     }
 
     @ParameterizedTest
