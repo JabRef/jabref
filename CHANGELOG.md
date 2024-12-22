@@ -127,7 +127,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when click on entry at "Check Integrity" wasn't properly focusing the entry and field. [#11997](https://github.com/JabRef/jabref/issues/11997)
 - We fixed an issue with the ui not scaling when changing the font size [#11219](https://github.com/JabRef/jabref/issues/11219)
 - We fixed an issue where a custom application for external file types would not be saved [#112311](https://github.com/JabRef/jabref/issues/12311)
-- We fixed an issue where a no longer existing file cannot be deleted from an entry using keyboard shortcut [#9731](https://github.com/JabRef/jabref/issues/9731)
+- We fixed an issue where a file that no longer exists could not be deleted from an entry using keyboard shortcut [#9731](https://github.com/JabRef/jabref/issues/9731)
 
 ### Removed
 
