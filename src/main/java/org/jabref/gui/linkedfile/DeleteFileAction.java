@@ -99,6 +99,7 @@ public class DeleteFileAction extends SimpleCommand {
                 dialogTitle = Localization.lang("Delete '%0'", path.getFileName().toString());
             } else {
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
+                deleteFiles(false);
                 // Deleting a non-existing file is a success
                 success = true;
                 return;
