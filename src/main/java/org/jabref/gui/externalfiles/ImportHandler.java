@@ -101,7 +101,7 @@ public class ImportHandler {
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
-        // TODO: Make a class out of this :)
+        // TODO: Make a utility class out of this. Package: org.jabref.logic.externalfiles.
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
