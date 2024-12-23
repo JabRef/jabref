@@ -30,7 +30,7 @@ import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
@@ -75,7 +75,7 @@ public class ImportFormatReader {
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimImporter(importFormatPreferences));
+        formats.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
         formats.add(new PdfContentImporter());
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {

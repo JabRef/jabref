@@ -22,18 +22,18 @@ import static org.mockito.Mockito.when;
 
 class PdfVerbatimBibtexImporterTest {
 
-    private PdfVerbatimImporter importer;
+    private PdfVerbatimBibtexImporter importer;
 
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfVerbatimImporter(importFormatPreferences);
+        importer = new PdfVerbatimBibtexImporter(importFormatPreferences);
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfVerbatimImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfVerbatimBibtexImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }

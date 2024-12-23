@@ -12,7 +12,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -33,7 +33,7 @@ public class PdfMergeDialog {
         dialog.setTitle(Localization.lang("Merge PDF metadata"));
 
         dialog.addSource(Localization.lang("Entry"), entry);
-        dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimImporter(preferences.getImportFormatPreferences()), filePath));
+        dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
         dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
 
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {

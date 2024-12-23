@@ -15,6 +15,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -23,7 +24,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
  */
-public class PdfMergeMetadataImporter extends Importer {
+public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
@@ -59,7 +60,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
         // TODO: Evaluate priorities of these {@link PdfBibExtractor}s.
         this.metadataImporters = new ArrayList<>(List.of(
-                new PdfVerbatimImporter(importFormatPreferences),
+                new PdfVerbatimBibtexImporter(importFormatPreferences),
                 new PdfEmbeddedBibFileImporter(importFormatPreferences),
                 new PdfXmpImporter(importFormatPreferences.xmpPreferences()),
                 new PdfContentImporter()
@@ -68,25 +69,6 @@ public class PdfMergeMetadataImporter extends Importer {
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(2, new PdfGrobidImporter(importFormatPreferences));
         }
-    }
-
-    @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
-    }
-
-    @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
-    public ParserResult importDatabase(String data) throws IOException {
-        Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(String data). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     /**
@@ -98,25 +80,21 @@ public class PdfMergeMetadataImporter extends Importer {
      * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
      */
     @Override
-    public ParserResult importDatabase(Path filePath) throws IOException {
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
-            if (extractedCandidates.isEmpty()) {
-                return new ParserResult();
-            }
-
-            List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
-
-            Stream<BibEntry> allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());
-            BibEntry entry = mergeCandidates(allCandidates);
-
-            // We use the absolute path here as we do not know the context where this import will be used.
-            // The caller is responsible for making the path relative if necessary.
-            entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
-            return new ParserResult(List.of(entry));
-        } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
+        if (extractedCandidates.isEmpty()) {
+            return List.of();
         }
+
+        List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
+
+        Stream<BibEntry> allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());
+        BibEntry entry = mergeCandidates(allCandidates);
+
+        // We use the absolute path here as we do not know the context where this import will be used.
+        // The caller is responsible for making the path relative if necessary.
+        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
+        return List.of(entry);
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
@@ -263,13 +241,9 @@ public class PdfMergeMetadataImporter extends Importer {
             for (LinkedFile file : entry.getFiles()) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
-                    try {
-                        ParserResult result = importDatabase(filePath.get());
-                        if (!result.isEmpty()) {
-                            return FileUtil.relativize(result.getDatabase().getEntries(), databaseContext, filePreferences);
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error("Cannot read {}", filePath.get(), e);
+                    ParserResult result = importDatabase(filePath.get());
+                    if (!result.isEmpty()) {
+                        return FileUtil.relativize(result.getDatabase().getEntries(), databaseContext, filePreferences);
                     }
                 }
             }
