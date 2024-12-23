@@ -132,8 +132,7 @@ public class ImportHandler {
                         if (FileUtil.isPDFFile(file)) {
                             List<BibEntry> pdfEntriesInFile;
 
-                            // See {@link PdfMergeDialog#make} for reason why it is useful to call a merge dialog with
-                            // various {@link PdfBibExtractor}s.
+                            // Details: See ADR-0043
                             if (files.size() == 1) {
                                 pdfEntriesInFile = new ArrayList<>(1);
                                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
