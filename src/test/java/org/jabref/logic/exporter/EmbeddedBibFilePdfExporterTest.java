@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -48,7 +48,7 @@ class EmbeddedBibFilePdfExporterTest {
 
     private EmbeddedBibFilePdfExporter exporter;
 
-    private PdfEmbeddedPartialImporter importer;
+    private PdfEmbeddedBibFileImporter importer;
 
     private BibDatabaseContext databaseContext;
     private JournalAbbreviationRepository abbreviationRepository;
@@ -119,7 +119,7 @@ class EmbeddedBibFilePdfExporterTest {
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfEmbeddedPartialImporter(importFormatPreferences);
+        importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
 
         databaseContext = new BibDatabaseContext();
         BibDatabase dataBase = databaseContext.getDatabase();

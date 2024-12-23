@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -19,20 +18,20 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class PdfContentImporterTest {
+class PdfContentPartialImporterTest {
 
-    private final PdfContentPartialImporter importer = new PdfContentPartialImporter();
+    private final PdfContentImporter importer = new PdfContentImporter();
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfContentPartialImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(List.of(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfContentPartialImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
@@ -133,7 +132,7 @@ class PdfContentImporterTest {
     @ParameterizedTest
     @MethodSource("providePdfData")
     void pdfTitleExtraction(String expectedTitle, String filePath) throws Exception {
-        Path file = Path.of(Objects.requireNonNull(PdfContentPartialImporter.class.getResource(filePath)).toURI());
+        Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Optional.of(expectedTitle), result.getFirst().getTitle());
     }

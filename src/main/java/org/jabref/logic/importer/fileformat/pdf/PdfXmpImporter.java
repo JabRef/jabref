@@ -14,11 +14,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 /**
  * Wraps the XMPUtility function to be used as an Importer.
  */
-public class PdfXmpPartialImporter extends PdfPartialImporter {
+public class PdfXmpImporter extends PdfImporter {
 
     private final XmpPreferences xmpPreferences;
 
-    public PdfXmpPartialImporter(XmpPreferences xmpPreferences) {
+    public PdfXmpImporter(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
     }
 

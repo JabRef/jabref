@@ -43,7 +43,7 @@ import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
  * <p>
  * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
-public class PdfContentPartialImporter extends PdfPartialImporter {
+public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 

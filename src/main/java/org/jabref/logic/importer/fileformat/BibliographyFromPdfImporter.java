@@ -19,7 +19,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Currently, IEEE two column format is supported.
  * <p>
- * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentPartialImporter}.
+ * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
  * <p>
  * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
  */

@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -7,7 +7,6 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -23,18 +22,18 @@ import static org.mockito.Mockito.when;
 
 class PdfVerbatimBibtexImporterTest {
 
-    private PdfVerbatimPartialImporter importer;
+    private PdfVerbatimImporter importer;
 
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfVerbatimPartialImporter(importFormatPreferences);
+        importer = new PdfVerbatimImporter(importFormatPreferences);
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfVerbatimPartialImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfVerbatimImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }

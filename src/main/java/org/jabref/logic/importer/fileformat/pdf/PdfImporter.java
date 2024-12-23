@@ -18,19 +18,19 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
- * Intermediate class to bundle all PDF analysis steps. {@link PdfPartialImporter} are also {@link org.jabref.logic.importer.Importer}s,
+ * Intermediate class to bundle all PDF analysis steps. {@link PdfImporter}s are also {@link org.jabref.logic.importer.Importer}s,
  * which allows user for more fine-grained control of how {@link BibEntry} is extracted from a PDF file.
  * <p>
- * {@link PdfPartialImporter}s are used in two places in JabRef:
- * 1. {@link PdfMergeMetadataImporter}: uses several {@link PdfPartialImporter} and automatically
+ * {@link PdfImporter}s are used in two places in JabRef:
+ * 1. {@link PdfMergeMetadataImporter}: uses several {@link PdfImporter} and automatically
  *    merges them into 1 {@link BibEntry}.
- * 2. {@link org.jabref.gui.externalfiles.PdfMergeDialog}: also uses several {@link PdfPartialImporter}, but
+ * 2. {@link org.jabref.gui.externalfiles.PdfMergeDialog}: also uses several {@link PdfImporter}, but
  *    it shows a merge dialog (instead of automatic merging).
  * <p>
  * Note, that this step should not add PDF file to {@link BibEntry}, it will be finally added either in
- * {@link PdfPartialImporter#importDatabase(Path)} or {@link PdfMergeMetadataImporter}.
+ * {@link PdfImporter#importDatabase(Path)} or {@link PdfMergeMetadataImporter}.
  */
-public abstract class PdfPartialImporter extends Importer {
+public abstract class PdfImporter extends Importer {
     public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
     @Override

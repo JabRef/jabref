@@ -13,7 +13,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -52,7 +52,7 @@ class XmpPdfExporterTest {
     private static final BibEntry VAPNIK_2000 = new BibEntry(StandardEntryType.Article);
 
     private XmpPdfExporter exporter;
-    private PdfXmpPartialImporter importer;
+    private PdfXmpImporter importer;
     private XmpPreferences xmpPreferences;
 
     private BibDatabaseContext databaseContext;
@@ -109,7 +109,7 @@ class XmpPdfExporterTest {
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfXmpPartialImporter(xmpPreferences);
+        importer = new PdfXmpImporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
         BibDatabase dataBase = databaseContext.getDatabase();

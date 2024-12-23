@@ -13,14 +13,14 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
- * Wraps the GrobidService function to be used as a {@link PdfPartialImporter}.
+ * Wraps the GrobidService function to be used as a {@link PdfImporter}.
  */
-public class PdfGrobidPartialImporter extends PdfPartialImporter {
+public class PdfGrobidImporter extends PdfImporter {
 
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfGrobidPartialImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfGrobidImporter(ImportFormatPreferences importFormatPreferences) {
         this.grobidService = new GrobidService(importFormatPreferences.grobidPreferences());
         this.importFormatPreferences = importFormatPreferences;
     }

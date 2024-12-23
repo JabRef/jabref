@@ -27,11 +27,11 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
@@ -75,13 +75,13 @@ public class ImportFormatReader {
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimPartialImporter(importFormatPreferences));
-        formats.add(new PdfContentPartialImporter());
-        formats.add(new PdfEmbeddedPartialImporter(importFormatPreferences));
+        formats.add(new PdfVerbatimImporter(importFormatPreferences));
+        formats.add(new PdfContentImporter());
+        formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            formats.add(new PdfGrobidPartialImporter(importFormatPreferences));
+            formats.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpPartialImporter(importFormatPreferences.xmpPreferences()));
+        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));

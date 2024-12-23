@@ -19,12 +19,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.pdf.PdfPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tries to import BibTeX data trying multiple {@link PdfPartialImporter}s and merging the results.
+ * Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
  * See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
  * <p>
  * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
@@ -52,21 +52,21 @@ public class PdfMergeMetadataImporter extends Importer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
     private final ImportFormatPreferences importFormatPreferences;
-    private final List<PdfPartialImporter> metadataImporters;
+    private final List<PdfImporter> metadataImporters;
 
     public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
 
         // TODO: Evaluate priorities of these {@link PdfBibExtractor}s.
         this.metadataImporters = new ArrayList<>(List.of(
-                new PdfVerbatimPartialImporter(importFormatPreferences),
-                new PdfEmbeddedPartialImporter(importFormatPreferences),
-                new PdfXmpPartialImporter(importFormatPreferences.xmpPreferences()),
-                new PdfContentPartialImporter()
+                new PdfVerbatimImporter(importFormatPreferences),
+                new PdfEmbeddedBibFileImporter(importFormatPreferences),
+                new PdfXmpImporter(importFormatPreferences.xmpPreferences()),
+                new PdfContentImporter()
         ));
 
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            this.metadataImporters.add(2, new PdfGrobidPartialImporter(importFormatPreferences));
+            this.metadataImporters.add(2, new PdfGrobidImporter(importFormatPreferences));
         }
     }
 
@@ -90,12 +90,12 @@ public class PdfMergeMetadataImporter extends Importer {
     }
 
     /**
-     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfPartialImporter}).
+     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
      * <p>
      * Algorithm:
      * 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
      * priority for merging, which means that more fields will be stored for first entries, rather than last.
-     * 2. Run {@link PdfPartialImporter}s, and store extracted candidates in the list.
+     * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
      */
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
@@ -122,7 +122,7 @@ public class PdfMergeMetadataImporter extends Importer {
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
         List<BibEntry> candidates = new ArrayList<>();
 
-        for (PdfPartialImporter metadataImporter : metadataImporters) {
+        for (PdfImporter metadataImporter : metadataImporters) {
             try {
                 List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document);
                 candidates.addAll(extractedEntries);

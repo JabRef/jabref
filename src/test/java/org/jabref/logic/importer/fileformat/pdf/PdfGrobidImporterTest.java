@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class PdfGrobidImporterTest {
 
-    private PdfGrobidPartialImporter importer;
+    private PdfGrobidImporter importer;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +39,7 @@ class PdfGrobidImporterTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
-        importer = new PdfGrobidPartialImporter(importFormatPreferences);
+        importer = new PdfGrobidImporter(importFormatPreferences);
     }
 
     @Test
