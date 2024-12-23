@@ -30,16 +30,11 @@ several `PdfImporter`s) when importing PDF files or should every file be analyse
 
 * Automatically merge all `BibEntry` candidates from `PdfImporters`.
 * Open a merge dialog with all candidates.
+* Open a merge dialog with all candidates if a single PDF is imported.
 
 ## Decision Outcome
 
-Chosen option **is mixed**:
-
-- If only 1 PDF is imported, then open a merge dialog.
-- If several PDFs are imported, merge candidates for each PDF automatically.
-
-This section differs from conventional MADR with single decision outcome, but these options both allow for PDF
-batch-processing and for fine-grained control.
+Chosen option: "Open a merge dialog with all candidates if a single PDF is imported", because comes out best (see below).
 
 ## Pros and Cons of the Options
 
@@ -54,5 +49,12 @@ batch-processing and for fine-grained control.
   which is undesirable for power-users.
 * Bad, because it is a dialog. If lots of PDFs are imported, then there will be lots of dialogs, which might be
   too daunting to process manually.
+
+### Open a merge dialog with all candidates if a single PDF is imported.
+
+- If a single PDF is imported, then open a merge dialog.
+- If several PDFs are imported, merge candidates for each PDF automatically.
+
+* Good, because it combines the best of the other two options: Allow bopth for PDF batch-processing and for fine-grained control.
 
 <!-- markdownlint-disable-file MD004 -->
