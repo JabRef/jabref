@@ -27,13 +27,13 @@ public class PdfXmpImporter extends PdfImporter {
     }
 
     @Override
-    public String getName() {
-        return Localization.lang("XMP-annotated PDF");
+    public String getId() {
+        return "pdfXmp";
     }
 
     @Override
-    public String getId() {
-        return "xmp";
+    public String getName() {
+        return Localization.lang("XMP-annotated PDF");
     }
 
     @Override

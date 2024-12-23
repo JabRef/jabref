@@ -194,13 +194,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     @Override
-    public String getName() {
-        return "PDF meta data merger";
+    public String getId() {
+        return "pdfMerged";
     }
 
     @Override
-    public StandardFileType getFileType() {
-        return StandardFileType.PDF;
+    public String getName() {
+        return Localization.lang("PDF meta data merger");
     }
 
     @Override
@@ -210,7 +210,6 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
     public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(EntryBasedFetcherWrapper.class);
         private final FilePreferences filePreferences;
         private final BibDatabaseContext databaseContext;
 

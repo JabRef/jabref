@@ -31,7 +31,7 @@ public class PdfGrobidImporter extends PdfImporter {
 
     @Override
     public String getId() {
-        return "grobidPdf";
+        return "pdfGrobid";
     }
 
     @Override

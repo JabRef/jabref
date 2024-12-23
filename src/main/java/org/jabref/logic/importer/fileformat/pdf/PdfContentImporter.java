@@ -652,8 +652,13 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     @Override
+    public String getId() {
+        return "pdfContent";
+    }
+
+    @Override
     public String getName() {
-        return "PDFcontent";
+        return Localization.lang("PDF content");
     }
 
     @Override

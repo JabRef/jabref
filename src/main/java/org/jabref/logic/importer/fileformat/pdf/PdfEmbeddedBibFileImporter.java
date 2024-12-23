@@ -109,8 +109,13 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
     }
 
     @Override
+    public String getId() {
+        return "pdfEmbeddedBibFile";
+    }
+
+    @Override
     public String getName() {
-        return "PDFembeddedbibfile";
+        return Localization.lang("Embedded BIB-file in PDF");
     }
 
     @Override

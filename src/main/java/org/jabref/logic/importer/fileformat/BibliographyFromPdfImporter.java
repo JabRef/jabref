@@ -93,6 +93,11 @@ public class BibliographyFromPdfImporter extends Importer {
     }
 
     @Override
+    public String getId() {
+        return "pdfBibiliography";
+    }
+
+    @Override
     public String getName() {
         return "Bibliography from PDF";
     }

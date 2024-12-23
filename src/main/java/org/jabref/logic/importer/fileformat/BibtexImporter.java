@@ -129,6 +129,11 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
+    public String getId() {
+        return "bibTex";
+    }
+
+    @Override
     public String getName() {
         return "BibTeX";
     }

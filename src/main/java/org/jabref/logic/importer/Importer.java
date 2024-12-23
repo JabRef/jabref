@@ -169,29 +169,18 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
-     * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
-     * the command line. Typically, it should be in English and be overridden, as the default implementation uses `getName()`,
-     * which might be localized.
+     * Returns a <a href="https://developer.mozilla.org/en-US/docs/Glossary/Slug">slug</a>, which identifies this importer.
+     * Used, for example, to identify the importer in CLI.
+     * <p>
+     * Typically, this name should be short, in English, and should not contain special characters like #, %, etc.
      *
      * @return ID, must be unique and not <code>null</code>
      */
-    public String getId() {
-        String id = getName();
-        StringBuilder result = new StringBuilder(id.length());
-        for (int i = 0; i < id.length(); i++) {
-            char c = id.charAt(i);
-            if (Character.isLetterOrDigit(c)) {
-                result.append(Character.toLowerCase(c));
-            }
-        }
-        return result.toString();
-    }
+    public abstract String getId();
 
     /**
      * Returns the name of this import format. Typically, this is a string that denotes file type or format.
      * It can also be localized, like "XMP-annotated PDF".
-     *
-     * <p>The name must be unique.</p>
      *
      * @return format name, must be unique and not <code>null</code>
      */

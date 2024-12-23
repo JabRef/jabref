@@ -28,7 +28,7 @@ public class PdfVerbatimBibtexImporter extends PdfImporter {
         List<BibEntry> result;
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         BibtexParser parser = new BibtexParser(importFormatPreferences);
-        // TODO: Test if it will accept page with partial BibTex and partial natural langauge content.
+        // TODO: Test if it will accept page with partial BibTex and partial natural language content.
         result = parser.parseEntries(firstPageContents);
 
         // TODO: Check if it's needed in {@link PdfImporter}.
@@ -38,8 +38,13 @@ public class PdfVerbatimBibtexImporter extends PdfImporter {
     }
 
     @Override
+    public String getId() {
+        return "pdfVerbatimBibtex";
+    }
+
+    @Override
     public String getName() {
-        return "PdfVerbatimBibText";
+        return Localization.lang("Verbatim BibTeX in PDF");
     }
 
     @Override
