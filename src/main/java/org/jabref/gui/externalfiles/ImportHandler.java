@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
+import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.DragDrop;
@@ -100,6 +101,7 @@ public class ImportHandler {
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
+        // TODO: Make a class out of this :)
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
@@ -128,18 +130,29 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            ParserResult pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
-                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+                            List<BibEntry> pdfEntriesInFile;
 
-                            if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                            // See {@link PdfMergeDialog#make} for reason why it is useful to call a merge dialog with
+                            // various {@link PdfBibExtractor}s.
+                            if (files.size() == 1) {
+                                pdfEntriesInFile = new ArrayList<>();
+                                UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
+                                    MultiMergeEntriesView dialog = PdfMergeDialog.make(new BibEntry(), file, preferences, taskExecutor);
+                                    dialogService.showCustomDialogAndWait(dialog).ifPresent(pdfEntriesInFile::add);
+                                });
+                            } else {
+                                ParserResult pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
+                                pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+                                if (pdfImporterResult.hasWarnings()) {
+                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                                }
                             }
 
                             if (pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             } else {
-                                pdfEntriesInFile.forEach(entry -> {
+                                for (BibEntry entry : pdfEntriesInFile) {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
                                         LOGGER.warn("Entry's files: {}", entry.getFiles());
@@ -150,7 +163,7 @@ public class ImportHandler {
                                     DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
-                                });
+                                }
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
