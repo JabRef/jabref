@@ -96,7 +96,7 @@ public class MetaDataParser {
     public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         return parse(new MetaData(), data, keywordSeparator);
     }
-    
+
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
      *
