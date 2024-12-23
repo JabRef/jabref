@@ -2,9 +2,7 @@
 nav_order: 43
 parent: Decision Records
 ---
-<!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
-<!-- markdownlint-disable-next-line MD025 -->
-# Importing PDF files
+# Show merge dialog when importing a single PDF
 
 ## Context and Problem Statement
 
