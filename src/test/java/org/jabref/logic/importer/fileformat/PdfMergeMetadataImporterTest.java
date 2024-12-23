@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class PdfMergeMetadataImporterTest {
 
-    private PdfImporter importer;
+    private PdfMergeMetadataImporter importer;
 
     @BeforeEach
     void setUp() {
@@ -42,12 +42,12 @@ class PdfMergeMetadataImporterTest {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
-        importer = new PdfImporter(importFormatPreferences);
+        importer = new PdfMergeMetadataImporter(importFormatPreferences);
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
@@ -94,8 +94,8 @@ class PdfMergeMetadataImporterTest {
         BibDatabaseContext database = new BibDatabaseContext();
 
         // Initialize file and working directory
-        Path file = Path.of(PdfImporter.class.getResource("/pdfs/minimal.pdf").toURI());
-        Path directory = Path.of(PdfImporter.class.getResource("/pdfs/").toURI());
+        Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
         preferences.setWorkingDirectory(directory);
 
         List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();

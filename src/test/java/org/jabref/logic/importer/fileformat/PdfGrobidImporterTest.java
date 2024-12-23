@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class PdfGrobidImporterTest {
 
-    private PdfGrobidBibExtractor importer;
+    private PdfGrobidPartialImporter importer;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +40,7 @@ class PdfGrobidImporterTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
-        importer = new PdfGrobidBibExtractor(importFormatPreferences);
+        importer = new PdfGrobidPartialImporter(importFormatPreferences);
     }
 
     @Test

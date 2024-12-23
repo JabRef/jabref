@@ -55,7 +55,7 @@ import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -439,12 +439,12 @@ public class EntryEditor extends BorderPane {
                 databaseContext);
         for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
-            if (fetcher instanceof PdfImporter.EntryBasedFetcherWrapper) {
+            if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
                     GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
-                    PdfImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
-                            new PdfImporter.EntryBasedFetcherWrapper(
+                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
+                            new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
                                     preferences.getImportFormatPreferences(),
                                     preferences.getFilePreferences(),
                                     databaseContext);

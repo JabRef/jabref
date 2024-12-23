@@ -19,12 +19,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
-import org.jabref.logic.importer.fileformat.pdf.PdfBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -42,31 +42,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tries to import BibTeX data trying multiple {@link PdfBibExtractor}s and merging the results.
- * See {@link org.jabref.logic.importer.fileformat.PdfImporter#metadataImporters} for the list of importers used.
+ * Tries to import BibTeX data trying multiple {@link PdfPartialImporter}s and merging the results.
+ * See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
  * <p>
  * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
  */
-public class PdfImporter extends Importer {
+public class PdfMergeMetadataImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdfImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
     private final ImportFormatPreferences importFormatPreferences;
-    private final List<PdfBibExtractor> metadataImporters;
+    private final List<PdfPartialImporter> metadataImporters;
 
-    public PdfImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
 
         // TODO: Evaluate priorities of these {@link PdfBibExtractor}s.
         this.metadataImporters = new ArrayList<>(List.of(
-                new PdfVerbatimBibExtractor(importFormatPreferences),
-                new PdfEmbeddedBibExtractor(importFormatPreferences),
-                new PdfXmpBibExtractor(importFormatPreferences.xmpPreferences()),
-                new PdfFirstPageBibExtractor()
+                new PdfVerbatimPartialImporter(importFormatPreferences),
+                new PdfEmbeddedPartialImporter(importFormatPreferences),
+                new PdfXmpPartialImporter(importFormatPreferences.xmpPreferences()),
+                new PdfFirstPagePartialImporter()
         ));
 
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            this.metadataImporters.add(2, new PdfGrobidBibExtractor(importFormatPreferences));
+            this.metadataImporters.add(2, new PdfGrobidPartialImporter(importFormatPreferences));
         }
     }
 
@@ -90,12 +90,12 @@ public class PdfImporter extends Importer {
     }
 
     /**
-     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfBibExtractor}).
+     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfPartialImporter}).
      * <p>
      * Algorithm:
      * 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
      * priority for merging, which means that more fields will be stored for first entries, rather than last.
-     * 2. Run {@link PdfBibExtractor}s, and store extracted candidates in the list.
+     * 2. Run {@link PdfPartialImporter}s, and store extracted candidates in the list.
      */
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
@@ -122,7 +122,7 @@ public class PdfImporter extends Importer {
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
         List<BibEntry> candidates = new ArrayList<>();
 
-        for (PdfBibExtractor metadataImporter : metadataImporters) {
+        for (PdfPartialImporter metadataImporter : metadataImporters) {
             try {
                 List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document);
                 candidates.addAll(extractedEntries);
@@ -213,9 +213,9 @@ public class PdfImporter extends Importer {
     }
 
     /**
-     * A modified version of {@link PdfImporter#importDatabase(Path)}, but it
+     * A modified version of {@link PdfMergeMetadataImporter#importDatabase(Path)}, but it
      * relativizes the {@code filePath} if there are working directories before parsing it
-     * into {@link PdfImporter#importDatabase(Path)}
+     * into {@link PdfMergeMetadataImporter#importDatabase(Path)}
      * (Otherwise no path modification happens).
      *
      * @param filePath    The unrelativized {@code filePath}.
@@ -246,7 +246,7 @@ public class PdfImporter extends Importer {
         return Localization.lang("Imports BibTeX data from a PDF using multiple strategies (e.g., XMP, embedded BibTeX, text parsing, Grobid, and DOI lookup) and merges the result.");
     }
 
-    public static class EntryBasedFetcherWrapper extends PdfImporter implements EntryBasedFetcher {
+    public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(EntryBasedFetcherWrapper.class);
         private final FilePreferences filePreferences;

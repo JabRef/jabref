@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
-import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
@@ -41,9 +41,9 @@ import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
  * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
  * please see {@link BibliographyFromPdfImporter}.
  * <p>
- * If several PDF importers should be tried, use {@link PdfImporter}.
+ * If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
  */
-public class PdfFirstPageBibExtractor extends PdfBibExtractor {
+public class PdfFirstPagePartialImporter extends PdfPartialImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 

@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 
 class PdfXmpImporterTest {
 
-    private PdfXmpBibExtractor importer;
+    private PdfXmpPartialImporter importer;
 
     private static Stream<String> invalidFileNames() throws IOException {
         Predicate<String> fileName = name -> !name.contains("annotated.pdf");
@@ -35,7 +35,7 @@ class PdfXmpImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new PdfXmpBibExtractor(mock(XmpPreferences.class));
+        importer = new PdfXmpPartialImporter(mock(XmpPreferences.class));
     }
 
     @Disabled("XMP reader prints warnings to the logger when parsing does not work")

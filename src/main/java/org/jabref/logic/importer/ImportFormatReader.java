@@ -24,20 +24,18 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import org.apache.pdfbox.pdmodel.PDFormContentStream;
 
 public class ImportFormatReader {
 
@@ -76,14 +74,14 @@ public class ImportFormatReader {
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
-        formats.add(new PdfImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimBibExtractor(importFormatPreferences));
-        formats.add(new PdfFirstPageBibExtractor());
-        formats.add(new PdfEmbeddedBibExtractor(importFormatPreferences));
+        formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
+        formats.add(new PdfVerbatimPartialImporter(importFormatPreferences));
+        formats.add(new PdfFirstPagePartialImporter());
+        formats.add(new PdfEmbeddedPartialImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            formats.add(new PdfGrobidBibExtractor(importFormatPreferences));
+            formats.add(new PdfGrobidPartialImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpBibExtractor(importFormatPreferences.xmpPreferences()));
+        formats.add(new PdfXmpPartialImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));

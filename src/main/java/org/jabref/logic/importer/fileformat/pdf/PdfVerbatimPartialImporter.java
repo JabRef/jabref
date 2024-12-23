@@ -16,11 +16,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 /**
  * This importer imports a verbatim BibTeX entry from the first page of the PDF.
  */
-public class PdfVerbatimBibExtractor extends PdfBibExtractor {
+public class PdfVerbatimPartialImporter extends PdfPartialImporter {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfVerbatimBibExtractor(ImportFormatPreferences importFormatPreferences) {
+    public PdfVerbatimPartialImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 

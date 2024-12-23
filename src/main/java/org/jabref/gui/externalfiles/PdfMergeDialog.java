@@ -8,22 +8,23 @@ import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPageBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibExtractor;
-import org.jabref.logic.importer.fileformat.pdf.PdfXmpBibExtractor;
+import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 public class PdfMergeDialog {
     /**
-     * Constructs a merge dialog for a PDF file. This dialog merges results from various {@link org.jabref.logic.importer.fileformat.pdf.PdfBibExtractor}s.
+     * Constructs a merge dialog for a PDF file. This dialog merges results from various {@link PdfPartialImporter}s.
      * <p>
-     * {@link org.jabref.logic.importer.fileformat.pdf.PdfBibExtractor}s try to extract a {@link BibEntry} out of a PDF file,
+     * {@link PdfPartialImporter}s try to extract a {@link BibEntry} out of a PDF file,
      * but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
-     * Thus, JabRef provides this merge dialog that collects the results of all {@link org.jabref.logic.importer.fileformat.pdf.PdfBibExtractor}s
+     * Thus, JabRef provides this merge dialog that collects the results of all {@link PdfPartialImporter}s
      * and gives user a choice between field values.
      */
     public static MultiMergeEntriesView make(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
@@ -32,15 +33,15 @@ public class PdfMergeDialog {
         dialog.setTitle(Localization.lang("Merge PDF metadata"));
 
         dialog.addSource(Localization.lang("Entry"), entry);
-        dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibExtractor(preferences.getImportFormatPreferences()), filePath));
-        dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibExtractor(preferences.getImportFormatPreferences()), filePath));
+        dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimPartialImporter(preferences.getImportFormatPreferences()), filePath));
+        dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedPartialImporter(preferences.getImportFormatPreferences()), filePath));
 
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidBibExtractor(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidPartialImporter(preferences.getImportFormatPreferences()), filePath));
         }
 
-        dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpBibExtractor(preferences.getXmpPreferences()), filePath));
-        dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfFirstPageBibExtractor(), filePath));
+        dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpPartialImporter(preferences.getXmpPreferences()), filePath));
+        dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfFirstPagePartialImporter(), filePath));
 
         return dialog;
     }

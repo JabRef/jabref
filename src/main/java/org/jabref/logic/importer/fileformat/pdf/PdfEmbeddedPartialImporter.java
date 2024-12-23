@@ -26,11 +26,11 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachme
 /**
  * Imports an embedded Bib-File from the PDF.
  */
-public class PdfEmbeddedBibExtractor extends PdfBibExtractor {
+public class PdfEmbeddedPartialImporter extends PdfPartialImporter {
 
     private final BibtexParser bibtexParser;
 
-    public PdfEmbeddedBibExtractor(ImportFormatPreferences importFormatPreferences) {
+    public PdfEmbeddedPartialImporter(ImportFormatPreferences importFormatPreferences) {
         bibtexParser = new BibtexParser(importFormatPreferences);
     }
 
