@@ -450,7 +450,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void parsePdfMetadataAndShowMergeDialog() {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
-            MultiMergeEntriesView dialog = PdfMergeDialog.make(entry, filePath, preferences, taskExecutor);
+            MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(entry, filePath, preferences, taskExecutor);
             dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);

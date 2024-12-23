@@ -135,9 +135,9 @@ public class ImportHandler {
                             // See {@link PdfMergeDialog#make} for reason why it is useful to call a merge dialog with
                             // various {@link PdfBibExtractor}s.
                             if (files.size() == 1) {
-                                pdfEntriesInFile = new ArrayList<>();
+                                pdfEntriesInFile = new ArrayList<>(1);
                                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                                    MultiMergeEntriesView dialog = PdfMergeDialog.make(new BibEntry(), file, preferences, taskExecutor);
+                                    MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(new BibEntry(), file, preferences, taskExecutor);
                                     dialogService.showCustomDialogAndWait(dialog).ifPresent(pdfEntriesInFile::add);
                                 });
                             } else {
