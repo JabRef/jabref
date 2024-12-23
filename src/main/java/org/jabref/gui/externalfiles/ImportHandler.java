@@ -160,7 +160,7 @@ public class ImportHandler {
                                     entry.clearField(StandardField.FILE);
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
-                                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                                    DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 }

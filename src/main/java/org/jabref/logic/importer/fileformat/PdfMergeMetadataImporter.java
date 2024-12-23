@@ -186,21 +186,9 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return entry;
     }
 
-    /**
-     * A modified version of {@link PdfMergeMetadataImporter#importDatabase(Path)}, but it
-     * relativizes the {@code filePath} if there are working directories before parsing it
-     * into {@link PdfMergeMetadataImporter#importDatabase(Path)}
-     * (Otherwise no path modification happens).
-     *
-     * @param filePath    The unrelativized {@code filePath}.
-     */
     public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
         Objects.requireNonNull(context);
         Objects.requireNonNull(filePreferences);
-
-        List<Path> directories = context.getFileDirectories(filePreferences);
-
-        filePath = FileUtil.relativize(filePath, directories);
 
         return importDatabase(filePath);
     }

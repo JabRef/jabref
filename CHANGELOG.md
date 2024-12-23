@@ -82,6 +82,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The CitationKey column is now a default shown column for the entry table. [#10510](https://github.com/JabRef/jabref/issues/10510)
 - We disabled the actions "Open Terminal here" and "Reveal in file explorer" for unsaved libraries. [#11920](https://github.com/JabRef/jabref/issues/11920)
 - JabRef now opens the corresponding directory in the library properties when "Browse" is clicked. [#12223](https://github.com/JabRef/jabref/pull/12223)
+- We changed the icon for macOS to be more consistent with Apple's Guidelines [#8443](https://github.com/JabRef/jabref/issues/8443)
 
 ### Fixed
 
@@ -126,6 +127,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where identifier paste couldn't work with Unicode REPLACEMENT CHARACTER. [#11986](https://github.com/JabRef/jabref/issues/11986)
 - We fixed an issue when click on entry at "Check Integrity" wasn't properly focusing the entry and field. [#11997](https://github.com/JabRef/jabref/issues/11997)
 - We fixed an issue with the ui not scaling when changing the font size [#11219](https://github.com/JabRef/jabref/issues/11219)
+- We fixed an issue where a custom application for external file types would not be saved [#112311](https://github.com/JabRef/jabref/issues/12311)
+- We fixed an issue where a file that no longer exists could not be deleted from an entry using keyboard shortcut [#9731](https://github.com/JabRef/jabref/issues/9731)
 
 ### Removed
 
