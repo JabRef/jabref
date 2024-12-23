@@ -168,7 +168,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             writeBibEntryToColumn(entrySourceColumn, columnIndex);
         } else {
             header.setDisable(true);
-            entrySourceColumn.isLoadingProperty().addListener((observable, oldValue, newValue) -> {
+            entrySourceColumn.isLoadingProperty().addListener((_, _, newValue) -> {
                 if (!newValue && entrySourceColumn.entryProperty().get() != null) {
                     writeBibEntryToColumn(entrySourceColumn, columnIndex);
                     header.setDisable(false);
@@ -372,7 +372,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             fieldEditorCell.addEventFilter(KeyEvent.KEY_PRESSED, event -> toggleGroup.selectToggle(null));
 
-            toggleGroup.selectedToggleProperty().addListener((obs, oldValue, newValue) -> {
+            toggleGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
                 if (newValue == null) {
                     viewModel.mergedEntryProperty().get().setField(field, "");
                 } else {
