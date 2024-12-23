@@ -98,10 +98,16 @@ public class DeleteFileAction extends SimpleCommand {
                 Path path = file.get();
                 dialogTitle = Localization.lang("Delete '%0'", path.getFileName().toString());
             } else {
+                LOGGER.warn("Could not find file {}", linkedFile.getLink());
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
+
+                // We can trigger deletion of "all" files from the entry (no deletion on disk), because in this case, there is only one files
+                assert numberOfLinkedFiles == 1;
                 deleteFiles(false);
+
                 // Deleting a non-existing file is a success
                 success = true;
+
                 return;
             }
         }
