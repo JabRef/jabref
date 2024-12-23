@@ -101,7 +101,7 @@ public class DeleteFileAction extends SimpleCommand {
                 LOGGER.warn("Could not find file {}", linkedFile.getLink());
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
 
-                // We can trigger deletion of "all" files, because in this case, there is only one files
+                // We can trigger deletion of "all" files from the entry (no deletion on disk), because in this case, there is only one files
                 assert numberOfLinkedFiles == 1;
                 deleteFiles(false);
 
