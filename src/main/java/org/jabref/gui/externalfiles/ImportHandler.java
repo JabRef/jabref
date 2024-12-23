@@ -130,7 +130,7 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            List<BibEntry> pdfEntriesInFile;
+                            final List<BibEntry> pdfEntriesInFile;
 
                             // Details: See ADR-0043
                             if (files.size() == 1) {
@@ -151,7 +151,7 @@ public class ImportHandler {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             } else {
-                                for (BibEntry entry : pdfEntriesInFile) {
+                                pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
                                         LOGGER.warn("Entry's files: {}", entry.getFiles());
@@ -162,7 +162,7 @@ public class ImportHandler {
                                     DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
-                                }
+                                });
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
