@@ -172,7 +172,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "10.0.0"
+    def luceneVersion = "10.1.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
