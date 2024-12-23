@@ -164,6 +164,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         constraint.prefWidthProperty().bind(header.widthProperty());
         optionsGrid.getColumnConstraints().add(constraint);
 
+        // Copy BibEntry to column - either immediately (if available) or after loading
         if (!entrySourceColumn.isLoadingProperty().getValue()) {
             writeBibEntryToColumn(entrySourceColumn, columnIndex);
         } else {
