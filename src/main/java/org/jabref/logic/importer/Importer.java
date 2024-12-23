@@ -170,7 +170,8 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
-     * the command line.
+     * the command line. Typically, it should be in English and be overridden, as the default implementation uses `getName()`,
+     * which might be localized.
      *
      * @return ID, must be unique and not <code>null</code>
      */
@@ -187,7 +188,8 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
-     * Returns the name of this import format.
+     * Returns the name of this import format. Typically, this is a string that denotes file type or format.
+     * It can also be localized, like "XMP-annotated PDF".
      *
      * <p>The name must be unique.</p>
      *
@@ -202,7 +204,7 @@ public abstract class Importer implements Comparable<Importer> {
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import
      * </li><li>
-     *   by what criteria it {@link #isRecognizedFormat(BufferedReader) recognizes} an import format
+     *   by what criteria it {@link #isRecognizedFormat(BufferedReader)} recognizes an import format
      * </li></ul>
      *
      * @return description of the import format
