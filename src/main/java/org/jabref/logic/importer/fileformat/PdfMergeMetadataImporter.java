@@ -21,7 +21,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.pdf.PdfPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
@@ -62,7 +62,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 new PdfVerbatimPartialImporter(importFormatPreferences),
                 new PdfEmbeddedPartialImporter(importFormatPreferences),
                 new PdfXmpPartialImporter(importFormatPreferences.xmpPreferences()),
-                new PdfFirstPagePartialImporter()
+                new PdfContentPartialImporter()
         ));
 
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {

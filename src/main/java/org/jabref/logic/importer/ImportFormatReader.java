@@ -28,7 +28,7 @@ import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpPartialImporter;
@@ -76,7 +76,7 @@ public class ImportFormatReader {
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
         formats.add(new PdfVerbatimPartialImporter(importFormatPreferences));
-        formats.add(new PdfFirstPagePartialImporter());
+        formats.add(new PdfContentPartialImporter());
         formats.add(new PdfEmbeddedPartialImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             formats.add(new PdfGrobidPartialImporter(importFormatPreferences));

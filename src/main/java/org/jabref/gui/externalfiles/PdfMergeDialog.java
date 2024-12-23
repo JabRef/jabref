@@ -9,7 +9,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedPartialImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfFirstPagePartialImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfPartialImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimPartialImporter;
@@ -41,7 +41,7 @@ public class PdfMergeDialog {
         }
 
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpPartialImporter(preferences.getXmpPreferences()), filePath));
-        dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfFirstPagePartialImporter(), filePath));
+        dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentPartialImporter(), filePath));
 
         return dialog;
     }
