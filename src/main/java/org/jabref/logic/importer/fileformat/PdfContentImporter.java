@@ -204,7 +204,7 @@ public class PdfContentImporter extends PdfImporter {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            String titleByFontSize = extractTitleFromDocument(document);
+            Optional<String> titleByFontSize = extractTitleFromDocument(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
@@ -217,7 +217,7 @@ public class PdfContentImporter extends PdfImporter {
         return new ParserResult(result);
     }
 
-    private static String extractTitleFromDocument(PDDocument document) throws IOException {
+    private static Optional<String> extractTitleFromDocument(PDDocument document) throws IOException {
         TitleExtractorByFontSize stripper = new TitleExtractorByFontSize();
         return stripper.getTitle(document);
     }
@@ -231,7 +231,7 @@ public class PdfContentImporter extends PdfImporter {
             this.textPositionsList = new ArrayList<>();
         }
 
-        public String getTitle(PDDocument document) throws IOException {
+        public Optional<String> getTitle(PDDocument document) throws IOException {
             this.setStartPage(1);
             this.setEndPage(2);
             this.writeText(document, new StringWriter());
@@ -267,7 +267,7 @@ public class PdfContentImporter extends PdfImporter {
             return isFarAway(previousTextPosition, textPosition);
         }
 
-        private String findLargestFontText(List<TextPosition> textPositions) {
+        private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
             Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
@@ -286,10 +286,10 @@ public class PdfContentImporter extends PdfImporter {
             for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
                 String candidateText = entry.getValue().toString().trim();
                 if (isLegalTitle(candidateText)) {
-                    return candidateText;
+                    return Optional.of(candidateText);
                 }
             }
-            return fontSizeTextMap.values().iterator().next().toString().trim();
+            return fontSizeTextMap.values().stream().findFirst().map(StringBuilder::toString).map(String::trim);
         }
 
         private boolean isLegalTitle(String candidateText) {
@@ -335,7 +335,7 @@ public class PdfContentImporter extends PdfImporter {
      *         is successful. Otherwise, an empty {@link Optional}.
      */
     @VisibleForTesting
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByFontSize) {
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
@@ -396,8 +396,8 @@ public class PdfContentImporter extends PdfImporter {
         title = streamlineTitle(curString);
         // i points to the next non-empty line
         curString = "";
-        if (!isNullOrEmpty(titleByFontSize)) {
-            title = titleByFontSize;
+        if (titleByFontSize.isPresent() && !isNullOrEmpty(titleByFontSize.get())) {
+            title = titleByFontSize.get();
         }
 
         // after title: authors

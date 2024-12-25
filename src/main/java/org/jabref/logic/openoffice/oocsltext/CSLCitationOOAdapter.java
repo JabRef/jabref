@@ -54,14 +54,14 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
-        String inTextCitation;
+        String citation;
         if (isAlphanumeric) {
-            inTextCitation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
+            citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            inTextCitation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
         }
 
-        String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
+        String formattedCitation = CSLFormatUtils.transformHTML(citation);
 
         if (selectedStyle.isNumericStyle()) {
             formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
@@ -75,7 +75,7 @@ public class CSLCitationOOAdapter {
      * Inserts in-text citations for a group of entries.
      * Comparable to LaTeX's \citet command.
      *
-     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
+     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, CreationException, Exception {
@@ -152,22 +152,22 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String citation = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
 
-                String formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(citation), currentNumber);
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+                String formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(bibliographyEntry), currentNumber);
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
 
                 OOTextIntoOO.write(document, cursor, ooText);
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> citations = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
-            for (String citation : citations) {
-                String formattedCitation = CSLFormatUtils.transformHTML(citation);
-                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+            for (String bibliographyEntry : bibliographyEntries) {
+                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
                 OOTextIntoOO.write(document, cursor, ooText);
             }
         }
