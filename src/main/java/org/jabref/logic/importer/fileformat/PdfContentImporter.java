@@ -576,7 +576,7 @@ public class PdfContentImporter extends PdfImporter {
         if (pages != null) {
             entry.setField(StandardField.PAGES, pages);
         }
-        if (year != null && !year.equals("0000")) {
+        if (year != null && !"0000".equals(year)) {
             entry.setField(StandardField.YEAR, year);
         } else if (arXivId != null) {
             year = "20" + arXivId.substring(0, 2);
@@ -603,19 +603,10 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     private String getArXivId(String arXivId) {
-        int currIndex = 0;
-        for (int i = 0; i < lines.length; i++) {
-            if (curString.equals(lines[i])) {
-                currIndex = i;
-                break;
-            }
-        }
         if (arXivId == null) {
             for (String line: lines) {
-                curString = line;
-                arXivId = ArXivIdentifier.parse(curString).map(ArXivIdentifier::asString).orElse(null);
+                arXivId = ArXivIdentifier.parse(line).map(ArXivIdentifier::asString).orElse(null);
                 if (arXivId != null) {
-                    curString = lines[currIndex];
                     return arXivId;
                 }
             }
