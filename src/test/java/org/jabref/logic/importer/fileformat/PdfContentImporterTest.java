@@ -165,7 +165,7 @@ class PdfContentImporterTest {
 
                 ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
     }
 
     @ParameterizedTest
