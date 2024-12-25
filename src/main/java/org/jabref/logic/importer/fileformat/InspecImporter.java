@@ -28,6 +28,11 @@ public class InspecImporter extends Importer {
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
     @Override
+    public String getId() {
+        return "inspec";
+    }
+
+    @Override
     public String getName() {
         return "INSPEC";
     }

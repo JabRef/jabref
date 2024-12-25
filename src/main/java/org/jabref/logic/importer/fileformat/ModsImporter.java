@@ -614,6 +614,11 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
+    public String getId() {
+        return "mods";
+    }
+
+    @Override
     public String getName() {
         return "MODS";
     }

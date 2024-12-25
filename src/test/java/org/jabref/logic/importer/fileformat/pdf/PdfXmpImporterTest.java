@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -69,10 +70,5 @@ class PdfXmpImporterTest {
     @MethodSource("invalidFileNames")
     void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
-    }
-
-    @Test
-    void getCommandLineId() {
-        assertEquals("xmp", importer.getId());
     }
 }

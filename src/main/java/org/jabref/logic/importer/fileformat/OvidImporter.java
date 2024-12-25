@@ -49,6 +49,11 @@ public class OvidImporter extends Importer {
     private static final int MAX_ITEMS = 50;
 
     @Override
+    public String getId() {
+        return "ovid";
+    }
+
+    @Override
     public String getName() {
         return "Ovid";
     }

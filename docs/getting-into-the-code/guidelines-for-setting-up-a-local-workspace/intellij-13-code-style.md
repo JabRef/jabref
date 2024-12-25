@@ -96,7 +96,7 @@ Activate the CheckStyle configuration file by ticking it in the list
 ![JabRef's checkstyle config is activated](guidelines-intellij-checkstyle-jabref-active.png)
 {% endfigure %}
 
-Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.3.4 or higher).
+Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
 Also, set the "Scan Scope" to "Only Java sources (including tests)".
 
 {% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}

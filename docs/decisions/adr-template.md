@@ -16,7 +16,8 @@ parent: Decision Records
 # consulted: {list everyone whose opinions are sought (typically subject-matter experts); and with whom there is a two-way communication}
 # informed: {list everyone who is kept up-to-date on progress; and with whom there is a one-way communication}
 ---
-<!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
+<!-- We need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template. -->
+<!-- Remove these three lines when creating a real ADR - and keep the title consistent. -->
 <!-- markdownlint-disable-next-line MD025 -->
 # {short title, representative of solved problem and found solution}
 

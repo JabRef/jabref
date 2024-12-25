@@ -1,8 +1,10 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
