@@ -52,9 +52,13 @@ Chosen option: "Open a merge dialog with all candidates if a single PDF is impor
 
 ### Open a merge dialog with all candidates if a single PDF is imported
 
+Explanation:
+
 - If a single PDF is imported, then open a merge dialog.
 - If several PDFs are imported, merge candidates for each PDF automatically.
 
-* Good, because it combines the best of the other two options: Allow bopth for PDF batch-processing and for fine-grained control.
+Outcomes:
+
+* Good, because it combines the best of the other two options: Allow both for PDF batch-processing and for fine-grained control.
 
 <!-- markdownlint-disable-file MD004 -->
