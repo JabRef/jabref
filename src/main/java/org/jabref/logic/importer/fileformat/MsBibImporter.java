@@ -78,7 +78,7 @@ public class MsBibImporter extends Importer {
 
     @Override
     public String getId() {
-        return "msOfficeBib";
+        return "msbib";
     }
 
     @Override

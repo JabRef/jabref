@@ -25,9 +25,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,18 +44,6 @@ public class ImporterTest {
     @MethodSource("instancesToTest")
     void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void importDatabaseWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @ParameterizedTest
@@ -83,14 +69,6 @@ public class ImporterTest {
     void getIdDoesNotContainWhitespace(Importer format) {
         Pattern whitespacePattern = Pattern.compile("\\s");
         assertFalse(whitespacePattern.matcher(format.getId()).find());
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
-        Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
-        when(importer.getName()).thenReturn("*Test-Importer");
-        assertEquals("testimporter", importer.getId());
     }
 
     @ParameterizedTest

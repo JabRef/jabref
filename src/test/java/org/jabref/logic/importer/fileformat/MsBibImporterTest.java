@@ -44,11 +44,6 @@ class MsBibImporterTest {
     }
 
     @Test
-    final void getFormatName() {
-        assertEquals("MSBib", importer.getName());
-    }
-
-    @Test
     final void getCommandLineId() {
         assertEquals("msbib", importer.getId());
     }

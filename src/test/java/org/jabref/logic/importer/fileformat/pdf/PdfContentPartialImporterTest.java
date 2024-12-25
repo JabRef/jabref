@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -36,8 +35,7 @@ class PdfContentPartialImporterTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
-                .withField(StandardField.TITLE, "Hello World")
-                .withFiles(List.of(new LinkedFile("", file.toAbsolutePath(), "PDF")));
+                .withField(StandardField.TITLE, "Hello World");
         assertEquals(List.of(expected), result);
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();

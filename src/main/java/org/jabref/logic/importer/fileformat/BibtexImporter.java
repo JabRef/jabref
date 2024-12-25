@@ -130,7 +130,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public String getId() {
-        return "bibTex";
+        return "bibtex";
     }
 
     @Override

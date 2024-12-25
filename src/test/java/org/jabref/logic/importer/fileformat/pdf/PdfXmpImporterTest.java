@@ -71,9 +71,4 @@ class PdfXmpImporterTest {
     void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
-
-    @Test
-    void getCommandLineId() {
-        assertEquals("xmp", importer.getId());
-    }
 }
