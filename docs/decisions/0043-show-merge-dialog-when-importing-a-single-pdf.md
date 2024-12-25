@@ -18,7 +18,7 @@ PDF importing in JabRef is done via `PdfImporter` abstract class and its descend
 `PdfImporter` is typically a single heuristics or method of extracting a `BibEntry` from PDF. `PdfMergeMetadataImporter`
 collects `BibEntry` candidates from all `PdfImporter`s and merges them automatically into a single `BibEntry`.
 
-The specific problem JabRef has: should JabRef automate all heuristics (automatically merge all `BibEntry`ies from 
+The specific problem JabRef has: should JabRef automate all heuristics (automatically merge all `BibEntry`ies from
 several `PdfImporter`s) when importing PDF files or should every file be analysed thoroughly by users?
 
 ## Decision Drivers
@@ -38,19 +38,19 @@ Chosen option: "Open a merge dialog with all candidates if a single PDF is impor
 
 ## Pros and Cons of the Options
 
-### Automatically merge all `BibEntry` candidates from `PdfImporters`.
+### Automatically merge all `BibEntry` candidates from `PdfImporters`
 
 * Good, because minimal user interaction and disruption of flow. It also allows batch-processing.
 * Bad, because heuristics are not ideal, and it is even harder to develop a "smarter" merging algorithm.
 
-### Open a merge dialog with all candidates.
+### Open a merge dialog with all candidates
 
 * Good, because allows for fine-grained import. Some correct field may be overridden by a wrong field from other importer,
   which is undesirable for power-users.
 * Bad, because it is a dialog. If lots of PDFs are imported, then there will be lots of dialogs, which might be
   too daunting to process manually.
 
-### Open a merge dialog with all candidates if a single PDF is imported.
+### Open a merge dialog with all candidates if a single PDF is imported
 
 - If a single PDF is imported, then open a merge dialog.
 - If several PDFs are imported, merge candidates for each PDF automatically.
