@@ -370,11 +370,13 @@ public class PdfContentImporter extends PdfImporter {
         String publisher = null;
 
         EntryType type = StandardEntryType.InProceedings;
+        // sometimes ArXiv ID is read before all parameters
+        getArXivId(null);
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
             extractYear();
             doi = getDoi(null);
-            arXivId = getArXivId(null);
+            arXivId = getArXivId(arXivId);
             if (curString.contains("Conference")) {
                 fillCurStringWithNonEmptyLines();
                 conference = curString;
@@ -390,7 +392,6 @@ public class PdfContentImporter extends PdfImporter {
                 }
             }
         }
-
         // start: title
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
@@ -535,6 +536,10 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
 
+        if (arXivId != null && arXivId.contains(year)) {
+            year = null;
+        }
+
         BibEntry entry = new BibEntry();
         entry.setType(type);
 
@@ -576,7 +581,7 @@ public class PdfContentImporter extends PdfImporter {
         if (pages != null) {
             entry.setField(StandardField.PAGES, pages);
         }
-        if (year != null && !"0000".equals(year)) {
+        if (year != null) {
             entry.setField(StandardField.YEAR, year);
         } else if (arXivId != null) {
             year = "20" + arXivId.substring(0, 2);
@@ -604,11 +609,13 @@ public class PdfContentImporter extends PdfImporter {
 
     private String getArXivId(String arXivId) {
         if (arXivId == null) {
-            for (String line: lines) {
-                arXivId = ArXivIdentifier.parse(line).map(ArXivIdentifier::asString).orElse(null);
-                if (arXivId != null) {
-                    return arXivId;
+            arXivId = ArXivIdentifier.parse(curString).map(ArXivIdentifier::asString).orElse(null);
+            if (arXivId != null) {
+                if (curString.length() > arXivId.length() + 7) {
+                    curString = curString.substring(arXivId.length() + 7);
+                    extractYear();
                 }
+                return arXivId;
             }
         }
         return arXivId;

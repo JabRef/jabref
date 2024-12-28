@@ -132,16 +132,17 @@ class PdfContentImporterTest {
     @Test
     void extractArXivFromPage1() {
         BibEntry entry = new BibEntry(StandardEntryType.TechReport)
-                .withField(StandardField.AUTHOR, "Filippo Ricca and Alessandro Marchetto and Andrea Stoccoc")
-                .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
+                .withField(StandardField.AUTHOR, "Filippo Riccaa and Alessandro Marchettob and Andrea Stoccoc")
+                .withField(StandardField.TITLE, "[cs.SE] 12 Aug 2024 A Multi-Year Grey Literature Review on AI-assisted Test Automation")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.EPRINT, "2408.06224v1")
                 .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
 
         String firstPageContent = """
+                arXiv:2408.06224v1 [cs.SE] 12 Aug 2024
                 A Multi-Year Grey Literature Review on AI-assisted Test Automation
 
-                Filippo Ricca, Alessandro Marchetto and Andrea Stoccoc
+                Filippo Riccaa, Alessandro Marchettob and Andrea Stoccoc
 
                 aUniversity of Genoa, Via Balbi 5, Genova, 16126, Italy
                 bUniversity of Trento, Via Sommarive 9, Trento, 38123, Italy
@@ -155,9 +156,6 @@ class PdfContentImporterTest {
                 Grey Literature
                 Automated Test Generation
                 Self-Healing Test Scripts
-
-                arXiv:2408.06224v1
-                [cs.SE] 12 Aug 2024
 
                 *Corresponding author
                 filippo.ricca@unige.it (F. Ricca)
