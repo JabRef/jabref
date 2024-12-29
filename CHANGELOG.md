@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
+
 ### Removed
 
 ## [6.0-alpha] – 2024-12-23
