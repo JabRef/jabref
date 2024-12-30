@@ -98,11 +98,8 @@ open module org.jabref {
 
     // region: SQL databases
     requires embedded.postgres;
-    requires org.tukaani.xz;
-    requires ojdbc10;
     requires org.postgresql.jdbc;
-    requires org.mariadb.jdbc;
-    uses org.mariadb.jdbc.credential.CredentialPlugin;
+    requires org.tukaani.xz;
     // endregion
 
     // region: Apache Commons and other (similar) helper libraries

@@ -31,7 +31,7 @@ public class MetaDataSerializer {
     }
 
     /**
-     * Writes all data in the format &lt;key, serialized data>.
+     * Writes all data in the format {@code <key, serialized data>}.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
                                                              GlobalCitationKeyPatterns globalCiteKeyPatterns) {
