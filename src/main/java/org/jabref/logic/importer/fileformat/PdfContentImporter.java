@@ -370,8 +370,6 @@ public class PdfContentImporter extends PdfImporter {
         String publisher = null;
 
         EntryType type = StandardEntryType.InProceedings;
-        // sometimes ArXiv ID is read before all parameters
-        getArXivId(null);
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
             extractYear();
@@ -392,6 +390,8 @@ public class PdfContentImporter extends PdfImporter {
                 }
             }
         }
+        // sometimes ArXiv ID is read before title
+        getArXivId(null);
         // start: title
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
@@ -609,11 +609,15 @@ public class PdfContentImporter extends PdfImporter {
 
     private String getArXivId(String arXivId) {
         if (arXivId == null) {
-            arXivId = ArXivIdentifier.parse(curString).map(ArXivIdentifier::asString).orElse(null);
+            String arXiv = curString.split(" ")[0];
+            arXivId = ArXivIdentifier.parse(arXiv).map(ArXivIdentifier::asString).orElse(null);
             if (arXivId != null) {
                 if (curString.length() > arXivId.length() + 7) {
+                    // The arxiv string also contains the year
                     curString = curString.substring(arXivId.length() + 7);
                     extractYear();
+                    curString = "";
+                    proceedToNextNonEmptyLine();
                 }
                 return arXivId;
             }

@@ -133,7 +133,7 @@ class PdfContentImporterTest {
     void extractArXivFromPage1() {
         BibEntry entry = new BibEntry(StandardEntryType.TechReport)
                 .withField(StandardField.AUTHOR, "Filippo Riccaa and Alessandro Marchettob and Andrea Stoccoc")
-                .withField(StandardField.TITLE, "[cs.SE] 12 Aug 2024 A Multi-Year Grey Literature Review on AI-assisted Test Automation")
+                .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.EPRINT, "2408.06224v1")
                 .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");

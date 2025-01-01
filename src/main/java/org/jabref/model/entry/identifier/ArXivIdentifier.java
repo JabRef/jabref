@@ -38,7 +38,7 @@ public class ArXivIdentifier extends EprintIdentifier {
     }
 
     public static Optional<ArXivIdentifier> parse(String value) {
-        String identifier = value.split(" ")[0];
+        String identifier = value.replace(" ", "");
         Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
         Matcher identifierMatcher = identifierPattern.matcher(identifier);
         if (identifierMatcher.matches()) {
