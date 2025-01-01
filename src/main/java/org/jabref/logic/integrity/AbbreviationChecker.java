@@ -25,9 +25,16 @@ public class AbbreviationChecker implements EntryChecker {
         List<IntegrityMessage> messages = new ArrayList<>();
         for (Field field : fields) {
             Optional<String> value = entry.getFieldLatexFree(field);
+
+            // Debugging Output
+            value.ifPresent(val -> {
+                System.out.println("Checking field: " + field);
+                System.out.println("Value: " + val);
+                System.out.println("Is Abbreviated: " + abbreviationRepository.isAbbreviatedName(val));
+            });
+
             value.filter(abbreviationRepository::isAbbreviatedName)
                  .ifPresent(val -> messages.add(new IntegrityMessage(Localization.lang("abbreviation detected"), entry, field)));
         }
         return messages;
-    }
-}
+    }}
