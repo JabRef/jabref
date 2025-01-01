@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.27.2'
+    id 'org.openrewrite.rewrite' version '6.29.0'
 
     id "org.itsallcode.openfasttrace" version "3.0.1"
 }
@@ -172,7 +172,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "10.0.0"
+    def luceneVersion = "10.1.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -181,7 +181,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.12.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
     implementation 'commons-logging:commons-logging:1.3.4'
     implementation 'com.h2database:h2-mvstore:2.3.232'
 
@@ -204,10 +204,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.2'
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.0.0.202409031743-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.1.0.202411261347-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.18.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.18.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.2'
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
@@ -243,8 +243,8 @@ dependencies {
         exclude group: 'org.openjfx'
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.64.0') {
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.4'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.80.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -265,7 +265,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
     // region HTTP clients
-    implementation 'org.jsoup:jsoup:1.18.1'
+    implementation 'org.jsoup:jsoup:1.18.3'
     implementation 'com.konghq:unirest-java-core:4.4.5'
     implementation 'com.konghq:unirest-modules-gson:4.4.5'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
@@ -279,7 +279,7 @@ dependencies {
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.16'
     // route all requests to log4j to SLF4J
-    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.2'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.3'
 
     implementation('de.undercouch:citeproc-java:3.1.0') {
         exclude group: 'org.antlr'
@@ -335,7 +335,7 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
 
     // region AI
-    implementation 'dev.langchain4j:langchain4j:0.36.0'
+    implementation 'dev.langchain4j:langchain4j:0.36.2'
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
     implementation('dev.langchain4j:langchain4j-open-ai:0.36.2') {
         exclude group: 'com.squareup.okhttp3'
@@ -358,7 +358,7 @@ dependencies {
     }
 
     implementation 'org.apache.velocity:velocity-engine-core:2.4.1'
-    implementation platform('ai.djl:bom:0.30.0')
+    implementation platform('ai.djl:bom:0.31.1')
     implementation 'ai.djl:api'
     implementation 'ai.djl.huggingface:tokenizers'
     implementation 'ai.djl.pytorch:pytorch-model-zoo'
@@ -380,8 +380,8 @@ dependencies {
     implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:17.2.0')
 
     testImplementation 'io.github.classgraph:classgraph:4.8.179'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.11.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.11.4'
 
     testImplementation 'org.mockito:mockito-core:5.14.2'
     testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
@@ -394,9 +394,9 @@ dependencies {
     testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.2"
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation 'org.wiremock:wiremock-standalone:3.9.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.20.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.21.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
@@ -594,7 +594,8 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
     }
 }
