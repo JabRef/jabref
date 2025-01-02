@@ -16,7 +16,7 @@
         <Text text="%This setting may be changed in preferences at any time."/>
         <GridPane fx:id="aiPolicies" hgap="4" vgap="4" />
         <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously." />
-        <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You find information about the privacy policy here." />
+        <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about DJL privacy policy here." />
         <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
     </VBox>
 </fx:root>

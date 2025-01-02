@@ -36,7 +36,7 @@ public class CSLFormatUtils {
 
     /**
      * Transforms provided HTML into a format that can be fully parsed and inserted into an OO document.
-     * Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} is not directly (completely) parsable by by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
+     * Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} is not directly (completely) parsable by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
      * For more details, read the documentation for the {@link OOTextIntoOO} class.
      * <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
      *
@@ -122,7 +122,7 @@ public class CSLFormatUtils {
 
     /**
      * Method to update citation number of a bibliographic entry (to be inserted in the list of references).
-     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} always starts the numbering of a list of citations with "1".
+     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography}) always starts the numbering of a list of references with "1".
      * If a citation doesn't correspond to the first cited entry, the number should be changed to the appropriate current citation number.
      * The numbers should be globally unique. If an entry has been cited before, the older citation number corresponding to it should be reused.
      * The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
