@@ -10,11 +10,11 @@ import org.jabref.model.ai.EmbeddingModel;
 
 public class AiDefaultPreferences {
     public enum PredefinedChatModel {
-        GPT_4O_MINI(AiProvider.OPEN_AI, "gpt-4o-mini", 128000),
-        GPT_4O(AiProvider.OPEN_AI, "gpt-4o", 128000),
-        GPT_4(AiProvider.OPEN_AI, "gpt-4", 8192),
-        GPT_4_TURBO(AiProvider.OPEN_AI, "gpt-4-turbo", 128000),
-        GPT_3_5_TURBO(AiProvider.OPEN_AI, "gpt-3.5-turbo", 16385),
+        GPT_4O_MINI(AiProvider.OPEN_AI_COMPATIBLE, "gpt-4o-mini", 128000),
+        GPT_4O(AiProvider.OPEN_AI_COMPATIBLE, "gpt-4o", 128000),
+        GPT_4(AiProvider.OPEN_AI_COMPATIBLE, "gpt-4", 8192),
+        GPT_4_TURBO(AiProvider.OPEN_AI_COMPATIBLE, "gpt-4-turbo", 128000),
+        GPT_3_5_TURBO(AiProvider.OPEN_AI_COMPATIBLE, "gpt-3.5-turbo", 16385),
         OPEN_MISTRAL_NEMO(AiProvider.MISTRAL_AI, "open-mistral-nemo", 128000),
         OPEN_MISTRAL_7B(AiProvider.MISTRAL_AI, "open-mistral-7b", 32000),
         // "mixtral" is not a typo.
@@ -59,10 +59,10 @@ public class AiDefaultPreferences {
     public static final boolean AUTO_GENERATE_EMBEDDINGS = false;
     public static final boolean AUTO_GENERATE_SUMMARIES = false;
 
-    public static final AiProvider PROVIDER = AiProvider.OPEN_AI;
+    public static final AiProvider PROVIDER = AiProvider.OPEN_AI_COMPATIBLE;
 
     public static final Map<AiProvider, PredefinedChatModel> CHAT_MODELS = Map.of(
-            AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
+            AiProvider.OPEN_AI_COMPATIBLE, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
