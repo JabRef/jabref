@@ -243,11 +243,13 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isFarAway(TextPosition previous, TextPosition current) {
-            float XspaceThreshold = 3.0F;
-            float YspaceThreshold = previous.getFontSizeInPt() * 1.5F;
+            float XspaceThreshold = previous.getFontSizeInPt() * 3.0F;
+            float YspaceThreshold = previous.getFontSizeInPt() * 3.0F;
             float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
-            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
-            return Xgap > XspaceThreshold && Ygap > YspaceThreshold;
+            float Ygap = current.getYDirAdj() - previous.getYDirAdj();
+            // For cases like paper titles spanning two or more lines, both X and Y gaps must exceed thresholds,
+            // so "&&" is used instead of "||".
+            return Math.abs(Xgap) > XspaceThreshold && Math.abs(Ygap) > YspaceThreshold;
         }
 
         private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition) {
@@ -258,28 +260,27 @@ public class PdfContentImporter extends PdfImporter {
                 return true;
             }
             // The title usually don't in the bottom 10% of a page.
-            if ((textPosition.getPageHeight() - textPosition.getYDirAdj())
-                    < (textPosition.getPageHeight() * 0.1)) {
-                return true;
-            }
-            // The title character usually stay together.
-            return isFarAway(previousTextPosition, textPosition);
+            return (textPosition.getPageHeight() - textPosition.getYDirAdj())
+                    < (textPosition.getPageHeight() * 0.1);
         }
 
         private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
             Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
+            Map<Float, TextPosition> lastPositionMap = new TreeMap<>(Collections.reverseOrder());
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
+                float fontSize = textPosition.getFontSizeInPt();
                 // Exclude unwanted text based on heuristics
-                if (isUnwantedText(previousTextPosition, textPosition)) {
+                if (isUnwantedText(previousTextPosition, textPosition) ||
+                    (lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition))) {
                     continue;
                 }
-                float fontSize = textPosition.getFontSizeInPt();
                 fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
                 if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
                     fontSizeTextMap.get(fontSize).append(" ");
                 }
                 fontSizeTextMap.get(fontSize).append(textPosition.getUnicode());
+                lastPositionMap.put(fontSize, textPosition);
                 previousTextPosition = textPosition;
             }
             for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
