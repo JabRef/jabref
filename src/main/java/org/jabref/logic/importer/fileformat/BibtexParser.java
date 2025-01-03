@@ -212,7 +212,7 @@ public class BibtexParser implements Parser {
                 skipWhitespace();
                 String label = parseTextToken().trim();
 
-                if (label.equals(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
+                if (BibtexDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
                 }
@@ -354,7 +354,7 @@ public class BibtexParser implements Parser {
         // We remove all line breaks in the metadata
         // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
-        if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
+        if (MetaData.META_FLAG.equals(comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())))) {
             if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
@@ -367,8 +367,8 @@ public class BibtexParser implements Parser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length()))
-                          .equals(MetaData.ENTRYTYPE_FLAG)) {
+        } else if (MetaData.ENTRYTYPE_FLAG
+                          .equals(comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length())))) {
             // A custom entry type can also be stored in a
             // "@comment"
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);

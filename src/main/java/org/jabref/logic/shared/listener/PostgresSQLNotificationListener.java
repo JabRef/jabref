@@ -36,7 +36,7 @@ public class PostgresSQLNotificationListener implements Runnable {
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
-                        if (!notification.getName().equals(DBMSProcessor.PROCESSOR_ID)) {
+                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getName())) {
                             dbmsSynchronizer.pullChanges();
                         }
                     }
