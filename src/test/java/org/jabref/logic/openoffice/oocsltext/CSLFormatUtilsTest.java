@@ -197,7 +197,7 @@ class CSLFormatUtilsTest {
 
                 // Small-caps
                 Arguments.of(
-                        "  <smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
+                        "  <smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps> and <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -305,7 +305,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "(Smith, Jones, Williams, 2016)",
+                        "(Smith, Jones, & Williams, \"Title of the test entry\")",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -429,7 +429,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "(Garcia, Lee, 2021; Smith, Johnson, 2020)",
+                        "(Garcia & Lee, \"Quantum Entanglement in Superconductors\"; Smith & Johnson, \"A Study on Machine Learning Algorithms\")",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
