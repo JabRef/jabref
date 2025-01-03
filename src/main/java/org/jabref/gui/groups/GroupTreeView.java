@@ -533,6 +533,7 @@ public class GroupTreeView extends BorderPane {
         ActionFactory factory = new ActionFactory();
 
         MenuItem removeGroup;
+
         if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {
             removeGroup = new Menu(Localization.lang("Remove group"), null,
                     factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS,
@@ -552,6 +553,7 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
+                factory.createMenuItem(StandardActions.GROUP_RENAME, new ContextAction(StandardActions.GROUP_RENAME, group)),
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
@@ -634,6 +636,8 @@ public class GroupTreeView extends BorderPane {
                     switch (command) {
                         case GROUP_EDIT ->
                                 group.isEditable();
+                        case GROUP_RENAME ->
+                                group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
                         case GROUP_SUBGROUP_ADD ->
@@ -657,6 +661,10 @@ public class GroupTreeView extends BorderPane {
             switch (command) {
                 case GROUP_REMOVE ->
                         viewModel.removeGroupNoSubgroups(group);
+                case GROUP_RENAME -> {
+                    viewModel.renameGroup(group);
+                    groupTree.refresh();
+                }
                 case GROUP_REMOVE_KEEP_SUBGROUPS ->
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
