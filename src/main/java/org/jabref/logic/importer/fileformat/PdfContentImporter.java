@@ -203,7 +203,7 @@ public class PdfContentImporter extends PdfImporter {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            String titleByFontSize = extractTitleFromDocument(document);
+            Optional<String> titleByFontSize = extractTitleFromDocument(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
@@ -216,7 +216,7 @@ public class PdfContentImporter extends PdfImporter {
         return new ParserResult(result);
     }
 
-    private static String extractTitleFromDocument(PDDocument document) throws IOException {
+    private static Optional<String> extractTitleFromDocument(PDDocument document) throws IOException {
         TitleExtractorByFontSize stripper = new TitleExtractorByFontSize();
         return stripper.getTitle(document);
     }
@@ -230,7 +230,7 @@ public class PdfContentImporter extends PdfImporter {
             this.textPositionsList = new ArrayList<>();
         }
 
-        public String getTitle(PDDocument document) throws IOException {
+        public Optional<String> getTitle(PDDocument document) throws IOException {
             this.setStartPage(1);
             this.setEndPage(2);
             this.writeText(document, new StringWriter());
@@ -243,11 +243,13 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isFarAway(TextPosition previous, TextPosition current) {
-            float XspaceThreshold = 3.0F;
-            float YspaceThreshold = previous.getFontSizeInPt() * 1.5F;
+            float XspaceThreshold = previous.getFontSizeInPt() * 3.0F;
+            float YspaceThreshold = previous.getFontSizeInPt() * 3.0F;
             float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
-            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
-            return Xgap > XspaceThreshold && Ygap > YspaceThreshold;
+            float Ygap = current.getYDirAdj() - previous.getYDirAdj();
+            // For cases like paper titles spanning two or more lines, both X and Y gaps must exceed thresholds,
+            // so "&&" is used instead of "||".
+            return Math.abs(Xgap) > XspaceThreshold && Math.abs(Ygap) > YspaceThreshold;
         }
 
         private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition) {
@@ -258,37 +260,36 @@ public class PdfContentImporter extends PdfImporter {
                 return true;
             }
             // The title usually don't in the bottom 10% of a page.
-            if ((textPosition.getPageHeight() - textPosition.getYDirAdj())
-                    < (textPosition.getPageHeight() * 0.1)) {
-                return true;
-            }
-            // The title character usually stay together.
-            return isFarAway(previousTextPosition, textPosition);
+            return (textPosition.getPageHeight() - textPosition.getYDirAdj())
+                    < (textPosition.getPageHeight() * 0.1);
         }
 
-        private String findLargestFontText(List<TextPosition> textPositions) {
+        private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
             Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
+            Map<Float, TextPosition> lastPositionMap = new TreeMap<>(Collections.reverseOrder());
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
+                float fontSize = textPosition.getFontSizeInPt();
                 // Exclude unwanted text based on heuristics
-                if (isUnwantedText(previousTextPosition, textPosition)) {
+                if (isUnwantedText(previousTextPosition, textPosition) ||
+                    (lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition))) {
                     continue;
                 }
-                float fontSize = textPosition.getFontSizeInPt();
                 fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
                 if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
                     fontSizeTextMap.get(fontSize).append(" ");
                 }
                 fontSizeTextMap.get(fontSize).append(textPosition.getUnicode());
+                lastPositionMap.put(fontSize, textPosition);
                 previousTextPosition = textPosition;
             }
             for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
                 String candidateText = entry.getValue().toString().trim();
                 if (isLegalTitle(candidateText)) {
-                    return candidateText;
+                    return Optional.of(candidateText);
                 }
             }
-            return fontSizeTextMap.values().iterator().next().toString().trim();
+            return fontSizeTextMap.values().stream().findFirst().map(StringBuilder::toString).map(String::trim);
         }
 
         private boolean isLegalTitle(String candidateText) {
@@ -334,7 +335,7 @@ public class PdfContentImporter extends PdfImporter {
      *         is successful. Otherwise, an empty {@link Optional}.
      */
     @VisibleForTesting
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, String titleByFontSize) {
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
@@ -393,8 +394,8 @@ public class PdfContentImporter extends PdfImporter {
         title = streamlineTitle(curString);
         // i points to the next non-empty line
         curString = "";
-        if (!isNullOrEmpty(titleByFontSize)) {
-            title = titleByFontSize;
+        if (titleByFontSize.isPresent() && !isNullOrEmpty(titleByFontSize.get())) {
+            title = titleByFontSize.get();
         }
 
         // after title: authors
