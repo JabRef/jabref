@@ -36,7 +36,6 @@ public class MainTableColumnModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
     public enum Type {
         MATCH_CATEGORY("match_category"), // Not localized, because this column is always hidden
-        MATCH_SCORE("match_score", Localization.lang("Match score")),
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),
@@ -53,6 +52,7 @@ public class MainTableColumnModel {
 
         private final String name;
         private final String displayName;
+
         Type(String name) {
             this.name = name;
             this.displayName = name;
@@ -79,6 +79,14 @@ public class MainTableColumnModel {
             }
             LOGGER.warn("Column type '{}' is unknown.", text);
             return NORMALFIELD;
+        }
+
+        @Override
+        public String toString() {
+            return "Type{" +
+                   "name='" + name + '\'' +
+                   ", displayName='" + displayName + '\'' +
+                   '}';
         }
     }
 
@@ -153,7 +161,7 @@ public class MainTableColumnModel {
 
     public String getDisplayName() {
         if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
-                || (typeProperty.getValue() == Type.INDEX) || typeProperty.getValue() == Type.MATCH_SCORE) {
+                || (typeProperty.getValue() == Type.INDEX)) {
             return typeProperty.getValue().getDisplayName();
         } else {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
@@ -219,6 +227,14 @@ public class MainTableColumnModel {
     @Override
     public int hashCode() {
         return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "MainTableColumnModel{" +
+               "qualifierProperty=" + qualifierProperty +
+               ", typeProperty=" + typeProperty +
+               '}';
     }
 
     /**

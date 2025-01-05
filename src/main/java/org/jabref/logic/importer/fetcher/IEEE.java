@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -59,7 +58,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
-    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
@@ -160,7 +158,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // If not, try DOI
         if (stampString.isEmpty()) {
             Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
+            if (doi.isPresent() && doi.get().asString().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = null;
                 try {
@@ -204,7 +202,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             LOGGER.debug("Full text document found on IEEE Xplore");
             URL value;
             try {
-                value = URI.create(matcher.group(1)).toURL();
+                value = URLUtil.create(matcher.group(1));
             } catch (MalformedURLException e) {
                 throw new FetcherException("Malformed URL", e);
             }
@@ -264,10 +262,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
-    private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(API_KEY);
-    }
-
     @Override
     public String getTestUrl() {
         return TEST_URL_WITHOUT_API_KEY;
@@ -280,7 +274,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", getApiKey());
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }

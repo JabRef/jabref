@@ -119,8 +119,8 @@ public class MetaDataParser {
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
-            } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
-                metaData.setDefaultFileDirectory(parseDirectory(entry.getValue()));
+            } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
+                metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
@@ -130,26 +130,26 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 metaData.setLatexFileDirectory(user, path);
-            } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
+            } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
-            } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
+            } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
-            } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
+            } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
                 defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
-            } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
+            } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
                 if (Boolean.parseBoolean(getSingleItem(values))) {
                     metaData.markAsProtected();
                 } else {
                     metaData.markAsNotProtected();
                 }
-            } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
+            } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
-            } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
+            } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
-            } else if (entry.getKey().equals(MetaData.GROUPS_SEARCH_SYNTAX_VERSION)) {
+            } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
-            } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
+            } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {
                 metaData.setVersionDBStructure(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
@@ -170,7 +170,7 @@ public class MetaDataParser {
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
      *
-     * No normalization is done - the general file directory could be passed as Mac OS X path, but the user could sit on Windows.
+     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
      */

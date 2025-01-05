@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,14 +42,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -59,6 +56,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -71,7 +69,6 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
@@ -82,7 +79,7 @@ public class GroupTreeView extends BorderPane {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final ChatHistoryService chatHistoryService;
+    private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
 
@@ -108,22 +105,21 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         ChatHistoryService chatHistoryService
-    ) {
+                         AiService aiService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.chatHistoryService = chatHistoryService;
+        this.aiService = aiService;
 
         createNodes();
-        this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
         initialize();
     }
 
     private void createNodes() {
         searchField = SearchTextField.create(preferences.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
+        searchField.setId("groupFilterBar");
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -151,7 +147,6 @@ public class GroupTreeView extends BorderPane {
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setId("addNewGroup");
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
@@ -164,7 +159,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, chatHistoryService, preferences, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -555,6 +550,8 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
+                factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
@@ -668,6 +665,10 @@ public class GroupTreeView extends BorderPane {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
+                case GROUP_GENERATE_EMBEDDINGS ->
+                        viewModel.generateEmbeddings(group);
+                case GROUP_GENERATE_SUMMARIES ->
+                        viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
                     viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->

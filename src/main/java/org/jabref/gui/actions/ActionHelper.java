@@ -29,6 +29,11 @@ public class ActionHelper {
         return stateManager.activeDatabaseProperty().isPresent();
     }
 
+    public static BooleanExpression needsSavedLocalDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.LOCAL && c.getDatabasePath().isPresent()).isPresent());
+        return BooleanExpression.booleanExpression(binding);
+    }
+
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
         return BooleanExpression.booleanExpression(binding);
@@ -49,7 +54,7 @@ public class ActionHelper {
 
     public static BooleanExpression needsEntriesSelected(int numberOfEntries, StateManager stateManager) {
         return Bindings.createBooleanBinding(() -> stateManager.getSelectedEntries().size() == numberOfEntries,
-                                             stateManager.getSelectedEntries());
+                stateManager.getSelectedEntries());
     }
 
     public static BooleanExpression isFieldSetForSelectedEntry(Field field, StateManager stateManager) {

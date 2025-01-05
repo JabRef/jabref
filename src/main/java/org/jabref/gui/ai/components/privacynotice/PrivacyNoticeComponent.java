@@ -2,16 +2,19 @@ package org.jabref.gui.ai.components.privacynotice;
 
 import java.io.IOException;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.model.ai.AiProvider;
 
@@ -22,10 +25,8 @@ import org.slf4j.LoggerFactory;
 public class PrivacyNoticeComponent extends ScrollPane {
     private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);
 
-    @FXML private TextFlow openAiPrivacyTextFlow;
-    @FXML private TextFlow mistralAiPrivacyTextFlow;
-    @FXML private TextFlow geminiPrivacyTextFlow;
-    @FXML private TextFlow huggingFacePrivacyTextFlow;
+    @FXML private VBox text;
+    @FXML private GridPane aiPolicies;
     @FXML private Text embeddingModelText;
 
     private final AiPreferences aiPreferences;
@@ -46,10 +47,11 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     @FXML
     private void initialize() {
-        initPrivacyHyperlink(openAiPrivacyTextFlow, AiProvider.OPEN_AI);
-        initPrivacyHyperlink(mistralAiPrivacyTextFlow, AiProvider.MISTRAL_AI);
-        initPrivacyHyperlink(geminiPrivacyTextFlow, AiProvider.GEMINI);
-        initPrivacyHyperlink(huggingFacePrivacyTextFlow, AiProvider.HUGGING_FACE);
+        addPrivacyHyperlink(aiPolicies, AiProvider.OPEN_AI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.MISTRAL_AI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.GEMINI);
+        addPrivacyHyperlink(aiPolicies, AiProvider.HUGGING_FACE);
+        addPrivacyHyperlink(aiPolicies, AiProvider.GPT4ALL);
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);
@@ -57,36 +59,26 @@ public class PrivacyNoticeComponent extends ScrollPane {
         // Because of the https://bugs.openjdk.org/browse/JDK-8090400 bug, the text in the privacy policy cannot be
         // fully wrapped.
 
-        embeddingModelText.wrappingWidthProperty().bind(this.widthProperty());
+        DoubleBinding textWidth = Bindings.subtract(this.widthProperty(), 88d);
+        text.getChildren().forEach(child -> {
+            if (child instanceof Text line) {
+                line.wrappingWidthProperty().bind(textWidth);
+            }
+        });
+        aiPolicies.prefWidthProperty().bind(textWidth);
+        embeddingModelText.wrappingWidthProperty().bind(textWidth);
     }
 
-    private void initPrivacyHyperlink(TextFlow textFlow, AiProvider aiProvider) {
-        if (textFlow.getChildren().isEmpty() || !(textFlow.getChildren().getFirst() instanceof Text text)) {
-            return;
-        }
+    private void addPrivacyHyperlink(GridPane gridPane, AiProvider aiProvider) {
+        int row = gridPane.getRowCount();
+        Label aiName = new Label(aiProvider.getLabel());
+        gridPane.add(aiName, 0, row);
 
-        String replacedText = text.getText().replaceAll("%0", aiProvider.getLabel()).replace("%1", "");
-
-        replacedText = replacedText.endsWith(".") ? replacedText.substring(0, replacedText.length() - 1) : replacedText;
-
-        text.setText(replacedText);
-        text.wrappingWidthProperty().bind(this.widthProperty());
-
-        String link = AiDefaultPreferences.PROVIDERS_PRIVACY_POLICIES.get(aiProvider);
-        Hyperlink hyperlink = new Hyperlink(link);
+        Hyperlink hyperlink = new Hyperlink(aiProvider.getPrivacyPolicyUrl());
         hyperlink.setWrapText(true);
-        hyperlink.setFont(text.getFont());
-        hyperlink.setOnAction(event -> {
-            openBrowser(link);
-        });
-
-        textFlow.getChildren().add(hyperlink);
-
-        Text dot = new Text(".");
-        dot.setFont(text.getFont());
-        dot.wrappingWidthProperty().bind(this.widthProperty());
-
-        textFlow.getChildren().add(dot);
+        // hyperlink.setFont(aiName.getFont());
+        hyperlink.setOnAction(event -> openBrowser(aiProvider.getApiUrl()));
+        gridPane.add(hyperlink, 1, row);
     }
 
     @FXML

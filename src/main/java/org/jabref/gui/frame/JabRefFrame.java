@@ -33,7 +33,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -65,6 +64,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
+
 /**
  * Represents the inner frame of the JabRef window
  */
@@ -77,11 +78,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final SplitPane splitPane = new SplitPane();
     private final GuiPreferences preferences;
     private final AiService aiService;
-    private final ChatHistoryService chatHistoryService;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
-    private final FrameDndHandler frameDndHandler;
 
     @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
@@ -106,7 +105,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
                        AiService aiService,
-                       ChatHistoryService chatHistoryService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
@@ -117,7 +115,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
         this.aiService = aiService;
-        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
@@ -140,7 +137,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, viewModel);
 
-        this.frameDndHandler = new FrameDndHandler(
+        FrameDndHandler frameDndHandler = new FrameDndHandler(
                 tabbedPane,
                 mainStage::getScene,
                 this::getOpenDatabaseAction,
@@ -157,10 +154,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
-                chatHistoryService,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -429,7 +426,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)} (Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -437,6 +434,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 databaseContext,
                 this,
                 dialogService,
+                aiService,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
@@ -527,8 +525,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Refreshes the ui after preferences changes
      */
     public void refresh() {
-        globalSearchBar.updateHintVisibility();
-        getLibraryTabs().forEach(LibraryTab::setupMainPanel);
+        // Disabled, because Bindings implement automatic update. Left here as commented out code to guide if something does not work after updating the preferences.
+        // getLibraryTabs().forEach(LibraryTab::setupMainPanel);
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
@@ -640,6 +638,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public OpenDatabaseFolder(Supplier<BibDatabaseContext> databaseContext) {
             this.databaseContext = databaseContext;
+            this.executable.bind(needsSavedLocalDatabase(stateManager));
         }
 
         @Override

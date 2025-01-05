@@ -6,11 +6,11 @@ import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
+import org.jabref.gui.fieldeditors.optioneditors.LanguageEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.MonthEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.OptionEditor;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.CustomFieldEditorViewModel;
@@ -25,7 +25,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -45,8 +44,6 @@ public class FieldEditors {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
     public static FieldEditorFX getForField(final Field field,
-                                            final TaskExecutor taskExecutor,
-                                            final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
                                             final GuiPreferences preferences,
                                             final BibDatabaseContext databaseContext,
@@ -89,7 +86,10 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
+            return new OptionEditor<>(new
+                    MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
+        } else if (fieldProperties.contains(FieldProperty.LANGUAGE)) {
+            return new OptionEditor<>(new LanguageEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
         } else if (field == StandardField.GENDER) {
             return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {

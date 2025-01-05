@@ -4,49 +4,82 @@
  * These search expressions are used for searching the bibtex library. They are heavily used for search groups.
  */
 grammar Search;
+options { caseInsensitive = true; }
 
-WS: [ \t] -> skip; // whitespace is ignored/skipped
+WS: [ \t\n\r]+ -> skip; // whitespace is ignored/skipped
 
-LPAREN:'(';
-RPAREN:')';
+LPAREN: '(';
+RPAREN: ')';
 
-EQUAL:'='; // semantically the same as CONTAINS
-EEQUAL:'=='; // semantically the same as MATCHES
-NEQUAL:'!=';
+EQUAL: '='; // case insensitive contains, semantically the same as CONTAINS
+CEQUAL: '=!'; // case sensitive contains
 
-AND:[aA][nN][dD]; // 'and' case insensitive
-OR:[oO][rR]; // 'or' case insensitive
-CONTAINS:[cC][oO][nN][tT][aA][iI][nN][sS]; // 'contains' case insensitive
-MATCHES:[mM][aA][tT][cC][hH][eE][sS]; // 'matches' case insensitive
-NOT:[nN][oO][tT]; // 'not' case insensitive
+EEQUAL: '=='; // exact match case insensitive, semantically the same as MATCHES
+CEEQUAL: '==!'; // exact match case sensitive
 
-STRING:QUOTE (~'"')* QUOTE;
-QUOTE:'"';
+REQUAL: '=~'; // regex check case insensitive
+CREEQUAL: '=~!'; // regex check case sensitive
 
-FIELDTYPE:LETTER+;
-// fragments are not accessible from the code, they are only for describing the grammar better
-fragment LETTER : ~[ \t"()=!];
+NEQUAL: '!='; //  negated case insensitive contains
+NCEQUAL: '!=!'; // negated case sensitive contains
 
+NEEQUAL: '!=='; // negated case insensitive exact match
+NCEEQUAL: '!==!'; // negated case sensitive exact match
 
-start:
-    expression EOF;
+NREQUAL: '!=~'; // negated regex check case insensitive
+NCREEQUAL: '!=~!'; // negated regex check case sensitive
 
-// labels are used to refer to parts of the rules in the generated code later on
-// label=actualThingy
-expression:
-    LPAREN expression RPAREN                         #parenExpression  // example: (author=miller)
-    | NOT expression                                 #unaryExpression  // example: not author = miller
-    | left=expression operator=AND right=expression  #binaryExpression // example: author = miller and title = test
-    | left=expression operator=OR right=expression   #binaryExpression // example: author = miller or title = test
-    | comparison                                     #atomExpression
+AND: 'AND';
+OR: 'OR';
+CONTAINS: 'CONTAINS';
+MATCHES: 'MATCHES';
+NOT: 'NOT';
+
+FIELD: [A-Z]+;
+STRING_LITERAL: '"' ('\\"' | ~["])* '"';    // " should be escaped with a backslash
+TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a backslash
+
+start
+    : EOF
+    | andExpression EOF
     ;
 
-comparison:
-    left=name operator=(CONTAINS | MATCHES | EQUAL | EEQUAL | NEQUAL) right=name // example: author != miller
-    | right=name                                                                 // example: miller (search all fields)
+andExpression
+    : expression+                                         #implicitAndExpression   // example: author = miller year = 2010 --> equivalent to: author = miller AND year = 2010
     ;
 
-name:
-    STRING // example: "miller"
-    | FIELDTYPE // example: author
+expression
+    : LPAREN andExpression RPAREN                         #parenExpression        // example: (author = miller)
+    | NOT expression                                      #negatedExpression      // example: NOT author = miller
+    | left = expression bin_op = AND right = expression   #binaryExpression       // example: author = miller AND year = 2010
+    | left = expression bin_op = OR right = expression    #binaryExpression       // example: author = miller OR year = 2010
+    | comparison                                          #comparisonExpression   // example: miller OR author = miller
+    ;
+
+comparison
+    : FIELD operator searchValue    // example: author = miller
+    | searchValue                   // example: miller
+    ;
+
+operator
+    : EQUAL
+    | CEQUAL
+    | EEQUAL
+    | CEEQUAL
+    | REQUAL
+    | CREEQUAL
+    | NEQUAL
+    | NCEQUAL
+    | NEEQUAL
+    | NCEEQUAL
+    | NREQUAL
+    | NCREEQUAL
+    | CONTAINS
+    | MATCHES
+    ;
+
+searchValue
+    : STRING_LITERAL
+    | FIELD
+    | TERM
     ;

@@ -15,7 +15,6 @@ import java.net.CookiePolicy;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -42,6 +41,7 @@ import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
 
@@ -90,7 +90,7 @@ public class URLDownload {
      * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
      */
     public URLDownload(String source) throws MalformedURLException {
-        this(URI.create(source).toURL());
+        this(URLUtil.create(source));
     }
 
     /**
@@ -153,7 +153,7 @@ public class URLDownload {
 
         // Try to resolve local URIs
         try {
-            URLConnection connection = URI.create(source.toString()).toURL().openConnection();
+            URLConnection connection = URLUtil.create(source.toString()).openConnection();
             contentType = connection.getContentType();
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);

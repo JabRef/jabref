@@ -133,7 +133,7 @@ public class BibDatabaseContext {
      */
     public boolean isStudy() {
         return this.getDatabasePath()
-                   .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                   .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&
                            Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
                    .orElse(false);
     }
@@ -144,7 +144,7 @@ public class BibDatabaseContext {
      * <ol>
      * <li>next to the .bib file.</li>
      * <li>the preferences can specify a default one.</li>
-     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a library-specific directory.</li>
      * <li>the database's metadata can specify a user-specific directory.</li>
      * </ol>
      * <p>
@@ -162,15 +162,15 @@ public class BibDatabaseContext {
         // Paths are a) ordered and b) should be contained only once in the result
         LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
 
-        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
-        generalFileDirectory.ifPresent(fileDirs::add);
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
+        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
-        //   2) no general file directory is set (in the metadata of the bib file)
+        //   2) no library-specific file directory is set (in the metadata of the bib file)
 
         // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {

@@ -11,8 +11,10 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50">
+<fx:root type="BorderPane"
+         xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50"
+         id="entryEditor">
     <left>
         <ToolBar orientation="VERTICAL">
             <Button styleClass="icon-button,narrow" onAction="#close">

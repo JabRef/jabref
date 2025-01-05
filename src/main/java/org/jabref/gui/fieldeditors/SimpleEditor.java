@@ -92,4 +92,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
             textInput.insertText(insertionPoint, text);
         }
     }
+
+    protected TextInputControl getTextInput() {
+        return textInput;
+    }
 }

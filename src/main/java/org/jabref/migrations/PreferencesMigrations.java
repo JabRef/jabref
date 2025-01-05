@@ -47,7 +47,7 @@ public class PreferencesMigrations {
     /**
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
-    public static void runMigrations(JabRefGuiPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public static void runMigrations(JabRefGuiPreferences preferences) {
         Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -55,7 +55,7 @@ public class PreferencesMigrations {
         upgradeFaultyEncodingStrings(preferences);
         upgradeLabelPatternToCitationKeyPattern(preferences, mainPrefsNode);
         upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
-        upgradeStoredBibEntryTypes(preferences, mainPrefsNode, entryTypesManager);
+        upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
@@ -516,9 +516,9 @@ public class PreferencesMigrations {
         List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
-                && (formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
-                || formatterCleanups.getFirst().equals(FieldFormatterCleanups.DISABLED))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
+                && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
+                || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 

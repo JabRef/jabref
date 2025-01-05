@@ -1815,7 +1815,7 @@ class BibtexParserTest {
                         + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                         + "@comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}"));
 
-        assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals("\\Literature\\", result.getMetaData().getLibrarySpecificFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
         assertEquals("D:\\Latex", result.getMetaData().getLatexFileDirectory("defaultOwner-user").get().toString());
     }
@@ -1830,7 +1830,7 @@ class BibtexParserTest {
     void fileDirectoriesUnmodified(String directory) throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory:" + directory + "}"));
-        assertEquals(directory, result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals(directory, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 
     @ParameterizedTest
@@ -1840,7 +1840,7 @@ class BibtexParserTest {
     void fileDirectoryWithDoubleEscapeIsRead(String expected, String provided) throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory: " + provided + "}"));
-        assertEquals(expected, result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals(expected, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 
     @Test

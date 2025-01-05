@@ -19,7 +19,6 @@ import org.jabref.model.entry.field.Field;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 public class MarkdownEditor extends SimpleEditor {
-
     private final FlexmarkHtmlConverter flexmarkHtmlConverter = FlexmarkHtmlConverter.builder().build();
 
     private final BibDatabaseContext databaseContext;
@@ -86,5 +85,9 @@ public class MarkdownEditor extends SimpleEditor {
                 }
             }
         };
+    }
+
+    public void setEditable(boolean isEditable) {
+        getTextInput().setEditable(isEditable);
     }
 }

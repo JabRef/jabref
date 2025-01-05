@@ -1,11 +1,10 @@
 package org.jabref.logic.ai.chatting;
 
-import java.util.concurrent.Executor;
-
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -20,19 +19,19 @@ public class AiChatService {
     private final ChatLanguageModel chatLanguageModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
-    private final Executor cachedThreadPool;
+    private final TemplatesService templatesService;
 
     public AiChatService(AiPreferences aiPreferences,
                        ChatLanguageModel chatLanguageModel,
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
-                       Executor cachedThreadPool
+                       TemplatesService templatesService
     ) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = chatLanguageModel;
         this.embeddingModel = embeddingModel;
         this.embeddingStore = embeddingStore;
-        this.cachedThreadPool = cachedThreadPool;
+        this.templatesService = templatesService;
     }
 
     public AiChatLogic makeChat(
@@ -46,7 +45,7 @@ public class AiChatService {
                 chatLanguageModel,
                 embeddingModel,
                 embeddingStore,
-                cachedThreadPool,
+                templatesService,
                 name,
                 chatHistory,
                 entries,

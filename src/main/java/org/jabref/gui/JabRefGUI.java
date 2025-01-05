@@ -14,7 +14,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -25,13 +24,16 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -61,7 +63,6 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
-    private static ChatHistoryService chatHistoryService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -102,7 +103,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor,
                 preferences,
                 aiService,
-                chatHistoryService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -137,6 +137,9 @@ public class JabRefGUI extends Application {
     public void initialize() {
         WebViewStore.init();
 
+        DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+        Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
+
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
 
@@ -168,14 +171,10 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
-
-        JabRefGUI.chatHistoryService = new ChatHistoryService(
-                preferences.getCitationKeyPatternPreferences(),
-                dialogService);
-        Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);
     }
 
     private void setupProxy() {
@@ -289,13 +288,19 @@ public class JabRefGUI extends Application {
 
     private void saveWindowState() {
         CoreGuiPreferences preferences = JabRefGUI.preferences.getGuiPreferences();
-        if (!mainStage.isMaximized()) {
+        // workaround for mac, maximize will always report true
+        if (!mainStage.isMaximized() || OS.OS_X) {
             preferences.setPositionX(mainStage.getX());
             preferences.setPositionY(mainStage.getY());
             preferences.setSizeX(mainStage.getWidth());
             preferences.setSizeY(mainStage.getHeight());
         }
-        preferences.setWindowMaximised(mainStage.isMaximized());
+        // maximize does not correctly work on OSX, reports true, although the window was resized!
+        if (OS.OS_X) {
+            preferences.setWindowMaximised(false);
+        } else {
+            preferences.setWindowMaximised(mainStage.isMaximized());
+        }
         debugLogWindowState(mainStage);
     }
 
@@ -375,8 +380,6 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
-        LOGGER.trace("Closing chat history service");
-        chatHistoryService.close();
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
         LOGGER.trace("Stopping background tasks");
@@ -400,6 +403,9 @@ public class JabRefGUI extends Application {
         LOGGER.trace("Shutting down directoryMonitor");
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
+        LOGGER.trace("Shutting down postgreServer");
+        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+        postgreServer.shutdown();
         LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
         LOGGER.trace("Finished shutdownThreadPools");

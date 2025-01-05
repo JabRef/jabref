@@ -2,12 +2,12 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -53,7 +53,7 @@ public class OpenAccessDoi implements FulltextFetcher {
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException {
-        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
+        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.asString() + "?email=developers@jabref.org")
                                                 .header("accept", "application/json")
                                                 .asJson();
 
@@ -67,7 +67,7 @@ public class OpenAccessDoi implements FulltextFetcher {
                        .map(location -> location.optString("url"))
                        .flatMap(url -> {
                            try {
-                               return Optional.of(URI.create(url).toURL());
+                               return Optional.of(URLUtil.create(url));
                            } catch (MalformedURLException e) {
                                LOGGER.debug("Could not determine URL to fetch full text from", e);
                                return Optional.empty();

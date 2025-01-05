@@ -52,7 +52,7 @@ public class MetaDataSerializer {
         stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getAsString())));
-        metaData.getDefaultFileDirectory().ifPresent(
+        metaData.getLibrarySpecificFileDirectory().ifPresent(
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
@@ -98,7 +98,7 @@ public class MetaDataSerializer {
                 continue;
             }
 
-            boolean isSaveActions = metaItem.getKey().equals(MetaData.SAVE_ACTIONS);
+            boolean isSaveActions = MetaData.SAVE_ACTIONS.equals(metaItem.getKey());
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, "", MetaData.SEPARATOR_STRING);
             boolean lastWasSaveActionsEnablement = false;
