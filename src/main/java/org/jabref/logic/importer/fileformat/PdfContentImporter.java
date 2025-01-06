@@ -372,9 +372,9 @@ public class PdfContentImporter extends PdfImporter {
         EntryType type = StandardEntryType.InProceedings;
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
+            arXivId = getArXivId(null);
             extractYear();
             doi = getDoi(null);
-            arXivId = getArXivId(arXivId);
             if (curString.contains("Conference")) {
                 fillCurStringWithNonEmptyLines();
                 conference = curString;
@@ -391,7 +391,7 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
         // sometimes ArXiv ID is read before title
-        getArXivId(null);
+        arXivId = getArXivId(arXivId);
         // start: title
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
@@ -608,18 +608,16 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     private String getArXivId(String arXivId) {
+        final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
         if (arXivId == null) {
             String arXiv = curString.split(" ")[0];
             arXivId = ArXivIdentifier.parse(arXiv).map(ArXivIdentifier::asString).orElse(null);
-            if (arXivId != null) {
-                if (curString.length() > arXivId.length() + 7) {
-                    // The arxiv string also contains the year
-                    curString = curString.substring(arXivId.length() + 7);
-                    extractYear();
-                    curString = "";
-                    proceedToNextNonEmptyLine();
-                }
-                return arXivId;
+            if (arXivId != null && curString.length() > arXivId.length() + ARXIV_PREFIX_LENGTH) {
+                // The arxiv string also contains the year
+                curString = curString.substring(arXivId.length() + ARXIV_PREFIX_LENGTH);
+                extractYear();
+                curString = "";
+                proceedToNextNonEmptyLine();
             }
         }
         return arXivId;
