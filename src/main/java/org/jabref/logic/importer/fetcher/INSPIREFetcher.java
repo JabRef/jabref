@@ -109,21 +109,10 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         try {
             URLDownload download = getUrlDownload(url);
             List<BibEntry> results = getParser().parseEntries(download.asInputStream());
-
-            for (BibEntry result : results) {
-                // Use UnknownField to check for "texkeys" field
-                Optional<String> texKey = result.getField(new UnknownField("texkeys"));
-                if (texKey.isPresent()) {
-                    result.setField(StandardField.KEY, texKey.get());
-                }
-
-                // Perform additional cleanup
-                doPostCleanup(result);
-            }
-
+            results.forEach(this::doPostCleanup);
             return results;
         } catch (ParseException e) {
             throw new FetcherException(url, e);
         }
-    }}
-
+    }
+}

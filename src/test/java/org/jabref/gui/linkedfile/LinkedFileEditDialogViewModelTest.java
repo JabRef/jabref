@@ -41,7 +41,7 @@ class LinkedFileEditDialogViewModelTest {
     @Test
     void badFilenameCharWillBeReplacedByUnderscore(@TempDir Path tempDir) throws Exception {
 
-        Path invalidFile = tempDir.resolve("invalid.pdf");
+        Path invalidFile = tempDir.resolve("?invalid.pdf");
         Files.createFile(invalidFile);
         when(dialogService.showConfirmationDialogAndWait(any(), any(), any())).thenReturn(true);
 
