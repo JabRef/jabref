@@ -52,6 +52,8 @@ public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 
+    private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
+
     // input lines into several lines
     private String[] lines;
 
@@ -608,18 +610,22 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     private String getArXivId(String arXivId) {
-        final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
-        if (arXivId == null) {
-            String arXiv = curString.split(" ")[0];
-            arXivId = ArXivIdentifier.parse(arXiv).map(ArXivIdentifier::asString).orElse(null);
-            if (arXivId != null && curString.length() > arXivId.length() + ARXIV_PREFIX_LENGTH) {
-                // The arxiv string also contains the year
-                curString = curString.substring(arXivId.length() + ARXIV_PREFIX_LENGTH);
-                extractYear();
-                curString = "";
-                proceedToNextNonEmptyLine();
-            }
+        if (arXivId != null) {
+            return arXivId;
         }
+
+        String arXiv = curString.split(" ")[0];
+        arXivId = ArXivIdentifier.parse(arXiv).map(ArXivIdentifier::asString).orElse(null);
+
+        if (arXivId == null || curString.length() < arXivId.length() + ARXIV_PREFIX_LENGTH) {
+            return arXivId;
+        }
+        // The arxiv string also contains the year
+        curString = curString.substring(arXivId.length() + ARXIV_PREFIX_LENGTH);
+        extractYear();
+        curString = "";
+        proceedToNextNonEmptyLine();
+
         return arXivId;
     }
 
