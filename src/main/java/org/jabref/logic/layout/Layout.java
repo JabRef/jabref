@@ -57,7 +57,7 @@ public class Layout {
                             tmpEntries.add(le);
                             blockEntries = null;
                         } else {
-                            LOGGER.debug(blockStart + '\n' + parsedEntry.s);
+                            LOGGER.debug("{}\n{}", blockStart, parsedEntry.s);
                             LOGGER.warn("Nested field/group entries are not implemented!");
                             Thread.dumpStack();
                         }
