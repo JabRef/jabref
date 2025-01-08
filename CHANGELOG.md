@@ -21,6 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
+
 ## [6.0-alpha] – 2024-12-23
 
 ### Added
