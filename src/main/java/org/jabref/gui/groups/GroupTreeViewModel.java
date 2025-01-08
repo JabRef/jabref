@@ -613,7 +613,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
             int groupsWithSameName = 0;
             String name = group.getGroupNode().getGroup().getName();
-            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            Optional<GroupTreeNode> rootGroup = currentDatabase.flatMap(g-> g.getMetaData().getGroups());
             if (rootGroup.isPresent()) {
                 groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
             }
@@ -630,6 +630,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         //    return; // user aborted operation
 
         group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
+        dialogService.notify(Localization.lang("Added %0 entries to group \"%1\"", stateManager.getSelectedEntries().size(), group.getDisplayName()));
 
         // TODO: Add undo
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
