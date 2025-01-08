@@ -139,7 +139,6 @@ class PdfContentImporterTest {
                 .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
 
         String firstPageContent = """
-                arXiv:2408.06224v1 [cs.SE] 12 Aug 2024
                 A Multi-Year Grey Literature Review on AI-assisted Test Automation
 
                 Filippo Riccaa, Alessandro Marchettob and Andrea Stoccoc
@@ -160,7 +159,9 @@ class PdfContentImporterTest {
                 *Corresponding author
                 filippo.ricca@unige.it (F. Ricca)
                 https://person.dibris.unige.it/ricca-filippo/ (F. Ricca)
-                ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)""";
+                ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)
+
+                arXiv:2408.06224v1 [cs.SE] 12 Aug 2024""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
     }

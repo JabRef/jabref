@@ -373,8 +373,8 @@ public class PdfContentImporter extends PdfImporter {
 
         EntryType type = StandardEntryType.InProceedings;
         if (curString.length() > 4) {
-            // special case: possibly conference as first line on the page
             arXivId = getArXivId(null);
+            // special case: possibly conference as first line on the page
             extractYear();
             doi = getDoi(null);
             if (curString.contains("Conference")) {
@@ -392,7 +392,7 @@ public class PdfContentImporter extends PdfImporter {
                 }
             }
         }
-        // sometimes ArXiv ID is read before title
+
         arXivId = getArXivId(arXivId);
         // start: title
         fillCurStringWithNonEmptyLines();
