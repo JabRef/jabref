@@ -14,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
+import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
@@ -35,7 +36,14 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 
+import org.jabref.model.database.BibDatabaseContext;
+
 import com.tobiasdiez.easybind.EasyBind;
+
+import javafx.collections.ObservableList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RightClickMenu {
 
@@ -61,6 +69,7 @@ public class RightClickMenu {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
+                createCopyToMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor), // mine
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
@@ -101,6 +110,38 @@ public class RightClickMenu {
         });
 
         return contextMenu;
+    }
+
+    private static Menu createCopyToMenu(ActionFactory factory,
+                                         DialogService dialogService,
+                                         StateManager stateManager,
+                                         GuiPreferences preferences,
+                                         ClipBoardManager clipBoardManager,
+                                         JournalAbbreviationRepository abbreviationRepository,
+                                         TaskExecutor taskExecutor
+                                         ) {
+        Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
+
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
+        List<String> checkedPaths = new ArrayList<>();
+
+        if(!openDatabases.isEmpty()) {
+            openDatabases.forEach(library -> {
+                String path = library.getDatabasePath().get().toString();
+                String name = path.substring(path.lastIndexOf('\\') + 1);
+
+                if (!checkedPaths.contains(path)) {
+                    checkedPaths.add(path);
+                }
+
+                copyToMenu.getItems().addAll(
+                        factory.createCustomCheckMenuItem(StandardActions.COPY_TO, new CopyTo(StandardActions.COPY_TO, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository, checkedPaths, path), true, name)
+                );
+            });
+        }
+
+        return copyToMenu;
     }
 
     private static Menu createCopySubMenu(ActionFactory factory,

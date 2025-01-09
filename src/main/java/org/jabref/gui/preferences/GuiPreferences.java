@@ -17,8 +17,11 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.gui.edit.CopyToPreferences;
 
 public interface GuiPreferences extends CliPreferences {
+    CopyToPreferences getCopyToPreferences();
+
     EntryEditorPreferences getEntryEditorPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
