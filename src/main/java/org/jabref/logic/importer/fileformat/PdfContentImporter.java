@@ -252,16 +252,24 @@ public class PdfContentImporter extends PdfImporter {
             return Math.abs(Xgap) > XspaceThreshold && Math.abs(Ygap) > YspaceThreshold;
         }
 
-        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition) {
+        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition,
+                                       Map<Float, TextPosition> lastPositionMap, float fontSize) {
+            // This indicates that the text is at the start of the line, so it is needed.
             if (textPosition == null || previousTextPosition == null) {
                 return false;
             }
+            // We use the font size to identify titles. Blank characters don't have a font size, so we discard them.
+            // The space will be added back in the final result, but not in this method.
             if (StringUtil.isBlank(textPosition.getUnicode())) {
                 return true;
             }
-            // The title usually don't in the bottom 10% of a page.
-            return (textPosition.getPageHeight() - textPosition.getYDirAdj())
-                    < (textPosition.getPageHeight() * 0.1);
+            // Titles are generally not located in the bottom 10% of a page.
+            if ((textPosition.getPageHeight() - textPosition.getYDirAdj()) < (textPosition.getPageHeight() * 0.1)) {
+                return true;
+            }
+            // Characters in a title typically remain close together,
+            // so a distant character is unlikely to be part of the title.
+            return (lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition));
         }
 
         private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
@@ -271,8 +279,7 @@ public class PdfContentImporter extends PdfImporter {
             for (TextPosition textPosition : textPositions) {
                 float fontSize = textPosition.getFontSizeInPt();
                 // Exclude unwanted text based on heuristics
-                if (isUnwantedText(previousTextPosition, textPosition) ||
-                    (lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition))) {
+                if (isUnwantedText(previousTextPosition, textPosition , lastPositionMap, fontSize)) {
                     continue;
                 }
                 fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
