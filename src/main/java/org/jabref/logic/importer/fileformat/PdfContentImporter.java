@@ -269,7 +269,7 @@ public class PdfContentImporter extends PdfImporter {
             }
             // Characters in a title typically remain close together,
             // so a distant character is unlikely to be part of the title.
-            return (lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition));
+            return lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition);
         }
 
         private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
