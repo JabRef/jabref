@@ -279,7 +279,7 @@ public class PdfContentImporter extends PdfImporter {
             for (TextPosition textPosition : textPositions) {
                 float fontSize = textPosition.getFontSizeInPt();
                 // Exclude unwanted text based on heuristics
-                if (isUnwantedText(previousTextPosition, textPosition , lastPositionMap, fontSize)) {
+                if (isUnwantedText(previousTextPosition, textPosition, lastPositionMap, fontSize)) {
                     continue;
                 }
                 fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
