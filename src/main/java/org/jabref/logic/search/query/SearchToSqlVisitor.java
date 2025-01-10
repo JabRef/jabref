@@ -207,6 +207,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
         }
 
+        // field = "" -> should find entries where the field is empty
+        // field != "" -> should find entries where the field is not empty
+        if (term.isEmpty() && searchFlags.contains(NEGATION)) {
+            searchFlags.remove(NEGATION);
+        } else if (term.isEmpty()) {
+            searchFlags.add(NEGATION);
+        }
+
         return getFieldQueryNode(field.toLowerCase(Locale.ROOT), term, searchFlags);
     }
 
