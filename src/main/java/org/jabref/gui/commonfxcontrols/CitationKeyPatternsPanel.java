@@ -124,7 +124,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
                 setStyle("");
             } else if (isSelected()) {
                 setStyle("-fx-background-color: -fx-selection-bar");
-            } else if (item.getEntryType().getName().equals(CitationKeyPatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME)) {
+            } else if (CitationKeyPatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME.equals(item.getEntryType().getName())) {
                 setStyle("-fx-background-color: -fx-default-button");
             } else {
                 setStyle("");
