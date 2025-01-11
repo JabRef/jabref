@@ -1,7 +1,11 @@
 package org.jabref.gui.maintable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.undo.UndoManager;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -33,17 +37,11 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 
-import org.jabref.model.database.BibDatabaseContext;
-
 import com.tobiasdiez.easybind.EasyBind;
-
-import javafx.collections.ObservableList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RightClickMenu {
 
@@ -122,11 +120,10 @@ public class RightClickMenu {
                                          ) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
         ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
         List<String> checkedPaths = new ArrayList<>();
 
-        if(!openDatabases.isEmpty()) {
+        if (!openDatabases.isEmpty()) {
             openDatabases.forEach(library -> {
                 String path = library.getDatabasePath().get().toString();
                 String name = path.substring(path.lastIndexOf('\\') + 1);

@@ -24,6 +24,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -45,7 +46,6 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
-import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -214,10 +214,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
     private static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
 
-    // Add a constant key for the preference
-    // private static String REMEMBER_CROSS_REFERENCE_DECISION = "rememberCrossReferenceDecision";
-    private static String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
-    private static String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
+    private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
+    private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
 
     private static JabRefGuiPreferences singleton;
 
@@ -420,7 +418,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     public CopyToPreferences getCopyToPreferences() {
-        if(copyToPreferences != null) {
+        if (copyToPreferences != null) {
             return copyToPreferences;
         }
         copyToPreferences = new CopyToPreferences(

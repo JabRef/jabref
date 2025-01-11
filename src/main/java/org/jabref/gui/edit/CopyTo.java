@@ -1,7 +1,6 @@
 package org.jabref.gui.edit;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -59,19 +58,19 @@ public class CopyTo extends SimpleCommand {
         List<String> titles = selectedEntries.stream()
                 .filter(entry -> entry.getTitle().isPresent())
                 .map(entry -> entry.getTitle().get())
-                .collect(Collectors.toList());
+                .toList();
 
-        for(String title: titles) {
+        for (String title: titles) {
             logger.info("Selected Entreis: " + title);
         }
-        for(String checkedPath: checkedPaths) {
+        for (String checkedPath: checkedPaths) {
             logger.info("Selected Libraries to copy: " + checkedPath);
         }
 
         boolean includeCrossReferences = askForCrossReferencedEntries();
         preferences.getCopyToPreferences().setShouldIncludeCrossReferences(includeCrossReferences);
 
-        if(preferences.getCopyToPreferences().getShouldIncludeCrossReferences()) {
+        if (preferences.getCopyToPreferences().getShouldIncludeCrossReferences()) {
             logger.info("Include Cross References");
         } else {
             logger.info("Exclude Cross References");
@@ -79,7 +78,7 @@ public class CopyTo extends SimpleCommand {
     }
 
     private boolean askForCrossReferencedEntries() {
-        if(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()) {
+        if (preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Include or exclude cross-referenced entries"),
                     Localization.lang("Would you like to include cross-reference entries in the current operation?"),
