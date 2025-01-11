@@ -38,9 +38,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
           - os: windows-latest
