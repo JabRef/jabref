@@ -50,6 +50,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -118,6 +119,7 @@ public class EntryEditor extends BorderPane {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
+    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -296,8 +298,13 @@ public class EntryEditor extends BorderPane {
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
-        tabs.add(new CitationRelationsTab(dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferences, libraryTab, taskExecutor, bibEntryTypesManager));
+        tabs.add(new CitationRelationsTab(
+                dialogService, databaseContext,
+                undoManager, stateManager,
+                fileMonitor, preferences,
+                libraryTab, taskExecutor,
+                bibEntryTypesManager, searchCitationsRelationsService
+            ));
         tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferences, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,

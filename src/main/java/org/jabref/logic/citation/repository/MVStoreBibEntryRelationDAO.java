@@ -1,7 +1,9 @@
 package org.jabref.logic.citation.repository;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.ZoneId;
@@ -23,9 +25,12 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.WriteBuffer;
 import org.h2.mvstore.type.BasicDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationDAO.class);
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
 
     private final String mapName;
@@ -35,6 +40,18 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
 
     MVStoreBibEntryRelationDAO(Path path, String mapName) {
+
+        try {
+            if (!Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while opening {} storage", mapName, e);
+        }
+
         this.mapName = mapName;
         this.insertionTimeStampMapName = mapName + "-insertion-timestamp";
         this.storeConfiguration = new MVStore.Builder().autoCommitDisabled().fileName(path.toAbsolutePath().toString());
@@ -197,7 +214,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         private final BasicDataType<BibEntry> bibEntryDataType = new BibEntrySerializer();
 
         /**
-         * Memory size is the sum of all aggregated bibEntries memory size plus 4 bytes.
+         * Memory size is the sum of all aggregated bibEntries' memory size plus 4 bytes.
          * Those 4 bytes are used to store the length of the collection itself.
          *
          * @param bibEntries should not be null

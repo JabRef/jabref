@@ -8,15 +8,20 @@ import org.jabref.model.entry.BibEntry;
 
 public class ChainBibEntryRelationsRepository implements BibEntryRelationsRepository {
 
+    private static final String CITATIONS_STORE = "citations";
+    private static final String REFERENCES_STORE = "references";
+
     private final BibEntryRelationDAO citationsDao;
     private final BibEntryRelationDAO referencesDao;
 
     public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore) {
         this.citationsDao = BibEntryRelationDAOChain.of(
-            LRUCacheBibEntryRelationsDAO.CITATIONS, new MVStoreBibEntryRelationDAO(citationsStore, "citations")
+            LRUCacheBibEntryRelationsDAO.CITATIONS,
+            new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE)
         );
         this.referencesDao = BibEntryRelationDAOChain.of(
-            LRUCacheBibEntryRelationsDAO.REFERENCES, new MVStoreBibEntryRelationDAO(relationsStore, "relations")
+            LRUCacheBibEntryRelationsDAO.REFERENCES,
+            new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE)
         );
     }
 
@@ -62,5 +67,11 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     @Override
     public boolean isReferencesUpdatable(BibEntry entry) {
         return referencesDao.isUpdatable(entry);
+    }
+
+    public static ChainBibEntryRelationsRepository of(Path citationsRelationsDirectory) {
+        var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
+        var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
+        return new ChainBibEntryRelationsRepository(citationsPath, relationsPath);
     }
 }

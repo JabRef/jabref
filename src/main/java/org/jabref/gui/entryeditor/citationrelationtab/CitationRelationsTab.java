@@ -1,11 +1,8 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,12 +43,10 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.citation.repository.ChainBibEntryRelationsRepository;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.CitationFetcher;
-import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -103,7 +98,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 GuiPreferences preferences,
                                 LibraryTab libraryTab,
                                 TaskExecutor taskExecutor,
-                                BibEntryTypesManager bibEntryTypesManager) {
+                                BibEntryTypesManager bibEntryTypesManager,
+                                SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
@@ -114,19 +110,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
-
-        try {
-            var jabRefPath = Paths.get("/home/sacha/Documents/projects/JabRef");
-            var citationsPath = Path.of(jabRefPath.toAbsolutePath() + File.separator + "citations");
-            var relationsPath = Path.of(jabRefPath.toAbsolutePath() + File.separator + "references");
-            var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(citationsPath, relationsPath);
-            this.searchCitationsRelationsService = new SearchCitationsRelationsService(
-                new SemanticScholarCitationFetcher(preferences.getImporterPreferences()), bibEntryRelationsRepository
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        this.searchCitationsRelationsService = searchCitationsRelationsService;
 
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
             databaseContext,

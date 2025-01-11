@@ -27,6 +27,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
@@ -169,6 +170,11 @@ public class JabRefGUI extends Application {
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
+
+        Injector.setModelOrService(
+                SearchCitationsRelationsService.class,
+                new SearchCitationsRelationsService(preferences.getImporterPreferences())
+        );
     }
 
     private void setupProxy() {
