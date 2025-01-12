@@ -67,7 +67,7 @@ public class RightClickMenu {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
-                createCopyToMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor), // mine
+                createCopyToMenu(factory, dialogService, stateManager, preferences),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
@@ -113,10 +113,7 @@ public class RightClickMenu {
     private static Menu createCopyToMenu(ActionFactory factory,
                                          DialogService dialogService,
                                          StateManager stateManager,
-                                         GuiPreferences preferences,
-                                         ClipBoardManager clipBoardManager,
-                                         JournalAbbreviationRepository abbreviationRepository,
-                                         TaskExecutor taskExecutor
+                                         GuiPreferences preferences
                                          ) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
@@ -125,16 +122,23 @@ public class RightClickMenu {
 
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(library -> {
-                String path = library.getDatabasePath().get().toString();
-                String name = path.substring(path.lastIndexOf('\\') + 1);
+                library.getDatabasePath().ifPresent(databasePath -> {
+                    String path = databasePath.toString();
+                    String name = path.substring(path.lastIndexOf('\\') + 1);
 
-                if (!checkedPaths.contains(path)) {
-                    checkedPaths.add(path);
-                }
+                    if (!checkedPaths.contains(path)) {
+                        checkedPaths.add(path);
+                    }
 
-                copyToMenu.getItems().addAll(
-                        factory.createCustomCheckMenuItem(StandardActions.COPY_TO, new CopyTo(StandardActions.COPY_TO, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository, checkedPaths, path), true, name)
-                );
+                    copyToMenu.getItems().addAll(
+                            factory.createCustomCheckMenuItem(
+                                    StandardActions.COPY_TO,
+                                    new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), checkedPaths, path),
+                                    true,
+                                    name
+                            )
+                    );
+                });
             });
         }
 
