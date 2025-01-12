@@ -8,8 +8,8 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import com.dlsc.gemsfx.ExpandingTextArea?>
 <fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane"
          xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent">
@@ -23,7 +23,7 @@
                     <Font name="System Bold" size="12.0" />
                 </font>
             </Label>
-            <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" styleClass="chat-message-text-area" />
+            <Text fx:id="contentText" nodeOrientation="LEFT_TO_RIGHT" text="Content" styleClass="chat-message-text-area" />
         </VBox>
 
         <VBox fx:id="buttonsVBox" alignment="BASELINE_RIGHT">
@@ -33,6 +33,14 @@
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Delete message from chat history" />
+                </tooltip>
+            </Button>
+            <Button onAction="#copyToClipboard" styleClass="icon-button,narrow" textAlignment="CENTER">
+                <graphic>
+                    <JabRefIconView glyph="COPY"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Copy to clipboard" />
                 </tooltip>
             </Button>
         </VBox>
