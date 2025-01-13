@@ -57,7 +57,7 @@ public class Version {
      * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
     public static Version parse(String version) {
-        if ((version == null) || version.isEmpty() || version.equals(BuildInfo.UNKNOWN_VERSION)
+        if ((version == null) || version.isEmpty() || BuildInfo.UNKNOWN_VERSION.equals(version)
                 || "${version}".equals(version)) {
             return UNKNOWN_VERSION;
         }
@@ -127,9 +127,9 @@ public class Version {
         Objects.requireNonNull(otherVersion);
         if (Objects.equals(this, otherVersion)) {
             return false;
-        } else if (this.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
+        } else if (BuildInfo.UNKNOWN_VERSION.equals(this.getFullVersion())) {
             return false;
-        } else if (otherVersion.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
+        } else if (BuildInfo.UNKNOWN_VERSION.equals(otherVersion.getFullVersion())) {
             return false;
         }
 
