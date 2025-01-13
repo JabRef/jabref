@@ -35,6 +35,7 @@ public class ImporterTestEngine {
             return stream
                     .map(path -> path.getFileName().toString())
                     .filter(fileNamePredicate)
+                    .filter(name -> !name.equals("pdf")) // There is a `pdf` in {@link TEST_RESOURCES}.
                     .collect(Collectors.toList());
         }
     }

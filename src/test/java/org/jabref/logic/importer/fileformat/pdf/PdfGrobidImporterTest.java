@@ -75,6 +75,6 @@ class PdfGrobidImporterTest {
 
     @Test
     void getCommandLineId() {
-        assertEquals("grobidPdf", importer.getId());
+        assertEquals("pdfGrobid", importer.getId());
     }
 }

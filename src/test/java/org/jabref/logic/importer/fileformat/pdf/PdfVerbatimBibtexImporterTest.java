@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -51,7 +50,6 @@ class PdfVerbatimBibtexImporterTest {
         expected.setField(StandardField.JOURNAL, "Some Journal");
         expected.setField(StandardField.YEAR, "2021");
         expected.setField(StandardField.ISBN, "0134685997");
-        expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.singletonList(expected), result);
