@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,10 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -121,24 +125,28 @@ public class RightClickMenu {
         List<String> checkedPaths = new ArrayList<>();
 
         if (!openDatabases.isEmpty()) {
-            openDatabases.forEach(library -> {
-                library.getDatabasePath().ifPresent(databasePath -> {
-                    String path = databasePath.toString();
-                    String name = path.substring(path.lastIndexOf('\\') + 1);
+            openDatabases.forEach(bibDatabaseContext -> {
+                String path = " ";
 
-                    if (!checkedPaths.contains(path)) {
-                        checkedPaths.add(path);
-                    }
+                if (bibDatabaseContext.getDatabasePath().isPresent()) {
+                    Path databasePath = bibDatabaseContext.getDatabasePath().get();
+                    path = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), databasePath).get();
+                } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+                    path = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                }
 
-                    copyToMenu.getItems().addAll(
-                            factory.createCustomCheckMenuItem(
-                                    StandardActions.COPY_TO,
-                                    new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), checkedPaths, path),
-                                    true,
-                                    name
-                            )
-                    );
-                });
+                if (!checkedPaths.contains(path)) {
+                    checkedPaths.add(path);
+                }
+
+                copyToMenu.getItems().addAll(
+                        factory.createCustomCheckMenuItem(
+                                StandardActions.COPY_TO,
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), checkedPaths, path),
+                                true,
+                                path
+                        )
+                );
             });
         }
 
