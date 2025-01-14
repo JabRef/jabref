@@ -140,6 +140,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             URLDownload download = getUrlDownload(doiURL);
             download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
 
+            download.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36");
+            download.addHeader("Referer", "https://pubs.acs.org/");
+
             String bibtexString;
             URLConnection openConnection;
 
