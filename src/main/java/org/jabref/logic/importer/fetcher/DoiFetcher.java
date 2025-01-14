@@ -247,6 +247,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
         String suffix = doiAsString.substring(doiAsString.lastIndexOf('/') + 1);
         String organizationId = doiAsString.substring(doiAsString.indexOf('.') + 1, doiAsString.indexOf('/'));
-        return organizationId.equals(APS_JOURNAL_ORG_DOI_ID) && APS_SUFFIX_PATTERN.matcher(suffix).matches();
+        return APS_JOURNAL_ORG_DOI_ID.equals(organizationId) && APS_SUFFIX_PATTERN.matcher(suffix).matches();
     }
 }
