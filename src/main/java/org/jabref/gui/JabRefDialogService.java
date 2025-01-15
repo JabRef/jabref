@@ -178,6 +178,8 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
+        inputDialog.getDialogPane().setPrefSize(500, 200); // Set preferred size
+        inputDialog.setResizable(true);
         return inputDialog.showAndWait();
     }
 
