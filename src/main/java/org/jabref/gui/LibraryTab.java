@@ -345,6 +345,24 @@ public class LibraryTab extends Tab {
 
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
+
+         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+            int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
+            if (numberOfOpenDatabases == 1) {
+                tabPane.setStyle("-fx-tab-max-height: 0;");
+                tabPane.lookup(".tab-header-area").setStyle("-fx-pref-height: 0; visibility: hidden");
+                tabPane.lookupAll(".tab-pane > .tab-header-area > .headers-region > .tab").forEach(node -> {
+                    node.setStyle("-fx-padding: 0; -fx-border-width: 0; -fx-pref-height: 0;");
+                });
+            } else {
+                tabPane.setStyle("");
+                tabPane.lookup(".tab-header-area").setStyle("");
+                tabPane.lookupAll(".tab-pane > .tab-header-area > .headers-region > .tab").forEach(node -> {
+                    node.setStyle("");
+                });
+            }
+        });
+
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
