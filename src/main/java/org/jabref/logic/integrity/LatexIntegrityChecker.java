@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import org.jabref.model.entry.field.InternalField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ed.ph.snuggletex.ErrorCode;
@@ -62,6 +63,8 @@ public class LatexIntegrityChecker implements EntryChecker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         return entry.getFieldMap().entrySet().stream()
+                    // Ignore checks for the citation key field
+                    .filter(field -> !(field.getKey().equals(InternalField.KEY_FIELD) && field.getValue().matches(".*[\\^_].*")))
                     .filter(field -> FieldFactory.isLatexField(field.getKey()))
                     .flatMap(LatexIntegrityChecker::getUnescapedAmpersandsWithCount)
                     // Exclude all DOM building errors as this functionality is not used.

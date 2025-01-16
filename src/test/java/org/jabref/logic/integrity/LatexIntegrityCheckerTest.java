@@ -300,10 +300,18 @@ class LatexIntegrityCheckerTest {
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM03), StandardField.TITLE, "$\\right)$"),
 
                 // TFEM04: \left had no following \right
-                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM04), StandardField.TITLE, "$\\left($")
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM04), StandardField.TITLE, "$\\left($"),
 
                 // TFETB0: \hline must be the only token in table row
                 // Skipped
+
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.TITLE, "Title with ^ and _ characters"),
+                // Ensure invalid LaTeX syntax with special characters in other fields is detected
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.AUTHOR, "Author_Name"),
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.JOURNAL, "Journal_Name"),
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.BOOKTITLE, "Book^Title"),
+                Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.NOTE, "Note_with_subscript_and_superscript^_")
+
         );
     }
 }
