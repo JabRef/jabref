@@ -20,7 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
 - We fixed an issue where new entries were inserted in the middle of the table instead of at the end. [#12371](https://github.com/JabRef/jabref/pull/12371)
 - We fixed an issue where removing the sort from the table did not restore the original order. [#12371](https://github.com/JabRef/jabref/pull/12371)
-- We fixed an issue where citation keys containing superscript (`^`) and subscript (`_`) characters in text mode were incorrectly flagged by the integrity checker. [#11948](https://github.com/JabRef/jabref/issues/11948)
+- We fixed an issue where citation keys containing superscript (`^`) and subscript (`_`) characters in text mode were incorrectly flagged by the integrity checker. [#12391](https://github.com/JabRef/jabref/pull/12391)
 
 ### Removed
 

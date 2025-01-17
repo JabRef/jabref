@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
@@ -311,7 +312,22 @@ class LatexIntegrityCheckerTest {
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.JOURNAL, "Journal_Name"),
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.BOOKTITLE, "Book^Title"),
                 Arguments.of(LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03), StandardField.NOTE, "Note_with_subscript_and_superscript^_")
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource("provideCitationKeyInputs")
+    void testCitationKeyField(String expectedMessage, Field field, String value) {
+        entry.setField(field, value);
+        // Ensure TTEM03 error is not raised for citation key field
+        assertEquals(List.of(), checker.check(entry));
+    }
+
+    private static Stream<Arguments> provideCitationKeyInputs() {
+        return Stream.of(
+                Arguments.of("", InternalField.KEY_FIELD, "Corti_2009"),
+                Arguments.of("", InternalField.KEY_FIELD, "Key_With^Superscript"),
+                Arguments.of("", InternalField.KEY_FIELD, "Key_With_Subscript")
         );
     }
 }
