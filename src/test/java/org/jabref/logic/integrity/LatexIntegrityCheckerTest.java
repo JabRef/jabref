@@ -317,7 +317,7 @@ class LatexIntegrityCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideCitationKeyInputs")
-    void testCitationKeyField(String expectedMessage, Field field, String value) {
+    void citationKeyField(String expectedMessage, Field field, String value) {
         entry.setField(field, value);
         // Ensure TTEM03 error is not raised for citation key field
         assertEquals(List.of(), checker.check(entry));
