@@ -546,10 +546,6 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
 
-        if (arXivId != null && arXivId.contains(year)) {
-            year = null;
-        }
-
         BibEntry entry = new BibEntry();
         entry.setType(type);
 
@@ -592,9 +588,6 @@ public class PdfContentImporter extends PdfImporter {
             entry.setField(StandardField.PAGES, pages);
         }
         if (year != null) {
-            entry.setField(StandardField.YEAR, year);
-        } else if (arXivId != null) {
-            year = "20" + arXivId.substring(0, 2);
             entry.setField(StandardField.YEAR, year);
         }
         if (publisher != null) {
