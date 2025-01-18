@@ -349,10 +349,8 @@ public class LibraryTab extends Tab {
         if (preferences.getWorkspacePreferences().shouldHideTabBar()) {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
                 int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
-                if (numberOfOpenDatabases == 1) {
-                    if (!tabPane.getStyleClass().contains("hide-tab-bar")) {
-                        tabPane.getStyleClass().add("hide-tab-bar");
-                    }
+                if (numberOfOpenDatabases == 1 && !tabPane.getStyleClass().contains("hide-tab-bar")) {
+                    tabPane.getStyleClass().add("hide-tab-bar");
                 } else {
                     tabPane.getStyleClass().remove("hide-tab-bar");
                 }
@@ -507,8 +505,7 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void editEntryAndFocusField(BibEntry entry, Field
-        field) {
+    public void editEntryAndFocusField(BibEntry entry, Field field) {
         showAndEdit(entry);
         Platform.runLater(() -> {
             // Focus field and entry in main table (async to give entry editor time to load)
