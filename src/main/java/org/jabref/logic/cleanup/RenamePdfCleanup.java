@@ -32,6 +32,12 @@ public class RenamePdfCleanup implements CleanupJob {
         this.filePreferences = filePreferences;
     }
 
+    private boolean allowedFileType(String filePath) {
+        String lowerCase = filePath.toLowerCase();
+
+        return lowerCase.endsWith(".pdf");
+    }
+
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<LinkedFile> files = entry.getFiles();
@@ -39,6 +45,10 @@ public class RenamePdfCleanup implements CleanupJob {
         boolean changed = false;
         for (LinkedFile file : files) {
             if (onlyRelativePaths && Path.of(file.getLink()).isAbsolute()) {
+                continue;
+            }
+            if (!allowedFileType(file.getLink())) {
+                LOGGER.info("Skipping renaming: {}", file.getLink());
                 continue;
             }
 
