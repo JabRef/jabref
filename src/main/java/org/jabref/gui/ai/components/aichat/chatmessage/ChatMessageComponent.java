@@ -1,8 +1,5 @@
 package org.jabref.gui.ai.components.aichat.chatmessage;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.function.Consumer;
 
 import javafx.beans.property.ObjectProperty;
@@ -14,9 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.MarkdownFormatter;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
@@ -28,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class ChatMessageComponent extends HBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);
 
-    MarkdownFormatter markdownFormatter = new MarkdownFormatter();
+    private final double textWrappingLimit = 400.0;
 
     private final ObjectProperty<ChatMessage> chatMessage = new SimpleObjectProperty<>();
     private final ObjectProperty<Consumer<ChatMessageComponent>> onDelete = new SimpleObjectProperty<>();
@@ -73,7 +70,7 @@ public class ChatMessageComponent extends HBox {
         switch (chatMessage.get()) {
             case UserMessage userMessage -> {
                 setColor("-jr-ai-message-user", "-jr-ai-message-user-border");
-                setTextWrapping(400.0);
+                setTextWrapping();
                 setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
                 sourceLabel.setText(Localization.lang("User"));
                 contentText.setText(userMessage.singleText());
@@ -81,7 +78,7 @@ public class ChatMessageComponent extends HBox {
 
             case AiMessage aiMessage -> {
                 setColor("-jr-ai-message-ai", "-jr-ai-message-ai-border");
-                setTextWrapping(400.0);
+                setTextWrapping();
                 setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
                 sourceLabel.setText(Localization.lang("AI"));
                 contentText.setText(aiMessage.text());
@@ -89,7 +86,7 @@ public class ChatMessageComponent extends HBox {
 
             case ErrorMessage errorMessage -> {
                 setColor("-jr-ai-message-error", "-jr-ai-message-error-border");
-                setTextWrapping(400.0);
+                setTextWrapping();
                 setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
                 sourceLabel.setText(Localization.lang("Error"));
                 contentText.setText(errorMessage.getText());
@@ -114,15 +111,15 @@ public class ChatMessageComponent extends HBox {
 
     @FXML
     private void copyToClipboard() {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(new StringSelection(contentText.getText()), null);
+        ClipBoardManager clipBoardManager = new ClipBoardManager();
+        clipBoardManager.setContent(contentText.getText());
     }
 
     private void setColor(String fillColor, String borderColor) {
         vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
     }
 
-    private void setTextWrapping(Double wrappingWidth) {
-        contentText.setWrappingWidth(wrappingWidth);
+    private void setTextWrapping() {
+        contentText.setWrappingWidth(textWrappingLimit);
     }
 }
