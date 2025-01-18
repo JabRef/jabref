@@ -346,23 +346,35 @@ public class LibraryTab extends Tab {
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
 
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-            int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
-            if (numberOfOpenDatabases == 1) {
-                tabPane.setStyle("-fx-tab-max-height: 0;");
-                tabPane.lookup(".tab-header-area").setStyle("-fx-pref-height: 0; visibility: hidden");
-                tabPane.lookupAll(".tab-pane > .tab-header-area > .headers-region > .tab").forEach(node -> {
-                    node.setStyle("-fx-padding: 0; -fx-border-width: 0; -fx-pref-height: 0;");
-                });
-            } else {
-                tabPane.setStyle("");
-                tabPane.lookup(".tab-header-area").setStyle("");
-                tabPane.lookupAll(".tab-pane > .tab-header-area > .headers-region > .tab").forEach(node -> {
-                    node.setStyle("");
-                });
-            }
-        });
-        
+        if (preferences.getWorkspacePreferences().shouldHideTabBar()) {
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+                int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
+                if (numberOfOpenDatabases == 1) {
+                    if (!tabPane.getStyleClass().contains("hide-tab-bar")) {
+                        tabPane.getStyleClass().add("hide-tab-bar");
+                    }
+                } else {
+                    tabPane.getStyleClass().remove("hide-tab-bar");
+                }
+            });
+        }
+
+         /* BindingsHelper.subscribeFuture(
+                preferences.getWorkspacePreferences().confirmHideTabBarProperty(),
+                hideTabBar -> {
+                    stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+                        int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
+                        if (hideTabBar && numberOfOpenDatabases == 1) {
+                            if (!tabPane.getStyleClass().contains("hide-tab-bar")) {
+                                tabPane.getStyleClass().add("hide-tab-bar");
+                            }
+                        } else {
+                            tabPane.getStyleClass().remove("hide-tab-bar");
+                        }
+                    });
+                }
+        );*/
+
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
@@ -495,7 +507,8 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void editEntryAndFocusField(BibEntry entry, Field field) {
+    public void editEntryAndFocusField(BibEntry entry, Field
+        field) {
         showAndEdit(entry);
         Platform.runLater(() -> {
             // Focus field and entry in main table (async to give entry editor time to load)
