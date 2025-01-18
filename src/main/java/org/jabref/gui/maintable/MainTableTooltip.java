@@ -40,8 +40,8 @@ public class MainTableTooltip extends Tooltip {
         fieldValueLabel.setMaxWidth(400);
 
         tooltipContent.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-        tooltipContent.setMaxWidth(500);
-        tooltipContent.setMaxHeight(400);
+        tooltipContent.setMaxWidth(700);
+        tooltipContent.setMaxHeight(200);
 
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
