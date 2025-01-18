@@ -403,7 +403,7 @@ public class GroupDialogViewModel {
             if (parentNode != null) {
                 parentNode.getGroup()
                           .getIconName()
-                          .filter(iconName -> !iconName.equals(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON))
+                          .filter(iconName -> !DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON.equals(iconName))
                           .ifPresent(iconProperty::setValue);
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
