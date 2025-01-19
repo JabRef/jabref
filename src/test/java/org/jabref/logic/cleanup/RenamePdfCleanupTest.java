@@ -54,7 +54,7 @@ class RenamePdfCleanupTest {
      */
     @Test
     void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        Path path = testFolder.resolve("toot.tmp");
+        Path path = testFolder.resolve("toot.pdf");
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
@@ -63,13 +63,13 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.pdf"), "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
     @Test
     void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        Path path = testFolder.resolve("Toot.tmp");
+        Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
 
         entry.setField(StandardField.TITLE, "test title");
@@ -85,14 +85,14 @@ class RenamePdfCleanupTest {
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(
                 Arrays.asList(
                         new LinkedFile("", Path.of(""), ""),
-                        new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
+                        new LinkedFile("", Path.of("Toot - test title.pdf"), ""),
                         new LinkedFile("", Path.of(""), "")))),
                 entry.getField(StandardField.FILE));
     }
 
     @Test
     void cleanupRenamePdfRenamesFileStartingWithCitationKey() throws IOException {
-        Path path = testFolder.resolve("Toot.tmp");
+        Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
@@ -102,7 +102,7 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.tmp"), "");
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.pdf"), "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
