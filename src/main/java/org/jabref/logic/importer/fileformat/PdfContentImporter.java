@@ -546,8 +546,7 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
 
-        BibEntry entry = new BibEntry();
-        entry.setType(type);
+        BibEntry entry = new BibEntry(type);
 
         // TODO: institution parsing missing
 
@@ -623,10 +622,7 @@ public class PdfContentImporter extends PdfImporter {
         if (arXivId == null || curString.length() < arXivId.length() + ARXIV_PREFIX_LENGTH) {
             return arXivId;
         }
-        // The arxiv string also contains the year
-        curString = curString.substring(arXivId.length() + ARXIV_PREFIX_LENGTH);
-        extractYear();
-        curString = "";
+
         proceedToNextNonEmptyLine();
 
         return arXivId;
