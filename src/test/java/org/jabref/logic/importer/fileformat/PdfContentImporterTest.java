@@ -130,7 +130,7 @@ class PdfContentImporterTest {
     }
 
     @Test
-    void extractArXivFromPage1() {
+    void extractArXivFromPage() {
         BibEntry entry = new BibEntry(StandardEntryType.TechReport)
                 .withField(StandardField.AUTHOR, "Filippo Riccaa and Alessandro Marchettob and Andrea Stoccoc")
                 .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
