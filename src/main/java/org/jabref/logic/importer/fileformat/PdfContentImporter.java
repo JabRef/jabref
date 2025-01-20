@@ -574,6 +574,8 @@ public class PdfContentImporter extends PdfImporter {
         }
         if (arXivId != null) {
             entry.setField(StandardField.EPRINT, arXivId);
+            assert !arXivId.startsWith("arxiv");
+            entry.setField(StandardField.EPRINTTYPE, "arxiv");
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
