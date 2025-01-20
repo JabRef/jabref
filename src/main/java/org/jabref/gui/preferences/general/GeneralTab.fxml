@@ -72,6 +72,7 @@
               text="%Warn about unresolved duplicates when closing inspection window"/>
 
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
+    <CheckBox fx:id="confirmHideTabBar" text="%Hide tab bar when single library is present"/>
 
     <Label styleClass="sectionHeader" text="%Single instance" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">

@@ -25,6 +25,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final BooleanProperty confirmHideTabBar;
     private final ObservableList<String> selectedSlrCatalogs;
 
     public WorkspacePreferences(Language language,
@@ -37,6 +38,7 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
+                                boolean confirmHideTabBar,
                                 List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
@@ -48,6 +50,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
     }
 
@@ -161,6 +164,18 @@ public class WorkspacePreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
+    }
+
+    public boolean shouldHideTabBar() {
+        return confirmHideTabBar.get();
+    }
+
+    public BooleanProperty confirmHideTabBarProperty() {
+        return confirmHideTabBar;
+    }
+
+    public void setHideTabBar(boolean hideTabBar) {
+        this.confirmHideTabBar.set(hideTabBar);
     }
 
     public ObservableList<String> getSelectedSlrCatalogs() {
