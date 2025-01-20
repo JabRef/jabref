@@ -346,32 +346,7 @@ public class LibraryTab extends Tab {
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
 
-        if (preferences.getWorkspacePreferences().shouldHideTabBar()) {
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-                int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
-                if (numberOfOpenDatabases == 1 && !tabPane.getStyleClass().contains("hide-tab-bar")) {
-                    tabPane.getStyleClass().add("hide-tab-bar");
-                } else {
-                    tabPane.getStyleClass().remove("hide-tab-bar");
-                }
-            });
-        }
-
-         /* BindingsHelper.subscribeFuture(
-                preferences.getWorkspacePreferences().confirmHideTabBarProperty(),
-                hideTabBar -> {
-                    stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-                        int numberOfOpenDatabases = stateManager.getOpenDatabases().size();
-                        if (hideTabBar && numberOfOpenDatabases == 1) {
-                            if (!tabPane.getStyleClass().contains("hide-tab-bar")) {
-                                tabPane.getStyleClass().add("hide-tab-bar");
-                            }
-                        } else {
-                            tabPane.getStyleClass().remove("hide-tab-bar");
-                        }
-                    });
-                }
-        );*/
+        new TabBarManager(tabPane, stateManager, preferences.getWorkspacePreferences());
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
