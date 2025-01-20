@@ -25,20 +25,19 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DragDrop;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.query.SearchQuery;
 
 /// Displays the entry preview
 ///
 /// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
-public class PreviewPanel extends VBox {
+public class PreviewPanel extends VBox implements PreviewControls {
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -53,20 +52,19 @@ public class PreviewPanel extends VBox {
                         GuiPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
-                        StateManager stateManager,
-                        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                        StateManager stateManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.previewPreferences = preferences.getPreviewPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), dialogService, stateManager);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, searchQueryProperty);
+        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);
         previewView.setOnDragOver(PreviewPanel::onDragOver);
-        previewView.setOnDragDropped(event -> onDragDropped(event));
+        previewView.setOnDragDropped(this::onDragDropped);
 
         this.getChildren().add(previewView);
 
@@ -156,10 +154,12 @@ public class PreviewPanel extends VBox {
         previewView.print();
     }
 
+    @Override
     public void nextPreviewStyle() {
         cyclePreview(previewPreferences.getLayoutCyclePosition() + 1);
     }
 
+    @Override
     public void previousPreviewStyle() {
         cyclePreview(previewPreferences.getLayoutCyclePosition() - 1);
     }
