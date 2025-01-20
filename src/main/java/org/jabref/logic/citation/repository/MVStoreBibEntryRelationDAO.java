@@ -32,6 +32,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationDAO.class);
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
+    private final static String TIME_STAMP_SUFFIX = "-insertion-timestamp";
 
     private final String mapName;
     private final String insertionTimeStampMapName;
@@ -52,8 +53,10 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         }
 
         this.mapName = mapName;
-        this.insertionTimeStampMapName = mapName + "-insertion-timestamp";
-        this.storeConfiguration = new MVStore.Builder().autoCommitDisabled().fileName(path.toAbsolutePath().toString());
+        this.insertionTimeStampMapName = mapName + TIME_STAMP_SUFFIX;
+        this.storeConfiguration = new MVStore.Builder()
+                .autoCommitDisabled()
+                .fileName(path.toAbsolutePath().toString());
     }
 
     @Override

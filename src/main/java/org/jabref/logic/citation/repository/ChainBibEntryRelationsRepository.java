@@ -34,6 +34,9 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
 
     @Override
     public List<BibEntry> readCitations(BibEntry entry) {
+        if (entry == null) {
+            return List.of();
+        }
         return citationsDao.getRelations(entry);
     }
 
@@ -56,6 +59,9 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
 
     @Override
     public List<BibEntry> readReferences(BibEntry entry) {
+        if (entry == null) {
+            return List.of();
+        }
         return referencesDao.getRelations(entry);
     }
 
