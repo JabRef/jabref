@@ -15,6 +15,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -106,6 +107,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                             .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);
+                }
+            }
+            if (candidate.hasField(StandardField.EPRINT)) {
+                try {
+                    new ArXivFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.EPRINT).get()).ifPresent(fetchedCandidates::add);
+                } catch (FetcherException e) {
+                    LOGGER.error("Fetching failed for arXiv ID \"{}\".", candidate.getField(StandardField.EPRINT).get(), e);
                 }
             }
         }
