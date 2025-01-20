@@ -253,7 +253,7 @@ class CleanupWorkerTest {
     void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.RENAME_PDF);
 
-        Path path = pdfPath.resolve("AnotherRandomlyNamedFile.tmp");
+        Path path = pdfPath.resolve("AnotherRandomlyNamedFile.pdf");
         Files.createFile(path);
         BibEntry entry = new BibEntry()
                 .withCitationKey("Toot");
@@ -261,7 +261,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.pdf"), "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
