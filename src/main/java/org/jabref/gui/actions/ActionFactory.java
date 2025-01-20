@@ -123,6 +123,15 @@ public class ActionFactory {
         return checkMenuItem;
     }
 
+    public CheckMenuItem createCustomCheckMenuItem(Action action, Command command, boolean selected, String text) {
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        checkMenuItem.textProperty().unbind();
+        checkMenuItem.setText(text);
+        checkMenuItem.setSelected(selected);
+
+        return checkMenuItem;
+    }
+
     public Menu createMenu(Action action) {
         Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
 
