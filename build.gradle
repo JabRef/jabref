@@ -301,7 +301,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.64.8'
     implementation 'com.vladsch.flexmark:flexmark-html2md-converter:0.64.8'
 
-    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.2'
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.3.0'
 
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
     // JAX-RS implemented by Jersey
