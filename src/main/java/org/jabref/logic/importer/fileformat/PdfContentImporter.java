@@ -574,7 +574,11 @@ public class PdfContentImporter extends PdfImporter {
         if (arXivId != null) {
             entry.setField(StandardField.EPRINT, arXivId);
             assert !arXivId.startsWith("arxiv");
-            entry.setField(StandardField.EPRINTTYPE, "arxiv");
+            entry.setField(StandardField.EPRINTTYPE, "arXiv");
+
+            // Quick workaround to avoid wrong year and number parsing
+            number = null; // "Germany" in org.jabref.logic.importer.fileformat.PdfContentImporterTest.extractArXivFromPage
+            year = null; // "2408" in org.jabref.logic.importer.fileformat.PdfContentImporterTest.extractArXivFromPage
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
