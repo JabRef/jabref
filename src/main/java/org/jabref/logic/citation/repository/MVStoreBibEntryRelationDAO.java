@@ -7,13 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.time.LocalDateTime;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -40,7 +40,6 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
 
     MVStoreBibEntryRelationDAO(Path path, String mapName) {
-
         try {
             if (!Files.exists(path.getParent())) {
                 Files.createDirectories(path.getParent());

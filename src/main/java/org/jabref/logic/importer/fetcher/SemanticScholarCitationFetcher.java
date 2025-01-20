@@ -7,16 +7,17 @@ import java.util.List;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.citation.semanticscholar.CitationsResponse;
 import org.jabref.model.citation.semanticscholar.ReferencesResponse;
 import org.jabref.logic.util.URLUtil;
-import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
-    private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
     public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
+
+    private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     private final ImporterPreferences importerPreferences;
 
