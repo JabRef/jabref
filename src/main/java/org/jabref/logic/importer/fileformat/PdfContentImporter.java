@@ -583,7 +583,7 @@ public class PdfContentImporter extends PdfImporter {
         if (volume != null) {
             entry.setField(StandardField.VOLUME, volume);
         }
-        if (number != null && number.chars().allMatch(Character::isDigit)) {
+        if (number != null) {
             entry.setField(StandardField.NUMBER, number);
         }
         if (pages != null) {
