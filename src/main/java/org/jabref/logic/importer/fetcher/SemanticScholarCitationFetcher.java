@@ -7,10 +7,10 @@ import java.util.List;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.citation.semanticscholar.CitationsResponse;
 import org.jabref.model.citation.semanticscholar.ReferencesResponse;
-import org.jabref.logic.util.URLUtil;
+import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
 
