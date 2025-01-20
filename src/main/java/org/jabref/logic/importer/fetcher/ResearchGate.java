@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -77,7 +77,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         LOGGER.debug("PDF link: {}", link);
 
         if (link.contains("researchgate.net")) {
-            return Optional.of(URI.create(link).toURL());
+            return Optional.of(URLUtil.create(link));
         }
         return Optional.empty();
     }
@@ -152,9 +152,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         try {
             URIBuilder source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
-            source.addParameter("query", doi.getDOI());
+            source.addParameter("query", doi.asString());
 
-            source = new URIBuilder(GOOGLE_SEARCH + doi.getDOI() + GOOGLE_SITE);
+            source = new URIBuilder(GOOGLE_SEARCH + doi.asString() + GOOGLE_SITE);
             Connection connection = Jsoup.connect(source.toString());
             Document html = connection
                     .cookieStore(connection.cookieStore())
@@ -254,7 +254,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     private BufferedReader getInputStream(String urlString) {
         try {
-            URL url = URI.create(urlString).toURL();
+            URL url = URLUtil.create(urlString);
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL", e);

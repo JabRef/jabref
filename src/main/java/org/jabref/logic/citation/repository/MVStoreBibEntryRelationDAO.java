@@ -64,7 +64,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             .map(doi -> {
                 try (var store = this.storeConfiguration.open()) {
                     MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                    return relationsMap.getOrDefault(doi.getDOI(), new LinkedHashSet<>()).stream().toList();
+                    return relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>()).stream().toList();
                 }
             })
             .orElse(List.of());
@@ -82,14 +82,14 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             try (var store = this.storeConfiguration.open()) {
                 // Save the relations
                 MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                var relationsAlreadyStored = relationsMap.getOrDefault(doi.getDOI(), new LinkedHashSet<>());
+                var relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
-                relationsMap.put(doi.getDOI(), relationsAlreadyStored);
+                relationsMap.put(doi.asString(), relationsAlreadyStored);
 
                 // Save insertion timestamp
                 var insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
                 MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
-                insertionTimeStampMap.put(doi.getDOI(), insertionTime);
+                insertionTimeStampMap.put(doi.asString(), insertionTime);
 
                 // Commit
                 store.commit();
@@ -104,7 +104,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             .map(doi -> {
                 try (var store = this.storeConfiguration.open()) {
                     MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                    return relationsMap.containsKey(doi.getDOI());
+                    return relationsMap.containsKey(doi.asString());
                 }
             })
             .orElse(false);
@@ -124,7 +124,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             .map(doi -> {
                 try (var store = this.storeConfiguration.open()) {
                     MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
-                    return insertionTimeStampMap.getOrDefault(doi.getDOI(), executionTime);
+                    return insertionTimeStampMap.getOrDefault(doi.asString(), executionTime);
                 }
             })
             .map(lastExecutionTime ->
@@ -144,7 +144,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                 entry.getField(StandardField.YEAR).orElse("null"),
                 entry.getField(StandardField.AUTHOR).orElse("null"),
                 entry.getType().getDisplayName() == null ? "null" : entry.getType().getDisplayName(),
-                entry.getDOI().map(DOI::getDOI).orElse("null"),
+                entry.getDOI().map(DOI::asString).orElse("null"),
                 entry.getField(StandardField.URL).orElse("null"),
                 entry.getField(StandardField.ABSTRACT).orElse("null")
             );

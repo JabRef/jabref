@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -51,6 +53,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,6 +171,10 @@ public class BibEntry implements Cloneable, Serializable {
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
+    }
+
+    public Optional<FieldChange> setLangid(Langid parsedLangid) {
+        return setField(StandardField.LANGUAGEID, parsedLangid.getJabRefFormat());
     }
 
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
@@ -310,22 +317,21 @@ public class BibEntry implements Cloneable, Serializable {
      * If a database is given, this function will try to resolve any string
      * references in the field-value.
      * Also, if a database is given, this function will try to find values for
-     * unset fields in the entry linked by the "crossref" field, if any.
+     * unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
      *
      * @param field    The field to return the value of.
-     * @param database maybenull
-     *                 The database of the bibtex entry.
+     * @param database The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
 
-    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);
     }
 
-    private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
+    private Optional<String> genericGetResolvedFieldOrAlias(Field field, @Nullable BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
         if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {
             return Optional.of(type.get().getDisplayName());
         }
@@ -484,6 +490,7 @@ public class BibEntry implements Cloneable, Serializable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
+                // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
                 String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
                 latexFreeFields.put(field, latexFreeValue);
                 return Optional.of(latexFreeValue);
@@ -1070,6 +1077,7 @@ public class BibEntry implements Cloneable, Serializable {
         }
     }
 
+    // region files
     public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(StandardField.FILE);
         String newValue = FileFieldWriter.getStringRepresentation(files);
@@ -1103,6 +1111,51 @@ public class BibEntry implements Cloneable, Serializable {
         return FileFieldParser.parse(oldValue.get());
     }
 
+    public Optional<FieldChange> addFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFile(int index, LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(index, file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFiles(List<LinkedFile> filesToAdd) {
+        if (filesToAdd.isEmpty()) {
+            return Optional.empty();
+        }
+        if (this.getField(StandardField.FILE).isEmpty()) {
+            return setFiles(filesToAdd);
+        }
+        List<LinkedFile> currentFiles = getFiles();
+        currentFiles.addAll(filesToAdd);
+        return setFiles(currentFiles);
+    }
+    // endregion
+
+    /**
+     * Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+     * <p>
+     * Empty citation keys are not returned. There is no consistency check made.
+     *
+     * @return List of citation keys; empty list if field is empty or not available.
+     */
+    public SequencedSet<String> getCites() {
+        return this.getField(StandardField.CITES)
+                   .map(content -> Arrays.stream(content.split(",")))
+                   .orElseGet(Stream::empty)
+                   .map(String::trim)
+                   .filter(key -> !key.isEmpty())
+                   .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public Optional<FieldChange> setCites(SequencedSet<String> keys) {
+        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
+    }
+
     public void setDate(Date date) {
         date.getYear().ifPresent(year -> setField(StandardField.YEAR, year.toString()));
         date.getMonth().ifPresent(this::setMonth);
@@ -1122,18 +1175,6 @@ public class BibEntry implements Cloneable, Serializable {
 
     public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
-    }
-
-    public Optional<FieldChange> addFile(LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(file);
-        return setFiles(linkedFiles);
-    }
-
-    public Optional<FieldChange> addFile(int index, LinkedFile file) {
-        List<LinkedFile> linkedFiles = getFiles();
-        linkedFiles.add(index, file);
-        return setFiles(linkedFiles);
     }
 
     public ObservableMap<Field, String> getFieldsObservable() {

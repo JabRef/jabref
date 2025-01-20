@@ -1,8 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.SequencedSet;
 
 import javax.swing.undo.UndoManager;
 
@@ -11,12 +10,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fetcher.CitationFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class CitationsRelationsTabViewModel {
@@ -40,7 +38,11 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).toList();
+        List<BibEntry> entries = entriesToImport.stream()
+                                                .map(CitationRelationItem::entry)
+                                                // We need to have a clone of the entry, because we add the entry to the library (and keep it in the citation relation tab, too)
+                                                .map(entry -> (BibEntry) entry.clone())
+                                                .toList();
 
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
@@ -50,66 +52,51 @@ public class CitationsRelationsTabViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
+        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         switch (searchType) {
-            case CITES -> importCites(entries, existingEntry, importHandler);
-            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler);
+            case CITES -> importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
         }
     }
 
-    private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
+    private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler, CitationKeyGenerator generator, boolean generateNewKeyOnImport) {
+        SequencedSet<String> citeKeys = existingEntry.getCites();
 
-        List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
-        citeKeys.removeIf(String::isEmpty);
         for (BibEntry entryToCite : entries) {
             if (generateNewKeyOnImport || entryToCite.getCitationKey().isEmpty()) {
                 String key = generator.generateKey(entryToCite);
                 entryToCite.setCitationKey(key);
-                addToKeyToList(citeKeys, key);
-            } else {
-                addToKeyToList(citeKeys, entryToCite.getCitationKey().get());
             }
+            citeKeys.add(entryToCite.getCitationKey().get());
         }
-        existingEntry.setField(StandardField.CITES, toCommaSeparatedString(citeKeys));
+
+        existingEntry.setCites(citeKeys);
         importHandler.importEntries(entries);
     }
 
-    private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
-        boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
-
-        for (BibEntry entryThatCitesOurExistingEntry : entries) {
-            List<String> existingCites = getExistingEntriesFromCiteField(entryThatCitesOurExistingEntry);
-            existingCites.removeIf(String::isEmpty);
-            String key;
-            if (generateNewKeyOnImport || entryThatCitesOurExistingEntry.getCitationKey().isEmpty()) {
-                key = generator.generateKey(entryThatCitesOurExistingEntry);
-                entryThatCitesOurExistingEntry.setCitationKey(key);
-            } else {
-                key = existingEntry.getCitationKey().get();
+    /**
+     * "cited by" is the opposite of "cites", but not stored in field `CITED_BY`, but in the `CITES` field of the citing entry.
+     * <p>
+     * Therefore, some special handling is needed
+     */
+    private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler, CitationKeyGenerator generator, boolean generateNewKeyOnImport) {
+        if (existingEntry.getCitationKey().isEmpty()) {
+            if (!generateNewKeyOnImport) {
+                dialogService.notify(Localization.lang("No citation key for %0", existingEntry.getAuthorTitleYear()));
+                return;
             }
-            addToKeyToList(existingCites, key);
-            entryThatCitesOurExistingEntry.setField(StandardField.CITES, toCommaSeparatedString(existingCites));
+            existingEntry.setCitationKey(generator.generateKey(existingEntry));
+        }
+        String citationKey = existingEntry.getCitationKey().get();
+
+        for (BibEntry citingEntry : entries) {
+            SequencedSet<String> existingCites = citingEntry.getCites();
+            existingCites.add(citationKey);
+            citingEntry.setCites(existingCites);
         }
 
         importHandler.importEntries(entries);
-    }
-
-    private void addToKeyToList(List<String> list, String key) {
-        if (!list.contains(key)) {
-            list.add(key);
-        }
-    }
-
-    private List<String> getExistingEntriesFromCiteField(BibEntry entry) {
-        return Arrays.stream(entry.getField(StandardField.CITES).orElse("").split(",")).collect(Collectors.toList());
-    }
-
-    private String toCommaSeparatedString(List<String> citeentries) {
-        return String.join(",", citeentries);
     }
 }

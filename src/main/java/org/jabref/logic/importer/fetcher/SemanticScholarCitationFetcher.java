@@ -1,24 +1,22 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.citation.semanticscholar.CitationsResponse;
 import org.jabref.model.citation.semanticscholar.ReferencesResponse;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
-
-    private static final String API_KEY = new BuildInfo().semanticScholarApiKey;
+    public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
 
     private final ImporterPreferences importerPreferences;
 
@@ -27,7 +25,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     public String getAPIUrl(String entry_point, BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().getDOI() + "/" + entry_point
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entry_point
                 + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
                 + "&limit=1000";
     }
@@ -40,16 +38,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         URL citationsUrl;
         try {
-            citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
+            citationsUrl = URLUtil.create(getAPIUrl("citations", entry));
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
         URLDownload urlDownload = new URLDownload(citationsUrl);
 
-        String apiKey = getApiKey();
-        if (!apiKey.isEmpty()) {
-            urlDownload.addHeader("x-api-key", apiKey);
-        }
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+
         CitationsResponse citationsResponse = new Gson()
                 .fromJson(urlDownload.asString(), CitationsResponse.class);
 
@@ -66,16 +62,13 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         URL referencesUrl;
         try {
-            referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
+            referencesUrl = URLUtil.create(getAPIUrl("references", entry));
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
-        String apiKey = getApiKey();
-        if (!apiKey.isEmpty()) {
-            urlDownload.addHeader("x-api-key", apiKey);
-        }
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         ReferencesResponse referencesResponse = new Gson()
                 .fromJson(urlDownload.asString(), ReferencesResponse.class);
 
@@ -87,10 +80,6 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     @Override
     public String getName() {
-        return "Semantic Scholar Citations Fetcher";
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKey(getName()).orElse(API_KEY);
+        return FETCHER_NAME;
     }
 }

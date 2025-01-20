@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -73,7 +73,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         if (doi.isPresent()) {
             try {
                 // Retrieve PDF link
-                String source = SOURCE_ID_SEARCH + doi.get().getDOI();
+                String source = SOURCE_ID_SEARCH + doi.get().asString();
                 var jsoupRequest = Jsoup.connect(getURLBySource(source))
                                         .userAgent(URLDownload.USER_AGENT)
                                         .header("Accept", "text/html; charset=utf-8")
@@ -115,7 +115,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             return Optional.empty();
         }
         LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
-        return Optional.of(URI.create(link).toURL());
+        return Optional.of(URLUtil.create(link));
     }
 
     @Override

@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
+ *
+ * "Complete" entries are tested at {@link org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest}
  */
 @Execution(ExecutionMode.CONCURRENT)
 class BracketedPatternTest {
@@ -583,6 +585,75 @@ class BracketedPatternTest {
     }
 
     /**
+     * Test the [:camel] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'CamelTitleFormatter', 'Camel Title Formatter'",
+            "'CamelTitleFormatter', 'CAMEL TITLE FORMATTER'",
+            "'CamelTitleFormatter', 'camel title formatter'",
+            "'CamelTitleFormatter', 'cAMEL tITLE fORMATTER'",
+            "'C', 'c'"
+    })
+
+    void expandBracketsCamelTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:camel]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:veryshorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very', 'A very short title'",
+            "'V', 'V'",
+            "'V', 'A v'"
+    })
+
+    void expandBracketsVeryShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:veryshorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:shorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very Short Title', 'A very short title'",
+            "'Short Title', 'Short title'",
+            "'Title', 'A title'",
+            "'Title', 'A Title'"
+    })
+
+    void expandBracketsShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:shorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:camelN] modifier
+     */
+    @Test
+    void expandBracketsCamelNModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, "Open Source Software And The Private Collective Innovation Model Issues");
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[title:camel1]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAnd",
+                BracketedPattern.expandBrackets("[title:camel4]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
+                BracketedPattern.expandBrackets("[title:camel10]", ';', bibEntry, null));
+    }
+
+    /**
      * Test the [camelN] title marker.
      */
     @Test
@@ -606,14 +677,44 @@ class BracketedPatternTest {
     @Test
     void expandBracketsWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
-
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void regExForFirstWord() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "First Second Third");
+        assertEquals("First", BracketedPattern.expandBrackets("[TITLE:regex(\"(\\w+).*\",\"$1\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void regExWithComma() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "First,Second,Third");
+        assertEquals("First+Second+Third", BracketedPattern.expandBrackets("[TITLE:regex(\",\",\"+\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void regExWithEscapedQuote() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "First\"Second\"Third");
+        assertEquals("First+Second+Third", BracketedPattern.expandBrackets("[TITLE:regex(\"\\\"\",\"+\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void regExWithEtAlTwoAuthors() {
+        // Example from https://docs.jabref.org/setup/citationkeypatterns#modifiers
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "First Last and Second Last");
+        assertEquals("LastAndLast", BracketedPattern.expandBrackets("[auth.etal:regex(\"\\.etal\",\"EtAl\"):regex(\"\\.\",\"And\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void regExWithEtAlThreeAuthors() {
+        // Example from https://docs.jabref.org/setup/citationkeypatterns#modifiers
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "First Last and Second Last and Third Last");
+        assertEquals("LastEtAl", BracketedPattern.expandBrackets("[auth.etal:regex(\"\\.etal\",\"EtAl\"):regex(\"\\.\",\"And\")]", null, bibEntry, null));
     }
 
     @Test
     void expandBracketsEmptyStringFromEmptyBrackets() {
         BibEntry bibEntry = new BibEntry();
-
         assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
     }
 
@@ -621,7 +722,6 @@ class BracketedPatternTest {
     void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABRACKET})}");
-
         assertEquals("EUASABRACKET", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 
@@ -629,7 +729,6 @@ class BracketedPatternTest {
     void expandBracketsInstitutionAbbreviationForAuthorContainingUnion() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}");
-
         assertEquals("EUASA", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 
@@ -637,7 +736,6 @@ class BracketedPatternTest {
     void expandBracketsLastNameForAuthorStartingWithOnlyLastNameStartingWithLowerCase() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.AUTHOR, "{eBay}");
-
         assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 
@@ -645,7 +743,6 @@ class BracketedPatternTest {
     void expandBracketsLastNameWithChineseCharacters() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.AUTHOR, "杨秀群");
-
         assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 
@@ -653,7 +750,6 @@ class BracketedPatternTest {
     void expandBracketsUnmodifiedStringFromLongFirstPageNumber() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.PAGES, "2325967120921344");
-
         assertEquals("2325967120921344", BracketedPattern.expandBrackets("[firstpage]", null, bibEntry, null));
     }
 
@@ -661,7 +757,6 @@ class BracketedPatternTest {
     void expandBracketsUnmodifiedStringFromLongLastPageNumber() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.PAGES, "2325967120921344");
-
         assertEquals("2325967120921344", BracketedPattern.expandBrackets("[lastpage]", null, bibEntry, null));
     }
 

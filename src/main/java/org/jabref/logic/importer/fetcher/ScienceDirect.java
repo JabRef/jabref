@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -35,11 +34,11 @@ import org.slf4j.LoggerFactory;
  * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
  */
 public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "ScienceDirect";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
-    private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
-    private static final String FETCHER_NAME = "ScienceDirect";
 
     private final ImporterPreferences importerPreferences;
 
@@ -57,7 +56,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        String urlFromDoi = getUrlByDoi(doi.get().getDOI());
+        String urlFromDoi = getUrlByDoi(doi.get().asString());
         if (urlFromDoi.isEmpty()) {
             return Optional.empty();
         }
@@ -72,7 +71,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
         if (!metaLinks.isEmpty()) {
             String link = metaLinks.first().attr("content");
-            return Optional.of(URI.create(link).toURL());
+            return Optional.of(URLUtil.create(link));
         }
 
         // We use the ScienceDirect web page which contains the article (presented using HTML).
@@ -103,7 +102,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         String fullLinkToPdf;
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
-            URL url = URI.create(urlFromDoi).toURL();
+            URL url = URLUtil.create(urlFromDoi);
             fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
@@ -123,7 +122,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
         LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
         try {
-            return Optional.of(URI.create(fullLinkToPdf).toURL());
+            return Optional.of(URLUtil.create(fullLinkToPdf));
         } catch (MalformedURLException e) {
             LOGGER.error("malformed URL", e);
             return Optional.empty();
@@ -140,7 +139,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(API_KEY))
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(""))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 

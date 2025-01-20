@@ -205,7 +205,7 @@ public class ExternalFileTypes {
         // Read the prefs information for file types:
         String[][] vals = StringUtil.decodeStringDoubleArray(storedFileTypes);
         for (String[] val : vals) {
-            if ((val.length == 2) && val[1].equals(FILE_TYPE_REMOVED_FLAG)) {
+            if ((val.length == 2) && FILE_TYPE_REMOVED_FLAG.equals(val[1])) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {

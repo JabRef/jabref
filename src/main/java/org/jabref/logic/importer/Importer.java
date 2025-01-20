@@ -121,7 +121,8 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
 
-            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()))) {
+            // if we have utf8 with 100 confidence we assume that the file is in utf8, more likely
+            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
                 return defaultCharSet;
             }
 

@@ -1,5 +1,6 @@
 package org.jabref.architecture;
 
+import java.net.URI;
 import java.nio.file.Paths;
 
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
@@ -15,7 +16,6 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
  * This class checks JabRef's shipped classes for architecture quality.
- *
  * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
  */
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.DoNotIncludeTests.class)
@@ -100,7 +100,7 @@ class MainArchitectureTest {
                              .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
                              .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
 
-                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(CLI, Migrations)
+                             .whereLayer(GUI).mayOnlyBeAccessedByLayers(Migrations)
                              .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations)
                              .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
 
@@ -149,5 +149,14 @@ class MainArchitectureTest {
                    .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
                    .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
+    }
+
+    @ArchTest
+    public void shouldNotCallUriCreateMethod(JavaClasses classes) {
+       noClasses()
+               .that()
+               .resideInAPackage("org.jabref..")
+               .should().callMethod(URI.class, "create", String.class)
+               .check(classes);
     }
 }

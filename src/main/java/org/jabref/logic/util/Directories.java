@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.os.OS;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.model.search.LinkedFilesConstants;
 
 import net.harawata.appdirs.AppDirsFactory;
 
@@ -25,13 +25,13 @@ public class Directories {
         return Path.of(System.getProperty("user.home"));
     }
 
-    public static Path getLogDirectory() {
+    public static Path getLogDirectory(Version version) {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
                                              OS.APP_DIR_APP_NAME,
                                              "logs",
                                              OS.APP_DIR_APP_AUTHOR))
-                   .resolve(new BuildInfo().version.toString());
+                   .resolve(version.toString());
     }
 
     public static Path getBackupDirectory() {
@@ -45,7 +45,7 @@ public class Directories {
     public static Path getFulltextIndexBaseDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(OS.APP_DIR_APP_NAME,
-                                             "lucene" + File.separator + SearchFieldConstants.VERSION,
+                                             "lucene" + File.separator + LinkedFilesConstants.VERSION,
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
