@@ -22,8 +22,6 @@ The generator uses all `.csv` files from https://github.com/JabRef/abbrv.jabref.
         );
 ```
 
-
-
 ## Future work
 
 See <https://github.com/JabRef/jabref-issue-melting-pot/issues/41>
