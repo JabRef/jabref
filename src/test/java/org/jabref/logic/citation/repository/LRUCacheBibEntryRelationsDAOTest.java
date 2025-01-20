@@ -54,7 +54,7 @@ class LRUCacheBibEntryRelationsDAOTest {
                     .withField(StandardField.YEAR, String.valueOf(2024))
                     .withField(StandardField.AUTHOR, "A list of authors:" + i)
                     .withType(StandardEntryType.Book)
-                    .withField(StandardField.DOI, entry.getDOI().map(DOI::getDOI).orElse("") + ":" + i)
+                    .withField(StandardField.DOI, entry.getDOI().map(DOI::asString).orElse("") + ":" + i)
                     .withField(StandardField.URL, "www.jabref.org/" + i)
                     .withField(StandardField.ABSTRACT, "The Universe is expanding:" + i)
                 )
