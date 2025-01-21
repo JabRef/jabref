@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,10 +33,10 @@ public class RenamePdfCleanup implements CleanupJob {
         this.filePreferences = filePreferences;
     }
 
-    private boolean allowedFileType(String filePath) {
-        String lowerCase = filePath.toLowerCase();
+    private boolean allowedFileType(String fileName) {
+        Path file = Path.of(fileName);
 
-        return lowerCase.endsWith(".pdf");
+       return FileUtil.isPDFFile(file);
     }
 
     @Override
