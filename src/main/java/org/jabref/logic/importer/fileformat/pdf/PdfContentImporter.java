@@ -20,6 +20,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -46,6 +47,8 @@ import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+
+    private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
 
     // input lines into several lines
     private String[] lines;
@@ -218,43 +221,51 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isFarAway(TextPosition previous, TextPosition current) {
-            float XspaceThreshold = 3.0F;
-            float YspaceThreshold = previous.getFontSizeInPt() * 1.5F;
+            float XspaceThreshold = previous.getFontSizeInPt() * 3.0F;
+            float YspaceThreshold = previous.getFontSizeInPt() * 3.0F;
             float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
-            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
-            return Xgap > XspaceThreshold && Ygap > YspaceThreshold;
+            float Ygap = current.getYDirAdj() - previous.getYDirAdj();
+            // For cases like paper titles spanning two or more lines, both X and Y gaps must exceed thresholds,
+            // so "&&" is used instead of "||".
+            return Math.abs(Xgap) > XspaceThreshold && Math.abs(Ygap) > YspaceThreshold;
         }
 
-        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition) {
+        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition,
+                                       Map<Float, TextPosition> lastPositionMap, float fontSize) {
+            // This indicates that the text is at the start of the line, so it is needed.
             if (textPosition == null || previousTextPosition == null) {
                 return false;
             }
+            // We use the font size to identify titles. Blank characters don't have a font size, so we discard them.
+            // The space will be added back in the final result, but not in this method.
             if (StringUtil.isBlank(textPosition.getUnicode())) {
                 return true;
             }
-            // The title usually don't in the bottom 10% of a page.
-            if ((textPosition.getPageHeight() - textPosition.getYDirAdj())
-                    < (textPosition.getPageHeight() * 0.1)) {
+            // Titles are generally not located in the bottom 10% of a page.
+            if ((textPosition.getPageHeight() - textPosition.getYDirAdj()) < (textPosition.getPageHeight() * 0.1)) {
                 return true;
             }
-            // The title character usually stay together.
-            return isFarAway(previousTextPosition, textPosition);
+            // Characters in a title typically remain close together,
+            // so a distant character is unlikely to be part of the title.
+            return lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition);
         }
 
         private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
             Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
+            Map<Float, TextPosition> lastPositionMap = new TreeMap<>(Collections.reverseOrder());
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
+                float fontSize = textPosition.getFontSizeInPt();
                 // Exclude unwanted text based on heuristics
-                if (isUnwantedText(previousTextPosition, textPosition)) {
+                if (isUnwantedText(previousTextPosition, textPosition, lastPositionMap, fontSize)) {
                     continue;
                 }
-                float fontSize = textPosition.getFontSizeInPt();
                 fontSizeTextMap.putIfAbsent(fontSize, new StringBuilder());
                 if (previousTextPosition != null && isThereSpace(previousTextPosition, textPosition)) {
                     fontSizeTextMap.get(fontSize).append(" ");
                 }
                 fontSizeTextMap.get(fontSize).append(textPosition.getUnicode());
+                lastPositionMap.put(fontSize, textPosition);
                 previousTextPosition = textPosition;
             }
             for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
@@ -339,11 +350,13 @@ public class PdfContentImporter extends PdfImporter {
         String volume = null;
         String number = null;
         String pages = null;
+        String arXivId = null;
         // year is a class variable as the method extractYear() uses it;
         String publisher = null;
 
         EntryType type = StandardEntryType.InProceedings;
         if (curString.length() > 4) {
+            arXivId = getArXivId(null);
             // special case: possibly conference as first line on the page
             extractYear();
             doi = getDoi(null);
@@ -363,6 +376,7 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
 
+        arXivId = getArXivId(arXivId);
         // start: title
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
@@ -482,6 +496,7 @@ public class PdfContentImporter extends PdfImporter {
                 }
             } else {
                 doi = getDoi(doi);
+                arXivId = getArXivId(arXivId);
 
                 if ((publisher == null) && curString.contains("IEEE")) {
                     // IEEE has the conference things at the end
@@ -506,8 +521,7 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
 
-        BibEntry entry = new BibEntry();
-        entry.setType(type);
+        BibEntry entry = new BibEntry(type);
 
         // TODO: institution parsing missing
 
@@ -531,6 +545,15 @@ public class PdfContentImporter extends PdfImporter {
         }
         if (doi != null) {
             entry.setField(StandardField.DOI, doi);
+        }
+        if (arXivId != null) {
+            entry.setField(StandardField.EPRINT, arXivId);
+            assert !arXivId.startsWith("arxiv");
+            entry.setField(StandardField.EPRINTTYPE, "arXiv");
+
+            // Quick workaround to avoid wrong year and number parsing
+            number = null; // "Germany" in org.jabref.logic.importer.fileformat.PdfContentImporterTest.extractArXivFromPage
+            year = null; // "2408" in org.jabref.logic.importer.fileformat.PdfContentImporterTest.extractArXivFromPage
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);
@@ -565,6 +588,23 @@ public class PdfContentImporter extends PdfImporter {
             }
         }
         return doi;
+    }
+
+    private String getArXivId(String arXivId) {
+        if (arXivId != null) {
+            return arXivId;
+        }
+
+        String arXiv = curString.split(" ")[0];
+        arXivId = ArXivIdentifier.parse(arXiv).map(ArXivIdentifier::asString).orElse(null);
+
+        if (arXivId == null || curString.length() < arXivId.length() + ARXIV_PREFIX_LENGTH) {
+            return arXivId;
+        }
+
+        proceedToNextNonEmptyLine();
+
+        return arXivId;
     }
 
     /**

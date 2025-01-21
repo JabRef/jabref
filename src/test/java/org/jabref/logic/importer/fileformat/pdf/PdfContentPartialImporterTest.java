@@ -127,6 +127,44 @@ class PdfContentPartialImporterTest {
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
     }
 
+    @Test
+    void extractArXivFromPage() {
+        BibEntry entry = new BibEntry(StandardEntryType.TechReport)
+                .withField(StandardField.AUTHOR, "Filippo Riccaa and Alessandro Marchettob and Andrea Stoccoc")
+                .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
+                .withField(StandardField.EPRINT, "2408.06224v1")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
+
+        // This is from https://arxiv.org/abs/2408.06224
+        String firstPageContent = """
+                A Multi-Year Grey Literature Review on AI-assisted Test Automation
+
+                Filippo Riccaa, Alessandro Marchettob and Andrea Stoccoc
+
+                aUniversity of Genoa, Via Balbi 5, Genova, 16126, Italy
+                bUniversity of Trento, Via Sommarive 9, Trento, 38123, Italy
+                cTechnical University of Munich, Boltzmannstraße 3, Munich, 85748, Germany
+                dfortiss GmbH, Guerickestraße 25, Munich, 80805, Germany
+
+                Keywords:
+                Test Automation
+                Artificial Intelligence
+                AI-assisted Test Automation
+                Grey Literature
+                Automated Test Generation
+                Self-Healing Test Scripts
+
+                *Corresponding author
+                filippo.ricca@unige.it (F. Ricca)
+                https://person.dibris.unige.it/ricca-filippo/ (F. Ricca)
+                ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)
+
+                arXiv:2408.06224v1 [cs.SE] 12 Aug 2024""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
+    }
+
     @ParameterizedTest
     @MethodSource("providePdfData")
     void pdfTitleExtraction(String expectedTitle, String filePath) throws Exception {
@@ -148,7 +186,8 @@ class PdfContentPartialImporterTest {
                 Arguments.of("On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis", "/pdfs/PdfContentImporter/Bogner2019.pdf"),
                 Arguments.of("Pandemic programming", "/pdfs/PdfContentImporter/Ralph2020.pdf"),
                 Arguments.of("Do RESTful API design rules have an impact on the understandability of Web APIs?", "/pdfs/PdfContentImporter/Bogner2023.pdf"),
-                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf")
+                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf"),
+                Arguments.of("OPIUM: Optimal Package Install/Uninstall Manager", "/pdfs/PdfContentImporter/Tucker2007.pdf")
         );
     }
 }

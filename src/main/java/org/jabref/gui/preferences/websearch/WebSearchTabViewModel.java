@@ -147,7 +147,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
                                    .map(SearchBasedFetcher::getName)
-                                   .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                   .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                    .map(name -> {
                                        boolean enabled = importerPreferences.getCatalogs().contains(name);
                                        return new StudyCatalogItem(name, enabled);

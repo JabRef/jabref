@@ -148,6 +148,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", isbn.get(), e);
                 }
             }
+            if (candidate.hasField(StandardField.EPRINT)) {
+                try {
+                    new ArXivFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.EPRINT).get()).ifPresent(fetchedCandidates::add);
+                } catch (FetcherException e) {
+                    LOGGER.error("Fetching failed for arXiv ID \"{}\".", candidate.getField(StandardField.EPRINT).get(), e);
+                }
+            }
 
             // TODO: Handle URLs too.
             // However, it may have problems if URL refers to the same identifier in DOI, ISBN, or arXiv.
