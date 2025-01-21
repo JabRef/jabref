@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="950.0"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="700.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.preferences.PreferencesFilterDialog">
 
     <content>

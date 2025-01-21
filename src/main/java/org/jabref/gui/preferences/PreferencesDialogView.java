@@ -52,6 +52,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                   .load()
                   .setAsDialogPane(this);
 
+        getDialogPane().setPrefWidth(700);
+        getDialogPane().setPrefHeight(500);
+
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
         // Stop the default button from firing when the user hits enter within the search box
