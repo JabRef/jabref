@@ -238,7 +238,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                // factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new JabRefFrame.OpenDatabaseFolder(tab::getBibDatabaseContext)),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new JabRefFrame.OpenDatabaseFolder(dialogService, stateManager, preferences, () -> stateManager.getActiveDatabase().orElse(null))),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService)),
 
                 new SeparatorMenuItem(),

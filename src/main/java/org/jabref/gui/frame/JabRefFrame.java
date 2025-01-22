@@ -465,7 +465,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
-                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab::getBibDatabaseContext)),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, preferences, dialogService)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
@@ -636,11 +636,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    private class OpenDatabaseFolder extends SimpleCommand {
+    public static class OpenDatabaseFolder extends SimpleCommand {
 
         private final Supplier<BibDatabaseContext> databaseContext;
+        private final DialogService dialogService;
+        private final StateManager stateManager;
+        private final GuiPreferences preferences;
 
-        public OpenDatabaseFolder(Supplier<BibDatabaseContext> databaseContext) {
+        public OpenDatabaseFolder(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, Supplier<BibDatabaseContext> databaseContext) {
+            this.dialogService = dialogService;
+            this.stateManager = stateManager;
+            this.preferences = preferences;
             this.databaseContext = databaseContext;
             this.executable.bind(needsSavedLocalDatabase(stateManager));
         }
