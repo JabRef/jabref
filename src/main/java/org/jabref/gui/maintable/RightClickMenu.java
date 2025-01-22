@@ -1,8 +1,7 @@
 package org.jabref.gui.maintable;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -71,7 +70,7 @@ public class RightClickMenu {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
-                createCopyToMenu(factory, dialogService, stateManager, preferences),
+                createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
@@ -117,34 +116,39 @@ public class RightClickMenu {
     private static Menu createCopyToMenu(ActionFactory factory,
                                          DialogService dialogService,
                                          StateManager stateManager,
-                                         GuiPreferences preferences
+                                         GuiPreferences preferences,
+                                         LibraryTab libraryTab
                                          ) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
         ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
-        List<String> checkedPaths = new ArrayList<>();
+
+        BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
+
+        Optional<Path> sourcePath = libraryTab.getBibDatabaseContext().getDatabasePath();
+        String sourceDatabaseName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), sourcePath.get()).get();
 
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(bibDatabaseContext -> {
-                String path = " ";
+                Optional<Path> destinationPath = Optional.empty();
+                String destinationDatabaseName = " ";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    Path databasePath = bibDatabaseContext.getDatabasePath().get();
-                    path = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), databasePath).get();
+                    destinationPath = bibDatabaseContext.getDatabasePath();
+                    String uniquePathName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), destinationPath.get()).get();
+                    if (uniquePathName.equals(sourceDatabaseName)) {
+                        return;
+                    }
+                    destinationDatabaseName = uniquePathName;
                 } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-                    path = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
-                }
-
-                if (!checkedPaths.contains(path)) {
-                    checkedPaths.add(path);
+                    destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
                 }
 
                 copyToMenu.getItems().addAll(
-                        factory.createCustomCheckMenuItem(
+                        factory.createCustomMenuItem(
                                 StandardActions.COPY_TO,
-                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), checkedPaths, path),
-                                true,
-                                path
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), libraryTab, sourceDatabaseContext, bibDatabaseContext),
+                                destinationDatabaseName
                         )
                 );
             });

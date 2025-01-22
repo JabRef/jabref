@@ -3,44 +3,56 @@ package org.jabref.gui.edit;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CopyTo extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final CopyToPreferences copyToPreferences;
-    // For later use
-    private final List<String> checkedPaths;
-    private final String path;
+    private final LibraryTab libraryTab;
+    private final BibDatabaseContext sourceDatabaseContext;
+    private final BibDatabaseContext targetDatabaseContext;
 
     public CopyTo(DialogService dialogService,
                   StateManager stateManager,
                   CopyToPreferences copyToPreferences,
-                  List<String> checkedPaths,
-                  String path) {
+                  LibraryTab libraryTab,
+                  BibDatabaseContext sourceDatabaseContext,
+                  BibDatabaseContext targetDatabaseContext) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.copyToPreferences = copyToPreferences;
-        this.checkedPaths = checkedPaths;
-        this.path = path;
+        this.libraryTab = libraryTab;
+        this.sourceDatabaseContext = sourceDatabaseContext;
+        this.targetDatabaseContext = targetDatabaseContext;
+
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
     public void execute() {
-        List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        List<String> titles = selectedEntries.stream()
-                .filter(entry -> entry.getTitle().isPresent())
-                .map(entry -> entry.getTitle().get())
-                .toList();
-
         boolean includeCrossReferences = askForCrossReferencedEntries();
         copyToPreferences.setShouldIncludeCrossReferences(includeCrossReferences);
+
+        copyEntryToAnotherLibrary(sourceDatabaseContext, targetDatabaseContext);
+    }
+
+     public void copyEntryToAnotherLibrary(BibDatabaseContext sourceDatabaseContext, BibDatabaseContext targetDatabaseContext) {
+        List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+
+        targetDatabaseContext.getDatabase().insertEntries(selectedEntries);
     }
 
     private boolean askForCrossReferencedEntries() {

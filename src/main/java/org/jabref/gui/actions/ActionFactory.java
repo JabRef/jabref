@@ -107,6 +107,15 @@ public class ActionFactory {
         return menuItem;
     }
 
+    public MenuItem createCustomMenuItem(Action action, Command command, String text) {
+        MenuItem menuItem = new MenuItem();
+        configureMenuItem(action, command, menuItem);
+        menuItem.textProperty().unbind();
+        menuItem.setText(text);
+
+        return menuItem;
+    }
+
     public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
         CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
         checkMenuItem.setSelected(selected);
@@ -119,15 +128,6 @@ public class ActionFactory {
         CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
         EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);
         setGraphic(checkMenuItem, action);
-
-        return checkMenuItem;
-    }
-
-    public CheckMenuItem createCustomCheckMenuItem(Action action, Command command, boolean selected, String text) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
-        checkMenuItem.textProperty().unbind();
-        checkMenuItem.setText(text);
-        checkMenuItem.setSelected(selected);
 
         return checkMenuItem;
     }
