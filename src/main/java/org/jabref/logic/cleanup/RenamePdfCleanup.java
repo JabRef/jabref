@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,9 +33,7 @@ public class RenamePdfCleanup implements CleanupJob {
     }
 
     private boolean allowedFileType(String fileName) {
-        Path file = Path.of(fileName);
-
-       return FileUtil.isPDFFile(file);
+       return true;
     }
 
     @Override
@@ -48,11 +45,22 @@ public class RenamePdfCleanup implements CleanupJob {
             if (onlyRelativePaths && Path.of(file.getLink()).isAbsolute()) {
                 continue;
             }
-            if (!allowedFileType(file.getLink())) {
-                LOGGER.info("Skipping renaming: {}", file.getLink());
+
+            String fullName = Path.of(file.getLink()).getFileName().toString();
+            int dot = fullName.lastIndexOf('.');
+            if (dot == -1) {
                 continue;
             }
+            String extension = fullName.substring(dot + 1);
+            String baseName = fullName.substring(0, dot);
+            String newCitationKey = entry.getCitationKey().orElse("");
 
+            String newBaseName = newCitationKey;
+            int dash = baseName.indexOf('-');
+            if (dash != -1) {
+                newBaseName += baseName.substring(dash);
+            }
+            String newFileName = newBaseName + "." + extension;
             LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext.get(), filePreferences);
             try {
                 boolean changedFile = fileHandler.renameToSuggestedName();

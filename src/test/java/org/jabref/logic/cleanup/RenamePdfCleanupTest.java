@@ -69,7 +69,7 @@ class RenamePdfCleanupTest {
 
     @Test
     void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        Path path = testFolder.resolve("Toot.pdf");
+        Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
         entry.setField(StandardField.TITLE, "test title");
@@ -85,7 +85,7 @@ class RenamePdfCleanupTest {
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(
                 Arrays.asList(
                         new LinkedFile("", Path.of(""), ""),
-                        new LinkedFile("", Path.of("Toot - test title.pdf"), ""),
+                        new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
                         new LinkedFile("", Path.of(""), "")))),
                 entry.getField(StandardField.FILE));
     }
