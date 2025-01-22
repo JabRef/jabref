@@ -29,6 +29,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.TabBarManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -79,6 +80,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GuiPreferences preferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
+    private final TabBarManager tabBarManager;
 
     private final FileHistoryMenu fileHistory;
 
@@ -150,6 +152,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 undoManager,
                 dialogService,
                 SearchType.NORMAL_SEARCH);
+
+        this.tabBarManager = new TabBarManager(tabbedPane, stateManager, preferences.getWorkspacePreferences());
 
         this.sidePane = new SidePane(
                 this,
