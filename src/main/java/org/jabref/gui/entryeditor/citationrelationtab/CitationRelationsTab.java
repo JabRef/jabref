@@ -434,7 +434,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setItems(observableList);
 
         // TODO: It should not be possible to cancel a search task that is already running for same tab
-        if (!citingTask.isCancelled()) {
+        if (citingTask != null && !citingTask.isCancelled()) {
             citingTask.cancel();
         }
 
