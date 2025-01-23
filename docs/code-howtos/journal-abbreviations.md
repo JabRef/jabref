@@ -7,7 +7,7 @@
 
 ## Where does the data come from?
 
-The generator uses all `.csv` files from https://github.com/JabRef/abbrv.jabref.org/tree/main/journals, but ignores following ones:
+The generator uses all `.csv` files from <https://github.com/JabRef/abbrv.jabref.org/tree/main/journals>, but ignores following ones:
 
 ```java
         Set<String> ignoredNames = Set.of(
