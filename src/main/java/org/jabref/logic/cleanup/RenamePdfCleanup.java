@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -47,12 +48,14 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             String fullName = Path.of(file.getLink()).getFileName().toString();
-            int dot = fullName.lastIndexOf('.');
-            if (dot == -1) {
+            Optional<String> extension = FileUtil.getFileExtension(fullName);
+            String baseName = FileUtil.getBaseName(fullName);
+
+            if (extension.isEmpty()) {
+                LOGGER.info(" No extension found ");
                 continue;
             }
-            String extension = fullName.substring(dot + 1);
-            String baseName = fullName.substring(0, dot);
+            String extensionFinal = extension.get();
             String newCitationKey = entry.getCitationKey().orElse("");
 
             String newBaseName = newCitationKey;
@@ -60,7 +63,7 @@ public class RenamePdfCleanup implements CleanupJob {
             if (dash != -1) {
                 newBaseName += baseName.substring(dash);
             }
-            String newFileName = newBaseName + "." + extension;
+            String newFileName = newBaseName + "." + extensionFinal;
             LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext.get(), filePreferences);
             try {
                 boolean changedFile = fileHandler.renameToSuggestedName();
