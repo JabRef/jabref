@@ -21,6 +21,7 @@ import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -58,7 +59,8 @@ public class RightClickMenu {
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
-                                     BibEntryTypesManager entryTypesManager) {
+                                     BibEntryTypesManager entryTypesManager,
+                                     ImportHandler importHandler) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -70,7 +72,7 @@ public class RightClickMenu {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
-                createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab),
+                createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
@@ -117,7 +119,8 @@ public class RightClickMenu {
                                          DialogService dialogService,
                                          StateManager stateManager,
                                          GuiPreferences preferences,
-                                         LibraryTab libraryTab
+                                         LibraryTab libraryTab,
+                                         ImportHandler importHandler
                                          ) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
@@ -147,7 +150,7 @@ public class RightClickMenu {
                 copyToMenu.getItems().addAll(
                         factory.createCustomMenuItem(
                                 StandardActions.COPY_TO,
-                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), libraryTab, sourceDatabaseContext, bibDatabaseContext),
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), libraryTab, importHandler, sourceDatabaseContext, bibDatabaseContext),
                                 destinationDatabaseName
                         )
                 );

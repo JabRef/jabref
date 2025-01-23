@@ -7,6 +7,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -16,12 +17,13 @@ import org.slf4j.LoggerFactory;
 
 public class CopyTo extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyTo.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final CopyToPreferences copyToPreferences;
     private final LibraryTab libraryTab;
+    private final ImportHandler importHandler;
     private final BibDatabaseContext sourceDatabaseContext;
     private final BibDatabaseContext targetDatabaseContext;
 
@@ -29,12 +31,14 @@ public class CopyTo extends SimpleCommand {
                   StateManager stateManager,
                   CopyToPreferences copyToPreferences,
                   LibraryTab libraryTab,
+                  ImportHandler importHandler,
                   BibDatabaseContext sourceDatabaseContext,
                   BibDatabaseContext targetDatabaseContext) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.copyToPreferences = copyToPreferences;
         this.libraryTab = libraryTab;
+        this.importHandler = importHandler;
         this.sourceDatabaseContext = sourceDatabaseContext;
         this.targetDatabaseContext = targetDatabaseContext;
 
@@ -51,8 +55,7 @@ public class CopyTo extends SimpleCommand {
 
      public void copyEntryToAnotherLibrary(BibDatabaseContext sourceDatabaseContext, BibDatabaseContext targetDatabaseContext) {
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-
-        targetDatabaseContext.getDatabase().insertEntries(selectedEntries);
+        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
     }
 
     private boolean askForCrossReferencedEntries() {
