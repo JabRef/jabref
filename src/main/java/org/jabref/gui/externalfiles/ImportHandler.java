@@ -215,7 +215,6 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
-        dialogService.notify("cleaned" + bibDatabaseContext.getDatabasePath().toString());
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
