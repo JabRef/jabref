@@ -1,6 +1,5 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -9,20 +8,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
@@ -39,7 +35,7 @@ import org.apache.pdfbox.text.TextPosition;
 import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
 
 /**
- * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
+ * Parses data of the first page of the PDF and creates a BibTeX entry.
  * <p>
  * Currently, Springer, and IEEE formats are supported.
  * <p>
@@ -189,34 +185,13 @@ public class PdfContentImporter extends PdfImporter {
         return removeNonLettersAtEnd(title);
     }
 
-    @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
-    }
-
-    @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(BufferedReader reader)."
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
-    public ParserResult importDatabase(Path filePath) {
+    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            String firstPageContents = getFirstPageContents(document);
-            Optional<String> titleByFontSize = extractTitleFromDocument(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
-            entry.ifPresent(result::add);
-        } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
-            return ParserResult.fromError(exception);
-        }
-
-        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
-        return new ParserResult(result);
+        String firstPageContents = PdfUtils.getFirstPageContents(document);
+        Optional<String> titleByFontSize = extractTitleFromDocument(document);
+        Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE, titleByFontSize);
+        entry.ifPresent(result::add);
+        return result;
     }
 
     private static Optional<String> extractTitleFromDocument(PDDocument document) throws IOException {
@@ -632,19 +607,6 @@ public class PdfContentImporter extends PdfImporter {
         return arXivId;
     }
 
-    private String getFirstPageContents(PDDocument document) throws IOException {
-        PDFTextStripper stripper = new PDFTextStripper();
-
-        stripper.setStartPage(1);
-        stripper.setEndPage(1);
-        stripper.setSortByPosition(true);
-        stripper.setParagraphEnd(System.lineSeparator());
-        StringWriter writer = new StringWriter();
-        stripper.writeText(document, writer);
-
-        return writer.toString();
-    }
-
     /**
      * Extract the year out of curString (if it is not yet defined)
      */
@@ -730,13 +692,13 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     @Override
-    public String getName() {
-        return "PDFcontent";
+    public String getId() {
+        return "pdfContent";
     }
 
     @Override
-    public StandardFileType getFileType() {
-        return StandardFileType.PDF;
+    public String getName() {
+        return Localization.lang("PDF content");
     }
 
     @Override
