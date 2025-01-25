@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a 'Copy to' context menu option with features for cross-reference inclusion/exclusion, as well as the ability to save user preferences. [#12374](https://github.com/JabRef/jabref/pull/12374)
+
 ### Changed
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
@@ -29,7 +31,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added a 'Copy to' context menu option with features for cross-reference inclusion/exclusion, as well as the ability to save user preferences. [#12374](https://github.com/JabRef/jabref/pull/12374)
 - We added a Markdown export layout. [#12220](https://github.com/JabRef/jabref/pull/12220)
 - We added a "view as BibTeX" option before importing an entry from the citation relation tab. [#11826](https://github.com/JabRef/jabref/issues/11826)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)

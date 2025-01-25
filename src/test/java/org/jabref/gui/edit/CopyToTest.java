@@ -3,6 +3,7 @@ package org.jabref.gui.edit;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
@@ -20,8 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -64,9 +65,15 @@ public class CopyToTest {
                 .withField(StandardField.BOOKTITLE, "Springer")
                 .withCitationKey("InternationalConferenceonMachineLearning2023");
 
-        this.selectedEntries = stateManager.getSelectedEntries();
+        this.selectedEntries = FXCollections.observableArrayList();
+        when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
+
         this.sourceDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry, entryWithCrossRef, referencedEntry)));
         this.targetDatabaseContext = new BibDatabaseContext();
+
+        CopyToPreferences copyToPreferences = mock(CopyToPreferences.class);
+        when(preferences.getCopyToPreferences()).thenReturn(copyToPreferences);
+        when(copyToPreferences.getShouldAskForIncludingCrossReferences()).thenReturn(false);
     }
 
     @Test
