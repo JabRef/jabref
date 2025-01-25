@@ -51,7 +51,7 @@ class ChainBibEntryRelationsRepositoryTest {
         // GIVEN
         var tempDir = Files.createTempDirectory("temp");
         var mvStorePath = Files.createTempFile(tempDir, "cache", "");
-        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath);
+        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath, 0);
         assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
 
         // WHEN
@@ -77,7 +77,7 @@ class ChainBibEntryRelationsRepositoryTest {
         // GIVEN
         var tempDir = Files.createTempDirectory("temp");
         var mvStorePath = Files.createTempFile(tempDir, "cache", "");
-        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath);
+        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath, 0);
         assertFalse(bibEntryRelationsRepository.containsReferences(bibEntry));
 
         // WHEN

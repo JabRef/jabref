@@ -14,14 +14,14 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     private final BibEntryRelationDAO citationsDao;
     private final BibEntryRelationDAO referencesDao;
 
-    public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore) {
+    public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore, int storeTTL) {
         this.citationsDao = BibEntryRelationDAOChain.of(
             LRUCacheBibEntryRelationsDAO.CITATIONS,
-            new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE)
+            new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE, storeTTL)
         );
         this.referencesDao = BibEntryRelationDAOChain.of(
             LRUCacheBibEntryRelationsDAO.REFERENCES,
-            new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE)
+            new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE, storeTTL)
         );
     }
 
@@ -75,9 +75,9 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
         return referencesDao.isUpdatable(entry);
     }
 
-    public static ChainBibEntryRelationsRepository of(Path citationsRelationsDirectory) {
+    public static ChainBibEntryRelationsRepository of(Path citationsRelationsDirectory, int storeTTL) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
-        return new ChainBibEntryRelationsRepository(citationsPath, relationsPath);
+        return new ChainBibEntryRelationsRepository(citationsPath, relationsPath, storeTTL);
     }
 }

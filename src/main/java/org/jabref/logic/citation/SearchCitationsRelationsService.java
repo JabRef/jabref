@@ -32,7 +32,8 @@ public class SearchCitationsRelationsService {
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
         this.relationsRepository = ChainBibEntryRelationsRepository.of(
-            Directories.getCitationsRelationsDirectory()
+            Directories.getCitationsRelationsDirectory(),
+            importerPreferences.getCitationsRelationsStoreTTL()
         );
     }
 

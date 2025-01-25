@@ -80,7 +80,7 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
     void DAOShouldMergeRelationsWhenInserting(BibEntry bibEntry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME);
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
         Assertions.assertFalse(dao.containsKey(bibEntry));
         var firstRelations = createRelations(bibEntry);
         var secondRelations = createRelations(bibEntry);
@@ -105,7 +105,7 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
     void containsKeyShouldReturnFalseIfNothingWasInserted(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME);
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
 
         // THEN
         Assertions.assertFalse(dao.containsKey(entry));
@@ -116,7 +116,7 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
     void containsKeyShouldReturnTrueIfRelationsWereInserted(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME);
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
 
         // WHEN
@@ -131,7 +131,7 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
     void isUpdatableShouldReturnTrueBeforeInsertionsAndFalseAfterInsertions(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME);
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
         Assertions.assertTrue(dao.isUpdatable(entry));
 
@@ -147,7 +147,7 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
     void isUpdatableShouldReturnTrueAfterOneWeek(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME);
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
         var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
         Assertions.assertTrue(dao.isUpdatable(entry, clock));
@@ -162,5 +162,27 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
             ZoneId.of("UTC")
         );
         Assertions.assertTrue(dao.isUpdatable(entry, clockOneWeekAfter));
+    }
+
+    @ParameterizedTest
+    @MethodSource("createBibEntries")
+    void isUpdatableShouldReturnFalseAfterOneWeekWhenTTLisSetTo30(BibEntry entry) throws IOException {
+        // GIVEN
+        var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 30);
+        var relations = createRelations(entry);
+        var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
+        Assertions.assertTrue(dao.isUpdatable(entry, clock));
+
+        // WHEN
+        dao.cacheOrMergeRelations(entry, relations);
+
+        // THEN
+        Assertions.assertFalse(dao.isUpdatable(entry, clock));
+        var clockOneWeekAfter = Clock.fixed(
+                LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
+                ZoneId.of("UTC")
+        );
+        Assertions.assertFalse(dao.isUpdatable(entry, clockOneWeekAfter));
     }
 }

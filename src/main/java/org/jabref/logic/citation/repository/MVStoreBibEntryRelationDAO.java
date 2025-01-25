@@ -39,8 +39,9 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
     private final MVStore.Builder storeConfiguration;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration =
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
+    private final int storeTTLInDays;
 
-    MVStoreBibEntryRelationDAO(Path path, String mapName) {
+    MVStoreBibEntryRelationDAO(Path path, String mapName, int storeTTLInDays) {
         try {
             if (!Files.exists(path.getParent())) {
                 Files.createDirectories(path.getParent());
@@ -57,6 +58,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         this.storeConfiguration = new MVStore.Builder()
                 .autoCommitDisabled()
                 .fileName(path.toAbsolutePath().toString());
+        this.storeTTLInDays = storeTTLInDays;
     }
 
     @Override
@@ -129,8 +131,8 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                     return insertionTimeStampMap.getOrDefault(doi.asString(), executionTime);
                 }
             })
-            .map(lastExecutionTime ->
-                lastExecutionTime.equals(executionTime) || lastExecutionTime.isBefore(executionTime.minusWeeks(1))
+            .map(lastExecutionTime -> lastExecutionTime.equals(executionTime)
+                || lastExecutionTime.isBefore(executionTime.minusDays(this.storeTTLInDays))
             )
             .orElse(true);
     }
