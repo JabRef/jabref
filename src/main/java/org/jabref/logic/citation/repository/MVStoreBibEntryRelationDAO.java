@@ -10,15 +10,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.h2.mvstore.MVMap;
@@ -139,39 +138,26 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
     private static class BibEntrySerializer extends BasicDataType<BibEntry> {
 
-        private final static String FIELD_SEPARATOR = "--";
-
         private static String toString(BibEntry entry) {
-            return String.join(
-                FIELD_SEPARATOR,
-                entry.getTitle().orElse("null"),
-                entry.getField(StandardField.YEAR).orElse("null"),
-                entry.getField(StandardField.AUTHOR).orElse("null"),
-                entry.getType().getDisplayName() == null ? "null" : entry.getType().getDisplayName(),
-                entry.getDOI().map(DOI::asString).orElse("null"),
-                entry.getField(StandardField.URL).orElse("null"),
-                entry.getField(StandardField.ABSTRACT).orElse("null")
-            );
-        }
-
-        private static Optional<String> extractFieldValue(String field) {
-            return Objects.equals(field, "null") || field == null
-                ? Optional.empty()
-                : Optional.of(field);
+            return entry.toString();
         }
 
         private static BibEntry fromString(String serializedString) {
-            var fields = serializedString.split(FIELD_SEPARATOR);
-            BibEntry entry = new BibEntry();
-            extractFieldValue(fields[0]).ifPresent(title -> entry.setField(StandardField.TITLE, title));
-            extractFieldValue(fields[1]).ifPresent(year -> entry.setField(StandardField.YEAR, year));
-            extractFieldValue(fields[2]).ifPresent(authors -> entry.setField(StandardField.AUTHOR, authors));
-            extractFieldValue(fields[3]).ifPresent(type -> entry.setType(StandardEntryType.valueOf(type)));
-            extractFieldValue(fields[4]).ifPresent(doi -> entry.setField(StandardField.DOI, doi));
-            extractFieldValue(fields[5]).ifPresent(url -> entry.setField(StandardField.URL, url));
-            extractFieldValue(fields[6])
-                .ifPresent(entryAbstract -> entry.setField(StandardField.ABSTRACT, entryAbstract));
-            return entry;
+            try {
+                var bibEntryPreferences = new BibEntryPreferences('S');
+                var importFormatPreferences = new ImportFormatPreferences(
+                    bibEntryPreferences, null, null, null, null, null
+                );
+                return BibtexParser
+                    .singleFromString(serializedString, importFormatPreferences)
+                    .map(entry -> {
+                        entry.clearField(new UnknownField("_jabref_shared"));
+                        return entry;
+                    })
+                    .orElseThrow();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
@@ -248,7 +234,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         @Override
         @SuppressWarnings("unchecked")
         public LinkedHashSet<BibEntry>[] createStorage(int size) {
-            return new LinkedHashSet[size];
+            return (LinkedHashSet<BibEntry>[]) new LinkedHashSet[size];
         }
 
         @Override

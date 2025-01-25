@@ -88,7 +88,10 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
         // WHEN
         dao.cacheOrMergeRelations(bibEntry, firstRelations);
         dao.cacheOrMergeRelations(bibEntry, secondRelations);
-        var relationFromCache = dao.getRelations(bibEntry);
+        var relationFromCache = dao
+                .getRelations(bibEntry)
+                .stream()
+                .toList();
 
         // THEN
         var uniqueRelations = Stream
