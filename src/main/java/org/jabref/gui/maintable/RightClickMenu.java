@@ -134,7 +134,7 @@ public class RightClickMenu {
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(bibDatabaseContext -> {
                 Optional<Path> destinationPath = Optional.empty();
-                String destinationDatabaseName = " ";
+                String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
                     destinationPath = bibDatabaseContext.getDatabasePath();
