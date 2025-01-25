@@ -875,7 +875,7 @@ jlink {
 
         if (OperatingSystem.current().isLinux()) {
             imageOptions = [
-                    '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
+                    '--icon', "${projectDir}/src/main/resources/icons/JabRef-linux-icon-64.png",
                     '--app-version', "${project.version}",
             ]
             installerOptions = [
