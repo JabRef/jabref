@@ -11,15 +11,19 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We introduced a settings parameters to manage citations' relations local storage time-to-live. [#11189](https://github.com/JabRef/jabref/issues/11189)
+
 ### Changed
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
+- We improved the citations relations caching by implementing a two levels cache aside strategy including offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 
 ### Fixed
 
 - We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
 - We fixed an issue where new entries were inserted in the middle of the table instead of at the end. [#12371](https://github.com/JabRef/jabref/pull/12371)
 - We fixed an issue where removing the sort from the table did not restore the original order. [#12371](https://github.com/JabRef/jabref/pull/12371)
+- We fixed the citations relations merge logic. [#11189](https://github.com/JabRef/jabref/issues/11189)
 
 ### Removed
 

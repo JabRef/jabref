@@ -30,15 +30,16 @@ import org.slf4j.LoggerFactory;
 public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationDAO.class);
+
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
     private final static String TIME_STAMP_SUFFIX = "-insertion-timestamp";
 
     private final String mapName;
     private final String insertionTimeStampMapName;
     private final MVStore.Builder storeConfiguration;
+    private final int storeTTLInDays;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration =
         new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
-    private final int storeTTLInDays;
 
     MVStoreBibEntryRelationDAO(Path path, String mapName, int storeTTLInDays) {
         try {
@@ -144,9 +145,8 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
         private static BibEntry fromString(String serializedString) {
             try {
-                var bibEntryPreferences = new BibEntryPreferences('S');
                 var importFormatPreferences = new ImportFormatPreferences(
-                    bibEntryPreferences, null, null, null, null, null
+                    new BibEntryPreferences('$'), null, null, null, null, null
                 );
                 return BibtexParser
                     .singleFromString(serializedString, importFormatPreferences)
@@ -203,15 +203,10 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
         private final BasicDataType<BibEntry> bibEntryDataType = new BibEntrySerializer();
 
-        /**
-         * Memory size is the sum of all aggregated bibEntries' memory size plus 4 bytes.
-         * Those 4 bytes are used to store the length of the collection itself.
-         *
-         * @param bibEntries should not be null
-         * @return total size in memory of the serialized collection of bib entries
-         */
         @Override
         public int getMemory(LinkedHashSet<BibEntry> bibEntries) {
+            // Memory size is the sum of all aggregated bibEntries' memory size plus 4 bytes.
+            // Those 4 bytes are used to store the length of the collection itself.
             return bibEntries
                 .stream()
                 .map(this.bibEntryDataType::getMemory)

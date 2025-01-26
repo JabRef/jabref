@@ -177,10 +177,8 @@ public class JabRefGUI extends Application {
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
 
-        Injector.setModelOrService(
-                SearchCitationsRelationsService.class,
-                new SearchCitationsRelationsService(preferences.getImporterPreferences())
-        );
+        var searchRelationsService = new SearchCitationsRelationsService(preferences.getImporterPreferences());
+        Injector.setModelOrService(SearchCitationsRelationsService.class, searchRelationsService);
     }
 
     private void setupProxy() {

@@ -124,7 +124,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.searchCitationsRelationsService = searchCitationsRelationsService;
 
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
+        this.citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
             databaseContext,
             preferences,
             undoManager,
