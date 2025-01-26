@@ -10,10 +10,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -143,7 +145,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             return entry.toString();
         }
 
-        private static BibEntry fromString(String serializedString) {
+        private static Optional<BibEntry> fromString(String serializedString) {
             try {
                 var importFormatPreferences = new ImportFormatPreferences(
                     new BibEntryPreferences('$'), null, null, null, null, null
@@ -153,10 +155,10 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                     .map(entry -> {
                         entry.clearField(new UnknownField("_jabref_shared"));
                         return entry;
-                    })
-                    .orElseThrow();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                    });
+            } catch (ParseException e) {
+                LOGGER.error("An error occurred while parsing from relation MV store.", e);
+                return Optional.empty();
             }
         }
 
@@ -177,7 +179,8 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             int serializedEntrySize = buff.getInt();
             var serializedEntry = new byte[serializedEntrySize];
             buff.get(serializedEntry);
-            return fromString(new String(serializedEntry, StandardCharsets.UTF_8));
+            return fromString(new String(serializedEntry, StandardCharsets.UTF_8))
+                .orElse(new BibEntry());
         }
 
         @Override
