@@ -153,11 +153,11 @@
     -fx-background-color: -fx-light-text-color, -fx-control-inner-background;
 }
 
-.numberColumn > .hits:any-selected {
+#groupTree .numberColumn > .hits:any-selected {
     -fx-background-color: derive(-jr-gray-3, 25%);
 }
 
-.numberColumn > .hits:all-selected {
+#groupTree .numberColumn > .hits:all-selected {
     -fx-background-color: -jr-gray-3;
 }
 
