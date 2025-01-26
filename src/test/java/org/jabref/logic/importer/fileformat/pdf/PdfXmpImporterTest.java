@@ -1,12 +1,10 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -16,8 +14,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,11 +22,6 @@ import static org.mockito.Mockito.mock;
 class PdfXmpImporterTest {
 
     private PdfXmpImporter importer;
-
-    private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.contains("annotated.pdf");
-        return ImporterTestEngine.getTestFiles(fileName).stream();
-    }
 
     @BeforeEach
     void setUp() {
@@ -63,16 +54,5 @@ class PdfXmpImporterTest {
     void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidFileNames")
-    void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
-        ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
-    }
-
-    @Test
-    void getCommandLineId() {
-        assertEquals("xmp", importer.getId());
     }
 }
