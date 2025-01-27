@@ -160,7 +160,7 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    def pdfbox = "3.0.3"
+    def pdfbox = "3.0.4"
     implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
         exclude group: 'commons-logging'
     }
