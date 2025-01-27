@@ -233,6 +233,13 @@ public class ImportHandler {
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
+    public void importCleanedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) {
+        bibDatabaseContext.getDatabase().insertEntries(entries);
+        generateKeys(entries);
+        setAutomaticFields(entries);
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
+    }
+
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
     }
@@ -251,7 +258,7 @@ public class ImportHandler {
                               }
                               finalEntry = duplicateHandledEntry.get();
                           }
-                          importCleanedEntries(List.of(finalEntry));
+                          importCleanedEntries(bibDatabaseContext, List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
                           BibEntry entryToFocus = finalEntry;
                           stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
