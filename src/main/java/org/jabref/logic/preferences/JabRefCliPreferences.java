@@ -1,6 +1,5 @@
 package org.jabref.logic.preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -115,7 +114,6 @@ import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.agent.tool.P;
 import jakarta.inject.Singleton;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
@@ -432,8 +430,7 @@ public class JabRefCliPreferences implements CliPreferences {
             if (Files.exists(jabrefXml)) {
                 importPreferences(jabrefXml);
             }
-        } catch (
-                JabRefException e) {
+        } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
@@ -877,15 +874,13 @@ public class JabRefCliPreferences implements CliPreferences {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences(Path.of("jabref.xml"));
-            } catch (
-                    JabRefException e) {
+            } catch (JabRefException e) {
                 LOGGER.warn("Could not export preferences for memory stick mode: {}", e.getMessage(), e);
             }
         }
         try {
             prefs.flush();
-        } catch (
-                BackingStoreException ex) {
+        } catch (BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
     }
@@ -994,10 +989,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
-        } catch (
-                InvalidPreferencesFormatException
-                |
-                IOException ex) {
+        } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
@@ -1055,8 +1047,7 @@ public class JabRefCliPreferences implements CliPreferences {
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
                   .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
-        } catch (
-                BackingStoreException e) {
+        } catch (BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
         return storedEntryTypes;
@@ -1073,8 +1064,7 @@ public class JabRefCliPreferences implements CliPreferences {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
             prefsNode.flush();
-        } catch (
-                BackingStoreException e) {
+        } catch (BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
@@ -1132,8 +1122,7 @@ public class JabRefCliPreferences implements CliPreferences {
             try {
                 currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (
-                    IOException ex) {
+            } catch (IOException ex) {
                 LOGGER.warn("Could not create JStyle", ex);
             }
         }
@@ -1301,11 +1290,9 @@ public class JabRefCliPreferences implements CliPreferences {
                         keyring.getPassword("org.jabref", "proxy"),
                         getInternalPreferences().getUserAndHost())
                         .decrypt();
-            } catch (
-                    PasswordAccessException ex) {
+            } catch (PasswordAccessException ex) {
                 LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-            } catch (
-                    Exception ex) {
+            } catch (Exception ex) {
                 LOGGER.warn("JabRef could not open the key store", ex);
             }
         }
@@ -1357,8 +1344,7 @@ public class JabRefCliPreferences implements CliPreferences {
                         EntryTypeFactory.parse(key),
                         preferences.get(key, null));
             }
-        } catch (
-                BackingStoreException ex) {
+        } catch (BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
 
@@ -2144,14 +2130,12 @@ public class JabRefCliPreferences implements CliPreferences {
                             keyring.getPassword("org.jabref.customapikeys", fetcher),
                             getInternalPreferences().getUserAndHost())
                             .decrypt());
-                } catch (
-                        PasswordAccessException ex) {
+                } catch (PasswordAccessException ex) {
                     LOGGER.debug("No api key stored for {} fetcher", fetcher);
                     keys.add("");
                 }
             }
-        } catch (
-                Exception ex) {
+        } catch (Exception ex) {
             LOGGER.warn("JabRef could not open the key store");
         }
 

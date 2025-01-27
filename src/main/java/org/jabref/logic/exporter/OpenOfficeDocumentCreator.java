@@ -84,7 +84,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
     private static void exportOpenOfficeCalcXML(Path tmpFile, BibDatabase database, List<BibEntry> entries) {
         OOCalcDatabase od = new OOCalcDatabase(database, entries);
 
-        try (Writer ps =  Files.newBufferedWriter(tmpFile, StandardCharsets.UTF_8)) {
+        try (Writer ps = Files.newBufferedWriter(tmpFile, StandardCharsets.UTF_8)) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();
