@@ -1,6 +1,7 @@
 package org.jabref.logic.citation.repository;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -187,5 +188,30 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
                 ZoneId.of("UTC")
         );
         Assertions.assertFalse(dao.isUpdatable(entry, clockOneWeekAfter));
+    }
+
+    @ParameterizedTest
+    @MethodSource("createBibEntries")
+    void deserializerErrorShouldReturnEmptyList(BibEntry entry) throws IOException {
+        // GIVEN
+        var serializer = new MVStoreBibEntryRelationDAO.BibEntryHashSetSerializer(
+            new MVStoreBibEntryRelationDAO.BibEntrySerializer() {
+                @Override
+                public BibEntry read(ByteBuffer buffer) {
+                    // Fake the return after an exception
+                    return new BibEntry();
+                }
+            }
+        );
+        var file = Files.createFile(temporaryFolder.resolve(TEMPORARY_FOLDER_NAME));
+        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        var relations = createRelations(entry);
+        dao.cacheOrMergeRelations(entry, relations);
+
+        // WHEN
+        var deserializedRelations = dao.getRelations(entry);
+
+        // THEN
+        Assertions.assertTrue(deserializedRelations.isEmpty());
     }
 }

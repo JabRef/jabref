@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,10 +41,20 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
     private final String insertionTimeStampMapName;
     private final MVStore.Builder storeConfiguration;
     private final int storeTTLInDays;
-    private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration =
-        new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(new BibEntryHashSetSerializer());
+    private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration;
 
     MVStoreBibEntryRelationDAO(Path path, String mapName, int storeTTLInDays) {
+        this(
+            path,
+            mapName,
+            storeTTLInDays,
+            new MVStoreBibEntryRelationDAO.BibEntryHashSetSerializer()
+        );
+    }
+
+    MVStoreBibEntryRelationDAO(
+        Path path, String mapName, int storeTTLInDays, BasicDataType<LinkedHashSet<BibEntry>> serializer
+    ) {
         try {
             if (!Files.exists(path.getParent())) {
                 Files.createDirectories(path.getParent());
@@ -61,6 +72,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                 .autoCommitDisabled()
                 .fileName(path.toAbsolutePath().toString());
         this.storeTTLInDays = storeTTLInDays;
+        this.mapConfiguration = new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(serializer);
     }
 
     @Override
@@ -139,13 +151,15 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             .orElse(true);
     }
 
-    private static class BibEntrySerializer extends BasicDataType<BibEntry> {
+    static class BibEntrySerializer extends BasicDataType<BibEntry> {
+
+        private final List<Field> fieldsToRemoveFromSerializedEntry = List.of(new UnknownField("_jabref_shared"));
 
         private static String toString(BibEntry entry) {
             return entry.toString();
         }
 
-        private static Optional<BibEntry> fromString(String serializedString) {
+        private static Optional<BibEntry> fromString(String serializedString, List<Field> fieldsToRemove) {
             try {
                 var importFormatPreferences = new ImportFormatPreferences(
                     new BibEntryPreferences('$'), null, null, null, null, null
@@ -153,7 +167,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
                 return BibtexParser
                     .singleFromString(serializedString, importFormatPreferences)
                     .map(entry -> {
-                        entry.clearField(new UnknownField("_jabref_shared"));
+                        fieldsToRemove.forEach(entry::clearField);
                         return entry;
                     });
             } catch (ParseException e) {
@@ -179,7 +193,10 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
             int serializedEntrySize = buff.getInt();
             var serializedEntry = new byte[serializedEntrySize];
             buff.get(serializedEntry);
-            return fromString(new String(serializedEntry, StandardCharsets.UTF_8))
+            return fromString(
+                    new String(serializedEntry, StandardCharsets.UTF_8),
+                    this.fieldsToRemoveFromSerializedEntry
+                )
                 .orElse(new BibEntry());
         }
 
@@ -202,9 +219,17 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         }
     }
 
-    private static class BibEntryHashSetSerializer extends BasicDataType<LinkedHashSet<BibEntry>> {
+    static class BibEntryHashSetSerializer extends BasicDataType<LinkedHashSet<BibEntry>> {
 
-        private final BasicDataType<BibEntry> bibEntryDataType = new BibEntrySerializer();
+        private final BasicDataType<BibEntry> bibEntryDataType;
+
+        BibEntryHashSetSerializer() {
+            this.bibEntryDataType = new BibEntrySerializer();
+        }
+
+        BibEntryHashSetSerializer(BasicDataType<BibEntry> bibEntryDataType) {
+            this.bibEntryDataType = bibEntryDataType;
+        }
 
         @Override
         public int getMemory(LinkedHashSet<BibEntry> bibEntries) {
@@ -226,6 +251,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         public LinkedHashSet<BibEntry> read(ByteBuffer buff) {
             return IntStream.range(0, buff.getInt())
                             .mapToObj(it -> this.bibEntryDataType.read(buff))
+                            .filter(entry -> !entry.isEmpty())
                             .collect(Collectors.toCollection(LinkedHashSet::new));
         }
 
