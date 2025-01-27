@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a feature to hide the tab bar when only one library is open, restore it when multiple libraries are open. [#9971](https://github.com/JabRef/jabref/issues/9971)
+- We added a feature to hide the tab bar when only one library is open, restore it when multiple libraries are open [#9971 ](https://github.com/JabRef/jabref/issues/9971).
 
 ### Changed
 
@@ -22,6 +23,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
 - We fixed an issue where new entries were inserted in the middle of the table instead of at the end. [#12371](https://github.com/JabRef/jabref/pull/12371)
 - We fixed an issue where removing the sort from the table did not restore the original order. [#12371](https://github.com/JabRef/jabref/pull/12371)
+- We fixed an issue where JabRef icon merges with dark background [#7771](https://github.com/JabRef/jabref/issues/7771)
+- We fixed an issue where an entry's group was no longer highlighted on selection [#12413](https://github.com/JabRef/jabref/issues/12413)
 
 ### Removed
 
