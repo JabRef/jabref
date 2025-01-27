@@ -2085,8 +2085,7 @@ public class JabRefCliPreferences implements CliPreferences {
                     // Old format: name, cliId, className, basePath
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
                 }
-            } catch (
-                    Exception e) {
+            } catch (Exception e) {
                 LOGGER.warn("Could not load {} from preferences. Will ignore.", importerString.getFirst(), e);
             }
         }
@@ -2187,8 +2186,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 if (StringUtil.isNullOrEmpty(keys.get(i))) {
                     try {
                         keyring.deletePassword("org.jabref.customapikeys", names.get(i));
-                    } catch (
-                            PasswordAccessException ex) {
+                    } catch (PasswordAccessException ex) {
                         // Already removed
                     }
                 } else {
@@ -2198,8 +2196,7 @@ public class JabRefCliPreferences implements CliPreferences {
                             .encrypt());
                 }
             }
-        } catch (
-                Exception ex) {
+        } catch (Exception ex) {
             LOGGER.error("Unable to open key store", ex);
         }
     }
@@ -2211,12 +2208,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 for (String name : names) {
                     keyring.deletePassword("org.jabref.customapikeys", name);
                 }
-            } catch (
-                    PasswordAccessException ex) {
+            } catch (PasswordAccessException ex) {
                 // nothing to do, no password to remove
             }
-        } catch (
-                Exception ex) {
+        } catch (Exception ex) {
             LOGGER.error("Unable to open key store");
         }
     }

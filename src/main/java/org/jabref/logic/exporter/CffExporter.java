@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
