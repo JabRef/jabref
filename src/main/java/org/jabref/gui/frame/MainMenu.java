@@ -17,6 +17,7 @@ import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
+import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -245,6 +246,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
