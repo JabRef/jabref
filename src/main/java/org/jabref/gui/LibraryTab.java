@@ -346,8 +346,6 @@ public class LibraryTab extends Tab {
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
 
-        new TabBarManager(tabPane, stateManager, preferences.getWorkspacePreferences());
-
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
