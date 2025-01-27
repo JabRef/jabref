@@ -105,7 +105,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
@@ -121,6 +120,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                            @Nullable GroupTreeNode parentNode,
                            @Nullable AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
+
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
