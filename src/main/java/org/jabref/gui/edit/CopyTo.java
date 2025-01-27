@@ -2,6 +2,7 @@ package org.jabref.gui.edit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -50,7 +51,7 @@ public class CopyTo extends SimpleCommand {
         boolean includeCrossReferences = false;
         boolean showDialogBox = copyToPreferences.getShouldAskForIncludingCrossReferences();
 
-        for (BibEntry bibEntry: selectedEntries) {
+        for (BibEntry bibEntry : selectedEntries) {
             if (bibEntry.hasField(StandardField.CROSSREF) && showDialogBox) {
                 includeCrossReferences = askForCrossReferencedEntries();
                 copyToPreferences.setShouldIncludeCrossReferences(includeCrossReferences);
@@ -58,7 +59,7 @@ public class CopyTo extends SimpleCommand {
         }
 
         if (includeCrossReferences) {
-           copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
+            copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
         }
@@ -67,29 +68,18 @@ public class CopyTo extends SimpleCommand {
     public void copyEntriesWithCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
         List<BibEntry> entriesToAdd = new ArrayList<>(selectedEntries);
 
-        for (BibEntry bibEntry: selectedEntries) {
-            if (bibEntry.hasField(StandardField.CROSSREF)) {
-                BibEntry crossRefEntry = getCrossRefEntry(bibEntry, sourceDatabaseContext);
-                if (crossRefEntry != null) {
-                    entriesToAdd.add(crossRefEntry);
-                }
-            }
-        }
-
+        List<BibEntry> entriesWithCrossRef = selectedEntries.stream().filter(bibEntry -> bibEntry.hasField(StandardField.CROSSREF))
+                                                            .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
+        entriesToAdd.addAll(entriesWithCrossRef);
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd);
     }
 
-     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
+    public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
     }
 
-    public BibEntry getCrossRefEntry(BibEntry bibEntry, BibDatabaseContext sourceDatabaseContext) {
-        for (BibEntry entry: sourceDatabaseContext.getEntries()) {
-            if (bibEntry.getField(StandardField.CROSSREF).equals(entry.getCitationKey())) {
-                return entry;
-            }
-        }
-        return null;
+    public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {
+        return sourceDatabaseContext.getEntries().stream().filter(entry -> bibEntryToCheck.getField(StandardField.CROSSREF).equals(entry.getCitationKey())).findFirst();
     }
 
     private boolean askForCrossReferencedEntries() {

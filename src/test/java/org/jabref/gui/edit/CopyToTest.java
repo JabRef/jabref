@@ -105,7 +105,7 @@ public class CopyToTest {
     void executeGetCrossRefEntry() {
         copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
-        BibEntry result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext);
+        BibEntry result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext).orElse(null);
 
         assertNotNull(result);
         assertEquals(referencedEntry, result);
