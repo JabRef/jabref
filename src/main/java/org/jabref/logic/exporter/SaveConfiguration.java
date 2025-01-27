@@ -1,6 +1,6 @@
 package org.jabref.logic.exporter;
 
-import org.jabref.gui.autosaveandbackup.BackupManagerGit;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.model.metadata.SaveOrder;
 
 public class SaveConfiguration {
@@ -44,7 +44,7 @@ public class SaveConfiguration {
     }
 
     /**
-     * Required by {@link BackupManagerGit}. Should not be used in other settings
+     * Required by {@link BackupManager}. Should not be used in other settings
      *
      * @param newMakeBackup whether a backup (.bak file) should be made
      */

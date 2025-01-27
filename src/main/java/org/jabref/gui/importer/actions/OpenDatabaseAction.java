@@ -18,7 +18,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.autosaveandbackup.BackupManagerGit;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -266,7 +266,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         ParserResult parserResult = null;
-        if (BackupManagerGit.backupGitDiffers(fileToLoad, backupDir)) {
+        if (BackupManager.backupGitDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             LOGGER.info("Backup differs from saved file, ask the user what to do");
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BackupManagerGitTest {
+public class BackupManagerTest {
 
     private Path tempDir1;
     private Path tempDir2;
@@ -126,8 +126,8 @@ public class BackupManagerGitTest {
     @Test
     void initializationCreatesBackupDirectory() throws IOException, GitAPIException {
         // Create BackupManagerGit
-        BackupManagerGit manager1 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
-        BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
+        BackupManager manager1 = new BackupManager(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
+        BackupManager manager2 = new BackupManager(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
         // Check if the backup directory exists
         assertTrue(Files.exists(tempDir), " directory should be created which contains .git and single copies og .bib");
         assertTrue(Files.exists(tempDir1), "Backup directory should be created during initialization.");
@@ -137,7 +137,7 @@ public class BackupManagerGitTest {
     @Test
     void gitInitialization() throws IOException, GitAPIException {
         // Initialize Git
-        BackupManagerGit.ensureGitInitialized(tempDir);
+        BackupManager.ensureGitInitialized(tempDir);
         // Verify that the .git directory is created
         Path gitDir = tempDir.resolve(".git");
         assertTrue(Files.exists(gitDir), ".git directory should be created during Git initialization.");
@@ -145,12 +145,12 @@ public class BackupManagerGitTest {
 
     @Test
     void backupFileCopiedToDirectory() throws IOException, GitAPIException {
-        BackupManagerGit manager1 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
-        BackupManagerGit manager2 = new BackupManagerGit(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
+        BackupManager manager1 = new BackupManager(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
+        BackupManager manager2 = new BackupManager(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
 
         // Generate the expected backup file names
-        String uuid1 = BackupManagerGit.getOrGenerateFileUuid(dataBasePath1);
-        String uuid2 = BackupManagerGit.getOrGenerateFileUuid(dataBasePath2);
+        String uuid1 = BackupManager.getOrGenerateFileUuid(dataBasePath1);
+        String uuid2 = BackupManager.getOrGenerateFileUuid(dataBasePath2);
 
         String backupFileName1 = dataBasePath1.getFileName().toString().replace(".bib", "") + "_" + uuid1 + ".bib";
         String backupFileName2 = dataBasePath2.getFileName().toString().replace(".bib", "") + "_" + uuid2 + ".bib";
@@ -164,26 +164,26 @@ public class BackupManagerGitTest {
 
     @Test
     public void start() throws IOException, GitAPIException {
-        BackupManagerGit startedManager = BackupManagerGit.start(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, mockPreferences);
+        BackupManager startedManager = BackupManager.start(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, mockPreferences);
         assertNotNull(startedManager);
     }
 
     @Test
     void performBackupCommitsChanges() throws IOException, GitAPIException {
         // Initialize Git
-        BackupManagerGit.ensureGitInitialized(tempDir);
+        BackupManager.ensureGitInitialized(tempDir);
 
         // Create a test file
         Path dbFile1 = tempDir.resolve("test1.bib");
 
         // Create BackupManagerGit and perform backup
-        BackupManagerGit manager = new BackupManagerGit(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
+        BackupManager manager = new BackupManager(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         Files.writeString(dbFile1, "Initial content of test 1");
 
-        BackupManagerGit.copyDatabaseFileToBackupDir(dbFile1, tempDir);
+        BackupManager.copyDatabaseFileToBackupDir(dbFile1, tempDir);
 
         // Generate the expected backup file name
-        String uuid1 = BackupManagerGit.getOrGenerateFileUuid(dbFile1);
+        String uuid1 = BackupManager.getOrGenerateFileUuid(dbFile1);
         String backupFileName1 = dbFile1.getFileName().toString().replace(".bib", "") + "_" + uuid1 + ".bib";
         Path backupFile1 = tempDir.resolve(backupFileName1);
 

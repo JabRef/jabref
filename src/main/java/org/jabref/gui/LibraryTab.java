@@ -42,7 +42,7 @@ import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
-import org.jabref.gui.autosaveandbackup.BackupManagerGit;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -374,7 +374,7 @@ public class LibraryTab extends Tab {
             autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
-            BackupManagerGit.start(this, bibDatabaseContext, entryTypesManager, preferences);
+            BackupManager.start(this, bibDatabaseContext, entryTypesManager, preferences);
         }
     }
 
@@ -799,7 +799,7 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down autosave manager", e);
         }
         try {
-            BackupManagerGit.shutdown(bibDatabaseContext,
+            BackupManager.shutdown(bibDatabaseContext,
                     preferences.getFilePreferences().getBackupDirectory(),
                     preferences.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {

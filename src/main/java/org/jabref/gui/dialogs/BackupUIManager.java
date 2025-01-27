@@ -12,7 +12,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.autosaveandbackup.BackupManagerGit;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupChoiceDialog;
 import org.jabref.gui.backup.BackupChoiceDialogRecord;
 import org.jabref.gui.backup.BackupEntry;
@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stores all user dialogs related to {@link BackupManagerGit}.
+ * Stores all user dialogs related to {@link BackupManager}.
  */
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
@@ -61,13 +61,13 @@ public class BackupUIManager {
         return actionOpt.flatMap(action -> {
             try {
 
-                List<RevCommit> commits = BackupManagerGit.retrieveCommits(originalPath, preferences.getFilePreferences().getBackupDirectory(), -1);
-                List<BackupEntry> backups = BackupManagerGit.retrieveCommitDetails(commits, originalPath, preferences.getFilePreferences().getBackupDirectory()).reversed();
+                List<RevCommit> commits = BackupManager.retrieveCommits(originalPath, preferences.getFilePreferences().getBackupDirectory(), -1);
+                List<BackupEntry> backups = BackupManager.retrieveCommitDetails(commits, originalPath, preferences.getFilePreferences().getBackupDirectory()).reversed();
 
                 if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                     ObjectId commitId = backups.getFirst().getId();
 
-                    BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
+                    BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
 
                     return Optional.empty();
                 } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
@@ -84,7 +84,7 @@ public class BackupUIManager {
                     if (recordBackupChoice.get().action() == BackupChoiceDialog.RESTORE_BACKUP) {
                         LOGGER.warn(recordBackupChoice.get().entry().getSize());
                         ObjectId commitId = recordBackupChoice.get().entry().getId();
-                        BackupManagerGit.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
+                        BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory(), commitId);
                         return Optional.empty();
                     }
                     if (recordBackupChoice.get().action() == BackupChoiceDialog.REVIEW_BACKUP) {
@@ -134,9 +134,9 @@ public class BackupUIManager {
 
             Path backupPath = preferences.getFilePreferences().getBackupDirectory();
 
-            BackupManagerGit.writeBackupFileToCommit(originalPath, backupPath, commitIdToReview);
+            BackupManager.writeBackupFileToCommit(originalPath, backupPath, commitIdToReview);
 
-            Path backupFilePath = BackupManagerGit.getBackupFilePath(originalPath, backupPath);
+            Path backupFilePath = BackupManager.getBackupFilePath(originalPath, backupPath);
 
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupFilePath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
@@ -167,7 +167,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                BackupManagerGit.writeBackupFileToCommit(originalPath, backupPath, latestCommitId);
+                BackupManager.writeBackupFileToCommit(originalPath, backupPath, latestCommitId);
                 return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             });
         } catch (IOException e) {

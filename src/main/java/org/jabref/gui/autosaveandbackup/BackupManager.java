@@ -47,12 +47,12 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BackupManagerGit {
+public class BackupManager {
 
-    static Set<BackupManagerGit> runningInstances = new HashSet<>();
+    static Set<BackupManager> runningInstances = new HashSet<>();
 
     private static final String LINE_BREAK = System.lineSeparator();
-    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManagerGit.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
@@ -67,7 +67,7 @@ public class BackupManagerGit {
 
     private boolean needsBackup = false;
 
-    BackupManagerGit(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, Path backupDir) throws IOException, GitAPIException {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, Path backupDir) throws IOException, GitAPIException {
         Path dbFile = bibDatabaseContext.getDatabasePath().orElseThrow(() -> new IllegalArgumentException("Database path is not provided."));
         if (!Files.exists(dbFile)) {
             LOGGER.error("Database file does not exist: {}", dbFile);
@@ -233,13 +233,13 @@ public class BackupManagerGit {
      * @throws GitAPIException if a Git API error occurs
      */
 
-    public static BackupManagerGit start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) throws IOException, GitAPIException {
         LOGGER.info("In methode Start");
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
-        BackupManagerGit backupManagerGit = new BackupManagerGit(libraryTab, bibDatabaseContext, entryTypesManager, backupDir);
-        backupManagerGit.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), bibDatabaseContext);
-        runningInstances.add(backupManagerGit);
-        return backupManagerGit;
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, backupDir);
+        backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory(), bibDatabaseContext);
+        runningInstances.add(backupManager);
+        return backupManager;
     }
 
     /**
