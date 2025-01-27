@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum BackupFileType implements FileType {
 
-    // Used at BackupManagerGit
+    // Used at BackupManager
     BACKUP("Backup", "bak"),
 
     // Used when writing the .bib file. See {@link org.jabref.logic.exporter.AtomicFileWriter}

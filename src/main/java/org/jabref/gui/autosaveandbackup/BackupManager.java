@@ -222,13 +222,13 @@ public class BackupManager {
     // A method
 
     /**
-     * Starts a new BackupManagerGit instance and begins the backup task.
+     * Starts a new BackupManager instance and begins the backup task.
      *
      * @param libraryTab         the library tab
      * @param bibDatabaseContext the BibDatabaseContext to be backed up
      * @param entryTypesManager  the BibEntryTypesManager
      * @param preferences        the CLI preferences
-     * @return the started BackupManagerGit instance
+     * @return the started BackupManager instance
      * @throws IOException     if an I/O error occurs
      * @throws GitAPIException if a Git API error occurs
      */
@@ -243,7 +243,7 @@ public class BackupManager {
     }
 
     /**
-     * Shuts down the BackupManagerGit instances associated with the given BibDatabaseContext.
+     * Shuts down the BackupManager instances associated with the given BibDatabaseContext.
      *
      * @param bibDatabaseContext the BibDatabaseContext
      * @param createBackup whether to create a backup before shutting down

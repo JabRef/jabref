@@ -125,7 +125,7 @@ public class BackupManagerTest {
 
     @Test
     void initializationCreatesBackupDirectory() throws IOException, GitAPIException {
-        // Create BackupManagerGit
+        // Create BackupManager
         BackupManager manager1 = new BackupManager(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         BackupManager manager2 = new BackupManager(mockLibraryTab, mockDatabaseContext2, mockEntryTypesManager, tempDir);
         // Check if the backup directory exists
@@ -176,7 +176,7 @@ public class BackupManagerTest {
         // Create a test file
         Path dbFile1 = tempDir.resolve("test1.bib");
 
-        // Create BackupManagerGit and perform backup
+        // Create BackupManager and perform backup
         BackupManager manager = new BackupManager(mockLibraryTab, mockDatabaseContext1, mockEntryTypesManager, tempDir);
         Files.writeString(dbFile1, "Initial content of test 1");
 
