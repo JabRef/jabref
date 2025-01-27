@@ -2,7 +2,9 @@ package org.jabref.logic.exporter;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -141,7 +144,7 @@ public class CffExporter extends Exporter {
         if (main.hasField(StandardField.RELATED)) {
             main.getEntryLinkList(StandardField.RELATED, databaseContext.getDatabase())
                 .stream()
-                .map(link -> link.getLinkedEntry())
+                .map(ParsedEntryLink::getLinkedEntry)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(entry -> {
@@ -158,7 +161,7 @@ public class CffExporter extends Exporter {
             cffData.put("references", related);
         }
 
-        try (FileWriter writer = new FileWriter(file.toFile(), StandardCharsets.UTF_8)) {
+        try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             yaml.dump(cffData, writer);
         } catch (IOException ex) {
             throw new SaveException(ex);

@@ -3,6 +3,7 @@ package org.jabref.logic.crawler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.model.study.Study;
@@ -21,7 +22,7 @@ public class StudyYamlParser {
      */
     public Study parseStudyYamlFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        try (InputStream fileInputStream = new FileInputStream(studyYamlFile.toFile())) {
+        try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
             return yamlMapper.readValue(fileInputStream, Study.class);
         }
     }

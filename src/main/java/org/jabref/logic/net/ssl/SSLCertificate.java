@@ -2,6 +2,8 @@ package org.jabref.logic.net.ssl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -87,11 +89,13 @@ public class SSLCertificate {
         Objects.requireNonNull(certPath);
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-            return fromX509((X509Certificate) certificateFactory.generateCertificate(new FileInputStream(certPath.toFile())));
+            return fromX509((X509Certificate) certificateFactory.generateCertificate(Files.newInputStream(certPath)));
         } catch (CertificateException e) {
             LOGGER.warn("Certificate doesn't follow X.509 format", e);
         } catch (FileNotFoundException e) {
             LOGGER.warn("Bad Certificate path: {}", certPath, e);
+        } catch (IOException e) {
+           LOGGER.warn("Error while reading certificate", e);
         }
         return Optional.empty();
     }

@@ -4,11 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 public class OpenDocumentSpreadsheetCreator extends Exporter {
 
@@ -83,15 +82,15 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
             throws IOException {
 
         // First store the xml formatted content to a temporary file.
-        File tmpFile = File.createTempFile("opendocument", null);
+        Path tmpFile = Files.createTempFile("opendocument", null);
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+        try (InputStream in = Files.newInputStream(file)) {
             OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
-        if (!tmpFile.delete()) {
+        if (!Files.deleteIfExists(tmpFile)) {
             LOGGER.info("Cannot delete temporary export file");
         }
     }
@@ -106,11 +105,14 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
+    private static void exportOpenDocumentSpreadsheetXML(Path tmpFile, BibDatabase database, List<BibEntry> entries) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
+        writeDomtoFile(tmpFile, od.getDOMrepresentation(), od);
+    }
 
-        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
-            DOMSource source = new DOMSource(od.getDOMrepresentation());
+    static void writeDomtoFile(Path tmpFile, Document domRepresentation, OpenDocumentRepresentation od) {
+        try (Writer ps = Files.newBufferedWriter(tmpFile, StandardCharsets.UTF_8)) {
+            DOMSource source = new DOMSource(domRepresentation);
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");

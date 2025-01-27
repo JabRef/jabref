@@ -44,7 +44,7 @@ public class TrustStoreManager {
         createTruststoreFileIfNotExist(storePath);
         try {
             store = KeyStore.getInstance(KeyStore.getDefaultType());
-            store.load(new FileInputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
+            store.load(Files.newInputStream(storePath), STORE_PASSWORD.toCharArray());
         } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e) {
             LOGGER.warn("Error while loading trust store from: {}", storePath.toAbsolutePath(), e);
         }
@@ -56,7 +56,7 @@ public class TrustStoreManager {
 
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-            store.setCertificateEntry(alias, certificateFactory.generateCertificate(new FileInputStream(certPath.toFile())));
+            store.setCertificateEntry(alias, certificateFactory.generateCertificate(Files.newInputStream(certPath)));
         } catch (KeyStoreException | CertificateException | IOException e) {
             LOGGER.warn("Error while adding a new certificate to the truststore: {}", alias, e);
         }
