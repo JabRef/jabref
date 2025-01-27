@@ -63,7 +63,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (InputStream in = Files.newInputStream(file)) {
+        try (InputStream in = Files.newInputStream(tmpFile)) {
             OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);
         }
 
