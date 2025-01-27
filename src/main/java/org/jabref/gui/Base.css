@@ -664,13 +664,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 0 0 0;
 }
 
-.numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
-}
 
-.numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
-}
 
 .table-view,
 .tree-table-view {
@@ -1207,10 +1201,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0 0 -2 0;
 }
 
-.table-row-cell:dragOver-center {
-    -fx-border-color: -jr-drag-target;
-    -fx-border-width: 1 1 1 1;
-    -fx-padding: -1 -1 -1 -1;
+.table-row-cell:dragOver-center > .table-cell {
     -fx-background-color: -jr-drag-target-hover;
 }
 
@@ -2038,6 +2029,14 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn > .hits .text {
     -fx-fill: -jr-group-hits-fg;
+}
+
+#groupTree .numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
+}
+
+#groupTree .numberColumn > .hits:all-selected {
+    -fx-background-color: -jr-green;
 }
 
 #groupTree .expansionNodeColumn {

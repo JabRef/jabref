@@ -121,7 +121,8 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
 
-            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()))) {
+            // if we have utf8 with 100 confidence we assume that the file is in utf8, more likely
+            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
                 return defaultCharSet;
             }
 
@@ -169,27 +170,18 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
-     * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
-     * the command line.
+     * Returns a <a href="https://developer.mozilla.org/en-US/docs/Glossary/Slug">slug</a>, which identifies this importer.
+     * Used, for example, to identify the importer in CLI.
+     * <p>
+     * Typically, this name should be short, in English, and should not contain special characters like #, %, etc.
      *
      * @return ID, must be unique and not <code>null</code>
      */
-    public String getId() {
-        String id = getName();
-        StringBuilder result = new StringBuilder(id.length());
-        for (int i = 0; i < id.length(); i++) {
-            char c = id.charAt(i);
-            if (Character.isLetterOrDigit(c)) {
-                result.append(Character.toLowerCase(c));
-            }
-        }
-        return result.toString();
-    }
+    public abstract String getId();
 
     /**
-     * Returns the name of this import format.
-     *
-     * <p>The name must be unique.</p>
+     * Returns the name of this import format. Typically, this is a string that denotes file type or format.
+     * It can also be localized, like "XMP-annotated PDF".
      *
      * @return format name, must be unique and not <code>null</code>
      */
@@ -202,7 +194,7 @@ public abstract class Importer implements Comparable<Importer> {
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import
      * </li><li>
-     *   by what criteria it {@link #isRecognizedFormat(BufferedReader) recognizes} an import format
+     *   by what criteria it {@link #isRecognizedFormat(BufferedReader)} recognizes an import format
      * </li></ul>
      *
      * @return description of the import format

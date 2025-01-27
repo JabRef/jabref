@@ -71,6 +71,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
     private final BibDatabaseContext database;
+    private final GuiPreferences preferences;
+    private final DialogService dialogService;
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
@@ -100,6 +102,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
+        this.preferences = preferences;
+        this.dialogService = dialogService;
         this.model = model;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
@@ -144,7 +148,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         clipBoardManager,
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                        entryTypesManager))
+                        entryTypesManager,
+                        importHandler))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
                 .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
                 .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))
@@ -185,7 +190,28 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         // Enable sorting
-        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
+        // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
+        // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
+        // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
+        this.setSortPolicy(_ -> true);
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(
+                this.comparatorProperty().map(comparator -> {
+                    if (comparator == null) {
+                        return null;
+                    }
+
+                    return (entry1, entry2) -> {
+                        int result = comparator.compare(entry1, entry2);
+                        if (result != 0) {
+                            return result;
+                        }
+                        // If the entries are equal according to the comparator, compare them by their index in the database.
+                        // The comparison should ideally be based on the database index, but retrieving the index takes log(n). See {@link BibDatabase#indexOf}.
+                        // Using the entry ID is also valid since IDs are monotonically increasing.
+                        return entry1.getEntry().getId().compareTo(entry2.getEntry().getId());
+                    };
+                })
+        );
 
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
@@ -302,6 +328,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -345,6 +372,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
                          scrollToPreviousMatchCategory();
+                        event.consume();
+                        break;
+                    case OPEN_URL_OR_DOI:
+                        openUrlAction.execute();
                         event.consume();
                         break;
                     default:
