@@ -46,7 +46,8 @@ public class CopyTo extends SimpleCommand {
 
     @Override
     public void execute() {
-        List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+        // we need to operate on a copy otherwise we might get ConcurrentModification issues
+        List<BibEntry> selectedEntries = stateManager.getSelectedEntries().stream().toList();
 
         boolean includeCrossReferences = false;
         boolean showDialogBox = copyToPreferences.getShouldAskForIncludingCrossReferences();
