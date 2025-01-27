@@ -12,6 +12,9 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
@@ -29,7 +32,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.TabBarManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -46,6 +48,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -80,7 +83,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GuiPreferences preferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
-    private final TabBarManager tabBarManager;
 
     private final FileHistoryMenu fileHistory;
 
@@ -153,8 +155,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
-        this.tabBarManager = new TabBarManager(tabbedPane, stateManager, preferences.getWorkspacePreferences());
-
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
@@ -190,6 +190,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
         initBindings();
+        initTabBarManager();
     }
 
     private void initLayout() {
@@ -395,6 +396,39 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
+    }
+
+    public void initTabBarManager() {
+        IntegerProperty numberOfOpenDatabases = new SimpleIntegerProperty();
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+            numberOfOpenDatabases.set(stateManager.getOpenDatabases().size());
+            updateTabBarState(numberOfOpenDatabases);
+        });
+
+        BindingsHelper.subscribeFuture(preferences.getWorkspacePreferences().confirmHideTabBarProperty(), hideTabBar -> updateTabBarState(numberOfOpenDatabases));
+        maintainInitialTabBarState(preferences.getWorkspacePreferences().shouldHideTabBar());
+    }
+
+    public void updateTabBarState(IntegerProperty numberOfOpenDatabases) {
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && numberOfOpenDatabases.get() == 1) {
+            if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
+                tabbedPane.getStyleClass().add("hide-tab-bar");
+            }
+        } else {
+            tabbedPane.getStyleClass().remove("hide-tab-bar");
+        }
+    }
+
+    public void maintainInitialTabBarState(boolean show) {
+        if (show) {
+            if (stateManager.getOpenDatabases().size() == 1) {
+                if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
+                    tabbedPane.getStyleClass().add("hide-tab-bar");
+                }
+            } else {
+                tabbedPane.getStyleClass().remove("hide-tab-bar");
+            }
+        }
     }
 
     /* ************************************************************************
