@@ -213,7 +213,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.12'
 
-    implementation 'org.postgresql:postgresql:42.7.4'
+    implementation 'org.postgresql:postgresql:42.7.5'
 
     // Support unix socket connection types
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
