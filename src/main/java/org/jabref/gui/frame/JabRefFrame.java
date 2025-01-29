@@ -398,7 +398,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
     }
 
-    public void initTabBarManager() {
+    private void initTabBarManager() {
         IntegerProperty numberOfOpenDatabases = new SimpleIntegerProperty();
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
             numberOfOpenDatabases.set(stateManager.getOpenDatabases().size());
@@ -409,7 +409,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         maintainInitialTabBarState(preferences.getWorkspacePreferences().shouldHideTabBar());
     }
 
-    public void updateTabBarState(IntegerProperty numberOfOpenDatabases) {
+    private void updateTabBarState(IntegerProperty numberOfOpenDatabases) {
         if (preferences.getWorkspacePreferences().shouldHideTabBar() && numberOfOpenDatabases.get() == 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
@@ -419,7 +419,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    public void maintainInitialTabBarState(boolean show) {
+    private void maintainInitialTabBarState(boolean show) {
         if (show) {
             if (stateManager.getOpenDatabases().size() == 1) {
                 if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
