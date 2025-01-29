@@ -73,15 +73,15 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
-                              GuiPreferences preferences,
-                              AiService aiService,
-                              DialogService dialogService,
-                              StateManager stateManager,
-                              FileUpdateMonitor fileUpdateMonitor,
-                              BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager,
-                              ClipBoardManager clipBoardManager,
-                              TaskExecutor taskExecutor) {
+                                 GuiPreferences preferences,
+                                 AiService aiService,
+                                 DialogService dialogService,
+                                 StateManager stateManager,
+                                 FileUpdateMonitor fileUpdateMonitor,
+                                 BibEntryTypesManager entryTypesManager,
+                                 CountingUndoManager undoManager,
+                                 ClipBoardManager clipBoardManager,
+                                 TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -96,7 +96,9 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
+            LOGGER.info("Performing post open action: {}", action.getClass().getSimpleName());
             if (action.isActionNecessary(result, dialogService, preferences)) {
+                LOGGER.info("Action is necessary");
                 action.performAction(result, dialogService, preferences);
             }
         }
@@ -104,6 +106,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        LOGGER.info("OpenDatabaseAction");
         List<Path> filesToOpen = getFilesToOpen();
         openFiles(new ArrayList<>(filesToOpen));
     }
@@ -118,6 +121,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         } catch (IllegalArgumentException e) {
             // See https://github.com/JabRef/jabref/issues/10548 for details
             // Rebuild a new config with the home directory
+            LOGGER.error("Error while opening file dialog", e);
             FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());
             filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(homeDirectoryConfig);
         }
@@ -242,16 +246,29 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
+        LOGGER.info("Opening {}", file);
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
+        LOGGER.info("Opening {}", fileToLoad);
 
         preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
         Path backupDir = preferences.getFilePreferences().getBackupDirectory();
 
+        // To debug
+        if (!Files.exists(backupDir)) {
+            LOGGER.error("Backup directory does not exist: {}", backupDir);
+            throw new IOException("Backup directory not found: " + backupDir);
+        }
+        if (!Files.isReadable(backupDir)) {
+            LOGGER.error("Backup directory is not readable: {}", backupDir);
+            throw new IOException("Cannot read from backup directory: " + backupDir);
+        }
+
         ParserResult parserResult = null;
-        if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
+        if (BackupManager.backupGitDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
+            LOGGER.info("Backup differs from saved file, ask the user what to do");
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
             parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
                                           .orElse(null);
@@ -260,6 +277,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         try {
             if (parserResult == null) {
                 // No backup was restored, do the "normal" loading
+                LOGGER.info("No backup was restored, do the \"normal\" loading");
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
@@ -277,18 +295,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-                         openSharedDatabase(
-                                 parserResult,
-                                 tabContainer,
-                                 dialogService,
-                                 preferences,
-                                 aiService,
-                                 stateManager,
-                                 entryTypesManager,
-                                 fileUpdateMonitor,
-                                 undoManager,
-                                 clipboardManager,
-                                 taskExecutor);
+            openSharedDatabase(
+                    parserResult,
+                    tabContainer,
+                    dialogService,
+                    preferences,
+                    aiService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager,
+                    clipboardManager,
+                    taskExecutor);
         }
         return parserResult;
     }
