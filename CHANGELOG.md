@@ -11,11 +11,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added a 'Copy to' context menu option with features for cross-reference inclusion/exclusion, as well as the ability to save user preferences. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
 
 ### Changed
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
+- The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
 
 ### Fixed
 
