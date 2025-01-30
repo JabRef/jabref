@@ -12,16 +12,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a GUI for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/pull/12433)
+- We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
 
 ### Changed
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
+- The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
 
 ### Fixed
 
+- We fixed an issue where the F3 shortcut key did not work without opening the right-click context menu. [#12417](https://github.com/JabRef/jabref/pull/12417)
 - We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
 - We fixed an issue where new entries were inserted in the middle of the table instead of at the end. [#12371](https://github.com/JabRef/jabref/pull/12371)
 - We fixed an issue where removing the sort from the table did not restore the original order. [#12371](https://github.com/JabRef/jabref/pull/12371)
+- We fixed an issue where JabRef icon merges with dark background [#7771](https://github.com/JabRef/jabref/issues/7771)
+- We fixed an issue where an entry's group was no longer highlighted on selection [#12413](https://github.com/JabRef/jabref/issues/12413)
 
 ### Removed
 
