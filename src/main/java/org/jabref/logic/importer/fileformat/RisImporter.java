@@ -35,6 +35,11 @@ public class RisImporter extends Importer {
     private static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
     @Override
+    public String getId() {
+        return "ris";
+    }
+
+    @Override
     public String getName() {
         return "RIS";
     }

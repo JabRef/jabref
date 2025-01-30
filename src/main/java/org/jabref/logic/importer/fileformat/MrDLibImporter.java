@@ -34,7 +34,6 @@ public class MrDLibImporter extends Importer {
     private String recommendationsDescription;
     private String recommendationSetId;
 
-    @SuppressWarnings("unused")
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         String recommendationsAsString = convertToString(input);
@@ -53,6 +52,11 @@ public class MrDLibImporter extends Importer {
     public ParserResult importDatabase(BufferedReader input) throws IOException {
         parse(input);
         return parserResult;
+    }
+
+    @Override
+    public String getId() {
+        return "mrDlib";
     }
 
     @Override
