@@ -26,7 +26,7 @@ public class BooktitleChecker implements ValueChecker {
         }
 
         if (FULL_URL_PATTERN.matcher(value).find()) {
-            return Optional.of(Localization.lang("The title contains a URL"));
+            return Optional.of(Localization.lang("The book title contains a URL"));
         }
 
         if (DOMAIN_ONLY_PATTERN.matcher(value).find()) {
