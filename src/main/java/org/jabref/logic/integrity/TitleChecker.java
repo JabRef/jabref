@@ -46,7 +46,7 @@ public class TitleChecker implements ValueChecker {
         }
 
         if (FULL_URL_PATTERN.matcher(value).find()) {
-            return Optional.of(Localization.lang("The title contains a full URL which is forbidden"));
+            return Optional.of(Localization.lang("The title contains a URL"));
         }
 
         if (DOMAIN_ONLY_PATTERN.matcher(value).find()) {
