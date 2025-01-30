@@ -69,6 +69,33 @@ public class TitleCheckerTest {
                     Arguments.of("bibTexDoesNotAcceptsLeadingTranslatedTitleWithOriginal ", "[This is translated title] This is a title")
             );
         }
+
+        @ParameterizedTest(name = "{index}. Title: \"{1}\" {0}")
+        @MethodSource("invalidTitlesWithURLs")
+        void titleShouldRaiseWarningForFullURLs(String message, String title) {
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+        }
+
+        static Stream<Arguments> invalidTitlesWithURLs() {
+            return Stream.of(
+                    Arguments.of("Title contains full URL with https", "Check this out: https://example.com/something"),
+                    Arguments.of("Title contains full URL with http", "Visit http://example.com/path"),
+                    Arguments.of("Title contains full URL without protocol", "Found at www.example.com/something")
+            );
+        }
+
+        @ParameterizedTest(name = "{index}. Title: \"{1}\" {0}")
+        @MethodSource("validTitlesWithDomainOnlyURLs")
+        void titleShouldAllowDomainOnlyURLs(String message, String title) {
+            assertEquals(Optional.empty(), checker.checkValue(title));
+        }
+
+        static Stream<Arguments> validTitlesWithDomainOnlyURLs() {
+            return Stream.of(
+                    Arguments.of("Title contains a domain only URL", "Visit www.example.com"),
+                    Arguments.of("Title contains a domain only HTTPS URL", "Check https://example.com")
+            );
+        }
     }
 
     @Nested
