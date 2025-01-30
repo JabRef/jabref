@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a GUI for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/pull/12433)
+
 ### Changed
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
