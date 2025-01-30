@@ -49,6 +49,10 @@ public class TitleChecker implements ValueChecker {
             return Optional.of(Localization.lang("The title contains a URL"));
         }
 
+        if (DOMAIN_ONLY_PATTERN.matcher(value).find()) {
+            return Optional.empty();
+        }
+
         String valueOnlySpacesWithinCurlyBraces = INSIDE_CURLY_BRAKETS.matcher(value).replaceAll("");
 
         String[] splitTitle = DELIMITERS.split(valueOnlySpacesWithinCurlyBraces);
