@@ -1,31 +1,41 @@
 package org.jabref.gui.consistency;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
+import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
-    /* @FXML private TableColumn<ConsistencyMessage, String> entryTypeColumn;
-    @FXML private TableColumn<ConsistencyMessage, String> keyColumn;*/
+    @FXML private ComboBox<String> entryTypeCombo;
+
+    private final BibliographyConsistencyCheck.Result result;
+    private final DialogService dialogService;
+    private final GuiPreferences preferences;
+    private String selectedEntry;
 
     private ConsistencyCheckDialogViewModel viewModel;
 
-    public ConsistencyCheckDialog() {
+    public ConsistencyCheckDialog(BibliographyConsistencyCheck.Result result, DialogService dialogService, GuiPreferences preferences) {
+        this.result = result;
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+
         this.setTitle(Localization.lang("Check consistency"));
         this.initModality(Modality.NONE);
 
@@ -38,42 +48,34 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         return viewModel;
     }
 
-    /* @FXML
-    private void initialize() {
-        viewModel = new ConsistencyCheckDialogViewModel();
-
-        ObservableList<ConsistencyMessage> data = FXCollections.observableArrayList(
-                new ConsistencyMessage("Article", "Key1"),
-                new ConsistencyMessage("Book", "Key2"),
-                new ConsistencyMessage("Conference Paper", "Key3"),
-                new ConsistencyMessage("Thesis", "Key4")
-        );
-
-        entryTypeColumn.setCellValueFactory(new PropertyValueFactory<>("entryType"));
-        keyColumn.setCellValueFactory(new PropertyValueFactory<>("key"));
-
-        tableView.setItems(data);
-    }*/
-
     @FXML
     public void initialize() {
-        List<String> columns = Arrays.asList("Entrytype", "Citationkey", "Address", "Booktitle", "Crossref", "DOI", "Pages", "Ranking", "Series", "URL", "Urldate", "Volume", "Year");
+        viewModel = new ConsistencyCheckDialogViewModel(result, dialogService, preferences);
 
-        for (String column : columns) {
-            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(column);
-            tableColumn.setCellValueFactory(new PropertyValueFactory<>(column.replace(" ", "").toLowerCase())); // Assuming properties in the data class match the column names
-            // tableColumn.setCellValueFactory(new PropertyValueFactory<>("entryType")); // Assuming properties in the data class match the column names
-            tableView.getColumns().add(tableColumn);
-        }
+        result.entryTypeToResultMap().forEach((entrySet, entryTypeResult) -> {
+            entryTypeCombo.getItems().add(entrySet.toString());
 
-        tableView.getItems().addAll(getSampleData());
+            Collection<Field> fields = entryTypeResult.fields();
+            for (Field field: fields) {
+                TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(field.toString());
+                tableColumn.setCellValueFactory(new PropertyValueFactory<>(field.toString()));
+                tableView.getColumns().add(tableColumn);
+            }
+        });
+
+        entryTypeCombo.getSelectionModel().select(entryTypeCombo.getItems().getFirst());
     }
 
-    private ObservableList<ConsistencyMessage> getSampleData() {
-        return FXCollections.observableArrayList(
-                new ConsistencyMessage("Article", "Beck1988", "-", "-", "-", "?", "o", "-", "-", "-", "-", "-", "x"),
-                new ConsistencyMessage("Article", "Duranton2016", "-", "-", "-", "-", "o", "?", "-", "?", "?", "o", "x")
-        );
+    public void selectEntry() {
+        selectedEntry = entryTypeCombo.getSelectionModel().getSelectedItem();
+    }
+
+    public void exportAsCsv() {
+        viewModel.startExportAsCsv();
+    }
+
+    public void exportAsTxt() {
+        viewModel.startExportAsTxt();
     }
 }
 
