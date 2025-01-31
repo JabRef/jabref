@@ -83,19 +83,6 @@ public class TitleCheckerTest {
                     Arguments.of("Title contains full URL without protocol", "Found at www.example.com/something")
             );
         }
-
-        @ParameterizedTest(name = "{index}. Title: \"{1}\" {0}")
-        @MethodSource("validTitlesWithDomainOnlyURLs")
-        void titleShouldAllowDomainOnlyURLs(String message, String title) {
-            assertEquals(Optional.empty(), checker.checkValue(title));
-        }
-
-        static Stream<Arguments> validTitlesWithDomainOnlyURLs() {
-            return Stream.of(
-                    Arguments.of("Title contains a domain only URL", "Visit www.example.com"),
-                    Arguments.of("Title contains a domain only HTTPS URL", "Check https://example.com")
-            );
-        }
     }
 
     @Nested

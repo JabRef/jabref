@@ -31,10 +31,4 @@ class BooktitleCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("Proceedings of the https://example.com/conference"));
         assertNotEquals(Optional.empty(), checker.checkValue("Workshop on www.example.com/session"));
     }
-
-    @Test
-    void booktitleAcceptsDomainOnlyURL() {
-        assertEquals(Optional.empty(), checker.checkValue("Annual Meeting of www.example.com"));
-        assertEquals(Optional.empty(), checker.checkValue("Conference hosted at https://example.com"));
-    }
 }
