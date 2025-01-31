@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.AbstractViewModel;
@@ -22,10 +23,17 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final BibliographyConsistencyCheck.Result result;
 
-    public ConsistencyCheckDialogViewModel(BibliographyConsistencyCheck.Result result, DialogService dialogService, GuiPreferences preferences) {
+    private final List<String> citationKeys;
+
+    public ConsistencyCheckDialogViewModel(BibliographyConsistencyCheck.Result result, List<String> citationKeys, DialogService dialogService, GuiPreferences preferences) {
         this.result = result;
+        this.citationKeys = citationKeys;
         this.dialogService = dialogService;
         this.preferences = preferences;
+    }
+
+    public List<String> getCitationKeys() {
+        return citationKeys;
     }
 
     public void startExportAsTxt() {

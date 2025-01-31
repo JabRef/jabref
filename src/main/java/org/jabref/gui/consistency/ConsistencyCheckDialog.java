@@ -1,12 +1,13 @@
 package org.jabref.gui.consistency;
 
-import java.util.Collection;
+import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
@@ -15,11 +16,15 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
-import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
@@ -27,12 +32,20 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private String selectedEntry;
+
+    private final List<String> entryTypes;
+    private final List<String> columns;
+    private final List<String> citationKeys;
+    private final StringProperty selectedEntry = new SimpleStringProperty();
 
     private ConsistencyCheckDialogViewModel viewModel;
 
-    public ConsistencyCheckDialog(BibliographyConsistencyCheck.Result result, DialogService dialogService, GuiPreferences preferences) {
+    public ConsistencyCheckDialog(BibliographyConsistencyCheck.Result result, List<String> entryTypes, List<String> columns, List<String> citationKeys, DialogService dialogService, GuiPreferences preferences) {
         this.result = result;
+        this.entryTypes = entryTypes;
+        this.columns = columns;
+        this.selectedEntry.setValue(entryTypes.getFirst());
+        this.citationKeys = citationKeys;
         this.dialogService = dialogService;
         this.preferences = preferences;
 
@@ -50,24 +63,22 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ConsistencyCheckDialogViewModel(result, dialogService, preferences);
+        viewModel = new ConsistencyCheckDialogViewModel(result, citationKeys, dialogService, preferences);
 
-        result.entryTypeToResultMap().forEach((entrySet, entryTypeResult) -> {
-            entryTypeCombo.getItems().add(entrySet.toString());
+        entryTypeCombo.getItems().addAll(entryTypes);
+        entryTypeCombo.getSelectionModel().select(selectedEntry.getValue());
 
-            Collection<Field> fields = entryTypeResult.fields();
-            for (Field field: fields) {
-                TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(field.toString());
-                tableColumn.setCellValueFactory(new PropertyValueFactory<>(field.toString()));
-                tableView.getColumns().add(tableColumn);
-            }
-        });
+        TableColumn<ConsistencyMessage, String> keyColumn = new TableColumn<>(StandardField.KEY.toString());
+        tableView.getColumns().add(keyColumn);
 
-        entryTypeCombo.getSelectionModel().select(entryTypeCombo.getItems().getFirst());
+        for (String column: columns) {
+            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(column);
+            tableView.getColumns().add(tableColumn);
+        }
     }
 
     public void selectEntry() {
-        selectedEntry = entryTypeCombo.getSelectionModel().getSelectedItem();
+        selectedEntry.set(entryTypeCombo.getSelectionModel().getSelectedItem());
     }
 
     public void exportAsCsv() {
