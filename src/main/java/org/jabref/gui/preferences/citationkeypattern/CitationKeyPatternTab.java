@@ -46,7 +46,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(preferences);
+        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());

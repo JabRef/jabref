@@ -16,7 +16,6 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -40,9 +39,11 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
     private final CitationKeyPatternPreferences keyPatternPreferences;
     private final ImporterPreferences importerPreferences;
 
-    public CitationKeyPatternTabViewModel(CliPreferences preferences) {
-        this.keyPatternPreferences = preferences.getCitationKeyPatternPreferences();
-        this.importerPreferences = preferences.getImporterPreferences();
+    public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences, ImporterPreferences importerPreferences) {
+        this.keyPatternPreferences = keyPatternPreferences;
+
+        // Defines key generation preference during import.
+        this.importerPreferences = importerPreferences;
     }
 
     @Override
