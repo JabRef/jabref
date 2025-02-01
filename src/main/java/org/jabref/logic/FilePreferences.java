@@ -32,6 +32,7 @@ public class FilePreferences {
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
+    private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty(false);
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -45,7 +46,8 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean shouldKeepDownloadUrl) {
+                           boolean shouldKeepDownloadUrl,
+                           boolean autoRenameFilesOnChange) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -59,6 +61,7 @@ public class FilePreferences {
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
+        this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);
     }
 
     public String getUserAndHost() {
@@ -211,6 +214,18 @@ public class FilePreferences {
 
     public BooleanProperty shouldKeepDownloadUrlProperty() {
         return shouldKeepDownloadUrl;
+    }
+
+    public boolean isAutoRenameFilesOnChange() {
+        return autoRenameFilesOnChange.get();
+    }
+
+    public void setAutoRenameFilesOnChange(boolean autoRenameFilesOnChange) {
+        this.autoRenameFilesOnChange.set(autoRenameFilesOnChange);
+    }
+
+    public BooleanProperty autoRenameFilesOnChangeProperty() {
+        return autoRenameFilesOnChange;
     }
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
