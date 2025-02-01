@@ -15,12 +15,15 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
     private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();
+    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty letterStartAProperty = new SimpleBooleanProperty();
     private final BooleanProperty letterStartBProperty = new SimpleBooleanProperty();
     private final BooleanProperty letterAlwaysAddProperty = new SimpleBooleanProperty();
@@ -35,9 +38,11 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
+    private final ImporterPreferences importerPreferences;
 
-    public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
-        this.keyPatternPreferences = keyPatternPreferences;
+    public CitationKeyPatternTabViewModel(CliPreferences preferences) {
+        this.keyPatternPreferences = preferences.getCitationKeyPatternPreferences();
+        this.importerPreferences = preferences.getImporterPreferences();
     }
 
     @Override
@@ -45,6 +50,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         overwriteAllowProperty.setValue(!keyPatternPreferences.shouldAvoidOverwriteCiteKey());
         overwriteWarningProperty.setValue(keyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
         generateOnSaveProperty.setValue(keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
+        generateKeyOnImportProperty.setValue(importerPreferences.shouldGenerateNewKeyOnImport());
 
         if (keyPatternPreferences.getKeySuffix()
                 == CitationKeyPatternPreferences.KeySuffix.ALWAYS) {
@@ -97,6 +103,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         keyPatternPreferences.setAvoidOverwriteCiteKey(!overwriteAllowProperty.getValue());
         keyPatternPreferences.setWarnBeforeOverwriteCiteKey(overwriteWarningProperty.getValue());
         keyPatternPreferences.setGenerateCiteKeysBeforeSaving(generateOnSaveProperty.getValue());
+        importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         keyPatternPreferences.setKeySuffix(keySuffix);
         keyPatternPreferences.setKeyPatternRegex(keyPatternRegexProperty.getValue());
         keyPatternPreferences.setKeyPatternReplacement(keyPatternReplacementProperty.getValue());
@@ -114,6 +121,10 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty generateOnSaveProperty() {
         return generateOnSaveProperty;
+    }
+
+    public BooleanProperty generateKeyOnImportProperty() {
+        return generateKeyOnImportProperty;
     }
 
     public BooleanProperty letterStartAProperty() {
