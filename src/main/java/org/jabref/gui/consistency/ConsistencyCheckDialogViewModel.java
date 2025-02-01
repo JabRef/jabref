@@ -18,7 +18,13 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.util.StandardFileType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
+
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final BibliographyConsistencyCheck.Result result;
@@ -52,23 +58,29 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             BibliographyConsistencyCheckResultTxtWriter bibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer);
             bibliographyConsistencyCheckResultTxtWriter.writeFindings();
         } catch (IOException e) {
-            dialogService.notify(Localization.lang("Failed to export file!"));
+            LOGGER.error("Problem when export file", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file!"));
         }
     }
 
     public void startExportAsCsv() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
-                .addExtensionFilter(StandardFileType.TXT)
-                .withDefaultExtension(StandardFileType.TXT)
+                .addExtensionFilter(StandardFileType.CSV)
+                .withDefaultExtension(StandardFileType.CSV)
                 .build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
 
+        if (exportPath.isEmpty()) {
+            return;
+        }
+
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()))) {
-            BibliographyConsistencyCheckResultCsvWriter bibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer);
-            bibliographyConsistencyCheckResultTxtWriter.writeFindings();
+            BibliographyConsistencyCheckResultCsvWriter bibliographyConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer);
+            bibliographyConsistencyCheckResultCsvWriter.writeFindings();
         } catch (IOException e) {
-            dialogService.notify(Localization.lang("Failed to export file!"));
+            LOGGER.error("Problem when export file", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file!"));
         }
     }
 }

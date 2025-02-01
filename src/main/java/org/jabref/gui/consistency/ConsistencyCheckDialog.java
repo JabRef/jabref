@@ -77,15 +77,18 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         }
     }
 
-    public void selectEntry() {
+    @FXML
+    private void selectEntry() {
         selectedEntry.set(entryTypeCombo.getSelectionModel().getSelectedItem());
     }
 
-    public void exportAsCsv() {
+    @FXML
+    private void exportAsCsv() {
         viewModel.startExportAsCsv();
     }
 
-    public void exportAsTxt() {
+    @FXML
+    private void exportAsTxt() {
         viewModel.startExportAsTxt();
     }
 }

@@ -12,6 +12,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 public class ConsistencyCheckAction extends SimpleCommand {
 
     private final DialogService dialogService;
@@ -26,6 +28,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
