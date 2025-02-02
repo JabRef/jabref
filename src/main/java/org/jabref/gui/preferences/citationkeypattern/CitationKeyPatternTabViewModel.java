@@ -36,13 +36,18 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
+    /**
+     * The preference for whether to use the key generator on import is different from how it is configured.
+     * <p>
+     * For the UI, there is no better place to put the option than the Citation Key Generator tab,
+     * but shifting the preference to {@link CitationKeyPreferences} would break the abstraction or hierarchy.
+     * Hence, we keep the preference in {@link ImporterPreferences}, but in the UI, we initialize it here.
+     */
     private final ImporterPreferences importerPreferences;
+    private final CitationKeyPatternPreferences keyPatternPreferences;
 
     public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences, ImporterPreferences importerPreferences) {
         this.keyPatternPreferences = keyPatternPreferences;
-
-        // Defines key generation preference during import.
         this.importerPreferences = importerPreferences;
     }
 
