@@ -1,16 +1,19 @@
 package org.jabref.gui.consistency;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -19,38 +22,51 @@ public class ConsistencyCheckAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final BibEntryTypesManager entryTypesManager;
+    private final UiTaskExecutor taskExecutor;
 
-    private final List<String> entryTypes = new ArrayList<>();
-    private final List<String> citationKeys = new ArrayList<>();
-    private final List<String> columns = new ArrayList<>();
-
-    public ConsistencyCheckAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public ConsistencyCheckAction(DialogService dialogService,
+                                  StateManager stateManager,
+                                  GuiPreferences preferences,
+                                  BibEntryTypesManager entryTypesManager,
+                                  UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
+        this.taskExecutor = taskExecutor;
+
         this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+        Task<BibliographyConsistencyCheck.Result> task = new Task<>() {
+            @Override
+            protected BibliographyConsistencyCheck.Result call() {
+             BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+             List<BibEntry> entries = databaseContext.getDatabase().getEntries();
 
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+             BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+             BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
 
-        result.entryTypeToResultMap().forEach((entrySet, entryTypeResult) -> {
-            entryTypes.add(entrySet.toString());
-
-            for (BibEntry entry: entryTypeResult.sortedEntries()) {
-                citationKeys.add(entry.getCitationKey().get());
+             return result;
             }
-
-            for (Field field: entryTypeResult.fields()) {
-                columns.add(field.toString());
+        };
+        task.setOnSucceeded(value -> {
+            BibliographyConsistencyCheck.Result result = task.getValue();
+            if (result.entryTypeToResultMap().isEmpty()) {
+                dialogService.notify(Localization.lang("No problems found."));
+            } else {
+                dialogService.showCustomDialogAndWait(new ConsistencyCheckDialog(dialogService, preferences, entryTypesManager, result));
             }
         });
+        task.setOnFailed(event -> dialogService.showErrorDialogAndWait(Localization.lang("Consistency check failed."), task.getException()));
 
-        dialogService.showCustomDialogAndWait(new ConsistencyCheckDialog(result, entryTypes, columns, citationKeys, dialogService, preferences));
+        dialogService.showProgressDialog(
+                Localization.lang("Checking consistency..."),
+                Localization.lang("Checking consistency..."),
+                task);
+        taskExecutor.execute(task);
     }
 }

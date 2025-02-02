@@ -1,7 +1,6 @@
 package org.jabref.gui.consistency;
 
-import java.util.List;
-
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -16,38 +15,31 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
-
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+    private final StringProperty selectedEntry = new SimpleStringProperty();
 
-    private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-
-    private final List<String> entryTypes;
-    private final List<String> columns;
-    private final List<String> citationKeys;
-    private final StringProperty selectedEntry = new SimpleStringProperty();
+    private final BibEntryTypesManager entryTypesManager;
+    private final BibliographyConsistencyCheck.Result result;
 
     private ConsistencyCheckDialogViewModel viewModel;
 
-    public ConsistencyCheckDialog(BibliographyConsistencyCheck.Result result, List<String> entryTypes, List<String> columns, List<String> citationKeys, DialogService dialogService, GuiPreferences preferences) {
-        this.result = result;
-        this.entryTypes = entryTypes;
-        this.columns = columns;
-        this.selectedEntry.setValue(entryTypes.getFirst());
-        this.citationKeys = citationKeys;
+    public ConsistencyCheckDialog(DialogService dialogService,
+                                  GuiPreferences preferences,
+                                  BibEntryTypesManager entryTypesManager,
+                                  BibliographyConsistencyCheck.Result result) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
+        this.result = result;
 
         this.setTitle(Localization.lang("Check consistency"));
         this.initModality(Modality.NONE);
@@ -63,16 +55,18 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ConsistencyCheckDialogViewModel(result, citationKeys, dialogService, preferences);
+        viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
 
-        entryTypeCombo.getItems().addAll(entryTypes);
+        selectedEntry.set(viewModel.getEntryTypes().getFirst());
+
+        entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.getSelectionModel().select(selectedEntry.getValue());
 
-        TableColumn<ConsistencyMessage, String> keyColumn = new TableColumn<>(StandardField.KEY.toString());
-        tableView.getColumns().add(keyColumn);
+        tableView.setItems(viewModel.getTableData());
 
-        for (String column: columns) {
-            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(column);
+        for (String columnName : viewModel.getColumnNames()) {
+            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
+            tableColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
             tableView.getColumns().add(tableColumn);
         }
     }
@@ -92,4 +86,3 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         viewModel.startExportAsTxt();
     }
 }
-
