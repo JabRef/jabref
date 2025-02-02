@@ -140,7 +140,7 @@ public class CommentsTab extends FieldsEditorTab {
                     Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user-specific comments field"));
                     hideDefaultOwnerCommentButton.setOnAction(e -> {
                         gridPane.getChildren().removeIf(node ->
-                                (node instanceof FieldNameLabel && ((FieldNameLabel) node).getText().equals(userSpecificCommentField.getName()))
+                                (node instanceof FieldNameLabel fnl && fnl.getText().equals(userSpecificCommentField.getName()))
                         );
                         fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
                         editors.remove(userSpecificCommentField);
