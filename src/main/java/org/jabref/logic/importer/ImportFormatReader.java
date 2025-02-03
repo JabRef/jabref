@@ -17,6 +17,7 @@ import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+import org.jabref.logic.importer.fileformat.EpubImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -88,6 +89,7 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());
+        formats.add(new EpubImporter());
 
         // Get custom import formats
         formats.addAll(importerPreferences.getCustomImporters());
