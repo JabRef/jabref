@@ -125,7 +125,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
             Optional<String> eprint = candidate.getField(StandardField.EPRINT);
             if (eprint.isPresent()) {
-                // This code assumes that any `eprint` refers to an arXiv preprint, which is not correct.
+                // This code assumes that `eprint` field refers to an arXiv preprint, which is not correct.
+                // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
                 try {
                     new ArXivFetcher(importFormatPreferences)
                             .performSearchById(eprint.get())
