@@ -319,12 +319,12 @@ class LatexIntegrityCheckerTest {
     @MethodSource("provideCitationKeyInputs")
     void citationKeyField(String expectedMessage, Field field, String value) {
         entry.setField(field, value);
-        // Ensure TTEM03 error is not raised for citation key field
         assertEquals(List.of(), checker.check(entry));
     }
 
     private static Stream<Arguments> provideCitationKeyInputs() {
         return Stream.of(
+                // Ensure TTEM03 error is not raised for citation key field
                 Arguments.of("", InternalField.KEY_FIELD, "Corti_2009"),
                 Arguments.of("", InternalField.KEY_FIELD, "Key_With^Superscript"),
                 Arguments.of("", InternalField.KEY_FIELD, "Key_With_Subscript")

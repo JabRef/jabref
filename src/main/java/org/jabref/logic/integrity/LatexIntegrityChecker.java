@@ -67,7 +67,6 @@ public class LatexIntegrityChecker implements EntryChecker {
                     .filter(pair -> !pair.getValue().getErrorCode().getErrorGroup().equals(CoreErrorGroup.TDE))
                     // Exclude TTEM03 error for citation key field
                     .filter(pair -> !(pair.getValue().getErrorCode().equals(CoreErrorCode.TTEM03) && pair.getKey().equals(InternalField.KEY_FIELD)))
-                    // Exclude errors present in EXCLUDED_ERRORS set
                     .filter(pair -> !EXCLUDED_ERRORS.contains(pair.getValue().getErrorCode()))
                     .map(pair ->
                             new IntegrityMessage(errorMessageFormatHelper(pair.getValue().getErrorCode(), pair.getValue().getArguments()), entry, pair.getKey()))
