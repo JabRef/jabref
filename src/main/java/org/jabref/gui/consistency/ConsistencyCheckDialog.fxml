@@ -7,7 +7,9 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="1200.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.consistency.ConsistencyCheckDialog">
     <content>
@@ -22,15 +24,20 @@
             <HBox spacing="4.0" alignment="CENTER">
                 <Label text="%Entry type"/>
                 <ComboBox fx:id="entryTypeCombo" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
-                <Button onAction="#selectEntry" text="%Select">
+            </HBox>
+            <HBox spacing="4.0" alignment="CENTER">
+                <Button onAction="#exportAsCsv" text="%Export as csv file" />
+                <Button onAction="#exportAsTxt" text="%Export as txt file" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#showInfo"
+                        styleClass="icon-button" prefHeight="20.0" prefWidth="20.0" alignment="CENTER_RIGHT">
+                    <graphic>
+                        <JabRefIconView glyph="INTEGRITY_INFO"/>
+                    </graphic>
                     <tooltip>
-                        <Tooltip text="%Shows results for the selected entry type."/>
+                        <Tooltip text="%Symbols information"/>
                     </tooltip>
                 </Button>
-            </HBox>
-            <HBox spacing="4.0">
-                <Button onAction="#exportAsCsv" text="%Export as csv file" />
-                <Button onAction="#exportAsTxt" text="%Export as txt file" alignment="CENTER_LEFT" />
             </HBox>
         </VBox>
     </content>

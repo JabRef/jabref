@@ -14,6 +14,8 @@ import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -56,6 +58,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final List<Field> allReportedFields;
     private final int columnCount;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
+    private final StringProperty selectedEntryType = new SimpleStringProperty();
 
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
                                            GuiPreferences preferences,
@@ -78,6 +81,10 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
               .forEach(Unchecked.consumer(mapEntry -> {
                   writeMapEntry(mapEntry);
               }));
+    }
+
+    public StringProperty selectedEntryTypeProperty() {
+        return selectedEntryType;
     }
 
     public List<String> getEntryTypes() {

@@ -1,9 +1,8 @@
 package org.jabref.gui.consistency;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -20,12 +19,16 @@ import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
+    private Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
+
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
-    private final StringProperty selectedEntry = new SimpleStringProperty();
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -71,12 +74,22 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
 
-        selectedEntry.set(viewModel.getEntryTypes().getFirst());
-
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
-        entryTypeCombo.getSelectionModel().select(selectedEntry.getValue());
+        entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
+        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), observable -> entryTypeCombo.commitValue());
+        entryTypeCombo.getSelectionModel().selectFirst();
 
-        tableView.setItems(viewModel.getTableData());
+        FilteredList<ConsistencyMessage> filteredData = new FilteredList<>(viewModel.getTableData(), message ->
+                message.message().split("\\s+")[0].equals(viewModel.selectedEntryTypeProperty().get())
+        );
+
+        viewModel.selectedEntryTypeProperty().addListener((obs, oldValue, newValue) -> {
+            filteredData.setPredicate(message ->
+                    message.message().split("\\s+")[0].equals(newValue)
+            );
+        });
+
+        tableView.setItems(filteredData);
 
         for (int i = 0; i < viewModel.getColumnNames().size(); i++) {
             int columnIndex = i;
@@ -90,11 +103,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     }
 
     @FXML
-    private void selectEntry() {
-        selectedEntry.set(entryTypeCombo.getSelectionModel().getSelectedItem());
-    }
-
-    @FXML
     private void exportAsCsv() {
         viewModel.startExportAsCsv();
     }
@@ -102,5 +110,15 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     private void exportAsTxt() {
         viewModel.startExportAsTxt();
+    }
+
+    @FXML
+    private void showInfo() {
+        dialogService.showInformationDialogAndWait(
+                Localization.lang("Symbols Information"),
+                Localization.lang("x    :    Field is present\n" +
+                                  "o    :    Optional field is present\n" +
+                                  "?    :    Unknown field is present\n" +
+                                  "-    :    Field is absent"));
     }
 }
