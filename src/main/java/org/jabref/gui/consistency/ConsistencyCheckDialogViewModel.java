@@ -132,7 +132,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
         StringBuilder sb = new StringBuilder();
         for (String s: theRecord) {
-            sb.append(s + " ");
+            String modifiedString = s.replaceAll("\\s+", " ");
+            sb.append(modifiedString).append(" ");
         }
         tableData.add(new ConsistencyMessage(sb.toString()));
     }
