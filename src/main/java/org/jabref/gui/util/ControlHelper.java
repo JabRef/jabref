@@ -112,7 +112,7 @@ public class ControlHelper {
      * @return the new, truncated string
      */
     public static String truncateString(String text, int maxCharacters, String ellipsisString, EllipsisPosition ellipsisPosition) {
-        if (text == null || "".equals(text)) {
+        if (text == null || text.isEmpty()) {
             return text; // return original
         }
 

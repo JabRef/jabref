@@ -40,7 +40,7 @@ public class GroupSerializer {
     }
 
     private String serializeKeywordGroup(KeywordGroup group) {
-        Boolean isRegex = group instanceof RegexKeywordGroup;
+        boolean isRegex = group instanceof RegexKeywordGroup;
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.KEYWORD_GROUP_ID);
         sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
