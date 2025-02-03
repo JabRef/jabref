@@ -664,12 +664,19 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 0 0 0;
 }
 
-.numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
+.tab-pane.hide-tab-bar > .tab-header-area {
+    -fx-pref-height: 0;
+    visibility: hidden;
 }
 
-.numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
+.tab-pane.hide-tab-bar > .tab-header-area > .headers-region > .tab {
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-pref-height: 0;
+}
+
+.numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
 }
 
 .table-view,
@@ -2035,6 +2042,14 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn > .hits .text {
     -fx-fill: -jr-group-hits-fg;
+}
+
+#groupTree .numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
+}
+
+#groupTree .numberColumn > .hits:all-selected {
+    -fx-background-color: -jr-green;
 }
 
 #groupTree .expansionNodeColumn {
