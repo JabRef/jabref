@@ -664,12 +664,12 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 0 0 0;
 }
 
-.tab-pane.hide-tab-bar .tab-header-area {
+.tab-pane.hide-tab-bar > .tab-header-area {
     -fx-pref-height: 0;
     visibility: hidden;
 }
 
-.tab-pane.hide-tab-bar .tab-header-area > .headers-region > .tab {
+.tab-pane.hide-tab-bar > .tab-header-area > .headers-region > .tab {
     -fx-padding: 0;
     -fx-border-width: 0;
     -fx-pref-height: 0;
