@@ -18,8 +18,12 @@ import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
@@ -64,9 +68,14 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(viewModel.getTableData());
 
-        for (String columnName : viewModel.getColumnNames()) {
-            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
-            tableColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
+        for (int i = 0; i < viewModel.getColumnNames().size(); i++) {
+            int columnIndex = i;
+            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
+            tableColumn.setCellValueFactory(row -> {
+                String[] message = row.getValue().message().split("\\s+");
+                LOGGER.info("info: " + message[columnIndex]);
+                return new ReadOnlyStringWrapper(message[columnIndex]);
+            });
             tableView.getColumns().add(tableColumn);
         }
     }

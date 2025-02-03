@@ -1,14 +1,14 @@
 package org.jabref.logic.quality.consistency;
 
-public class ConsistencyMessage {
-    private String message;
+public record ConsistencyMessage(String message) implements Cloneable {
 
-    public ConsistencyMessage(String message) {
-        this.message = message;
+    @Override
+    public String toString() {
+        return "[" + message() + "]";
     }
 
-    public String getMessage() {
-        return message;
+    @Override
+    public Object clone() {
+        return new ConsistencyMessage(message);
     }
 }
-
