@@ -1,6 +1,8 @@
 package org.jabref.logic.util.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -491,6 +494,17 @@ public class FileUtil {
     }
 
     /**
+     * Test if the file is a ePUB file by simply checking the extension to be ".epub"
+     *
+     * @param file The file to check
+     * @return True if file extension is ".pdf", false otherwise
+     */
+    public static boolean isEpubFile(Path file) {
+        Optional<String> extension = FileUtil.getFileExtension(file);
+        return extension.isPresent() && StandardFileType.EPUB.getExtensions().contains(extension.get());
+    }
+
+    /**
      * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
      */
     public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
@@ -584,5 +598,20 @@ public class FileUtil {
 
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
+    }
+
+    /**
+     * When you need to read (extract) a file from a ZIP archive, you cannot convert `ZipPath` (`ZipPath` is a private class) to {@link File}.
+     * One way of solving this problem is to make a temporary file, and copy ZIP file contents to the temporary file.
+     * <p>
+     * Adapted from <a href="https://stackoverflow.com/a/79077999/10037342">...</a>.
+     */
+    public static Path remapZipPath(Path zipPath) throws IOException {
+        final File tempFile = File.createTempFile("PREFIX" + UUID.randomUUID(), "SUFFIX");
+        tempFile.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            Files.copy(zipPath, out);
+        }
+        return tempFile.toPath();
     }
 }
