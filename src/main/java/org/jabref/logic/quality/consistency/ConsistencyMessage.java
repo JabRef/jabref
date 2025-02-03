@@ -1,6 +1,8 @@
 package org.jabref.logic.quality.consistency;
 
-public record ConsistencyMessage(String message) implements Cloneable {
+import org.jabref.model.entry.BibEntry;
+
+public record ConsistencyMessage(String message, BibEntry bibEntry) implements Cloneable {
 
     @Override
     public String toString() {
@@ -9,6 +11,6 @@ public record ConsistencyMessage(String message) implements Cloneable {
 
     @Override
     public Object clone() {
-        return new ConsistencyMessage(message);
+        return new ConsistencyMessage(message, bibEntry);
     }
 }

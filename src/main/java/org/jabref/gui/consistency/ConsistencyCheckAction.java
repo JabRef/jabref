@@ -1,10 +1,12 @@
 package org.jabref.gui.consistency;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -19,17 +21,20 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class ConsistencyCheckAction extends SimpleCommand {
 
+    Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final UiTaskExecutor taskExecutor;
 
-    public ConsistencyCheckAction(DialogService dialogService,
+    public ConsistencyCheckAction(Supplier<LibraryTab> tabSupplier,
+                                  DialogService dialogService,
                                   StateManager stateManager,
                                   GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   UiTaskExecutor taskExecutor) {
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -58,7 +63,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
             if (result.entryTypeToResultMap().isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new ConsistencyCheckDialog(dialogService, preferences, entryTypesManager, result));
+                dialogService.showCustomDialogAndWait(new ConsistencyCheckDialog(tabSupplier.get(), dialogService, preferences, entryTypesManager, result));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait(Localization.lang("Consistency check failed."), task.getException()));

@@ -3,6 +3,7 @@ package org.jabref.gui.consistency;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -10,6 +11,7 @@ import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -18,17 +20,14 @@ import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
     private final StringProperty selectedEntry = new SimpleStringProperty();
 
+    private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -36,10 +35,12 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     private ConsistencyCheckDialogViewModel viewModel;
 
-    public ConsistencyCheckDialog(DialogService dialogService,
+    public ConsistencyCheckDialog(LibraryTab libraryTab,
+                                  DialogService dialogService,
                                   GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   BibliographyConsistencyCheck.Result result) {
+        this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
@@ -53,6 +54,13 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
     }
 
+    private void onSelectionChanged(ListChangeListener.Change<? extends ConsistencyMessage> change) {
+        if (change.next()) {
+            change.getAddedSubList().stream().findFirst().ifPresent(message ->
+                    libraryTab.showAndEdit(message.bibEntry()));
+        }
+    }
+
     public ConsistencyCheckDialogViewModel getViewModel() {
         return viewModel;
     }
@@ -60,6 +68,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
+
+        tableView.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
 
         selectedEntry.set(viewModel.getEntryTypes().getFirst());
 
@@ -73,7 +83,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
             tableColumn.setCellValueFactory(row -> {
                 String[] message = row.getValue().message().split("\\s+");
-                LOGGER.info("info: " + message[columnIndex]);
                 return new ReadOnlyStringWrapper(message[columnIndex]);
             });
             tableView.getColumns().add(tableColumn);
