@@ -20,12 +20,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
-
-    private Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialog.class);
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
@@ -116,9 +112,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     private void showInfo() {
         dialogService.showInformationDialogAndWait(
                 Localization.lang("Symbols Information"),
-                Localization.lang("x    :    Field is present\n" +
-                                  "o    :    Optional field is present\n" +
-                                  "?    :    Unknown field is present\n" +
-                                  "-    :    Field is absent"));
+                Localization.lang("x    :    Field is present\no    :    Optional field is present\n?    :    Unknown field is present\n-    :    Field is absent"));
     }
 }
