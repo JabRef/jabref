@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
+import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.DragDrop;
@@ -100,6 +101,7 @@ public class ImportHandler {
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences, TransferMode transferMode) {
+        // TODO: Make a utility class out of this. Package: org.jabref.logic.externalfiles.
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
@@ -128,11 +130,21 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            ParserResult pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
-                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+                            final List<BibEntry> pdfEntriesInFile;
 
-                            if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                            // Details: See ADR-0043
+                            if (files.size() == 1) {
+                                pdfEntriesInFile = new ArrayList<>(1);
+                                UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
+                                    MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(new BibEntry(), file, preferences, taskExecutor);
+                                    dialogService.showCustomDialogAndWait(dialog).ifPresent(pdfEntriesInFile::add);
+                                });
+                            } else {
+                                ParserResult pdfImporterResult = contentImporter.importPDFContent(file, bibDatabaseContext, filePreferences);
+                                pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+                                if (pdfImporterResult.hasWarnings()) {
+                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                                }
                             }
 
                             if (pdfEntriesInFile.isEmpty()) {
@@ -221,6 +233,13 @@ public class ImportHandler {
         addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
+    public void importCleanedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) {
+        bibDatabaseContext.getDatabase().insertEntries(entries);
+        generateKeys(entries);
+        setAutomaticFields(entries);
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
+    }
+
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
     }
@@ -239,7 +258,7 @@ public class ImportHandler {
                               }
                               finalEntry = duplicateHandledEntry.get();
                           }
-                          importCleanedEntries(List.of(finalEntry));
+                          importCleanedEntries(bibDatabaseContext, List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
                           BibEntry entryToFocus = finalEntry;
                           stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));

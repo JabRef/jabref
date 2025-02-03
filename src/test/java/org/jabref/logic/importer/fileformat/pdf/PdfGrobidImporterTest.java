@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -75,6 +75,6 @@ class PdfGrobidImporterTest {
 
     @Test
     void getCommandLineId() {
-        assertEquals("grobidPdf", importer.getId());
+        assertEquals("pdfGrobid", importer.getId());
     }
 }

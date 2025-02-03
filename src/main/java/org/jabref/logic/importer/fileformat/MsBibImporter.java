@@ -77,6 +77,11 @@ public class MsBibImporter extends Importer {
     }
 
     @Override
+    public String getId() {
+        return "msbib";
+    }
+
+    @Override
     public String getName() {
         return "MSBib";
     }
