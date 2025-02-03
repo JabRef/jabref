@@ -110,8 +110,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void showInfo() {
-        dialogService.showInformationDialogAndWait(
-                Localization.lang("Symbols Information"),
-                Localization.lang("x    :    Field is present\no    :    Optional field is present\n?    :    Unknown field is present\n-    :    Field is absent"));
+        dialogService.showInformationDialogAndWait(Localization.lang("Symbols Information"), Localization.lang("Symbols Information"));
     }
 }
