@@ -45,9 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ImportFormatReader {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     public static final String BIBTEX_FORMAT = "BibTeX";
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     /**
      * All import formats.
