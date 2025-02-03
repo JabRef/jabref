@@ -160,7 +160,7 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    def pdfbox = "3.0.3"
+    def pdfbox = "3.0.4"
     implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
         exclude group: 'commons-logging'
     }
@@ -213,7 +213,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.12'
 
-    implementation 'org.postgresql:postgresql:42.7.4'
+    implementation 'org.postgresql:postgresql:42.7.5'
 
     // Support unix socket connection types
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
@@ -244,7 +244,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.4'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.81.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.83.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
