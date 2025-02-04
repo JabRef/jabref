@@ -54,7 +54,7 @@ class RenamePdfCleanupTest {
      */
     @Test
     void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        Path path = testFolder.resolve("toot.tmp");
+        Path path = testFolder.resolve("toot.pdf");
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
@@ -63,7 +63,7 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.pdf"), "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
@@ -92,7 +92,7 @@ class RenamePdfCleanupTest {
 
     @Test
     void cleanupRenamePdfRenamesFileStartingWithCitationKey() throws IOException {
-        Path path = testFolder.resolve("Toot.tmp");
+        Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
@@ -102,7 +102,7 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.tmp"), "");
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.pdf"), "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
