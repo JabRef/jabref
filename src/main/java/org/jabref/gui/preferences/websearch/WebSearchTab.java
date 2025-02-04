@@ -26,6 +26,7 @@ import org.jabref.logic.preferences.FetcherApiKey;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.apache.logging.log4j.util.Strings;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
@@ -35,6 +36,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
     @FXML private ComboBox<PlainCitationParserChoice> defaultPlainCitationParser;
+    @FXML private TextField citationsRelationStoreTTL;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -83,6 +85,25 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 .install(defaultPlainCitationParser);
         defaultPlainCitationParser.itemsProperty().bind(viewModel.plainCitationParsers());
         defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());
+
+        viewModel.citationsRelationsStoreTTLProperty()
+                 .addListener((observable, oldValue, newValue) -> {
+                     if (newValue != null && !newValue.toString().equals(citationsRelationStoreTTL.getText())) {
+                         citationsRelationStoreTTL.setText(newValue.toString());
+                     }
+                 });
+        citationsRelationStoreTTL
+                .textProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (Strings.isBlank(newValue)) {
+                        return;
+                    }
+                    if (!newValue.matches("\\d*")) {
+                        citationsRelationStoreTTL.setText(newValue.replaceAll("\\D", ""));
+                        return;
+                    }
+                    viewModel.citationsRelationsStoreTTLProperty().set(Integer.parseInt(newValue));
+                });
 
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
