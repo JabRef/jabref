@@ -23,6 +23,11 @@
     </fx:define>
     <Label styleClass="titleHeader" text="%Linked files"/>
     <Label styleClass="sectionHeader" text="%File directory"/>
+    <CheckBox fx:id="autoRenameFilesOnChange" text="%Auto rename files if entry changes">
+        <tooltip>
+            <Tooltip text="%Automatically rename attached files when the entry changes"/>
+        </tooltip>
+    </CheckBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <RadioButton fx:id="useMainFileDirectory" text="%Main file directory" toggleGroup="$fileDirectoryToggleGroup"></RadioButton>
         <TextField fx:id="mainFileDirectory" HBox.hgrow="ALWAYS"/>
