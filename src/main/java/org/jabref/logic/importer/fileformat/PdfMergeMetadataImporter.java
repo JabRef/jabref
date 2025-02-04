@@ -125,14 +125,14 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
             Optional<String> eprint = candidate.getField(StandardField.EPRINT);
             if (eprint.isPresent()) {
-                // It's not exactly right, arXiv is not the only preprint service.
-                // There should be check for `archivePrefix = {arXiv}`, but I'm worried if user didn't set it.
+                // This code assumes that `eprint` field refers to an arXiv preprint, which is not correct.
+                // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
                 try {
                     new ArXivFetcher(importFormatPreferences)
                             .performSearchById(eprint.get())
                             .ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
-                    LOGGER.error("Fetching failed for eprint \"{}\".", eprint.get(), e);
+                    LOGGER.error("Fetching failed for arXiv ID \"{}\".", eprint.get(), e);
                 }
             }
 
@@ -148,13 +148,6 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", isbn.get(), e);
                 }
             }
-            if (candidate.hasField(StandardField.EPRINT)) {
-                try {
-                    new ArXivFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.EPRINT).get()).ifPresent(fetchedCandidates::add);
-                } catch (FetcherException e) {
-                    LOGGER.error("Fetching failed for arXiv ID \"{}\".", candidate.getField(StandardField.EPRINT).get(), e);
-                }
-            }
 
             // TODO: Handle URLs too.
             // However, it may have problems if URL refers to the same identifier in DOI, ISBN, or arXiv.
@@ -166,7 +159,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
         BibEntry entry = new BibEntry();
 
-        // Functional style is used here (instead of imperative like in `extractCandidatesFromPdf` or `fetchIdsOfCandidates`,
+        // Functional style is used here instead of imperative like in `extractCandidatesFromPdf` or `fetchIdsOfCandidates`,
         // because they have checked exceptions.
 
         candidates.forEach(candidate -> {
