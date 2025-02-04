@@ -176,6 +176,18 @@ public class ImportHandler {
                                 message = bibtexParserResult.getErrorMessage();
                             }
                             addResultToList(file, success, message);
+                        } else if (FileUtil.isEpubFile(file)) {
+                            ParserResult result = contentImporter.importEpubContent(file);
+                            List<BibEntry> entries = result.getDatabase().getEntries();
+                            boolean success = !result.hasWarnings();
+                            String message;
+                            if (success) {
+                                message = Localization.lang("ePUB entry was successfully imported");
+                            } else {
+                                message = result.getErrorMessage();
+                            }
+                            entriesToAdd.addAll(entries);
+                            addResultToList(file, true, message);
                         } else {
                             BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
                             entriesToAdd.add(emptyEntryWithLink);
