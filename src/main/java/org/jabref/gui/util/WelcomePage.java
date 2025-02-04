@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -114,7 +115,7 @@ public class WelcomePage extends VBox {
         }
     }
 
-    private VBox createBox(Pos alignment, javafx.scene.Node... nodes) {
+    private VBox createBox(Pos alignment, Node... nodes) {
         VBox box = new VBox(5);
         box.setAlignment(alignment);
         box.getChildren().addAll(nodes);
