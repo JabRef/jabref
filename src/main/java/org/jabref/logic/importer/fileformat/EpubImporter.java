@@ -43,12 +43,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class EpubImporter extends Importer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EpubImporter.class);
-
     private static final char[] EPUB_HEADER_MAGIC_NUMBER = {0x50, 0x4b, 0x03, 0x04};
-
-    private static final String METADATA_PATH_1 = "/OEBPS/content.opf";
-    private static final String METADATA_PATH_2 = "/content.opf";
 
     private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     private final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -92,7 +87,7 @@ public class EpubImporter extends Importer {
         try (FileSystem fileSystem = FileSystems.newFileSystem(filePath)) {
             OptionalObjectProperty<Path> metadataFilePath = OptionalObjectProperty.empty();
 
-            Files.walkFileTree(fileSystem.getPath("/"), new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(fileSystem.getPath("/"), new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     if (file.toString().endsWith(".opf")) {
