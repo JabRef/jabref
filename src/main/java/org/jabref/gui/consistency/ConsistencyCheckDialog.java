@@ -5,12 +5,14 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -90,10 +92,41 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         for (int i = 0; i < viewModel.getColumnNames().size(); i++) {
             int columnIndex = i;
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
+
             tableColumn.setCellValueFactory(row -> {
                 String[] message = row.getValue().message().split("\\s+");
                 return new ReadOnlyStringWrapper(message[columnIndex]);
             });
+
+            tableColumn.setCellFactory(column -> new TableCell<ConsistencyMessage, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        switch (item.toLowerCase()) {
+                            case "-":
+                                setGraphic(IconTheme.JabRefIcons.HYPHEN.getGraphicNode());
+                                break;
+                            case "x":
+                                setGraphic(IconTheme.JabRefIcons.CROSS.getGraphicNode());
+                                break;
+                            case "?":
+                                setGraphic(IconTheme.JabRefIcons.QUESTION_MARK.getGraphicNode());
+                                break;
+                            case "o":
+                                setGraphic(IconTheme.JabRefIcons.CIRCLE.getGraphicNode());
+                                break;
+                            default:
+                                setGraphic(null);
+                                setText(item);
+                        }
+                    }
+                }
+            });
+
             tableView.getColumns().add(tableColumn);
         }
     }
@@ -110,6 +143,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void showInfo() {
-        dialogService.showInformationDialogAndWait(Localization.lang("Symbols Information"), Localization.lang("Symbols Information"));
+        ConsistencySymbolsDialog consistencySymbolsDialog = new ConsistencySymbolsDialog();
+        dialogService.showCustomDialog(consistencySymbolsDialog);
     }
 }
