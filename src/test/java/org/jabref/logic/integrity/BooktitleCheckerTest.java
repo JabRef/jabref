@@ -25,4 +25,10 @@ class BooktitleCheckerTest {
     void booktitleIsBlank() {
         assertEquals(Optional.empty(), checker.checkValue(" "));
     }
+
+    @Test
+    void booktitleDoesNotAcceptFullURL() {
+        assertNotEquals(Optional.empty(), checker.checkValue("Proceedings of the https://example.com/conference"));
+        assertNotEquals(Optional.empty(), checker.checkValue("Workshop on www.example.com/session"));
+    }
 }
