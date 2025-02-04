@@ -119,6 +119,7 @@ public class ControlHelper {
         if (ellipsisString == null) {
             ellipsisString = "";
         }
+        text = text.replace("_", "__");
 
         if (maxCharacters == -1) {
             maxCharacters = 75; // default
