@@ -18,12 +18,14 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -49,6 +51,7 @@ import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.WelcomePage;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -104,6 +107,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private Subscription dividerSubscription;
 
+    private final WelcomePage welcomePage;
+    private final StackPane contentPane = new StackPane();
+
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -124,6 +130,30 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+
+        this.fileHistory = new FileHistoryMenu(
+                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
+                dialogService,
+                getOpenDatabaseAction());
+
+        this.fileHistory.getItems().addListener((ListChangeListener<MenuItem>) change -> {
+            boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
+            fileHistory.setDisable(!hasRecentFiles);
+        });
+
+        this.welcomePage = new WelcomePage(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor,
+                fileHistory
+        );
 
         setId("frame");
 
@@ -174,10 +204,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this.preferences,
                 taskExecutor);
 
-        this.fileHistory = new FileHistoryMenu(
-                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
-                dialogService,
-                getOpenDatabaseAction());
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -191,6 +217,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         frameDndHandler.initDragAndDrop();
         initBindings();
         initTabBarManager();
+        bindDatabaseChanges();
+        updateContent();
     }
 
     private void initLayout() {
@@ -230,11 +258,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         setTop(head);
 
         splitPane.getItems().addAll(tabbedPane);
+        contentPane.getChildren().addAll(welcomePage, splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
-        setCenter(splitPane);
+        setCenter(contentPane);
+        updateSidePane();
+        updateContent();
+    }
+
+    private void updateContent() {
+        boolean hasOpenDatabases = !stateManager.getOpenDatabases().isEmpty();
+        welcomePage.setVisible(!hasOpenDatabases);
+        splitPane.setVisible(hasOpenDatabases);
+
+        boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
+        fileHistory.setDisable(!hasRecentFiles);
+    }
+
+    private void bindDatabaseChanges() {
+        stateManager.getOpenDatabases().addListener((InvalidationListener) obs -> Platform.runLater(this::updateContent));
     }
 
     private void updateSidePane() {
