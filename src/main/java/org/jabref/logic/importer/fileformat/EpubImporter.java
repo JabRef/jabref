@@ -37,8 +37,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -82,6 +80,13 @@ public class EpubImporter extends Importer {
         // to write {@link addField}.
         // Potentially, this class won't work properly in concurrent situations.
 
+        // TODO: JabRef has {@link DublinCoreExtractor}, which is exactly the schema used in OPF. However, that class
+        // is tied to {@link DublinCoreSchema}, which is tied to {@link XMPSchema}. It seems there are no way to pass
+        // ordinary XML nodes to {@link DublinCoreSchema}.
+        //
+        // Current implementation uses some hand-crafted {@link XPath}s, which work okayish, but not as good as a
+        // full-featured {@link DublinCoreExtractor}.
+
         entry = new BibEntry(StandardEntryType.Book);
 
         try (FileSystem fileSystem = FileSystems.newFileSystem(filePath)) {
@@ -113,8 +118,6 @@ public class EpubImporter extends Importer {
             List<String> authors = XMLUtil.getNodesContentByXPath(document, creatorPath);
             List<String> subjects = XMLUtil.getNodesContentByXPath(document, subjectPath);
             List<String> languages = XMLUtil.getNodesContentByXPath(document, languagePath);
-
-            // TODO: Extract editors.
 
             addField(StandardField.TITLE, title);
             addField(StandardField.ABSTRACT, description);

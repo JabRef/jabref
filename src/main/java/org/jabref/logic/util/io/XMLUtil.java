@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.RandomAccess;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import javax.xml.transform.OutputKeys;
@@ -152,7 +153,7 @@ public class XMLUtil {
         return IntStream
                 .range(0, nodes.getLength())
                 .mapToObj(i -> nodes.item(i).getTextContent())
-                .filter(s -> !(s == null || s.isBlank())) // Just in case.
+                .filter(Predicate.not(StringUtil::isNullOrEmpty)) // Just in case.
                 .toList();
     }
 

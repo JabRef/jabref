@@ -600,13 +600,15 @@ public class FileUtil {
     }
 
     /**
+     * Create a temporary file and fill it with contents of a file in ZIP archive.
+     * <p>
      * When you need to read (extract) a file from a ZIP archive, you cannot convert `ZipPath` (`ZipPath` is a private class) to {@link File}.
      * One way of solving this problem is to make a temporary file, and copy ZIP file contents to the temporary file.
      * <p>
-     * Adapted from <a href="https://stackoverflow.com/a/79077999/10037342">...</a>.
+     * Adapted from <a href="https://stackoverflow.com/a/79077999/10037342"/>.
      */
     public static Path remapZipPath(Path zipPath) throws IOException {
-        final File tempFile = File.createTempFile("PREFIX" + UUID.randomUUID(), "SUFFIX");
+        File tempFile = Files.createTempFile(UUID.randomUUID().toString(), ".tmp").toFile();
         tempFile.deleteOnExit();
         try (FileOutputStream out = new FileOutputStream(tempFile)) {
             Files.copy(zipPath, out);

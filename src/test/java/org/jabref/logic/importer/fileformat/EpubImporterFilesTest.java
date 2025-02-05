@@ -60,7 +60,7 @@ class EpubImporterFilesTest {
 
     private static Stream<String> invalidFileNames() throws IOException {
         // Clashes with ZIP-based formats are inevitable.
-        Predicate<String> fileName = name -> !name.startsWith("EpubImporterTest") && !name.startsWith("CitaviXmlImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("EpubImporterTest") && !name.endsWith(".ctv6bak");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
