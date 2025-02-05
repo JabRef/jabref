@@ -137,7 +137,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
-        uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("offset", (pageNumber * getPageSize()));
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified
         uriBuilder.addParameter("fields", "paperId,externalIds,url,title,abstract,venue,year,authors");

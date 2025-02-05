@@ -170,7 +170,7 @@ public class MainTableColumnFactory {
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
         column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
-                String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
+                (cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);

@@ -293,7 +293,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
         }
         // Starts to index at 1 for the first entry
-        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
+        uriBuilder.addParameter("start_record", (getPageSize() * pageNumber) + 1);
 
         return uriBuilder.build().toURL();
     }

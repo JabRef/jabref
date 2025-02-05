@@ -91,7 +91,7 @@ public class AstrophysicsDataSystem
         builder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
-        builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
+        builder.addParameter("start", (getPageSize() * pageNumber));
         return builder.build().toURL();
     }
 

@@ -194,7 +194,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         uriBuilder.addParameter("hl", "en");
         uriBuilder.addParameter("btnG", "Search");
         uriBuilder.addParameter("q", transformedQuery);
-        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("start", (pageNumber * getPageSize()));
         uriBuilder.addParameter("num", String.valueOf(getPageSize()));
         uriBuilder.addParameter("as_ylo", String.valueOf(queryTransformer.getStartYear()));
         uriBuilder.addParameter("as_yhi", String.valueOf(queryTransformer.getEndYear()));

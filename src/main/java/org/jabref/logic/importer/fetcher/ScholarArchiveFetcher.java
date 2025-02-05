@@ -48,7 +48,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new ScholarArchiveQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
-        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber));
+        uriBuilder.addParameter("from", (getPageSize() * pageNumber));
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
         uriBuilder.addParameter("format", "json");
 

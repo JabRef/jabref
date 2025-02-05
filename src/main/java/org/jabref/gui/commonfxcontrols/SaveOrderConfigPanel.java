@@ -83,11 +83,11 @@ public class SaveOrderConfigPanel extends VBox {
                          .forEach(item -> {
                              GridPane.setRowIndex(item, GridPane.getRowIndex(item) + 1);
                              if (item instanceof Label label) {
-                                 label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));
+                                 label.setText((GridPane.getRowIndex(item) + 1));
                              }
                          });
 
-        Label label = new Label(String.valueOf(row + 1));
+        Label label = new Label((row + 1));
         sortCriterionList.add(label, 0, row);
 
         ComboBox<Field> field = new ComboBox<>(viewModel.sortableFieldsProperty());
@@ -144,7 +144,7 @@ public class SaveOrderConfigPanel extends VBox {
                          .forEach(item -> {
                              GridPane.setRowIndex(item, GridPane.getRowIndex(item) - 1);
                              if (item instanceof Label label) {
-                                 label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));
+                                 label.setText((GridPane.getRowIndex(item) + 1));
                              }
                          });
     }
