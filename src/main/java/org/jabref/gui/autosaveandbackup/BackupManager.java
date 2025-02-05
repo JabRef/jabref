@@ -60,7 +60,7 @@ public class BackupManager {
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
-    private static final Set<BackupManager> runningInstances = new HashSet<>();
+    private static final Set<BackupManager> RUNNING_INSTANCES = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final CliPreferences preferences;
@@ -110,7 +110,7 @@ public class BackupManager {
     public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
-        runningInstances.add(backupManager);
+        RUNNING_INSTANCES.add(backupManager);
         return backupManager;
     }
 
@@ -120,7 +120,7 @@ public class BackupManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
+        RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
     /**
@@ -131,8 +131,8 @@ public class BackupManager {
      * @param backupDir The path to the backup directory
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
-        runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
+        RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
+        RUNNING_INSTANCES.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
     /**
