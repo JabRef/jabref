@@ -133,19 +133,24 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
-                    notificationPane.notify(
-                            IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
-                            Localization.lang("Export operation finished successfully."),
-                            List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
-                                try {
-                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
-                                } catch (IOException e) {
-                                    LOGGER.error("Could not open export folder.", e);
-                                }
-                                notificationPane.hide();
-                            })),
-                            Duration.seconds(5));
+                    if (tabSupplier.get() != null) {
+                        LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
+                        notificationPane.notify(
+                                IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
+                                Localization.lang("Export operation finished successfully."),
+                                List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
+                                    try {
+                                        NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
+                                    } catch (
+                                            IOException e) {
+                                        LOGGER.error("Could not open export folder.", e);
+                                    }
+                                    notificationPane.hide();
+                                })),
+                                Duration.seconds(5));
+                    } else {
+                        LOGGER.warn("Library Tab is null as Welcome Tab is open");
+                    }
                 })
                 .onFailure(this::handleError)
                 .executeWith(taskExecutor);

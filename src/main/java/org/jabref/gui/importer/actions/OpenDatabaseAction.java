@@ -147,10 +147,15 @@ public class OpenDatabaseAction extends SimpleCommand {
     Path getInitialDirectory() {
         if (tabContainer.getLibraryTabs().isEmpty()) {
             return preferences.getFilePreferences().getWorkingDirectory();
-        } else {
-            Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
         }
+
+        LibraryTab currentTab = tabContainer.getCurrentLibraryTab();
+        if (currentTab == null) {
+            return preferences.getFilePreferences().getWorkingDirectory();
+        }
+
+        Optional<Path> databasePath = currentTab.getBibDatabaseContext().getDatabasePath();
+        return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
     }
 
     /**

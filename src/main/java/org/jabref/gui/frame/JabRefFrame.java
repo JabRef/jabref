@@ -25,7 +25,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -34,6 +33,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -108,7 +108,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private Subscription dividerSubscription;
 
     private final WelcomePage welcomePage;
-    private final StackPane contentPane = new StackPane();
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -257,22 +256,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
-        contentPane.getChildren().addAll(welcomePage, splitPane);
+        WelcomeTab welcomeTab = new WelcomeTab(welcomePage);
+        tabbedPane.getTabs().add(welcomeTab);
+        splitPane.getItems().add(tabbedPane);
+        setCenter(splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
-        updateSidePane();
-        setCenter(contentPane);
         updateSidePane();
         updateContent();
     }
 
     private void updateContent() {
-        boolean hasOpenDatabases = !stateManager.getOpenDatabases().isEmpty();
-        welcomePage.setVisible(!hasOpenDatabases);
-        splitPane.setVisible(hasOpenDatabases);
-
         boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
         fileHistory.setDisable(!hasRecentFiles);
     }
@@ -495,10 +490,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
-            return null;
-        }
-        return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
+        return (LibraryTab) Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
+                                    .filter(tab -> tab instanceof LibraryTab).orElse(null);
     }
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {

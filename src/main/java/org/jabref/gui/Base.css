@@ -1740,18 +1740,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: "Arial";
 }
 
-.description-label {
+.welcome-description-label {
     -fx-font-size: 25px;
     -fx-font-family: "Arial";
 }
 
-.header-label {
+.welcome-header-label {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
 }
 
-.no-recent-label {
+.welcome-no-recent-label {
     -fx-font-size: 18px;
     -fx-text-fill: -jr-theme;
     -fx-font-family: "Arial";
@@ -1768,7 +1768,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 31;
+    -fx-font-size: 30;
     -fx-text-fill: -jr-theme;
 }
 

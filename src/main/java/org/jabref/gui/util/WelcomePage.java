@@ -24,9 +24,22 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-public class WelcomePage extends VBox {
+public class WelcomePage {
 
+    private final VBox welcomePageContainer;
+    private final HBox welcomeMainContainer;
     private final VBox recentLibrariesBox;
+    private final JabRefFrame frame;
+    private final GuiPreferences preferences;
+    private final AiService aiService;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final CountingUndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
+    private final TaskExecutor taskExecutor;
+    private final FileHistoryMenu fileHistoryMenu;
 
     public WelcomePage(JabRefFrame frame,
                        GuiPreferences preferences,
@@ -40,22 +53,37 @@ public class WelcomePage extends VBox {
                        TaskExecutor taskExecutor,
                        FileHistoryMenu fileHistoryMenu) {
 
-        setAlignment(Pos.CENTER);
-        setSpacing(10);
+        this.frame = frame;
+        this.preferences = preferences;
+        this.aiService = aiService;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
+        this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
+        this.taskExecutor = taskExecutor;
+        this.fileHistoryMenu = fileHistoryMenu;
 
         this.recentLibrariesBox = new VBox(5);
 
+        this.welcomePageContainer = new VBox(20);
+        welcomePageContainer.setAlignment(Pos.CENTER);
+
+        this.welcomeMainContainer = new HBox(20);
+        welcomeMainContainer.setAlignment(Pos.CENTER);
+
         VBox welcomeBox = createWelcomeBox();
-        VBox startBox = createStartBox(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
-        VBox recentBox = createRecentBox(fileHistoryMenu);
+        VBox startBox = createWelcomeStartBox();
+        VBox recentBox = createWelcomeRecentBox();
 
-        VBox container = new VBox(20, welcomeBox, startBox, recentBox);
-        container.setAlignment(Pos.CENTER);
+        welcomePageContainer.getChildren().addAll(welcomeBox, startBox, recentBox);
 
-        HBox mainContainer = new HBox(20, container);
-        mainContainer.setAlignment(Pos.CENTER);
+        welcomeMainContainer.getChildren().add(welcomePageContainer);
+    }
 
-        getChildren().add(mainContainer);
+    public HBox getWelcomeMainContainer() {
+        return welcomeMainContainer;
     }
 
     private VBox createWelcomeBox() {
@@ -63,51 +91,50 @@ public class WelcomePage extends VBox {
         welcomeLabel.getStyleClass().add("welcome-label");
 
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your Literature"));
-        descriptionLabel.getStyleClass().add("description-label");
+        descriptionLabel.getStyleClass().add("welcome-description-label");
 
-        return createBox(Pos.TOP_LEFT, welcomeLabel, descriptionLabel);
+        return createVBoxContainer(welcomeLabel, descriptionLabel);
     }
 
-    private VBox createStartBox(JabRefFrame frame, GuiPreferences preferences, AiService aiService, DialogService dialogService, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager, CountingUndoManager undoManager, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
+    private VBox createWelcomeStartBox() {
         Label startLabel = new Label(Localization.lang("Start"));
-        startLabel.getStyleClass().add("header-label");
+        startLabel.getStyleClass().add("welcome-header-label");
 
-        Hyperlink newLibrary = new Hyperlink(Localization.lang("New Library"));
-        newLibrary.getStyleClass().add("welcome-hyperlink");
-        newLibrary.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
+        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New Library"));
+        newLibraryLink.getStyleClass().add("welcome-hyperlink");
+        newLibraryLink.setOnAction(e -> new NewDatabaseAction(frame, preferences).execute());
 
-        Hyperlink openLibrary = new Hyperlink(Localization.lang("Open Library"));
-        openLibrary.getStyleClass().add("welcome-hyperlink");
-        openLibrary.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
+        Hyperlink openLibraryLink = new Hyperlink(Localization.lang("Open Library"));
+        openLibraryLink.getStyleClass().add("welcome-hyperlink");
+        openLibraryLink.setOnAction(e -> new OpenDatabaseAction(frame, preferences, aiService, dialogService,
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
-        return createBox(Pos.TOP_LEFT, startLabel, newLibrary, openLibrary);
+        return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink);
     }
 
-    private VBox createRecentBox(FileHistoryMenu fileHistoryMenu) {
+    private VBox createWelcomeRecentBox() {
         Label recentLabel = new Label(Localization.lang("Recent"));
-        recentLabel.getStyleClass().add("header-label");
+        recentLabel.getStyleClass().add("welcome-header-label");
 
         recentLibrariesBox.setAlignment(Pos.TOP_LEFT);
-        updateRecentLibraries(fileHistoryMenu);
+        updateWelcomeRecentLibraries();
 
-        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) change -> updateRecentLibraries(fileHistoryMenu));
+        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) change -> updateWelcomeRecentLibraries());
 
-        return createBox(Pos.TOP_LEFT, recentLabel, recentLibrariesBox);
+        return createVBoxContainer(recentLabel, recentLibrariesBox);
     }
 
-    private void updateRecentLibraries(FileHistoryMenu fileHistoryMenu) {
+    private void updateWelcomeRecentLibraries() {
         recentLibrariesBox.getChildren().clear();
 
         if (fileHistoryMenu.getItems().isEmpty()) {
             Label noRecentLibrariesLabel = new Label(Localization.lang("No Recent Libraries"));
-            noRecentLibrariesLabel.getStyleClass().add("no-recent-label");
+            noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
             recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
         } else {
             for (MenuItem item : fileHistoryMenu.getItems()) {
-                String filePath = item.getText();
-                Hyperlink recentLibraryLink = new Hyperlink(filePath);
+                Hyperlink recentLibraryLink = new Hyperlink(item.getText());
                 recentLibraryLink.getStyleClass().add("welcome-hyperlink");
                 recentLibraryLink.setOnAction(item.getOnAction());
                 recentLibrariesBox.getChildren().add(recentLibraryLink);
@@ -115,9 +142,9 @@ public class WelcomePage extends VBox {
         }
     }
 
-    private VBox createBox(Pos alignment, Node... nodes) {
+    private VBox createVBoxContainer(Node... nodes) {
         VBox box = new VBox(5);
-        box.setAlignment(alignment);
+        box.setAlignment(Pos.TOP_LEFT);
         box.getChildren().addAll(nodes);
         return box;
     }
