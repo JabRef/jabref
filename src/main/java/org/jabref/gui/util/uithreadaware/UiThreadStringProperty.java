@@ -53,7 +53,7 @@ public class UiThreadStringProperty extends StringProperty {
 
     @Override
     public void addListener(ChangeListener<? super String> listener) {
-        delegate.addListener(new UiThreadChangeListener(listener));
+        delegate.addListener(new UiThreadChangeListener<>(listener));
     }
 
     @Override

@@ -74,25 +74,21 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
-        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> {
-            rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
-                groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue != null && oldValue != null) {
-                        transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);
-                    }
-                });
-
-                groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -> {
-                    if (oldValue != null && newValue != null) {
-                        transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());
-                    }
-                });
+        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
+            groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && oldValue != null) {
+                    transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);
+                }
             });
-        });
 
-        bibDatabaseContext.getDatabase().getEntries().forEach(entry -> {
-            entry.registerListener(new CitationKeyChangeListener(bibDatabaseContext));
-        });
+            groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -> {
+                if (oldValue != null && newValue != null) {
+                    transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());
+                }
+            });
+        }));
+
+        bibDatabaseContext.getDatabase().getEntries().forEach(entry -> entry.registerListener(new CitationKeyChangeListener(bibDatabaseContext)));
     }
 
     public ObservableList<ChatMessage> getChatHistoryForEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
