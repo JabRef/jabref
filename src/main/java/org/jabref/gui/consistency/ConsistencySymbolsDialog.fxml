@@ -10,17 +10,17 @@
     <content>
         <VBox spacing="10.0">
             <HBox spacing="10.0">
-                <JabRefIconView glyph="HYPHEN"/>
+                <JabRefIconView glyph="CONSISTENCY_UNSET_FIELD"/>
                 <Label text="%Required Field" />
             </HBox><HBox spacing="10.0">
-                <JabRefIconView glyph="CIRCLE"/>
+                <JabRefIconView glyph="CONSISTENCY_OPTIONAL_FIELD"/>
                 <Label text="%Optional Field" />
             </HBox><HBox spacing="10.0">
-                <JabRefIconView glyph="QUESTION_MARK"/>
+                <JabRefIconView glyph="CONSISTENCY_UNKNOWN_FIELD"/>
                 <Label text="%Unknown Field" />
             </HBox>
             <HBox spacing="10.0">
-                <JabRefIconView glyph="CROSS"/>
+                <JabRefIconView glyph="CONSISTENCY_REQUIRED_FIELD"/>
                 <Label text="%Unset Field" />
             </HBox>
         </VBox>

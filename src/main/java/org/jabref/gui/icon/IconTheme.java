@@ -361,10 +361,10 @@ public class IconTheme {
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
         MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
         ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY),
-        HYPHEN(MaterialDesignM.MINUS),
-        CROSS(MaterialDesignC.CLOSE),
-        CIRCLE(MaterialDesignC.CIRCLE_OUTLINE),
-        QUESTION_MARK(MaterialDesignH.HELP);
+        CONSISTENCY_UNSET_FIELD(MaterialDesignM.MINUS),
+        CONSISTENCY_REQUIRED_FIELD(MaterialDesignC.CLOSE),
+        CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
+        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP);
 
         private final JabRefIcon icon;
 

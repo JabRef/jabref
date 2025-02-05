@@ -108,16 +108,16 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                     } else {
                         switch (item.toLowerCase()) {
                             case "-":
-                                setGraphic(IconTheme.JabRefIcons.HYPHEN.getGraphicNode());
+                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_UNSET_FIELD.getGraphicNode());
                                 break;
                             case "x":
-                                setGraphic(IconTheme.JabRefIcons.CROSS.getGraphicNode());
+                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_REQUIRED_FIELD.getGraphicNode());
                                 break;
                             case "?":
-                                setGraphic(IconTheme.JabRefIcons.QUESTION_MARK.getGraphicNode());
+                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_UNKNOWN_FIELD.getGraphicNode());
                                 break;
                             case "o":
-                                setGraphic(IconTheme.JabRefIcons.CIRCLE.getGraphicNode());
+                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_REQUIRED_FIELD.getGraphicNode());
                                 break;
                             default:
                                 setGraphic(null);
