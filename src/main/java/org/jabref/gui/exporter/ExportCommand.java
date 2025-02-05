@@ -141,8 +141,7 @@ public class ExportCommand extends SimpleCommand {
                                 List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                     try {
                                         NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
-                                    } catch (
-                                            IOException e) {
+                                    } catch (IOException e) {
                                         LOGGER.error("Could not open export folder.", e);
                                     }
                                     notificationPane.hide();
