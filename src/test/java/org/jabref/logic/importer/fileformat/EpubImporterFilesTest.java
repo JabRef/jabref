@@ -59,7 +59,8 @@ class EpubImporterFilesTest {
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        // Clashes with ZIP-based formats are inevitable.
+        // `.ctv6bak` is a ZIP-based file format, just as ePUB. We need to exclude them from tests, as
+        // {@link EpubImporter#isRecognizedFormat} works by checking only the ZIP file header.
         Predicate<String> fileName = name -> !name.startsWith("EpubImporterTest") && !name.endsWith(".ctv6bak");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
