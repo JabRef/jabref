@@ -10,7 +10,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ConsistencySymbolsDialog extends BaseDialog<Void> {
 
     public ConsistencySymbolsDialog() {
-        this.setTitle(Localization.lang("Symbols Information"));
+        this.setTitle(Localization.lang("Symbols information"));
         this.initModality(Modality.NONE);
         this.setResizable(false);
 
