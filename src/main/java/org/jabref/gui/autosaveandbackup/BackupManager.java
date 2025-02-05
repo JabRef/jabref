@@ -38,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
@@ -59,7 +60,7 @@ public class BackupManager {
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
-    private static Set<BackupManager> runningInstances = new HashSet<>();
+    private static final Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final CliPreferences preferences;
@@ -268,6 +269,9 @@ public class BackupManager {
                                                 .map(BibEntry.class::cast)
                                                 .toList();
         BibDatabase bibDatabaseClone = new BibDatabase(list);
+        bibDatabaseContext.getDatabase().getStringValues().stream().map(BibtexString::clone)
+                          .map(BibtexString.class::cast)
+                          .forEach(bibDatabaseClone::addString);
         BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
