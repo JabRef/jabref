@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '7.0.0'
+    id 'org.openrewrite.rewrite' version '7.0.5'
 
     id "org.itsallcode.openfasttrace" version "3.0.1"
 }
