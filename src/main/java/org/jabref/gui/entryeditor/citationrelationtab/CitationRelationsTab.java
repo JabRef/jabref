@@ -440,7 +440,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask.cancel();
         }
 
-        this.createBackGroundTask(entry, searchType)
+        this.createBackgroundTask(entry, searchType)
             .consumeOnRunning(task -> prepareToSearchForRelations(
                 abortButton, refreshButton, importButton, progress, task
             ))
@@ -469,7 +469,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * TODO: Make the method return a callable and let the calling method create the background task.
      */
-    private BackgroundTask<List<BibEntry>> createBackGroundTask(
+    private BackgroundTask<List<BibEntry>> createBackgroundTask(
         BibEntry entry, CitationFetcher.SearchType searchType
     ) {
         return switch (searchType) {
