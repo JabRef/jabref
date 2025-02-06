@@ -2254,14 +2254,10 @@ class BibtexParserTest {
                 """;
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         Optional<JsonObject> actualJson = parser.parseCommentToJson(entries);
-        assertEquals(actualJson, Optional.of(getExpectedJson()));
-    }
-
-    private JsonObject getExpectedJson() {
         JsonObject saveActions = new JsonObject();
         saveActions.addProperty("state", true);
         JsonObject expectedJson = new JsonObject();
         expectedJson.add("saveActions", saveActions);
-        return expectedJson;
+        assertEquals(actualJson, Optional.of(expectedJson));
     }
 }
