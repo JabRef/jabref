@@ -24,6 +24,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -169,6 +170,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
+    private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
     // endregion
 
     private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
@@ -213,6 +215,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
     private static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
 
+    private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
+    private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
@@ -232,6 +237,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
     private KeyBindingRepository keyBindingRepository;
+    private CopyToPreferences copyToPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -266,6 +272,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(THEME, Theme.BASE_CSS);
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
+        defaults.put(CONFIRM_HIDE_TAB_BAR, Boolean.TRUE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         // endregion
 
@@ -394,6 +401,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
         // endregion
+
+        defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
+        defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
     }
 
     /**
@@ -407,6 +417,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             JabRefGuiPreferences.singleton = new JabRefGuiPreferences();
         }
         return JabRefGuiPreferences.singleton;
+    }
+
+    public CopyToPreferences getCopyToPreferences() {
+        if (copyToPreferences != null) {
+            return copyToPreferences;
+        }
+        copyToPreferences = new CopyToPreferences(
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES),
+                getBoolean(INCLUDE_CROSS_REFERENCES)
+        );
+        return copyToPreferences;
     }
 
     // region EntryEditorPreferences
@@ -633,6 +654,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
+                getBoolean(CONFIRM_HIDE_TAB_BAR),
                 getStringList(SELECTED_SLR_CATALOGS));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
@@ -651,6 +673,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.listen(workspacePreferences.confirmHideTabBarProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
         workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) change ->
                 putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
         return workspacePreferences;

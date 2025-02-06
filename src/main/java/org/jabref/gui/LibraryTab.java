@@ -345,6 +345,7 @@ public class LibraryTab extends Tab {
 
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
+
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
@@ -941,8 +942,7 @@ public class LibraryTab extends Tab {
     private List<BibEntry> handleNonBibTeXStringData(String data) {
         try {
             return this.importHandler.handleStringData(data);
-        } catch (
-                FetcherException exception) {
+        } catch (FetcherException exception) {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
             } else if (exception instanceof FetcherServerException) {

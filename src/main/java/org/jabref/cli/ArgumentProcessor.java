@@ -99,7 +99,7 @@ public class ArgumentProcessor {
     }
 
     /**
-     * Will open a file (like {@link #importFile(String)}, but will also request JabRef to focus on this database.
+     * Will open a file (like {@link #importFile(String)}, but will also request JabRef to focus on this library.
      *
      * @return ParserResult with setToOpenTab(true)
      */

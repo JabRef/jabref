@@ -5,8 +5,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="1080.0"
-            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="org.jabref.gui.errorconsole.ErrorConsoleView">
+<DialogPane prefHeight="500.0" prefWidth="1080.0"
+            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60"
+            fx:controller="org.jabref.gui.errorconsole.ErrorConsoleView"
+            id="errorConsole">
     <content>
         <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="list-content"
                   BorderPane.alignment="CENTER"/>
