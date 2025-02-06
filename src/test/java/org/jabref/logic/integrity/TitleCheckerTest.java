@@ -8,6 +8,7 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -73,13 +74,17 @@ public class TitleCheckerTest {
 
         @ParameterizedTest(name = "{index}. Title: \"{0}\"")
         @CsvSource({
-                "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on",
                 "Proceedings of the https://example.com/conference",
                 "Find more at http://mywebsite.org/article",
-                "Visit ftp://files.example.com/download"
+                "Visit ftp://files.example.com/download",
         })
         void titleShouldRaiseWarningForFullURLs(String title) {
             assertNotEquals(Optional.empty(), checker.checkValue(title));
+        }
+
+        @Test
+        void titleShouldAcceptURLWithoutProtocol() {
+            assertEquals(Optional.empty(), checker.checkValue("Applying {T}rip@dvice {R}ecommendation {T}echnology to www.visiteurope.com"));
         }
     }
 

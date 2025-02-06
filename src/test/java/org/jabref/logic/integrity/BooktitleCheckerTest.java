@@ -28,6 +28,11 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), checker.checkValue(" "));
     }
 
+    @Test
+    void booktitleShouldAcceptURLWithoutProtocol() {
+        assertEquals(Optional.empty(), checker.checkValue("Applying {T}rip@dvice {R}ecommendation {T}echnology to www.visiteurope.com"));
+    }
+
     @ParameterizedTest(name = "{index}. Booktitle: \"{0}\" should be invalid")
     @CsvSource({
             "Proceedings of the https://example.com/conference",
