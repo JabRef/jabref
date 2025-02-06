@@ -435,102 +435,69 @@ public class GroupNodeViewModel {
 
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof KeywordGroup) {
-            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
-            return groupNode.getParent()
+        return switch (group) {
+            case AllEntriesGroup _ -> false;
+            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case KeywordGroup _ ->
+                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+                    groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                            .map(groupParent ->
+                                    !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-        } else if (group instanceof SearchGroup) {
-            return true;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return true;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return true;
-        } else if (group instanceof TexGroup) {
-            return true;
-        } else {
-            throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
-        }
+
+            case null -> throw new IllegalArgumentException("Group cannot be null");
+            default -> throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean canAddGroupsIn() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return true;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof KeywordGroup) {
-            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
-            return groupNode.getParent()
+        return switch (group) {
+            case AllEntriesGroup _, ExplicitGroup _, SearchGroup _, TexGroup _ -> true;
+            case KeywordGroup _ ->
+                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+                    groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-        } else if (group instanceof SearchGroup) {
-            return true;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return false;
-        } else if (group instanceof TexGroup) {
-            return true;
-        } else {
-            throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
-        }
+            case AutomaticKeywordGroup _, AutomaticPersonsGroup _ -> false;
+            case null -> throw new IllegalArgumentException("Group cannot be null");
+            default -> throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof KeywordGroup) {
-            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
-            return groupNode.getParent()
+        return switch (group) {
+            case AllEntriesGroup _ -> false;
+            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case KeywordGroup _ ->
+                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+                    groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-        } else if (group instanceof SearchGroup) {
-            return true;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return true;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return true;
-        } else if (group instanceof TexGroup) {
-            return true;
-        } else {
-            throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
-        }
+            case null -> throw new IllegalArgumentException("Group cannot be null");
+            default -> throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean isEditable() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof KeywordGroup) {
-            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
-            return groupNode.getParent()
+        return switch (group) {
+            case AllEntriesGroup _ -> false;
+            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case KeywordGroup _ ->
+                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+                    groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-        } else if (group instanceof SearchGroup) {
-            return true;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return true;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return true;
-        } else if (group instanceof TexGroup) {
-            return true;
-        } else {
-            throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
-        }
+
+            case null -> throw new IllegalArgumentException("Group cannot be null");
+            default -> throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     class SearchIndexListener {
