@@ -360,7 +360,6 @@ public class BibtexParser implements Parser {
       
         if (MetaData.META_FLAG.equals(comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())))) {
             if (comment.startsWith(MetaData.META_FLAG)) {
-
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
                 int pos = rest.indexOf(':');
