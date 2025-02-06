@@ -58,6 +58,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -354,6 +357,7 @@ public class BibtexParser implements Parser {
         // We remove all line breaks in the metadata
         // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
+      
         if (MetaData.META_FLAG.equals(comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())))) {
             if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
@@ -387,6 +391,13 @@ public class BibtexParser implements Parser {
                 parserResult.addException(ex);
             }
         }
+    }
+
+    @VisibleForTesting
+    Optional<JsonObject> parseCommentToJson(String comment) {
+        String content = comment.substring(comment.indexOf(MetaData.META_FLAG_VERSION_010) + MetaData.META_FLAG_VERSION_010.length());
+        Gson gson = new Gson();
+        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
     }
 
     /**

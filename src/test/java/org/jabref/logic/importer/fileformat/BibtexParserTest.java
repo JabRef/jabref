@@ -57,6 +57,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -2237,5 +2238,26 @@ class BibtexParserTest {
                 .withCitationKey("Test2");
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseCommentToJson() {
+        String entries =
+                """
+                    @Comment{jabref-meta-0.1.0
+                        {
+                            "saveActions" :
+                            {
+                                "state": true
+                            }
+                        }
+                """;
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        Optional<JsonObject> actualJson = parser.parseCommentToJson(entries);
+        JsonObject saveActions = new JsonObject();
+        saveActions.addProperty("state", true);
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.add("saveActions", saveActions);
+        assertEquals(actualJson, Optional.of(expectedJson));
     }
 }
