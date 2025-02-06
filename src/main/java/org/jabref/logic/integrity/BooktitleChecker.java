@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.strings.StringUtil;
 
 public class BooktitleChecker implements ValueChecker {
@@ -22,7 +23,7 @@ public class BooktitleChecker implements ValueChecker {
             return Optional.of(Localization.lang("booktitle ends with 'conference on'"));
         }
 
-        if (FULL_URL_PATTERN.matcher(value).find()) {
+        if (URLUtil.URL_PATTERN.matcher(value).find()) {
             return Optional.of(Localization.lang("The book title contains a URL"));
         }
 

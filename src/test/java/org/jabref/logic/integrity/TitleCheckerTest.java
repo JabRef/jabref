@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,18 +71,15 @@ public class TitleCheckerTest {
             );
         }
 
-        @ParameterizedTest(name = "{index}. Title: \"{1}\" {0}")
-        @MethodSource("invalidTitlesWithURLs")
-        void titleShouldRaiseWarningForFullURLs(String message, String title) {
+        @ParameterizedTest(name = "{index}. Title: \"{0}\"")
+        @CsvSource({
+                "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on",
+                "Proceedings of the https://example.com/conference",
+                "Find more at http://mywebsite.org/article",
+                "Visit ftp://files.example.com/download"
+        })
+        void titleShouldRaiseWarningForFullURLs(String title) {
             assertNotEquals(Optional.empty(), checker.checkValue(title));
-        }
-
-        static Stream<Arguments> invalidTitlesWithURLs() {
-            return Stream.of(
-                    Arguments.of("Title contains full URL with https", "Check this out: https://example.com/something"),
-                    Arguments.of("Title contains full URL with http", "Visit http://example.com/path"),
-                    Arguments.of("Title contains full URL without protocol", "Found at www.example.com/something")
-            );
         }
     }
 

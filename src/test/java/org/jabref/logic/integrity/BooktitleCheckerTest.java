@@ -3,6 +3,8 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -26,9 +28,13 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), checker.checkValue(" "));
     }
 
-    @Test
-    void booktitleDoesNotAcceptFullURL() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Proceedings of the https://example.com/conference"));
-        assertNotEquals(Optional.empty(), checker.checkValue("Workshop on www.example.com/session"));
+    @ParameterizedTest(name = "{index}. Booktitle: \"{0}\" should be invalid")
+    @CsvSource({
+            "Proceedings of the https://example.com/conference",
+            "Find more at http://mywebsite.org/article",
+            "Visit ftp://files.example.com/download",
+    })
+    void booktitleShouldRaiseWarning(String booktitle) {
+        assertNotEquals(Optional.empty(), checker.checkValue(booktitle));
     }
 }

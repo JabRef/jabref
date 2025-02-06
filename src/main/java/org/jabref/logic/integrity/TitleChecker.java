@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
@@ -13,8 +14,6 @@ public class TitleChecker implements ValueChecker {
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
     private static final Pattern DELIMITERS = Pattern.compile("\\.|\\!|\\?|\\;|\\:|\\[");
     private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
-    private static final Pattern FULL_URL_PATTERN = Pattern.compile(
-            "(https?://\\S+/\\S+|www\\.\\S+/\\S+)", Pattern.CASE_INSENSITIVE);
 
     private final BibDatabaseContext databaseContext;
 
@@ -42,7 +41,7 @@ public class TitleChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        if (FULL_URL_PATTERN.matcher(value).find()) {
+        if (URLUtil.URL_PATTERN.matcher(value).find()) {
             return Optional.of(Localization.lang("The title contains a URL"));
         }
 
