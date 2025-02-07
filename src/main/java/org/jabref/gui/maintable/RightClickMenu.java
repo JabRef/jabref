@@ -133,18 +133,18 @@ public class RightClickMenu {
 
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(bibDatabaseContext -> {
-                Optional<Path> destinationPath = Optional.empty();
+                Optional<String> destinationPath = Optional.empty();
                 String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    destinationPath = bibDatabaseContext.getDatabasePath();
-                    String uniquePathName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), destinationPath.get()).get();
-                    if (uniquePathName.equals(sourceDatabaseName)) {
+                    destinationDatabaseName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get()).get();
+                    if (destinationDatabaseName.equals(sourceDatabaseName)) {
                         return;
                     }
-                    destinationDatabaseName = uniquePathName;
                 } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
                     destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                } else {
+                    destinationDatabaseName = destinationPath.orElse(Localization.lang("untitled"));
                 }
 
                 copyToMenu.getItems().addAll(
