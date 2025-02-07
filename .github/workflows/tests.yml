@@ -109,7 +109,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v18
+        uses: DavidAnson/markdownlint-cli2-action@v19
         with:
           globs: |
             *.md

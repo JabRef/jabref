@@ -133,7 +133,7 @@ public class BibDatabaseContext {
      */
     public boolean isStudy() {
         return this.getDatabasePath()
-                   .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                   .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&
                            Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
                    .orElse(false);
     }

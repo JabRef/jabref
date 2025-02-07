@@ -40,7 +40,6 @@ import kong.unirest.core.UnirestException;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
-    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldkeepDownloadUrl = new SimpleBooleanProperty();
@@ -126,7 +125,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
-        generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
@@ -147,7 +145,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
                                    .map(SearchBasedFetcher::getName)
-                                   .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                   .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                    .map(name -> {
                                        boolean enabled = importerPreferences.getCatalogs().contains(name);
                                        return new StudyCatalogItem(name, enabled);
@@ -158,7 +156,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
-        importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
@@ -182,10 +179,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableWebSearchProperty() {
         return enableWebSearchProperty;
-    }
-
-    public BooleanProperty generateKeyOnImportProperty() {
-        return generateKeyOnImportProperty;
     }
 
     public ListProperty<PlainCitationParserChoice> plainCitationParsers() {
