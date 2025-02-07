@@ -70,7 +70,7 @@ public class ImporterPreferences {
         this.importerEnabled.set(importerEnabled);
     }
 
-    public boolean isGenerateNewKeyOnImport() {
+    public boolean shouldGenerateNewKeyOnImport() {
         return generateNewKeyOnImport.get();
     }
 
