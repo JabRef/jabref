@@ -21,13 +21,7 @@
         <ToggleGroup fx:id="autolinkToggleGroup"/>
         <ToggleGroup fx:id="fileDirectoryToggleGroup"/>
     </fx:define>
-    <Label styleClass="titleHeader" text="%Linked files"/>
     <Label styleClass="sectionHeader" text="%File directory"/>
-    <CheckBox fx:id="autoRenameFilesOnChange" text="%Auto rename files if entry changes">
-        <tooltip>
-            <Tooltip text="%Automatically rename attached files when the entry changes"/>
-        </tooltip>
-    </CheckBox>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <RadioButton fx:id="useMainFileDirectory" text="%Main file directory" toggleGroup="$fileDirectoryToggleGroup"></RadioButton>
         <TextField fx:id="mainFileDirectory" HBox.hgrow="ALWAYS"/>
@@ -64,6 +58,11 @@
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
 
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
+    <CheckBox fx:id="autoRenameFilesOnChange" text="%Auto rename files if entry changes">
+        <tooltip>
+            <Tooltip text="%Automatically rename attached files when the entry changes"/>
+        </tooltip>
+    </CheckBox>
     <GridPane hgap="4.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
