@@ -7,7 +7,17 @@ import java.util.function.Function;
 
 import org.jabref.model.entry.BibEntry;
 
+/**
+ * Provide helpers methods and classes for tests to manage {@link BibEntryRelationsRepository} mocks.
+ */
 public class BibEntryRelationsRepositoryHelpersForTest {
+
+    /**
+     * Provide mocks factories for {@link BibEntryRelationsRepository} mocks.
+     * <br>
+     * Those implementations should help to test the values passed to an injected repository instance
+     * when it is called from {@link org.jabref.logic.citation.SearchCitationsRelationsService}.
+     */
     public static class Mocks {
         public static BibEntryRelationsRepository from(
             Function<BibEntry, List<BibEntry>> retrieveCitations,
