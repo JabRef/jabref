@@ -15,15 +15,13 @@
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.consistency.ConsistencyCheckDialog">
     <content>
         <VBox spacing="10.0">
-            <ScrollPane fitToHeight="true" fitToWidth="false" hbarPolicy="ALWAYS" vbarPolicy="AS_NEEDED">
-                <TableView fx:id="tableView" prefHeight="550" prefWidth="1200.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
-                    <columns>
-                    </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN"/>
-                    </columnResizePolicy>
-                </TableView>
-            </ScrollPane>
+            <TableView fx:id="tableView" prefHeight="550" prefWidth="1200.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                <columns>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
             <HBox spacing="4.0" alignment="CENTER">
                 <Label text="%Entry type"/>
                 <ComboBox fx:id="entryTypeCombo" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
