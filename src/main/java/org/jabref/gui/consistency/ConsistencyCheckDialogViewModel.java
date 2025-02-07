@@ -43,11 +43,6 @@ import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
-    protected static final String REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "x";
-    protected static final String OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "o";
-    protected static final String UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "?";
-    protected static final String UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "-";
-
     private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
 
     private final BibliographyConsistencyCheck.Result result;
@@ -152,13 +147,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         allReportedFields.forEach(field -> {
             result.add(bibEntry.getField(field).map(value -> {
                 if (requiredFields.contains(field)) {
-                    return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 } else if (optionalFields.contains(field)) {
-                    return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 } else {
-                    return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 }
-            }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY));
+            }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()));
         });
         return result;
     }

@@ -12,7 +12,6 @@ import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -105,25 +104,18 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                     if (empty || item == null) {
                         setGraphic(null);
-                    } else {
-                        switch (item.toLowerCase()) {
-                            case "-":
-                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_UNSET_FIELD.getGraphicNode());
-                                break;
-                            case "x":
-                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_REQUIRED_FIELD.getGraphicNode());
-                                break;
-                            case "?":
-                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_UNKNOWN_FIELD.getGraphicNode());
-                                break;
-                            case "o":
-                                setGraphic(IconTheme.JabRefIcons.CONSISTENCY_REQUIRED_FIELD.getGraphicNode());
-                                break;
-                            default:
-                                setGraphic(null);
-                                setText(item);
-                        }
+                        setText(null);
+                        return;
                     }
+
+                    ConsistencySymbol.fromText(item)
+                                     .ifPresentOrElse(
+                                              symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
+                                              () -> {
+                                                  setGraphic(null);
+                                                  setText(item);
+                                              }
+                                      );
                 }
             });
 
