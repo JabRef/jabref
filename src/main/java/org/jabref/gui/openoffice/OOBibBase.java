@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -87,7 +88,9 @@ public class OOBibBase {
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        Supplier<List<BibDatabaseContext>> databasesSupplier = () -> stateManager.getOpenDatabases();
+        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier);
         this.cslCitationOOAdapter.readAndUpdateExistingMarks();
     }
 
@@ -95,7 +98,6 @@ public class OOBibBase {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
-
             this.connection.selectDocument(autoSelectForSingle);
         } catch (NoDocumentFoundException ex) {
             OOError.from(ex).showErrorDialog(dialogService);

@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.model.database.BibDatabase;
@@ -37,14 +37,16 @@ public class CSLCitationOOAdapter {
 
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
+    private final Supplier<List<BibDatabaseContext>> databasesSupplier;
 
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
 
-    public CSLCitationOOAdapter(XTextDocument doc) {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier) {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
+        this.databasesSupplier = databasesSupplier;
     }
 
     public void setStyle(CitationStyle newStyle) {
@@ -263,13 +265,13 @@ public class CSLCitationOOAdapter {
         /*
         Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
         So, to get all databases in real time without having to refresh the connection, we obtain all open databases via the state manager
-         */
-        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        */
 
         // Collect all open databases
+        List<BibDatabaseContext> databaseContexts = databasesSupplier.get();
         List<BibDatabase> databases = new ArrayList<>();
-        for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
-                databases.add(database.getDatabase());
+        for (BibDatabaseContext databaseContext : databaseContexts) {
+                databases.add(databaseContext.getDatabase());
         }
 
         // We first get a list of all cited entries to create a unified database context
