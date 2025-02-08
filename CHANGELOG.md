@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef icon merges with dark background [#7771](https://github.com/JabRef/jabref/issues/7771)
 - We fixed an issue where an entry's group was no longer highlighted on selection [#12413](https://github.com/JabRef/jabref/issues/12413)
 - We fixed an issue where BibTeX Strings were not included in the backup file [#12462](https://github.com/JabRef/jabref/issues/12462)
+- We fixed an issue where mixing JStyle and CSL style citations in LibreOffice used to cause two separate bibliography sections to be generated. [#12262](https://github.com/JabRef/jabref/issues/12262)
 
 ### Removed
 
