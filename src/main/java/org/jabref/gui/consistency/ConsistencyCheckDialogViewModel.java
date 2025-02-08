@@ -141,7 +141,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList(columnCount + 2);
+        List<String> result = new ArrayList(columnCount + EXTRA_COLUMNS_COUNT);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> {
