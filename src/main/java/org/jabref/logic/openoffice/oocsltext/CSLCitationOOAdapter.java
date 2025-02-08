@@ -240,9 +240,10 @@ public class CSLCitationOOAdapter {
     }
 
     /**
-     * Ideally, the methods of this class are supposed to work with MarkManager and not CSLReferenceMark directly
-     * However, all "generation" of citation styles via CitationSTylegenerator occur in this class, and not in Markmanager
-     * Hence, we keep MarkManager independent of Citation Style generator and CitationSTyle
+     * Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
+     * However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
+     * Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
+     * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle} and keep this method here.
      */
     private void updateAllCitationsWithNewStyle(CitationStyle style)
             throws IOException, Exception {
