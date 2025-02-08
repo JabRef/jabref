@@ -141,12 +141,10 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (!linkedFiles.isEmpty()) {
             StringBuilder tooltipText = new StringBuilder();
 
-            // Iterate through all linked files and append their links to the tooltip text
             for (LinkedFile linkedFile : linkedFiles) {
-                tooltipText.append(linkedFile.getLink()).append("\n"); // Add a new line between each link
+                tooltipText.append(linkedFile.getLink()).append("\n"); 
             }
 
-            // Return the concatenated text as a formatted tooltip
             return Localization.lang("Open files: \n%0", tooltipText.toString());
         }
         return null;
