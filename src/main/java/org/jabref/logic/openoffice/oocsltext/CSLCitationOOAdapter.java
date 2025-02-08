@@ -68,6 +68,7 @@ public class CSLCitationOOAdapter {
         setStyle(selectedStyle);
 
         String style = selectedStyle.getSource();
+        boolean isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
 
         String citation;
@@ -80,12 +81,12 @@ public class CSLCitationOOAdapter {
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
 
-        if (selectedStyle.isNumericStyle()) {
+        if (isNumericStyle) {
             formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText, selectedStyle.isNumericStyle());
+        insertReferences(cursor, entries, ooText, isNumericStyle);
 
         if (styleChanged) {
             updateAllCitationsWithNewStyle(currentStyle, false);
@@ -137,7 +138,7 @@ public class CSLCitationOOAdapter {
             }
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertReferences(cursor, List.of(currentEntry), ooText, selectedStyle.isNumericStyle());
+            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle);
         }
 
         if (styleChanged) {
@@ -162,7 +163,9 @@ public class CSLCitationOOAdapter {
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, CreationException, NoSuchElementException {
-        markManager.setRealTimeNumberUpdateRequired(selectedStyle.isNumericStyle());
+        boolean isNumericStyle = selectedStyle.isNumericStyle();
+
+        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
@@ -172,7 +175,7 @@ public class CSLCitationOOAdapter {
 
         String style = selectedStyle.getSource();
 
-        if (selectedStyle.isNumericStyle()) {
+        if (isNumericStyle) {
             // Sort entries based on their order of appearance in the document
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
@@ -253,12 +256,16 @@ public class CSLCitationOOAdapter {
      */
     private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
             throws IOException, Exception {
+        boolean isNumericStyle = style.isNumericStyle();
+        boolean isAlphaNumericStyle = style.isAlphanumericStyle();
+
         /*
         Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
         So, to get all databases in real time without having to refresh the connection, we obtain all open databases via the state manager
          */
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
+        // Collect all open databases
         List<BibDatabase> databases = new ArrayList<>();
         for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
                 databases.add(database.getDatabase());
@@ -282,7 +289,7 @@ public class CSLCitationOOAdapter {
         List<CSLReferenceMark> marksInOrder = markManager.getMarksInOrder();
 
         if (isInTextStyle) {
-            // Refer to comments below in the else clause (for non in-text citations) - we follow the same flow to update for in-text
+            // Now, for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
@@ -296,27 +303,23 @@ public class CSLCitationOOAdapter {
 
                 while (iterator.hasNext()) {
                     BibEntry currentEntry = iterator.next();
+
+                    // We re-generate the citation in the new style and update it in the document
                     String newCitation;
 
-                    if (style.isAlphanumericStyle()) {
+                    if (isAlphaNumericStyle) {
                         newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
                     } else {
-                        newCitation = CitationStyleGenerator.generateCitation(
-                                List.of(currentEntry),
-                                style.getSource(),
-                                CSLFormatUtils.OUTPUT_FORMAT,
-                                unifiedBibDatabaseContext,
-                                bibEntryTypesManager
-                        ).getText();
+                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager).getText();
                     }
 
                     String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
 
-                    if (style.isNumericStyle()) {
+                    if (isNumericStyle) {
                         formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
                         String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);
                         formattedCitation = prefix + formattedCitation;
-                    } else if (!style.isAlphanumericStyle()) {
+                    } else if (!isAlphaNumericStyle) {
                         formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);
                     }
 
@@ -330,7 +333,7 @@ public class CSLCitationOOAdapter {
                 markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString());
             }
         } else {
-            // Now, for each such reference mark, we get the entries to be updated
+            // Same flow as above - for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
@@ -339,9 +342,10 @@ public class CSLCitationOOAdapter {
                                                      .map(java.util.Optional::get)
                                                      .toList();
 
-                // We update the entries with the new style
+                // We re-generate the citation in the new style and update it in the document
                 String newCitation;
-                if (style.isAlphanumericStyle()) {
+
+                if (isAlphaNumericStyle) {
                     newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
                 } else {
                     newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
@@ -349,6 +353,7 @@ public class CSLCitationOOAdapter {
                 }
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
+
                 markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation);
             }
         }
