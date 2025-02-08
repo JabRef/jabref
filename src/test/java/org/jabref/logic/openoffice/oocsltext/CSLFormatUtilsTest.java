@@ -677,4 +677,115 @@ class CSLFormatUtilsTest {
 
         );
     }
+
+    /**
+     * Test for proper generation of author prefix for in-text citations
+     */
+    @ParameterizedTest
+    @MethodSource
+    void generateAuthorPrefixTest(String expected, BibEntry entry) {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        String actual = CSLFormatUtils.generateAuthorPrefix(entry, context);
+        assertEquals(expected, actual);
+    }
+
+    private static Stream<Arguments> generateAuthorPrefixTest() {
+        return Stream.of(
+                // Single author
+                Arguments.of(
+                        "Garcia ",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Garcia, Maria")
+                                .withField(StandardField.YEAR, "2021")
+                ),
+
+                // Two authors
+                Arguments.of(
+                        "Smith et al. ",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, John and Johnson, Emily")
+                                .withField(StandardField.YEAR, "2020")
+                ),
+
+                // Three authors
+                Arguments.of(
+                        "Johnson et al. ",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Johnson, Emily and Williams, Jessica and Lee, David")
+                                .withField(StandardField.YEAR, "2019")
+                ),
+
+                // Four or more authors (should use et al.)
+                Arguments.of(
+                        "Smith et al. ",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, John and Johnson, Emily and Lee, David and Williams, Jessica")
+                                .withField(StandardField.YEAR, "2018")
+                ),
+
+                // Missing author (should return empty string)
+                Arguments.of(
+                        "",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.TITLE, "No Author Paper")
+                                .withField(StandardField.YEAR, "2020")
+                )
+        );
+    }
+
+    /**
+     * Test for proper generation of alphanumeric in-text citations
+     */
+    @ParameterizedTest
+    @MethodSource
+    void generateAlphanumericInTextCitationTest(String expected, BibEntry entry) {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        String actual = CSLFormatUtils.generateAlphanumericInTextCitation(entry, context);
+        assertEquals(expected, actual);
+    }
+
+    private static Stream<Arguments> generateAlphanumericInTextCitationTest() {
+        return Stream.of(
+                // Single author
+                Arguments.of(
+                        "Garcia [Ga21]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Garcia, Maria")
+                                .withField(StandardField.YEAR, "2021")
+                ),
+
+                // Two authors
+                Arguments.of(
+                        "Smith et al. [SJ20]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, John and Johnson, Emily")
+                                .withField(StandardField.YEAR, "2020")
+                ),
+
+                // Three authors
+                Arguments.of(
+                        "Johnson et al. [JWL19]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Johnson, Emily and Williams, Jessica and Lee, David")
+                                .withField(StandardField.YEAR, "2019")
+                ),
+
+                // Four or more authors (should use et al.)
+                Arguments.of(
+                        "Smith et al. [SJLW18]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, John and Johnson, Emily and Lee, David and Williams, Jessica")
+                                .withField(StandardField.YEAR, "2018")
+                ),
+
+                // Missing author (should fall back to citation key)
+                Arguments.of(
+                        " [missing_key]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.TITLE, "No Author Paper")
+                                .withField(StandardField.YEAR, "2020")
+                                .withCitationKey("missing_key")
+                )
+        );
+    }
 }
