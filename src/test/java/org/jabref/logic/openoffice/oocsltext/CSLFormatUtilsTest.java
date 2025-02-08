@@ -723,6 +723,14 @@ class CSLFormatUtilsTest {
                                 .withField(StandardField.YEAR, "2018")
                 ),
 
+                // Four or more authors with first author beginning with "and"
+                Arguments.of(
+                        "Smith et al. ",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith and James, John and Johnson, Emily and Lee, David and Williams, Jessica")
+                                .withField(StandardField.YEAR, "2018")
+                ),
+
                 // Missing author
                 Arguments.of(
                         "",
@@ -734,7 +742,7 @@ class CSLFormatUtilsTest {
     }
 
     /**
-     * Test for proper generation of alphanumeric in-text citations
+     * Test for proper generation of in-text citations for alphanumeric styles (currently supported: DIN 1505-2)
      */
     @ParameterizedTest
     @MethodSource
@@ -770,11 +778,19 @@ class CSLFormatUtilsTest {
                                 .withField(StandardField.YEAR, "2019")
                 ),
 
-                // Four or more authors (should use et al.)
+                // Four or more authors
                 Arguments.of(
                         "Smith et al. [SJLW18]",
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Smith, John and Johnson, Emily and Lee, David and Williams, Jessica")
+                                .withField(StandardField.YEAR, "2018")
+                ),
+
+                // Four or more authors, with first author containing "and"
+                Arguments.of(
+                        "Smith et al. [SJJL18]",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith and James, John and Johnson, Emily and Lee, David and Williams, Jessica")
                                 .withField(StandardField.YEAR, "2018")
                 ),
 
