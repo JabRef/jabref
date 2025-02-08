@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -89,7 +88,7 @@ public class CSLCitationOOAdapter {
         insertReferences(cursor, entries, ooText, selectedStyle.isNumericStyle());
 
         if (styleChanged) {
-            updateAllCitationsWithNewStyle(currentStyle);
+            updateAllCitationsWithNewStyle(currentStyle, false);
             styleChanged = false;
         }
     }
@@ -102,6 +101,8 @@ public class CSLCitationOOAdapter {
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, CreationException, Exception {
+        setStyle(selectedStyle);
+
         String style = selectedStyle.getSource();
         boolean isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
@@ -137,6 +138,11 @@ public class CSLCitationOOAdapter {
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertReferences(cursor, List.of(currentEntry), ooText, selectedStyle.isNumericStyle());
+        }
+
+        if (styleChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, true);
+            styleChanged = false;
         }
     }
 
@@ -243,9 +249,9 @@ public class CSLCitationOOAdapter {
      * Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
      * However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
      * Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
-     * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle} and keep this method here.
+     * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
      */
-    private void updateAllCitationsWithNewStyle(CitationStyle style)
+    private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
             throws IOException, Exception {
         /*
         Entries from multiple libraries may need to be updated, and new libraries could have been opened after the document connection
@@ -272,28 +278,79 @@ public class CSLCitationOOAdapter {
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
         BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
+        // Next, we get the list of reference marks sorted in order of appearance in the document
         List<CSLReferenceMark> marksInOrder = markManager.getMarksInOrder();
 
-        // Now for each reference mark, in order of appearance in the document, we get the entries to be updated
-        for (CSLReferenceMark mark : marksInOrder) {
-            List<String> citationKeys = mark.getCitationKeys();
-            List<BibEntry> entries = citationKeys.stream()
-                                                 .map(unifiedDatabase::getEntryByCitationKey)
-                                                 .filter(java.util.Optional::isPresent)
-                                                 .map(java.util.Optional::get)
-                                                 .collect(Collectors.toList());
+        if (isInTextStyle) {
+            // Refer to comments below in the else clause (for non in-text citations) - we follow the same flow to update for in-text
+            for (CSLReferenceMark mark : marksInOrder) {
+                List<String> citationKeys = mark.getCitationKeys();
+                List<BibEntry> entries = citationKeys.stream()
+                                                     .map(unifiedDatabase::getEntryByCitationKey)
+                                                     .filter(java.util.Optional::isPresent)
+                                                     .map(java.util.Optional::get)
+                                                     .toList();
 
-            // We update the entries with the new style
-            String newCitation;
-            if (style.isAlphanumericStyle()) {
-                newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
-            } else {
-                newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                        CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager).getText();
+                StringBuilder finalText = new StringBuilder();
+                Iterator<BibEntry> iterator = entries.iterator();
+
+                while (iterator.hasNext()) {
+                    BibEntry currentEntry = iterator.next();
+                    String newCitation;
+
+                    if (style.isAlphanumericStyle()) {
+                        newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
+                    } else {
+                        newCitation = CitationStyleGenerator.generateCitation(
+                                List.of(currentEntry),
+                                style.getSource(),
+                                CSLFormatUtils.OUTPUT_FORMAT,
+                                unifiedBibDatabaseContext,
+                                bibEntryTypesManager
+                        ).getText();
+                    }
+
+                    String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
+
+                    if (style.isNumericStyle()) {
+                        formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
+                        String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);
+                        formattedCitation = prefix + formattedCitation;
+                    } else if (!style.isAlphanumericStyle()) {
+                        formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);
+                    }
+
+                    finalText.append(formattedCitation);
+
+                    if (iterator.hasNext()) {
+                        finalText.append(",");
+                    }
+                }
+
+                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString());
             }
+        } else {
+            // Now, for each such reference mark, we get the entries to be updated
+            for (CSLReferenceMark mark : marksInOrder) {
+                List<String> citationKeys = mark.getCitationKeys();
+                List<BibEntry> entries = citationKeys.stream()
+                                                     .map(unifiedDatabase::getEntryByCitationKey)
+                                                     .filter(java.util.Optional::isPresent)
+                                                     .map(java.util.Optional::get)
+                                                     .toList();
 
-            String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
-            markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation);
+                // We update the entries with the new style
+                String newCitation;
+                if (style.isAlphanumericStyle()) {
+                    newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
+                } else {
+                    newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
+                            CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager).getText();
+                }
+
+                String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
+                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation);
+            }
         }
     }
 
