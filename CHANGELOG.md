@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- When working with CSL styles in LibreOffice, citing with a new style now updates all cited entries in the document to the current style. [12472](https://github.com/JabRef/jabref/pull/12472)
 
 ### Changed
 
