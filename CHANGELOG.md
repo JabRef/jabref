@@ -32,7 +32,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where BibTeX Strings were not included in the backup file [#12462](https://github.com/JabRef/jabref/issues/12462)
 - We fixed an issue in the LibreOffice integration where the formatting of text (e.g. superscript) would be lost when using numeric CSL styles. [melting-pot#772](https://github.com/JabRef/jabref-issue-melting-pot/issues/772)
 
-
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
