@@ -18,7 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
-- When working with CSL styles in LibreOffice, citing with a new style now updates all cited entries in the document to the current style. [12472](https://github.com/JabRef/jabref/pull/12472)
+- When working with CSL styles in LibreOffice, citing with a new style now updates all the cited entries in the document to the current style. [12472](https://github.com/JabRef/jabref/pull/12472)
 
 ### Fixed
 
