@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat;
+package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -18,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class PdfContentImporterTest {
+class PdfContentPartialImporterTest {
 
     private final PdfContentImporter importer = new PdfContentImporter();
 
@@ -36,8 +35,7 @@ class PdfContentImporterTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
-                .withField(StandardField.TITLE, "Hello World")
-                .withFiles(List.of(new LinkedFile("", file.toAbsolutePath(), "PDF")));
+                .withField(StandardField.TITLE, "Hello World");
         assertEquals(List.of(expected), result);
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();
@@ -70,7 +68,7 @@ class PdfContentImporterTest {
                 Corpus linguistics investigates human language by starting out from large
                 """;
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
     @Test
@@ -93,7 +91,7 @@ class PdfContentImporterTest {
                 UNSPECIFIED
                 Master of Research (MRes) thesis, University of Kent,.""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
     @Test
@@ -126,7 +124,45 @@ class PdfContentImporterTest {
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", ""));
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
+    }
+
+    @Test
+    void extractArXivFromPage() {
+        BibEntry entry = new BibEntry(StandardEntryType.TechReport)
+                .withField(StandardField.AUTHOR, "Filippo Riccaa and Alessandro Marchettob and Andrea Stoccoc")
+                .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
+                .withField(StandardField.EPRINT, "2408.06224v1")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
+
+        // This is from https://arxiv.org/abs/2408.06224
+        String firstPageContent = """
+                A Multi-Year Grey Literature Review on AI-assisted Test Automation
+
+                Filippo Riccaa, Alessandro Marchettob and Andrea Stoccoc
+
+                aUniversity of Genoa, Via Balbi 5, Genova, 16126, Italy
+                bUniversity of Trento, Via Sommarive 9, Trento, 38123, Italy
+                cTechnical University of Munich, Boltzmannstraße 3, Munich, 85748, Germany
+                dfortiss GmbH, Guerickestraße 25, Munich, 80805, Germany
+
+                Keywords:
+                Test Automation
+                Artificial Intelligence
+                AI-assisted Test Automation
+                Grey Literature
+                Automated Test Generation
+                Self-Healing Test Scripts
+
+                *Corresponding author
+                filippo.ricca@unige.it (F. Ricca)
+                https://person.dibris.unige.it/ricca-filippo/ (F. Ricca)
+                ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)
+
+                arXiv:2408.06224v1 [cs.SE] 12 Aug 2024""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));
     }
 
     @ParameterizedTest
@@ -150,7 +186,8 @@ class PdfContentImporterTest {
                 Arguments.of("On the impact of service-oriented patterns on software evolvability: a controlled experiment and metric-based analysis", "/pdfs/PdfContentImporter/Bogner2019.pdf"),
                 Arguments.of("Pandemic programming", "/pdfs/PdfContentImporter/Ralph2020.pdf"),
                 Arguments.of("Do RESTful API design rules have an impact on the understandability of Web APIs?", "/pdfs/PdfContentImporter/Bogner2023.pdf"),
-                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf")
+                Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf"),
+                Arguments.of("OPIUM: Optimal Package Install/Uninstall Manager", "/pdfs/PdfContentImporter/Tucker2007.pdf")
         );
     }
 }
