@@ -338,7 +338,7 @@ public class OpenOfficePanel {
         }
     }
 
-    public List<BibDatabase> getBaseList() {
+    private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
         if (openOfficePreferences.getUseAllDatabases()) {
             for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
