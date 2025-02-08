@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -294,8 +295,8 @@ public class CSLCitationOOAdapter {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
                                                      .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .filter(java.util.Optional::isPresent)
-                                                     .map(java.util.Optional::get)
+                                                     .filter(Optional::isPresent)
+                                                     .map(Optional::get)
                                                      .toList();
 
                 StringBuilder finalText = new StringBuilder();
@@ -338,8 +339,8 @@ public class CSLCitationOOAdapter {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
                                                      .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .filter(java.util.Optional::isPresent)
-                                                     .map(java.util.Optional::get)
+                                                     .filter(Optional::isPresent)
+                                                     .map(Optional::get)
                                                      .toList();
 
                 // We re-generate the citation in the new style and update it in the document
