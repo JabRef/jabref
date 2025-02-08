@@ -185,6 +185,9 @@ public class CSLFormatUtils {
         return formattedCitation;
     }
 
+    /**
+     * Generates Author Prefix for an in-text citation
+     */
     public static String generateAuthorPrefix(BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
         return currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
                            .map(AuthorList::parse)
