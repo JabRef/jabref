@@ -715,7 +715,7 @@ class CSLFormatUtilsTest {
                                 .withField(StandardField.YEAR, "2019")
                 ),
 
-                // Four or more authors (should use et al.)
+                // Four or more authors
                 Arguments.of(
                         "Smith et al. ",
                         new BibEntry(StandardEntryType.Article)
@@ -723,7 +723,7 @@ class CSLFormatUtilsTest {
                                 .withField(StandardField.YEAR, "2018")
                 ),
 
-                // Missing author (should return empty string)
+                // Missing author
                 Arguments.of(
                         "",
                         new BibEntry(StandardEntryType.Article)
