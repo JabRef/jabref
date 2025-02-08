@@ -52,6 +52,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private final List<Field> allReportedFields;
     private final int columnCount;
+    private final int EXTRA_COLUMNS_COUNT = 2;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
 
@@ -95,7 +96,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     public List<String> getColumnNames() {
-        List<String> result = new ArrayList(columnCount + 2);
+        List<String> result = new ArrayList(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
         result.add("Citation Key");
         allReportedFields.forEach(field -> {

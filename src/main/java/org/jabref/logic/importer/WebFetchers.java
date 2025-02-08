@@ -205,7 +205,7 @@ public class WebFetchers {
         fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));
 
         // Publishers
-        fetchers.add(new ScienceDirect(importerPreferences));
+        fetchers.add(new ScienceDirect(importerPreferences)); // this
         fetchers.add(new SpringerLink(importerPreferences));
         fetchers.add(new ACS());
         fetchers.add(new ArXivFetcher(importFormatPreferences));
