@@ -120,6 +120,20 @@ public class CSLFormatUtils {
         return citation.toString();
     }
 
+    public static String generateAlphanumericInTextCitation(BibEntry entry, BibDatabaseContext bibDatabaseContext) {
+        // Generate the alphanumeric citation
+        String inTextCitation = generateAlphanumericCitation(List.of(entry), bibDatabaseContext);
+
+        // Get the author's name
+        String authorName = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                        .map(AuthorList::parse)
+                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
+                                        .orElse("");
+
+        // Combine author name with the citation
+        return authorName + " " + inTextCitation;
+    }
+
     /**
      * Method to update citation number of a bibliographic entry (to be inserted in the list of references).
      * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography}) always starts the numbering of a list of references with "1".
@@ -169,5 +183,12 @@ public class CSLFormatUtils {
             return matcher.group(2) + " " + matcher.group(1) + matcher.group(3);
         }
         return formattedCitation;
+    }
+
+    public static String generateAuthorPrefix(BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+        return currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                           .map(AuthorList::parse)
+                           .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
+                           .orElse("");
     }
 }

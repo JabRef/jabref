@@ -591,8 +591,6 @@ public class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
 
-                initializeCitationAdapter(doc);
-
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
                     this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -601,7 +599,7 @@ public class OOBibBase {
                     this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), citationStyle, entries);
+                    this.cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
                 }
 
                 // If "Automatically sync bibliography when inserting citations" is enabled
@@ -908,8 +906,6 @@ public class OOBibBase {
 
                 try {
                     UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
-
-                    initializeCitationAdapter(doc);
 
                     // Collect only cited entries from all databases
                     List<BibEntry> citedEntries = new ArrayList<>();

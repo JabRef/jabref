@@ -230,6 +230,15 @@ public class CitationStyle implements OOStyle {
         return isNumericStyle;
     }
 
+    /**
+     * Currently, we have support for one alphanumeric CSL style.
+     * There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
+     * Thus, we currently hardcode the check for "DIN 1505-2".
+     */
+    public boolean isAlphanumericStyle() {
+        return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(this.getTitle());
+    }
+
     public String getSource() {
         return source;
     }
