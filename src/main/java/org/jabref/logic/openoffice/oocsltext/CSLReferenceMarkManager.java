@@ -286,6 +286,7 @@ public class CSLReferenceMarkManager {
             String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
             OOText ooText = OOText.fromString(updatedText);
 
+            // The only way to edit a reference mark is to remove it and add a new one
             // Remove the old reference mark without removing the text
             text.removeTextContent(oldContent);
 
