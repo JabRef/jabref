@@ -15,7 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- Change Tooltip to display all linked Files when Hovering instead of only displays the First Linked File. [#12470](https://github.com/JabRef/jabref/issues/12470)
+- WE changed the tooltop to display all linked Files when hovering instead of only displaying the the first linked file. [#12470](https://github.com/JabRef/jabref/issues/12470)
+- We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
 
