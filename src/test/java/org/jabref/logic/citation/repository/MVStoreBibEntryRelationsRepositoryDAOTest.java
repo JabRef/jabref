@@ -11,7 +11,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.random.RandomGenerator;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -63,17 +62,16 @@ class MVStoreBibEntryRelationsRepositoryDAOTest {
             .map(key -> RandomGenerator.StreamableGenerator
                 .of("L128X256MixRandom").ints(150)
                 .mapToObj(i -> new BibEntry()
-                    .withField(StandardField.TITLE, "A title:" + i)
+                    .withField(StandardField.TITLE, "A title: " + i)
                     .withField(StandardField.YEAR, String.valueOf(2024))
-                    .withField(StandardField.AUTHOR, "A list of authors:" + i)
+                    .withField(StandardField.AUTHOR, "{A list of authors: " + i + "}")
                     .withType(StandardEntryType.Book)
                     .withField(StandardField.DOI, entry.getDOI().map(DOI::asString).orElse("") + ":" + i)
-                    .withField(StandardField.URL, "www.jabref.org/" + i)
-                    .withField(StandardField.ABSTRACT, "The Universe is expanding:" + i)
+                    .withField(StandardField.ABSTRACT, "The Universe is expanding: " + i)
                 )
             )
             .orElseThrow()
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @ParameterizedTest
