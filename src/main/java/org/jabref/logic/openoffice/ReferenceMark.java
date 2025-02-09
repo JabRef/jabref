@@ -15,8 +15,8 @@ public class ReferenceMark {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
-    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^(JABREF_\\w+ CID_\\d+(?:, JABREF_\\w+ CID_\\d+)*) (\\w+)$");
-    private static final Pattern ENTRY_PATTERN = Pattern.compile("JABREF_(\\w+) CID_(\\w+)");
+    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^(JABREF_[\\w-:.]+ CID_\\d+(?:, JABREF_[\\w-:.]+ CID_\\d+)*) (\\w+)$");
+    private static final Pattern ENTRY_PATTERN = Pattern.compile("JABREF_([\\w-:.]+) CID_(\\d+)");
 
     private final String name;
     private List<String> citationKeys;
