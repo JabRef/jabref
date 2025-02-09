@@ -1,6 +1,8 @@
 package org.jabref.cli;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -42,6 +44,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -289,6 +294,71 @@ public class ArgumentProcessor {
         if (!cli.isBlank() && !loaded.isEmpty()) {
             uiCommands.add(new UiCommand.OpenDatabases(loaded));
         }
+
+        if (cli.isCheckConsistency()) {
+            checkConsistency(cliPreferences, entryTypesManager);
+        }
+    }
+
+    private void checkConsistency(CliPreferences cliPreferences,
+                                  BibEntryTypesManager entryTypesManager) {
+        if (!cli.isCheckConsistency()) {
+            System.out.println(Localization.lang("No file specified for consistency check."));
+            return;
+        }
+
+        String fileName = cli.getCheckConsistency();
+        String outputFormat = cli.getCheckConsistencyOutputFormat();
+
+        if (fileName == null) {
+            System.out.println(Localization.lang("No file specified for consistency check."));
+            return;
+        }
+
+        try {
+            Path filePath = Path.of(fileName);
+            ParserResult pr = OpenDatabase.loadDatabase(filePath, cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
+            BibDatabaseContext databaseContext = pr.getDatabaseContext();
+            List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+
+            BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+            BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+
+            if (outputFormat.isEmpty()) {
+                System.out.println("No output format if found!");
+                return;
+            }
+
+            String outputFileName = fileName.substring(0, fileName.lastIndexOf('.')) + "_consistency_check." + outputFormat.toLowerCase();
+            try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
+                if ("CSV".equalsIgnoreCase(outputFormat)) {
+                    BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                    csvWriter.writeFindings();
+                } else {
+                    BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                    txtWriter.writeFindings();
+                }
+                System.out.println(Localization.lang("Consistency check completed"));
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error accessing file '{}'.", fileName);
+        }
+    }
+
+    public void writeFindings(BibliographyConsistencyCheck.Result result) {
+        System.out.print(Localization.lang("Field Presence Consistency Check Result\n"));
+        System.out.print("\n\n");
+
+        if (result.entryTypeToResultMap().isEmpty()) {
+            System.out.println("No errors found.");
+            return;
+        }
+
+        System.out.print("\n");
+        System.out.print("%s | %s\n".formatted("x", Localization.lang("required field is present")));
+        System.out.print("%s | %s\n".formatted("o", Localization.lang("optional field is present")));
+        System.out.print("%s | %s\n".formatted("?", Localization.lang("unknown field is present")));
+        System.out.print("%s | %s\n".formatted("-", Localization.lang("field is absent")));
     }
 
     private static void writeMetadataToPdf(List<ParserResult> loaded,
