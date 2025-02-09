@@ -85,8 +85,8 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         var secondRelations = createRelations(bibEntry);
 
         // WHEN
-        dao.cacheOrMergeRelations(bibEntry, firstRelations);
-        dao.cacheOrMergeRelations(bibEntry, secondRelations);
+        dao.addRelations(bibEntry, firstRelations);
+        dao.addRelations(bibEntry, secondRelations);
         var relationFromCache = dao
                 .getRelations(bibEntry)
                 .stream()
@@ -122,7 +122,7 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         var relations = createRelations(entry);
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
 
         // THEN
         Assertions.assertTrue(dao.containsKey(entry));
@@ -138,7 +138,7 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         Assertions.assertTrue(dao.isUpdatable(entry));
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
 
         // THEN
         Assertions.assertFalse(dao.isUpdatable(entry));
@@ -155,7 +155,7 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         Assertions.assertTrue(dao.isUpdatable(entry, clock));
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
 
         // THEN
         Assertions.assertFalse(dao.isUpdatable(entry, clock));
@@ -177,7 +177,7 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         Assertions.assertTrue(dao.isUpdatable(entry, clock));
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
 
         // THEN
         Assertions.assertFalse(dao.isUpdatable(entry, clock));
@@ -204,7 +204,7 @@ class MVStoreBibEntryRelationsRepositoryRepositoryTest {
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
         var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
         var relations = createRelations(entry);
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
 
         // WHEN
         var deserializedRelations = dao.getRelations(entry);

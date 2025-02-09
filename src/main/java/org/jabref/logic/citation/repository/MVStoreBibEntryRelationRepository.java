@@ -30,6 +30,10 @@ import org.h2.mvstore.type.BasicDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is responsible for storing and retrieving relations between BibEntry objects.
+ * It uses an MVStore to store the relations.
+ */
 public class MVStoreBibEntryRelationRepository implements BibEntryRelationRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationRepository.class);
@@ -93,7 +97,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
      * @param relations should not be null
      */
     @Override
-    synchronized public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
+    synchronized public void addRelations(BibEntry entry, List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {
             try (var store = this.storeConfiguration.open()) {
                 // Save the relations

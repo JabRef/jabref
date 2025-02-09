@@ -27,7 +27,7 @@ public class BibEntryRelationsRepositoryChain implements BibEntryRelationsReposi
 
     @Override
     public void insertCitations(BibEntry entry, List<BibEntry> citations) {
-        citationsDao.cacheOrMergeRelations(
+        citationsDao.addRelations(
             entry, Objects.requireNonNullElseGet(citations, List::of)
         );
     }
@@ -52,7 +52,7 @@ public class BibEntryRelationsRepositoryChain implements BibEntryRelationsReposi
 
     @Override
     public void insertReferences(BibEntry entry, List<BibEntry> references) {
-        referencesDao.cacheOrMergeRelations(
+        referencesDao.addRelations(
             entry, Objects.requireNonNullElseGet(references, List::of)
         );
     }

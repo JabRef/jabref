@@ -78,7 +78,7 @@ class BibEntryRelationRepositoryChainTest {
         }
 
         @Override
-        public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
+        public void addRelations(BibEntry entry, List<BibEntry> relations) {
             this.table.put(entry, relations);
         }
 
@@ -98,7 +98,7 @@ class BibEntryRelationRepositoryChainTest {
     void theChainShouldReadFromFirstNode(BibEntryRelationRepository dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
         var secondDao = new RepositoryMock();
         var doaChain = BibEntryRelationRepositoryChain.of(dao, secondDao);
 
@@ -115,7 +115,7 @@ class BibEntryRelationRepositoryChainTest {
     void theChainShouldReadFromSecondNode(BibEntryRelationRepository dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
         var firstDao = new RepositoryMock();
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, dao);
 
@@ -136,7 +136,7 @@ class BibEntryRelationRepositoryChainTest {
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, dao);
 
         // WHEN
-        doaChain.cacheOrMergeRelations(entry, relations);
+        doaChain.addRelations(entry, relations);
         var relationsFromChain = doaChain.getRelations(entry);
 
         // THEN
@@ -154,7 +154,7 @@ class BibEntryRelationRepositoryChainTest {
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, secondDao);
 
         // WHEN
-        secondDao.cacheOrMergeRelations(entry, relations);
+        secondDao.addRelations(entry, relations);
 
         // THEN
         Assertions.assertFalse(firstDao.containsKey(entry));
@@ -171,7 +171,7 @@ class BibEntryRelationRepositoryChainTest {
         Assertions.assertTrue(daoChain.isUpdatable(entry));
 
         // WHEN
-        daoChain.cacheOrMergeRelations(entry, relations);
+        daoChain.addRelations(entry, relations);
 
         // THEN
         Assertions.assertTrue(daoChain.containsKey(entry));

@@ -4,11 +4,17 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
+/**
+ * Generic interface for a repository that stores relations between BibEntries.
+ */
 public interface BibEntryRelationRepository {
 
     List<BibEntry> getRelations(BibEntry entry);
 
-    void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations);
+    /**
+     * Adds the given relations to the entry. Appends to existing relations.
+     */
+    void addRelations(BibEntry entry, List<BibEntry> relations);
 
     boolean containsKey(BibEntry entry);
 

@@ -37,7 +37,7 @@ public enum LRUCacheBibEntryRelationsRepository implements BibEntryRelationRepos
     }
 
     @Override
-    public synchronized void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
+    public synchronized void addRelations(BibEntry entry, List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {
             var cachedRelations = this.relationsMap.getOrDefault(doi, new LinkedHashSet<>());
             cachedRelations.addAll(relations);

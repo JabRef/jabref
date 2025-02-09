@@ -79,8 +79,8 @@ class LRUCacheBibEntryRelationsRepositoryTest {
         // WHEN
         var firstRelations = createRelations(entry);
         var secondRelations = createRelations(entry);
-        dao.cacheOrMergeRelations(entry, firstRelations);
-        dao.cacheOrMergeRelations(entry, secondRelations);
+        dao.addRelations(entry, firstRelations);
+        dao.addRelations(entry, secondRelations);
 
         // THEN
         var uniqueRelations = Stream
@@ -103,7 +103,7 @@ class LRUCacheBibEntryRelationsRepositoryTest {
         assertFalse(dao.containsKey(entry));
 
         // WHEN
-        dao.cacheOrMergeRelations(entry, relations);
+        dao.addRelations(entry, relations);
         assertTrue(dao.containsKey(entry));
         dao.clearEntries();
 

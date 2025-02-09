@@ -25,17 +25,17 @@ public class BibEntryRelationRepositoryChain implements BibEntryRelationReposito
             return List.of();
         }
         var relations = this.next.getRelations(entry);
-        this.current.cacheOrMergeRelations(entry, relations);
+        this.current.addRelations(entry, relations);
         // Makes sure to obtain a copy and not a direct reference to what was inserted
         return this.current.getRelations(entry);
     }
 
     @Override
-    public void cacheOrMergeRelations(BibEntry entry, List<BibEntry> relations) {
+    public void addRelations(BibEntry entry, List<BibEntry> relations) {
         if (this.next != EMPTY) {
-            this.next.cacheOrMergeRelations(entry, relations);
+            this.next.addRelations(entry, relations);
         }
-        this.current.cacheOrMergeRelations(entry, relations);
+        this.current.addRelations(entry, relations);
     }
 
     @Override
