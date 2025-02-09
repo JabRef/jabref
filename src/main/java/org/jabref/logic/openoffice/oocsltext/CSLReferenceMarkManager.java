@@ -270,69 +270,34 @@ public class CSLReferenceMarkManager {
     }
 
     private void updateMarkAndTextWithNewNumbers(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception, CreationException {
-        XTextContent oldContent = mark.getTextContent();
-        XTextRange range = oldContent.getAnchor();
+        String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
+        String currentText = mark.getTextContent().getAnchor().getString();
+        String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
 
-        if (range != null) {
-            XText text = range.getText();
+        updateMarkAndText(mark, updatedText, updatedName);
 
-            // Store the position of the mark
-            XTextCursor cursor = text.createTextCursorByRange(range);
+        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
+        XNameAccess marks = supplier.getReferenceMarks();
+        XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, marks.getByName(updatedName));
 
-            // Get the current text content
-            String currentText = range.getString();
-
-            // Update the citation numbers in the text
-            String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
-            OOText ooText = OOText.fromString(updatedText);
-
-            // The only way to edit a reference mark is to remove it and add a new one
-            // Remove the old reference mark without removing the text
-            text.removeTextContent(oldContent);
-
-            // Store the start position before writing
-            XTextRange startRange = cursor.getStart();
-
-            // Update the text using OOTextIntoOO
-            OOTextIntoOO.write(document, cursor, ooText);
-
-            // Store the end position after writing
-            XTextRange endRange = cursor.getEnd();
-
-            // Move cursor to wrap the entire inserted content
-            cursor.gotoRange(startRange, false);
-            cursor.gotoRange(endRange, true);
-
-            // Create updated name for the reference mark
-            String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
-
-            // Create and attach the mark
-            DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, updatedName, cursor, true);
-            UnoReferenceMark.create(documentAnnotation);
-
-            // Move cursor to the end
-            cursor.gotoRange(endRange, false);
-
-            // Get the newly created reference mark content
-            XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
-            XNameAccess marks = supplier.getReferenceMarks();
-            XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, marks.getByName(updatedName));
-
-            // Update our internal reference to the new text content and name
-            mark.updateTextContent(newContent);
-            mark.updateName(updatedName);
-            mark.setCitationNumbers(newNumbers);
-        }
+        mark.updateTextContent(newContent);
+        mark.updateName(updatedName);
+        mark.setCitationNumbers(newNumbers);
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText) throws Exception, CreationException {
+        String unchangedName = mark.getName();
+
+        updateMarkAndText(mark, newText, unchangedName);
+    }
+
+    private void updateMarkAndText(CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
 
         if (range != null) {
             XText text = range.getText();
             XTextCursor cursor = text.createTextCursorByRange(range);
-
             OOText ooText = OOText.fromString(newText);
 
             // Remove old reference mark but keep cursor position
@@ -352,19 +317,11 @@ public class CSLReferenceMarkManager {
             cursor.gotoRange(endRange, true);
 
             // Create and attach DocumentAnnotation
-            DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, mark.getName(), cursor, true);
+            DocumentAnnotation documentAnnotation = new DocumentAnnotation(document, markName, cursor, true);
             UnoReferenceMark.create(documentAnnotation);
 
             // Move cursor to the end
             cursor.gotoRange(endRange, false);
-
-            // Get the newly created reference mark content
-            XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
-            XNameAccess marks = supplier.getReferenceMarks();
-            XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, marks.getByName(mark.getName()));
-
-            // Update mark's content reference
-            mark.updateTextContent(newContent);
         }
     }
 }

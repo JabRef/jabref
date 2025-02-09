@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,10 +44,15 @@ public class CSLCitationOOAdapter {
     private CitationStyle currentStyle;
     private boolean styleChanged;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier) {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
+        if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle citationStyle) {
+            this.currentStyle = citationStyle;
+        }
+
+        readAndUpdateExistingMarks();
     }
 
     public void setStyle(CitationStyle newStyle) {

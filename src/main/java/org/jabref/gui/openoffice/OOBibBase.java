@@ -70,11 +70,11 @@ public class OOBibBase {
 
     private final DialogService dialogService;
 
-    private final boolean alwaysAddCitedOnPages;
-
     private final OOBibBaseConnect connection;
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
+
+    private OpenOfficePreferences openOfficePreferences;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
@@ -83,15 +83,15 @@ public class OOBibBase {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
-
-        this.alwaysAddCitedOnPages = openOfficePreferences.getAlwaysAddCitedOnPages();
+        this.openOfficePreferences = openOfficePreferences;
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-        Supplier<List<BibDatabaseContext>> databasesSupplier = () -> stateManager.getOpenDatabases();
-        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier);
-        this.cslCitationOOAdapter.readAndUpdateExistingMarks();
+        if (this.cslCitationOOAdapter == null) {
+            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+            Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
+            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences);
+        }
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
@@ -585,7 +585,7 @@ public class OOBibBase {
             }
         }
 
-        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages));
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.openOfficePreferences.getAlwaysAddCitedOnPages()));
 
         try {
 
@@ -861,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
+                            .setAlwaysAddCitedOnPages(this.openOfficePreferences.getAlwaysAddCitedOnPages());
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
