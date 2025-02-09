@@ -1,5 +1,6 @@
 package org.jabref.gui.consistency;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
@@ -27,11 +28,8 @@ public enum ConsistencySymbol {
     }
 
     public static Optional<ConsistencySymbol> fromText(String text) {
-        for (ConsistencySymbol symbol : ConsistencySymbol.values()) {
-            if (symbol.getText().equals(text)) {
-                return Optional.of(symbol);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(ConsistencySymbol.values())
+                     .filter(symbol -> symbol.getText().equals(text))
+                     .findFirst();
     }
 }
