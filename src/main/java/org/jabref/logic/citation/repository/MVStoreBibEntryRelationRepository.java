@@ -27,6 +27,7 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.WriteBuffer;
 import org.h2.mvstore.type.BasicDataType;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,12 +93,9 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
 
     /**
      * Allows insertion of empty list in order to keep track of insertion date for an entry.
-     *
-     * @param entry should not be null
-     * @param relations should not be null
      */
     @Override
-    synchronized public void addRelations(BibEntry entry, List<BibEntry> relations) {
+    synchronized public void addRelations(@NonNull BibEntry entry, @NonNull List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {
             try (var store = this.storeConfiguration.open()) {
                 // Save the relations
