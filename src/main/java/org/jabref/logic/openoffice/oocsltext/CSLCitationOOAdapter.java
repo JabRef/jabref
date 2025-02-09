@@ -258,7 +258,7 @@ public class CSLCitationOOAdapter {
      * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
      */
     private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
-            throws IOException, Exception {
+            throws IOException, Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
 
