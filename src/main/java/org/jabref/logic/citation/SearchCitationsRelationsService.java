@@ -11,6 +11,7 @@ import org.jabref.logic.importer.fetcher.SemanticScholarCitationFetcher;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,19 +23,23 @@ public class SearchCitationsRelationsService {
     private final CitationFetcher citationFetcher;
     private final BibEntryRelationsRepository relationsRepository;
 
-    public SearchCitationsRelationsService(
-        CitationFetcher citationFetcher, BibEntryRelationsRepository repository
-    ) {
-        this.citationFetcher = citationFetcher;
-        this.relationsRepository = repository;
-    }
-
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
         this.relationsRepository = ChainBibEntryRelationsRepository.of(
             Directories.getCitationsRelationsDirectory(),
             importerPreferences.getCitationsRelationsStoreTTL()
         );
+    }
+
+    /**
+     * @implNote Typically, this would be a Shim in JavaFX
+     */
+    @VisibleForTesting
+    public SearchCitationsRelationsService(
+            CitationFetcher citationFetcher, BibEntryRelationsRepository repository
+    ) {
+        this.citationFetcher = citationFetcher;
+        this.relationsRepository = repository;
     }
 
     public List<BibEntry> searchReferences(BibEntry referencer) {
