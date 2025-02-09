@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added a new CLI to ensure consistency among BibTeX entries, supporting TXT, CSV, and console-based output. [#11984](https://github.com/JabRef/jabref/pull/12475)
+- We added a new CLI that supports TXT, CSV, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/pull/12475)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
 
 ### Changed
