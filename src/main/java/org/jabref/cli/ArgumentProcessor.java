@@ -302,11 +302,6 @@ public class ArgumentProcessor {
 
     private void checkConsistency(CliPreferences cliPreferences,
                                   BibEntryTypesManager entryTypesManager) {
-        if (!cli.isCheckConsistency()) {
-            System.out.println(Localization.lang("No file specified for consistency check."));
-            return;
-        }
-
         String fileName = cli.getCheckConsistency();
         String outputFormat = cli.getCheckConsistencyOutputFormat();
 
@@ -325,7 +320,7 @@ public class ArgumentProcessor {
             BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
 
             if (outputFormat.isEmpty()) {
-                System.out.println("No output format if found!");
+                writeFindings(result);
                 return;
             }
 
@@ -346,11 +341,11 @@ public class ArgumentProcessor {
     }
 
     public void writeFindings(BibliographyConsistencyCheck.Result result) {
-        System.out.print(Localization.lang("Field Presence Consistency Check Result\n"));
+        System.out.print(Localization.lang("Field Presence Consistency Check Result"));
         System.out.print("\n\n");
 
         if (result.entryTypeToResultMap().isEmpty()) {
-            System.out.println("No errors found.");
+            System.out.println("No errors found.\n");
             return;
         }
 
