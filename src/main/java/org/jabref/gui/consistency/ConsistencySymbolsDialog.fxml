@@ -10,7 +10,7 @@
     <content>
         <VBox spacing="10.0">
             <HBox spacing="10.0">
-                <JabRefIconView glyph="CONSISTENCY_UNSET_FIELD"/>
+                <JabRefIconView glyph="CONSISTENCY_REQUIRED_FIELD"/>
                 <Label text="%Required field is present" />
             </HBox><HBox spacing="10.0">
                 <JabRefIconView glyph="CONSISTENCY_OPTIONAL_FIELD"/>
@@ -20,7 +20,7 @@
                 <Label text="%Unknown field is present" />
             </HBox>
             <HBox spacing="10.0">
-                <JabRefIconView glyph="CONSISTENCY_REQUIRED_FIELD"/>
+                <JabRefIconView glyph="CONSISTENCY_UNSET_FIELD"/>
                 <Label text="%Unset field is absent" />
             </HBox>
         </VBox>
