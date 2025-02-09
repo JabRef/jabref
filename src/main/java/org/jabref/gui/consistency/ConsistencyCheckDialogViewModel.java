@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +75,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
         result.entryTypeToResultMap().entrySet().stream()
               .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
-              .forEach(Unchecked.consumer(mapEntry -> {
-                  writeMapEntry(mapEntry);
-              }));
+              .forEach(Unchecked.consumer(this::writeMapEntry));
     }
 
     public StringProperty selectedEntryTypeProperty() {
@@ -96,7 +95,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     public List<String> getColumnNames() {
-        List<String> result = new ArrayList(columnCount + EXTRA_COLUMNS_COUNT);
+        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
         result.add("Citation Key");
         allReportedFields.forEach(field -> {
@@ -113,13 +112,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         Set<Field> requiredFields = bibEntryType
                 .map(BibEntryType::getRequiredFields)
                 .stream()
-                .flatMap(orFieldsCollection -> orFieldsCollection.stream())
+                .flatMap(Collection::stream)
                 .flatMap(orFields -> orFields.getFields().stream())
                 .collect(Collectors.toSet());
         Set<Field> optionalFields = bibEntryType
                 .map(BibEntryType::getOptionalFields)
                 .stream()
-                .flatMap(bibFieldSet -> bibFieldSet.stream())
+                .flatMap(Collection::stream)
                 .map(BibField::field)
                 .collect(Collectors.toSet());
 
@@ -142,11 +141,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList(columnCount + EXTRA_COLUMNS_COUNT);
+        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> {
-            result.add(bibEntry.getField(field).map(value -> {
+            result.add(bibEntry.getField(field).map(_ -> {
                 if (requiredFields.contains(field)) {
                     return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 } else if (optionalFields.contains(field)) {
