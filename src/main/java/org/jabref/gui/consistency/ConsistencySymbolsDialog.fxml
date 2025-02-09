@@ -21,7 +21,7 @@
             </HBox>
             <HBox spacing="10.0">
                 <JabRefIconView glyph="CONSISTENCY_UNSET_FIELD"/>
-                <Label text="%Unset field is absent" />
+                <Label text="%Field is absent" />
             </HBox>
         </VBox>
     </content>
