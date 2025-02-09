@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-public class BibEntryRelationDAOChain implements BibEntryRelationDAO {
+public class BibEntryRelationRepositoryChain implements BibEntryRelationRepository {
 
-    private static final BibEntryRelationDAO EMPTY = new BibEntryRelationDAOChain(null, null);
+    private static final BibEntryRelationRepository EMPTY = new BibEntryRelationRepositoryChain(null, null);
 
-    private final BibEntryRelationDAO current;
-    private final BibEntryRelationDAO next;
+    private final BibEntryRelationRepository current;
+    private final BibEntryRelationRepository next;
 
-    BibEntryRelationDAOChain(BibEntryRelationDAO current, BibEntryRelationDAO next) {
+    BibEntryRelationRepositoryChain(BibEntryRelationRepository current, BibEntryRelationRepository next) {
         this.current = current;
         this.next = next;
     }
@@ -50,10 +50,10 @@ public class BibEntryRelationDAOChain implements BibEntryRelationDAO {
             && (this.next == EMPTY || this.next.isUpdatable(entry));
     }
 
-    public static BibEntryRelationDAO of(BibEntryRelationDAO... dao) {
+    public static BibEntryRelationRepository of(BibEntryRelationRepository... dao) {
         return List.of(dao)
             .reversed()
             .stream()
-            .reduce(EMPTY, (acc, current) -> new BibEntryRelationDAOChain(current, acc));
+            .reduce(EMPTY, (acc, current) -> new BibEntryRelationRepositoryChain(current, acc));
     }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-public interface BibEntryRelationDAO {
+public interface BibEntryRelationRepository {
 
     List<BibEntry> getRelations(BibEntry entry);
 

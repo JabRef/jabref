@@ -23,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LRUCacheBibEntryRelationsDAOTest {
+class LRUCacheBibEntryRelationsRepositoryTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(LRUCacheBibEntryRelationsDAOTest::createBibEntry);
+            .mapToObj(LRUCacheBibEntryRelationsRepositoryTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -66,13 +66,13 @@ class LRUCacheBibEntryRelationsDAOTest {
 
     private static Stream<Arguments> createCacheAndBibEntry() {
         return Stream
-            .of(LRUCacheBibEntryRelationsDAO.CITATIONS, LRUCacheBibEntryRelationsDAO.REFERENCES)
+            .of(LRUCacheBibEntryRelationsRepository.CITATIONS, LRUCacheBibEntryRelationsRepository.REFERENCES)
             .flatMap(dao -> createBibEntries().map(entry -> Arguments.of(dao, entry)));
     }
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void repositoryShouldMergeCitationsWhenInserting(LRUCacheBibEntryRelationsDAO dao, BibEntry entry) {
+    void repositoryShouldMergeCitationsWhenInserting(LRUCacheBibEntryRelationsRepository dao, BibEntry entry) {
         // GIVEN
         dao.clearEntries();
         assertFalse(dao.containsKey(entry));
@@ -97,7 +97,7 @@ class LRUCacheBibEntryRelationsDAOTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void clearingCacheShouldWork(LRUCacheBibEntryRelationsDAO dao, BibEntry entry) {
+    void clearingCacheShouldWork(LRUCacheBibEntryRelationsRepository dao, BibEntry entry) {
         // GIVEN
         dao.clearEntries();
         var relations = createRelations(entry);

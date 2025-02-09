@@ -10,9 +10,9 @@ import org.jabref.model.entry.identifier.DOI;
 
 import org.eclipse.jgit.util.LRUMap;
 
-import static org.jabref.logic.citation.repository.LRUCacheBibEntryRelationsDAO.Configuration.MAX_CACHED_ENTRIES;
+import static org.jabref.logic.citation.repository.LRUCacheBibEntryRelationsRepository.Configuration.MAX_CACHED_ENTRIES;
 
-public enum LRUCacheBibEntryRelationsDAO implements BibEntryRelationDAO {
+public enum LRUCacheBibEntryRelationsRepository implements BibEntryRelationRepository {
 
     CITATIONS(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES)),
     REFERENCES(new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES));
@@ -23,7 +23,7 @@ public enum LRUCacheBibEntryRelationsDAO implements BibEntryRelationDAO {
 
     private final Map<DOI, Set<BibEntry>> relationsMap;
 
-    LRUCacheBibEntryRelationsDAO(Map<DOI, Set<BibEntry>> relationsMap) {
+    LRUCacheBibEntryRelationsRepository(Map<DOI, Set<BibEntry>> relationsMap) {
         this.relationsMap = relationsMap;
     }
 

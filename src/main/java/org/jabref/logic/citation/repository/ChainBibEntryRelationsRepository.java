@@ -11,17 +11,17 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     private static final String CITATIONS_STORE = "citations";
     private static final String REFERENCES_STORE = "references";
 
-    private final BibEntryRelationDAO citationsDao;
-    private final BibEntryRelationDAO referencesDao;
+    private final BibEntryRelationRepository citationsDao;
+    private final BibEntryRelationRepository referencesDao;
 
     public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore, int storeTTL) {
-        this.citationsDao = BibEntryRelationDAOChain.of(
-            LRUCacheBibEntryRelationsDAO.CITATIONS,
-            new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE, storeTTL)
+        this.citationsDao = BibEntryRelationRepositoryChain.of(
+            LRUCacheBibEntryRelationsRepository.CITATIONS,
+            new MVStoreBibEntryRelationRepository(citationsStore, CITATIONS_STORE, storeTTL)
         );
-        this.referencesDao = BibEntryRelationDAOChain.of(
-            LRUCacheBibEntryRelationsDAO.REFERENCES,
-            new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE, storeTTL)
+        this.referencesDao = BibEntryRelationRepositoryChain.of(
+            LRUCacheBibEntryRelationsRepository.REFERENCES,
+            new MVStoreBibEntryRelationRepository(relationsStore, REFERENCES_STORE, storeTTL)
         );
     }
 

@@ -30,9 +30,9 @@ import org.h2.mvstore.type.BasicDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
+public class MVStoreBibEntryRelationRepository implements BibEntryRelationRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationRepository.class);
 
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
     private final static String TIME_STAMP_SUFFIX = "-insertion-timestamp";
@@ -43,16 +43,16 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
     private final int storeTTLInDays;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration;
 
-    MVStoreBibEntryRelationDAO(Path path, String mapName, int storeTTLInDays) {
+    MVStoreBibEntryRelationRepository(Path path, String mapName, int storeTTLInDays) {
         this(
             path,
             mapName,
             storeTTLInDays,
-            new MVStoreBibEntryRelationDAO.BibEntryHashSetSerializer()
+            new MVStoreBibEntryRelationRepository.BibEntryHashSetSerializer()
         );
     }
 
-    MVStoreBibEntryRelationDAO(
+    MVStoreBibEntryRelationRepository(
         Path path, String mapName, int storeTTLInDays, BasicDataType<LinkedHashSet<BibEntry>> serializer
     ) {
         try {
