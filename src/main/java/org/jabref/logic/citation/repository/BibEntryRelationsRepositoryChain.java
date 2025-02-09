@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
-public class ChainBibEntryRelationsRepository implements BibEntryRelationsRepository {
+public class BibEntryRelationsRepositoryChain implements BibEntryRelationsRepository {
 
     private static final String CITATIONS_STORE = "citations";
     private static final String REFERENCES_STORE = "references";
@@ -14,7 +14,7 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
     private final BibEntryRelationRepository citationsDao;
     private final BibEntryRelationRepository referencesDao;
 
-    public ChainBibEntryRelationsRepository(Path citationsStore, Path relationsStore, int storeTTL) {
+    public BibEntryRelationsRepositoryChain(Path citationsStore, Path relationsStore, int storeTTL) {
         this.citationsDao = BibEntryRelationRepositoryChain.of(
             LRUCacheBibEntryRelationsRepository.CITATIONS,
             new MVStoreBibEntryRelationRepository(citationsStore, CITATIONS_STORE, storeTTL)
@@ -75,9 +75,9 @@ public class ChainBibEntryRelationsRepository implements BibEntryRelationsReposi
         return referencesDao.isUpdatable(entry);
     }
 
-    public static ChainBibEntryRelationsRepository of(Path citationsRelationsDirectory, int storeTTL) {
+    public static BibEntryRelationsRepositoryChain of(Path citationsRelationsDirectory, int storeTTL) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
-        return new ChainBibEntryRelationsRepository(citationsPath, relationsPath, storeTTL);
+        return new BibEntryRelationsRepositoryChain(citationsPath, relationsPath, storeTTL);
     }
 }

@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-class ChainBibEntryRelationsRepositoryTest {
+class BibEntryRelationsRepositoryChainTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(ChainBibEntryRelationsRepositoryTest::createBibEntry);
+            .mapToObj(BibEntryRelationsRepositoryChainTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -51,7 +51,7 @@ class ChainBibEntryRelationsRepositoryTest {
         // GIVEN
         var tempDir = Files.createTempDirectory("temp");
         var mvStorePath = Files.createTempFile(tempDir, "cache", "");
-        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath, 0);
+        var bibEntryRelationsRepository = new BibEntryRelationsRepositoryChain(mvStorePath, mvStorePath, 0);
         assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
 
         // WHEN
@@ -77,7 +77,7 @@ class ChainBibEntryRelationsRepositoryTest {
         // GIVEN
         var tempDir = Files.createTempDirectory("temp");
         var mvStorePath = Files.createTempFile(tempDir, "cache", "");
-        var bibEntryRelationsRepository = new ChainBibEntryRelationsRepository(mvStorePath, mvStorePath, 0);
+        var bibEntryRelationsRepository = new BibEntryRelationsRepositoryChain(mvStorePath, mvStorePath, 0);
         assertFalse(bibEntryRelationsRepository.containsReferences(bibEntry));
 
         // WHEN
