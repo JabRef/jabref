@@ -30,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef icon merges with dark background [#7771](https://github.com/JabRef/jabref/issues/7771)
 - We fixed an issue where an entry's group was no longer highlighted on selection [#12413](https://github.com/JabRef/jabref/issues/12413)
 - We fixed an issue where BibTeX Strings were not included in the backup file [#12462](https://github.com/JabRef/jabref/issues/12462)
+- We fixed an issue where CSL style citations with citation keys having special characters such as hyphens and colons would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
 
 ### Removed
 
