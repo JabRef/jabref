@@ -280,7 +280,7 @@ public class CSLCitationOOAdapter {
         List<BibDatabaseContext> databaseContexts = databasesSupplier.get();
         List<BibDatabase> databases = new ArrayList<>();
         for (BibDatabaseContext databaseContext : databaseContexts) {
-                databases.add(databaseContext.getDatabase());
+            databases.add(databaseContext.getDatabase());
         }
 
         // We first get a list of all cited entries to create a unified database context
