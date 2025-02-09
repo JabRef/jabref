@@ -56,9 +56,7 @@ public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
         Path path, String mapName, int storeTTLInDays, BasicDataType<LinkedHashSet<BibEntry>> serializer
     ) {
         try {
-            if (!Files.exists(path.getParent())) {
-                Files.createDirectories(path.getParent());
-            }
+            Files.createDirectories(path.getParent());
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }
