@@ -142,14 +142,13 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             StringBuilder tooltipText = new StringBuilder();
 
             for (LinkedFile linkedFile : linkedFiles) {
-                tooltipText.append(linkedFile.getLink()).append("\n"); 
+                tooltipText.append(linkedFile.getLink()).append("\n");
             }
 
             return Localization.lang("Open files: \n%0", tooltipText.toString());
         }
         return null;
     }
-
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
         if (linkedFiles.size() <= 1) {
