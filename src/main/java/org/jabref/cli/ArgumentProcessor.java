@@ -326,7 +326,7 @@ public class ArgumentProcessor {
 
             String outputFileName = fileName.substring(0, fileName.lastIndexOf('.')) + "_consistency_check." + outputFormat.get().toLowerCase();
             try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
-                if ("CSV".equalsIgnoreCase(outputFormat.get())) {
+                if ("csv".equalsIgnoreCase(outputFormat.get())) {
                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
                     csvWriter.writeFindings();
                 } else {

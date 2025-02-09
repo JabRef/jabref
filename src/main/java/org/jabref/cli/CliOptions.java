@@ -321,7 +321,7 @@ public class CliOptions {
         options.addOption(Option
                 .builder()
                 .longOpt("check-consistency-output-format")
-                .desc(Localization.lang("Output format for consistency check (TXT/CSV)"))
+                .desc(Localization.lang("Output format for consistency check (txt/csv)"))
                 .hasArg()
                 .argName("FORMAT")
                 .build());
