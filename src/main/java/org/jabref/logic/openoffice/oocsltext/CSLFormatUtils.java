@@ -121,16 +121,13 @@ public class CSLFormatUtils {
     }
 
     public static String generateAlphanumericInTextCitation(BibEntry entry, BibDatabaseContext bibDatabaseContext) {
-        // Generate the alphanumeric citation
         String inTextCitation = generateAlphanumericCitation(List.of(entry), bibDatabaseContext);
 
-        // Get the author's name
         String authorName = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
                                         .map(AuthorList::parse)
                                         .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
                                         .orElse("");
 
-        // Combine author name with the citation
         return authorName + " " + inTextCitation;
     }
 

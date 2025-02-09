@@ -32,7 +32,12 @@ import com.sun.star.uno.Exception;
 /**
  * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
  * It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
- * Any method in this class is NOT supposed to be moved.
+ * Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
+ *
+ * @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
+ * These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
+ * In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
+ * For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
  */
 public class CSLCitationOOAdapter {
 
@@ -71,8 +76,6 @@ public class CSLCitationOOAdapter {
     /**
      * Inserts a citation for a group of entries.
      * Comparable to LaTeX's \cite command.
-     *
-     * @implNote UNO API calls are expensive, and any additional insertion or update slows down the net "macro-task" we are trying to achieve in the document.
      */
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, IOException, Exception {
@@ -281,14 +284,10 @@ public class CSLCitationOOAdapter {
         }
 
         // We first get a list of all cited entries to create a unified database context
-        List<BibEntry> citedEntries = new ArrayList<>();
-        for (BibDatabase database : databases) {
-            for (BibEntry entry : database.getEntries()) {
-                if (isCitedEntry(entry)) {
-                    citedEntries.add(entry);
-                }
-            }
-        }
+        List<BibEntry> citedEntries = databases.stream()
+                                               .flatMap(db -> db.getEntries().stream())
+                                               .filter(this::isCitedEntry)
+                                               .toList();
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
@@ -303,8 +302,7 @@ public class CSLCitationOOAdapter {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
                                                      .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .filter(Optional::isPresent)
-                                                     .map(Optional::get)
+                                                     .flatMap(Optional::stream)
                                                      .toList();
 
                 StringBuilder finalText = new StringBuilder();
@@ -347,8 +345,7 @@ public class CSLCitationOOAdapter {
                 List<String> citationKeys = mark.getCitationKeys();
                 List<BibEntry> entries = citationKeys.stream()
                                                      .map(unifiedDatabase::getEntryByCitationKey)
-                                                     .filter(Optional::isPresent)
-                                                     .map(Optional::get)
+                                                     .flatMap(Optional::stream)
                                                      .toList();
 
                 // We re-generate the citation in the new style and update it in the document
