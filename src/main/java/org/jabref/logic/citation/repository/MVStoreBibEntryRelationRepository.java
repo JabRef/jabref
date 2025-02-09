@@ -99,6 +99,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         entry.getDOI().ifPresent(doi -> {
             try (var store = this.storeConfiguration.open()) {
                 // Save the relations
+                // FIXME: This is costing much performance - store should be stared only once
                 MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
                 var relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
