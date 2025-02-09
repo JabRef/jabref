@@ -165,7 +165,7 @@ public class CSLReferenceMarkManager {
 
         for (String name : marks.getElementNames()) {
             String[] parts = name.split(" ");
-            if (parts[0].equals(ReferenceMark.PREFIXES[0]) && parts[0].equals(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
+            if (parts[0].equals(ReferenceMark.PREFIXES[0]) && parts[1].equals(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
 
                 ReferenceMark referenceMark = new ReferenceMark(name);
@@ -203,7 +203,7 @@ public class CSLReferenceMarkManager {
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
         String[] parts = oldName.split(" ");
-        if (parts[0].equals(ReferenceMark.PREFIXES[0]) && parts[0].equals(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
+        if (parts[0].equals(ReferenceMark.PREFIXES[0]) && parts[1].equals(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
             StringBuilder newName = new StringBuilder();
             for (int i = 0; i < parts.length - 1; i += 2) {
                 // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
