@@ -71,10 +71,18 @@ public class CSLCitationOOAdapter {
     /**
      * Inserts a citation for a group of entries.
      * Comparable to LaTeX's \cite command.
+     *
+     * @implNote UNO API calls are expensive, and any additional insertion or update slows down the net "macro-task" we are trying to achieve in the document.
      */
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, IOException, Exception {
         setStyle(selectedStyle);
+
+        // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
+        if (styleChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, false);
+            styleChanged = false;
+        }
 
         String style = selectedStyle.getSource();
         boolean isNumericStyle = selectedStyle.isNumericStyle();
@@ -96,11 +104,6 @@ public class CSLCitationOOAdapter {
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
         insertReferences(cursor, entries, ooText, isNumericStyle);
-
-        if (styleChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, false);
-            styleChanged = false;
-        }
     }
 
     /**
@@ -112,6 +115,11 @@ public class CSLCitationOOAdapter {
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, CreationException, Exception {
         setStyle(selectedStyle);
+
+        if (styleChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, true);
+            styleChanged = false;
+        }
 
         String style = selectedStyle.getSource();
         boolean isNumericStyle = selectedStyle.isNumericStyle();
@@ -149,11 +157,6 @@ public class CSLCitationOOAdapter {
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle);
         }
-
-        if (styleChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, true);
-            styleChanged = false;
-        }
     }
 
     /**
@@ -171,11 +174,8 @@ public class CSLCitationOOAdapter {
      * The list is generated based on the existing citations, in-text citations and empty citations in the document.
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, CreationException, NoSuchElementException {
+            throws WrappedTargetException, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
-
-        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
-        markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));

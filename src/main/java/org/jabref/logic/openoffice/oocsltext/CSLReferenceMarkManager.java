@@ -271,6 +271,7 @@ public class CSLReferenceMarkManager {
     }
 
     private void updateMarkAndTextWithNewNumbers(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception, CreationException {
+        System.out.println("Numbers method call");
         String updatedName = getUpdatedReferenceMarkNameWithNewNumbers(mark.getName(), newNumbers);
         String currentText = mark.getTextContent().getAnchor().getString();
         String updatedText = getUpdatedCitationTextWithNewNumbers(currentText, newNumbers);
@@ -287,6 +288,7 @@ public class CSLReferenceMarkManager {
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText) throws Exception, CreationException {
+        System.out.println("Text method call");
         String unchangedName = mark.getName();
 
         updateMarkAndText(mark, newText, unchangedName);
