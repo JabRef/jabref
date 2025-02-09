@@ -193,7 +193,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
         // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
         // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
-        this.setSortPolicy(i -> true);
+        this.setSortPolicy(_ -> true);
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(
                 this.comparatorProperty().map(comparator -> {
                     if (comparator == null) {
