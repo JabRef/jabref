@@ -74,36 +74,6 @@ public class CSLReferenceMarkManager {
         return referenceMark;
     }
 
-    public int getCitationNumber(String citationKey) {
-        return citationKeyToNumber.computeIfAbsent(citationKey, _ -> ++highestCitationNumber);
-    }
-
-    public List<CSLReferenceMark> getMarksInOrder() {
-        sortMarksInOrder();
-        return marksInOrder;
-    }
-
-    public boolean hasCitationForKey(String citationKey) {
-        return citationKeyToNumber.containsKey(citationKey);
-    }
-
-    public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
-        this.isNumberUpdateRequired = isNumeric;
-    }
-
-    private void sortMarksInOrder() {
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
-    }
-
-    private int compareTextRanges(XTextRange r1, XTextRange r2) {
-        try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
-            return 0;
-        }
-    }
-
     public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter)
             throws CreationException, Exception {
         CSLReferenceMark mark = createReferenceMark(entries);
@@ -323,6 +293,36 @@ public class CSLReferenceMarkManager {
 
             // Move cursor to the end
             cursor.gotoRange(endRange, false);
+        }
+    }
+
+    public int getCitationNumber(String citationKey) {
+        return citationKeyToNumber.computeIfAbsent(citationKey, _ -> ++highestCitationNumber);
+    }
+
+    public List<CSLReferenceMark> getMarksInOrder() {
+        sortMarksInOrder();
+        return marksInOrder;
+    }
+
+    public boolean hasCitationForKey(String citationKey) {
+        return citationKeyToNumber.containsKey(citationKey);
+    }
+
+    public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
+        this.isNumberUpdateRequired = isNumeric;
+    }
+
+    private void sortMarksInOrder() {
+        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+    }
+
+    private int compareTextRanges(XTextRange r1, XTextRange r2) {
+        try {
+            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
+            return 0;
         }
     }
 }
