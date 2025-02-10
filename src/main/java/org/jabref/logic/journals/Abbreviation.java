@@ -10,6 +10,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1;
+
     private static final LevenshteinDistance LEVENSHTEIN = LevenshteinDistance.getDefaultInstance();
 
     private final transient String name;
@@ -119,8 +120,9 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
             return false;
         }
         Abbreviation that = (Abbreviation) o;
-        return isSimilar(that.getName()) && isSimilar(that.getAbbreviation())
-                && isSimilar(that.getShortestUniqueAbbreviation());
+        return Objects.equals(normalize(name), normalize(that.name)) &&
+                Objects.equals(normalize(abbreviation), normalize(that.abbreviation)) &&
+                Objects.equals(normalize(shortestUniqueAbbreviation), normalize(that.shortestUniqueAbbreviation));
     }
 
     @Override
