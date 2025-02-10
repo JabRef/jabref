@@ -57,7 +57,7 @@ public class CSLCitationOOAdapter {
             this.currentStyle = citationStyle;
         }
 
-        readAndUpdateExistingMarks();
+        markManager.readAndUpdateExistingMarks();
     }
 
     public void setStyle(CitationStyle newStyle) {
@@ -67,10 +67,6 @@ public class CSLCitationOOAdapter {
         } else {
             styleChanged = false;
         }
-    }
-
-    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
-        markManager.readAndUpdateExistingMarks();
     }
 
     /**
