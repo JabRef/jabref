@@ -148,7 +148,7 @@ class ArgumentProcessorTest {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--check-consistency-output-format", "TXT");
+        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--output-format", "txt");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
