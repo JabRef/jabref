@@ -13,12 +13,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 
 ### Changed
 
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
+- We improved the citations relations caching by implementing a two levels cache aside strategy including offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We improved the user comments field visibility so that it remains displayed if it contains text. Additionally, users can now easily toggle the field on or off via buttons unless disabled in preferences. [#11021](https://github.com/JabRef/jabref/issues/11021)
 
 ### Fixed
