@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -69,11 +70,11 @@ public class OOBibBase {
 
     private final DialogService dialogService;
 
-    private final boolean alwaysAddCitedOnPages;
-
     private final OOBibBaseConnect connection;
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
+
+    private OpenOfficePreferences openOfficePreferences;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
@@ -82,21 +83,22 @@ public class OOBibBase {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
-
-        this.alwaysAddCitedOnPages = openOfficePreferences.getAlwaysAddCitedOnPages();
+        this.openOfficePreferences = openOfficePreferences;
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-        this.cslCitationOOAdapter.readAndUpdateExistingMarks();
+        if (cslCitationOOAdapter == null) {
+            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+            Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences);
+        }
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
-
-            this.connection.selectDocument(autoSelectForSingle);
+            connection.selectDocument(autoSelectForSingle);
         } catch (NoDocumentFoundException ex) {
             OOError.from(ex).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
@@ -108,7 +110,7 @@ public class OOBibBase {
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
 
-        if (this.isConnectedToDocument()) {
+        if (isConnectedToDocument()) {
             initializeCitationAdapter(this.getXTextDocument().get());
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
@@ -583,7 +585,7 @@ public class OOBibBase {
             }
         }
 
-        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages));
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
 
         try {
 
@@ -591,17 +593,15 @@ public class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
 
-                initializeCitationAdapter(doc);
-
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
-                    this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     // "Cite in-text" button
-                    this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), citationStyle, entries);
+                    cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
                 }
 
                 // If "Automatically sync bibliography when inserting citations" is enabled
@@ -861,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
+                            .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
@@ -908,8 +908,6 @@ public class OOBibBase {
 
                 try {
                     UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
-
-                    initializeCitationAdapter(doc);
 
                     // Collect only cited entries from all databases
                     List<BibEntry> citedEntries = new ArrayList<>();
