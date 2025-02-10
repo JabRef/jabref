@@ -137,6 +137,6 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(normalize(getName()), normalize(getAbbreviation()), normalize(getShortestUniqueAbbreviation()));
+        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
     }
 }
