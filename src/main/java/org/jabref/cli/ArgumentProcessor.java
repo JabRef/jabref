@@ -322,25 +322,30 @@ public class ArgumentProcessor {
             BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
 
             if (outputFormat.isEmpty()) {
-                Writer ouputStreamWriter = new OutputStreamWriter(System.out);
-                BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, ouputStreamWriter, entryTypesManager, databaseContext.getMode());
-
-                txtWriter.writeFindings();
-                return;
+                try (Writer outputStreamWriter = new OutputStreamWriter(System.out)) {
+                    BibliographyConsistencyCheckResultTxtWriter ouputTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, outputStreamWriter, entryTypesManager, databaseContext.getMode());
+                    ouputTxtWriter.writeFindings();
+                    return;
+                } catch (IOException e) {
+                    LOGGER.error("Error accessing file '{}'.", fileName);
+                }
             }
 
-            String outputFileName = fileName.get().substring(0, fileName.get().lastIndexOf('.')) + "_consistency_check." + outputFormat.get().toLowerCase();
+            String outputFileName = fileName.get().substring(0, fileName.get().lastIndexOf('.')) + "_consistency_check" + outputFormat.get().toLowerCase();
+            // String outputFileName = StringUtil.getCorrectFileName(fileName.get(), ".bib").lastIndexOf('.')) + "_consistency_check_" + outputFormat.get().toLowerCase();;
 
-            try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
-                if ("csv".equalsIgnoreCase(outputFormat.get())) {
+            if ("csv".equalsIgnoreCase(outputFormat.get())) {
+                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
                     csvWriter.writeFindings();
-                } else {
+                }
+            } else {
+                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
                     BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode());
                     txtWriter.writeFindings();
                 }
-                System.out.println(Localization.lang("Consistency check completed"));
             }
+            System.out.println(Localization.lang("Consistency check completed"));
         } catch (IOException e) {
             LOGGER.error("Error accessing file '{}'.", fileName);
         }
