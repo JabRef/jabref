@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '7.0.5'
+    id 'org.openrewrite.rewrite' version '7.1.0'
 
     id "org.itsallcode.openfasttrace" version "3.0.1"
 }
@@ -191,8 +191,8 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.9.0'
 
     // region: LibreOffice
-    implementation 'org.libreoffice:unoloader:24.2.3'
-    implementation 'org.libreoffice:libreoffice:24.2.3'
+    implementation 'org.libreoffice:unoloader:24.8.4'
+    implementation 'org.libreoffice:libreoffice:24.8.4'
     // Required for ID generation
     implementation 'io.github.thibaultmeyer:cuid:2.0.3'
     // endregion
@@ -244,7 +244,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.4'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.83.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.89.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -401,7 +401,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.0.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.2.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
