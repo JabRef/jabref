@@ -236,7 +236,7 @@ public class CitationStyle implements OOStyle {
      * Thus, we currently hardcode the check for "DIN 1505-2".
      */
     public boolean isAlphanumericStyle() {
-        return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(this.getTitle());
+        return this.getTitle().equals("DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690");
     }
 
     public String getSource() {
