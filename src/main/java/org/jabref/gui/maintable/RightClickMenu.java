@@ -1,8 +1,6 @@
 package org.jabref.gui.maintable;
 
-import java.nio.file.Path;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
