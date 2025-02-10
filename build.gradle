@@ -178,7 +178,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
     implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
-    implementation 'org.apache.commons:commons-text:1.13.0'
+
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.13.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
