@@ -271,6 +271,7 @@ public class CSLReferenceMarkManager {
             XTextCursor cursor = text.createTextCursorByRange(range);
             OOText ooText = OOText.fromString(newText);
 
+            // The only way to edit a reference mark is to remove it and add a new one
             // Remove old reference mark but keep cursor position
             text.removeTextContent(oldContent);
 
