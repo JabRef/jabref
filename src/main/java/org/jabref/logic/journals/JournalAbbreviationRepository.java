@@ -152,7 +152,7 @@ public class JournalAbbreviationRepository {
     }
 
     public Optional<String> getNextAbbreviation(String text) {
-        return get(text).map(abbreviation -> abbreviation.getNext(text));
+        return get(text).map(abbreviation -> abbreviation.getNext(text.trim()));
     }
 
     public Optional<String> getDefaultAbbreviation(String text) {
