@@ -47,6 +47,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -311,44 +312,47 @@ public class ArgumentProcessor {
 
         Optional<String> outputFormat = Optional.ofNullable(cli.getCheckConsistencyOutputFormat());
 
+        Path filePath = Path.of(fileName.get());
+        ParserResult pr;
         try {
-            Path filePath = Path.of(fileName.get());
-            ParserResult pr = OpenDatabase.loadDatabase(filePath, cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
-            BibDatabaseContext databaseContext = pr.getDatabaseContext();
-            List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+            pr = OpenDatabase.loadDatabase(filePath, cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
+        } catch (IOException ex) {
+            LOGGER.error("Error reading '{}'.", filePath, ex);
+            return;
+        }
+        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
 
-            BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-            BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
 
-            if (outputFormat.isEmpty() || "txt".equalsIgnoreCase(outputFormat.get())) {
-                try (Writer outputStreamWriter = new OutputStreamWriter(System.out);
-                     BibliographyConsistencyCheckResultTxtWriter ouputTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(
-                             result,
-                             outputStreamWriter,
-                             cli.isPorcelainOutputMode(),
-                             entryTypesManager,
-                             databaseContext.getMode())) {
-                    ouputTxtWriter.writeFindings();
-                    return;
-                } catch (IOException e) {
-                    LOGGER.error("Error accessing file '{}'.", fileName);
-                }
-            } else {
-                try (Writer writer = new OutputStreamWriter(System.out);
-                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(
-                             result,
-                             writer,
-                             cli.isPorcelainOutputMode(),
-                             entryTypesManager,
-                             databaseContext.getMode())) {
-                    csvWriter.writeFindings();
-                }
-            }
-            if (!cli.isPorcelainOutputMode()) {
-                System.out.println(Localization.lang("Consistency check completed"));
-            }
+        Writer writer = new OutputStreamWriter(System.out);
+        BibliographyConsistencyCheckResultWriter checkResultWriter;
+        if (outputFormat.isEmpty() || "txt".equalsIgnoreCase(outputFormat.get())) {
+            checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
+                    result,
+                    writer,
+                    cli.isPorcelainOutputMode(),
+                    entryTypesManager,
+                    databaseContext.getMode());
+        } else {
+            checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
+                    result,
+                    writer,
+                    cli.isPorcelainOutputMode(),
+                    entryTypesManager,
+                    databaseContext.getMode());
+        }
+
+        // System.out should not be closed, therefore no try-with-resources
+        try {
+            checkResultWriter.writeFindings();
+            writer.flush();
         } catch (IOException e) {
-            LOGGER.error("Error accessing file '{}'.", fileName);
+            LOGGER.error("Error writing results", e);
+        }
+        if (!cli.isPorcelainOutputMode()) {
+            System.out.println(Localization.lang("Consistency check completed"));
         }
     }
 
