@@ -159,7 +159,7 @@ class ArgumentProcessorTest {
                 entryTypesManager);
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+        System.setOut(new PrintStream(outContent, true));
 
         processor.processArguments();
 
