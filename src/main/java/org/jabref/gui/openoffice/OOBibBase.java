@@ -87,10 +87,10 @@ public class OOBibBase {
     }
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
-        if (this.cslCitationOOAdapter == null) {
+        if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
-            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences);
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences);
         }
     }
 
@@ -98,7 +98,7 @@ public class OOBibBase {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
-            this.connection.selectDocument(autoSelectForSingle);
+            connection.selectDocument(autoSelectForSingle);
         } catch (NoDocumentFoundException ex) {
             OOError.from(ex).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
@@ -110,7 +110,7 @@ public class OOBibBase {
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
 
-        if (this.isConnectedToDocument()) {
+        if (isConnectedToDocument()) {
             initializeCitationAdapter(this.getXTextDocument().get());
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
@@ -585,7 +585,7 @@ public class OOBibBase {
             }
         }
 
-        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.openOfficePreferences.getAlwaysAddCitedOnPages()));
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
 
         try {
 
@@ -595,13 +595,13 @@ public class OOBibBase {
 
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
-                    this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     // "Cite in-text" button
-                    this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    this.cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
+                    cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
                 }
 
                 // If "Automatically sync bibliography when inserting citations" is enabled
@@ -861,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.openOfficePreferences.getAlwaysAddCitedOnPages());
+                            .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
