@@ -1,5 +1,6 @@
 package org.jabref.logic.journals;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -7,8 +8,9 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1;
-    private static final LevenshteinDistance LEVENSHTEIN = new LevenshteinDistance();
+    private static final LevenshteinDistance LEVENSHTEIN = LevenshteinDistance.getDefaultInstance();
 
     private final transient String name;
     private final String abbreviation;
@@ -123,14 +125,12 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(normalize(getName()), normalize(getAbbreviation()),
-                normalize(getShortestUniqueAbbreviation()));
+        return Objects.hash(normalize(getName()), normalize(getAbbreviation()), normalize(getShortestUniqueAbbreviation()));
     }
 
     @Override
     public String toString() {
-        return "Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}"
-                .formatted(
+        return "Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}".formatted(
                 this.name,
                 this.abbreviation,
                 this.dotlessAbbreviation,
