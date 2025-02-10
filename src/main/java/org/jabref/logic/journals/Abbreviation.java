@@ -3,15 +3,16 @@ package org.jabref.logic.journals;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
+    private static final LevenshteinDistance LEVENSHTEIN = new LevenshteinDistance();
 
-    private transient String name;
+    private final transient String name;
     private final String abbreviation;
-    private transient String dotlessAbbreviation;
-
-    // Is the empty string if not available
+    private final transient String dotlessAbbreviation;
     private String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
@@ -21,12 +22,12 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         this(name,
                 abbreviation,
-                // "L. N." becomes "L  N ", we need to remove the double spaces inbetween
                 abbreviation.replace(".", " ").replace("  ", " ").trim(),
                 shortestUniqueAbbreviation.trim());
     }
 
-    private Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
+    private Abbreviation(String name, String abbreviation, String dotlessAbbreviation,
+                         String shortestUniqueAbbreviation) {
         this.name = name.intern();
         this.abbreviation = abbreviation.intern();
         this.dotlessAbbreviation = dotlessAbbreviation.intern();
@@ -58,9 +59,17 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     @Override
     public int compareTo(Abbreviation toCompare) {
+        if (isSimilar(toCompare.getName())) {
+            return 0;
+        }
+
         int nameComparison = getName().compareTo(toCompare.getName());
         if (nameComparison != 0) {
             return nameComparison;
+        }
+
+        if (isSimilar(toCompare.getAbbreviation())) {
+            return 0;
         }
 
         int abbreviationComparison = getAbbreviation().compareTo(toCompare.getAbbreviation());
@@ -75,8 +84,10 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         String currentTrimmed = current.trim();
 
         if (getDotlessAbbreviation().equals(currentTrimmed)) {
-            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
-        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
+            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ?
+                    getName() : getShortestUniqueAbbreviation();
+        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) &&
+                !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getAbbreviation();
@@ -85,13 +96,16 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}".formatted(
-                this.name,
-                this.abbreviation,
-                this.dotlessAbbreviation,
-                this.shortestUniqueAbbreviation);
+    public boolean isSimilar(String otherName) {
+        String normalizedThis = normalize(this.name);
+        String normalizedOther = normalize(otherName);
+
+        int distance = LEVENSHTEIN.apply(normalizedThis, normalizedOther);
+        return distance <= 2;
+    }
+
+    private static String normalize(String input) {
+        return input.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
     }
 
     @Override
@@ -103,11 +117,23 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
             return false;
         }
         Abbreviation that = (Abbreviation) o;
-        return getName().equals(that.getName()) && getAbbreviation().equals(that.getAbbreviation()) && getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation());
+        return isSimilar(that.getName()) && isSimilar(that.getAbbreviation())
+                && isSimilar(that.getShortestUniqueAbbreviation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
+        return Objects.hash(normalize(getName()), normalize(getAbbreviation()),
+                normalize(getShortestUniqueAbbreviation()));
+    }
+
+    @Override
+    public String toString() {
+        return "Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}"
+                .formatted(
+                this.name,
+                this.abbreviation,
+                this.dotlessAbbreviation,
+                this.shortestUniqueAbbreviation);
     }
 }
