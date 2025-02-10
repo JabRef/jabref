@@ -354,21 +354,18 @@ public class BibtexParser implements Parser {
         // We remove all line breaks in the metadata
         // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
-        if (MetaData.META_FLAG.equals(comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())))) {
-            if (comment.startsWith(MetaData.META_FLAG)) {
-                String rest = comment.substring(MetaData.META_FLAG.length());
+        if (comment.startsWith(MetaData.META_FLAG)) {
+            String rest = comment.substring(MetaData.META_FLAG.length());
 
-                int pos = rest.indexOf(':');
+            int pos = rest.indexOf(':');
 
-                if (pos > 0) {
-                    meta.put(rest.substring(0, pos), rest.substring(pos + 1));
+            if (pos > 0) {
+                meta.put(rest.substring(0, pos), rest.substring(pos + 1));
 
-                    // meta comments are always re-written by JabRef and not stored in the file
-                    dumpTextReadSoFarToString();
-                }
+                // meta comments are always re-written by JabRef and not stored in the file
+                dumpTextReadSoFarToString();
             }
-        } else if (MetaData.ENTRYTYPE_FLAG
-                          .equals(comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length())))) {
+        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);

@@ -27,7 +27,7 @@ public class OrFields implements Comparable<OrFields> {
     }
 
     public OrFields(Field... fieldsToAdd) {
-        Arrays.stream(fieldsToAdd).forEach(fields::add);
+        fields.addAll(Arrays.asList(fieldsToAdd));
     }
 
     public OrFields(Collection<Field> fieldsToAdd) {

@@ -68,7 +68,7 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
     }
 
     private Integer getColumnWidthOfEntryTypes() {
-        Integer max = result.entryTypeToResultMap().keySet()
+        int max = result.entryTypeToResultMap().keySet()
                             .stream()
                             .map(entryType -> entryType.getDisplayName().length())
                             .max(Integer::compareTo)
