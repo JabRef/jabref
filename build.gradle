@@ -191,8 +191,8 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.9.0'
 
     // region: LibreOffice
-    implementation 'org.libreoffice:unoloader:24.2.3'
-    implementation 'org.libreoffice:libreoffice:24.2.3'
+    implementation 'org.libreoffice:unoloader:24.8.4'
+    implementation 'org.libreoffice:libreoffice:24.8.4'
     // Required for ID generation
     implementation 'io.github.thibaultmeyer:cuid:2.0.3'
     // endregion
