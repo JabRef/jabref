@@ -134,6 +134,28 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
+    void checkLibraryWithoutIssuesWithOutPorcelain(@TempDir Path tempDir) throws Exception {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PAGES, "some pages");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PAGES, "some pages");
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+
+        Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+        }
+        assertEquals("""
+                Field Presence Consistency Check Result
+
+                No errors found.
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     void checkLibraryWithoutIssuesWithPorcelain(@TempDir Path tempDir) throws Exception {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
@@ -146,28 +168,6 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
              BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
-        }
-        assertEquals("""
-                Field Presence Consistency Check Result
-
-                No errors found.
-                """, Files.readString(txtFile).replace("\r\n", "\n"));
-    }
-
-    @Test
-    void checkLibraryWithoutIssuesWithoutPorcelain(@TempDir Path tempDir) throws Exception {
-        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
-                .withField(StandardField.AUTHOR, "Author One")
-                .withField(StandardField.PAGES, "some pages");
-        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
-                .withField(StandardField.AUTHOR, "Author One")
-                .withField(StandardField.PAGES, "some pages");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
-
-        Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("", Files.readString(txtFile).replace("\r\n", "\n"));
