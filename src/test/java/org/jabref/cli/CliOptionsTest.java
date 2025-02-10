@@ -162,7 +162,7 @@ class CliOptionsTest {
 
     @Test
     void checkConsistencyOutputFormatOption() throws Exception {
-        CliOptions cli = new CliOptions(new String[] {"--check-consistency", "jabref-authors.bib", "--check-consistency-output-format", "csv"});
+        CliOptions cli = new CliOptions(new String[] {"--check-consistency", "jabref-authors.bib", "--output-format", "csv"});
         assertEquals("csv", cli.getCheckConsistencyOutputFormat());
     }
 }

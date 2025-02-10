@@ -70,7 +70,7 @@ public class CliOptions {
     }
 
     public String getCheckConsistencyOutputFormat() {
-        return commandLine.getOptionValue("check-consistency-output-format");
+        return commandLine.getOptionValue("output-format");
     }
 
     public boolean isPreferencesExport() {
@@ -320,7 +320,7 @@ public class CliOptions {
 
         options.addOption(Option
                 .builder()
-                .longOpt("check-consistency-output-format")
+                .longOpt("output-format")
                 .desc(Localization.lang("Output format for consistency check (txt/csv)"))
                 .hasArg()
                 .argName("FORMAT")
