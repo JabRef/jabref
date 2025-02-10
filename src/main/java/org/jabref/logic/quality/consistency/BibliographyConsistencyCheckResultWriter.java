@@ -47,6 +47,7 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
 
     protected final BibliographyConsistencyCheck.Result result;
     protected final Writer writer;
+    protected final boolean isPorcelain;
     protected final BibEntryTypesManager entryTypesManager;
     protected final BibDatabaseMode bibDatabaseMode;
     protected final List<String> columnNames;
@@ -54,13 +55,14 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
 
     private final List<Field> allReportedFields;
 
-    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
-        this(result, writer, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
+    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain) {
+        this(result, writer, isPorcelain, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
     }
 
-    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         this.result = result;
         this.writer = writer;
+        this.isPorcelain = isPorcelain;
         this.entryTypesManager = entryTypesManager;
         this.bibDatabaseMode = bibDatabaseMode;
         this.allReportedFields = result.entryTypeToResultMap().values().stream()

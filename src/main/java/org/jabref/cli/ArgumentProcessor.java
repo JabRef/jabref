@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -321,31 +320,33 @@ public class ArgumentProcessor {
             BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
             BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
 
-            if (outputFormat.isEmpty()) {
-                try (Writer outputStreamWriter = new OutputStreamWriter(System.out)) {
-                    BibliographyConsistencyCheckResultTxtWriter ouputTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, outputStreamWriter, entryTypesManager, databaseContext.getMode());
+            if (outputFormat.isEmpty() || "txt".equalsIgnoreCase(outputFormat.get())) {
+                try (Writer outputStreamWriter = new OutputStreamWriter(System.out);
+                     BibliographyConsistencyCheckResultTxtWriter ouputTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(
+                             result,
+                             outputStreamWriter,
+                             cli.isPorcelainOutputMode(),
+                             entryTypesManager,
+                             databaseContext.getMode())) {
                     ouputTxtWriter.writeFindings();
                     return;
                 } catch (IOException e) {
                     LOGGER.error("Error accessing file '{}'.", fileName);
                 }
-            }
-
-            String outputFileName = fileName.get().substring(0, fileName.get().lastIndexOf('.')) + "_consistency_check" + outputFormat.get().toLowerCase();
-            // String outputFileName = StringUtil.getCorrectFileName(fileName.get(), ".bib").lastIndexOf('.')) + "_consistency_check_" + outputFormat.get().toLowerCase();;
-
-            if ("csv".equalsIgnoreCase(outputFormat.get())) {
-                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8);
-                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode())) {
+            } else {
+                try (Writer writer = new OutputStreamWriter(System.out);
+                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(
+                             result,
+                             writer,
+                             cli.isPorcelainOutputMode(),
+                             entryTypesManager,
+                             databaseContext.getMode())) {
                     csvWriter.writeFindings();
                 }
-            } else {
-                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8);
-                     BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode())) {
-                    txtWriter.writeFindings();
-                }
             }
-            System.out.println(Localization.lang("Consistency check completed"));
+            if (!cli.isPorcelainOutputMode()) {
+                System.out.println(Localization.lang("Consistency check completed"));
+            }
         } catch (IOException e) {
             LOGGER.error("Error accessing file '{}'.", fileName);
         }

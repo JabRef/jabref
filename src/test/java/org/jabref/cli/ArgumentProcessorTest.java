@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -113,7 +114,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void convertBibtexToTablerefsabsbib(@TempDir Path tempDir) throws Exception {
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws Exception {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -144,7 +145,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void checkConsistency(@TempDir Path tempDir) throws Exception {
+    void checkConsistency() throws Exception {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
@@ -164,6 +165,32 @@ class ArgumentProcessorTest {
 
         String output = outContent.toString();
         assertTrue(output.contains("Consistency check completed"));
+
+        System.setOut(System.out);
+    }
+
+    @Test
+    void checkConsistencyPorcelain() throws Exception {
+        Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        // "txt" is the default output format; thus not provided here
+        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--porcelain");
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        processor.processArguments();
+
+        String output = outContent.toString();
+        assertEquals("", output);
 
         System.setOut(System.out);
     }

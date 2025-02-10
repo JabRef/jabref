@@ -73,6 +73,10 @@ public class CliOptions {
         return commandLine.getOptionValue("output-format");
     }
 
+    public boolean isPorcelainOutputMode() {
+        return commandLine.hasOption("porcelain");
+    }
+
     public boolean isPreferencesExport() {
         return commandLine.hasOption("prexp");
     }
@@ -324,6 +328,12 @@ public class CliOptions {
                 .desc(Localization.lang("Output format for consistency check (txt/csv)"))
                 .hasArg()
                 .argName("FORMAT")
+                .build());
+
+        options.addOption(Option
+                .builder("porcelain")
+                .longOpt("porcelain")
+                .desc(Localization.lang("Script-friendly output"))
                 .build());
 
         return options;
