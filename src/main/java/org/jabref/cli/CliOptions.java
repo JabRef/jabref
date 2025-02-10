@@ -61,6 +61,22 @@ public class CliOptions {
         return commandLine.hasOption("nogui");
     }
 
+    public boolean isCheckConsistency() {
+        return commandLine.hasOption("check-consistency");
+    }
+
+    public String getCheckConsistency() {
+        return commandLine.getOptionValue("check-consistency");
+    }
+
+    public String getCheckConsistencyOutputFormat() {
+        return commandLine.getOptionValue("output-format");
+    }
+
+    public boolean isPorcelainOutputMode() {
+        return commandLine.hasOption("porcelain");
+    }
+
     public boolean isPreferencesExport() {
         return commandLine.hasOption("prexp");
     }
@@ -296,6 +312,28 @@ public class CliOptions {
                 .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
                 .hasArg()
                 .argName("CITATIONKEY")
+                .build());
+
+        options.addOption(Option
+                .builder("cc")
+                .longOpt("check-consistency")
+                .desc(Localization.lang("Check consistency of BibTeX file"))
+                .hasArg()
+                .argName("FILE")
+                .build());
+
+        options.addOption(Option
+                .builder()
+                .longOpt("output-format")
+                .desc(Localization.lang("Output format for consistency check (txt/csv)"))
+                .hasArg()
+                .argName("FORMAT")
+                .build());
+
+        options.addOption(Option
+                .builder("porcelain")
+                .longOpt("porcelain")
+                .desc(Localization.lang("Script-friendly output"))
                 .build());
 
         return options;

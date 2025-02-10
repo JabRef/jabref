@@ -170,12 +170,12 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()))) {
-            BibliographyConsistencyCheckResultTxtWriter bibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer);
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()));
+             BibliographyConsistencyCheckResultTxtWriter bibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
             bibliographyConsistencyCheckResultTxtWriter.writeFindings();
         } catch (IOException e) {
             LOGGER.error(Localization.lang("Problem when exporting file"), e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file!"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file."));
         }
     }
 
@@ -191,12 +191,12 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()))) {
-            BibliographyConsistencyCheckResultCsvWriter bibliographyConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer);
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()));
+             BibliographyConsistencyCheckResultCsvWriter bibliographyConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
             bibliographyConsistencyCheckResultCsvWriter.writeFindings();
         } catch (IOException e) {
             LOGGER.error(Localization.lang("Problem when exporting file"), e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file!"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file."));
         }
     }
 }

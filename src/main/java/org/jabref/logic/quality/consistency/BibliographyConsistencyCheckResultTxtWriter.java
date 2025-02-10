@@ -23,20 +23,24 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
     private List<Integer> columnWidths;
 
-    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
-        super(result, writer);
+    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain) {
+        super(result, writer, isPorcelain);
     }
 
-    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
-        super(result, writer, entryTypesManager, bibDatabaseMode);
+    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+        super(result, writer, isPorcelain, entryTypesManager, bibDatabaseMode);
     }
 
     public void writeFindings() throws IOException {
-        writer.write(Localization.lang("Field Presence Consistency Check Result"));
-        writer.write("\n\n");
+        if (!isPorcelain) {
+            writer.write(Localization.lang("Field Presence Consistency Check Result"));
+            writer.write("\n\n");
+        }
 
         if (result.entryTypeToResultMap().isEmpty()) {
-            writer.write("No errors found.\n");
+            if (!isPorcelain) {
+                writer.write("No errors found.\n");
+            }
             return;
         }
 
@@ -48,11 +52,13 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
         super.writeFindings();
 
-        writer.write("\n");
-        writer.write("%s | %s\n".formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
-        writer.write("%s | %s\n".formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
-        writer.write("%s | %s\n".formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));
-        writer.write("%s | %s\n".formatted(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("field is absent")));
+        if (!isPorcelain) {
+            writer.write("\n");
+            writer.write("%s | %s\n".formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
+            writer.write("%s | %s\n".formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
+            writer.write("%s | %s\n".formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));
+            writer.write("%s | %s\n".formatted(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("field is absent")));
+        }
     }
 
     private void initializeColumnWidths() {
