@@ -335,13 +335,13 @@ public class ArgumentProcessor {
             // String outputFileName = StringUtil.getCorrectFileName(fileName.get(), ".bib").lastIndexOf('.')) + "_consistency_check_" + outputFormat.get().toLowerCase();;
 
             if ("csv".equalsIgnoreCase(outputFormat.get())) {
-                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
-                    BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8);
+                     BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, entryTypesManager, databaseContext.getMode())) {
                     csvWriter.writeFindings();
                 }
             } else {
-                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8)) {
-                    BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode());
+                try (Writer writer = new FileWriter(outputFileName, StandardCharsets.UTF_8);
+                     BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, entryTypesManager, databaseContext.getMode())) {
                     txtWriter.writeFindings();
                 }
             }
