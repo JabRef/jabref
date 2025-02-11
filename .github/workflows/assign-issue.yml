@@ -20,7 +20,7 @@ jobs:
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           days_until_unassign: 90
-          maintainers: koppor, Siedlerchr, ThiloteE, calixtus, HoussemNasri
+          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,LinusDietz'
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 

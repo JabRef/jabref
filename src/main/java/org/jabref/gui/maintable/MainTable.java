@@ -71,6 +71,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
     private final BibDatabaseContext database;
+    private final GuiPreferences preferences;
+    private final DialogService dialogService;
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
@@ -100,6 +102,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
+        this.preferences = preferences;
+        this.dialogService = dialogService;
         this.model = model;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
@@ -144,7 +148,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         clipBoardManager,
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                        entryTypesManager))
+                        entryTypesManager,
+                        importHandler))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
                 .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
                 .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))
@@ -323,6 +328,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -366,6 +372,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
                          scrollToPreviousMatchCategory();
+                        event.consume();
+                        break;
+                    case OPEN_URL_OR_DOI:
+                        openUrlAction.execute();
                         event.consume();
                         break;
                     default:
