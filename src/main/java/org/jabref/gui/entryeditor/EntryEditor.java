@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -167,6 +168,15 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
             }
         });
+
+        stateManager.getSelectedEntries().addListener((InvalidationListener) c -> {
+                    if (stateManager.getSelectedEntries().isEmpty()) {
+                        setCurrentlyEditedEntry(new BibEntry());
+                    } else {
+                        setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+                    }
+                }
+        );
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (obs, oldValue, newValue) -> {
