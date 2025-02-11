@@ -132,12 +132,12 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
-        StringBuilder sb = new StringBuilder();
+        List<String> message = new ArrayList<>();
         for (String s: theRecord) {
             String modifiedString = s.replaceAll("\\s+", " ");
-            sb.append(modifiedString).append(" ");
+            message.add(modifiedString);
         }
-        tableData.add(new ConsistencyMessage(sb.toString(), bibEntry));
+        tableData.add(new ConsistencyMessage(message, bibEntry));
     }
 
     private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
