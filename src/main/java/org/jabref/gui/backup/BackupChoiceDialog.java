@@ -36,9 +36,7 @@ public class BackupChoiceDialog extends BaseDialog<BackupChoiceDialogRecord> {
         getDialogPane().setMinWidth(450);
         getDialogPane().getButtonTypes().setAll(RESTORE_BACKUP, IGNORE_BACKUP, REVIEW_BACKUP);
 
-        String content = Localization.lang("It looks like JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
-                Localization.lang("Do you want to recover the library from a backup file?");
-
+        String content = Localization.lang("It looks like JabRef did not shut down cleanly last time the file was used.\n\nDo you want to recover the library from a backup file?");
         backupTableView = new TableView<>();
         setupBackupTableView();
         tableData.addAll(backups);
