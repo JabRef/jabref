@@ -151,8 +151,11 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             if (tab.isPresent()) {
                 this.previewPanel.setDatabase(tab.get().getBibDatabaseContext());
 
+                tabbed.getTabs().clear();
+
                 this.allPossibleTabs.clear();
                 this.allPossibleTabs.addAll(createTabs(tab.get()));
+
                 adaptVisibleTabs();
             } else {
                 this.previewPanel.setDatabase(null);
@@ -426,12 +429,15 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             // Remove subscription for old entry if existing
             typeSubscription.unsubscribe();
         }
-        typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), type -> {
-            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
-            adaptVisibleTabs();
-            setupToolBar();
-            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
-        });
+
+        if (!currentlyEditedEntry.isEmpty()) {
+            typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), type -> {
+                typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+                adaptVisibleTabs();
+                setupToolBar();
+                getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+            });
+        }
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
