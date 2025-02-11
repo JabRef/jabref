@@ -38,7 +38,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
@@ -70,7 +70,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
@@ -113,7 +113,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
@@ -134,7 +134,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
-    void checkLibraryWithoutIssues(@TempDir Path tempDir) throws Exception {
+    void checkLibraryWithoutIssuesWithOutPorcelain(@TempDir Path tempDir) throws Exception {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -145,7 +145,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
@@ -156,6 +156,24 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
+    void checkLibraryWithoutIssuesWithPorcelain(@TempDir Path tempDir) throws Exception {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PAGES, "some pages");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PAGES, "some pages");
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+
+        Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+        }
+        assertEquals("", Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     @Disabled("This test is only for manual generation of a report")
     void checkManualInput() throws Exception {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
@@ -163,7 +181,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext.getEntries());
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
     }
