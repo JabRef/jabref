@@ -79,12 +79,12 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getSelectionModel().selectFirst();
 
         FilteredList<ConsistencyMessage> filteredData = new FilteredList<>(viewModel.getTableData(), message ->
-                message.message().get(0).equals(viewModel.selectedEntryTypeProperty().get())
+                message.message().getFirst().equals(viewModel.selectedEntryTypeProperty().get())
         );
 
         viewModel.selectedEntryTypeProperty().addListener((obs, oldValue, newValue) -> {
             filteredData.setPredicate(message ->
-                    message.message().get(0).equals(newValue)
+                    message.message().getFirst().equals(newValue)
             );
         });
 
