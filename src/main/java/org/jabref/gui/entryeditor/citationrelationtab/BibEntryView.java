@@ -20,6 +20,9 @@ import org.jabref.model.entry.types.StandardEntryType;
  */
 public class BibEntryView {
 
+    public static final EnumSet<StandardEntryType> CROSS_REF_TYPES = EnumSet.of(StandardEntryType.InBook,
+            StandardEntryType.InProceedings, StandardEntryType.InCollection);
+
     /**
      * Creates a layout for a given {@link BibEntry} to be displayed in a List
      *
@@ -62,12 +65,12 @@ public class BibEntryView {
      * @return Icon corresponding to {@link EntryType}
      */
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
-        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook,
-                StandardEntryType.InProceedings, StandardEntryType.InCollection);
-        if (type == StandardEntryType.Book) {
-            return IconTheme.JabRefIcons.BOOK;
-        } else if (crossRefTypes.contains(type)) {
-            return IconTheme.JabRefIcons.OPEN_LINK;
+        if (type instanceof StandardEntryType standardEntry) {
+            if (standardEntry == StandardEntryType.Book) {
+                return IconTheme.JabRefIcons.BOOK;
+            } else if (CROSS_REF_TYPES.contains(standardEntry)) {
+                return IconTheme.JabRefIcons.OPEN_LINK;
+            }
         }
         return IconTheme.JabRefIcons.ARTICLE;
     }

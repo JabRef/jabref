@@ -33,17 +33,15 @@ public class FieldsUtil {
     };
 
     public static String getNameWithType(Field field, CliPreferences preferences, UndoManager undoManager) {
-        if (field instanceof SpecialField specialField) {
-            return new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()
-                    + " (" + Localization.lang("Special") + ")";
-        } else if (field instanceof IEEEField) {
-            return field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";
-        } else if (field instanceof InternalField) {
-            return field.getDisplayName() + " (" + Localization.lang("Internal") + ")";
-        } else if (field instanceof UnknownField) {
-            return field.getDisplayName() + " (" + Localization.lang("Custom") + ")";
-        } else {
-            return field.getDisplayName();
-        }
+        return switch (field) {
+            case SpecialField specialField ->
+                    new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()
+                            + " (" + Localization.lang("Special") + ")";
+            case IEEEField _ -> field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";
+            case InternalField _ -> field.getDisplayName() + " (" + Localization.lang("Internal") + ")";
+            case UnknownField _ -> field.getDisplayName() + " (" + Localization.lang("Custom") + ")";
+            case null -> throw new IllegalArgumentException("Field must not be null");
+            default -> field.getDisplayName();
+        };
     }
 }

@@ -152,4 +152,17 @@ class CliOptionsTest {
 
         assertEquals(expected, CliOptions.alignStringTable(given));
     }
+
+    @Test
+    void checkConsistencyOption() throws Exception {
+        CliOptions cli = new CliOptions(new String[] {"--check-consistency", "jabref-authors.bib"});
+        assertTrue(cli.isCheckConsistency());
+        assertEquals("jabref-authors.bib", cli.getCheckConsistency());
+    }
+
+    @Test
+    void checkConsistencyOutputFormatOption() throws Exception {
+        CliOptions cli = new CliOptions(new String[] {"--check-consistency", "jabref-authors.bib", "--output-format", "csv"});
+        assertEquals("csv", cli.getCheckConsistencyOutputFormat());
+    }
 }

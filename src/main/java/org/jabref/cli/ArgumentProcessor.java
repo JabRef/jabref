@@ -1,6 +1,8 @@
 package org.jabref.cli;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -42,6 +44,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -288,6 +294,65 @@ public class ArgumentProcessor {
 
         if (!cli.isBlank() && !loaded.isEmpty()) {
             uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
+
+        if (cli.isCheckConsistency()) {
+            checkConsistency(cliPreferences, entryTypesManager);
+        }
+    }
+
+    private void checkConsistency(CliPreferences cliPreferences,
+                                  BibEntryTypesManager entryTypesManager) {
+        Optional<String> fileName = Optional.ofNullable(cli.getCheckConsistency());
+
+        if (fileName.isEmpty()) {
+            System.out.println(Localization.lang("No file specified for consistency check."));
+            return;
+        }
+
+        Optional<String> outputFormat = Optional.ofNullable(cli.getCheckConsistencyOutputFormat());
+
+        Path filePath = Path.of(fileName.get());
+        ParserResult pr;
+        try {
+            pr = OpenDatabase.loadDatabase(filePath, cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
+        } catch (IOException ex) {
+            LOGGER.error("Error reading '{}'.", filePath, ex);
+            return;
+        }
+        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+
+        Writer writer = new OutputStreamWriter(System.out);
+        BibliographyConsistencyCheckResultWriter checkResultWriter;
+        if (outputFormat.isEmpty() || "txt".equalsIgnoreCase(outputFormat.get())) {
+            checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
+                    result,
+                    writer,
+                    cli.isPorcelainOutputMode(),
+                    entryTypesManager,
+                    databaseContext.getMode());
+        } else {
+            checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
+                    result,
+                    writer,
+                    cli.isPorcelainOutputMode(),
+                    entryTypesManager,
+                    databaseContext.getMode());
+        }
+
+        // System.out should not be closed, therefore no try-with-resources
+        try {
+            checkResultWriter.writeFindings();
+            writer.flush();
+        } catch (IOException e) {
+            LOGGER.error("Error writing results", e);
+        }
+        if (!cli.isPorcelainOutputMode()) {
+            System.out.println(Localization.lang("Consistency check completed"));
         }
     }
 
