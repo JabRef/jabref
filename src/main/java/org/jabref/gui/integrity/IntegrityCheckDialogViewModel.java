@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.DialogService;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -21,11 +20,8 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
     private final ObservableList<IntegrityMessage> messages;
     private final ObservableSet<String> entryTypes;
 
-    private final DialogService dialogService;
-
-    public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages, DialogService dialogService) {
+    public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages) {
         this.messages = FXCollections.observableArrayList(messages);
-        this.dialogService = dialogService;
 
         Set<String> types = messages.stream()
                                     .map(item -> item.field().getDisplayName())

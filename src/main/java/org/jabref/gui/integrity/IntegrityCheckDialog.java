@@ -102,7 +102,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new IntegrityCheckDialogViewModel(messages, dialogService);
+        viewModel = new IntegrityCheckDialogViewModel(messages);
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
@@ -124,7 +124,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     IntegrityMessage rowData = getTableRow().getItem();
                     switch (rowData.field()) {
                         case StandardField.TITLE:
-                            button.setText("Fix");
+                            button.setText(Localization.lang("Fix"));
                             button.setOnAction(event -> {
                                 viewModel.fixTitle(rowData);
                                 dialogService.notify(Localization.lang("Masked capital letters using curly brackets {}"));
