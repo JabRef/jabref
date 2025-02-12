@@ -2,16 +2,12 @@ package org.jabref.logic.integrity;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.strings.StringUtil;
 
 public class BooktitleChecker implements ValueChecker {
-
-    private static final Pattern FULL_URL_PATTERN = Pattern.compile(
-            "(https?://\\S+/\\S+|www\\.\\S+/\\S+)", Pattern.CASE_INSENSITIVE);
 
     @Override
     public Optional<String> checkValue(String value) {

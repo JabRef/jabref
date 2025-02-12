@@ -15,8 +15,12 @@ import java.util.regex.Pattern;
  * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
  */
 public class URLUtil {
-    public static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
+    private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
+    /**
+     * Pattern match a string containing a URL with a protocol
+     */
     public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
+
     private static final String URL_EXP = "^(https?|ftp)://.+";
     // Detect Google search URL
     private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
