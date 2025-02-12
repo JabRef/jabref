@@ -390,6 +390,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
 
         if (currentlyEditedEntry == null) {
+            tabbed.getTabs().clear();
             return;
         }
 

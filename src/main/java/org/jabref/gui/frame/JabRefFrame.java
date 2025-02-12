@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -410,47 +409,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
-            } else if (selectedTab == null) {
-                // All databases are closed
+                stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
+
+                // Update active search query when switching between databases
+                if (preferences.getSearchPreferences().shouldKeepSearchString()) {
+                    libraryTab.searchQueryProperty().set(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+                } else {
+                    stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(libraryTab.searchQueryProperty().get());
+                }
+                stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
+                globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
+
+                libraryTab.getMainTable().requestFocus();
+
+                // Set window title dynamically
+                mainStage.titleProperty().bind(Bindings.createStringBinding(
+                        () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE, // not a minus, but codepoint 2013
+                        libraryTab.textProperty()));
+            } else {
+                // All databases are closed or an unknown tab is selected
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
-            }
-        });
-
-        /*
-         * The following state listener makes sure focus is registered with the
-         * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would sometimes occur in the wrong tab.
-         */
-        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
-            if (!(tab instanceof LibraryTab libraryTab)) {
                 stateManager.setSelectedEntries(Collections.emptyList());
                 mainStage.titleProperty().unbind();
                 mainStage.setTitle(FRAME_TITLE);
-                return;
             }
-
-            // Poor-mans binding to global state
-            stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
-
-            // Update active search query when switching between databases
-            if (preferences.getSearchPreferences().shouldKeepSearchString()) {
-                libraryTab.searchQueryProperty().set(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
-            } else {
-                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(libraryTab.searchQueryProperty().get());
-            }
-            stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
-
-            // Update search autocompleter with information for the correct database:
-            globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
-
-            libraryTab.getMainTable().requestFocus();
-
-            // Set window title - copy tab title
-            StringBinding windowTitle = Bindings.createStringBinding(
-                    () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE, // not a minus, but codepoint 2013
-                    libraryTab.textProperty());
-            mainStage.titleProperty().bind(windowTitle);
         });
 
         BindingsHelper.bindBidirectional((ObservableValue<Boolean>) stateManager.getEditorShowing(), panelMode,
