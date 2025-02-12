@@ -306,7 +306,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateVerticalDividerPosition() {
         if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            verticalSplit.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition() / verticalSplit.getHeight());
+            verticalSplit.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition());
             // ToDo: Move DividerPosition to GuiPreferences
             verticalDividerSubscription = EasyBind.valueAt(verticalSplit.getDividers(), 0)
                                                   .mapObservable(SplitPane.Divider::positionProperty)
