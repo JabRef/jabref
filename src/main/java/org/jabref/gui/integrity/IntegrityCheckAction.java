@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
@@ -17,6 +19,7 @@ import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -29,6 +32,8 @@ public class IntegrityCheckAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
+    private final CliPreferences cliPreferences;
+    private final UndoManager undoManager;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
@@ -36,12 +41,16 @@ public class IntegrityCheckAction extends SimpleCommand {
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 UiTaskExecutor taskExecutor,
+                                CliPreferences cliPreferences,
+                                UndoManager undoManager,
                                 JournalAbbreviationRepository abbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.cliPreferences = cliPreferences;
+        this.undoManager = undoManager;
         this.abbreviationRepository = abbreviationRepository;
         this.executable.bind(needsDatabase(this.stateManager));
     }
@@ -78,7 +87,7 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get()));
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier, dialogService, stateManager, taskExecutor, cliPreferences, undoManager));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
