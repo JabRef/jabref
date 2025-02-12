@@ -147,7 +147,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
         setupKeyBindings();
 
-        EasyBind.subscribe(stateManager.activeTabProperty(), (tab) -> {
+        EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
             if (tab.isPresent()) {
                 this.previewPanel.setDatabase(tab.get().getBibDatabaseContext());
 
