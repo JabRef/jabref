@@ -3,6 +3,8 @@ package org.jabref.gui.importer.actions;
 import java.nio.file.Path;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -32,13 +34,15 @@ public class OpenDatabaseActionTest {
     DialogService dialogService;
     GuiPreferences guiPreferences;
     OpenDatabaseAction openDatabaseAction;
+    LibraryTabContainer libraryTabContainer;
 
     @BeforeEach
     void initializeOpenDatabaseAction() {
         dialogService = mock(DialogService.class);
         guiPreferences = mock(GuiPreferences.class);
+        libraryTabContainer = mock(LibraryTabContainer.class);
         openDatabaseAction = spy(new OpenDatabaseAction(
-                mock(LibraryTabContainer.class),
+                libraryTabContainer,
                 guiPreferences,
                 mock(AiService.class),
                 dialogService,
@@ -60,6 +64,7 @@ public class OpenDatabaseActionTest {
         FileDialogConfiguration goodConfig = mock(FileDialogConfiguration.class);
 
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+        when(libraryTabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
         when(openDatabaseAction.getInitialDirectory()).thenReturn(path);
 
         // Make it so that showFileOpenDialogAndGetMultipleFiles will throw an error when called with the bad path, but
