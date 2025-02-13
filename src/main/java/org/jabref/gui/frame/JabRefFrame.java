@@ -51,7 +51,6 @@ import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.WelcomePage;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -107,8 +106,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private Subscription dividerSubscription;
 
-    private final WelcomePage welcomePage;
-
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -139,20 +136,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
             fileHistory.setDisable(!hasRecentFiles);
         });
-
-        this.welcomePage = new WelcomePage(
-                this,
-                preferences,
-                aiService,
-                dialogService,
-                stateManager,
-                fileUpdateMonitor,
-                entryTypesManager,
-                undoManager,
-                clipBoardManager,
-                taskExecutor,
-                fileHistory
-        );
 
         setId("frame");
 
@@ -256,7 +239,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        WelcomeTab welcomeTab = new WelcomeTab(welcomePage);
+        WelcomeTab welcomeTab = new WelcomeTab(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor,
+                fileHistory
+        );
         tabbedPane.getTabs().add(welcomeTab);
         splitPane.getItems().add(tabbedPane);
         setCenter(splitPane);

@@ -77,16 +77,10 @@ public class SaveDatabaseAction {
     }
 
     public boolean save() {
-        if (libraryTab == null) {
-            return false;
-        }
         return save(libraryTab.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
     }
 
     public boolean save(SaveDatabaseMode mode) {
-        if (libraryTab == null) {
-            return false;
-        }
         return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
@@ -94,16 +88,10 @@ public class SaveDatabaseAction {
      * Asks the user for the path and saves afterward
      */
     public void saveAs() {
-        if (libraryTab == null) {
-            return;
-        }
         askForSavePath().ifPresent(this::saveAs);
     }
 
     public boolean saveAs(Path file) {
-        if (libraryTab == null) {
-            return false;
-        }
         return this.saveAs(file, SaveDatabaseMode.NORMAL);
     }
 

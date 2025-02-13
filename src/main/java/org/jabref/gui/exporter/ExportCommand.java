@@ -133,7 +133,9 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    if (tabSupplier.get() != null) {
+                    boolean libraryTab = tabSupplier.get() != null;
+                    // libraryTab is null in case of Welcome Tab
+                    if (libraryTab) {
                         LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
                         notificationPane.notify(
                                 IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
@@ -147,8 +149,6 @@ public class ExportCommand extends SimpleCommand {
                                     notificationPane.hide();
                                 })),
                                 Duration.seconds(5));
-                    } else {
-                        LOGGER.warn("Library Tab is null as Welcome Tab is open");
                     }
                 })
                 .onFailure(this::handleError)

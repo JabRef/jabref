@@ -809,6 +809,11 @@ public class LibraryTab extends Tab {
         if (tableModel != null) {
             tableModel.unbind();
         }
+
+        if (stateManager.getOpenDatabases().isEmpty() && stateManager.activeDatabaseProperty().isPresent().get()) {
+            stateManager.activeDatabaseProperty().setValue(Optional.empty());
+        }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
