@@ -61,10 +61,10 @@ public class CopyTo extends SimpleCommand {
 
         if (includeCrossReferences) {
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entry copied successfully, including cross-reference."));
+            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entry copied successfully, no cross-reference included."));
+            dialogService.notify(Localization.lang("Entries copied successfully, without cross-references."));
         }
     }
 
