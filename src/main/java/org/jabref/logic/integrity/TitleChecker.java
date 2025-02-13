@@ -42,7 +42,7 @@ public class TitleChecker implements ValueChecker {
         }
 
         if (URLUtil.URL_PATTERN.matcher(value).find()) {
-            return Optional.of(Localization.lang("The title contains a URL"));
+            return Optional.of(Localization.lang("contains a URL"));
         }
 
         String valueOnlySpacesWithinCurlyBraces = INSIDE_CURLY_BRAKETS.matcher(value).replaceAll("");

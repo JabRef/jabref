@@ -15,9 +15,11 @@ import java.util.regex.Pattern;
  * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
  */
 public class URLUtil {
+
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
+
     /**
-     * Pattern match a string containing a URL with a protocol
+     * Pattern matches a string containing a URL with a protocol
      */
     public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
 
