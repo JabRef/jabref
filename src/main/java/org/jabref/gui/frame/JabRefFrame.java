@@ -16,6 +16,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -30,6 +31,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -122,6 +124,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
+        this.fileHistory = new FileHistoryMenu(
+                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
+                dialogService,
+                getOpenDatabaseAction());
+
+        this.fileHistory.getItems().addListener((ListChangeListener<MenuItem>) change -> {
+            boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
+            fileHistory.setDisable(!hasRecentFiles);
+        });
+
         setId("frame");
 
         // Create components
@@ -171,10 +183,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this.preferences,
                 taskExecutor);
 
-        this.fileHistory = new FileHistoryMenu(
-                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
-                dialogService,
-                getOpenDatabaseAction());
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -225,12 +233,36 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        WelcomeTab welcomeTab = new WelcomeTab(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor,
+                fileHistory
+        );
+        tabbedPane.getTabs().add(welcomeTab);
+        splitPane.getItems().add(tabbedPane);
+        setCenter(splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
-        setCenter(splitPane);
+        updateContent();
+    }
+
+    private void updateContent() {
+        boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
+        fileHistory.setDisable(!hasRecentFiles);
+    }
+
+    private void bindDatabaseChanges() {
+        stateManager.getOpenDatabases().addListener((InvalidationListener) obs -> Platform.runLater(this::updateContent));
     }
 
     private void updateSidePane() {
@@ -428,10 +460,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
-            return null;
-        }
-        return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
+        return (LibraryTab) Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
+                                    .filter(tab -> tab instanceof LibraryTab).orElse(null);
     }
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
