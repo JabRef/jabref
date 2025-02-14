@@ -11,9 +11,7 @@ import java.util.function.Supplier;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -212,7 +210,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
         initBindings();
-        initTabBarManager();
     }
 
     private void initLayout() {
@@ -260,8 +257,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         horizontalSplit.setOrientation(Orientation.HORIZONTAL);
 
         SplitPane.setResizableWithParent(sidePane, false);
-        sidePane.widthProperty().addListener(c -> updateSidePane());
-        sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
+        sidePane.widthProperty().addListener(_ -> updateSidePane());
+        sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
         setCenter(horizontalSplit);
     }
@@ -299,7 +296,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / horizontalSplit.getWidth());
             horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
                                                     .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((oldValue, newValue) -> preferences.getGuiPreferences().setSidePaneWidth(newValue.doubleValue()));
+                                                    .listenToValues((_, newValue) -> preferences.getGuiPreferences().setSidePaneWidth(newValue.doubleValue()));
         }
     }
 
@@ -445,38 +442,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryEditor.requestFocus();
             }
         });
+
+        // Hide tab bar
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
+        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
     }
 
-    private void initTabBarManager() {
-        IntegerProperty numberOfOpenDatabases = new SimpleIntegerProperty();
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
-            numberOfOpenDatabases.set(stateManager.getOpenDatabases().size());
-            updateTabBarState(numberOfOpenDatabases);
-        });
-
-        BindingsHelper.subscribeFuture(preferences.getWorkspacePreferences().confirmHideTabBarProperty(), hideTabBar -> updateTabBarState(numberOfOpenDatabases));
-        maintainInitialTabBarState(preferences.getWorkspacePreferences().shouldHideTabBar());
-    }
-
-    private void updateTabBarState(IntegerProperty numberOfOpenDatabases) {
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && numberOfOpenDatabases.get() == 1) {
+    private void updateTabBarVisible() {
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }
         } else {
             tabbedPane.getStyleClass().remove("hide-tab-bar");
-        }
-    }
-
-    private void maintainInitialTabBarState(boolean show) {
-        if (show) {
-            if (stateManager.getOpenDatabases().size() == 1) {
-                if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
-                    tabbedPane.getStyleClass().add("hide-tab-bar");
-                }
-            } else {
-                tabbedPane.getStyleClass().remove("hide-tab-bar");
-            }
         }
     }
 
@@ -510,7 +488,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)} (Path)}
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -720,12 +698,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         private final Supplier<BibDatabaseContext> databaseContext;
         private final DialogService dialogService;
-        private final StateManager stateManager;
         private final GuiPreferences preferences;
 
         public OpenDatabaseFolder(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, Supplier<BibDatabaseContext> databaseContext) {
             this.dialogService = dialogService;
-            this.stateManager = stateManager;
             this.preferences = preferences;
             this.databaseContext = databaseContext;
             this.executable.bind(needsSavedLocalDatabase(stateManager));
