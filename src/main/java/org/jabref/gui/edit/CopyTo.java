@@ -59,7 +59,7 @@ public class CopyTo extends SimpleCommand {
             }
         }
 
-        if (includeCrossReferences) {
+        if (copyToPreferences.getShouldIncludeCrossReferences()) {
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
