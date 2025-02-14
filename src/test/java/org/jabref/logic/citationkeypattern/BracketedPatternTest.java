@@ -95,7 +95,7 @@ class BracketedPatternTest {
         assertEquals(expected, BracketedPattern.authorsAlpha(list));
     }
 
-    static Stream<Arguments> authorsAlphaV2() {
+    static Stream<Arguments> authorsAlphaLNI() {
         return Stream.of(
                 Arguments.of("Ar", "Alexander Artemenko and others"),
                 Arguments.of("Aa", "Aachen and others"),
@@ -122,8 +122,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authorsAlphaV2(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authorsAlphaV2(list));
+    void authorsAlphaLNI(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlphaLNI(list));
     }
 
     /**
@@ -340,7 +340,7 @@ class BracketedPatternTest {
             "'New', '[auth3_1]', 'Isaac Newton'",
             "'Newton', '[authshort]', 'Isaac Newton'",
             "'New', '[authorsAlpha]', 'Isaac Newton'",
-            "'Ne', '[authorsAlphaV2]', 'Isaac Newton'",
+            "'Ne', '[authorsAlphaLNI]', 'Isaac Newton'",
             "'Newton', '[authorLast]', 'Isaac Newton'",
             "'I', '[authorLastForeIni]', 'Isaac Newton'",
 

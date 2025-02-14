@@ -100,7 +100,7 @@ public class CSLFormatUtils {
 
             if (author.isPresent() && year.isPresent()) {
                 AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = BracketedPattern.authorsAlphaV2(authorList);
+                String alphaKey = BracketedPattern.authorsAlphaLNI(authorList);
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?

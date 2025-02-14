@@ -359,8 +359,8 @@ public class BracketedPattern {
                         return allAuthors(authorList);
                     case "authorsAlpha":
                         return authorsAlpha(authorList);
-                    case "authorsAlphaV2":
-                        return authorsAlphaV2(authorList);
+                    case "authorsAlphaLNI":
+                        return authorsAlphaLNI(authorList);
                     case "authorLast":
                         return lastAuthor(authorList);
                     case "authorLastForeIni":
@@ -905,7 +905,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    public static String authorsAlphaV2(AuthorList authorList) {
+    public static String authorsAlphaLNI(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int numberOfAuthors = authorList.getNumberOfAuthors();
         boolean andOthersPresent = numberOfAuthors > 1 &&
