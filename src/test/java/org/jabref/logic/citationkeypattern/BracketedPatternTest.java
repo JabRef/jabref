@@ -79,6 +79,24 @@ class BracketedPatternTest {
 
     static Stream<Arguments> authorsAlpha() {
         return Stream.of(
+                Arguments.of("A+", "Alexander Artemenko and others"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authorsAlpha(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    }
+
+    static Stream<Arguments> authorsAlphaV2() {
+        return Stream.of(
                 Arguments.of("Ar", "Alexander Artemenko and others"),
                 Arguments.of("Aa", "Aachen and others"),
                 Arguments.of("Aa", "Aachen and Berlin and others"),
@@ -104,8 +122,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authorsAlpha(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    void authorsAlphaV2(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlphaV2(list));
     }
 
     /**
@@ -321,7 +339,8 @@ class BracketedPatternTest {
             "'New', '[auth3]', 'Isaac Newton'",
             "'New', '[auth3_1]', 'Isaac Newton'",
             "'Newton', '[authshort]', 'Isaac Newton'",
-            "'Ne', '[authorsAlpha]', 'Isaac Newton'",
+            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Ne', '[authorsAlphaV2]', 'Isaac Newton'",
             "'Newton', '[authorLast]', 'Isaac Newton'",
             "'I', '[authorLastForeIni]', 'Isaac Newton'",
 
