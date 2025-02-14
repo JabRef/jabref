@@ -131,7 +131,7 @@ jobs:
           export PATH=$PATH:$HOME/.jbang/bin
 
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.9.2:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.9.3:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
