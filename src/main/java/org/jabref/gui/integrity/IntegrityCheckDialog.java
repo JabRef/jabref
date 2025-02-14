@@ -24,7 +24,6 @@ import javafx.stage.Modality;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -102,7 +101,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new IntegrityCheckDialogViewModel(messages);
+        viewModel = new IntegrityCheckDialogViewModel(messages, tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager);
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
@@ -120,29 +119,42 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 super.updateItem(item, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
-                } else {
-                    IntegrityMessage rowData = getTableRow().getItem();
-                    switch (rowData.field()) {
-                        case StandardField.TITLE:
-                            button.setText(Localization.lang("Fix"));
-                            button.setOnAction(event -> {
-                                viewModel.fixTitle(rowData);
-                                dialogService.notify(Localization.lang("Masked capital letters using curly brackets {}"));
-                                removeRowFromTable(getTableRow().getItem());
-                            });
-                            setGraphic(button);
-                            break;
-                        case InternalField.KEY_FIELD:
-                            button.setText(Localization.lang("Generate Key"));
-                            button.setOnAction(event -> new GenerateCitationKeyAction(tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager).execute());
-                            removeRowFromTable(getTableRow().getItem());
-                            setGraphic(button);
-                            break;
-                        default:
-                            setGraphic(null);
-                            break;
-                    }
+                    return;
                 }
+                IntegrityMessage rowData = getTableRow().getItem();
+                configureButton(rowData);
+            }
+
+            private void configureButton(IntegrityMessage rowData) {
+                switch (rowData.field()) {
+                    case StandardField.URLDATE:
+                        configureButton("Remove field", () -> {
+                            viewModel.fix(StandardField.URLDATE, rowData, "Field removed successfully");
+                            removeRowFromTable(rowData);
+                        });
+                        break;
+                    case StandardField.TITLE:
+                        configureButton(Localization.lang("Fix"), () -> {
+                            viewModel.fix(StandardField.TITLE, rowData, "Masked capital letters using curly brackets {}");
+                            removeRowFromTable(rowData);
+                        });
+                        break;
+                    case InternalField.KEY_FIELD:
+                        configureButton(Localization.lang("Generate Key"), () -> {
+                            viewModel.fix(InternalField.KEY_FIELD, rowData, null);
+                            removeRowFromTable(rowData);
+                        });
+                        break;
+                    default:
+                        setGraphic(null);
+                        return;
+                }
+                setGraphic(button);
+            }
+
+            private void configureButton(String text, Runnable action) {
+                button.setText(text);
+                button.setOnAction(event -> action.run());
             }
         });
 
@@ -194,20 +206,37 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         messagesTable.setItems(mutableMessages);
     }
 
+    private void updateEntryTypeCombo() {
+        entryTypeCombo.getItems().setAll(viewModel.getEntryTypes());
+        entryTypeCombo.getSelectionModel().selectFirst();
+    }
+
     @FXML
     private void fixByType() {
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
-        if (selectedType.equals(StandardField.TITLE.getDisplayName())) {
-            for (IntegrityMessage message : messagesTable.getItems()) {
-                if (message.field().getDisplayName().equals(selectedType)) {
-                    viewModel.fixTitle(message);
-                    removeRowFromTable(message);
-                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                    entryTypeCombo.getItems().setAll(viewModel.getEntryTypes());
-                    entryTypeCombo.getSelectionModel().selectFirst();
-                    dialogService.notify(Localization.lang("Fixed successfully!"));
+        boolean isFixed = false;
+
+        for (IntegrityMessage message : messages) {
+            if (message.field().getDisplayName().equals(selectedType)) {
+                if (selectedType.equals(StandardField.TITLE.getDisplayName())) {
+                    viewModel.fix(StandardField.URLDATE, message, Localization.lang("Masked capital letters using curly brackets {}"));
+                } else if (selectedType.equals(StandardField.URLDATE.getDisplayName())) {
+                    viewModel.fix(StandardField.TITLE, message, Localization.lang("Field removed successfully!"));
+                } else if (selectedType.equals(InternalField.KEY_FIELD.getDisplayName())) {
+                    viewModel.fix(InternalField.KEY_FIELD, message, null);
+                } else {
+                    continue;
                 }
+                removeRowFromTable(message);
+                viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                isFixed = true;
             }
+        }
+
+        updateEntryTypeCombo();
+
+        if (isFixed) {
+            dialogService.notify(Localization.lang("Fixed successfully!"));
         } else {
             dialogService.notify(Localization.lang("No fixes available!"));
         }
