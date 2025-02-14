@@ -16,7 +16,7 @@ public class OpenEntryEditorAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager).and(stateManager.getEditorShowing().not()));
     }
 
     public void execute() {
