@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
@@ -38,6 +39,10 @@ public class TitleChecker implements ValueChecker {
 
         if (databaseContext.isBiblatexMode()) {
             return Optional.empty();
+        }
+
+        if (URLUtil.URL_PATTERN.matcher(value).find()) {
+            return Optional.of(Localization.lang("contains a URL"));
         }
 
         String valueOnlySpacesWithinCurlyBraces = INSIDE_CURLY_BRAKETS.matcher(value).replaceAll("");
