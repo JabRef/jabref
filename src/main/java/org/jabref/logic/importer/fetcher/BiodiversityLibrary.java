@@ -40,7 +40,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
-    private static final String TEST_URL_WITHOUT_API_KEY = "https://www.biodiversitylibrary.org/api3?apikey=";
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://www.biodiversitylibrary.org/api3?";
 
     private final ImporterPreferences importerPreferences;
 

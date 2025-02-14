@@ -51,10 +51,9 @@ class IacrEprintFetcherTest {
                 .withField(StandardField.ABSTRACT, "dummy")
                 .withField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman")
                 .withField(StandardField.DATE, "2017-11-24")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1118")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1118}")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology {ePrint} Archive, Paper 2017/1118")
                 .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527")
+                .withField(StandardField.URL, "https://eprint.iacr.org/archive/versions/2017/1118/20171124:064527")
                 .withField(StandardField.VERSION, "20171124:064527")
                 .withField(StandardField.YEAR, "2017");
 
@@ -75,10 +74,9 @@ class IacrEprintFetcherTest {
                 .withField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander")
                 .withField(StandardField.DATE, "2017-02-17")
                 .withField(StandardField.DOI, "10.1007/978-3-662-53018-4_23")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2016/119")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2016/119}")
-                .withField(StandardField.TITLE, "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2016/119/20170217:150415")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology {ePrint} Archive, Paper 2016/119")
+                .withField(StandardField.TITLE, "Lightweight Multiplication in {GF}(2^n) with Applications to {MDS} Matrices")
+                .withField(StandardField.URL, "https://eprint.iacr.org/archive/versions/2016/119/20170217:150415")
                 .withField(StandardField.VERSION, "20170217:150415")
                 .withField(StandardField.YEAR, "2016");
 
@@ -87,10 +85,9 @@ class IacrEprintFetcherTest {
                 .withField(StandardField.ABSTRACT, "dummy")
                 .withField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí")
                 .withField(StandardField.DATE, "2018-01-19")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1095")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1095}")
-                .withField(StandardField.TITLE, "Analysis of the Bitcoin UTXO set")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1095/20180119:113352")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology {ePrint} Archive, Paper 2017/1095")
+                .withField(StandardField.TITLE, "Analysis of the Bitcoin {UTXO} set")
+                .withField(StandardField.URL, "https://eprint.iacr.org/archive/versions/2017/1095/20180119:113352")
                 .withField(StandardField.VERSION, "20180119:113352")
                 .withField(StandardField.YEAR, "2017");
     }
