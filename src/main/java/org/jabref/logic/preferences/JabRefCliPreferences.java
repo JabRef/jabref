@@ -559,7 +559,7 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
         }
 
-        defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
+        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
         defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
