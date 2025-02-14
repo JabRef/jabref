@@ -1,6 +1,5 @@
 package org.jabref.logic.preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -427,8 +426,9 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     protected JabRefCliPreferences() {
         try {
-            if (new File("jabref.xml").exists()) {
-                importPreferences(Path.of("jabref.xml"));
+            Path jabrefXml = Path.of("jabref.xml");
+            if (Files.exists(jabrefXml)) {
+                importPreferences(jabrefXml);
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
@@ -493,8 +493,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, Directories
-                                        .getSslDirectory()
-                                        .resolve("truststore.jks").toString());
+                .getSslDirectory()
+                .resolve("truststore.jks").toString());
 
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
@@ -688,8 +688,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /**
      * @deprecated Never ever add a call to this method. There should be only one caller.
-     *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
+     * All other usages should get the preferences passed (or injected).
+     * The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -891,7 +891,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         try {
             addPrefsRecursively(this.prefs, result);
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
@@ -914,13 +915,16 @@ public class JabRefCliPreferences implements CliPreferences {
     private Object getObject(Preferences prefs, String key) {
         try {
             return prefs.get(key, (String) defaults.get(key));
-        } catch (ClassCastException e) {
+        } catch (
+                ClassCastException e) {
             try {
                 return prefs.getBoolean(key, getBooleanDefault(key));
-            } catch (ClassCastException e2) {
+            } catch (
+                    ClassCastException e2) {
                 try {
                     return prefs.getInt(key, getIntDefault(key));
-                } catch (ClassCastException e3) {
+                } catch (
+                        ClassCastException e3) {
                     return prefs.getDouble(key, getDoubleDefault(key));
                 }
             }
@@ -964,8 +968,10 @@ public class JabRefCliPreferences implements CliPreferences {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException
-                 | IOException ex) {
+        } catch (
+                BackingStoreException
+                |
+                IOException ex) {
             throw new JabRefException(
                     "Could not export preferences",
                     Localization.lang("Could not export preferences"),
@@ -983,8 +989,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException
-                 | IOException ex) {
+        } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
@@ -1082,7 +1087,8 @@ public class JabRefCliPreferences implements CliPreferences {
             bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
 
             prefsNode.flush();
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
     }
@@ -1110,7 +1116,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // Reassign currentStyle if it is not a CSL style
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
             currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
-                         .orElse(CitationStyle.getDefault());
+                                        .orElse(CitationStyle.getDefault());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
@@ -1267,7 +1273,8 @@ public class JabRefCliPreferences implements CliPreferences {
             if (!newValue) {
                 try (final Keyring keyring = Keyring.create()) {
                     keyring.deletePassword("org.jabref", "proxy");
-                } catch (Exception ex) {
+                } catch (
+                        Exception ex) {
                     LOGGER.warn("Unable to remove proxy credentials");
                 }
             }
@@ -1303,7 +1310,8 @@ public class JabRefCliPreferences implements CliPreferences {
                             getInternalPreferences().getUserAndHost())
                             .encrypt());
                 }
-            } catch (Exception ex) {
+            } catch (
+                    Exception ex) {
                 LOGGER.warn("Unable to open key store", ex);
             }
         }
@@ -1346,7 +1354,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
         if ((pattern.getDefaultValue() == null)
-                || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+            || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
             put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());
@@ -1356,7 +1364,8 @@ public class JabRefCliPreferences implements CliPreferences {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
@@ -1477,7 +1486,8 @@ public class JabRefCliPreferences implements CliPreferences {
             if (!newValue) {
                 try {
                     Files.deleteIfExists(Path.of("jabref.xml"));
-                } catch (IOException e) {
+                } catch (
+                        IOException e) {
                     LOGGER.warn("Error accessing filesystem", e);
                 }
             }
