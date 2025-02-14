@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the user comments field visibility so that it remains displayed if it contains text. Additionally, users can now easily toggle the field on or off via buttons unless disabled in preferences. [#11021](https://github.com/JabRef/jabref/issues/11021)
 - The LibreOffice integration for CSL styles is now more performant. [#12472](https://github.com/JabRef/jabref/pull/12472)
 - The "automatically sync bibliography when citing" feature of the LibreOffice integration is now disabled by default (can be enabled in settings). [#12472](https://github.com/JabRef/jabref/pull/12472)
+- For the Citation key generator patterns, we reverted how `[authorsAlpha]` would behave to the original pattern and renamed the LNI-based pattern to `[authorsAlphaLNI]`. [#12499](https://github.com/JabRef/jabref/pull/12499)
 
 ### Fixed
 
@@ -39,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where mixing JStyle and CSL style citations in LibreOffice caused two separate bibliography sections to be generated. [#12262](https://github.com/JabRef/jabref/issues/12262)
 - We fixed an issue in the LibreOffice integration where the formatting of text (e.g. superscript) was lost when using certain numeric CSL styles. [melting-pot#772](https://github.com/JabRef/jabref-issue-melting-pot/issues/772)
 - We fixed an issue where CSL style citations with citation keys having special characters (such as hyphens or colons) would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
+- We fixed an issue where the `[authorsAlpha]` pattern in Citation key generator would not behave as per the user documentation. [#12312](https://github.com/JabRef/jabref/issues/12312)
 
 ### Removed
 
