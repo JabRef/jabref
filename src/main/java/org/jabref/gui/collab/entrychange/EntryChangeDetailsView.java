@@ -55,9 +55,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
         TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferences, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
 
-        EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
-            newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
-        });
+        EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> newEntryTabPane.getSelectionModel().select(selectedIndex.intValue()));
 
         EasyBind.subscribe(newEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
             if (oldEntryTabPane.getSelectionModel().getSelectedIndex() != selectedIndex.intValue()) {

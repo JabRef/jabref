@@ -32,7 +32,7 @@ public final class Title {
         if (getWords().isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(getWords().get(getWords().size() - 1));
+        return Optional.of(getWords().getLast());
     }
 
     @Override

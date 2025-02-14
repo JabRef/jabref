@@ -515,21 +515,19 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                    BackgroundTask.wrap(() -> {
-                        for (BibEntry entry : event.entries()) {
-                            searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> BackgroundTask.wrap(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                    }
+                }).onFinished(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        if (groupNode.matches(entry)) {
+                            matchedEntries.add(entry.getId());
+                        } else {
+                            matchedEntries.remove(entry.getId());
                         }
-                    }).onFinished(() -> {
-                        for (BibEntry entry : event.entries()) {
-                            if (groupNode.matches(entry)) {
-                                matchedEntries.add(entry.getId());
-                            } else {
-                                matchedEntries.remove(entry.getId());
-                            }
-                        }
-                    }).executeWith(taskExecutor);
-                });
+                    }
+                }).executeWith(taskExecutor));
             }
         }
 

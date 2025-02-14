@@ -64,9 +64,7 @@ public class ActionHelper {
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> fieldsAreSet = EasyBind.valueAt(selectedEntries, 0)
-                                                .mapObservable(entry -> Bindings.createBooleanBinding(() -> {
-                                                    return entry.getFields().stream().anyMatch(fields::contains);
-                                                }, entry.getFieldsObservable()))
+                                                .mapObservable(entry -> Bindings.createBooleanBinding(() -> entry.getFields().stream().anyMatch(fields::contains), entry.getFieldsObservable()))
                                                 .orElseOpt(false);
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }

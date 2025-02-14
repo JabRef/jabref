@@ -263,9 +263,7 @@ public class MainTableColumnFactory {
             container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));
 
-            groupIcons.stream().distinct().forEach(groupIcon -> {
-                container.getChildren().add(groupIcon.getGraphicNode());
-            });
+            groupIcons.stream().distinct().forEach(groupIcon -> container.getChildren().add(groupIcon.getGraphicNode()));
 
             String matchedGroupsString = matchedGroups.stream()
                                                       .distinct()

@@ -76,7 +76,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                 // nothing fits
                 return false;
             }
-            super.getChildren().remove(super.getChildren().size() - 1);
+            super.getChildren().removeLast();
             super.autosize();
         }
         return true;
@@ -87,7 +87,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             if (super.getChildren().size() == allChildren.size()) {
                 if (!allChildren.isEmpty()) {
                     // all Texts are displayed, let's make sure all chars are as well
-                    Node lastChildAsShown = super.getChildren().get(super.getChildren().size() - 1);
+                    Node lastChildAsShown = super.getChildren().getLast();
                     Node lastChild = allChildren.getLast();
                     if (lastChildAsShown instanceof Text text && text.getText().length() < ((Text) lastChild).getText().length()) {
                         text.setText(((Text) lastChild).getText());
@@ -106,12 +106,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     private boolean ellipseUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
-            Text lastChildAsShown = (Text) super.getChildren().remove(super.getChildren().size() - 1);
+            Text lastChildAsShown = (Text) super.getChildren().removeLast();
             while (getEllipsisString().equals(lastChildAsShown.getText()) || "".equals(lastChildAsShown.getText())) {
                 if (super.getChildren().isEmpty()) {
                     return false;
                 }
-                lastChildAsShown = (Text) super.getChildren().remove(super.getChildren().size() - 1);
+                lastChildAsShown = (Text) super.getChildren().removeLast();
             }
             Text shortenedChild = new Text(ellipseString(lastChildAsShown.getText()));
             shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());

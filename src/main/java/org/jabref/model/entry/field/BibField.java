@@ -9,10 +9,9 @@ public record BibField(Field field, FieldPriority priority) implements Comparabl
         if (this == o) {
             return true;
         }
-        if (!(o instanceof BibField)) {
+        if (!(o instanceof BibField other)) {
             return false;
         }
-        BibField other = (BibField) o;
         return field.getName().equalsIgnoreCase(other.field.getName());
     }
 

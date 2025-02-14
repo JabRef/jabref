@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -51,7 +50,7 @@ class OpenDocumentRepresentation {
             entryList.addAll(entries);
         }
 
-        Collections.sort(entryList, new FieldComparatorStack<>(comparators));
+        entryList.sort(new FieldComparatorStack<>(comparators));
         this.entries = entryList;
     }
 

@@ -66,7 +66,7 @@ public class PreviewPanel extends VBox {
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);
         previewView.setOnDragOver(PreviewPanel::onDragOver);
-        previewView.setOnDragDropped(event -> onDragDropped(event));
+        previewView.setOnDragDropped(this::onDragDropped);
 
         this.getChildren().add(previewView);
 

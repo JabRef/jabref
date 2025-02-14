@@ -343,7 +343,7 @@ public class BackupManager {
 
         executor.scheduleAtFixedRate(
                                      // We need to determine the backup path on each action, because we use the timestamp in the filename
-                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(path -> this.performBackup(path)),
+                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup),
                                      DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
                                      DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
                                      TimeUnit.SECONDS);

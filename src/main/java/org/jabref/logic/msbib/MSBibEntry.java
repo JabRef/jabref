@@ -335,17 +335,11 @@ class MSBibEntry {
 
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
-        parsedDateAcesseField.flatMap(Date::getYear).map(Object::toString).ifPresent(yearAccessed -> {
-            addField(document, rootNode, "Year" + "Accessed", yearAccessed);
-        });
+        parsedDateAcesseField.flatMap(Date::getYear).map(Object::toString).ifPresent(yearAccessed -> addField(document, rootNode, "Year" + "Accessed", yearAccessed));
 
         parsedDateAcesseField.flatMap(Date::getMonth)
-                             .map(Month::getFullName).ifPresent(monthAcessed -> {
-            addField(document, rootNode, "Month" + "Accessed", monthAcessed);
-        });
-        parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
-            addField(document, rootNode, "Day" + "Accessed", dayAccessed);
-        });
+                             .map(Month::getFullName).ifPresent(monthAcessed -> addField(document, rootNode, "Month" + "Accessed", monthAcessed));
+        parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

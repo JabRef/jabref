@@ -48,7 +48,7 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
         outputRow(columnNames);
 
-        writer.write(columnWidths.stream().map(width -> "-".repeat(width)).collect(Collectors.joining(" | ", "| ", " |\n")));
+        writer.write(columnWidths.stream().map("-"::repeat).collect(Collectors.joining(" | ", "| ", " |\n")));
 
         super.writeFindings();
 

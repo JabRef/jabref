@@ -216,8 +216,7 @@ public class RisImporter extends Importer {
                         }
                     } else if ("KW".equals(tag)) {
                         if (fields.containsKey(StandardField.KEYWORDS)) {
-                            String kw = fields.get(StandardField.KEYWORDS);
-                            fields.put(StandardField.KEYWORDS, kw + ", " + value);
+                            fields.compute(StandardField.KEYWORDS, (_, kw) -> kw + ", " + value);
                         } else {
                             fields.put(StandardField.KEYWORDS, value);
                         }

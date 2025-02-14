@@ -428,7 +428,7 @@ public class StudyRepository {
     private void writeResultToFile(Path pathToFile, BibDatabaseContext context) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
-                    .withSaveOrder(context.getMetaData().getSaveOrder().map(so -> SelfContainedSaveOrder.of(so)).orElse(SaveOrder.getDefaultSaveOrder()))
+                    .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(

@@ -31,10 +31,9 @@ public class CitationLookupResult {
         if (otherObject == this) {
             return true;
         }
-        if (!(otherObject instanceof CitationLookupResult)) {
+        if (!(otherObject instanceof CitationLookupResult that)) {
             return false;
         }
-        CitationLookupResult that = (CitationLookupResult) otherObject;
         return Objects.equals(this.entry, that.entry) && Objects.equals(this.database, that.database);
     }
 

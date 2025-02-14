@@ -79,7 +79,7 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         m = ESCAPED_PATTERN3.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
-            LOGGER.warn("HTML escaped char not converted: {}{}{} = {}", m.group(1), m.group(2), m.group(3), " = ", num);
+            LOGGER.warn("HTML escaped char not converted: {}{}{} = {}", m.group(1), m.group(2), m.group(3), num);
         }
 
         // Remove $$ in case of two adjacent conversions

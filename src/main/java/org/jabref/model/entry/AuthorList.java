@@ -439,10 +439,9 @@ public class AuthorList implements Iterable<Author> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AuthorList)) {
+        if (!(o instanceof AuthorList a)) {
             return false;
         }
-        AuthorList a = (AuthorList) o;
 
         return this.authors.equals(a.authors);
     }

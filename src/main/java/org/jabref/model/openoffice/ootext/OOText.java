@@ -47,11 +47,9 @@ public class OOText {
             return true;
         }
 
-        if (!(object instanceof OOText)) {
+        if (!(object instanceof OOText other)) {
             return false;
         }
-
-        OOText other = (OOText) object;
 
         return data.equals(other.data);
     }

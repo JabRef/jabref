@@ -24,7 +24,7 @@ public class UiThreadObservableList<E> implements ObservableList<E> {
 
     @Override
     public void addListener(ListChangeListener<? super E> listener) {
-        delegate.addListener(new UiThreadListChangeListener(listener));
+        delegate.addListener(new UiThreadListChangeListener<>(listener));
     }
 
     @Override

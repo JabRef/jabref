@@ -3,7 +3,6 @@ package org.jabref.model.metadata;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,21 +21,18 @@ public class ContentSelectors {
     private final SortedSet<ContentSelector> contentSelectors;
 
     public ContentSelectors() {
-        contentSelectors = new TreeSet<>(new Comparator<ContentSelector>() {
-            @Override
-            public int compare(ContentSelector o1, ContentSelector o2) {
-                // First, check the field name
-                int result = o1.getField().getName().compareTo(o2.getField().getName());
-                if (result != 0) {
-                    return result;
-                }
-
-                // If the field names are equal, compare the properties
-                // We did not find any other way to compare enum sets, so we convert them to lists and compare them using the toString method
-                List<FieldProperty> properties1 = o1.getField().getProperties().stream().sorted().toList();
-                List<FieldProperty> properties2 = o2.getField().getProperties().stream().sorted().toList();
-                return properties1.toString().compareTo(properties2.toString());
+        contentSelectors = new TreeSet<>((o1, o2) -> {
+            // First, check the field name
+            int result = o1.getField().getName().compareTo(o2.getField().getName());
+            if (result != 0) {
+                return result;
             }
+
+            // If the field names are equal, compare the properties
+            // We did not find any other way to compare enum sets, so we convert them to lists and compare them using the toString method
+            List<FieldProperty> properties1 = o1.getField().getProperties().stream().sorted().toList();
+            List<FieldProperty> properties2 = o2.getField().getProperties().stream().sorted().toList();
+            return properties1.toString().compareTo(properties2.toString());
         });
     }
 

@@ -213,36 +213,34 @@ public class MainTableDataModel {
     class SearchIndexListener {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
-            indexAddedOrUpdatedEvent.entries().forEach(entry -> {
-                BackgroundTask.wrap(() -> {
-                    int index = bibDatabaseContext.getDatabase().indexOf(entry);
-                    if (index >= 0) {
-                        BibEntryTableViewModel viewModel = entriesViewModel.get(index);
-                        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
-                        boolean isMatched;
-                        if (searchQueryProperty.get().isPresent()) {
-                            SearchQuery searchQuery = searchQueryProperty.get().get();
-                            String newSearchExpression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
-                            SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
-                            SearchResults results = indexManager.search(entryQuery);
+            indexAddedOrUpdatedEvent.entries().forEach(entry -> BackgroundTask.wrap(() -> {
+                int index = bibDatabaseContext.getDatabase().indexOf(entry);
+                if (index >= 0) {
+                    BibEntryTableViewModel viewModel = entriesViewModel.get(index);
+                    boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+                    boolean isMatched;
+                    if (searchQueryProperty.get().isPresent()) {
+                        SearchQuery searchQuery = searchQueryProperty.get().get();
+                        String newSearchExpression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
+                        SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
+                        SearchResults results = indexManager.search(entryQuery);
 
-                            isMatched = results.isMatched(entry);
-                            viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
-                        } else {
-                            isMatched = true;
-                            viewModel.hasFullTextResultsProperty().set(false);
-                        }
+                        isMatched = results.isMatched(entry);
+                        viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
+                    } else {
+                        isMatched = true;
+                        viewModel.hasFullTextResultsProperty().set(false);
+                    }
 
-                        updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
-                        updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
-                    }
-                    return index;
-                }).onSuccess(index -> {
-                    if (index >= 0) {
-                        FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);
-                    }
-                }).executeWith(taskExecutor);
-            });
+                    updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
+                    updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
+                }
+                return index;
+            }).onSuccess(index -> {
+                if (index >= 0) {
+                    FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);
+                }
+            }).executeWith(taskExecutor));
         }
 
         @Subscribe

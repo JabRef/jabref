@@ -118,9 +118,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> {
-            viewModel.addBstStyle(bstFile);
-        });
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> viewModel.addBstStyle(bstFile));
     }
 
     public void initialize() {
