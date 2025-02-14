@@ -810,6 +810,7 @@ public class LibraryTab extends Tab {
             tableModel.unbind();
         }
 
+        // This check is needed, because the WelcomeTab is a tab, but not a database.
         if (stateManager.getOpenDatabases().isEmpty() && stateManager.activeDatabaseProperty().isPresent().get()) {
             stateManager.activeDatabaseProperty().setValue(Optional.empty());
         }

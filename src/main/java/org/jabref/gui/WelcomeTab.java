@@ -48,7 +48,7 @@ public class WelcomeTab extends Tab {
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu) {
 
-        super("Welcome");
+        super(Localization.lang("Welcome"));
         setClosable(true);
 
         this.tabContainer = tabContainer;
@@ -85,7 +85,7 @@ public class WelcomeTab extends Tab {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
         welcomeLabel.getStyleClass().add("welcome-label");
 
-        Label descriptionLabel = new Label(Localization.lang("Stay on top of your Literature"));
+        Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("welcome-description-label");
 
         return createVBoxContainer(welcomeLabel, descriptionLabel);
@@ -95,11 +95,11 @@ public class WelcomeTab extends Tab {
         Label startLabel = new Label(Localization.lang("Start"));
         startLabel.getStyleClass().add("welcome-header-label");
 
-        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New Library"));
+        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New library"));
         newLibraryLink.getStyleClass().add("welcome-hyperlink");
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(tabContainer, preferences).execute());
 
-        Hyperlink openLibraryLink = new Hyperlink(Localization.lang("Open Library"));
+        Hyperlink openLibraryLink = new Hyperlink(Localization.lang("Open library"));
         openLibraryLink.getStyleClass().add("welcome-hyperlink");
         openLibraryLink.setOnAction(e -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,

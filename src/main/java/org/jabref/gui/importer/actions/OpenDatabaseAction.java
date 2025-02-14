@@ -149,6 +149,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             return preferences.getFilePreferences().getWorkingDirectory();
         }
 
+        // This is because of the WelcomeTab class.
         LibraryTab currentTab = tabContainer.getCurrentLibraryTab();
         if (currentTab == null) {
             return preferences.getFilePreferences().getWorkingDirectory();
