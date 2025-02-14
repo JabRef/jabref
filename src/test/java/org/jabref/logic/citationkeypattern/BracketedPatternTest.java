@@ -68,7 +68,8 @@ class BracketedPatternTest {
                 Arguments.of("AachenBerlinChemnitzDüsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEssen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -86,7 +87,8 @@ class BracketedPatternTest {
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -146,7 +148,8 @@ class BracketedPatternTest {
                 Arguments.of("AacheBCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AacheBCD+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AacheBCDE", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -170,7 +173,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -194,7 +198,8 @@ class BracketedPatternTest {
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -219,7 +224,8 @@ class BracketedPatternTest {
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -244,7 +250,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -268,7 +275,8 @@ class BracketedPatternTest {
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -292,7 +300,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -316,7 +325,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
