@@ -23,6 +23,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
+import org.jabref.gui.groups.AddToGroupAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -77,6 +78,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager)),
 
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new AddToGroupAction(stateManager, dialogService)),
                 new SeparatorMenuItem(),
 
                 createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor),
