@@ -49,7 +49,7 @@ public class CopyTo extends SimpleCommand {
         // we need to operate on a copy otherwise we might get ConcurrentModification issues
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries().stream().toList();
 
-        boolean includeCrossReferences = false;
+        boolean includeCrossReferences = copyToPreferences.getShouldIncludeCrossReferences();
         boolean showDialogBox = copyToPreferences.getShouldAskForIncludingCrossReferences();
 
         for (BibEntry bibEntry : selectedEntries) {
@@ -59,7 +59,7 @@ public class CopyTo extends SimpleCommand {
             }
         }
 
-        if (copyToPreferences.getShouldIncludeCrossReferences()) {
+        if (includeCrossReferences) {
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
