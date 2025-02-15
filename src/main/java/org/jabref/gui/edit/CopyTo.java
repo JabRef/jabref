@@ -56,6 +56,7 @@ public class CopyTo extends SimpleCommand {
             if (bibEntry.hasField(StandardField.CROSSREF) && showDialogBox) {
                 includeCrossReferences = askForCrossReferencedEntries();
                 copyToPreferences.setShouldIncludeCrossReferences(includeCrossReferences);
+                break;
             }
         }
 
