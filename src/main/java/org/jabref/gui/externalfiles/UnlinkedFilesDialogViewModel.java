@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -145,7 +146,7 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        List<Path> fileList = new java.util.ArrayList<>(checkedFileListProperty
+        List<Path> fileList = new ArrayList<>(checkedFileListProperty
                 .stream()
                 .map(TreeItem::getValue)
                 .map(FileNodeViewModel::getPath)
