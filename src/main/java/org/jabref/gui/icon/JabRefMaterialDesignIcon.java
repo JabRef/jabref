@@ -35,8 +35,8 @@ public enum JabRefMaterialDesignIcon implements Ikon {
     TEXWORKS("jab-texworks", '\ue911'),
     BIBLIOGRAPHY("jab-bibliography", '\ue912');
 
-    private String description;
-    private int code;
+    private final String description;
+    private final int code;
 
     JabRefMaterialDesignIcon(String description, int code) {
         this.description = description;
