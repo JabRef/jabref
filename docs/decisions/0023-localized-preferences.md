@@ -32,7 +32,7 @@ The problems are:
 
 Chosen option: "Mark default value with `%`", because it achieves goals without requiring too much refactoring and reuses a pattern already in use.
 
-## Considered Options
+## Pros and Cons of the Options
 
 ### Mark default value with `%`
 
