@@ -255,7 +255,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         try {
             return dirsToCheck.stream()
                               .map(Path::toAbsolutePath)
-                              .flatMap(Unchecked.function(dir -> Files.list(dir)))
+                              .flatMap(Unchecked.function(Files::list))
                               .filter(path -> FileUtil.getFileExtension(path).equals(Optional.of("bib")))
                               .findFirst();
         } catch (UncheckedIOException ex) {

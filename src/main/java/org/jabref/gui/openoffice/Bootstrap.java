@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -324,9 +323,7 @@ public class Bootstrap {
                     Thread.sleep(500);
                 }
             }
-        } catch (BootstrapException e) {
-            throw e;
-        } catch (java.lang.RuntimeException e) {
+        } catch (BootstrapException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new BootstrapException(e);
@@ -349,8 +346,6 @@ public class Bootstrap {
                         }
                         out.println(prefix + s);
                     }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace(System.err);
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
