@@ -182,24 +182,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                                 .orElse(StandardEntryType.Misc);
                         entry.setType(entryType);
                     }
-                    case "contributors" -> {
-                        parseContributors(reader, entry);
-                    }
-                    case "titles" -> {
-                        parseTitles(reader, entry);
-                    }
-                    case "periodical" -> {
-                        parsePeriodical(reader, entry);
-                    }
-                    case "keywords" -> {
-                        parseKeywords(reader, entry);
-                    }
-                    case "urls" -> {
-                        parseUrls(reader, entry);
-                    }
-                    case "dates" -> {
-                        parseDates(reader, entry);
-                    }
+                    case "contributors" -> parseContributors(reader, entry);
+                    case "titles" -> parseTitles(reader, entry);
+                    case "periodical" -> parsePeriodical(reader, entry);
+                    case "keywords" -> parseKeywords(reader, entry);
+                    case "urls" -> parseUrls(reader, entry);
+                    case "dates" -> parseDates(reader, entry);
                     // TODO: Left for future work -- test files need to be adpated
                     // case "accession-num" -> {
                     //    String accessionNumber = parseElementContent(reader, "accession-num");

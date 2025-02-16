@@ -129,7 +129,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      */
     public void selectLastJournalFile() {
         if (!journalFiles.isEmpty()) {
-            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
+            currentFile.set(journalFilesProperty().getLast());
         }
     }
 
