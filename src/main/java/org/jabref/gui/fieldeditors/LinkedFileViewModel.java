@@ -157,11 +157,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public String getDescriptionAndLink() {
-        if (StringUtil.isBlank(linkedFile.getDescription())) {
-            return linkedFile.getLink();
-        } else {
-            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
-        }
+        return (StringUtil.isBlank(linkedFile.getDescription()) ? "" : linkedFile.getDescription() + " ")
+                + "(" + linkedFile.getLink() + ")";
     }
 
     public String getTruncatedDescriptionAndLink() {

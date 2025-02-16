@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -118,7 +119,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 undoManager);
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withStringTooltip(item -> getAllFiles())
                 .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
@@ -134,6 +135,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         setUpKeyBindings();
     }
+
+    private String getAllFiles() {
+        if (listView.getItems().isEmpty()) {
+            return "No linked files";
+        }
+
+        return listView.getItems().stream()
+                       .map(LinkedFileViewModel::getDescriptionAndLink)
+                       .collect(Collectors.joining("\n"));
+    }
+
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
