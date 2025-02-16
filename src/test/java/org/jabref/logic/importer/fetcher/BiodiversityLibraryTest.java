@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class BiodiversityLibraryTest {
-    private final String RESPONSE_FORMAT = "format=json";
+    private final String RESPONSE_FORMAT = "&format=json";
 
     private String apiKey;
     private BiodiversityLibrary fetcher;
@@ -56,6 +56,7 @@ class BiodiversityLibraryTest {
     void baseURLConstruction() throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT);
 
         assertEquals(expected, fetcher.getBaseURL().toString());
@@ -66,6 +67,7 @@ class BiodiversityLibraryTest {
     void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetPartMetadata&pages=f&names=f")
                 .concat("&id=");
@@ -78,6 +80,7 @@ class BiodiversityLibraryTest {
     void getItemMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
                 .getTestUrl()
+                .concat(apiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetItemMetadata&pages=f&ocr=f&ocr=f")
                 .concat("&id=");
