@@ -95,6 +95,33 @@ We will discuss improvements with you and agree to merge them once the [develope
 Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
 Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
 
+## Research and Education
+
+JabRef welcomes research applied to it.
+The current list of papers where JabRef helped to enhance science is maintained at <https://github.com/JabRef/jabref/wiki/JabRef-in-the-Media>.
+
+The JabRef team also fosters to use JabRef in Software Engineering training.
+We offer guidelines for this at <https://devdocs.jabref.org/teaching.html>.
+
+When citing JabRef, please use following citation:
+
+```bibtex
+@Article{jabref,
+  author  = {Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker},
+  title   = {JabRef: BibTeX-based literature management software},
+  journal = {TUGboat},
+  volume  = {44},
+  number  = {3},
+  pages   = {441--447},
+  doi     = {10.47397/tb/44-3/tb138kopp-jabref},
+  issn    = {0896-3207},
+  issue   = {138},
+  year    = {2023},
+}
+```
+
+DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.pdf)): [10.47397/tb/44-3/tb138kopp-jabref](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref).
+
 ## Sponsoring
 
 JabRef development is powered by YourKit Java Profiler  

@@ -133,7 +133,7 @@ public class BibDatabaseContext {
      */
     public boolean isStudy() {
         return this.getDatabasePath()
-                   .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                   .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&
                            Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
                    .orElse(false);
     }
@@ -162,10 +162,10 @@ public class BibDatabaseContext {
         // Paths are a) ordered and b) should be contained only once in the result
         LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
 
-        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
         userFileDirectory.ifPresent(fileDirs::add);
 
-        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
         librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:

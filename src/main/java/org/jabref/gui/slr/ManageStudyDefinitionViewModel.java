@@ -75,7 +75,7 @@ public class ManageStudyDefinitionViewModel {
                                     .map(SearchBasedFetcher::getName)
                                     // The user wants to select specific fetchers
                                     // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                     .map(name -> {
                                         boolean enabled = DEFAULT_SELECTION.contains(name);
                                         return new StudyCatalogItem(name, enabled);
@@ -108,7 +108,7 @@ public class ManageStudyDefinitionViewModel {
                                     .map(SearchBasedFetcher::getName)
                                     // The user wants to select specific fetchers
                                     // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                     .map(name -> {
                                         boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
                                         return new StudyCatalogItem(name, enabled);

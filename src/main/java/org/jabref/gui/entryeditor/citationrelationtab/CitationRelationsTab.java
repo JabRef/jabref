@@ -117,6 +117,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
+        setId("citationRelationsTab");
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
@@ -196,10 +197,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        refreshCitingButton.setOnMouseClicked(event -> {
-            searchForRelations(entry, citingListView, abortCitingButton,
-                    refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, true);
-        });
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(
+            entry,
+            citingListView,
+            abortCitingButton,
+            refreshCitingButton,
+            CitationFetcher.SearchType.CITES,
+            importCitingButton,
+            citingProgress,
+            true));
 
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
                 refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, true));
@@ -252,9 +258,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
-                        compareButton.setOnMouseClicked(event -> {
-                            openPossibleDuplicateEntriesWindow(entry, listView);
-                        });
+                        compareButton.setOnMouseClicked(event -> openPossibleDuplicateEntriesWindow(entry, listView));
                         vContainer.getChildren().add(compareButton);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
@@ -291,9 +295,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
-                    showEntrySource.setOnMouseClicked(event -> {
-                        showEntrySourceDialog(entry.entry());
-                    });
+                    showEntrySource.setOnMouseClicked(event -> showEntrySourceDialog(entry.entry()));
 
                     vContainer.getChildren().addLast(showEntrySource);
 

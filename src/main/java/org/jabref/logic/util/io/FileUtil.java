@@ -576,13 +576,10 @@ public class FileUtil {
         numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());
         numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
 
-        StringBuilder result = new StringBuilder();
-        result.append(name, 0, numCharsBeforeEllipsis)
-              .append(ELLIPSIS)
-              .append(name.substring(name.length() - numCharsAfterEllipsis))
-              .append(extension);
-
-        return result.toString();
+        return name.substring(0, numCharsBeforeEllipsis) +
+               ELLIPSIS +
+               name.substring(name.length() - numCharsAfterEllipsis) +
+               extension;
     }
 
     public static boolean isCharLegal(char c) {

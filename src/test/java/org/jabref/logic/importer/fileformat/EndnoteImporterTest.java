@@ -65,7 +65,7 @@ class EndnoteImporterTest {
     void isRecognizedFormatReject() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris",
-                "Endnote.pattern.no_enw", "empty.pdf", "annotated.pdf");
+                "Endnote.pattern.no_enw", "empty.pdf", "pdf/annotated.pdf");
 
         for (String string : list) {
             Path file = Path.of(EndnoteImporterTest.class.getResource(string).toURI());

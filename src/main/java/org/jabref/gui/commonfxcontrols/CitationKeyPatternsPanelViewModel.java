@@ -26,9 +26,9 @@ public class CitationKeyPatternsPanelViewModel {
 
         if (itemOneName.equals(itemTwoName)) {
             return 0;
-        } else if (itemOneName.equals(ENTRY_TYPE_DEFAULT_NAME)) {
+        } else if (ENTRY_TYPE_DEFAULT_NAME.equals(itemOneName)) {
             return -1;
-        } else if (itemTwoName.equals(ENTRY_TYPE_DEFAULT_NAME)) {
+        } else if (ENTRY_TYPE_DEFAULT_NAME.equals(itemTwoName)) {
             return 1;
         }
 

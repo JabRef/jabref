@@ -35,7 +35,7 @@ public class OpenConsoleAction extends SimpleCommand {
         this.preferences = preferences;
         this.dialogService = dialogService;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
 
     /**

@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.integrity.BracesCorrector;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -710,7 +710,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     if (linkTitle.equals(Optional.of("pdf"))) {
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
-                                return URI.create(url).toURL();
+                                return URLUtil.create(url);
                             } catch (MalformedURLException e) {
                                 return null;
                             }

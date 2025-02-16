@@ -1,12 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -45,7 +45,7 @@ class ResearchGateTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFoundByDOI() throws IOException, FetcherException {
-        assertEquals(Optional.of(URI.create(URL_PDF).toURL()), fetcher.findFullText(entry));
+        assertEquals(Optional.of(URLUtil.create(URL_PDF)), fetcher.findFullText(entry));
     }
 
     @Test

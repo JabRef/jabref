@@ -79,7 +79,7 @@
                                     <TableColumn fx:id="colMessage" prefWidth="320.0" text="%Message"/>
                                 </columns>
                                 <columnResizePolicy>
-                                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                                 </columnResizePolicy>
                             </TableView>
                         </TitledPane>

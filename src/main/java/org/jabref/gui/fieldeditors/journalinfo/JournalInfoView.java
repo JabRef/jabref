@@ -1,19 +1,15 @@
 package org.jabref.gui.fieldeditors.journalinfo;
 
-import java.util.Objects;
-
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.importer.FetcherException;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class JournalInfoView extends VBox {
     @FXML private Label title;
     @FXML private Label categories;
@@ -34,8 +30,6 @@ public class JournalInfoView extends VBox {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.getStylesheets().add(Objects.requireNonNull(JournalInfoView.class.getResource("JournalInfo.css")).toExternalForm());
 
         title.textProperty().bind(viewModel.titleProperty());
         categories.textProperty().bind(viewModel.categoriesProperty());

@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.time.DateTimeException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,6 +18,7 @@ import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -401,7 +401,7 @@ public class MarcXmlParser implements Parser {
     private static void handleVolltext(BibEntry bibEntry, String fieldName, String resource, Field fallBackField) {
         if ("Volltext".equals(fieldName) && StringUtil.isNotBlank(resource)) {
             try {
-                LinkedFile linkedFile = new LinkedFile("", URI.create(resource).toURL(), StandardFileType.PDF.getName());
+                LinkedFile linkedFile = new LinkedFile("", URLUtil.create(resource), StandardFileType.PDF.getName());
                 bibEntry.setFiles(List.of(linkedFile));
             } catch (MalformedURLException | IllegalArgumentException e) {
                 LOGGER.info("Malformed URL: {}", resource);

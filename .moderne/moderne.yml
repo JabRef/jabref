@@ -1,0 +1,3 @@
+specs: specs.moderne.ai/v1/cli
+java:
+  selectedJdk: '23'

@@ -40,7 +40,7 @@ public class EditionChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        if (value.equals(FIRST_EDITION)) {
+        if (FIRST_EDITION.equals(value)) {
             return Optional.of(Localization.lang("edition of book reported as just 1"));
         }
 

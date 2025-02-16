@@ -26,7 +26,7 @@ jobs:
       - name: 'Development history of current build'
         uses: BoundfoxStudios/action-gource@v2
         with:
-          gource_title: 'JabRef v5.16 (in development) | more information at contribute.jabref.org'
+          gource_title: 'JabRef v6.0 (in development) | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
@@ -36,7 +36,7 @@ jobs:
       - name: 'Store video'
         run: |
           mkdir gource-videos
-          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.16-dev.mp4
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v6.0-dev.mp4
       - name: 'Development history of last release'
         uses: BoundfoxStudios/action-gource@v2
         with:

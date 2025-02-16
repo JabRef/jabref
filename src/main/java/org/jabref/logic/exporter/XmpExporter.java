@@ -47,7 +47,7 @@ public class XmpExporter extends Exporter {
 
         // This is a distinction between writing all entries from the supplied list to a single .xmp file,
         // or write every entry to a separate file.
-        if (file.getFileName().toString().trim().equals(XMP_SPLIT_DIRECTORY_INDICATOR)) {
+        if (XMP_SPLIT_DIRECTORY_INDICATOR.equals(file.getFileName().toString().trim())) {
             for (BibEntry entry : entries) {
                 // Avoid situations, where two citation keys are null
                 Path entryFile;

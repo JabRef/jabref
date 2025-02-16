@@ -15,7 +15,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
-<DialogPane prefWidth="530.0" prefHeight="510.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.help.AboutDialogView">
+<DialogPane prefWidth="530.0" prefHeight="510.0"
+            xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.help.AboutDialogView"
+            id="aboutDialog">
     <content>
         <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <AnchorPane>

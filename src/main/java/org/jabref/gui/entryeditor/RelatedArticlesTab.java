@@ -188,7 +188,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");
         VBox vbox = new VBox();
-        vbox.setId("gdpr-dialog");
+        vbox.getStyleClass().add("gdpr-notice");
         vbox.setSpacing(20.0);
 
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));

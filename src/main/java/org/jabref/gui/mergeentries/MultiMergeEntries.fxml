@@ -12,7 +12,8 @@
 <?import javafx.scene.layout.VBox?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.mergeentries.MultiMergeEntriesView"
-            prefHeight="500.0" prefWidth="800.0">
+            prefHeight="500.0" prefWidth="800.0"
+            id="multiMergeEntries">
 
     <content>
         <VBox styleClass="box">

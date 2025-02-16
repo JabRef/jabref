@@ -15,7 +15,8 @@
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600"
             xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.jabref.gui.preferences.PreferencesDialogView">
+            fx:controller="org.jabref.gui.preferences.PreferencesDialogView"
+            id="preferencesDialog">
     <content>
         <SplitPane dividerPositions="0.2">
             <VBox id="sidepane">

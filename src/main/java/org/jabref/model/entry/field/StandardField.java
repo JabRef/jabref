@@ -51,9 +51,12 @@ public enum StandardField implements Field {
     EDITORCTYPE("editorctype", FieldProperty.EDITOR_TYPE),
     EID("eid"),
     ENTRYSET("entryset", FieldProperty.MULTIPLE_ENTRY_LINK),
+
+    // For the syntax of a "combined" field, see {@link org.jabref.logic.cleanup.EprintCleanupTest.cleanupCompleteEntry} for examples
     EPRINT("eprint", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EPRINTCLASS("eprintclass"),
     EPRINTTYPE("eprinttype"),
+
     EVENTDATE("eventdate", FieldProperty.DATE),
     EVENTTITLE("eventtitle"),
     EVENTTITLEADDON("eventtitleaddon"),

@@ -1,0 +1,1 @@
+* \format[RemoveLatexCommands,HTMLChars]{\title}. \begin{booktitle}\format[RemoveLatexCommands,HTMLChars]{\booktitle}\end{booktitle}\begin{publisher}, \format[RemoveLatexCommands,HTMLChars]{\publisher}\end{publisher} \format{\year}

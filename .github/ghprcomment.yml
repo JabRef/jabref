@@ -4,6 +4,9 @@
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
     Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+
+    In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
+    You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
 - jobName: OpenRewrite
   message: |
     Your code currently does not meet JabRef's code guidelines.

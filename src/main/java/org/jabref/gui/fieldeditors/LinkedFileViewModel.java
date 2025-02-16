@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.function.Supplier;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -23,6 +22,7 @@ import javafx.scene.Node;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.externalfiles.PdfMergeDialog;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -35,13 +35,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.PdfVerbatimBibtexImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -457,34 +450,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void parsePdfMetadataAndShowMergeDialog() {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
-            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
-            dialog.setTitle(Localization.lang("Merge PDF metadata"));
-            dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
-            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
-            if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
-            }
-            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
-            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+            MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(entry, filePath, preferences, taskExecutor);
             dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);
             });
         });
-    }
-
-    private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
-        return () -> {
-            try {
-                ParserResult parserResult = importer.importDatabase(filePath);
-                if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
-                    return null;
-                }
-                return parserResult.getDatabase().getEntries().getFirst();
-            } catch (IOException e) {
-                return null;
-            }
-        };
     }
 }

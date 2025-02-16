@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +22,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.JstorQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -66,10 +66,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
 
         if (identifier.contains("/")) {
             // if identifier links to a entry with a valid doi
-            return URI.create(start + identifier).toURL();
+            return URLUtil.create(start + identifier);
         }
         // else use default doi start.
-        return URI.create(start + "10.2307/" + identifier).toURL();
+        return URLUtil.create(start + "10.2307/" + identifier);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
 
         String url = elements.getFirst().attr("href");
-        return Optional.of(URI.create(url).toURL());
+        return Optional.of(URLUtil.create(url));
     }
 
     @Override

@@ -98,7 +98,7 @@ public class MetaDataSerializer {
                 continue;
             }
 
-            boolean isSaveActions = metaItem.getKey().equals(MetaData.SAVE_ACTIONS);
+            boolean isSaveActions = MetaData.SAVE_ACTIONS.equals(metaItem.getKey());
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, "", MetaData.SEPARATOR_STRING);
             boolean lastWasSaveActionsEnablement = false;

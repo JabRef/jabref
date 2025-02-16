@@ -15,7 +15,8 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" depthTest="DISABLE" prefHeight="600.0" prefWidth="750.0"
             xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.documentviewer.DocumentViewerView">
+            fx:controller="org.jabref.gui.documentviewer.DocumentViewerView"
+            id="documentViewerDialog">
     <content>
         <BorderPane fx:id="mainPane">
             <fx:define>

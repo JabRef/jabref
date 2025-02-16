@@ -30,7 +30,6 @@ import com.tobiasdiez.easybind.EasyBind;
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox enableWebSearch;
-    @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
     @FXML private CheckBox keepDownloadUrl;
@@ -73,7 +72,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         this.viewModel = new WebSearchTabViewModel(preferences, dialogService, refAiEnabled);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
-        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
         keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());

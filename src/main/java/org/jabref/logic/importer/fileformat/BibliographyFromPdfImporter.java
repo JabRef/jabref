@@ -19,6 +19,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
@@ -89,6 +90,11 @@ public class BibliographyFromPdfImporter extends Importer {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException("BibliopgraphyFromPdfImporter does not support importDatabase(BufferedReader reader)."
                 + "Instead use importDatabase(Path filePath).");
+    }
+
+    @Override
+    public String getId() {
+        return "pdfBibiliography";
     }
 
     @Override

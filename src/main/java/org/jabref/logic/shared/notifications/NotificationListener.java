@@ -36,9 +36,9 @@ public class NotificationListener implements Runnable {
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
-                        if (!notification.getName().equals(DBMSProcessor.PROCESSOR_ID)) {
-                            notification.getParameter();
+                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getName())) {
                             // Only process notifications that are not sent by this processor
+                            notification.getParameter();
                             dbmsSynchronizer.pullChanges();
                         }
                     }

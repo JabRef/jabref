@@ -16,8 +16,7 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -26,9 +25,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,18 +44,6 @@ public class ImporterTest {
     @MethodSource("instancesToTest")
     void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void importDatabaseWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @ParameterizedTest
@@ -88,14 +73,6 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
-        Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
-        when(importer.getName()).thenReturn("*Test-Importer");
-        assertEquals("testimporter", importer.getId());
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
     void getDescriptionDoesNotReturnNull(Importer format) {
         assertNotNull(format.getDescription());
     }
@@ -119,8 +96,7 @@ public class ImporterTest {
                 new ModsImporter(importFormatPreferences),
                 new MsBibImporter(),
                 new OvidImporter(),
-                new PdfContentImporter(),
-                new PdfXmpImporter(xmpPreferences),
+                new PdfMergeMetadataImporter(importFormatPreferences),
                 new RepecNepImporter(importFormatPreferences),
                 new RisImporter()
         );

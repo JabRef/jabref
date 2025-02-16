@@ -52,6 +52,7 @@ public class MainTableColumnModel {
 
         private final String name;
         private final String displayName;
+
         Type(String name) {
             this.name = name;
             this.displayName = name;
@@ -78,6 +79,14 @@ public class MainTableColumnModel {
             }
             LOGGER.warn("Column type '{}' is unknown.", text);
             return NORMALFIELD;
+        }
+
+        @Override
+        public String toString() {
+            return "Type{" +
+                   "name='" + name + '\'' +
+                   ", displayName='" + displayName + '\'' +
+                   '}';
         }
     }
 
@@ -218,6 +227,14 @@ public class MainTableColumnModel {
     @Override
     public int hashCode() {
         return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "MainTableColumnModel{" +
+               "qualifierProperty=" + qualifierProperty +
+               ", typeProperty=" + typeProperty +
+               '}';
     }
 
     /**

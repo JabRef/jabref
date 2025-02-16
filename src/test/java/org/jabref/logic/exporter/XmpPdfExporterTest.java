@@ -13,7 +13,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;

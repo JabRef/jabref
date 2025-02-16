@@ -129,6 +129,11 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
+    public String getId() {
+        return "bibtex";
+    }
+
+    @Override
     public String getName() {
         return "BibTeX";
     }
@@ -166,7 +171,7 @@ public class BibtexImporter extends Importer {
                 } else if (line.startsWith(SaveConfiguration.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
-                    Integer atSymbolIndex = line.indexOf('@');
+                    int atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
                         encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length(), atSymbolIndex);

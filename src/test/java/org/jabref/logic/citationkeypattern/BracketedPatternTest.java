@@ -68,7 +68,8 @@ class BracketedPatternTest {
                 Arguments.of("AachenBerlinChemnitzDüsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEssen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -78,6 +79,25 @@ class BracketedPatternTest {
     }
 
     static Stream<Arguments> authorsAlpha() {
+        return Stream.of(
+                Arguments.of("A+", "Alexander Artemenko and others"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authorsAlpha(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    }
+
+    static Stream<Arguments> authorsAlphaLNI() {
         return Stream.of(
                 Arguments.of("Ar", "Alexander Artemenko and others"),
                 Arguments.of("Aa", "Aachen and others"),
@@ -104,8 +124,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authorsAlpha(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    void authorsAlphaLNI(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlphaLNI(list));
     }
 
     /**
@@ -128,7 +148,8 @@ class BracketedPatternTest {
                 Arguments.of("AacheBCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AacheBCD+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AacheBCDE", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -152,7 +173,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -176,7 +198,8 @@ class BracketedPatternTest {
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -201,7 +224,8 @@ class BracketedPatternTest {
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -226,7 +250,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -250,7 +275,8 @@ class BracketedPatternTest {
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -274,7 +300,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -298,7 +325,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -321,7 +349,8 @@ class BracketedPatternTest {
             "'New', '[auth3]', 'Isaac Newton'",
             "'New', '[auth3_1]', 'Isaac Newton'",
             "'Newton', '[authshort]', 'Isaac Newton'",
-            "'Ne', '[authorsAlpha]', 'Isaac Newton'",
+            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Ne', '[authorsAlphaLNI]', 'Isaac Newton'",
             "'Newton', '[authorLast]', 'Isaac Newton'",
             "'I', '[authorLastForeIni]', 'Isaac Newton'",
 
@@ -582,6 +611,75 @@ class BracketedPatternTest {
     void expandBracketsDoesNotTruncateWithoutAnArgumentToTruncateModifier() {
         assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
+    }
+
+    /**
+     * Test the [:camel] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'CamelTitleFormatter', 'Camel Title Formatter'",
+            "'CamelTitleFormatter', 'CAMEL TITLE FORMATTER'",
+            "'CamelTitleFormatter', 'camel title formatter'",
+            "'CamelTitleFormatter', 'cAMEL tITLE fORMATTER'",
+            "'C', 'c'"
+    })
+
+    void expandBracketsCamelTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:camel]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:veryshorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very', 'A very short title'",
+            "'V', 'V'",
+            "'V', 'A v'"
+    })
+
+    void expandBracketsVeryShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:veryshorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:shorttitle] modifier
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'Very Short Title', 'A very short title'",
+            "'Short Title', 'Short title'",
+            "'Title', 'A title'",
+            "'Title', 'A Title'"
+    })
+
+    void expandBracketsShortTitleModifier(String expectedCitationKey, String title) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, title);
+        assertEquals(expectedCitationKey,
+                BracketedPattern.expandBrackets("[title:shorttitle]", ';', bibEntry, null));
+    }
+
+    /**
+     * Test the [:camelN] modifier
+     */
+    @Test
+    void expandBracketsCamelNModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, "Open Source Software And The Private Collective Innovation Model Issues");
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[title:camel1]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAnd",
+                BracketedPattern.expandBrackets("[title:camel4]", ';', bibEntry, null));
+        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
+                BracketedPattern.expandBrackets("[title:camel10]", ';', bibEntry, null));
     }
 
     /**

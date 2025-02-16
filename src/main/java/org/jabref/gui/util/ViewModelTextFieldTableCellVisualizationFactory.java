@@ -58,16 +58,16 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
              * @return The TextField containing the editable content of the TableCell
              */
             private Optional<TextField> lookupTextField() {
-                if (getGraphic() instanceof TextField) {
-                    return Optional.of((TextField) getGraphic());
+                if (getGraphic() instanceof TextField textField) {
+                    return Optional.of(textField);
                 } else {
                     // Could be an HBox with some graphic and a TextField if a graphic is specified for the TableCell
-                    if (getGraphic() instanceof HBox) {
-                        HBox hbox = (HBox) getGraphic();
-                        if ((hbox.getChildren().size() > 1) && hbox.getChildren().get(1) instanceof TextField) {
-                            return Optional.of((TextField) hbox.getChildren().get(1));
-                        }
+                    if (getGraphic() instanceof HBox hbox
+                        && hbox.getChildren().size() > 1
+                        && hbox.getChildren().get(1) instanceof TextField textField) {
+                        return Optional.of(textField);
                     }
+
                     return Optional.empty();
                 }
             }

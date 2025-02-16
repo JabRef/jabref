@@ -28,6 +28,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 public class BiblioscapeImporter extends Importer {
 
     @Override
+    public String getId() {
+        return "biblioscape";
+    }
+
+    @Override
     public String getName() {
         return "Biblioscape";
     }

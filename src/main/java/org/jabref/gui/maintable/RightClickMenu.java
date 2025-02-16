@@ -1,7 +1,10 @@
 package org.jabref.gui.maintable;
 
+import java.util.Optional;
+
 import javax.swing.undo.UndoManager;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -14,8 +17,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
+import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -31,7 +36,11 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 
@@ -49,7 +58,8 @@ public class RightClickMenu {
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
-                                     BibEntryTypesManager entryTypesManager) {
+                                     BibEntryTypesManager entryTypesManager,
+                                     ImportHandler importHandler) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -61,6 +71,7 @@ public class RightClickMenu {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
+                createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
@@ -101,6 +112,55 @@ public class RightClickMenu {
         });
 
         return contextMenu;
+    }
+
+    private static Menu createCopyToMenu(ActionFactory factory,
+                                         DialogService dialogService,
+                                         StateManager stateManager,
+                                         GuiPreferences preferences,
+                                         LibraryTab libraryTab,
+                                         ImportHandler importHandler) {
+        Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
+
+        ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
+
+        BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
+
+        Optional<String> sourceDatabaseName = libraryTab
+                .getBibDatabaseContext().getDatabasePath().stream()
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), path).stream())
+                .findFirst();
+
+        if (!openDatabases.isEmpty()) {
+            openDatabases.forEach(bibDatabaseContext -> {
+                Optional<String> destinationPath = Optional.empty();
+                String destinationDatabaseName = "";
+
+                if (bibDatabaseContext.getDatabasePath().isPresent()) {
+                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
+                    if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
+                        return;
+                    }
+                    if (uniqueFilePathFragment.isPresent()) {
+                        destinationDatabaseName = uniqueFilePathFragment.get();
+                    }
+                } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+                    destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                } else {
+                    destinationDatabaseName = destinationPath.orElse(Localization.lang("untitled"));
+                }
+
+                copyToMenu.getItems().addAll(
+                        factory.createCustomMenuItem(
+                                StandardActions.COPY_TO,
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, bibDatabaseContext),
+                                destinationDatabaseName
+                        )
+                );
+            });
+        }
+
+        return copyToMenu;
     }
 
     private static Menu createCopySubMenu(ActionFactory factory,
