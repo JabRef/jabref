@@ -270,7 +270,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     void startImport() {
         viewModel.startImport();
 
-        // Uncheck selected files
+        // Already imported files should not be re-added at a second click on "Import". Therefore, all imported files are unchecked.
         unlinkedFilesList.getCheckModel().clearChecks();
     }
 
