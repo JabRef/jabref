@@ -9,7 +9,7 @@ For user documentation, see <https://docs.jabref.org/collaborative-work/sqldatab
 
 ## Involved classes
 
-- `org.jabref.logic.shared.listener.PostgresSQLNotificationListener`: handles and routes notifications from the PostgreSQL database to the `DBMSSynchronizer`.
+* `org.jabref.logic.shared.listener.PostgresSQLNotificationListener`: handles and routes notifications from the PostgreSQL database to the `DBMSSynchronizer`.
 
 ## Flow of calls
 

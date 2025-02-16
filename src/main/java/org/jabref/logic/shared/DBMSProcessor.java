@@ -149,6 +149,9 @@ public class DBMSProcessor {
 
         // TODO: Before a release, fix the names (and migrate data to the new names)
         //       Think of using Flyway or Liquibase instead of manual migration
+        //       Liquibase:
+        //         - https://contribute.liquibase.com/extensions-integrations/directory/integration-docs/gradle
+        //         - https://forum.liquibase.org/t/adding-liquibase-to-an-existing-project/6076
         // If changed, also adjust {@link org.jabref.logic.shared.TestManager.clearTables}
         connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS \"jabref-alpha\"");
         connection.createStatement().executeUpdate("SET search_path TO \"jabref-alpha\"");
@@ -527,7 +530,7 @@ public class DBMSProcessor {
     /**
      * Queries the database for shared entries. Optionally, they are filtered by the given list of sharedIds
      *
-     * @param sharedIds the list of Ids to filter. If list is empty, then no filter is applied
+     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
      */
     public List<BibEntry> getSharedEntries(List<Integer> sharedIDs) {
         Objects.requireNonNull(sharedIDs);
