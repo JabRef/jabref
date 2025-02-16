@@ -7,7 +7,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests"]
+    workflows: ["Tests", "Force Push Detection"]
     types:
       - completed
 
