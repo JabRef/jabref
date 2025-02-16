@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
+- We removed support for MySQL/MariaDB and Oracle.
 
 ## [6.0-alpha] – 2024-12-23
 
@@ -174,7 +175,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-- We removed support for MySQL/MariaDB and Oracle.
 - We removed support for automatically generating file links using the CLI (`--automaticallySetFileLinks`).
 
 ## [5.15] – 2024-07-10
