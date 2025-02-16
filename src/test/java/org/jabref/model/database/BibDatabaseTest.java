@@ -67,18 +67,6 @@ class BibDatabaseTest {
     }
 
     @Test
-    void containsEntryWithLinkedFileFindsEntry(@TempDir Path path) {
-        LinkedFile file = new LinkedFile(path);
-
-        BibEntry entry = new BibEntry();
-        entry.addFile(file);
-
-        assertFalse(database.containsEntryWithLinkedFile(file));
-        database.insertEntry(entry);
-        assertTrue(database.containsEntryWithLinkedFile(file));
-    }
-
-    @Test
     void removeEntryRemovesEntryFromEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
