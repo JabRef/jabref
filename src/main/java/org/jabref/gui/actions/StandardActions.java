@@ -10,6 +10,7 @@ import org.jabref.logic.l10n.Localization;
 
 public enum StandardActions implements Action {
 
+    COPY_TO(Localization.lang("Copy to")),
     COPY_MORE(Localization.lang("Copy") + "..."),
     COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
     COPY_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
@@ -141,6 +142,7 @@ public enum StandardActions implements Action {
     MERGE_ENTRIES(Localization.lang("Merge entries"), IconTheme.JabRefIcons.MERGE_ENTRIES, KeyBinding.MERGE_ENTRIES),
     RESOLVE_DUPLICATE_KEYS(Localization.lang("Resolve duplicate citation keys"), Localization.lang("Find and remove duplicate citation keys"), KeyBinding.RESOLVE_DUPLICATE_CITATION_KEYS),
     CHECK_INTEGRITY(Localization.lang("Check integrity"), KeyBinding.CHECK_INTEGRITY),
+    CHECK_CONSISTENCY(Localization.lang("Check consistency"), KeyBinding.CHECK_CONSISTENCY),
     FIND_UNLINKED_FILES(Localization.lang("Search for unlinked local files"), IconTheme.JabRefIcons.SEARCH, KeyBinding.FIND_UNLINKED_FILES),
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
     LOOKUP_DOC_IDENTIFIER(Localization.lang("Search document identifier online")),

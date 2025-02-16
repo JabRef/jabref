@@ -35,6 +35,11 @@ public class RisImporter extends Importer {
     private static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
     @Override
+    public String getId() {
+        return "ris";
+    }
+
+    @Override
     public String getName() {
         return "RIS";
     }
@@ -109,25 +114,17 @@ public class RisImporter extends Importer {
                     String tag = entry.substring(0, 2);
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
-                        if ("BOOK".equals(value)) {
-                            type = StandardEntryType.Book;
-                        } else if ("JOUR".equals(value) || "MGZN".equals(value)) {
-                            type = StandardEntryType.Article;
-                        } else if ("THES".equals(value)) {
-                            type = StandardEntryType.PhdThesis;
-                        } else if ("UNPB".equals(value)) {
-                            type = StandardEntryType.Unpublished;
-                        } else if ("RPRT".equals(value)) {
-                            type = StandardEntryType.TechReport;
-                        } else if ("CONF".equals(value)) {
-                            type = StandardEntryType.InProceedings;
-                        } else if ("CHAP".equals(value)) {
-                            type = StandardEntryType.InCollection;
-                        } else if ("PAT".equals(value)) {
-                            type = IEEETranEntryType.Patent;
-                        } else {
-                            type = StandardEntryType.Misc;
-                        }
+                        type = switch (value) {
+                            case "BOOK" -> StandardEntryType.Book;
+                            case "JOUR", "MGZN" -> StandardEntryType.Article;
+                            case "THES" -> StandardEntryType.PhdThesis;
+                            case "UNPB" -> StandardEntryType.Unpublished;
+                            case "RPRT" -> StandardEntryType.TechReport;
+                            case "CONF" -> StandardEntryType.InProceedings;
+                            case "CHAP" -> StandardEntryType.InCollection;
+                            case "PAT" -> IEEETranEntryType.Patent;
+                            default -> StandardEntryType.Misc;
+                        };
                     } else if ("T1".equals(tag) || "TI".equals(tag)) {
                         String oldVal = fields.get(StandardField.TITLE);
                         if (oldVal == null) {

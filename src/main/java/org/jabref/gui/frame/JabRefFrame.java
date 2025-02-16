@@ -12,6 +12,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
@@ -226,8 +227,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
-        sidePane.widthProperty().addListener(c -> updateSidePane());
-        sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
+        sidePane.widthProperty().addListener(_ -> updateSidePane());
+        sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
         setCenter(splitPane);
     }
@@ -249,7 +250,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public void updateDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
             splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (obs, old, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
+            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (_, _, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
         }
     }
 
@@ -380,7 +381,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
             stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
 
-            // Update search autocompleter with information for the correct database:
+            // Update search AutoCompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
             libraryTab.getMainTable().requestFocus();
@@ -391,6 +392,20 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
+
+        // Hide tab bar
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
+        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+    }
+
+    private void updateTabBarVisible() {
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
+            if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
+                tabbedPane.getStyleClass().add("hide-tab-bar");
+            }
+        } else {
+            tabbedPane.getStyleClass().remove("hide-tab-bar");
+        }
     }
 
     /* ************************************************************************
@@ -426,7 +441,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)} (Path)}
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -461,7 +476,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
-                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab::getBibDatabaseContext)),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(dialogService, stateManager, preferences, tab::getBibDatabaseContext)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, preferences, dialogService)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
@@ -632,11 +647,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    private class OpenDatabaseFolder extends SimpleCommand {
+    public static class OpenDatabaseFolder extends SimpleCommand {
 
         private final Supplier<BibDatabaseContext> databaseContext;
+        private final DialogService dialogService;
+        private final GuiPreferences preferences;
 
-        public OpenDatabaseFolder(Supplier<BibDatabaseContext> databaseContext) {
+        public OpenDatabaseFolder(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, Supplier<BibDatabaseContext> databaseContext) {
+            this.dialogService = dialogService;
+            this.preferences = preferences;
             this.databaseContext = databaseContext;
             this.executable.bind(needsSavedLocalDatabase(stateManager));
         }

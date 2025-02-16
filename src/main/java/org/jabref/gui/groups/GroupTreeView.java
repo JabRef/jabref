@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -71,7 +69,6 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
@@ -108,8 +105,7 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService
-    ) {
+                         AiService aiService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -117,13 +113,13 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
 
         createNodes();
-        this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
         initialize();
     }
 
     private void createNodes() {
         searchField = SearchTextField.create(preferences.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
+        searchField.setId("groupFilterBar");
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -151,7 +147,6 @@ public class GroupTreeView extends BorderPane {
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setId("addNewGroup");
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));

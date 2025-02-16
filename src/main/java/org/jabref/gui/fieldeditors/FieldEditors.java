@@ -10,6 +10,7 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
+import org.jabref.gui.fieldeditors.optioneditors.LanguageEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.MonthEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.OptionEditor;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.CustomFieldEditorViewModel;
@@ -85,7 +86,10 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
+            return new OptionEditor<>(new
+                    MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
+        } else if (fieldProperties.contains(FieldProperty.LANGUAGE)) {
+            return new OptionEditor<>(new LanguageEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
         } else if (field == StandardField.GENDER) {
             return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {

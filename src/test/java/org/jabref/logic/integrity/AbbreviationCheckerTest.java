@@ -44,7 +44,7 @@ class AbbreviationCheckerTest {
 
     @Test
     void checkEntryDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
-        entry.setField(StandardField.BOOKTITLE, "IEEE Software");
+        entry.setField(StandardField.BOOKTITLE, "Non-Abbreviated-Title");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
