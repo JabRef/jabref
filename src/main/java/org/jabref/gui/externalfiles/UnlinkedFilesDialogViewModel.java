@@ -7,7 +7,6 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -43,7 +42,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -146,21 +144,18 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        List<Path> fileList = new ArrayList<>(checkedFileListProperty
+        List<Path> fileList = checkedFileListProperty
                 .stream()
                 .map(TreeItem::getValue)
                 .map(FileNodeViewModel::getPath)
                 .filter(Files::isRegularFile)
-                .toList());
+                .toList();
 
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked for import");
             return;
         }
         resultList.clear();
-
-        // Removes duplicate files before importing
-        fileList.removeIf(path -> bibDatabase.getDatabase().containsEntryWithLinkedFile(new LinkedFile(path)));
 
         importFilesBackgroundTask = importHandler
                 .importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)

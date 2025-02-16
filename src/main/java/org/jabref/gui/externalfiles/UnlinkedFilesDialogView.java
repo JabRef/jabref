@@ -269,6 +269,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void startImport() {
         viewModel.startImport();
+
+        // Uncheck selected files
+        unlinkedFilesList.getCheckModel().clearChecks();
     }
 
     @FXML
