@@ -4,11 +4,14 @@ import java.util.Collection;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
@@ -27,6 +30,8 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> entryTypeColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
+    @FXML private TextField searchField;
+    @FXML private ListView<String> suggestionList;
 
     @Inject private CliPreferences preferences;
 
@@ -58,10 +63,15 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
         this.setOnSort(event ->
                 viewModel.patternListProperty().sort(CitationKeyPatternsPanelViewModel.defaultOnTopComparator));
 
+        ObservableList<String> fullData = FXCollections.observableArrayList(
+                "[auth]", "[authFirstFull]", "[authForeIni]", "[auth.etal]", "[authEtAl]",
+                "[auth.auth.ea]", "[authors]", "[authorsN]", "[authIniN]", "[authN]", "[authN_M]",
+                "[authorIni]", "[authshort]", "[authorsAlpha]");
+
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
-        patternColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        patternColumn.setCellFactory(column -> new CitationKeyPatternSuggestionCell(fullData));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<CitationKeyPatternsPanelItemModel, String> event) ->
