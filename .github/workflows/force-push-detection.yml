@@ -10,12 +10,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Ensure full history for proper merge-base checks
 
       - name: Check force push
         id: force_push_check
         run: |
-          if git rev-list --ancestry-path ${{ github.event.before }}..${{ github.event.after }} | grep -q "${{ github.event.before }}"; then
+          MERGE_BASE=$(git merge-base ${{ github.event.before }} ${{ github.event.after }})
+          if [[ "$MERGE_BASE" == "${{ github.event.before }}" ]]; then
             echo "✅ Regular commit"
           else
             echo "❌ Force push detected"
