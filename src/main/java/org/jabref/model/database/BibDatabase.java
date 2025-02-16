@@ -27,6 +27,7 @@ import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -116,6 +117,17 @@ public class BibDatabase {
 
     public ObservableList<BibEntry> getEntries() {
         return FXCollections.unmodifiableObservableList(entries);
+    }
+
+    /**
+     * Returns whether an entry with the given linkedFile exists
+     */
+    public boolean containsEntryWithLinkedFile(LinkedFile linkedFile) {
+        return entries.stream().anyMatch(
+                entry -> entry.getFiles().stream().anyMatch(
+                        file -> file.getLink().equals(linkedFile.getLink())
+                )
+        );
     }
 
     /**

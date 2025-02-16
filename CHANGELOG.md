@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue in the LibreOffice integration where the formatting of text (e.g. superscript) was lost when using certain numeric CSL styles. [melting-pot#772](https://github.com/JabRef/jabref-issue-melting-pot/issues/772)
 - We fixed an issue where CSL style citations with citation keys having special characters (such as hyphens or colons) would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
 - We fixed an issue where the `[authorsAlpha]` pattern in Citation key generator would not behave as per the user documentation. [#12312](https://github.com/JabRef/jabref/issues/12312)
+- We fixed an issue where Import at "Find Unlinked Files" would import files already linked to an entry. [#12274](https://github.com/JabRef/jabref/issues/12274)
 
 ### Removed
 

@@ -1,5 +1,6 @@
 package org.jabref.model.database;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -19,6 +21,7 @@ import org.jabref.model.event.EventListenerTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -61,6 +64,18 @@ class BibDatabaseTest {
         BibEntry entry1 = new BibEntry();
         entry1.setId(entry0.getId());
         database.insertEntry(entry1);
+    }
+
+    @Test
+    void containsEntryWithLinkedFileFindsEntry(@TempDir Path path) {
+        LinkedFile file = new LinkedFile(path);
+
+        BibEntry entry = new BibEntry();
+        entry.addFile(file);
+
+        assertFalse(database.containsEntryWithLinkedFile(file));
+        database.insertEntry(entry);
+        assertTrue(database.containsEntryWithLinkedFile(file));
     }
 
     @Test
