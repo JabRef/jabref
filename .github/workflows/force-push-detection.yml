@@ -1,7 +1,9 @@
 name: Force Push Detection
 
 on:
-  push
+  pull_request:
+    types:
+      - synchronize
 
 jobs:
   detect-force-push:
@@ -10,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensure full history for proper merge-base checks
+          fetch-depth: 0
 
       - name: Check force push
         id: force_push_check
