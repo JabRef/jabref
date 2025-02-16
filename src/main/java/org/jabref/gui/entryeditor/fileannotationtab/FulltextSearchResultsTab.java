@@ -50,7 +50,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
-    private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
@@ -60,13 +59,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,
                                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
         this.searchQueryProperty = searchQueryProperty;
@@ -135,6 +132,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setStyle("-fx-font-weight: bold;");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);

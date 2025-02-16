@@ -20,6 +20,7 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -52,6 +53,7 @@ import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -66,7 +68,6 @@ public class SourceTab extends EntryEditorTab {
     private static final String TEXT_STYLE = "text";
     private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
-    private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
@@ -76,22 +77,21 @@ public class SourceTab extends EntryEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final StateManager stateManager;
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext,
-                     CountingUndoManager undoManager,
+    public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
+                     StateManager stateManager,
                      OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        this.mode = bibDatabaseContext.getMode();
-        this.setText(Localization.lang("%0 source", mode.getFormattedName()));
-        this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+        this.stateManager = stateManager;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
@@ -101,6 +101,18 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
         this.searchQueryProperty = searchQueryProperty;
+
+        EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
+            if (library.isEmpty()) {
+                this.setText(Localization.lang("Source"));
+                this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
+            } else {
+                BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                                   .orElse(BibDatabaseMode.BIBLATEX);
+                this.setText(Localization.lang("%0 source", mode.getFormattedName()));
+                this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+            }
+        });
         searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
     }
 
@@ -240,6 +252,9 @@ public class SourceTab extends EntryEditorTab {
             if (codeArea == null) {
                 setupSourceEditor();
             }
+
+            BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                               .orElse(BibDatabaseMode.BIBLATEX);
 
             codeArea.clear();
             try {

@@ -34,6 +34,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import jakarta.annotation.Nullable;
+
 /// Displays the entry preview
 ///
 /// The instance is re-used at each tab. The code ensures that the panel is moved across tabs when the user switches the tab.
@@ -146,7 +148,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
     }
 
-    public void setDatabase(BibDatabaseContext databaseContext) {
+    public void setDatabase(@Nullable BibDatabaseContext databaseContext) {
         previewView.setDatabaseContext(databaseContext);
     }
 

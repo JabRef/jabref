@@ -63,12 +63,10 @@ import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -149,8 +147,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
         EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
             if (tab.isPresent()) {
-                this.previewPanel.setDatabase(tab.get().getBibDatabaseContext());
-
                 tabbed.getTabs().clear();
 
                 this.allPossibleTabs.clear();
@@ -158,7 +154,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
                 adaptVisibleTabs();
             } else {
-                this.previewPanel.setDatabase(null);
                 this.allPossibleTabs.clear();
             }
         });
@@ -303,34 +298,30 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     private List<EntryEditorTab> createTabs(LibraryTab libraryTab) {
         List<EntryEditorTab> tabs = new LinkedList<>();
-        BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
-        DirectoryMonitorManager directoryMonitorManager = libraryTab.getDirectoryMonitorManager();
 
-        tabs.add(new PreviewTab(databaseContext, preferences, previewPanel));
+        tabs.add(new PreviewTab(preferences, stateManager, previewPanel));
 
         // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
-        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
-        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
-        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, previewPanel));
+        tabs.add(new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
+        tabs.add(new ImportantOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
+        tabs.add(new DetailOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
+        tabs.add(new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
+        tabs.add(new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferences, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, journalAbbreviationRepository, previewPanel));
+        tabs.add(new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, previewPanel));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel));
         }
 
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
-        tabs.add(new CitationRelationsTab(dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferences, libraryTab, taskExecutor, bibEntryTypesManager));
-        tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferences, dialogService, taskExecutor));
+        tabs.add(new CitationRelationsTab(dialogService, undoManager, stateManager, fileMonitor, preferences, taskExecutor, bibEntryTypesManager));
+        tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
         sourceTab = new SourceTab(
-                databaseContext,
                 undoManager,
                 preferences.getFieldPreferences(),
                 preferences.getImportFormatPreferences(),
@@ -338,12 +329,13 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 bibEntryTypesManager,
                 keyBindingRepository,
+                stateManager,
                 libraryTab.searchQueryProperty());
         tabs.add(sourceTab);
-        tabs.add(new LatexCitationsTab(databaseContext, preferences, dialogService, directoryMonitorManager));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, databaseContext, taskExecutor, libraryTab.searchQueryProperty()));
-        tabs.add(new AiSummaryTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferences));
-        tabs.add(new AiChatTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferences, taskExecutor));
+        tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager));
+        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
+        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, preferences));
+        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, taskExecutor));
 
         return tabs;
     }
