@@ -146,7 +146,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                        .collect(Collectors.joining("\n"));
     }
 
-
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
             event.acceptTransferModes(TransferMode.MOVE);
