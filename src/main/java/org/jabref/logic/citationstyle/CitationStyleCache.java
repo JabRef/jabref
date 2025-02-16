@@ -25,7 +25,7 @@ public class CitationStyleCache {
     private final LoadingCache<BibEntry, String> citationStyleCache;
 
     public CitationStyleCache(BibDatabaseContext databaseContext) {
-        citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
+        citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
             @Override
             public String load(BibEntry entry) {
                 if (citationStyle != null) {
