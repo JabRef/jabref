@@ -52,7 +52,6 @@ jobs:
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
-
   openrewrite:
     name: OpenRewrite
     runs-on: ubuntu-latest
@@ -371,6 +370,23 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
+
+  no-force-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check force push
+        id: force_push_check
+        run: |
+          if git cat-file -e ${{ github.event.before }} 2>/dev/null; then
+            echo "✅ Regular push detected."
+          else
+            echo "❌ Force push detected"
+          fi
 
   other_than_main:
     name: Source branch is other than "main"
