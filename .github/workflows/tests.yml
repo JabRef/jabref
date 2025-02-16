@@ -386,6 +386,7 @@ jobs:
             echo "✅ Regular push detected."
           else
             echo "❌ Force push detected"
+            exit 1
           fi
 
   other_than_main:
