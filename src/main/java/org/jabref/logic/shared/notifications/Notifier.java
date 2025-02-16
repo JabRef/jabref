@@ -18,5 +18,11 @@ public class Notifier {
         this.pgConnection = pgConnection;
     }
 
-    public void notifyAboutChangedField(FieldChangedEvent event) {}
+    public void notifyAboutChangedField(FieldChangedEvent event) {
+        // FIXME: BibEntry bibEntry = event.getBibEntry();
+
+        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
+        // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
+        // connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
+    }
 }

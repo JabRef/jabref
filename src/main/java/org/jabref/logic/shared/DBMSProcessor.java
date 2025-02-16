@@ -54,7 +54,7 @@ public class DBMSProcessor {
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
 
-    // TODO: We need to migrate data - or ask the user to recreate
+    // TODO: We need to migrate data - or ask the user to recreate, #Liquibase
     private int CURRENT_VERSION_DB_STRUCT = 2;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {

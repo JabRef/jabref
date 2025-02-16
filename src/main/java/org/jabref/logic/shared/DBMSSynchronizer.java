@@ -58,6 +58,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
 
+    @SuppressWarnings("unused")
     // will be required later for save actions
     private final FieldPreferences fieldPreferences;
 
@@ -106,16 +107,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (event.isFiltered() || !isEventSourceAccepted(event) || !checkCurrentConnection()) {
+        if (event.isFiltered() || !isEventSourceAccepted(event)) {
             return;
         }
 
         notifier.notifyAboutChangedField(event);
-
-        BibEntry bibEntry = event.getBibEntry();
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
-        // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        // connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
     }
 
     /**
