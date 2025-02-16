@@ -74,7 +74,8 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
-        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
+        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode ->
+            rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
             groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null && oldValue != null) {
                     transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);

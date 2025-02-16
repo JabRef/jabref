@@ -389,7 +389,9 @@ public class BibFieldsIndexer {
     }
 
     private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
-        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
+        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream()
+            .distinct()
+            .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
     }
 
     private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {

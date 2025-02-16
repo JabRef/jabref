@@ -197,8 +197,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton,
-                refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, true));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(
+            entry,
+            citingListView,
+            abortCitingButton,
+            refreshCitingButton,
+            CitationFetcher.SearchType.CITES,
+            importCitingButton,
+            citingProgress,
+            true));
 
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
                 refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, true));

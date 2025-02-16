@@ -64,7 +64,8 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
      */
     private void redownloadMissing(BibDatabaseContext databaseContext) {
         LOGGER.info("Redownloading missing files");
-        databaseContext.getEntries().forEach(entry -> entry.getFiles().forEach(linkedFile -> {
+        databaseContext.getEntries().forEach(entry ->
+            entry.getFiles().forEach(linkedFile -> {
             if (linkedFile.isOnlineLink() || linkedFile.getSourceUrl().isEmpty()) {
                 return;
             }

@@ -62,8 +62,9 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
                     return Optional.of(textField);
                 } else {
                     // Could be an HBox with some graphic and a TextField if a graphic is specified for the TableCell
-                    if (getGraphic() instanceof HBox hbox && (hbox.getChildren().size() > 1)
-                            && hbox.getChildren().get(1) instanceof TextField textField) {
+                    if (getGraphic() instanceof HBox hbox
+                        && hbox.getChildren().size() > 1
+                        && hbox.getChildren().get(1) instanceof TextField textField) {
                         return Optional.of(textField);
                     }
 
