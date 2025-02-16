@@ -1,0 +1,18 @@
+name: Force Push Detection
+
+on:
+  push
+
+jobs:
+  detect-force-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if force push
+        id: force_push_check
+        run: |
+          if git rev-list --ancestry-path ${{ github.event.before }}..${{ github.event.after }} | grep -q "${{ github.event.before }}"; then
+            echo "✅ Regular commit"
+          else
+            echo "❌ Force push detected"
+            exit 1
+          fi
