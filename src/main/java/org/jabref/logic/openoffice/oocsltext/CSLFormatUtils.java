@@ -100,7 +100,7 @@ public class CSLFormatUtils {
 
             if (author.isPresent() && year.isPresent()) {
                 AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = BracketedPattern.authorsAlpha(authorList);
+                String alphaKey = BracketedPattern.authorsAlphaLNI(authorList);
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?
@@ -118,6 +118,17 @@ public class CSLFormatUtils {
         }
         citation.append("]");
         return citation.toString();
+    }
+
+    public static String generateAlphanumericInTextCitation(BibEntry entry, BibDatabaseContext bibDatabaseContext) {
+        String inTextCitation = generateAlphanumericCitation(List.of(entry), bibDatabaseContext);
+
+        String authorName = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                        .map(AuthorList::parse)
+                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
+                                        .orElse("");
+
+        return authorName + " " + inTextCitation;
     }
 
     /**
@@ -169,5 +180,15 @@ public class CSLFormatUtils {
             return matcher.group(2) + " " + matcher.group(1) + matcher.group(3);
         }
         return formattedCitation;
+    }
+
+    /**
+     * Generates Author Prefix for an in-text citation
+     */
+    public static String generateAuthorPrefix(BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+        return currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                           .map(AuthorList::parse)
+                           .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
+                           .orElse("");
     }
 }

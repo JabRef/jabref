@@ -44,7 +44,7 @@ public class BibTeXConverter {
 
         // Value must be converted
         if (fieldValues.containsKey(StandardField.LANGUAGE)) {
-            int lcid = Integer.valueOf(fieldValues.get(StandardField.LANGUAGE));
+            int lcid = Integer.parseInt(fieldValues.get(StandardField.LANGUAGE));
             fieldValues.put(StandardField.LANGUAGE, MSBibMapping.getLanguage(lcid));
         }
 

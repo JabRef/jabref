@@ -561,7 +561,7 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
         }
 
-        defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
+        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
         defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
@@ -1931,9 +1931,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDouble(SEARCH_WINDOW_WIDTH),
                 getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) c -> {
-            putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT));
-        });
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) c ->
+            putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
         EasyBind.listen(searchPreferences.keepSearchStingProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));

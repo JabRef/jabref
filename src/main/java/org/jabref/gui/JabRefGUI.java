@@ -89,12 +89,10 @@ public class JabRefGUI extends Application {
     public void start(Stage stage) {
         this.mainStage = stage;
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> {
-            UiTaskExecutor.runInJavaFXThread(() -> {
-                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-                dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-            });
-        });
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
+            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+        }));
 
         initialize();
 
