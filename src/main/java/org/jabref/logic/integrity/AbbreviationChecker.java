@@ -29,5 +29,4 @@ public class AbbreviationChecker implements EntryChecker {
                  .ifPresent(val -> messages.add(new IntegrityMessage(Localization.lang("abbreviation detected"), entry, field)));
         }
         return messages;
-    }
-}
+    }}

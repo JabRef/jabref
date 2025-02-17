@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -23,20 +24,36 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.setShowDelay(Duration.seconds(1));
+
+        this.setShowDelay(Duration.millis(100));
+        this.setHideDelay(Duration.millis(500));
+
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+
+        tooltipContent.setStyle("-fx-padding: 10; -fx-background-color: white; -fx-border-color: gray; -fx-border-radius: 5;");
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
         fieldValueLabel.setText(fieldValue + "\n");
+
+        fieldValueLabel.setWrapText(true);
+        fieldValueLabel.setMaxWidth(400);
+
+        tooltipContent.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        tooltipContent.setMaxWidth(700);
+        tooltipContent.setMaxHeight(200);
+
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
+
             this.setGraphic(tooltipContent);
         } else {
             this.setGraphic(fieldValueLabel);
         }
+
         return this;
     }
 }
+
