@@ -695,6 +695,38 @@ class SearchQuerySQLConversionTest {
                             )
                         )
                         SELECT * FROM cte0 GROUP BY entryid"""
+                ),
+
+                Arguments.of(
+                        "file = \"\"",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entryid
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE main_table.entryid NOT IN (
+                                SELECT inner_table.entryid
+                                FROM bib_fields."tableName" AS inner_table
+                                WHERE (
+                                    (inner_table.field_name = 'file') AND ((inner_table.field_value_literal ILIKE ('%%')) OR (inner_table.field_value_transformed ILIKE ('%%')))
+                                )
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entryid"""
+                ),
+
+                Arguments.of(
+                        "file != \"\"",
+                        """
+                        WITH
+                        cte0 AS (
+                            SELECT main_table.entryid
+                            FROM bib_fields."tableName" AS main_table
+                            WHERE (
+                                (main_table.field_name = 'file') AND ((main_table.field_value_literal ILIKE ('%%')) OR (main_table.field_value_transformed ILIKE ('%%')))
+                            )
+                        )
+                        SELECT * FROM cte0 GROUP BY entryid"""
                 )
         );
     }

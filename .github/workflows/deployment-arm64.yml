@@ -245,7 +245,7 @@ jobs:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Download from GitHub workflow artifacts store (macOS)
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v4
         with:
           name: JabRef-macOS-arm-tbn
           path: build/distribution/

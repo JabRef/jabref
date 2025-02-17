@@ -285,8 +285,10 @@ public class BibFieldsIndexer {
     }
 
     public void updateEntry(BibEntry entry, Field field) {
-        removeField(entry, field);
-        insertField(entry, field);
+        synchronized (entry.getId()) {
+            removeField(entry, field);
+            insertField(entry, field);
+        }
     }
 
     private void insertField(BibEntry entry, Field field) {

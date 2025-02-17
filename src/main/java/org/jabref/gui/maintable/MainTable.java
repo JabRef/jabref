@@ -185,7 +185,28 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         // Enable sorting
-        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
+        // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
+        // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
+        // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
+        this.setSortPolicy(_ -> true);
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(
+                this.comparatorProperty().map(comparator -> {
+                    if (comparator == null) {
+                        return null;
+                    }
+
+                    return (entry1, entry2) -> {
+                        int result = comparator.compare(entry1, entry2);
+                        if (result != 0) {
+                            return result;
+                        }
+                        // If the entries are equal according to the comparator, compare them by their index in the database.
+                        // The comparison should ideally be based on the database index, but retrieving the index takes log(n). See {@link BibDatabase#indexOf}.
+                        // Using the entry ID is also valid since IDs are monotonically increasing.
+                        return entry1.getEntry().getId().compareTo(entry2.getEntry().getId());
+                    };
+                })
+        );
 
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
