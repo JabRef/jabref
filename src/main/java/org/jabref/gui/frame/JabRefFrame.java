@@ -233,20 +233,26 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        WelcomeTab welcomeTab = new WelcomeTab(
-                this,
-                preferences,
-                aiService,
-                dialogService,
-                stateManager,
-                fileUpdateMonitor,
-                entryTypesManager,
-                undoManager,
-                clipBoardManager,
-                taskExecutor,
-                fileHistory
-        );
-        tabbedPane.getTabs().add(welcomeTab);
+        boolean hasPreviousFiles = !stateManager.getOpenDatabases().isEmpty();
+
+        if (!hasPreviousFiles) {
+            WelcomeTab welcomeTab = new WelcomeTab(
+                    this,
+                    preferences,
+                    aiService,
+                    dialogService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    fileHistory
+            );
+
+            tabbedPane.getTabs().add(welcomeTab);
+        }
+
         splitPane.getItems().add(tabbedPane);
         setCenter(splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
@@ -466,6 +472,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
         tabbedPane.getSelectionModel().select(libraryTab);
+    }
+
+    public void showWelcomeTab() {
+        for (Tab tab : tabbedPane.getTabs()) {
+            if (!(tab instanceof LibraryTab)) {
+                tabbedPane.getSelectionModel().select(tab);
+                return;
+            }
+
+            WelcomeTab welcomeTab = new WelcomeTab(
+                    this,
+                    preferences,
+                    aiService,
+                    dialogService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    fileHistory
+            );
+            tabbedPane.getTabs().add(welcomeTab);
+            tabbedPane.getSelectionModel().select(welcomeTab);
+        }
     }
 
     /**

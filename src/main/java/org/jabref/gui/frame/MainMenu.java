@@ -12,6 +12,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
@@ -364,6 +365,16 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService, preferences.getExternalApplicationsPreferences()))
                 ),
+
+                factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {
+                    @Override
+                    public void execute() {
+                        frame.showWelcomeTab();
+                    }
+                }),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
 
