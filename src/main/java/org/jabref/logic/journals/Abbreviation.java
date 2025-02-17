@@ -1,11 +1,18 @@
+
 package org.jabref.logic.journals;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1;
+
+    private static final LevenshteinDistance LEVENSHTEIN = LevenshteinDistance.getDefaultInstance();
 
     private transient String name;
     private final String abbreviation;
@@ -56,11 +63,31 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         return this.dotlessAbbreviation;
     }
 
+    public boolean isSimilar(String otherName) {
+        String normalizedThis = normalize(this.name);
+        String normalizedOther = normalize(otherName);
+
+        int distance = LEVENSHTEIN.apply(normalizedThis, normalizedOther);
+        return distance <= 2;
+    }
+
+    private static String normalize(String input) {
+        return input.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
+    }
+
     @Override
     public int compareTo(Abbreviation toCompare) {
+        if (isSimilar(toCompare.getName())) {
+            return 0;
+        }
+
         int nameComparison = getName().compareTo(toCompare.getName());
         if (nameComparison != 0) {
             return nameComparison;
+        }
+
+        if (isSimilar(toCompare.getAbbreviation())) {
+            return 0;
         }
 
         int abbreviationComparison = getAbbreviation().compareTo(toCompare.getAbbreviation());
@@ -103,7 +130,9 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
             return false;
         }
         Abbreviation that = (Abbreviation) o;
-        return getName().equals(that.getName()) && getAbbreviation().equals(that.getAbbreviation()) && getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation());
+        return Objects.equals(normalize(name), normalize(that.name)) &&
+                Objects.equals(normalize(abbreviation), normalize(that.abbreviation)) &&
+                Objects.equals(normalize(shortestUniqueAbbreviation), normalize(that.shortestUniqueAbbreviation));
     }
 
     @Override
