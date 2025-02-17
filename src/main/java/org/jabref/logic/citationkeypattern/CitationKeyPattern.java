@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record CitationKeyPattern(String stringRepresentation) {
-    public static final CitationKeyPattern NULL_CITATION_KEY_PATTERN = new CitationKeyPattern("");
+    private static final CitationKeyPattern NULL_CITATION_KEY_PATTERN = new CitationKeyPattern("");
 
     // region - Author-related field markers
     private static final CitationKeyPattern AUTHOR_YEAR = new CitationKeyPattern("[auth]");
