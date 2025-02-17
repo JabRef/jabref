@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public record CitationKeyPattern(String stringRepresentation) {
     public static final CitationKeyPattern NULL_CITATION_KEY_PATTERN = new CitationKeyPattern("");
 
-    // region - Citation key patterns
+    // region - Author-related field markers
     public static final CitationKeyPattern AUTHOR_YEAR = new CitationKeyPattern("[auth]");
     public static final CitationKeyPattern AUTHOR_FIRST_FULL = new CitationKeyPattern("[authFirstFull]");
     public static final CitationKeyPattern AUTHOR_FORE_INI = new CitationKeyPattern("[authForeIni]");
