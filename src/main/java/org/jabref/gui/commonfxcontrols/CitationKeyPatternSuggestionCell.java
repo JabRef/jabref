@@ -113,7 +113,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             suggestionsList.getItems().addAll(menuItems);
 
             if (!menuItems.isEmpty()) {
-                menuItems.get(0).getContent().requestFocus();
+                menuItems.getFirst().getContent().requestFocus();
             }
         }
     }
