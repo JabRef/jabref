@@ -1,14 +1,14 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.model.citation.semanticscholar;
 
 import java.util.List;
 
 /**
  * Used for GSON
  */
-public class CitationsResponse {
+public class ReferencesResponse {
     private int offset;
     private int next;
-    private List<CitationDataItem> data;
+    private List<ReferenceDataItem> data;
 
     public int getOffset() {
         return offset;
@@ -26,11 +26,11 @@ public class CitationsResponse {
         this.next = next;
     }
 
-    public List<CitationDataItem> getData() {
+    public List<ReferenceDataItem> getData() {
         return data;
     }
 
-    public void setData(List<CitationDataItem> data) {
+    public void setData(List<ReferenceDataItem> data) {
         this.data = data;
     }
 }

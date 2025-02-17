@@ -9,8 +9,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
-import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -19,6 +17,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.CitationFetcher;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -42,9 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CitationsRelationsTabViewModelTest {
-    private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
-    private BibEntry testEntry;
 
     @Mock
     private GuiPreferences preferences;

@@ -173,6 +173,16 @@ public abstract class BackgroundTask<V> {
     }
 
     /**
+     * Curry a consumer to on an on running runnable and invoke it after the task is started.
+     *
+     * @param onRunningConsumer should not be null
+     * @see BackgroundTask#consumeOnRunning(Consumer)
+     */
+    public BackgroundTask<V> consumeOnRunning(Consumer<BackgroundTask<V>> onRunningConsumer) {
+        return this.onRunning(() -> onRunningConsumer.accept(this));
+    }
+
+    /**
      * Sets the {@link Consumer} that is invoked after the task is successfully finished.
      * The consumer always runs on the JavaFX thread.
      */
