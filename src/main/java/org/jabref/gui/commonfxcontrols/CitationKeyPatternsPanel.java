@@ -7,16 +7,15 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryType;
@@ -30,8 +29,6 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> entryTypeColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
-    @FXML private TextField searchField;
-    @FXML private ListView<String> suggestionList;
 
     @Inject private CliPreferences preferences;
 
@@ -39,9 +36,15 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
 
     private long lastKeyPressTime;
     private String tableSearchTerm;
+    private final ObservableList<String> patterns;
 
     public CitationKeyPatternsPanel() {
         super();
+        this.patterns = FXCollections.observableArrayList(
+                CitationKeyPattern.getAllPatterns().stream()
+                                  .map(CitationKeyPattern::stringRepresentation)
+                                  .toList()
+        );
 
         ViewLoader.view(this)
                   .root(this)
@@ -63,15 +66,10 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
         this.setOnSort(event ->
                 viewModel.patternListProperty().sort(CitationKeyPatternsPanelViewModel.defaultOnTopComparator));
 
-        ObservableList<String> fullData = FXCollections.observableArrayList(
-                "[auth]", "[authFirstFull]", "[authForeIni]", "[auth.etal]", "[authEtAl]",
-                "[auth.auth.ea]", "[authors]", "[authorsN]", "[authIniN]", "[authN]", "[authN_M]",
-                "[authorIni]", "[authshort]", "[authorsAlpha]");
-
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
-        patternColumn.setCellFactory(column -> new CitationKeyPatternSuggestionCell(fullData));
+        patternColumn.setCellFactory(_ -> new CitationKeyPatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<CitationKeyPatternsPanelItemModel, String> event) ->

@@ -1,48 +1,20 @@
 package org.jabref.gui.commonfxcontrols;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.collections.FXCollections;
-import javafx.scene.control.ListView;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.stage.Popup;
 
 public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<CitationKeyPatternsPanelItemModel, String> {
-    private final TextField searchField = new TextField();
-    private final ListView<String> suggestionList = new ListView<>();
-    private final Popup popup = new Popup();
+    private final CitationKeyPatternSuggestoinTextField searchField;
 
-    private final List<String> fullData;
-
-    public CitationKeyPatternSuggestionCell(List<String> fullData) {
-        this.fullData = fullData;
-        popup.getContent().add(suggestionList);
-        popup.setAutoHide(true);
-
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            List<String> filtered = fullData.stream()
-                                            .filter(item -> item.toLowerCase().contains(newVal.toLowerCase()))
-                                            .collect(Collectors.toList());
-
-            suggestionList.setItems(FXCollections.observableArrayList(filtered));
-            if (!filtered.isEmpty()) {
-                popup.show(searchField, searchField.localToScreen(0, searchField.getHeight()).getX(),
-                        searchField.localToScreen(0, searchField.getHeight() * 2).getY());
-            } else {
-                popup.hide();
-            }
-        });
-
-        suggestionList.setOnMouseClicked(event -> {
-            String selected = suggestionList.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                searchField.setText(selected);
-                popup.hide();
-            }
-        });
-
+    public CitationKeyPatternSuggestionCell(List<String> citationKeyPatterns) {
+        this.searchField = new CitationKeyPatternSuggestoinTextField(citationKeyPatterns);
         searchField.setOnAction(event -> commitEdit(searchField.getText()));
     }
 
@@ -58,7 +30,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
-        popup.hide();
     }
 
     @Override
@@ -76,6 +47,74 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             setText(null);
         } else {
             setText(item);
+        }
+    }
+
+    static class CitationKeyPatternSuggestoinTextField extends TextField {
+        private final List<String> citationKeyPatterns;
+        private final ContextMenu suggestionsList;
+
+        public CitationKeyPatternSuggestoinTextField(List<String> citationKeyPatterns) {
+            this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
+            this.suggestionsList = new ContextMenu();
+
+            setListener();
+        }
+
+        private void setListener() {
+            textProperty().addListener((observable, oldValue, newValue) -> {
+                String enteredText = getText();
+                if (enteredText == null || enteredText.isEmpty()) {
+                    suggestionsList.hide();
+                } else {
+                    List<String> filteredEntries = citationKeyPatterns.stream()
+                                                                      .filter(e -> e.toLowerCase().contains(enteredText.toLowerCase()))
+                                                                      .collect(Collectors.toList());
+                    if (!filteredEntries.isEmpty()) {
+                        populatePopup(filteredEntries);
+                        if (!suggestionsList.isShowing() && getScene() != null) {
+                            double screenX = localToScreen(0, 0).getX();
+                            double screenY = localToScreen(0, 0).getY() + getHeight();
+                            suggestionsList.show(this, screenX, screenY);
+                        }
+                    } else {
+                        suggestionsList.hide();
+                    }
+                }
+            });
+
+            focusedProperty().addListener((observable, oldValue, newValue) -> {
+                suggestionsList.hide();
+            });
+        }
+
+        private void populatePopup(List<String> searchResult) {
+            List<CustomMenuItem> menuItems = new ArrayList<>();
+            int maxEntries = 10;
+            int count = Math.min(searchResult.size(), maxEntries);
+            for (int i = 0; i < count; i++) {
+                final String result = searchResult.get(i);
+                Label entryLabel = new Label(result);
+                entryLabel.setPrefWidth(getWidth());
+
+                CustomMenuItem item = new CustomMenuItem(entryLabel, true);
+                item.setHideOnClick(false);
+
+                menuItems.add(item);
+
+                item.setOnAction(actionEvent -> {
+                    setText(result);
+                    positionCaret(result.length());
+                    suggestionsList.hide();
+                });
+            }
+
+            suggestionsList.getItems().clear();
+            suggestionsList.getItems().addAll(menuItems);
+
+            if (!menuItems.isEmpty()) {
+                menuItems.get(0).getContent().requestFocus();
+            }
         }
     }
 }
