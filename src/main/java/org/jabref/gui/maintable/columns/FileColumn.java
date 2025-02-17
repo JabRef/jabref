@@ -138,9 +138,16 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     }
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
-        return linkedFiles.stream()
-                          .map(file -> file.getLink())
-                          .collect(Collectors.joining("\n"));
+        if (!linkedFiles.isEmpty()) {
+            StringBuilder tooltipText = new StringBuilder();
+
+            for (LinkedFile linkedFile : linkedFiles) {
+                tooltipText.append(linkedFile.getLink()).append("\n");
+            }
+
+            return Localization.lang("Open files: \n%0", tooltipText.toString());
+        }
+        return null;
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
