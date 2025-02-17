@@ -2420,3 +2420,11 @@ journalInfo .grid-cell-b {
 #styleSelectDialog .currentStyleNameLabel {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
+.tooltip-content {
+    -fx-padding: 10;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-border-color: gray;
+    -fx-border-radius: 5;
+}
+

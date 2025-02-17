@@ -185,3 +185,11 @@
 .file-row-text {
     -fx-text-fill: -fx-light-text-color;
 }
+.tooltip-content {
+    -fx-padding: 10;
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: white;
+    -fx-border-color: gray;
+    -fx-border-radius: 5;
+}
+

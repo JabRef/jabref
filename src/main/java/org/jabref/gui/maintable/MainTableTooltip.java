@@ -29,8 +29,7 @@ public class MainTableTooltip extends Tooltip {
         this.setHideDelay(Duration.millis(500));
 
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
-
-        tooltipContent.setStyle("-fx-padding: 10; -fx-background-color: white; -fx-border-color: gray; -fx-border-radius: 5;");
+        tooltipContent.getStyleClass().add("tooltip-content");
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
