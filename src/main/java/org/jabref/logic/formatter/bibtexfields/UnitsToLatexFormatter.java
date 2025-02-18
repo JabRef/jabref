@@ -2,7 +2,6 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -89,7 +88,7 @@ public class UnitsToLatexFormatter extends Formatter {
                 prefixUnitCombinations.add(prefix + unit);
             }
         }
-        Collections.sort(prefixUnitCombinations, new StringLengthComparator()); // Sort based on string length
+        prefixUnitCombinations.sort(new StringLengthComparator()); // Sort based on string length
     }
 
     @Override
