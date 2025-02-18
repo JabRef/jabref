@@ -1,6 +1,7 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -94,7 +95,7 @@ public class SharedDatabaseUIManager {
 
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
-                tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
+                Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).ifPresent(tabContainer::closeTab);
                 dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.bibDatabaseContext().convertToLocalDatabase();
@@ -102,7 +103,7 @@ public class SharedDatabaseUIManager {
                 dialogService.notify(Localization.lang("Working offline."));
             }
         } else {
-            tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
+            Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).ifPresent(tabContainer::closeTab);
         }
     }
 
@@ -141,7 +142,7 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
-        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        LibraryTab libraryTab = Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).orElse(null);
         EntryEditor entryEditor = libraryTab.getEntryEditor();
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));

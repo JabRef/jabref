@@ -124,7 +124,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getChildren().clear();
 
         if (fileHistoryMenu.getItems().isEmpty()) {
-            Label noRecentLibrariesLabel = new Label(Localization.lang("No Recent Libraries"));
+            Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
             noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
             recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
         } else {

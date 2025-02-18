@@ -133,9 +133,9 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    boolean libraryTab = tabSupplier.get() != null;
+                    boolean currentTabIsLibraryTab = tabSupplier.get() != null;
                     // libraryTab is null in case of Welcome Tab
-                    if (libraryTab) {
+                    if (currentTabIsLibraryTab) {
                         LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
                         notificationPane.notify(
                                 IconTheme.JabRefIcons.FOLDER.getGraphicNode(),

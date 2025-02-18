@@ -1,5 +1,6 @@
 package org.jabref.gui.frame;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import javafx.event.ActionEvent;
@@ -152,8 +153,8 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
                 fileHistoryMenu,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
@@ -164,9 +165,9 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager))),
 
                 new SeparatorMenuItem(),
 
@@ -184,14 +185,14 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), undoManager, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), undoManager, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
 
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
                         factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
                         factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
@@ -201,12 +202,12 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences))),
 
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame::getCurrentLibraryTab, stateManager, dialogService)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, taskExecutor, preferences, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -219,12 +220,12 @@ public class MainMenu extends MenuBar {
                 specialFieldsSeparator,
                 // ToDo: SpecialField needs the active BasePanel to mark it as changed.
                 //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager));
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, undoManager, stateManager));
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
@@ -234,9 +235,9 @@ public class MainMenu extends MenuBar {
         });
 
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -249,11 +250,11 @@ public class MainMenu extends MenuBar {
         );
 
         quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), preferences, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -262,11 +263,11 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -313,7 +314,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferences)),
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences)),
                 factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),
 
                 new SeparatorMenuItem(),
@@ -331,13 +332,13 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, frame::getCurrentLibraryTab, stateManager)),
-                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager)),
+                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager)),
 
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, preferences)),
-                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService))
         );
 

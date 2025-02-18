@@ -184,7 +184,7 @@ public enum StandardActions implements Action {
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
     ABOUT(Localization.lang("About JabRef"), Localization.lang("About JabRef")),
-    OPEN_WELCOME_TAB(Localization.lang("Open Welcome Tab")),
+    OPEN_WELCOME_TAB(Localization.lang("Open welcome tab")),
 
     EDIT_LIST(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT),
     VIEW_LIST(Localization.lang("View"), IconTheme.JabRefIcons.FILE),
@@ -208,6 +208,7 @@ public enum StandardActions implements Action {
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
     CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
+
     private String text;
     private final String description;
     private final Optional<JabRefIcon> icon;

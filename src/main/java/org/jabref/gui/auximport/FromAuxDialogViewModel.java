@@ -1,6 +1,7 @@
 package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -15,6 +16,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -58,7 +60,9 @@ public class FromAuxDialogViewModel {
         this.stateManager = stateManager;
 
         librariesProperty.setAll(stateManager.getOpenDatabases());
-        selectedLibraryProperty.set(tabContainer.getCurrentLibraryTab().getBibDatabaseContext());
+        selectedLibraryProperty.set(
+                Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).map(LibraryTab::getBibDatabaseContext).orElse(null)
+        );
         EasyBind.listen(selectedLibraryProperty, (obs, oldValue, newValue) -> {
             if (auxParserResult != null) {
                 parse();

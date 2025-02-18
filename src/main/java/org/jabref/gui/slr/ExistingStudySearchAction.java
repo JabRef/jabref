@@ -2,6 +2,7 @@ package org.jabref.gui.slr;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -147,6 +148,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
         // The user focused an SLR
         // We hard close the tab
         // Future work: Properly close the tab (with saving, ...)
-        tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
+        Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).ifPresent(tabContainer::closeTab);
     }
 }
