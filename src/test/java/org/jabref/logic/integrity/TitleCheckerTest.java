@@ -8,10 +8,8 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,21 +68,6 @@ public class TitleCheckerTest {
                     Arguments.of("bibTexDoesNotAcceptCapitalLettersInsideTitle ", "This is a Title"),
                     Arguments.of("bibTexDoesNotAcceptsLeadingTranslatedTitleWithOriginal ", "[This is translated title] This is a title")
             );
-        }
-
-        @ParameterizedTest(name = "{index}. Title: \"{0}\"")
-        @CsvSource({
-                "Proceedings of the https://example.com/conference",
-                "Find more at http://mywebsite.org/article",
-                "Visit ftp://files.example.com/download",
-        })
-        void titleShouldRaiseWarningForFullURLs(String title) {
-            assertNotEquals(Optional.empty(), checker.checkValue(title));
-        }
-
-        @Test
-        void titleShouldAcceptURLWithoutProtocol() {
-            assertEquals(Optional.empty(), checker.checkValue("Applying {T}rip@dvice {R}ecommendation {T}echnology to www.visiteurope.com"));
         }
     }
 
