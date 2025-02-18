@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -77,37 +78,32 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
     public void writeFindings() throws IOException {
         result.entryTypeToResultMap().entrySet().stream()
               .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
-              .forEach(Unchecked.consumer(mapEntry -> {
-                  writeMapEntry(mapEntry);
-              }));
+              .forEach(Unchecked.consumer(this::writeMapEntry));
     }
 
     private List<String> getColumnNames() {
-        List<String> result = new ArrayList(columnCount + 2);
-        result.add("entry type");
-        result.add("citation key");
-        allReportedFields.forEach(field -> {
-            result.add(field.getDisplayName());
-        });
-        return result;
+        List<String> results = new ArrayList<>(columnCount + 2);
+        results.add("entry type");
+        results.add("citation key");
+        allReportedFields.forEach(field -> results.add(field.getDisplayName()));
+        return results;
     }
 
     protected List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList(columnCount + 2);
-        result.add(entryType);
-        result.add(bibEntry.getCitationKey().orElse(""));
-        allReportedFields.forEach(field -> {
-            result.add(bibEntry.getField(field).map(value -> {
-                if (requiredFields.contains(field)) {
-                    return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                } else if (optionalFields.contains(field)) {
-                    return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                } else {
-                    return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                }
-            }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY));
-        });
-        return result;
+        List<String> results = new ArrayList<>(columnCount + 2);
+        results.add(entryType);
+        results.add(bibEntry.getCitationKey().orElse(""));
+        allReportedFields.forEach(field -> results.add(
+            bibEntry.getField(field).map(value -> {
+            if (requiredFields.contains(field)) {
+                return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+            } else if (optionalFields.contains(field)) {
+                return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+            } else {
+                return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+            }
+        }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
+        return results;
     }
 
     protected void writeMapEntry(Map.Entry<EntryType, BibliographyConsistencyCheck.EntryTypeResult> mapEntry) {
@@ -117,22 +113,20 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         Set<Field> requiredFields = bibEntryType
                 .map(BibEntryType::getRequiredFields)
                 .stream()
-                .flatMap(orFieldsCollection -> orFieldsCollection.stream())
+                .flatMap(Collection::stream)
                 .flatMap(orFields -> orFields.getFields().stream())
                 .collect(Collectors.toSet());
         Set<Field> optionalFields = bibEntryType
                 .map(BibEntryType::getOptionalFields)
                 .stream()
-                .flatMap(bibFieldSet -> bibFieldSet.stream())
+                .flatMap(Collection::stream)
                 .map(BibField::field)
                 .collect(Collectors.toSet());
 
         BibliographyConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
-        bibEntries.forEach(Unchecked.consumer(bibEntry -> {
-            writeBibEntry(bibEntry, entryType, requiredFields, optionalFields);
-        }));
+        bibEntries.forEach(Unchecked.consumer(bibEntry -> writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)));
     }
 
     protected abstract void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException;
