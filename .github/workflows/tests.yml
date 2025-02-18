@@ -382,8 +382,13 @@ jobs:
       - name: Check force push
         id: force_push_check
         run: |
+          if [[ -z "${{ github.event.before }}" ]]; then
+            echo "✅ New PR created."
+            exit 0
+          fi
           if git cat-file -e ${{ github.event.before }} 2>/dev/null; then
             echo "✅ Regular push detected."
+            exit 0
           else
             echo "❌ Force push detected"
             exit 1
