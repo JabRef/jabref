@@ -84,8 +84,8 @@ public class EntryComparator implements Comparator<BibEntry> {
             f2 = e2.getCitationKey().orElse(null);
         } else if (sortField.isNumeric()) {
             try {
-                Integer i1 = Integer.parseInt((String) f1);
-                Integer i2 = Integer.parseInt((String) f2);
+                int i1 = Integer.parseInt((String) f1);
+                int i2 = Integer.parseInt((String) f2);
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;

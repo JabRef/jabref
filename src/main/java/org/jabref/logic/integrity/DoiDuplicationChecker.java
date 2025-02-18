@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class DoiDuplicationChecker implements DatabaseChecker {
 
         return duplicateMap.inverse().keySet().stream()
                            .filter(list -> list.size() > 1)
-                           .flatMap(list -> list.stream())
+                           .flatMap(Collection::stream)
                            .map(item -> new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), item, StandardField.DOI))
                            .collect(Collectors.toList());
     }

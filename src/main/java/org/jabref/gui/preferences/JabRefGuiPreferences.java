@@ -673,7 +673,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.confirmHideTabBarProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
+        EasyBind.listen(workspacePreferences.hideTabBarProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
         workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) change ->
                 putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
         return workspacePreferences;

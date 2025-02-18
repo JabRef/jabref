@@ -67,9 +67,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
         copyContentButton.disableProperty().bind(viewModel.toFieldValidationStatus().validProperty().not());
         overwriteFieldContentCheckBox.disableProperty().bind(viewModel.toFieldValidationStatus().validProperty().not());
 
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.toFieldValidationStatus(), toFieldComboBox, true);
-        });
+        Platform.runLater(() -> visualizer.initVisualization(viewModel.toFieldValidationStatus(), toFieldComboBox, true));
     }
 
     private void initializeFromAndToComboBox() {
