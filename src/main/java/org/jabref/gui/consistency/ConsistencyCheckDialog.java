@@ -135,8 +135,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
         );
 
-        for (ConsistencySymbol symbol : targetSymbols) {
-            removeColumnWithUniformValue(symbol.getText());
+        targetSymbols.stream()
+            .map(ConsistencySymbol::getText)
+            .forEach(removeColumnWithUniformValue);
         }
 
         for (Field field: SpecialField.values()) {
