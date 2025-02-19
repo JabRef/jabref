@@ -1,5 +1,6 @@
 package org.jabref.gui.consistency;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -129,19 +130,16 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             tableView.getColumns().add(tableColumn);
         }
 
-          for (ConsistencySymbol symbol: ConsistencySymbol.values()) {
-             switch (symbol) {
-                 case ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY:
-                     removeColumnWithUniformValue(ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
-                     break;
-                 case ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY:
-                     removeColumnWithUniformValue(ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
-                     break;
-                 default:
-                     break;
-             }
+        EnumSet<ConsistencySymbol> targetSymbols = EnumSet.of(
+                ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
+        );
+
+        for (ConsistencySymbol symbol : targetSymbols) {
+            removeColumnWithUniformValue(symbol.getText());
         }
-         for (Field field: SpecialField.values()) {
+
+        for (Field field: SpecialField.values()) {
             removeColumnByTitle(field.getDisplayName());
         }
     }
