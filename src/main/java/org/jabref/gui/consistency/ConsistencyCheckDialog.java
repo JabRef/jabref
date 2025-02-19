@@ -137,12 +137,11 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         targetSymbols.stream()
             .map(ConsistencySymbol::getText)
-            .forEach(removeColumnWithUniformValue);
-        }
+            .forEach(this::removeColumnWithUniformValue);
 
         Arrays.stream(SpecialField.values())
-                      .map(SpecialField::getDisplayName)
-                      .forEach(this::removeColumnByTitle);
+              .map(SpecialField::getDisplayName)
+              .forEach(this::removeColumnByTitle);
     }
 
     private void removeColumnWithUniformValue(String symbol) {
