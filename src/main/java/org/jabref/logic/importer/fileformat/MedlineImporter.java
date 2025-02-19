@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -998,7 +999,8 @@ public class MedlineImporter extends Importer implements Parser {
                             putIfValueNotNull(fields, new UnknownField("copyright"), reader.getText());
                         }
                     }
-                    case "AbstractText" -> handleTextElement(reader, abstractTextList, elementName);
+                    case "AbstractText" -> handleAbstractTextElement(reader, abstractTextList, elementName);
+
                 }
             }
 
@@ -1008,7 +1010,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!abstractTextList.isEmpty()) {
-            fields.put(StandardField.ABSTRACT, String.join(" ", abstractTextList));
+            fields.put(StandardField.ABSTRACT, String.join("\n\n", abstractTextList));
         }
     }
 
@@ -1020,7 +1022,25 @@ public class MedlineImporter extends Importer implements Parser {
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
             throws XMLStreamException {
         StringBuilder result = new StringBuilder();
+        handleText(reader, textList, startElement, result);
+    }
 
+    /**
+     * Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+     * We ignore the tags and return only the characters present in the enclosing parent element.
+     *
+     */
+    private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)
+            throws XMLStreamException {
+        StringBuilder result = new StringBuilder();
+        Optional.ofNullable(reader.getAttributeValue(null, "Label"))
+                .map(String::trim)
+                .filter(label -> !label.isEmpty() && !label.equals("UNLABELLED"))
+                .ifPresent(label -> result.append(label).append(": "));
+        handleText(reader, textList, startElement, result);
+    }
+
+    private void handleText(XMLStreamReader reader, List<String> textList, String startElement, StringBuilder result) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -1099,8 +1119,8 @@ public class MedlineImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "Author" -> parseAuthor(reader, authorNames);
+                if (elementName.equals("Author")) {
+                    parseAuthor(reader, authorNames);
                 }
             }
 
@@ -1121,24 +1141,9 @@ public class MedlineImporter extends Importer implements Parser {
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "CollectiveName" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            collectiveNames.add(reader.getText());
-                        }
-                    }
-                    case "LastName" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            authorName = new StringBuilder(reader.getText());
-                        }
-                    }
-                    case "ForeName" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            authorName.append(", ").append(reader.getText());
-                        }
-                    }
+                    case "CollectiveName" -> parseCollectiveName(reader, collectiveNames);
+                    case "LastName" -> authorName = parseLastName(reader, authorName);
+                    case "ForeName" -> parseForeName(reader, authorName);
                 }
             }
 
@@ -1152,6 +1157,28 @@ public class MedlineImporter extends Importer implements Parser {
         }
         if (!authorName.toString().isBlank()) {
             authorNames.add(authorName.toString());
+        }
+    }
+
+    private void parseForeName(XMLStreamReader reader, StringBuilder authorName) throws XMLStreamException {
+        reader.next();
+        if (isCharacterXMLEvent(reader)) {
+            authorName.append(", ").append(reader.getText());
+        }
+    }
+
+    private StringBuilder parseLastName(XMLStreamReader reader, StringBuilder authorName) throws XMLStreamException {
+        reader.next();
+        if (isCharacterXMLEvent(reader)) {
+            authorName = new StringBuilder(reader.getText());
+        }
+        return authorName;
+    }
+
+    private void parseCollectiveName(XMLStreamReader reader, List<String> collectiveNames) throws XMLStreamException {
+        reader.next();
+        if (isCharacterXMLEvent(reader)) {
+            collectiveNames.add(reader.getText());
         }
     }
 
@@ -1181,15 +1208,15 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private boolean isCharacterXMLEvent(XMLStreamReader reader) {
-        return reader.getEventType() == XMLEvent.CHARACTERS;
+        return reader.getEventType() == XMLStreamConstants.CHARACTERS;
     }
 
     private boolean isStartXMLEvent(XMLStreamReader reader) {
-        return reader.getEventType() == XMLEvent.START_ELEMENT;
+        return reader.getEventType() == XMLStreamConstants.START_ELEMENT;
     }
 
     private boolean isEndXMLEvent(XMLStreamReader reader) {
-        return reader.getEventType() == XMLEvent.END_ELEMENT;
+        return reader.getEventType() == XMLStreamConstants.END_ELEMENT;
     }
 
     @Override
