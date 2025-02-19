@@ -22,7 +22,6 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 public class IntegrityCheckDialogViewModel extends AbstractViewModel {
@@ -35,7 +34,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
     private final UndoManager undoManager;
 
     private final ObservableList<IntegrityMessage> messages;
-    private final ObservableSet<String> entryTypes;
+    private final ObservableSet<Field> entryTypes;
 
     public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages,
                                          Supplier<LibraryTab> tabSupplier,
@@ -52,8 +51,8 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.undoManager = undoManager;
 
-        Set<String> types = messages.stream()
-                                    .map(item -> item.field().getDisplayName())
+        Set<Field> types = messages.stream()
+                                    .map(IntegrityMessage::field)
                                     .collect(Collectors.toSet());
         this.entryTypes = FXCollections.observableSet(types);
     }
@@ -62,7 +61,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         return messages;
     }
 
-    public Set<String> getEntryTypes() {
+    public Set<Field> getEntryTypes() {
         return entryTypes;
     }
 
@@ -70,26 +69,35 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         entryTypes.remove(entry);
     }
 
-    public void fix(Field field, IntegrityMessage message, String text) {
+    public void fix(IntegrityIssue issue, IntegrityMessage message) {
         boolean fixed = true;
 
-        switch (field) {
-            case StandardField.TITLE:
-                fixTitle(message);
+        switch (issue) {
+            case CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS:
+                if (issue.getField().equals(StandardField.TITLE)) {
+                    fixTitle(message);
+                    return;
+                }
                 break;
-            case StandardField.URLDATE:
-                fixBiblatexFieldOnly(message);
+            case BIBTEX_FIELD_ONLY_KEY, BIBTEX_FIELD_ONLY_CROSS_REF:
+                removeField(message, issue.getField());
                 break;
-            case InternalField.KEY_FIELD:
+            case CITATION_KEY_DEVIATES_FROM_GENERATED_KEY:
                 new GenerateCitationKeyAction(tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager).execute();
+                break;
+            case INCORRECT_FORMAT:
+                if (issue.getField().equals(StandardField.ISSN)) {
+                    dialogService.notify("fixed issn");
+                    return;
+                }
                 break;
             default:
                 fixed = false;
                 break;
         }
 
-        if (fixed && text != null) {
-            dialogService.notify(text);
+         if (fixed) {
+            dialogService.notify("Fixed the issue");
         }
     }
 
@@ -108,9 +116,10 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         message.entry().setField(fields);
     }
 
-    public void fixBiblatexFieldOnly(IntegrityMessage message) {
+    public void removeField(IntegrityMessage message, Field
+        field) {
         Map<Field, String> fields = new HashMap<>();
-        fields.put(StandardField.URLDATE, "");
+        fields.put(field, "");
         message.entry().setField(fields);
     }
 }

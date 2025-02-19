@@ -1,6 +1,9 @@
 package org.jabref.gui.integrity;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -31,8 +34,7 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -105,8 +107,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
-        entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
-        entryTypeCombo.getSelectionModel().selectFirst();
+        updateEntryTypeCombo();
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().message()));
@@ -122,38 +123,25 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     return;
                 }
                 IntegrityMessage rowData = getTableRow().getItem();
-                configureButton(rowData);
+                configureAction(rowData);
             }
 
-            private void configureButton(IntegrityMessage rowData) {
-                switch (rowData.field()) {
-                    case StandardField.URLDATE:
-                        configureButton("Remove field", () -> {
-                            viewModel.fix(StandardField.URLDATE, rowData, "Field removed successfully");
-                            removeRowFromTable(rowData);
-                        });
-                        break;
-                    case StandardField.TITLE:
-                        configureButton(Localization.lang("Fix"), () -> {
-                            viewModel.fix(StandardField.TITLE, rowData, "Masked capital letters using curly brackets {}");
-                            removeRowFromTable(rowData);
-                        });
-                        break;
-                    case InternalField.KEY_FIELD:
-                        configureButton(Localization.lang("Generate Key"), () -> {
-                            viewModel.fix(InternalField.KEY_FIELD, rowData, null);
-                            removeRowFromTable(rowData);
-                        });
-                        break;
-                    default:
-                        setGraphic(null);
-                        return;
+            private void configureAction(IntegrityMessage message) {
+                Optional<IntegrityIssue> issue = IntegrityIssue.fromField(message.field());
+                if (issue.isPresent()) {
+                    configureButton("Fix", () -> {
+                        viewModel.fix(issue.get(), message);
+                        removeRowFromTable(message);
+                    });
+                    setGraphic(button);
+                    return;
                 }
-                setGraphic(button);
+                setGraphic(null);
             }
 
             private void configureButton(String text, Runnable action) {
                 button.setText(text);
+                button.setPrefHeight(20.0);
                 button.setOnAction(event -> action.run());
             }
         });
@@ -207,8 +195,16 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     private void updateEntryTypeCombo() {
-        entryTypeCombo.getItems().setAll(viewModel.getEntryTypes());
-        entryTypeCombo.getSelectionModel().selectFirst();
+        Set<Field> entryTypes = viewModel.getEntryTypes();
+        entryTypeCombo.getItems().clear();
+
+        Arrays.stream(IntegrityIssue.values())
+              .filter(issue -> entryTypes.contains(issue.getField()))
+              .forEach(issue -> entryTypeCombo.getItems().add(issue.getText()));
+
+        if (!entryTypeCombo.getItems().isEmpty()) {
+            entryTypeCombo.getSelectionModel().selectFirst();
+        }
     }
 
     @FXML
@@ -216,20 +212,18 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
         boolean isFixed = false;
 
-        for (IntegrityMessage message : messages) {
-            if (message.field().getDisplayName().equals(selectedType)) {
-                if (selectedType.equals(StandardField.TITLE.getDisplayName())) {
-                    viewModel.fix(StandardField.URLDATE, message, Localization.lang("Masked capital letters using curly brackets {}"));
-                } else if (selectedType.equals(StandardField.URLDATE.getDisplayName())) {
-                    viewModel.fix(StandardField.TITLE, message, Localization.lang("Field removed successfully!"));
-                } else if (selectedType.equals(InternalField.KEY_FIELD.getDisplayName())) {
-                    viewModel.fix(InternalField.KEY_FIELD, message, null);
-                } else {
-                    continue;
+        Optional<IntegrityIssue> selectedIssue = Arrays.stream(IntegrityIssue.values())
+                                                       .filter(issue -> issue.getText().equals(selectedType))
+                                                       .findFirst();
+
+        if (selectedIssue.isPresent()) {
+            for (IntegrityMessage message : messages) {
+                if (message.field().equals(selectedIssue.get().getField())) {
+                    viewModel.fix(selectedIssue.get(), message);
+                    removeRowFromTable(message);
+                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                    isFixed = true;
                 }
-                removeRowFromTable(message);
-                viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                isFixed = true;
             }
         }
 
