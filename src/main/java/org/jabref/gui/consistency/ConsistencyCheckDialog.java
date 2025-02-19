@@ -1,5 +1,6 @@
 package org.jabref.gui.consistency;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -139,9 +139,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             removeColumnWithUniformValue(symbol.getText());
         }
 
-        for (Field field: SpecialField.values()) {
-            removeColumnByTitle(field.getDisplayName());
-        }
+        Arrays.stream(SpecialField.values())
+                      .map(SpecialField::getDisplayName)
+                      .forEach(this::removeColumnByTitle);
     }
 
     private void removeColumnWithUniformValue(String symbol) {
