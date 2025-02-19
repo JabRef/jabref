@@ -48,6 +48,9 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.KEY, new ValidCitationKeyChecker());
         fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker());
 
+        fieldCheckers.put(StandardField.TITLE, new NoURLChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new NoURLChecker());
+
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(StandardField.DATE, new DateChecker());
             fieldCheckers.put(StandardField.URLDATE, new DateChecker());
