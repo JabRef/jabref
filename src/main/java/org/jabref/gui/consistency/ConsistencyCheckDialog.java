@@ -140,7 +140,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                  default:
                      break;
              }
-            removeColumnWithUniformValue(symbol.getText());
         }
          for (Field field: SpecialField.values()) {
             removeColumnByTitle(field.getDisplayName());
