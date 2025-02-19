@@ -1,5 +1,10 @@
 package org.jabref.gui.consistency;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
@@ -18,6 +23,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -121,6 +128,45 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
             tableView.getColumns().add(tableColumn);
         }
+
+          for (ConsistencySymbol symbol: ConsistencySymbol.values()) {
+             switch (symbol) {
+                 case ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY:
+                     removeColumnWithUniformValue(ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+                     break;
+                 case ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY:
+                     removeColumnWithUniformValue(ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+                     break;
+                 default:
+                     break;
+             }
+            removeColumnWithUniformValue(symbol.getText());
+        }
+         for (Field field: SpecialField.values()) {
+            removeColumnByTitle(field.getDisplayName());
+        }
+    }
+
+    private void removeColumnWithUniformValue(String symbol) {
+        List<TableColumn<ConsistencyMessage, ?>> columnToRemove = tableView.getColumns().stream()
+                                                                           .filter(column -> {
+                                                                               Set<String> values = tableView.getItems().stream()
+                                                                                                             .map(item -> {
+                                                                                                                 Optional<Object> value = Optional.ofNullable(column.getCellObservableValue(item).getValue());
+                                                                                                                 if (value.isPresent()) {
+                                                                                                                     return value.toString();
+                                                                                                                 }
+                                                                                                                 return "";
+                                                                                                             })
+                                                                                                             .collect(Collectors.toSet());
+                                                                               return values.size() == 1 && values.contains(symbol);
+                                                                           })
+                                                                           .toList();
+        tableView.getColumns().removeAll(columnToRemove);
+    }
+
+    public void removeColumnByTitle(String columnName) {
+        tableView.getColumns().removeIf(column -> column.getText().equalsIgnoreCase(columnName));
     }
 
     @FXML
