@@ -1,5 +1,7 @@
 package org.jabref.gui.frame;
 
+import java.util.Objects;
+
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -111,7 +113,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager))),
 
                 leftSpacer,
 
@@ -120,27 +122,27 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), StandardEntryType.Article, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, stateManager)),
                         createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), undoManager, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
                         pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager))),
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(() -> Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), preferences, dialogService, stateManager, taskExecutor, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
@@ -169,7 +171,7 @@ public class MainToolBar extends ToolBar {
         newEntryFromIdButton.setFocusTraversable(false);
         newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferences, taskExecutor, stateManager);
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(Objects.requireNonNull(frame.getCurrentLibraryTab()).orElse(null), dialogService, preferences, taskExecutor, stateManager);
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
