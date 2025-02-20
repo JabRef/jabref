@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.integrity.IntegrityIssue;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
@@ -48,7 +48,7 @@ public class TitleChecker implements ValueChecker {
             if (!subTitle.isEmpty()) {
                 subTitle = subTitle.substring(1);
                 if (HAS_CAPITAL_LETTERS.test(subTitle)) {
-                    return Optional.of(IntegrityIssue.CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS.getText());
+                    return Optional.of(Localization.lang("capital letters are not masked using curly brackets {}"));
                 }
             }
         }
