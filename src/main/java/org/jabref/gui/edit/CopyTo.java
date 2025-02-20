@@ -49,20 +49,23 @@ public class CopyTo extends SimpleCommand {
         // we need to operate on a copy otherwise we might get ConcurrentModification issues
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries().stream().toList();
 
-        boolean includeCrossReferences = false;
+        boolean includeCrossReferences = copyToPreferences.getShouldIncludeCrossReferences();
         boolean showDialogBox = copyToPreferences.getShouldAskForIncludingCrossReferences();
 
         for (BibEntry bibEntry : selectedEntries) {
             if (bibEntry.hasField(StandardField.CROSSREF) && showDialogBox) {
                 includeCrossReferences = askForCrossReferencedEntries();
                 copyToPreferences.setShouldIncludeCrossReferences(includeCrossReferences);
+                break;
             }
         }
 
         if (includeCrossReferences) {
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
+            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
+            dialogService.notify(Localization.lang("Entries copied successfully, without cross-references."));
         }
     }
 

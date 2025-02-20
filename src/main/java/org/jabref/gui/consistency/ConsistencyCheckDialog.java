@@ -85,12 +85,12 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getSelectionModel().selectFirst();
 
         FilteredList<ConsistencyMessage> filteredData = new FilteredList<>(viewModel.getTableData(), message ->
-                message.message().split("\\s+")[0].equals(viewModel.selectedEntryTypeProperty().get())
+                message.message().getFirst().equals(viewModel.selectedEntryTypeProperty().get())
         );
 
         viewModel.selectedEntryTypeProperty().addListener((obs, oldValue, newValue) -> {
             filteredData.setPredicate(message ->
-                    message.message().split("\\s+")[0].equals(newValue)
+                    message.message().getFirst().equals(newValue)
             );
         });
 
@@ -101,8 +101,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
 
             tableColumn.setCellValueFactory(row -> {
-                String[] message = row.getValue().message().split("\\s+");
-                return new ReadOnlyStringWrapper(message[columnIndex]);
+                List<String> message = row.getValue().message();
+                return new ReadOnlyStringWrapper(message.get(columnIndex));
             });
 
             tableColumn.setCellFactory(column -> new TableCell<ConsistencyMessage, String>() {
