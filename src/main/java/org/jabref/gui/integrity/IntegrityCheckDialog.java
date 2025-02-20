@@ -224,7 +224,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                                                        .findFirst();
 
         selectedIssue.ifPresent(issue -> {
-            messages.stream()
+            messagesTable.getItems().stream()
                     .filter(message -> message.field().equals(issue.getField()) && hasFix(message))
                     .forEach(message -> {
                         viewModel.fix(issue, message);
@@ -238,7 +238,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void fixAll() {
-        messages.stream()
+        messagesTable.getItems().stream()
                 .filter(this::hasFix)
                 .forEach(message -> IntegrityIssue.fromField(message.field()).ifPresent(issue -> {
                     viewModel.fix(issue, message);
