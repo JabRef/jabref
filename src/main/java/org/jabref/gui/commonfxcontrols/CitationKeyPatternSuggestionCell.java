@@ -51,6 +51,10 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
     }
 
     static class CitationKeyPatternSuggestoinTextField extends TextField {
+
+        // Maximum number of entries that can be displayed in the popup menu.
+        private static final int MAX_ENTRIES = 7;
+
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
 
@@ -90,8 +94,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         private void populatePopup(List<String> searchResult) {
             List<CustomMenuItem> menuItems = new ArrayList<>();
-            int maxEntries = 7;
-            int count = Math.min(searchResult.size(), maxEntries);
+            int count = Math.min(searchResult.size(), MAX_ENTRIES);
 
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
