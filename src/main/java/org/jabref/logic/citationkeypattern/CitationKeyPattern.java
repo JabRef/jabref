@@ -23,7 +23,7 @@ public record CitationKeyPattern(String stringRepresentation) {
     public static final CitationKeyPattern AUTHOR_INI = new CitationKeyPattern("[authorIni]");
     public static final CitationKeyPattern AUTH_SHORT = new CitationKeyPattern("[authshort]");
     public static final CitationKeyPattern AUTHORS_ALPHA = new CitationKeyPattern("[authorsAlpha]");
-    public static final CitationKeyPattern AUTHORS_ALPHA_LNI = new CitationKeyPattern("[authorsAlphaLni]");
+    public static final CitationKeyPattern AUTHORS_ALPHA_LNI = new CitationKeyPattern("[authorsAlphaLNI]");
     public static final CitationKeyPattern AUTHORS_LAST = new CitationKeyPattern("[authorsLast]");
     public static final CitationKeyPattern AUTHORS_LAST_FORE_INI = new CitationKeyPattern("[authorsLastForeIni]");
     // endregion
