@@ -210,38 +210,42 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
     }
 
+    private boolean hasFix(IntegrityMessage message) {
+        return message != null && message.field() != null && IntegrityIssue.fromField(message.field())
+                                                                           .map(issue -> issue.getFix() != null)
+                                                                           .orElse(false);
+    }
+
     @FXML
     private void fixByType() {
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
         Optional<IntegrityIssue> selectedIssue = Arrays.stream(IntegrityIssue.values())
                                                        .filter(issue -> issue.getText().equals(selectedType))
                                                        .findFirst();
-        if (selectedIssue.isPresent()) {
-            for (IntegrityMessage message : messages) {
-                if (message.field().equals(selectedIssue.get().getField())) {
-                    viewModel.fix(selectedIssue.get(), message);
-                    removeRowFromTable(message);
-                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                }
-            }
-        }
+
+        selectedIssue.ifPresent(issue -> {
+            messages.stream()
+                    .filter(message -> message.field().equals(issue.getField()) && hasFix(message))
+                    .forEach(message -> {
+                        viewModel.fix(issue, message);
+                        removeRowFromTable(message);
+                        viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                    });
+        });
+
         updateEntryTypeCombo();
     }
 
     @FXML
     private void fixAll() {
-        List<IntegrityIssue> fixableIssues = Arrays.stream(IntegrityIssue.values())
-                                                   .filter(issue -> issue.getFix() != null)
-                                                   .toList();
-        for (IntegrityIssue issue : fixableIssues) {
-            for (IntegrityMessage message : messages) {
-                if (message.field().equals(issue.getField())) {
+        messages.stream()
+                .filter(this::hasFix)
+                .forEach(message -> IntegrityIssue.fromField(message.field()).ifPresent(issue -> {
                     viewModel.fix(issue, message);
-                    removeRowFromTable(message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                }
-            }
-        }
+                    removeRowFromTable(message);
+                }));
+
         updateEntryTypeCombo();
     }
 }
