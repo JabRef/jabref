@@ -227,4 +227,21 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
         updateEntryTypeCombo();
     }
+
+    @FXML
+    private void fixAll() {
+        List<IntegrityIssue> fixableIssues = Arrays.stream(IntegrityIssue.values())
+                                                   .filter(issue -> issue.getFix() != null)
+                                                   .toList();
+        for (IntegrityIssue issue : fixableIssues) {
+            for (IntegrityMessage message : messages) {
+                if (message.field().equals(issue.getField())) {
+                    viewModel.fix(issue, message);
+                    removeRowFromTable(message);
+                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                }
+            }
+        }
+        updateEntryTypeCombo();
+    }
 }

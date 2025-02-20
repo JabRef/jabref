@@ -31,7 +31,7 @@
                 <MenuButton fx:id="messageFilterButton" prefHeight="30.0" maxHeight="30.0" text="%Message filters"/>
             </HBox>
             <HBox maxHeight="30" spacing="4.0" alignment="CENTER">
-                <Button prefHeight="20.0" text="%Fix all"/>
+                <Button onAction="#fixAll" prefHeight="20.0" text="%Fix all"/>
                 <Region HBox.hgrow="ALWAYS" />
                 <ComboBox fx:id="entryTypeCombo" maxWidth="400"  />
                 <Button onAction="#fixByType" alignment="CENTER_RIGHT" prefHeight="20.0" text="%Fix by type"/>
