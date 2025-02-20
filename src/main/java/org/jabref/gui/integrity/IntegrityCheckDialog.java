@@ -1,6 +1,7 @@
 package org.jabref.gui.integrity;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -196,10 +197,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     private void updateEntryTypeCombo() {
         Set<Field> entryTypes = viewModel.getEntryTypes();
+        Set<String> uniqueTexts = new HashSet<>();
         entryTypeCombo.getItems().clear();
 
         Arrays.stream(IntegrityIssue.values())
               .filter(issue -> entryTypes.contains(issue.getField()))
+              .filter(issue -> uniqueTexts.add(issue.getText()))
               .forEach(issue -> entryTypeCombo.getItems().add(issue.getText()));
 
         if (!entryTypeCombo.getItems().isEmpty()) {
