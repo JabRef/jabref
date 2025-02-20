@@ -2,7 +2,7 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.integrity.IntegrityIssue;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.strings.StringUtil;
 
@@ -18,11 +18,11 @@ public class ISBNChecker implements ValueChecker {
         ISBN isbn = new ISBN(value);
 
         if (!isbn.isValidFormat()) {
-            return Optional.of(Localization.lang("incorrect format"));
+            return Optional.of(IntegrityIssue.INCORRECT_FORMAT_ISBN.getText());
         }
 
         if (!isbn.isValidChecksum()) {
-            return Optional.of(Localization.lang("incorrect control digit"));
+            return Optional.of(IntegrityIssue.INCORRECT_CONTROL_DIGIT_ISBN.getText());
         }
 
         return Optional.empty();

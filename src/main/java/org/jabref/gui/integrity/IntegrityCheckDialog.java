@@ -128,8 +128,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
             private void configureAction(IntegrityMessage message) {
                 Optional<IntegrityIssue> issue = IntegrityIssue.fromField(message.field());
-                if (issue.isPresent()) {
-                    configureButton("Fix", () -> {
+                if (issue.isPresent() && issue.get().getFix() != null) {
+                    configureButton(issue.get().getFix(), () -> {
                         viewModel.fix(issue.get(), message);
                         removeRowFromTable(message);
                     });
@@ -210,29 +210,18 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML
     private void fixByType() {
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
-        boolean isFixed = false;
-
         Optional<IntegrityIssue> selectedIssue = Arrays.stream(IntegrityIssue.values())
                                                        .filter(issue -> issue.getText().equals(selectedType))
                                                        .findFirst();
-
         if (selectedIssue.isPresent()) {
             for (IntegrityMessage message : messages) {
                 if (message.field().equals(selectedIssue.get().getField())) {
                     viewModel.fix(selectedIssue.get(), message);
                     removeRowFromTable(message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                    isFixed = true;
                 }
             }
         }
-
         updateEntryTypeCombo();
-
-        if (isFixed) {
-            dialogService.notify(Localization.lang("Fixed successfully!"));
-        } else {
-            dialogService.notify(Localization.lang("No fixes available!"));
-        }
     }
 }

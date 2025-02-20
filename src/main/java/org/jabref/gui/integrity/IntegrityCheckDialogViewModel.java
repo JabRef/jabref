@@ -70,12 +70,10 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
     }
 
     public void fix(IntegrityIssue issue, IntegrityMessage message) {
-        boolean fixed = true;
-
         switch (issue) {
             case CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS:
                 if (issue.getField().equals(StandardField.TITLE)) {
-                    fixTitle(message);
+                    maskTitle(message);
                     return;
                 }
                 break;
@@ -85,23 +83,12 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
             case CITATION_KEY_DEVIATES_FROM_GENERATED_KEY:
                 new GenerateCitationKeyAction(tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager).execute();
                 break;
-            case INCORRECT_FORMAT:
-                if (issue.getField().equals(StandardField.ISSN)) {
-                    dialogService.notify("fixed issn");
-                    return;
-                }
-                break;
             default:
-                fixed = false;
                 break;
-        }
-
-         if (fixed) {
-            dialogService.notify("Fixed the issue");
         }
     }
 
-    public void fixTitle(IntegrityMessage message) {
+    public void maskTitle(IntegrityMessage message) {
         String title = message.entry().getTitle().get();
         StringBuilder result = new StringBuilder();
         for (char ch : title.toCharArray()) {

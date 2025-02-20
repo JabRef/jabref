@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.integrity.IntegrityIssue;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
@@ -46,15 +47,15 @@ public class EditionChecker implements ValueChecker {
 
         if (bibDatabaseContextEdition.isBiblatexMode()) {
             if (!ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
-                return Optional.of(Localization.lang("should contain an integer or a literal"));
+                return Optional.of(IntegrityIssue.SHOULD_CONTAIN_AN_INTEGER_OR_A_LITERAL.getText());
             }
         } else {
             if (ONLY_NUMERALS.test(value) && (!allowIntegerEdition)) {
-                return Optional.of(Localization.lang("no integer as values for edition allowed"));
+                return Optional.of(IntegrityIssue.NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED.getText());
             }
         }
         if (!isFirstCharDigit(value) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-            return Optional.of(Localization.lang("should have the first letter capitalized"));
+            return Optional.of(IntegrityIssue.SHOULD_HAVE_THE_FIRST_LETTER_CAPITALIZED.getText());
         }
         return Optional.empty();
     }

@@ -16,7 +16,7 @@ public class DateChecker implements ValueChecker {
 
         Optional<Date> parsedDate = Date.parse(value);
         if (parsedDate.isEmpty()) {
-            return Optional.of(IntegrityIssue.INCORRECT_FORMAT.getText());
+            return Optional.of(IntegrityIssue.INCORRECT_FORMAT_DATE.getText());
         }
 
         return Optional.empty();
