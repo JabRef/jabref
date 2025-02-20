@@ -90,8 +90,9 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         private void populatePopup(List<String> searchResult) {
             List<CustomMenuItem> menuItems = new ArrayList<>();
-            int maxEntries = 10;
+            int maxEntries = 7;
             int count = Math.min(searchResult.size(), maxEntries);
+
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
                 Label entryLabel = new Label(result);
