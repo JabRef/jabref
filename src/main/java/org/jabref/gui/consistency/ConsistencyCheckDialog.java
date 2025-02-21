@@ -105,7 +105,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 return new ReadOnlyStringWrapper(message.get(columnIndex));
             });
 
-            tableColumn.setCellFactory(column -> new TableCell<ConsistencyMessage, String>() {
+            tableColumn.setCellFactory(_ -> new TableCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -118,12 +118,12 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                     ConsistencySymbol.fromText(item)
                                      .ifPresentOrElse(
-                                              symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
-                                              () -> {
-                                                  setGraphic(null);
-                                                  setText(item);
-                                              }
-                                      );
+                                             symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
+                                             () -> {
+                                                 setGraphic(null);
+                                                 setText(item);
+                                             }
+                                     );
                 }
             });
 
@@ -148,13 +148,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         List<TableColumn<ConsistencyMessage, ?>> columnToRemove = tableView.getColumns().stream()
                                                                            .filter(column -> {
                                                                                Set<String> values = tableView.getItems().stream()
-                                                                                                             .map(item -> {
-                                                                                                                 Optional<Object> value = Optional.ofNullable(column.getCellObservableValue(item).getValue());
-                                                                                                                 if (value.isPresent()) {
-                                                                                                                     return value.toString();
-                                                                                                                 }
-                                                                                                                 return "";
-                                                                                                             })
+                                                                                                             .map(item -> Optional.ofNullable(column.getCellObservableValue(item).getValue()).map(Object::toString).orElse(""))
                                                                                                              .collect(Collectors.toSet());
                                                                                return values.size() == 1 && values.contains(symbol);
                                                                            })
