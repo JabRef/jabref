@@ -142,7 +142,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     CitationKeyPattern.Category.BIBENTRY_FIELDS, "BibEntry fields"
             );
 
-            for (var entry : categoryNames.entrySet()) {
+            for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
                 CitationKeyPattern.Category category = entry.getKey();
                 String categoryName = entry.getValue();
 
@@ -151,12 +151,15 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
                 for (CitationKeyPattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
+                    menuItem.setOnAction(event -> {
+                        setText(pattern.stringRepresentation());
+                        positionCaret(pattern.stringRepresentation().length());
+                        suggestionsList.hide();
+                    });
                     categoryMenu.getItems().add(menuItem);
                 }
-
                 patternsSubMenu.getItems().add(categoryMenu);
             }
-
             return patternsSubMenu;
         }
     }
