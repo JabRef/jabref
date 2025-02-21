@@ -2,19 +2,24 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+
 public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<CitationKeyPatternsPanelItemModel, String> {
-    private final CitationKeyPatternSuggestoinTextField searchField;
+    private final CitationKeyPatternSuggestionTextField searchField;
 
     public CitationKeyPatternSuggestionCell(List<String> citationKeyPatterns) {
-        this.searchField = new CitationKeyPatternSuggestoinTextField(citationKeyPatterns);
+        this.searchField = new CitationKeyPatternSuggestionTextField(citationKeyPatterns);
         searchField.setOnAction(event -> commitEdit(searchField.getText()));
     }
 
@@ -50,15 +55,14 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
     }
 
-    static class CitationKeyPatternSuggestoinTextField extends TextField {
-
+    static class CitationKeyPatternSuggestionTextField extends TextField {
         // Maximum number of entries that can be displayed in the popup menu.
         private static final int MAX_ENTRIES = 7;
 
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
 
-        public CitationKeyPatternSuggestoinTextField(List<String> citationKeyPatterns) {
+        public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
             this.suggestionsList = new ContextMenu();
 
@@ -74,6 +78,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     List<String> filteredEntries = citationKeyPatterns.stream()
                                                                       .filter(e -> e.toLowerCase().contains(enteredText.toLowerCase()))
                                                                       .collect(Collectors.toList());
+
                     if (!filteredEntries.isEmpty()) {
                         populatePopup(filteredEntries);
                         if (!suggestionsList.isShowing() && getScene() != null) {
@@ -114,11 +119,45 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             }
 
             suggestionsList.getItems().clear();
+            suggestionsList.getItems().add(createPatternsSubMenu());
             suggestionsList.getItems().addAll(menuItems);
 
             if (!menuItems.isEmpty()) {
                 menuItems.getFirst().getContent().requestFocus();
             }
+        }
+
+        private Menu createPatternsSubMenu() {
+            Menu patternsSubMenu = new Menu("All patterns");
+
+            Map<CitationKeyPattern.Category, List<CitationKeyPattern>> categorizedPatterns =
+                    CitationKeyPattern.getAllPatterns().stream()
+                                      .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
+
+            Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
+                    CitationKeyPattern.Category.AUTHOR_RELATED, "Author related",
+                    CitationKeyPattern.Category.EDITOR_RELATED, "Editor related",
+                    CitationKeyPattern.Category.TITLE_RELATED, "Title related",
+                    CitationKeyPattern.Category.OTHER_FIELDS, "Other fields",
+                    CitationKeyPattern.Category.BIBENTRY_FIELDS, "BibEntry fields"
+            );
+
+            for (var entry : categoryNames.entrySet()) {
+                CitationKeyPattern.Category category = entry.getKey();
+                String categoryName = entry.getValue();
+
+                Menu categoryMenu = new Menu(categoryName);
+                List<CitationKeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+
+                for (CitationKeyPattern pattern : patterns) {
+                    MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
+                    categoryMenu.getItems().add(menuItem);
+                }
+
+                patternsSubMenu.getItems().add(categoryMenu);
+            }
+
+            return patternsSubMenu;
         }
     }
 }
