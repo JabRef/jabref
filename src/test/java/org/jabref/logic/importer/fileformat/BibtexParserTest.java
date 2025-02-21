@@ -2150,7 +2150,8 @@ class BibtexParserTest {
     @Test
     void parseMonth21AsSpring() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@Article{ParseTest, date = {2025-21} }");
-        assertEquals(Season.SPRING, result.get().getYearDivision());
+        Season season = result.get().getPublicationDate().get().getSeason().get();
+        assertEquals(Season.SPRING, season);
     }
 
     @Test
