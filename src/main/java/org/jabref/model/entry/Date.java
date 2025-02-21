@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -247,11 +246,16 @@ public class Date {
                 "^(\\d{1,4})-(\\d{1,2})$" // covers 2025-21
         )) {
             try {
-                // Parse the date with season
-                Date date = parseDateWithSeason(dateString);
-                return Optional.of(date);
+                // parse the date with season
+                Optional<Date> optional = parseDateWithSeason(dateString);
+                if (optional.isPresent()) {
+                    return optional;
+                }
+                // else, just pass
             } catch (DateTimeParseException e) {
-                // Month not in 21-24, continue parsing
+                // neither month nor season.
+                LOGGER.debug("Invalid Date format", e);
+                return Optional.empty();
             }
         }
 
@@ -325,23 +329,21 @@ public class Date {
      * @param dateString the string which contain season to extract the date information
      * @return the date information with TemporalAccessor type
      */
-    private static Date parseDateWithSeason(String dateString) {
+    private static Optional<Date> parseDateWithSeason(String dateString) {
         String[] parts = dateString.split("-");
-        int year = Integer.parseInt(parts[0].strip());
         int monthOrSeason = Integer.parseInt(parts[1].strip());
-        try {
-            ChronoField.MONTH_OF_YEAR.checkValidIntValue(monthOrSeason);
-            // month in 1-12
-            return new Date(Year.of(year));
-        } catch (DateTimeException e) {
-            // check month is season
-            Optional<Season> optional = Season.getSeasonByNumber(monthOrSeason);
-            if (optional.isPresent()) {
-                // use month as season new DateTimeParseException
-                return new Date(Year.of(year), optional.get());
-            }
-            throw new DateTimeParseException("Invalid Date format", dateString, parts[0].length());
+        // Is month, don't parse it here.
+        if (monthOrSeason >= 1 && monthOrSeason <= 12) {
+            return Optional.empty();
         }
+        // check month is season
+        Optional<Season> optional = Season.getSeasonByNumber(monthOrSeason);
+        if (optional.isPresent()) {
+            int year = Integer.parseInt(parts[0].strip());
+            // use month as season
+            return Optional.of(new Date(Year.of(year), optional.get()));
+        }
+        throw new DateTimeParseException("Invalid Date format for season", dateString, parts[0].length());
     }
 
     public String getNormalized() {
