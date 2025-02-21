@@ -13,7 +13,8 @@ public record CitationKeyPattern(String stringRepresentation, Category category)
     public static final CitationKeyPattern NULL_CITATION_KEY_PATTERN = new CitationKeyPattern("", Category.OTHER_FIELDS);
 
     // region - Author-related field markers
-    public static final CitationKeyPattern AUTHOR_YEAR = new CitationKeyPattern("[auth]", Category.AUTHOR_RELATED);
+    public static final CitationKeyPattern AUTHOR = new CitationKeyPattern("[auth]", Category.AUTHOR_RELATED);
+    public static final CitationKeyPattern AUTHOR_YEAR = new CitationKeyPattern("[auth_year]", Category.AUTHOR_RELATED);
     public static final CitationKeyPattern AUTHOR_FIRST_FULL = new CitationKeyPattern("[authFirstFull]", Category.AUTHOR_RELATED);
     public static final CitationKeyPattern AUTHOR_FORE_INI = new CitationKeyPattern("[authForeIni]", Category.AUTHOR_RELATED);
     public static final CitationKeyPattern AUTHOR_ETAL = new CitationKeyPattern("[auth.etal]", Category.AUTHOR_RELATED);
