@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -59,7 +60,7 @@ public class Date {
                 "u G/u G",                              // covers 30 BC/5 AD
                 "uuuu G/uuuu G",                        // covers 0030 BC/0005 AD
                 "uuuu-MM G/uuuu-MM G"                   // covers 0030-01 BC/0005-02 AD
-                );
+        );
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -83,6 +84,7 @@ public class Date {
 
     private final TemporalAccessor date;
     private final TemporalAccessor endDate;
+    private final Season season;
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -99,6 +101,7 @@ public class Date {
     public Date(TemporalAccessor date) {
         this.date = date;
         endDate = null;
+        season = null;
     }
 
     /**
@@ -110,6 +113,13 @@ public class Date {
     public Date(TemporalAccessor date, TemporalAccessor endDate) {
         this.date = date;
         this.endDate = endDate;
+        this.season = null;
+    }
+
+    public Date(TemporalAccessor date, Season season) {
+        this.date = date;
+        this.season = season;
+        this.endDate = null;
     }
 
     /**
@@ -127,16 +137,16 @@ public class Date {
 
         // if dateString has range format, treat as date range
         if (dateString.matches(
-               "\\d{4}/\\d{4}|" + // uuuu/uuuu
-               "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" + // uuuu-mm/uuuu-mm
-               "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd/uuuu-mm-dd
-               "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
-               "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
-               "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
-               "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
-               "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
-               "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-               "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+                "\\d{4}/\\d{4}|" + // uuuu/uuuu
+                        "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" + // uuuu-mm/uuuu-mm
+                        "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd/uuuu-mm-dd
+                        "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
+                        "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+                        "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
+                        "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -148,16 +158,16 @@ public class Date {
                 return Optional.empty();
             }
         } else if (dateString.matches(
-              "\\d{4} / \\d{4}|" + // uuuu / uuuu
-              "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" + // uuuu-mm / uuuu-mm
-              "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd / uuuu-mm-dd
-              "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
-              "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
-              "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
-              "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
-              "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
-              "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-              "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+                "\\d{4} / \\d{4}|" + // uuuu / uuuu
+                        "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" + // uuuu-mm / uuuu-mm
+                        "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd / uuuu-mm-dd
+                        "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
+                        "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+                        "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
+                        "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split(" / ");
@@ -170,11 +180,11 @@ public class Date {
             }
         } else if (dateString.matches(
                 "\\d{1,4} BC/\\d{1,4} AD|" + // 30 BC/5 AD and 0030 BC/0005 AD
-                "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
-                "\\d{1,4} AD/\\d{1,4} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
+                        "\\d{1,4} AD/\\d{1,4} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -187,11 +197,11 @@ public class Date {
             }
         } else if (dateString.matches(
                 "\\d{1,4} BC / \\d{1,4} AD|" + // 30 BC / 5 AD and 0030 BC / 0005 AD
-                "\\d{1,4} BC / \\d{1,4} BC|" + // 30 BC / 10 BC and 0030 BC / 0010 BC
-                "\\d{1,4} AD / \\d{1,4} AD|" + // 5 AD / 10 AD and 0005 AD / 0010 AD
-                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
-                "\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4} BC / \\d{1,4} BC|" + // 30 BC / 10 BC and 0030 BC / 0010 BC
+                        "\\d{1,4} AD / \\d{1,4} AD|" + // 5 AD / 10 AD and 0005 AD / 0010 AD
+                        "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                        "\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
         )) {
             try {
                 String[] strDates = dateString.split(" / ");
@@ -219,9 +229,9 @@ public class Date {
         // handle the new date formats with era indicators
         if (dateString.matches(
                 "\\d{1,4} BC|" + // covers 1 BC
-                "\\d{1,4} AD|" + // covers 1 BC
-                "\\d{1,4}-\\d{1,2} BC|" +  // covers 0030-01 BC
-                "\\d{1,4}-\\d{1,2} AD" // covers 0005-01 AD
+                        "\\d{1,4} AD|" + // covers 1 BC
+                        "\\d{1,4}-\\d{1,2} BC|" +  // covers 0030-01 BC
+                        "\\d{1,4}-\\d{1,2} AD" // covers 0005-01 AD
         )) {
             try {
                 // Parse the date with era indicator
@@ -229,6 +239,19 @@ public class Date {
                 return Optional.of(new Date(date));
             } catch (DateTimeParseException e) {
                 LOGGER.warn("Invalid Date format with era indicator", e);
+                return Optional.empty();
+            }
+        }
+        // handle date whose month is represented as a season.
+        if (dateString.matches(
+                "^(\\d{1,4})-(\\d{1,2})$" // covers 2025-21
+        )) {
+            try {
+                // Parse the date with season
+                Date date = parseDateWithSeason(dateString);
+                return Optional.of(date);
+            } catch (DateTimeParseException e) {
+                LOGGER.warn("Invalid Date whose month is season", e);
                 return Optional.empty();
             }
         }
@@ -297,70 +320,102 @@ public class Date {
         return Year.of(year);
     }
 
-    public String getNormalized() {
-        return NORMALIZED_DATE_FORMATTER.format(date);
-    }
-
-    public Optional<Integer> getYear() {
-        return get(ChronoField.YEAR);
-    }
-
-    public Optional<Integer> get(ChronoField field) {
-        if (date.isSupported(field)) {
-            return Optional.of(date.get(field));
-        } else {
-            return Optional.empty();
+    /**
+     * Create a date whose month is represented as a season.
+     *
+     * @param dateString the string which contain season to extract the date information
+     * @return the date information with TemporalAccessor type
+     */
+    private static Date parseDateWithSeason(String dateString) {
+        String[] parts = dateString.split("-");
+        int year = Integer.parseInt(parts[0].strip());
+        int monthOrSeason = Integer.parseInt(parts[1].strip());
+        try {
+            ChronoField.MONTH_OF_YEAR.checkValidIntValue(monthOrSeason);
+            // month in 1-12
+            return new Date(Year.of(year));
+        } catch (DateTimeException e) {
+            // check month is season
+            Optional<Season> optional = Season.getSeasonByNumber(monthOrSeason);
+            if (optional.isPresent()) {
+                // use month as season new DateTimeParseException
+                return new Date(Year.of(year), optional.get());
+            }
+            throw new DateTimeParseException("Invalid Date format", dateString, parts[0].length());
         }
     }
 
-    public Optional<Month> getMonth() {
-        return get(ChronoField.MONTH_OF_YEAR).flatMap(Month::getMonthByNumber);
-    }
+public String getNormalized() {
+    return NORMALIZED_DATE_FORMATTER.format(date);
+}
 
-    public Optional<Integer> getDay() {
-        return get(ChronoField.DAY_OF_MONTH);
-    }
+public Optional<Integer> getYear() {
+    return get(ChronoField.YEAR);
+}
 
-    public TemporalAccessor toTemporalAccessor() {
-        return date;
+public Optional<Integer> get(ChronoField field) {
+    if (date.isSupported(field)) {
+        return Optional.of(date.get(field));
+    } else {
+        return Optional.empty();
     }
+}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-        Date date1 = (Date) o;
+public Optional<Month> getMonth() {
+    return get(ChronoField.MONTH_OF_YEAR).flatMap(Month::getMonthByNumber);
+}
 
-        return Objects.equals(getYear(), date1.getYear()) &&
-                Objects.equals(getMonth(), date1.getMonth()) &&
-                Objects.equals(getDay(), date1.getDay()) &&
-                Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
-                Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
-                Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
-                Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));
+public Optional<Season> getSeason() {
+    if (season == null) {
+        return Optional.empty();
     }
+    return Optional.of(season);
+}
 
-    @Override
-    public String toString() {
-        String formattedDate = date.toString();
-        if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
-            formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
-        } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
-            formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
-        } else if (date.isSupported(ChronoField.MONTH_OF_YEAR) && date.isSupported(ChronoField.DAY_OF_MONTH)) {
-            formattedDate = DateTimeFormatter.ISO_DATE.format(date);
-        }
-        return "Date{" +
-               "date=" + formattedDate +
-               '}';
-    }
+public Optional<Integer> getDay() {
+    return get(ChronoField.DAY_OF_MONTH);
+}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getYear(), getMonth(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));
+public TemporalAccessor toTemporalAccessor() {
+    return date;
+}
+
+@Override
+public boolean equals(Object o) {
+    if (this == o) {
+        return true;
     }
+    if ((o == null) || (getClass() != o.getClass())) {
+        return false;
+    }
+    Date date1 = (Date) o;
+
+    return Objects.equals(getYear(), date1.getYear()) &&
+            Objects.equals(getMonth(), date1.getMonth()) &&
+            Objects.equals(getDay(), date1.getDay()) &&
+            Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
+            Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
+            Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
+            Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));
+}
+
+@Override
+public String toString() {
+    String formattedDate = date.toString();
+    if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
+        formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
+    } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
+        formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
+    } else if (date.isSupported(ChronoField.MONTH_OF_YEAR) && date.isSupported(ChronoField.DAY_OF_MONTH)) {
+        formattedDate = DateTimeFormatter.ISO_DATE.format(date);
+    }
+    return "Date{" +
+            "date=" + formattedDate +
+            '}';
+}
+
+@Override
+public int hashCode() {
+    return Objects.hash(getYear(), getMonth(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));
+}
 }
