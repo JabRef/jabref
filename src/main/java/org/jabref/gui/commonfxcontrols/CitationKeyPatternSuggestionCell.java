@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.l10n.Localization;
 
 public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<CitationKeyPatternsPanelItemModel, String> {
     private final CitationKeyPatternSuggestionTextField searchField;
@@ -128,18 +129,18 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
 
         private Menu createPatternsSubMenu() {
-            Menu patternsSubMenu = new Menu("All patterns");
+            Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
             Map<CitationKeyPattern.Category, List<CitationKeyPattern>> categorizedPatterns =
                     CitationKeyPattern.getAllPatterns().stream()
                                       .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
 
             Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
-                    CitationKeyPattern.Category.AUTHOR_RELATED, "Author related",
-                    CitationKeyPattern.Category.EDITOR_RELATED, "Editor related",
-                    CitationKeyPattern.Category.TITLE_RELATED, "Title related",
-                    CitationKeyPattern.Category.OTHER_FIELDS, "Other fields",
-                    CitationKeyPattern.Category.BIBENTRY_FIELDS, "BibEntry fields"
+                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
             );
 
             for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
