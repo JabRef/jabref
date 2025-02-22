@@ -1157,6 +1157,10 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
+    public Optional<Season> getYearDivision() {
+        return getFieldOrAlias(StandardField.YEARDIVISION).flatMap(Season::parse);
+    }
+
     public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
             return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
