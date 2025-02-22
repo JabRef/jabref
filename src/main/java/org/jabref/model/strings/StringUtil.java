@@ -25,6 +25,12 @@ public class StringUtil {
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+    private static final Pattern NORMALIZE_PATTERN = Pattern.compile(
+             "\\s+|" +           // multiple whitespace
+                    "\\s*-+\\s*|" +     // hyphens with surrounding spaces
+                    "\\s*,\\s*|" +      // commas with surrounding spaces
+                    "\\s*;\\s*|" +      // semicolons with surrounding spaces
+                    "\\s*:\\s*");       // colons with surrounding spaces
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     public static String booleanToBinaryString(boolean expression) {
@@ -754,5 +760,44 @@ public class StringUtil {
     @AllowedToUseApacheCommonsLang3("No Guava equivalent existing")
     public static boolean endsWithIgnoreCase(String string, String suffix) {
         return StringUtils.endsWithIgnoreCase(string, suffix);
+    }
+
+    /**
+     * Normalizes a string by standardizing whitespace and punctuation. This includes:
+     * - Trimming outer whitespace
+     * - Converting multiple whitespace characters to a single space
+     * - Converting line breaks to spaces
+     * - Standardizing formatting around punctuation (hyphens, commas, semicolons, colons)
+     *
+     * @param value The string to normalize
+     * @return The normalized string, or empty string if input is null
+     */
+    public static String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        String withoutLineBreaks = LINE_BREAKS.matcher(value).replaceAll(" ");
+
+        String trimmed = withoutLineBreaks.trim();
+        return NORMALIZE_PATTERN.matcher(trimmed).replaceAll(match -> {
+            String matchStr = match.group();
+            if (matchStr.matches("\\s+")) {
+                return " ";
+            }
+            if (matchStr.matches("\\s*-+\\s*")) {
+                return "-";
+            }
+            if (matchStr.matches("\\s*,\\s*")) {
+                return ", ";
+            }
+            if (matchStr.matches("\\s*;\\s*")) {
+                return "; ";
+            }
+            if (matchStr.matches("\\s*:\\s*")) {
+                return ": ";
+            }
+            return matchStr;
+        });
     }
 }
