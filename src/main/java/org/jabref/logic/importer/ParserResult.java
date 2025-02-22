@@ -45,6 +45,10 @@ public class ParserResult {
         this.entryTypes = Objects.requireNonNull(entryTypes);
     }
 
+    public static ParserResult fromEntry(BibEntry entry) {
+        return new ParserResult(Collections.singleton(entry));
+    }
+
     public static ParserResult fromErrorMessage(String message) {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning(message);

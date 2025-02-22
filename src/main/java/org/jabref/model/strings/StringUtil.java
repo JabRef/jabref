@@ -755,4 +755,12 @@ public class StringUtil {
     public static boolean endsWithIgnoreCase(String string, String suffix) {
         return StringUtils.endsWithIgnoreCase(string, suffix);
     }
+
+    /**
+     * @param string input string
+     * @return  {@link Optional#empty()} if the {@param string} is empty, otherwise wrap it in {@link Optional}.
+     */
+    public static Optional<String> optionalOfEmpty(String string) {
+        return Optional.ofNullable(string).filter(s -> !s.isEmpty());
+    }
 }
