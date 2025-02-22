@@ -170,7 +170,7 @@ public class WorkspacePreferences {
         return confirmHideTabBar.get();
     }
 
-    public BooleanProperty confirmHideTabBarProperty() {
+    public BooleanProperty hideTabBarProperty() {
         return confirmHideTabBar;
     }
 
