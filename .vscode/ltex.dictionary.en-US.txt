@@ -1,7 +1,0 @@
-Checkstyle
-CouchDB
-JabDrive
-JabRef
-OpenFastTrace
-OpenRewrite
-Temurin

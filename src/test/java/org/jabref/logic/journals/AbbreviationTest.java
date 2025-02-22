@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbbreviationTest {
 
@@ -112,9 +113,45 @@ class AbbreviationTest {
     }
 
     @Test
+    void testSlightDifferences() {
+        assertTrue(new Abbreviation("Long Name", "L. N.").isSimilar("Longn Name"));
+    }
+
+    @Test
+    void testMissingLetter() {
+        assertTrue(new Abbreviation("Long Name", "L. N.").isSimilar("Long ame"));
+    }
+
+    @Test
+    void testPunctuationDifferences() {
+        assertTrue(new Abbreviation("Long Name", "L. N.").isSimilar("Long, Name"));
+    }
+
+    @Test
+    void testCaseDifferences() {
+        assertTrue(new Abbreviation("Long Name", "L. N.").isSimilar("LONG NAME"));
+    }
+
+    @Test
     void equalAbbrevationsWithFourComponentsAreAlsoCompareZero() {
         Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.", "LN");
         Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.", "LN");
         assertEquals(0, abbreviation1.compareTo(abbreviation2));
+    }
+
+    @Test
+    void testCompareToWithFuzzyMatching() {
+        Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.");
+        Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.");
+        assertEquals(0, abbreviation1.compareTo(abbreviation2));
+
+        abbreviation2 = new Abbreviation("Long Name", "L. N. ");
+        assertEquals(0, abbreviation1.compareTo(abbreviation2));
+
+        abbreviation2 = new Abbreviation("Long Name", "L. N");
+        assertEquals(0, abbreviation1.compareTo(abbreviation2));
+
+        abbreviation2 = new Abbreviation("Short Name", "S. N.");
+        assertNotEquals(0, abbreviation1.compareTo(abbreviation2));
     }
 }
