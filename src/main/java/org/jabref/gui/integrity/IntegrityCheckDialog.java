@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -52,17 +51,17 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @Inject private ThemeManager themeManager;
 
     private final List<IntegrityMessage> messages;
-    private final Supplier<LibraryTab> tabSupplier;
+    private final LibraryTab libraryTab;
     private final DialogService dialogService;
 
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
     public IntegrityCheckDialog(List<IntegrityMessage> messages,
-                                Supplier<LibraryTab> tabSupplier,
+                                LibraryTab libraryTab,
                                 DialogService dialogService) {
         this.messages = messages;
-        this.tabSupplier = tabSupplier;
+        this.libraryTab = libraryTab;
         this.dialogService = dialogService;
 
         this.setTitle(Localization.lang("Check integrity"));
@@ -78,7 +77,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
         if (change.next()) {
             change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    tabSupplier.get().editEntryAndFocusField(message.entry(), message.field()));
+                    libraryTab.editEntryAndFocusField(message.entry(), message.field()));
         }
     }
 
