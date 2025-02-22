@@ -9,7 +9,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 public enum IntegrityIssue {
-    CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(InternalField.KEY_FIELD, Localization.lang("Citation key deviates from generated key"), Localization.lang("Generate key")),
+    CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(InternalField.KEY_FIELD, Localization.lang("Citation key deviates from generated key")),
     BIBTEX_FIELD_ONLY_KEY(InternalField.KEY_FIELD, Localization.lang("bibtex field only"), Localization.lang("Remove field")),
     BIBTEX_FIELD_ONLY_CROSS_REF(StandardField.CROSSREF, Localization.lang("bibtex field only"), Localization.lang("Remove field")),
     INCORRECT_FORMAT_DATE(StandardField.DATE, Localization.lang("incorrect format")),

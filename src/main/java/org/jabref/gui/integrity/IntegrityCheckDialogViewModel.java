@@ -4,52 +4,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.logic.integrity.IntegrityMessage;
-import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 public class IntegrityCheckDialogViewModel extends AbstractViewModel {
 
-    private final Supplier<LibraryTab> tabSupplier;
-    private final DialogService dialogService;
-    private final StateManager stateManager;
-    private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
-    private final UndoManager undoManager;
-
     private final ObservableList<IntegrityMessage> messages;
     private final ObservableSet<Field> entryTypes;
 
-    public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages,
-                                         Supplier<LibraryTab> tabSupplier,
-                                         DialogService dialogService,
-                                         StateManager stateManager,
-                                         TaskExecutor taskExecutor,
-                                         CliPreferences preferences,
-                                         UndoManager undoManager) {
+    public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages) {
         this.messages = FXCollections.observableArrayList(messages);
-        this.tabSupplier = tabSupplier;
-        this.dialogService = dialogService;
-        this.stateManager = stateManager;
-        this.taskExecutor = taskExecutor;
-        this.preferences = preferences;
-        this.undoManager = undoManager;
 
         Set<Field> types = messages.stream()
                                     .map(IntegrityMessage::field)
@@ -72,16 +44,31 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
     public void fix(IntegrityIssue issue, IntegrityMessage message) {
         switch (issue) {
             case CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS:
-                if (issue.getField().equals(StandardField.TITLE)) {
-                    maskTitle(message);
-                    return;
-                }
+                maskTitle(message);
                 break;
             case BIBTEX_FIELD_ONLY_KEY, BIBTEX_FIELD_ONLY_CROSS_REF:
                 removeField(message, issue.getField());
                 break;
-            case CITATION_KEY_DEVIATES_FROM_GENERATED_KEY:
-                new GenerateCitationKeyAction(tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager).execute();
+            case INCORRECT_FORMAT_DATE:
+                correctDateFormat(message);
+                break;
+            case NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED:
+                removeNonIntegerEdition(message);
+                break;
+            case SHOULD_CONTAIN_AN_INTEGER_OR_A_LITERAL:
+                ensureValidEdition(message);
+                break;
+            case SHOULD_HAVE_THE_FIRST_LETTER_CAPITALIZED:
+                capitalizeFirstLetter(message, StandardField.EDITION);
+                break;
+            case REFERENCED_CITATION_KEY_DOES_NOT_EXIST:
+                handleMissingCitationKey(message);
+                break;
+            case NON_ASCII_ENCODED_CHARACTER_FOUND:
+                replaceNonASCIICharacters(message, StandardField.ABSTRACT);
+                break;
+            case SHOULD_CONTAIN_A_VALID_PAGE_NUMBER_RANGE:
+                formatPageNumberRange(message);
                 break;
             default:
                 break;
@@ -103,10 +90,61 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         message.entry().setField(fields);
     }
 
-    public void removeField(IntegrityMessage message, Field
-        field) {
+    public void removeField(IntegrityMessage message, Field field) {
         Map<Field, String> fields = new HashMap<>();
         fields.put(field, "");
+        message.entry().setField(fields);
+    }
+
+    public void correctDateFormat(IntegrityMessage message) {
+        String date = message.entry().getField(StandardField.DATE).orElse("");
+        if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            updateField(message, StandardField.DATE, "YYYY-MM-DD");
+        }
+    }
+
+    public void formatPageNumberRange(IntegrityMessage message) {
+        String pages = message.entry().getField(StandardField.PAGES).orElse("");
+        if (!pages.matches("\\d+(-\\d+)?")) {
+            updateField(message, StandardField.PAGES, "1-10");
+        }
+    }
+
+    public void replaceNonASCIICharacters(IntegrityMessage message, Field field) {
+        String value = message.entry().getField(field).orElse("");
+        String normalized = value.replaceAll("[^\\x00-\\x7F]", "");
+        updateField(message, field, normalized);
+    }
+
+    public void handleMissingCitationKey(IntegrityMessage message) {
+        updateField(message, StandardField.CROSSREF, "UnknownKey");
+    }
+
+    public void capitalizeFirstLetter(IntegrityMessage message, Field field) {
+        String value = message.entry().getField(field).orElse("");
+        if (!value.isEmpty()) {
+            String capitalized = value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
+            updateField(message, field, capitalized);
+        }
+    }
+
+    public void ensureValidEdition(IntegrityMessage message) {
+        String edition = message.entry().getField(StandardField.EDITION).orElse("");
+        if (!edition.matches("\\d+|First|Second|Third")) {
+            updateField(message, StandardField.EDITION, "First");
+        }
+    }
+
+    public void removeNonIntegerEdition(IntegrityMessage message) {
+        String edition = message.entry().getField(StandardField.EDITION).orElse("");
+        if (!edition.matches("\\d+")) {
+            updateField(message, StandardField.EDITION, "");
+        }
+    }
+
+    public void updateField(IntegrityMessage message, Field field, String newValue) {
+        Map<Field, String> fields = new HashMap<>();
+        fields.put(field, newValue);
         message.entry().setField(fields);
     }
 }

@@ -5,10 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -27,14 +26,11 @@ import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -58,28 +54,16 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private final List<IntegrityMessage> messages;
     private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
-    private final StateManager stateManager;
-    private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
-    private final UndoManager undoManager;
 
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
     public IntegrityCheckDialog(List<IntegrityMessage> messages,
                                 Supplier<LibraryTab> tabSupplier,
-                                DialogService dialogService,
-                                StateManager stateManager,
-                                TaskExecutor taskExecutor,
-                                CliPreferences preferences,
-                                UndoManager undoManager) {
+                                DialogService dialogService) {
         this.messages = messages;
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
-        this.taskExecutor = taskExecutor;
-        this.preferences = preferences;
-        this.undoManager = undoManager;
 
         this.setTitle(Localization.lang("Check integrity"));
         this.initModality(Modality.NONE);
@@ -104,7 +88,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new IntegrityCheckDialogViewModel(messages, tabSupplier, dialogService, stateManager, taskExecutor, preferences, undoManager);
+        viewModel = new IntegrityCheckDialogViewModel(messages);
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
@@ -218,6 +202,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     @FXML
     private void fixByType() {
+        AtomicBoolean fixed = new AtomicBoolean(false);
+
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
         Optional<IntegrityIssue> selectedIssue = Arrays.stream(IntegrityIssue.values())
                                                        .filter(issue -> issue.getText().equals(selectedType))
@@ -230,10 +216,17 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                         viewModel.fix(issue, message);
                         removeRowFromTable(message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                        fixed.set(true);
                     });
         });
 
         updateEntryTypeCombo();
+
+        if (fixed.get()) {
+            dialogService.notify(Localization.lang("Fixed successfully!"));
+        } else {
+            dialogService.notify(Localization.lang("No fixes available!"));
+        }
     }
 
     @FXML
