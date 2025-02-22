@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -12,6 +13,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Window;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
@@ -57,9 +59,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
     }
 
     static class CitationKeyPatternSuggestionTextField extends TextField {
-        // Maximum number of entries that can be displayed in the popup menu.
-        private static final int MAX_ENTRIES = 7;
-
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
 
@@ -99,8 +98,13 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
 
         private void populatePopup(List<String> searchResult) {
+            int heightOfMenuItem = 30; // Height of menu item
             List<CustomMenuItem> menuItems = new ArrayList<>();
-            int count = Math.min(searchResult.size(), MAX_ENTRIES);
+
+            double space = getAvailableSpaceBelow(this);
+            int maxItems = (int) (space / heightOfMenuItem) - 1;
+
+            int count = Math.min(searchResult.size(), maxItems);
 
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
@@ -126,6 +130,23 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             if (!menuItems.isEmpty()) {
                 menuItems.getFirst().getContent().requestFocus();
             }
+        }
+
+        public static double getAvailableSpaceBelow(TextField textField) {
+            if (textField.getScene() == null || textField.getScene().getWindow() == null) {
+                return 0;
+            }
+
+            Window window = textField.getScene().getWindow();
+            if (window == null) {
+                return 0;
+            }
+
+            Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
+            double screenHeight = window.getHeight();
+            double textFieldBottom = bounds.getMinY() + textField.getHeight();
+
+            return screenHeight - (textFieldBottom - window.getY());
         }
 
         private Menu createPatternsSubMenu() {
