@@ -393,6 +393,7 @@ public class Date {
 
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&
+                Objects.equals(getSeason(), date1.getSeason()) &&
                 Objects.equals(getDay(), date1.getDay()) &&
                 Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
                 Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
@@ -403,6 +404,12 @@ public class Date {
     @Override
     public String toString() {
         String formattedDate = date.toString();
+        if (season != null) {
+            return "Date{" +
+                    "date=" + formattedDate + ", " +
+                    "season=" + season +
+                    '}';
+        }
         if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
             formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
         } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
@@ -417,6 +424,6 @@ public class Date {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getYear(), getMonth(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));
+        return Objects.hash(getYear(), getMonth(), getSeason(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));
     }
 }

@@ -2,7 +2,6 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -10,18 +9,16 @@ import org.jabref.model.strings.StringUtil;
  */
 public enum Season {
 
-    SPRING("spring", "spr", 21),
-    SUMMER("summer", "sum", 22),
-    AUTUMN("autumn", "aut", 23),
-    WINTER("winter", "win", 24);
+    SPRING("spring", 21),
+    SUMMER("summer", 22),
+    AUTUMN("autumn", 23),
+    WINTER("winter", 24);
 
-    private final String fullName;
-    private final String shortName;
+    private final String name;
     private final int number;
 
-    Season(String fullName, String shortName, int number) {
-        this.fullName = fullName;
-        this.shortName = shortName;
+    Season(String name, int number) {
+        this.name = name;
         this.number = number;
     }
 
@@ -41,29 +38,14 @@ public enum Season {
     }
 
     /**
-     * Find season by shortName (3 letters) case-insensitive.
+     * Find season by name case-insensitive.
      * If no matching season is found, then an empty Optional is returned.
      *
-     * @param shortName spr, sum, aut, win
+     * @param name spring, summer, autumn, winter
      */
-    public static Optional<Season> getSeasonByShortName(String shortName) {
+    public static Optional<Season> getSeasonByName(String name) {
         for (Season season : Season.values()) {
-            if (season.shortName.equalsIgnoreCase(shortName)) {
-                return Optional.of(season);
-            }
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Find season by shortName (3 letters) case-insensitive.
-     * If no matching season is found, then an empty Optional is returned.
-     *
-     * @param fullName spring, summer, autumn, winter
-     */
-    public static Optional<Season> getSeasonByFullName(String fullName) {
-        for (Season season : Season.values()) {
-            if (season.fullName.equalsIgnoreCase(fullName)) {
+            if (season.name.equalsIgnoreCase(name)) {
                 return Optional.of(season);
             }
         }
@@ -83,14 +65,13 @@ public enum Season {
             return Optional.empty();
         }
 
-        // Much more liberal matching covering most known abbreviations etc.
         String testString = value;
-        Optional<Season> season = Season.getSeasonByFullName(testString);
+        Optional<Season> season = Season.getSeasonByName(testString);
         if (season.isPresent()) {
             return season;
         }
 
-        season = Season.parseGermanShortSeason(testString);
+        season = Season.parseGermanSeason(testString);
         if (season.isPresent()) {
             return season;
         }
@@ -110,42 +91,19 @@ public enum Season {
      * @return the corresponding season instance, empty if input is not in German
      * form
      */
-    static Optional<Season> parseGermanShortSeason(String value) {
+    static Optional<Season> parseGermanSeason(String value) {
         value = value.toLowerCase();
         return switch (value) {
-            case "fruehling", "frühling" -> Season.getSeasonByNumber(1);
-            case "sommer" -> Season.getSeasonByNumber(2);
-            case "herbst" -> Season.getSeasonByNumber(3);
-            case "winter" -> Season.getSeasonByNumber(4);
+            case "frühling" -> Optional.of(SPRING);
+            case "sommer" -> Optional.of(SUMMER);
+            case "herbst" -> Optional.of(AUTUMN);
+            case "winter" -> Optional.of(WINTER);
             default -> Optional.empty();
         };
     }
 
     /**
-     * Returns the name of a Season in a short (3-letter) format. (spr, sum, aut, win)
-     *
-     * @return 3-letter identifier for a Season
-     */
-    public String getShortName() {
-        return shortName;
-    }
-
-    /**
-     * Returns the season in JabRef format. The format is the short 3-digit name surrounded by a '#' (FieldWriter.BIBTEX_STRING_START_END_SYMBOL).
-     * Example: #jan#, #feb#, etc.
-     * <p>
-     * See <a href="https://github.com/JabRef/jabref/issues/263#issuecomment-151246595">Issue 263</a> for a discussion on that thing.
-     * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef.
-     * The documentation is available at the <a href="https://docs.jabref.org/fields/strings">Strings help</a> of JabRef.
-     *
-     * @return Season in JabRef format
-     */
-    public String getJabRefFormat() {
-        return (FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL).formatted(shortName);
-    }
-
-    /**
-     * Returns the number of the Season: 21 -> Spring, 22 -> Summer etc.
+     * Returns the number of the Season: SPRING -> 21, SUMMER -> 22  etc.
      *
      * @return number of the season in the Year
      */
@@ -158,7 +116,7 @@ public enum Season {
      *
      * @return Season
      */
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 }

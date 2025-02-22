@@ -32,7 +32,7 @@ public class ConvertToBibtexCleanup implements CleanupJob {
             }
 
             if (StringUtil.isBlank(entry.getField(StandardField.YEARDIVISION))) {
-                date.getSeason().flatMap(season -> entry.setField(StandardField.YEARDIVISION, season.getFullName())).ifPresent(changes::add);
+                date.getSeason().flatMap(season -> entry.setField(StandardField.YEARDIVISION, season.getName())).ifPresent(changes::add);
             }
 
             if (!changes.isEmpty()) {
