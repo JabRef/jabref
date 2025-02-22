@@ -98,7 +98,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
 
         private void populatePopup(List<String> searchResult) {
-            int heightOfMenuItem = 30; // Height of menu item
+            int heightOfMenuItem = 30; 
             List<CustomMenuItem> menuItems = new ArrayList<>();
 
             double space = getAvailableSpaceBelow(this);
