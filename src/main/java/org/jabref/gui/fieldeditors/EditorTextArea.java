@@ -31,12 +31,11 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
 
     public EditorTextArea() {
         this("");
-        System.out.println("Creating EditorTextArea with empty text");
     }
 
     public EditorTextArea(final String text) {
         super(text);
-        System.out.println("Creating EditorTextArea with text:");
+
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
 
@@ -61,7 +60,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     /**
-     * Set pasteActionHandler variable to passed handler.
+     * Set pasteActionHandler variable to passed handler
      *
      * @param handler an instance of PasteActionHandler that describes paste behavior
      */
@@ -71,7 +70,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     /**
-     * Override JavaFX TextArea paste method to perform paste and then execute pasteActionHandler.
+     * Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
      */
     @Override
     public void paste() {
