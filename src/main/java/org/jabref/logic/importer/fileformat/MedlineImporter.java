@@ -18,7 +18,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -1000,7 +999,6 @@ public class MedlineImporter extends Importer implements Parser {
                         }
                     }
                     case "AbstractText" -> handleAbstractTextElement(reader, abstractTextList, elementName);
-
                 }
             }
 
