@@ -1033,7 +1033,7 @@ public class MedlineImporter extends Importer implements Parser {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(reader.getAttributeValue(null, "Label"))
                 .map(String::trim)
-                .filter(label -> !label.isEmpty() && !label.equals("UNLABELLED"))
+                .filter(label -> !label.isEmpty() && !"UNLABELLED".equals(label))
                 .ifPresent(label -> result.append(label).append(": "));
         handleText(reader, textList, startElement, result);
     }
@@ -1117,7 +1117,7 @@ public class MedlineImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                if (elementName.equals("Author")) {
+                if ("Author".equals(elementName)) {
                     parseAuthor(reader, authorNames);
                 }
             }
