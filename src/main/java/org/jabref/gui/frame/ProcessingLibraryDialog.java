@@ -21,11 +21,11 @@ public class ProcessingLibraryDialog {
     }
 
     public void showAndWait(List<LibraryTab> libraryTabs) {
-        if (libraryTabs.stream().anyMatch(tab -> tab.isSaving())) {
+        if (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (libraryTabs.stream().anyMatch(tab -> tab.isSaving())) {
+                    while (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;
                         } else {
