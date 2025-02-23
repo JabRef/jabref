@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a new functionality that displays a drop-down list of matching suggestions when typing a citation key pattern. [#12502](https://github.com/JabRef/jabref/issues/12502)
 - We added a new CLI that supports txt, csv, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/issues/11984)
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
@@ -29,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the file renaming dialog was not resizable and its size was too small for long file names. [#12518](https://github.com/JabRef/jabref/pull/12518)
 - We fixed an issue where the name of the untitled database was shown as a blank space in the right-click context menu's "Copy to" option. [#12459](https://github.com/JabRef/jabref/pull/12459)
 - We fixed an issue where the F3 shortcut key did not work without opening the right-click context menu. [#12417](https://github.com/JabRef/jabref/pull/12417)
 - We fixed an issue where a bib file with UFF-8 charset was wrongly loaded with a different charset [forum#5369](https://discourse.jabref.org/t/jabref-5-15-opens-bib-files-with-shift-jis-encoding-instead-of-utf-8/5369/)
