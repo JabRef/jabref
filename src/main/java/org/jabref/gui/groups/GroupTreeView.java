@@ -87,6 +87,7 @@ public class GroupTreeView extends BorderPane {
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
+    private TreeTableRow<GroupNodeViewModel> row;
     private CustomTextField searchField;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
@@ -204,6 +205,17 @@ public class GroupTreeView extends BorderPane {
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription)
+                .withOnMouseClickedEvent(group -> event -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        Node node = (Node) event.getTarget();
+                        while (node != null && !(node instanceof TreeTableRow)) {
+                            node = node.getParent();
+                        }
+                        if (node instanceof TreeTableRow) {
+                            row = (TreeTableRow<GroupNodeViewModel>) node;
+                        }
+                    }
+                })
                 .install(mainColumn);
 
         // Number of hits (only if user wants to see them)
@@ -555,6 +567,7 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
@@ -639,6 +652,8 @@ public class GroupTreeView extends BorderPane {
                         case GROUP_SUBGROUP_ADD ->
                                 group.isEditable() && group.canAddGroupsIn()
                                         || group.isRoot();
+                        case GROUP_SUBGROUP_RENAME ->
+                            group.isEditable();
                         case GROUP_SUBGROUP_REMOVE ->
                                 group.isEditable() && group.hasSubgroups() && group.canRemove()
                                         || group.isRoot();
@@ -685,6 +700,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.sortReverseEntriesRecursive(group.getGroupNode());
                 case GROUP_ENTRIES_ADD ->
                         viewModel.addSelectedEntries(group);
+                case GROUP_SUBGROUP_RENAME ->
+                        viewModel.renameSubgroups(row);
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
             }

@@ -198,6 +198,7 @@ public enum StandardActions implements Action {
     GROUP_GENERATE_SUMMARIES(Localization.lang("Generate summaries for entries in the group")),
     GROUP_GENERATE_EMBEDDINGS(Localization.lang("Generate embeddings for linked files in the group")),
     GROUP_SUBGROUP_ADD(Localization.lang("Add subgroup")),
+    GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_SUBGROUP_REMOVE(Localization.lang("Remove subgroups")),
     GROUP_SUBGROUP_SORT(Localization.lang("Sort subgroups A-Z")),
     GROUP_SUBGROUP_SORT_REVERSE(Localization.lang("Sort subgroups Z-A")),

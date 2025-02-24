@@ -20,6 +20,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -474,6 +477,35 @@ public class GroupTreeViewModel extends AbstractViewModel {
         );
 
         dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));
+    }
+
+    public void renameSubgroups(TreeTableRow<GroupNodeViewModel> row) {
+        GroupNodeViewModel group = row.getItem();
+        if (group == null) {
+            return;
+        }
+
+        TextField textField = new TextField(group.getDisplayName());
+        textField.setMinWidth(row.getWidth());
+
+        textField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                group.setDisplayName(textField.getText());
+                row.setGraphic(null);
+                row.getTreeTableView().refresh();
+            }
+        });
+
+        textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                group.setDisplayName(textField.getText());
+                row.setGraphic(null);
+                row.getTreeTableView().refresh();
+            }
+        });
+
+        row.setGraphic(textField);
+        textField.requestFocus();
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
