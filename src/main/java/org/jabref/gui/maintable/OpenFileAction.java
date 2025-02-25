@@ -48,7 +48,7 @@ public class OpenFileAction extends SimpleCommand {
 
             BibEntry entry = entries.getFirst();
 
-            if (entry.hasField(StandardField.FILE)) {
+            if (entry.hasField(StandardField.FILE) && !entry.getFiles().isEmpty()) { // Check if files exist
                 LinkedFile linkedFile = entry.getFiles().getFirst();
                 try {
                     Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
@@ -59,6 +59,8 @@ public class OpenFileAction extends SimpleCommand {
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
                 }
+            } else {
+                dialogService.notify(Localization.lang("No file is attached to the selected entry."));
             }
         });
     }
