@@ -90,6 +90,7 @@ public enum KeyBinding {
     OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt+0", KeyBindingCategory.TOOLS),
     SHOW_PREFS("Preferences", Localization.lang("Preferences"), "ctrl+,", KeyBindingCategory.FILE),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
+    MERGE_WITH_FETCHED_ENTRY("Get bibliographic data from \"%0\", \"DOI/ISBN/...\"", Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), "F5", KeyBindingCategory.EDIT),
     PASTE("Paste", Localization.lang("Paste"), "ctrl+V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift+F9", KeyBindingCategory.VIEW),
