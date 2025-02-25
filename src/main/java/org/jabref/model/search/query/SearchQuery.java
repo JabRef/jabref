@@ -12,6 +12,8 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
 
@@ -20,6 +22,8 @@ public class SearchQuery {
     private SearchParser.StartContext context;
     private boolean isValidExpression;
     private SearchResults searchResults;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     public SearchQuery(String searchExpression) {
         this(searchExpression, EnumSet.noneOf(SearchFlags.class));
@@ -32,6 +36,7 @@ public class SearchQuery {
             this.context = getStartContext(searchExpression);
             isValidExpression = true;
         } catch (ParseCancellationException e) {
+            LOGGER.error("Search query Parsing error", e.getCause());
             isValidExpression = false;
         }
     }
