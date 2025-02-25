@@ -48,7 +48,7 @@ public class OpenFileAction extends SimpleCommand {
 
             BibEntry entry = entries.getFirst();
 
-            if (entry.hasField(StandardField.FILE) && !entry.getFiles().isEmpty()) { // Check if files exist
+            if (entry.hasField(StandardField.FILE) && !entry.getFiles().isEmpty()) { 
                 LinkedFile linkedFile = entry.getFiles().getFirst();
                 try {
                     Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
