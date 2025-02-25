@@ -48,6 +48,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
@@ -89,7 +90,6 @@ public class GroupTreeView extends BorderPane {
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
-    private TreeTableRow<GroupNodeViewModel> row;
     private CustomTextField searchField;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
@@ -146,6 +146,14 @@ public class GroupTreeView extends BorderPane {
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
+        groupTree.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
+                TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    viewModel.editGroup(groupTree.getRoot().getValue());
+                }
+            }
+        });
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
@@ -208,17 +216,6 @@ public class GroupTreeView extends BorderPane {
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription)
-                .withOnMouseClickedEvent(group -> event -> {
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        Node node = (Node) event.getTarget();
-                        while (node != null && !(node instanceof TreeTableRow)) {
-                            node = node.getParent();
-                        }
-                        if (node instanceof TreeTableRow) {
-                            row = (TreeTableRow<GroupNodeViewModel>) node;
-                        }
-                    }
-                })
                 .install(mainColumn);
 
         // Number of hits (only if user wants to see them)
