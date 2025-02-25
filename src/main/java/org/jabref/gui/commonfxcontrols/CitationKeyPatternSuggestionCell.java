@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -61,10 +62,12 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
     static class CitationKeyPatternSuggestionTextField extends TextField {
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
+        private int heightOfMenuItem;
 
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
             this.suggestionsList = new ContextMenu();
+            this.heightOfMenuItem = 30;
 
             setListener();
         }
@@ -98,7 +101,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         }
 
         private void populatePopup(List<String> searchResult) {
-            int heightOfMenuItem = 30; 
             List<CustomMenuItem> menuItems = new ArrayList<>();
 
             double space = getAvailableSpaceBelow(this);
@@ -121,6 +123,10 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     positionCaret(result.length());
                     suggestionsList.hide();
                 });
+            }
+
+            if (!menuItems.isEmpty()) {
+                Platform.runLater(() -> heightOfMenuItem = (int) menuItems.get(0).getContent().getBoundsInLocal().getHeight());
             }
 
             suggestionsList.getItems().clear();
