@@ -17,13 +17,13 @@ import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
+
     private final String searchExpression;
     private final EnumSet<SearchFlags> searchFlags;
     private SearchParser.StartContext context;
     private boolean isValidExpression;
     private SearchResults searchResults;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     public SearchQuery(String searchExpression) {
         this(searchExpression, EnumSet.noneOf(SearchFlags.class));
