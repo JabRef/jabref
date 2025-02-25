@@ -1,5 +1,8 @@
 package org.jabref.gui.integrity;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +68,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
                 handleMissingCitationKey(message);
                 break;
             case NON_ASCII_ENCODED_CHARACTER_FOUND:
-                replaceNonASCIICharacters(message, StandardField.ABSTRACT);
+                replaceNonASCIICharacters(message);
                 break;
             case SHOULD_CONTAIN_A_VALID_PAGE_NUMBER_RANGE:
                 formatPageNumberRange(message);
@@ -77,6 +80,9 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
 
     public void maskTitle(IntegrityMessage message) {
         String title = message.entry().getTitle().get();
+        if (title.isEmpty()) {
+            return;
+        }
         StringBuilder result = new StringBuilder();
         for (char ch : title.toCharArray()) {
             if (Character.isUpperCase(ch)) {
@@ -98,8 +104,14 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
 
     public void correctDateFormat(IntegrityMessage message) {
         String date = message.entry().getField(StandardField.DATE).orElse("");
-        if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            updateField(message, StandardField.DATE, "YYYY-MM-DD");
+        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter targetFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        try {
+            LocalDate parsedDate = LocalDate.parse(date, inputFormat);
+            updateField(message, StandardField.DATE, parsedDate.format(targetFormat));
+        } catch (DateTimeParseException e) {
+            System.err.println("Invalid date format: " + date);
         }
     }
 
@@ -110,10 +122,10 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         }
     }
 
-    public void replaceNonASCIICharacters(IntegrityMessage message, Field field) {
-        String value = message.entry().getField(field).orElse("");
+    public void replaceNonASCIICharacters(IntegrityMessage message) {
+        String value = message.entry().getField(StandardField.ABSTRACT).orElse("");
         String normalized = value.replaceAll("[^\\x00-\\x7F]", "");
-        updateField(message, field, normalized);
+        updateField(message, StandardField.ABSTRACT, normalized);
     }
 
     public void handleMissingCitationKey(IntegrityMessage message) {
