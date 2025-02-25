@@ -48,6 +48,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -82,6 +83,7 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final KeyBindingRepository keyBindingRepository;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -112,13 +114,14 @@ public class GroupTreeView extends BorderPane {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
+        this.keyBindingRepository = preferences.getKeyBindingRepository();
 
         createNodes();
         initialize();
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(preferences.getKeyBindingRepository());
+        searchField = SearchTextField.create(keyBindingRepository);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
         this.setTop(searchField);
@@ -645,15 +648,13 @@ public class GroupTreeView extends BorderPane {
 
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
-                        case GROUP_EDIT ->
+                        case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
                                 group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
                         case GROUP_SUBGROUP_ADD ->
                                 group.isEditable() && group.canAddGroupsIn()
                                         || group.isRoot();
-                        case GROUP_SUBGROUP_RENAME ->
-                            group.isEditable();
                         case GROUP_SUBGROUP_REMOVE ->
                                 group.isEditable() && group.hasSubgroups() && group.canRemove()
                                         || group.isRoot();
