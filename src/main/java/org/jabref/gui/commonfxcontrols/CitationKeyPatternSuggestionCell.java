@@ -126,7 +126,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             }
 
             if (!menuItems.isEmpty()) {
-                Platform.runLater(() -> heightOfMenuItem = (int) menuItems.get(0).getContent().getBoundsInLocal().getHeight());
+                Platform.runLater(() -> heightOfMenuItem = (int) menuItems.getFirst().getContent().getBoundsInLocal().getHeight());
             }
 
             suggestionsList.getItems().clear();
