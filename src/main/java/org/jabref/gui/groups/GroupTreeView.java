@@ -677,7 +677,7 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT -> {
+                case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
@@ -701,8 +701,6 @@ public class GroupTreeView extends BorderPane {
                         viewModel.sortReverseEntriesRecursive(group.getGroupNode());
                 case GROUP_ENTRIES_ADD ->
                         viewModel.addSelectedEntries(group);
-                case GROUP_SUBGROUP_RENAME ->
-                        viewModel.renameSubgroups(row);
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
             }
