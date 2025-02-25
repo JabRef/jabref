@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.logic.l10n.Localization;
 
 public enum StandardActions implements Action {
