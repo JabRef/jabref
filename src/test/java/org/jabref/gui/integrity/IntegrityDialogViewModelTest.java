@@ -32,20 +32,20 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void testMaskTitle() {
+    void maskTitle() {
         when(entry.getTitle()).thenReturn(Optional.of("Proceedings of the 40th International Conference on Machine Learning"));
         viewModel.maskTitle(message);
         verify(entry).setField(Map.of(StandardField.TITLE, "{P}roceedings of the 40th {I}nternational {C}onference on {M}achine {L}earning"));
     }
 
     @Test
-    void testRemoveField() {
+    void removeField() {
         viewModel.removeField(message, StandardField.AUTHOR);
         verify(entry).setField(Map.of(StandardField.AUTHOR, ""));
     }
 
     @Test
-    void testCorrectDateFormat() {
+    void correctDateFormat() {
         when(message.entry()).thenReturn(entry);
         when(entry.getField(StandardField.DATE)).thenReturn(Optional.of("25-02-2025"));
         viewModel.correctDateFormat(message);
@@ -53,7 +53,7 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void testFormatPageNumberRange() {
+    void formatPageNumberRange() {
         when(entry.getField(StandardField.PAGES)).thenReturn(Optional.of("abc"));
         viewModel.formatPageNumberRange(message);
         verify(entry).setField(Map.of(StandardField.PAGES, "1-10"));
@@ -67,7 +67,7 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void testReplaceNonASCIICharacters() {
+    void replaceNonASCIICharacters() {
         when(message.entry()).thenReturn(entry);
         when(entry.getField(StandardField.ABSTRACT)).thenReturn(Optional.of("Thé abstract"));
         viewModel.replaceNonASCIICharacters(message);
@@ -75,13 +75,13 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void testHandleMissingCitationKey() {
+    void handleMissingCitationKey() {
         viewModel.handleMissingCitationKey(message);
         verify(entry).setField(Map.of(StandardField.CROSSREF, "UnknownKey"));
     }
 
     @Test
-    void testCapitalizeFirstLetter() {
+    void capitalizeFirstLetter() {
         Field field = StandardField.AUTHOR;
         when(entry.getField(field)).thenReturn(Optional.of("john doe"));
         viewModel.capitalizeFirstLetter(message, field);
@@ -89,14 +89,14 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void testEnsureValidEdition() {
+    void ensureValidEdition() {
         when(entry.getField(StandardField.EDITION)).thenReturn(Optional.of("Fourth"));
         viewModel.ensureValidEdition(message);
         verify(entry).setField(Map.of(StandardField.EDITION, "First"));
     }
 
     @Test
-    void testRemoveNonIntegerEdition() {
+    void removeNonIntegerEdition() {
         when(entry.getField(StandardField.EDITION)).thenReturn(Optional.of("First"));
         viewModel.removeNonIntegerEdition(message);
         verify(entry).setField(Map.of(StandardField.EDITION, ""));

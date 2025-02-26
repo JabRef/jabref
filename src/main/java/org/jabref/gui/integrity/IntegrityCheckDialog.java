@@ -3,15 +3,15 @@ package org.jabref.gui.integrity;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -115,7 +115,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 if (issue.isPresent() && issue.get().getFix() != null) {
                     configureButton(issue.get().getFix(), () -> {
                         viewModel.fix(issue.get(), message);
-                        removeRowFromTable(message);
+                        viewModel.removeFromEntryTypes(message.field().getDisplayName());
                     });
                     setGraphic(button);
                     return;
@@ -141,6 +141,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         addMessageColumnFilter(keyColumn, keyFilterButton);
         addMessageColumnFilter(fieldColumn, fieldFilterButton);
         addMessageColumnFilter(messageColumn, messageFilterButton);
+
+       messagesTable.itemsProperty().bind(viewModel.columnsListProperty());
     }
 
     private void addMessageColumnFilter(TableColumn<IntegrityMessage, String> messageColumn, MenuButton messageFilterButton) {
@@ -170,12 +172,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 column.setGraphic(null);
             });
         }
-    }
-
-    private void removeRowFromTable(IntegrityMessage message) {
-        ObservableList<IntegrityMessage> mutableMessages = FXCollections.observableArrayList(messagesTable.getItems());
-        mutableMessages.remove(message);
-        messagesTable.setItems(mutableMessages);
     }
 
     private void updateEntryTypeCombo() {
@@ -213,8 +209,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     .filter(message -> message.field().equals(issue.getField()) && hasFix(message))
                     .forEach(message -> {
                         viewModel.fix(issue, message);
-                        removeRowFromTable(message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
                         fixed.set(true);
                     });
         });
@@ -235,7 +231,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 .forEach(message -> IntegrityIssue.fromField(message.field()).ifPresent(issue -> {
                     viewModel.fix(issue, message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                    removeRowFromTable(message);
+                    Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
                 }));
 
         updateEntryTypeCombo();

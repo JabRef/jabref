@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -18,8 +20,14 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class IntegrityCheckDialogViewModel extends AbstractViewModel {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckDialogViewModel.class);
+
+    private final ListProperty<IntegrityMessage> columnsListProperty;
     private final ObservableList<IntegrityMessage> messages;
     private final ObservableSet<Field> entryTypes;
 
@@ -30,6 +38,12 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
                                     .map(IntegrityMessage::field)
                                     .collect(Collectors.toSet());
         this.entryTypes = FXCollections.observableSet(types);
+
+        this.columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList(messages));
+    }
+
+    public ListProperty<IntegrityMessage> columnsListProperty() {
+        return this.columnsListProperty;
     }
 
     public ObservableList<IntegrityMessage> getMessages() {
@@ -111,7 +125,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
             LocalDate parsedDate = LocalDate.parse(date, inputFormat);
             updateField(message, StandardField.DATE, parsedDate.format(targetFormat));
         } catch (DateTimeParseException e) {
-            System.err.println("Invalid date format: " + date);
+            LOGGER.error("Invalid date format: {}", date);
         }
     }
 
