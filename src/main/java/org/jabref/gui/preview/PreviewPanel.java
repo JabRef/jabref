@@ -121,8 +121,7 @@ public class PreviewPanel extends VBox {
     }
 
     private ContextMenu createPopupMenu() {
-
-        MenuItem copyCitationHtml= new MenuItem(Localization.lang("Copy citation (html)"), IconTheme.JabRefIcons.COPY.getGraphicNode());
+        MenuItem copyCitationHtml = new MenuItem(Localization.lang("Copy citation (html)"), IconTheme.JabRefIcons.COPY.getGraphicNode());
         keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(copyCitationHtml::setAccelerator);
         copyCitationHtml.setOnAction(event -> previewView.copyPreviewHtmlToClipBoard());
         MenuItem copyCitationText = new MenuItem(Localization.lang("Copy citation (text)"));
