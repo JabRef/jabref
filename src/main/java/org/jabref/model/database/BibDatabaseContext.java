@@ -13,6 +13,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -43,6 +44,7 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
+    private Boolean underVersionControl;
 
     /**
      * Generate a random UID for unique of the concrete context
@@ -314,5 +316,20 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
+    }
+
+    public boolean isUnderVersionControl() {
+        if (underVersionControl == null) {
+            underVersionControl = getDatabasePath().map(GitHandler::isUnderVersionControl).orElse(false);
+        }
+        return underVersionControl;
+    }
+
+    public void pullLatestChanges() {
+        getDatabasePath().ifPresent(path -> {
+            if (isUnderVersionControl()) {
+                GitHandler.pullChanges(path);
+            }
+        });
     }
 }

@@ -11,8 +11,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -200,6 +202,29 @@ public class GitHandler {
     public String getCurrentlyCheckedOutBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
+        }
+    }
+
+    public static boolean isUnderVersionControl(Path path) {
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+        try {
+            builder.findGitDir(path.toFile());
+            return builder.getGitDir() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static void pullChanges(Path repoPath) {
+        try (Git git = Git.open(repoPath.toFile())) {
+            System.out.println("Pulling latest changes...");
+            git.pull().call();
+            System.out.println("Repository updated successfully.");
+        } catch (RepositoryNotFoundException e) {
+            System.err.println("Not a valid Git repository: " + repoPath);
+        } catch (GitAPIException | IOException e) {
+            System.err.println("Error while pulling changes: " + e.getMessage());
         }
     }
 }
