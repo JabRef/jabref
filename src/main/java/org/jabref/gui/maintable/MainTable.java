@@ -329,6 +329,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
+        OpenExternalFileAction openExternalFileActionFileAction = new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -378,6 +379,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         openUrlAction.execute();
                         event.consume();
                         break;
+                    case OPEN_FILE:
+                        openExternalFileActionFileAction.execute();
+                        event.consume();
                     default:
                         // Pass other keys to parent
                 }

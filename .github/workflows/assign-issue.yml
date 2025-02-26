@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@fix-rate-limit-err
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 90
+          days_until_unassign: 45
           maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,LinusDietz'
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
@@ -34,8 +34,9 @@ jobs:
 
             ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**"" label to prevent automatic unassignment.
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-        if: steps.assign.outputs.assigned == 'yes'
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: koppor/github-action-move-issues@work-for-labeled
+        # Action currently works for issues only - pre-condition: https://github.com/takanome-dev/assign-issue-action/issues/269 fixed
+        if: github.event_name == 'issue_comment'
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -45,8 +46,8 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Assigned" Column in "Good First Issues"
-        if: steps.assign.outputs.assigned == 'yes'
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: koppor/github-action-move-issues@work-for-labeled
+        if: github.event_name == 'issue_comment'
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"

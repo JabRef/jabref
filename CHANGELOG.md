@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CLI that supports txt, csv, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/issues/11984)
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 
 ### Changed
 
@@ -27,9 +28,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The "automatically sync bibliography when citing" feature of the LibreOffice integration is now disabled by default (can be enabled in settings). [#12472](https://github.com/JabRef/jabref/pull/12472)
 - For the Citation key generator patterns, we reverted how `[authorsAlpha]` would behave to the original pattern and renamed the LNI-based pattern introduced in V6.0-alpha to `[authorsAlphaLNI]`. [#12499](https://github.com/JabRef/jabref/pull/12499)
 - We keep the list of recent files if one files could not be found. [#12517](https://github.com/JabRef/jabref/pull/12517)
+- During the import process, the labels indicating individual paragraphs within an abstract returned by PubMed/Medline XML are preserved. [#12527](https://github.com/JabRef/jabref/issues/12527)
 
 ### Fixed
 
+- We fixed an issue where the F4 shortcut key did not work without opening the right-click context menu. [#6101](https://github.com/JabRef/jabref/pull/6101)
 - We fixed an issue where the file renaming dialog was not resizable and its size was too small for long file names. [#12518](https://github.com/JabRef/jabref/pull/12518)
 - We fixed an issue where the name of the untitled database was shown as a blank space in the right-click context menu's "Copy to" option. [#12459](https://github.com/JabRef/jabref/pull/12459)
 - We fixed an issue where the F3 shortcut key did not work without opening the right-click context menu. [#12417](https://github.com/JabRef/jabref/pull/12417)
