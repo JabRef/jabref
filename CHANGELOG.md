@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
 - We added a new "Copy citation (text)" button in the context menu of the preview . [#12551]
 - We added a new "Export to clipboard" button in the context menu of the preview . [#12551]
+- We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 
 ### Changed
 
