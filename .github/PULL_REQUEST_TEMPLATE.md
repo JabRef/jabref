@@ -1,6 +1,6 @@
 YOU HAVE TO MODIFIY THIS TEXT TO FIT YOUR PR. OTHERWISE YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT.
 Describe the changes you have made here: what, why, ...
-Link the issue that will be closed, e.g., "Closes #333". If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47".
+Link the issue that will be closed. Example: "Closes #333".
 
 ### Mandatory checks
 
