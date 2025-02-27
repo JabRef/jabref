@@ -140,7 +140,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
                     CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
                     CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
+                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
             );
 
             for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
