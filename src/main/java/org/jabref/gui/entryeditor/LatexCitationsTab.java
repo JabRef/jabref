@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.texparser.CitationsDisplay;
@@ -28,21 +30,23 @@ import com.tobiasdiez.easybind.EasyBind;
 public class LatexCitationsTab extends EntryEditorTab {
 
     public static final String NAME = "LaTeX citations";
+
+    private final StateManager stateManager;
+
     private final LatexCitationsTabViewModel viewModel;
+
     private final GridPane searchPane;
     private final ProgressIndicator progressIndicator;
     private final CitationsDisplay citationsDisplay;
 
-    public LatexCitationsTab(BibDatabaseContext databaseContext,
-                             GuiPreferences preferences,
+    public LatexCitationsTab(GuiPreferences preferences,
                              DialogService dialogService,
-                             DirectoryMonitorManager directoryMonitorManager) {
+                             StateManager stateManager) {
+        this.stateManager = stateManager;
 
         this.viewModel = new LatexCitationsTabViewModel(
-                databaseContext,
                 preferences,
-                dialogService,
-                directoryMonitorManager);
+                dialogService);
 
         this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
@@ -145,7 +149,14 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(entry);
+        if (stateManager.activeTabProperty().get().isPresent()) {
+            BibDatabaseContext databaseContext = stateManager.activeTabProperty().get()
+                                                             .map(LibraryTab::getBibDatabaseContext)
+                                                             .orElse(new BibDatabaseContext());
+            DirectoryMonitorManager directoryMonitorManager = stateManager.activeTabProperty().get().get()
+                                                                          .getDirectoryMonitorManager();
+            viewModel.bindToEntry(databaseContext, directoryMonitorManager, entry);
+        }
     }
 
     @Override
