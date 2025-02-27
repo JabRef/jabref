@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -2219,7 +2220,7 @@ class BibtexParserTest {
 
     @Test
     void parseInvalidBibDeskFilesResultsInWarnings() throws IOException {
-        // the first entry is invalid base 64, the second entry is correct plist format but does not contain the key
+        // the first entry is invalid base 64, the second entry is correct plist format and contains the key at index4 in the plist array
         String entries = """
                 @Article{Test2017,
                     bdsk-file-1 = {////=},
@@ -2234,7 +2235,8 @@ class BibtexParserTest {
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2017");
         BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("Test2");
+                .withCitationKey("Test2")
+                .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }
