@@ -143,7 +143,7 @@ class CheckForVersionControlActionTest {
     void performAction_WhenPreferenceDisablesAutoPull_ShouldNotPull() throws IOException {
         Path mockPath = Path.of("/path/to/database.bib");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        when(cliPreferences.isGitAutoPullEnabled()).thenReturn(false);
+        when(cliPreferences.shouldAutoPull()).thenReturn(false);
 
         GitHandler mockGitHandler = mock(GitHandler.class);
         action = new CheckForVersionControlAction();
