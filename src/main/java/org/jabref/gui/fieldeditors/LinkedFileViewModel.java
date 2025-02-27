@@ -270,7 +270,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         if (existingFile.isPresent()) {
             overwriteFile = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Target file name: \n'%0'", targetFileName),
                     Localization.lang("Overwrite"));
 
             if (!overwriteFile) {
