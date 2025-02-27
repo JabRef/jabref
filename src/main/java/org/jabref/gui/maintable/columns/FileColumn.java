@@ -139,7 +139,13 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
         if (!linkedFiles.isEmpty()) {
-            return Localization.lang("Open file %0", linkedFiles.getFirst().getLink());
+            StringBuilder tooltipText = new StringBuilder();
+
+            for (LinkedFile linkedFile : linkedFiles) {
+                tooltipText.append(linkedFile.getLink()).append("\n");
+            }
+
+            return Localization.lang("Open files: \n%0", tooltipText.toString());
         }
         return null;
     }
