@@ -31,6 +31,10 @@ public class ConvertToBibtexCleanup implements CleanupJob {
                 date.getMonth().flatMap(month -> entry.setField(StandardField.MONTH, month.getJabRefFormat())).ifPresent(changes::add);
             }
 
+            if (StringUtil.isBlank(entry.getField(StandardField.YEARDIVISION))) {
+                date.getSeason().flatMap(season -> entry.setField(StandardField.YEARDIVISION, season.getName())).ifPresent(changes::add);
+            }
+
             if (!changes.isEmpty()) {
                 entry.clearField(StandardField.DATE).ifPresent(changes::add);
             }
