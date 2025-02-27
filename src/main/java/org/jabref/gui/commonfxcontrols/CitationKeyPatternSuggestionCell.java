@@ -60,8 +60,12 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         // Maximum number of entries that can be displayed in the popup menu.
         private static final int MAX_ENTRIES = 7;
 
+        // Maximum number of entries that can be displayed in the popup menu.
+        private static final int MAX_COMPOUND_PATTERNS = 10;
+
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
+        private String enteredText;
 
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
@@ -72,7 +76,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         private void setListener() {
             textProperty().addListener((observable, oldValue, newValue) -> {
-                String enteredText = getText();
+                this.enteredText = getText();
                 if (enteredText == null || enteredText.isEmpty()) {
                     suggestionsList.hide();
                 } else {
@@ -90,6 +94,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     } else {
                         suggestionsList.hide();
                     }
+                    showCompoundPatternsMenu(enteredText);
                 }
             });
 
@@ -121,11 +126,57 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
             suggestionsList.getItems().clear();
             suggestionsList.getItems().add(createPatternsSubMenu());
+            suggestionsList.getItems().add(showCompoundPatternsMenu(enteredText));
             suggestionsList.getItems().addAll(menuItems);
 
             if (!menuItems.isEmpty()) {
                 menuItems.getFirst().getContent().requestFocus();
             }
+        }
+
+        public Menu showCompoundPatternsMenu(String enteredText) {
+            return createCompoundPatternsSubMenu(generateCompoundPatterns(enteredText));
+        }
+
+        public List<String> generateCompoundPatterns(String enteredText) {
+            List<String> patterns = List.of("auth", "edtr", "year", "title", "date");
+            List<String> filteredPatterns = new ArrayList<>();
+
+            for (String pattern : patterns) {
+                if (pattern.contains(enteredText)) {
+                    filteredPatterns.add(pattern);
+                }
+            }
+
+            List<String> compoundPatterns = new ArrayList<>();
+
+            for (String pattern : filteredPatterns) {
+                for (String otherPattern : patterns) {
+                    if (!pattern.equals(otherPattern)) {
+                        compoundPatterns.add("[" + pattern + "]_" + "[" + otherPattern + "]");
+                    }
+                }
+            }
+
+            return compoundPatterns;
+        }
+
+        private Menu createCompoundPatternsSubMenu(List<String> compoundPatterns) {
+            Menu compoundPatternsSubMenu = new Menu(Localization.lang("Compound patterns"));
+
+            int count = Math.min(compoundPatterns.size(), MAX_COMPOUND_PATTERNS);
+            for (int i = 0; i < count; i++) {
+                final String compoundPattern = compoundPatterns.get(i);
+                MenuItem menuItem = new MenuItem(compoundPattern.replace("_", "__"));
+                menuItem.setOnAction(event -> {
+                    setText(compoundPattern);
+                    positionCaret(compoundPattern.length());
+                    suggestionsList.hide();
+                });
+                compoundPatternsSubMenu.getItems().add(menuItem);
+            }
+
+            return compoundPatternsSubMenu;
         }
 
         private Menu createPatternsSubMenu() {
