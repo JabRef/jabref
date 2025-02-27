@@ -60,7 +60,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         // Maximum number of entries that can be displayed in the popup menu.
         private static final int MAX_ENTRIES = 7;
 
-        // Maximum number of entries that can be displayed in the popup menu.
+        // Maximum number of compound patterns that can be displayed in the sub menu.
         private static final int MAX_COMPOUND_PATTERNS = 10;
 
         private final List<String> citationKeyPatterns;
