@@ -36,6 +36,8 @@ public class SearchQuery {
             this.context = getStartContext(searchExpression);
             isValidExpression = true;
         } catch (ParseCancellationException e) {
+            // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
+            // and we don't see the root cause
             LOGGER.error("Search query Parsing error", e.getCause());
             isValidExpression = false;
         }
