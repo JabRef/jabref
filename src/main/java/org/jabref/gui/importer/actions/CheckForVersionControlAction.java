@@ -33,10 +33,14 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         // TODO: Tag as versioned
         // TODO: If the preference exists, only pull if the user has this preference on
 
-        try {
-            this.gitHandler.pullOnCurrentBranch();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        parserResult.getDatabaseContext().setVersioned(true); // tags as versioned
+
+        if (preferencesService.shouldAutoPull()) { // pulls only if preference allows
+            try {
+                this.gitHandler.pullOnCurrentBranch();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
