@@ -42,6 +42,7 @@
 
     <!-- Prevent multiple closing curly braces in the same line -->
     <module name="RegexpSingleline">
+        <property name="id" value="NoMultipleClosingBracesAtEndOfLine"/>
         <property name="message" value="Multiple closing curly braces in the same line are not allowed" />
         <property name="format" value="\}\s*\}\s*$" />
         <property name="fileExtensions" value="groovy,java" />
