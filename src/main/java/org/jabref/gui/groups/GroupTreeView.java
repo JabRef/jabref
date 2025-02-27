@@ -149,8 +149,8 @@ public class GroupTreeView extends BorderPane {
         groupTree.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
                 TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
-                if (selectedItem != null) {
-                    viewModel.editGroup(groupTree.getRoot().getValue());
+                if (selectedItem != null && selectedItem.getParent() != null) { 
+                    viewModel.editGroup(selectedItem.getValue());
                 }
             }
         });
