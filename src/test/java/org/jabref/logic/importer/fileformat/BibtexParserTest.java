@@ -78,6 +78,7 @@ import static org.mockito.Mockito.when;
  * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
  */
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
+// checkstyle: stop NoMultipleClosingBracesAtEndOfLine
 class BibtexParserTest {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
