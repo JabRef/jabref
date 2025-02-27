@@ -3,13 +3,14 @@ name: Suggestion for improvement
 about: Suggest an enhancement
 title: ''
 labels: ''
+type: 'feature'
 assignees: ''
 
 ---
 
 <!--
 Please use the GitHub issue tracker only for bug reports and smaller suggestions for improvements.
-Requests for completely new features, questions and general feedback is now handled at http://discourse.jabref.org.
+Requests for completely new features, questions and general feedback is now handled at https://discourse.jabref.org.
 Thanks!
 -->
 
