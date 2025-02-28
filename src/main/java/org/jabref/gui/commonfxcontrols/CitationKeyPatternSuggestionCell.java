@@ -60,12 +60,8 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         // Maximum number of entries that can be displayed in the popup menu.
         private static final int MAX_ENTRIES = 7;
 
-        // Maximum number of compound patterns that can be displayed in the sub menu.
-        private static final int MAX_COMPOUND_PATTERNS = 10;
-
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
-        private String enteredText;
 
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
@@ -76,7 +72,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         private void setListener() {
             textProperty().addListener((observable, oldValue, newValue) -> {
-                this.enteredText = getText();
+                String enteredText = getText();
                 if (enteredText == null || enteredText.isEmpty()) {
                     suggestionsList.hide();
                 } else {
@@ -94,7 +90,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     } else {
                         suggestionsList.hide();
                     }
-                    showCompoundPatternsMenu(enteredText);
                 }
             });
 
@@ -126,7 +121,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
             suggestionsList.getItems().clear();
             suggestionsList.getItems().add(createPatternsSubMenu());
-            suggestionsList.getItems().add(showCompoundPatternsMenu(enteredText));
+            suggestionsList.getItems().add(createCompoundPatternsSubMenu());
             suggestionsList.getItems().addAll(menuItems);
 
             if (!menuItems.isEmpty()) {
@@ -134,48 +129,39 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             }
         }
 
-        public Menu showCompoundPatternsMenu(String enteredText) {
-            return createCompoundPatternsSubMenu(generateCompoundPatterns(enteredText));
-        }
+        private Menu createCompoundPatternsSubMenu() {
+            Menu compoundPatternsSubMenu = new Menu(Localization.lang("All patterns"));
 
-        public List<String> generateCompoundPatterns(String enteredText) {
-            List<String> patterns = List.of("auth", "edtr", "year", "title", "date");
-            List<String> filteredPatterns = new ArrayList<>();
+            Map<CitationKeyPattern.Category, List<CitationKeyPattern>> categorizedPatterns =
+                    CitationKeyPattern.getAllPatterns().stream()
+                                      .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
 
-            for (String pattern : patterns) {
-                if (pattern.contains(enteredText)) {
-                    filteredPatterns.add(pattern);
+            Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
+                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
+            );
+
+            for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
+                CitationKeyPattern.Category category = entry.getKey();
+                String categoryName = entry.getValue();
+
+                Menu categoryMenu = new Menu(categoryName);
+                List<CitationKeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+
+                for (CitationKeyPattern pattern : patterns) {
+                    MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
+                    menuItem.setOnAction(event -> {
+                        setText(pattern.stringRepresentation());
+                        positionCaret(pattern.stringRepresentation().length());
+                        suggestionsList.hide();
+                    });
+                    categoryMenu.getItems().add(menuItem);
                 }
+                compoundPatternsSubMenu.getItems().add(categoryMenu);
             }
-
-            List<String> compoundPatterns = new ArrayList<>();
-
-            for (String pattern : filteredPatterns) {
-                for (String otherPattern : patterns) {
-                    if (!pattern.equals(otherPattern)) {
-                        compoundPatterns.add("[" + pattern + "]_" + "[" + otherPattern + "]");
-                    }
-                }
-            }
-
-            return compoundPatterns;
-        }
-
-        private Menu createCompoundPatternsSubMenu(List<String> compoundPatterns) {
-            Menu compoundPatternsSubMenu = new Menu(Localization.lang("Compound patterns"));
-
-            int count = Math.min(compoundPatterns.size(), MAX_COMPOUND_PATTERNS);
-            for (int i = 0; i < count; i++) {
-                final String compoundPattern = compoundPatterns.get(i);
-                MenuItem menuItem = new MenuItem(compoundPattern.replace("_", "__"));
-                menuItem.setOnAction(event -> {
-                    setText(compoundPattern);
-                    positionCaret(compoundPattern.length());
-                    suggestionsList.hide();
-                });
-                compoundPatternsSubMenu.getItems().add(menuItem);
-            }
-
             return compoundPatternsSubMenu;
         }
 
