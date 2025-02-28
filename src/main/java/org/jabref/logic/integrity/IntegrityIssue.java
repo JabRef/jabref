@@ -5,6 +5,11 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 
+/**
+ * Represents various integrity issues that can occur in a bibliography entry.
+ * Each issue has an associated message describing the problem, and some may provide
+ * a suggested fix.
+ */
 public enum IntegrityIssue {
     CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(Localization.lang("Citation key deviates from generated key")),
     BIBTEX_FIELD_ONLY(Localization.lang("bibtex field only"), Localization.lang("Remove field")),

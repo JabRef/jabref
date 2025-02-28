@@ -110,6 +110,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 configureAction(rowData);
             }
 
+            /**
+             * Configures the action for the button based on the provided {@link IntegrityMessage}.
+             * If a fix is available for the message, the button is configured to apply the fix when clicked.
+             *
+             * @param message the {@link IntegrityMessage} to check for available fixes
+             */
             private void configureAction(IntegrityMessage message) {
                 Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(message);
                 if (issue.isPresent() && issue.get().getFix() != null) {
@@ -189,12 +195,23 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
     }
 
+    /**
+     * Checks if a given {@link IntegrityMessage} has a fix available.
+     *
+     * @param message the {@link IntegrityMessage} to check
+     * @return {@code true} if a fix is available, {@code false} otherwise
+     */
     private boolean hasFix(IntegrityMessage message) {
         return message != null && message.field() != null && IntegrityIssue.fromMessage(message)
                                                                            .map(issue -> issue.getFix() != null)
                                                                            .orElse(false);
     }
 
+    /**
+     * Attempts to fix all {@link IntegrityMessage} objects of the selected type.
+     * If fixes are available, they are applied, and the fixed messages are removed.
+     * A notification is shown to indicate success or failure.
+     */
     @FXML
     private void fixByType() {
         AtomicBoolean fixed = new AtomicBoolean(false);
@@ -206,7 +223,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         selectedIssue.ifPresent(issue -> {
             messagesTable.getItems().stream()
-                    .filter(message -> message.message().equals(issue.getText()) && hasFix(message))
+                    .filter(message -> message.message().equals(issue.getText()) && hasFix(message)) // Filter messages matching the selected issue type and have a fix
                     .forEach(message -> {
                         viewModel.fix(issue, message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
@@ -224,10 +241,14 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
     }
 
+    /**
+     * Attempts to fix all {@link IntegrityMessage} objects that have a fix available.
+     * Messages with applicable fixes are processed, and the corresponding UI elements are updated.
+     */
     @FXML
     private void fixAll() {
         messagesTable.getItems().stream()
-                .filter(this::hasFix)
+                .filter(this::hasFix)   // Filter all messages that have a fix
                 .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> {
                     viewModel.fix(issue, message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
