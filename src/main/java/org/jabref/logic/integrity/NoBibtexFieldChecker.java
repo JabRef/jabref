@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -36,6 +35,6 @@ public class NoBibtexFieldChecker implements EntryChecker {
         final Set<Field> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
         return entry.getFields().stream()
                     .filter(allBiblatexOnlyFields::contains)
-                    .map(name -> new IntegrityMessage(Localization.lang("biblatex field only"), entry, name)).collect(Collectors.toList());
+                    .map(name -> new IntegrityMessage(IntegrityIssue.BIBTEX_FIELD_ONLY_KEY.getText(), entry, name)).collect(Collectors.toList());
     }
 }

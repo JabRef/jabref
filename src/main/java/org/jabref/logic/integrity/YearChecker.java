@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 public class YearChecker implements ValueChecker {
@@ -28,11 +27,11 @@ public class YearChecker implements ValueChecker {
         }
 
         if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
-            return Optional.of(Localization.lang("should contain a four digit number"));
+            return Optional.of(IntegrityIssue.SHOULD_CONTAIN_A_FOUR_DIGIT_NUMBER.getText());
         }
 
         if (!ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""))) {
-            return Optional.of(Localization.lang("last four nonpunctuation characters should be numerals"));
+            return Optional.of(IntegrityIssue.LAST_FOUR_NONPUNCTUATION_CHARACTERS_SHOULD_BE_NUMERALS.getText());
         }
 
         return Optional.empty();
