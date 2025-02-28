@@ -58,7 +58,7 @@ public class PagesChecker implements ValueChecker {
         if (Arrays.stream(value.split(","))
                 .map(String::trim)
                 .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))) {
-            return Optional.of(Localization.lang("should contain a valid page number range"));
+            return Optional.of(IntegrityIssue.SHOULD_CONTAIN_A_VALID_PAGE_NUMBER_RANGE.getText());
         }
         return Optional.empty();
     }

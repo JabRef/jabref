@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -35,7 +34,7 @@ public class BibStringChecker implements EntryChecker {
                 }
                 if ((hashCount & 1) == 1) { // Check if odd
                     // # is FieldWriter.BIBTEX_STRING_START_END_SYMBOL
-                    results.add(new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
+                    results.add(new IntegrityMessage(IntegrityIssue.ODD_NUMBER_OF_UNESCAPED.getText(), entry,
                             field.getKey()));
                 }
             }

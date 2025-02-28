@@ -28,9 +28,9 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.integrity.IntegrityIssue;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -111,7 +111,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
             }
 
             private void configureAction(IntegrityMessage message) {
-                Optional<IntegrityIssue> issue = IntegrityIssue.fromField(message.field());
+                Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(message);
                 if (issue.isPresent() && issue.get().getFix() != null) {
                     configureButton(issue.get().getFix(), () -> {
                         viewModel.fix(issue.get(), message);
@@ -175,12 +175,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     private void updateEntryTypeCombo() {
-        Set<Field> entryTypes = viewModel.getEntryTypes();
+        Set<String> entryTypes = viewModel.getEntryTypes();
         Set<String> uniqueTexts = new HashSet<>();
         entryTypeCombo.getItems().clear();
 
         Arrays.stream(IntegrityIssue.values())
-              .filter(issue -> entryTypes.contains(issue.getField()))
+              .filter(issue -> entryTypes.contains(issue.getText()))
               .filter(issue -> uniqueTexts.add(issue.getText()))
               .forEach(issue -> entryTypeCombo.getItems().add(issue.getText()));
 
@@ -190,7 +190,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     private boolean hasFix(IntegrityMessage message) {
-        return message != null && message.field() != null && IntegrityIssue.fromField(message.field())
+        return message != null && message.field() != null && IntegrityIssue.fromMessage(message)
                                                                            .map(issue -> issue.getFix() != null)
                                                                            .orElse(false);
     }
@@ -206,7 +206,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         selectedIssue.ifPresent(issue -> {
             messagesTable.getItems().stream()
-                    .filter(message -> message.field().equals(issue.getField()) && hasFix(message))
+                    .filter(message -> message.message().equals(issue.getText()) && hasFix(message))
                     .forEach(message -> {
                         viewModel.fix(issue, message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
@@ -228,7 +228,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void fixAll() {
         messagesTable.getItems().stream()
                 .filter(this::hasFix)
-                .forEach(message -> IntegrityIssue.fromField(message.field()).ifPresent(issue -> {
+                .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> {
                     viewModel.fix(issue, message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
                     Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));

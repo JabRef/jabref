@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.integrity.IntegrityIssue;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -29,13 +30,13 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
 
     private final ListProperty<IntegrityMessage> columnsListProperty;
     private final ObservableList<IntegrityMessage> messages;
-    private final ObservableSet<Field> entryTypes;
+    private final ObservableSet<String> entryTypes;
 
     public IntegrityCheckDialogViewModel(List<IntegrityMessage> messages) {
         this.messages = FXCollections.observableArrayList(messages);
 
-        Set<Field> types = messages.stream()
-                                    .map(IntegrityMessage::field)
+        Set<String> types = messages.stream()
+                                    .map(IntegrityMessage::message)
                                     .collect(Collectors.toSet());
         this.entryTypes = FXCollections.observableSet(types);
 
@@ -50,7 +51,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         return messages;
     }
 
-    public Set<Field> getEntryTypes() {
+    public Set<String> getEntryTypes() {
         return entryTypes;
     }
 
@@ -64,9 +65,9 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
                 maskTitle(message);
                 break;
             case BIBTEX_FIELD_ONLY_KEY, BIBTEX_FIELD_ONLY_CROSS_REF:
-                removeField(message, issue.getField());
+                removeField(message, message.field());
                 break;
-            case INCORRECT_FORMAT_DATE:
+            case INCORRECT_FORMAT:
                 correctDateFormat(message);
                 break;
             case NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED:

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -21,7 +20,7 @@ public class ASCIICharacterChecker implements EntryChecker {
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
             boolean asciiOnly = CharMatcher.ascii().matchesAllOf(field.getValue());
             if (!asciiOnly) {
-                results.add(new IntegrityMessage(Localization.lang("Non-ASCII encoded character found"), entry,
+                results.add(new IntegrityMessage(IntegrityIssue.NON_ASCII_ENCODED_CHARACTER_FOUND.getText(), entry,
                         field.getKey()));
             }
         }

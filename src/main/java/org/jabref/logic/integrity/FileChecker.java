@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
@@ -37,7 +36,7 @@ public class FileChecker implements ValueChecker {
         for (LinkedFile file : linkedFiles) {
             Optional<Path> linkedFile = file.findIn(context, filePreferences);
             if ((linkedFile.isEmpty()) || !Files.exists(linkedFile.get())) {
-                return Optional.of(Localization.lang("link should refer to a correct file path"));
+                return Optional.of(IntegrityIssue.LINK_SHOULD_REFER_TO_A_CORRECT_FILE_PATH.getText());
             }
         }
 
