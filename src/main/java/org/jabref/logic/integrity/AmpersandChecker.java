@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -30,7 +31,7 @@ public class AmpersandChecker implements EntryChecker {
                     .filter(field -> FieldFactory.isLatexField(field.getKey()))
                     // We use "flatMap" instead of filtering later, because we assume there won't be that much error messages - and construction of Stream.empty() is faster than construction of a new Tuple2 (including lifting long to Long)
                     .flatMap(AmpersandChecker::getUnescapedAmpersandsWithCount)
-                    .map(pair -> new IntegrityMessage(IntegrityIssue.FOUND_UNESCAPED_AMPERSAND.getText(), entry, pair.getKey()))
+                    .map(pair -> new IntegrityMessage(Localization.lang("Found %0 unescaped '&'", pair.getValue()), entry, pair.getKey()))
                     .toList();
     }
 
