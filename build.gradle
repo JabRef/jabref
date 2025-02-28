@@ -605,6 +605,14 @@ test {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
+    systemProperty 'testmode.enabled', 'true'
+    
+    // Add testLogging to show standard output during test execution
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+    }
+    
     moduleOptions {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
