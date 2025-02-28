@@ -1,6 +1,11 @@
 package org.jabref.gui.consistency;
 
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
@@ -20,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -99,7 +105,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 return new ReadOnlyStringWrapper(message.get(columnIndex));
             });
 
-            tableColumn.setCellFactory(column -> new TableCell<ConsistencyMessage, String>() {
+            tableColumn.setCellFactory(_ -> new TableCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -112,17 +118,46 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                     ConsistencySymbol.fromText(item)
                                      .ifPresentOrElse(
-                                              symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
-                                              () -> {
-                                                  setGraphic(null);
-                                                  setText(item);
-                                              }
-                                      );
+                                             symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
+                                             () -> {
+                                                 setGraphic(null);
+                                                 setText(item);
+                                             }
+                                     );
                 }
             });
 
             tableView.getColumns().add(tableColumn);
         }
+
+        EnumSet<ConsistencySymbol> targetSymbols = EnumSet.of(
+                ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
+        );
+
+        targetSymbols.stream()
+            .map(ConsistencySymbol::getText)
+            .forEach(this::removeColumnWithUniformValue);
+
+        Arrays.stream(SpecialField.values())
+              .map(SpecialField::getDisplayName)
+              .forEach(this::removeColumnByTitle);
+    }
+
+    private void removeColumnWithUniformValue(String symbol) {
+        List<TableColumn<ConsistencyMessage, ?>> columnToRemove = tableView.getColumns().stream()
+                                                                           .filter(column -> {
+                                                                               Set<String> values = tableView.getItems().stream()
+                                                                                                             .map(item -> Optional.ofNullable(column.getCellObservableValue(item).getValue()).map(Object::toString).orElse(""))
+                                                                                                             .collect(Collectors.toSet());
+                                                                               return values.size() == 1 && values.contains(symbol);
+                                                                           })
+                                                                           .toList();
+        tableView.getColumns().removeAll(columnToRemove);
+    }
+
+    public void removeColumnByTitle(String columnName) {
+        tableView.getColumns().removeIf(column -> column.getText().equalsIgnoreCase(columnName));
     }
 
     @FXML
