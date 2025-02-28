@@ -64,7 +64,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
             case CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS:
                 maskTitle(message);
                 break;
-            case BIBTEX_FIELD_ONLY_KEY, BIBTEX_FIELD_ONLY_CROSS_REF:
+            case BIBTEX_FIELD_ONLY:
                 removeField(message, message.field());
                 break;
             case INCORRECT_FORMAT:

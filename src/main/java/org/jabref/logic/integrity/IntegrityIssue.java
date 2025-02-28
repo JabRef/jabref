@@ -7,8 +7,8 @@ import org.jabref.logic.l10n.Localization;
 
 public enum IntegrityIssue {
     CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(Localization.lang("Citation key deviates from generated key")),
-    BIBTEX_FIELD_ONLY_KEY(Localization.lang("bibtex field only"), Localization.lang("Remove field")),
-    BIBTEX_FIELD_ONLY_CROSS_REF(Localization.lang("bibtex field only"), Localization.lang("Remove field")),
+    BIBTEX_FIELD_ONLY(Localization.lang("bibtex field only"), Localization.lang("Remove field")),
+    BIBLATEX_FIELD_ONLY(Localization.lang("biblatex field only"), Localization.lang("Remove field")),
     JOURNAL_NOT_FOUND_IN_ABBREVIATION_LIST(Localization.lang("journal not found in abbreviation list")),
     NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED(Localization.lang("no integer as values for edition allowed")),
     SHOULD_CONTAIN_AN_INTEGER_OR_A_LITERAL(Localization.lang("should contain an integer or a literal")),
@@ -34,11 +34,10 @@ public enum IntegrityIssue {
     FOUND_UNESCAPED_AMPERSAND(Localization.lang("Found unescaped '&'")),
     LAST_FOUR_NONPUNCTUATION_CHARACTERS_SHOULD_BE_NUMERALS(Localization.lang("last four nonpunctuation characters should be numerals")),
     SHOULD_CONTAIN_A_FOUR_DIGIT_NUMBER(Localization.lang("should contain a four digit number")),
-    EMPTY_CITATION_KEY("empty citation key"),
-    INVALID_CITATION_KEY("Invalid citation key"),
-    SHOULD_BE_NORMALIZED("should be normalized"),
-    SHOULD_BE_AN_INTEGER_OR_NORMALIZED("should be an integer or normalized"),
-
+    EMPTY_CITATION_KEY(Localization.lang("empty citation key")),
+    INVALID_CITATION_KEY(Localization.lang("Invalid citation key")),
+    SHOULD_BE_NORMALIZED(Localization.lang("should be normalized")),
+    SHOULD_BE_AN_INTEGER_OR_NORMALIZED(Localization.lang("should be an integer or normalized"));
 
     private final String text;
     private final String fix;
