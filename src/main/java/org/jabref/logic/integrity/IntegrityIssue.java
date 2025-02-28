@@ -31,7 +31,6 @@ public enum IntegrityIssue {
     LINK_SHOULD_REFER_TO_A_CORRECT_FILE_PATH(Localization.lang("link should refer to a correct file path")),
     SHOULD_HAVE_THE_FIRST_CHARACTER_CAPITALIZED(Localization.lang("should have the first letter capitalized")),
     HTML_ENCODED_CHARACTER_FOUND(Localization.lang("HTML encoded character found")),
-    FOUND_UNESCAPED_AMPERSAND(Localization.lang("Found unescaped '&'")),
     LAST_FOUR_NONPUNCTUATION_CHARACTERS_SHOULD_BE_NUMERALS(Localization.lang("last four nonpunctuation characters should be numerals")),
     SHOULD_CONTAIN_A_FOUR_DIGIT_NUMBER(Localization.lang("should contain a four digit number")),
     EMPTY_CITATION_KEY(Localization.lang("empty citation key")),
