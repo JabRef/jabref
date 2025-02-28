@@ -8,7 +8,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -29,23 +29,21 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
 
     public OptionalFieldsTabBase(String title,
                                  boolean isImportantOptionalFields,
-                                 BibDatabaseContext databaseContext,
-                                 SuggestionProviders suggestionProviders,
                                  UndoManager undoManager,
                                  UndoAction undoAction,
                                  RedoAction redoAction,
                                  GuiPreferences preferences,
                                  BibEntryTypesManager entryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
+                                 StateManager stateManager,
                                  PreviewPanel previewPanel) {
         super(true,
-                databaseContext,
-                suggestionProviders,
                 undoManager,
                 undoAction,
                 redoAction,
                 preferences,
                 journalAbbreviationRepository,
+                stateManager,
                 previewPanel);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
@@ -56,7 +54,8 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-        BibDatabaseMode mode = databaseContext.getMode();
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                           .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             if (isImportantOptionalFields) {
