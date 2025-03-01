@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
-    final Path repositoryPath;
+    protected final Path repositoryPath;
     final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
