@@ -13,6 +13,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
@@ -34,6 +35,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.git.GitSyncStatusPanel;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -66,9 +68,11 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
 
+
 /**
  * Represents the inner frame of the JabRef window
  */
+@SuppressWarnings("checkstyle:EmptyLineSeparator")
 public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
 
     public static final String FRAME_TITLE = "JabRef";
@@ -230,6 +234,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
         setCenter(splitPane);
+
+        SwingNode swingNode = new SwingNode();
+        Platform.runLater(() -> swingNode.setContent(new GitSyncStatusPanel()));
+
+        setBottom(swingNode);
     }
 
     private void updateSidePane() {
