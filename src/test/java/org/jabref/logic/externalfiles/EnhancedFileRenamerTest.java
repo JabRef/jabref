@@ -59,6 +59,7 @@ class EnhancedFileRenamerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(tempDir));
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAutoRenameFilesOnEntryChange()).thenReturn(true);
 
         // Create test entry with file
         entry = createTestEntryWithFile(tempDir);
