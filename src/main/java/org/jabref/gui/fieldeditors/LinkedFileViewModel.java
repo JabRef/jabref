@@ -37,6 +37,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -266,12 +267,24 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(String targetFileName) {
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
+        boolean keepBoth = false; // placeholder to implement functionality without trigger
 
         if (existingFile.isPresent()) {
+            Path existingFileVal = existingFile.get();
+            // show when hovering over "Keep both" button
+            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(
+                existingFileVal.getParent(),
+                existingFileVal.getFileName().toString()
+            );
+
             overwriteFile = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Target file already exists"),
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
                     Localization.lang("Overwrite"));
+            
+            if (keepBoth) { // this will be triggered by one of the added buttons
+                targetFileName = suggestedFileName;
+            }
 
             if (!overwriteFile) {
                 return;
