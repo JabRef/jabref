@@ -54,7 +54,7 @@
                 </GridPane>
             </HBox>
             <HBox spacing="4">
-                <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+                <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download referenced files (PDFs, ...)"/>
                 <CheckBox fx:id="showEntryInformation" text="%Show BibTeX source"/>
             </HBox>
         </VBox>

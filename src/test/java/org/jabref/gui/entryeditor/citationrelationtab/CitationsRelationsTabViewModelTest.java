@@ -63,7 +63,7 @@ class CitationsRelationsTabViewModelTest {
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
 
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.isGenerateNewKeyOnImport()).thenReturn(false);
+        when(importerPreferences.shouldGenerateNewKeyOnImport()).thenReturn(false);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);

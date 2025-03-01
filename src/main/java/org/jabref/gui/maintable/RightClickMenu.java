@@ -1,6 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -120,16 +119,17 @@ public class RightClickMenu {
                                          StateManager stateManager,
                                          GuiPreferences preferences,
                                          LibraryTab libraryTab,
-                                         ImportHandler importHandler
-                                         ) {
+                                         ImportHandler importHandler) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
         ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
 
         BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
 
-        Optional<Path> sourcePath = libraryTab.getBibDatabaseContext().getDatabasePath();
-        String sourceDatabaseName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), sourcePath.get()).get();
+        Optional<String> sourceDatabaseName = libraryTab
+                .getBibDatabaseContext().getDatabasePath().stream()
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), path).stream())
+                .findFirst();
 
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(bibDatabaseContext -> {
@@ -137,9 +137,12 @@ public class RightClickMenu {
                 String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    destinationDatabaseName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get()).get();
-                    if (destinationDatabaseName.equals(sourceDatabaseName)) {
+                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
+                    if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
                         return;
+                    }
+                    if (uniqueFilePathFragment.isPresent()) {
+                        destinationDatabaseName = uniqueFilePathFragment.get();
                     }
                 } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
                     destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
