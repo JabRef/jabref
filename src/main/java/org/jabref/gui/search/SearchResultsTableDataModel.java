@@ -66,9 +66,7 @@ public class SearchResultsTableDataModel {
             if (query.isPresent()) {
                 SearchResults searchResults = new SearchResults();
                 for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-                    stateManager.getIndexManager(context).ifPresent(indexManager -> {
-                        searchResults.mergeSearchResults(indexManager.search(query.get()));
-                    });
+                    stateManager.getIndexManager(context).ifPresent(indexManager -> searchResults.mergeSearchResults(indexManager.search(query.get())));
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
                     entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));

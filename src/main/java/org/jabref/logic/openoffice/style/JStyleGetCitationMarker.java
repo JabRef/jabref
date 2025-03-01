@@ -52,7 +52,7 @@ class JStyleGetCitationMarker {
                 stringBuilder.append(' ');
             }
             // last name if it exists
-            stringBuilder.append(author.getFamilyName().map(last -> REMOVE_BRACES_FORMATTER.format(last)).orElse(""));
+            stringBuilder.append(author.getFamilyName().map(REMOVE_BRACES_FORMATTER::format).orElse(""));
         }
 
         return stringBuilder.toString();

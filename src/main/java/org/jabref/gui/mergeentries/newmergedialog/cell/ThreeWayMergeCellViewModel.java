@@ -24,13 +24,9 @@ public class ThreeWayMergeCellViewModel {
             }
         }
 
-        EasyBind.subscribe(odd, isOdd -> {
-            setEven(!isOdd);
-        });
+        EasyBind.subscribe(odd, isOdd -> setEven(!isOdd));
 
-        EasyBind.subscribe(even, isEven -> {
-            setOdd(!isEven);
-        });
+        EasyBind.subscribe(even, isEven -> setOdd(!isEven));
     }
 
     public String getText() {

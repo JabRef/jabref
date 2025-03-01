@@ -41,10 +41,9 @@ public class EntryTypeViewModel {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof EntryTypeViewModel)) {
+        if (!(obj instanceof EntryTypeViewModel other)) {
             return false;
         }
-        EntryTypeViewModel other = (EntryTypeViewModel) obj;
         return Objects.equals(entryType, other.entryType) && Objects.equals(fields, other.fields);
     }
 

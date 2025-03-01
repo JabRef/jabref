@@ -40,14 +40,14 @@ public abstract class PdfImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        throw new UnsupportedOperationException("PdfBibExtractor does not support importDatabase(BufferedReader reader). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException("PdfImporter does not support importDatabase(BufferedReader reader). "
+                + "Instead use importDatabase(Path filePath).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
-        throw new UnsupportedOperationException("PdfBibExtractor  does not support importDatabase(String data). "
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException("PdfImporter does not support importDatabase(String data). "
+                + "Instead use importDatabase(Path filePath).");
     }
 
     @Override

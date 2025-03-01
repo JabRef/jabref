@@ -168,7 +168,7 @@ public abstract class BibDatabaseWriter {
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-        sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(id -> writeDatabaseID(id)));
+        sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(this::writeDatabaseID));
 
         // Some file formats write something at the start of the file (like the encoding)
         if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {

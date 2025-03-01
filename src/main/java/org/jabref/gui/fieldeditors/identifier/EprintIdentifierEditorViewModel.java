@@ -39,16 +39,14 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
                                            UndoManager undoManager) {
         super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(false, false);
-        EasyBind.subscribe(identifier, newIdentifier -> {
-            newIdentifier.ifPresent(id -> {
-                // TODO: We already have a common superclass between ArXivIdentifier and ARK. This could be refactored further.
-                if (id instanceof ArXivIdentifier) {
-                    configure(true, false);
-                } else if (id instanceof ARK) {
-                    configure(false, false);
-                }
-            });
-        });
+        EasyBind.subscribe(identifier, newIdentifier -> newIdentifier.ifPresent(id -> {
+            // TODO: We already have a common superclass between ArXivIdentifier and ARK. This could be refactored further.
+            if (id instanceof ArXivIdentifier) {
+                configure(true, false);
+            } else if (id instanceof ARK) {
+                configure(false, false);
+            }
+        }));
     }
 
     @Override

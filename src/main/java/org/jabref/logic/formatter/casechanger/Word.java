@@ -115,12 +115,12 @@ public final class Word {
     }
 
     private boolean isConjunction(char[] chars, int i) {
-        String word = "";
+        StringBuilder word = new StringBuilder();
             while (i < chars.length && !DASHES.contains(chars[i])) {
-                word += chars[i];
+                word.append(chars[i]);
                 i++;
             }
-        return !CONJUNCTIONS.contains(word);
+        return !CONJUNCTIONS.contains(word.toString());
     }
 
     public void stripConsonants() {

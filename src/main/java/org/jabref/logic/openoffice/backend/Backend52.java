@@ -279,7 +279,7 @@ public class Backend52 {
                 int totalCitations = joinableGroup.stream()
                                                    .map(CitationGroup::numberOfCitations)
                                                    .mapToInt(Integer::intValue).sum();
-                if ("".equals(singlePageInfo)) {
+                if (singlePageInfo.isEmpty()) {
                     singlePageInfo = null;
                 }
                 return OODataModel.fakePageInfos(singlePageInfo, totalCitations);

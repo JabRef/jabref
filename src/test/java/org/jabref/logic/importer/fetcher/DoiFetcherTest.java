@@ -38,6 +38,7 @@ class DoiFetcherTest {
             .withField(StandardField.PUBLISHER, "IEEE")
             .withField(StandardField.TITLE, "BPEL4Chor: Extending BPEL for Modeling Choreographies")
             .withField(StandardField.YEAR, "2007")
+            .withField(StandardField.PAGES, "296--303")
             .withField(StandardField.DOI, "10.1109/icws.2007.59");
     private final BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR,
@@ -54,7 +55,7 @@ class DoiFetcherTest {
             .withField(StandardField.YEAR, "2019")
             .withField(StandardField.DOI, "10.3303/CET1977146")
             .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
-            .withField(StandardField.PAGES, "871-876")
+            .withField(StandardField.PAGES, "871–876")
             .withField(StandardField.VOLUME, "77");
     private final BibEntry bibEntryStenzel2020 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Stenzel_2020")

@@ -62,9 +62,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
         newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
 
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.fieldNameValidationStatus(), newFieldNameTextField, true);
-        });
+        Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldNameValidationStatus(), newFieldNameTextField, true));
     }
 
     @Override

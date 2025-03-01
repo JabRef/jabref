@@ -43,6 +43,9 @@ public class CitationStyle implements OOStyle {
     private static final List<CitationStyle> STYLES = new ArrayList<>();
     private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
+    // Currently, we have support for only one alphanumeric style, so we hardcode it
+    private static final String ALPHANUMERIC_STYLE = "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690";
+
     private final String filePath;
     private final String title;
     private final boolean isNumericStyle;
@@ -228,6 +231,15 @@ public class CitationStyle implements OOStyle {
 
     public boolean isNumericStyle() {
         return isNumericStyle;
+    }
+
+    /**
+     * Currently, we have support for one alphanumeric CSL style.
+     * There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
+     * Thus, to determine alphanumeric nature, we currently manually check for equality with "DIN 1505-2".
+     */
+    public boolean isAlphanumericStyle() {
+        return ALPHANUMERIC_STYLE.equals(this.title);
     }
 
     public String getSource() {

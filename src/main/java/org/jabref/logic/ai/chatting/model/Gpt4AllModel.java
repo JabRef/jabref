@@ -65,7 +65,7 @@ public class Gpt4AllModel implements ChatLanguageModel {
                     .uri(URLUtil.createUri(fullUrl))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .timeout(Duration.ofSeconds(60))
+                    .timeout(Duration.ofMinutes(1))
                     .build();
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());

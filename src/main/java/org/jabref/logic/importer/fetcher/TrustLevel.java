@@ -10,7 +10,7 @@ public enum TrustLevel {
     META_SEARCH(1),
     UNKNOWN(0);
 
-    private int score;
+    private final int score;
 
     TrustLevel(int score) {
         this.score = score;

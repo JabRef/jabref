@@ -40,6 +40,14 @@
         <property name="fileExtensions" value="groovy,java" />
     </module>
 
+    <!-- Prevent multiple closing curly braces in the same line -->
+    <module name="RegexpSingleline">
+        <property name="id" value="NoMultipleClosingBracesAtEndOfLine"/>
+        <property name="message" value="Multiple closing curly braces in the same line are not allowed" />
+        <property name="format" value="\}\s*\}\s*$" />
+        <property name="fileExtensions" value="groovy,java" />
+    </module>
+
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->

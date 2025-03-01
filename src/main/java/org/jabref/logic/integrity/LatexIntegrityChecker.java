@@ -15,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,6 @@ public class LatexIntegrityChecker implements EntryChecker {
         snugglePackage.addComplexCommand("textless", false, 0, TEXT_MODE_ONLY, null, null, null);
         snugglePackage.addComplexCommand("textbackslash", false, 0, TEXT_MODE_ONLY, null, null, null);
         snugglePackage.addComplexCommand("textbar", false, 0, TEXT_MODE_ONLY, null, null, null);
-        // ENGINE.getPackages().get(0).addComplexCommandOneArg()
-              // engine.getPackages().get(0).addComplexCommandOneArg("text", false, ALL_MODES,LR, StyleDeclarationInterpretation.NORMALSIZE, null, TextFlowContext.ALLOW_INLINE);
 
         SESSION = ENGINE.createSession();
         SESSION.getConfiguration().setFailingFast(true);
@@ -66,6 +65,8 @@ public class LatexIntegrityChecker implements EntryChecker {
                     .flatMap(LatexIntegrityChecker::getUnescapedAmpersandsWithCount)
                     // Exclude all DOM building errors as this functionality is not used.
                     .filter(pair -> !pair.getValue().getErrorCode().getErrorGroup().equals(CoreErrorGroup.TDE))
+                    // Exclude TTEM03 error for citation key field
+                    .filter(pair -> !(pair.getValue().getErrorCode().equals(CoreErrorCode.TTEM03) && pair.getKey().equals(InternalField.KEY_FIELD)))
                     .filter(pair -> !EXCLUDED_ERRORS.contains(pair.getValue().getErrorCode()))
                     .map(pair ->
                             new IntegrityMessage(errorMessageFormatHelper(pair.getValue().getErrorCode(), pair.getValue().getArguments()), entry, pair.getKey()))

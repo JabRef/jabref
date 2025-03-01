@@ -27,9 +27,7 @@ public class PseudonymizationResultCsvWriter {
                   // In case a "dumb" string ordering is used, we would get date-1, date-10, date-11, date-2, ...
                   .sorted(Comparator.comparing((Map.Entry<String, String> entry) -> getKeyPrefix(entry.getKey())
                   ).thenComparingInt(entry -> extractNumber(entry.getKey())))
-                  .forEach(Unchecked.consumer(entry -> {
-                      csvPrinter.printRecord(entry.getKey(), entry.getValue());
-                  }));
+                  .forEach(Unchecked.consumer(entry -> csvPrinter.printRecord(entry.getKey(), entry.getValue())));
         }
     }
 

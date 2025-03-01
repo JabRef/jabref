@@ -275,12 +275,8 @@ public class EndnoteXmlExporter extends Exporter {
 
     private static void mapAuthorAndEditor(BibEntry entry, Document document, Element recordElement) {
         Element contributorsElement = document.createElement("contributors");
-        entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
-            addPersons(authors, document, contributorsElement, "authors");
-        });
-        entry.getField(StandardField.EDITOR).ifPresent(editors -> {
-            addPersons(editors, document, contributorsElement, "secondary-authors");
-        });
+        entry.getField(StandardField.AUTHOR).ifPresent(authors -> addPersons(authors, document, contributorsElement, "authors"));
+        entry.getField(StandardField.EDITOR).ifPresent(editors -> addPersons(editors, document, contributorsElement, "secondary-authors"));
         if (contributorsElement.hasChildNodes()) {
             recordElement.appendChild(contributorsElement);
         }

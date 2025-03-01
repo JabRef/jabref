@@ -39,7 +39,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25535")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/34739")
                                 .withField(StandardField.LANGUAGE, "English")
-                                .withField(StandardField.KEYWORDS, "poetry, love, warfare")
+                                .withField(StandardField.KEYWORDS, "poetry, love, warfare, thema EDItEUR::D Biography, Literature and Literary studies::DC Poetry::DCF Poetry by individual poets")
                                 .withField(StandardField.PUBLISHER, "punctum books"),
                         "i open fire"
                 ),
@@ -55,8 +55,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25287")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/26303")
                                 .withField(StandardField.LANGUAGE, "English")
-                                .withField(StandardField.KEYWORDS, "Open Access, Monographs, OAPEN Library, " +
-                                        "Directory of Open Access Books")
+                                .withField(StandardField.KEYWORDS, "Open Access, Monographs, OAPEN Library, Directory of Open Access Books, thema EDItEUR::G Reference, Information and Interdisciplinary subjects::GL Library and information sciences / Museology, thema EDItEUR::G Reference, Information and Interdisciplinary subjects::GP Research and information: general")
                                 .withField(StandardField.PUBLISHER, "Amsterdam University Press"),
                         "the deliverance of open access books"
                 ),
@@ -70,7 +69,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.URL, "https://library.oapen.org/handle/20.500.12657/48312")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/68086")
                                 .withField(StandardField.LANGUAGE, "English")
-                                .withField(StandardField.KEYWORDS, "Religion")
+                                .withField(StandardField.KEYWORDS, "Religion, thema EDItEUR::Q Philosophy and Religion::QR Religion and beliefs::QRM Christianity::QRMF Christianity: sacred texts and revered writings::QRMF1 Bibles::QRMF13 New Testaments")
                                 .withField(StandardField.PUBLISHER, "Brill"),
                         "Four Kingdom Motifs before and beyond the Book of Daniel"
                 ),

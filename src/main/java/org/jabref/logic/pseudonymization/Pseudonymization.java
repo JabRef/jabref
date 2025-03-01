@@ -32,11 +32,8 @@ public class Pseudonymization {
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
 
         Map<String, String> valueMapping = new HashMap<>();
-        fieldToValueToIdMap.forEach((field, stringToIntMap) -> {
-            stringToIntMap.forEach((value, id) -> {
-                valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value);
-            });
-        });
+        fieldToValueToIdMap.forEach((field, stringToIntMap) ->
+            stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);

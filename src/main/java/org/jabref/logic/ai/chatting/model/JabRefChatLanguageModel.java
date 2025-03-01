@@ -61,50 +61,40 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         }
 
         switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> {
-                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
-            }
+            case OPEN_AI -> langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
 
-            case GPT4ALL-> {
-                langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
-            }
+            case GPT4ALL-> langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
 
-            case MISTRAL_AI -> {
-                langchainChatModel = Optional.of(MistralAiChatModel
-                        .builder()
-                        .apiKey(apiKey)
-                        .modelName(aiPreferences.getSelectedChatModel())
-                        .temperature(aiPreferences.getTemperature())
-                        .baseUrl(aiPreferences.getSelectedApiBaseUrl())
-                        .logRequests(true)
-                        .logResponses(true)
-                        .build()
-                );
-            }
+            case MISTRAL_AI -> langchainChatModel = Optional.of(MistralAiChatModel
+                    .builder()
+                    .apiKey(apiKey)
+                    .modelName(aiPreferences.getSelectedChatModel())
+                    .temperature(aiPreferences.getTemperature())
+                    .baseUrl(aiPreferences.getSelectedApiBaseUrl())
+                    .logRequests(true)
+                    .logResponses(true)
+                    .build()
+            );
 
-            case GEMINI -> {
-                // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
-                langchainChatModel = Optional.of(GoogleAiGeminiChatModel
-                        .builder()
-                        .apiKey(apiKey)
-                        .modelName(aiPreferences.getSelectedChatModel())
-                        .temperature(aiPreferences.getTemperature())
-                        .logRequestsAndResponses(true)
-                        .build()
-                );
-            }
+            case GEMINI -> // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
+                    langchainChatModel = Optional.of(GoogleAiGeminiChatModel
+                            .builder()
+                            .apiKey(apiKey)
+                            .modelName(aiPreferences.getSelectedChatModel())
+                            .temperature(aiPreferences.getTemperature())
+                            .logRequestsAndResponses(true)
+                            .build()
+                    );
 
-            case HUGGING_FACE -> {
-                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
-                langchainChatModel = Optional.of(HuggingFaceChatModel
-                        .builder()
-                        .accessToken(apiKey)
-                        .modelId(aiPreferences.getSelectedChatModel())
-                        .temperature(aiPreferences.getTemperature())
-                        .timeout(Duration.ofMinutes(2))
-                        .build()
-                );
-            }
+            case HUGGING_FACE -> // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
+                    langchainChatModel = Optional.of(HuggingFaceChatModel
+                            .builder()
+                            .accessToken(apiKey)
+                            .modelId(aiPreferences.getSelectedChatModel())
+                            .temperature(aiPreferences.getTemperature())
+                            .timeout(Duration.ofMinutes(2))
+                            .build()
+                    );
         }
     }
 

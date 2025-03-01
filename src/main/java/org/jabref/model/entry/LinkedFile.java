@@ -43,6 +43,8 @@ public class LinkedFile implements Serializable {
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
     private transient StringProperty link = new SimpleStringProperty();
+    // This field is a {@link StringProperty}, and not an {@link ObjectProperty<FileType>}, as {@link LinkedFile} might
+    // be a URI, where a file type might not be present.
     private transient StringProperty fileType = new SimpleStringProperty();
     private transient StringProperty sourceURL = new SimpleStringProperty();
 

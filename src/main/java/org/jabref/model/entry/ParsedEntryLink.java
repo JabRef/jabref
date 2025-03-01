@@ -45,10 +45,9 @@ public class ParsedEntryLink {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof ParsedEntryLink)) {
+        if (!(obj instanceof ParsedEntryLink other)) {
             return false;
         }
-        ParsedEntryLink other = (ParsedEntryLink) obj;
         return Objects.equals(key, other.key) && Objects.equals(linkedEntry, other.linkedEntry);
     }
 

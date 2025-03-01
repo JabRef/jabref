@@ -389,18 +389,16 @@ public class BibFieldsIndexer {
     }
 
     private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
-        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream().distinct().forEach(link -> {
-            addBatch(preparedStatementSplitValues, entryId, field, link.getKey());
-        });
+        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream()
+            .distinct()
+            .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
     }
 
     private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
         // We could use KeywordList, but we are afraid that group names could have ">" in their name, and then they would not be handled correctly
         Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))
               .distinct()
-              .forEach(group -> {
-                  addBatch(preparedStatementSplitValues, entryId, field, group);
-              });
+              .forEach(group -> addBatch(preparedStatementSplitValues, entryId, field, group));
     }
 
     private static void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field, Character keywordSeparator) {

@@ -75,17 +75,18 @@ class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Repository")
                 .withField(StandardField.SUBTITLE, "Eine Einführung")
-                .withField(StandardField.PUBLISHER, "De Gruyter Oldenbourg")
+                .withField(StandardField.PUBLISHER, "Walter de Gruyter GmbH")
                 .withField(StandardField.AUTHOR, "Habermann, Hans-Joachim")
                 .withField(StandardField.ISBN, "9783110702125")
                 .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.ADDRESS, "München")
-                .withField(StandardField.EDITION, "Reprint 2020")
+                .withField(StandardField.ADDRESS, "Berlin/München/Boston")
+                .withField(StandardField.EDITION, "1st ed.")
                 .withField(StandardField.EDITOR, "Frank Leymann")
-                .withField(StandardField.NUMBER, "8.1")
-                .withField(StandardField.PAGETOTAL, "1294")
-                .withField(StandardField.SERIES, "Handbuch der Informatik")
-                .withField(new UnknownField("ppn_gvk"), "1738076555");
+                .withField(StandardField.NUMBER, "v.8.1")
+                .withField(StandardField.PAGETOTAL, "1296")
+                .withField(StandardField.SERIES, "Handbuch der Informatik Series")
+                .withField(StandardField.NOTE, "Description based on publisher supplied metadata and other sources.")
+                .withField(new UnknownField("ppn_gvk"), "1910493767");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9783110702125");
         assertEquals(Optional.of(bibEntry), fetchedEntry);

@@ -187,9 +187,7 @@ public class MedlinePlainImporter extends Importer {
                 switch (label) {
                     case "IRAD",
                          "IR",
-                         "FIR" -> {
-                        fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
-                    }
+                         "FIR" -> fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
                     case "MH",
                          "OT" -> {
                         if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {

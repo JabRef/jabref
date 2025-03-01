@@ -22,12 +22,12 @@ public class BibliographyConsistencyCheckResultCsvWriter extends BibliographyCon
 
     private CSVPrinter csvPrinter;
 
-    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
-        super(result, writer);
+    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain) {
+        super(result, writer, isPorcelain);
     }
 
-    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
-        super(result, writer, entryTypesManager, bibDatabaseMode);
+    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer, boolean isPorcelain, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+        super(result, writer, isPorcelain, entryTypesManager, bibDatabaseMode);
     }
 
     @Override

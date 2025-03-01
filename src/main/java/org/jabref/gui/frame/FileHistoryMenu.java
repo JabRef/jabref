@@ -97,8 +97,6 @@ public class FileHistoryMenu extends Menu {
             this.dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("File not found") + ": " + file);
-            history.removeItem(file);
-            setItems();
             return;
         }
         openDatabaseAction.openFile(file);

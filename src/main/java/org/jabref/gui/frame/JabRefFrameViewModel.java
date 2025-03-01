@@ -255,7 +255,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         try {
             return dirsToCheck.stream()
                               .map(Path::toAbsolutePath)
-                              .flatMap(Unchecked.function(dir -> Files.list(dir)))
+                              .flatMap(Unchecked.function(Files::list))
                               .filter(path -> FileUtil.getFileExtension(path).equals(Optional.of("bib")))
                               .findFirst();
         } catch (UncheckedIOException ex) {
@@ -416,8 +416,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
         // Create a listener for each observable
         ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
-            if (observable != null) {
-                loadings.remove(observable);
+            // Instanceof implicitly checks for null value
+            if (observable instanceof ObservableBooleanValue observableBoolean) {
+                loadings.remove(observableBoolean);
             }
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Count of loading tabs: {}", loadings.size());
