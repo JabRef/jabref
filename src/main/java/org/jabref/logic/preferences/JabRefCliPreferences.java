@@ -1554,7 +1554,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(KEEP_DOWNLOAD_URL));
+                getBoolean(KEEP_DOWNLOAD_URL),
+                false); // Default to false for autoRenameFilesOnEntryChange
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
