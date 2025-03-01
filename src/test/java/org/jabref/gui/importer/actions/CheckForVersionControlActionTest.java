@@ -60,10 +60,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-class CheckForVersionControlActionTestWithoutMockito {
+class CheckForVersionControlActionTest {
 
     private CheckForVersionControlAction action;
     private ParserResult parserResult;
@@ -125,7 +122,7 @@ class CheckForVersionControlActionTestWithoutMockito {
     }
 
     public static void main(String[] args) {
-        CheckForVersionControlActionTestWithoutMockito test = new CheckForVersionControlActionTestWithoutMockito();
+        CheckForVersionControlActionTest test = new CheckForVersionControlActionTest();
         test.setUp();
         test.testIsActionNecessary_NoDatabasePath();
         test.testIsActionNecessary_NonGitRepo();
@@ -497,6 +494,11 @@ class CheckForVersionControlActionTestWithoutMockito {
         @Override
         public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
             return null;
+        }
+
+        @Override
+        public boolean shouldAutoPull() {
+            return false;
         }
 
         @Override

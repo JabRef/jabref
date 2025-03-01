@@ -118,4 +118,6 @@ public interface CliPreferences {
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 
     boolean shouldAutoPull();
+
+    Object isGitAutoPullEnabled();
 }
