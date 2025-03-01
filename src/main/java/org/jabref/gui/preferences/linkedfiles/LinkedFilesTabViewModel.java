@@ -41,6 +41,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoRenameFilesOnEntryChangeProperty = new SimpleBooleanProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -84,6 +85,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
+        autoRenameFilesOnEntryChangeProperty.setValue(filePreferences.shouldAutoRenameFilesOnEntryChange());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -116,6 +118,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+        filePreferences.setAutoRenameFilesOnEntryChange(autoRenameFilesOnEntryChangeProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -191,6 +194,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty autoRenameFilesOnEntryChangeProperty() {
+        return this.autoRenameFilesOnEntryChangeProperty;
     }
 }
 
