@@ -266,12 +266,12 @@ public class LibraryTab extends Tab {
         });
         FilePreferences filePreferences = preferences.getFilePreferences();
         AutomaticFileRenamer fileRenamer = new AutomaticFileRenamer(bibDatabaseContext, filePreferences);
-        // 为数据库中所有现有的条目注册fileRenamer作为监听器
+        // Register fileRenamer as a listener for all existing entries in the database
         for (BibEntry entry : this.bibDatabaseContext.getDatabase().getEntries()) {
             entry.registerListener(fileRenamer);
-        }
+        }   
 
-        // 确保新添加的条目也注册上fileRenamer
+        // Ensure that newly added entries are also registered with fileRenamer
         this.bibDatabaseContext.getDatabase().registerListener(new Object() {
             @Subscribe
             public void listen(EntriesAddedEvent event) {
