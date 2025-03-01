@@ -1,9 +1,9 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -48,26 +48,56 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
     @Override
     public List<String> call() throws Exception {
         try {
+            if (isCancelled()) {
+                notifyCancellation();
+                return List.of();
+            }
+
             List<String> updatedEntries = processMergeEntries();
+
+            if (isCancelled()) {
+                notifyCancellation();
+                finalizeOperation(updatedEntries);
+                return updatedEntries;
+            }
+
             finalizeOperation(updatedEntries);
             LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
                     processedEntries.get(), successfulUpdates.get());
             notifySuccess(successfulUpdates.get());
             return updatedEntries;
         } catch (Exception e) {
+            if (isCancelled()) {
+                notifyCancellation();
+                return List.of();
+            }
             LOGGER.error("Critical error during merge operation", e);
             notifyError(e);
             throw e;
         }
     }
 
+    private void notifyCancellation() {
+        LOGGER.debug("Merge operation was cancelled. Processed: {}, Successfully updated: {}",
+                processedEntries.get(), successfulUpdates.get());
+        context.notificationService().notify(
+                Localization.lang("Merge operation cancelled after updating %0 entry(s)", successfulUpdates.get()));
+    }
+
     private List<String> processMergeEntries() {
-        return context.entries().stream()
-                      .takeWhile(_ -> !isCancelled())
-                      .map(this::processSingleEntryWithProgress)
-                      .filter(Optional::isPresent)
-                      .map(Optional::get)
-                      .collect(Collectors.toList());
+        List<String> updatedEntries = new ArrayList<>();
+
+        for (BibEntry entry : context.entries()) {
+            Optional<String> result = processSingleEntryWithProgress(entry);
+            result.ifPresent(updatedEntries::add);
+
+            if (isCancelled()) {
+                LOGGER.debug("Cancellation requested after processing entry {}", processedEntries.get());
+                break;
+            }
+        }
+
+        return updatedEntries;
     }
 
     private Optional<String> processSingleEntryWithProgress(BibEntry entry) {
