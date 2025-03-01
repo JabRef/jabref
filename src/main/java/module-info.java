@@ -193,8 +193,5 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires org.junit.jupiter.api;
-    requires org.mockito;
-    requires org.mockito.junit.jupiter;
     // endregion
 }
