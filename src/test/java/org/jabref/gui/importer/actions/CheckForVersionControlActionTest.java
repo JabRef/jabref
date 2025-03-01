@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.actions;
 
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
