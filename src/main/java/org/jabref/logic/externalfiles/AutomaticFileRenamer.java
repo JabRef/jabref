@@ -36,6 +36,12 @@ public class AutomaticFileRenamer {
         LOGGER.debug("Corresponding entry: {}", event.getBibEntry().getCitationKey().orElse("no citation key"));
         LOGGER.debug("New value: {}", event.getNewValue());
 
+        // Check preference setting first
+        if (!filePreferences.shouldAutoRenameFilesOnEntryChange()) {
+            LOGGER.debug("Auto rename files on entry change is disabled, ignoring event");
+            return;
+        }
+
         // Avoid reentrance
         if (isCurrentlyRenamingFile.get()) {
             LOGGER.debug("Already processing file renaming, ignoring new event: {}", event);
