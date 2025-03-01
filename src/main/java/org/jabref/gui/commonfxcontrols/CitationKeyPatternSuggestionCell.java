@@ -152,13 +152,12 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                     CitationKeyPattern.getAllPatterns().stream()
                                       .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
 
-            Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
-                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
-                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
-                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
-                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
-            );
+            Map<CitationKeyPattern.Category, String> categoryNames = new LinkedHashMap<>();
+            categoryNames.put(CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"));
+            categoryNames.put(CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
+            categoryNames.put(CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"));
+            categoryNames.put(CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
+            categoryNames.put(CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
 
             for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
                 CitationKeyPattern.Category category = entry.getKey();
@@ -193,7 +192,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             categoryNames.put(CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
             categoryNames.put(CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"));
             categoryNames.put(CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
-            categoryNames.put(CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields"));
+            categoryNames.put(CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
 
             for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
                 CitationKeyPattern.Category category = entry.getKey();
