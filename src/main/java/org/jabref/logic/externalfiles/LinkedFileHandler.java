@@ -186,6 +186,59 @@ public class LinkedFileHandler {
         }
     }
 
+    public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
+        Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
+        if (oldFile.isEmpty()) {
+            LOGGER.warn("Could not find original file, cannot rename");
+            return false;
+        }
+
+        final Path oldPath = oldFile.get();
+
+        Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
+        Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
+
+        Path newPath;
+        if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            newPath = oldPath.resolveSibling(targetFileName);
+        } else {
+            assert oldExtension.isPresent() && newExtension.isEmpty();
+            newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
+        }
+
+        String expandedOldFilePath = oldPath.toString();
+        boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
+                && !newPath.toString().equals(expandedOldFilePath);
+
+        // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+        // nonetheless rename files to a new name which just differs by case.
+        if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
+            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
+            return false;
+        }
+
+        try {
+            if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
+                Files.createDirectories(newPath.getParent());
+                LOGGER.debug("Overwriting existing file {}", newPath);
+                Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                Files.createDirectories(newPath.getParent());
+                Files.move(oldPath, newPath);
+            }
+
+            // Update path
+            String oldLink = linkedFile.getLink();
+            String newLink = FileUtil.relativize(newPath, databaseContext, filePreferences).toString();
+            linkedFile.setLink(newLink);
+
+            return true;
+        } catch (IOException e) {
+            LOGGER.error("Error moving file", e);
+            throw e;
+        }
+    }
+
     public String getSuggestedFileName() {
         String oldFileName = linkedFile.getLink();
 
