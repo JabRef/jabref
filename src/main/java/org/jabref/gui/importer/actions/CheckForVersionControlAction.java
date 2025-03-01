@@ -9,12 +9,16 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This action checks whether this BIB file is contained in a Git repository. If so,
  * then the file is tagged as "versioned" in BibDatabaseContext and a git pull is
  * attempted.
  */
 public class CheckForVersionControlAction implements GUIPostOpenAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckForVersionControlAction.class);
     private GitHandler gitHandler;
 
     @Override
@@ -30,13 +34,14 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
 
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
-        // TODO: Tag as versioned
-        // TODO: If the preference exists, only pull if the user has this preference on
+        parserResult.getDatabaseContext().setVersioned(true); // tags as versioned
 
-        try {
-            this.gitHandler.pullOnCurrentBranch();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (preferencesService.shouldAutoPull()) { // pulls only if preference allows
+            try {
+                this.gitHandler.pullOnCurrentBranch();
+            } catch (IOException e) {
+                LOGGER.error("Failed to pull.", e);
+            }
         }
     }
 }
