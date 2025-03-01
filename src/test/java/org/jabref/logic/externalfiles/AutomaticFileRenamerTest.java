@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -474,7 +475,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testManualBatchRenaming() throws IOException {
+    void manualBatchRenaming() throws IOException {
         // Create temporary file
         Path originalFile = Files.createFile(tempDir.resolve("testfile1.pdf"));
 
@@ -545,7 +546,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testBatchRenamingOnAddition() throws Exception {
+    void batchRenamingOnAddition() throws Exception {
 
         GlobalCitationKeyPatterns globalPattern = GlobalCitationKeyPatterns.fromPattern("[citationkey]");
         databaseContext.getMetaData().setCiteKeyPattern(globalPattern);
@@ -582,7 +583,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testRenameWithRealCiteKeyPattern() throws IOException {
+    void renameWithRealCiteKeyPattern() throws IOException {
         // Set citation key pattern，使用author字段
         GlobalCitationKeyPatterns globalPattern = GlobalCitationKeyPatterns.fromPattern("[auth]");
         databaseContext.getMetaData().setCiteKeyPattern(globalPattern);
@@ -651,7 +652,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testRenameToDefinedPattern() throws IOException {
+    void renameToDefinedPattern() throws IOException {
         // Create test files
         Path originalFile = tempDir.resolve("oldKey.pdf");
         Files.deleteIfExists(originalFile);
@@ -724,7 +725,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testRenameAFileWithLinkedFileHandler() throws Exception {
+    void renameAFileWithLinkedFileHandler() throws Exception {
         // Create temporary file
         Path originalFile = tempDir.resolve("oldKey.pdf");
         Files.deleteIfExists(originalFile); // Ensure file doesn't exist
@@ -802,7 +803,7 @@ class AutomaticFileRenamerTest {
     }
 
     private List<Path> createMultipleTestFiles(int count) throws IOException {
-        List<Path> files = new java.util.ArrayList<>();
+        List<Path> files = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             Path file = Files.createFile(tempDir.resolve("testfile" + i + ".pdf"));
             files.add(file);
@@ -811,7 +812,7 @@ class AutomaticFileRenamerTest {
     }
 
     private List<BibEntry> createEntriesWithFiles(List<Path> files) {
-        List<BibEntry> entries = new java.util.ArrayList<>();
+        List<BibEntry> entries = new ArrayList<>();
         for (int i = 0; i < files.size(); i++) {
             BibEntry entry = new BibEntry(StandardEntryType.Article)
                     .withCitationKey("entry" + (i + 1));
@@ -847,9 +848,9 @@ class AutomaticFileRenamerTest {
                              .filter(p -> p.getFileName().toString().toLowerCase().contains(expectedBaseName.toLowerCase()))
                              .findFirst()
                              .orElse(null);
-            foundSimilarFile = (actualFile != null);
+            foundSimilarFile = actualFile != null;
         } catch (Exception e) {
-            LOGGER.debug("Error checking for similar files: {}", e.getMessage());
+            LOGGER.debug("Error checking for similar files: {}", e.getMessage(), e);
         }
 
         if (foundSimilarFile) {

@@ -88,7 +88,7 @@ class EnhancedFileRenamerTest {
     }
 
     @Test
-    void testFileRenameWhenTargetAlreadyExists() throws Exception {
+    void fileRenameWhenTargetAlreadyExists() throws Exception {
         // First create the target file to simulate conflict
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -132,10 +132,10 @@ class EnhancedFileRenamerTest {
             // Check if the corresponding file exists
             Path alternativeFile = tempDir.resolve(actualLink);
             assertTrue(Files.exists(alternativeFile), "Alternative file should exist");
-        } else if (actualLink.equals("oldKey.pdf")) {
+        } else if ("oldKey.pdf".equals(actualLink)) {
             // Case where old link is preserved
             assertTrue(Files.exists(oldFile), "Old file should still exist");
-        } else if (actualLink.equals("newKey.pdf")) {
+        } else if ("newKey.pdf".equals(actualLink)) {
             // Case where new filename is used (if implementation allows overwrite)
             assertTrue(Files.exists(targetFile), "Target file should exist");
         }
@@ -143,7 +143,7 @@ class EnhancedFileRenamerTest {
 
     @Disabled("This test is currently failing due to changes in LinkedFileHandler. TODO: Fix this test later")
     @Test
-    void testFileRenameWhenTargetExistsWithSameContent() throws Exception {
+    void fileRenameWhenTargetExistsWithSameContent() throws Exception {
         // First create the target file with same content
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -154,7 +154,7 @@ class EnhancedFileRenamerTest {
         Files.writeString(oldFile, sameContent);
 
         // Verify files have same content
-        assertTrue(Files.mismatch(oldFile, targetFile) == -1);
+        assertEquals(-1, Files.mismatch(oldFile, targetFile));
 
         // Set new citation key
         entry.setCitationKey("newKey");
@@ -174,7 +174,7 @@ class EnhancedFileRenamerTest {
     }
 
     @Test
-    void testFileRenameWithFallbackToAlternativeFileName() throws Exception {
+    void fileRenameWithFallbackToAlternativeFileName() throws Exception {
         // First create the target file with different content
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -219,7 +219,7 @@ class EnhancedFileRenamerTest {
 
     @Disabled("This test is currently failing due to changes in LinkedFileHandler. TODO: Fix this test later")
     @Test
-    void testFileRenameWithCaseChangeOnly() throws Exception {
+    void fileRenameWithCaseChangeOnly() throws Exception {
         // Create entry with citekey "oldkey" (lowercase)
         BibEntry lowerCaseEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("oldkey") // lowercase
@@ -274,7 +274,7 @@ class EnhancedFileRenamerTest {
     }
 
     @Test
-    void testConcurrentRenamingIsThreadSafe() throws Exception {
+    void concurrentRenamingIsThreadSafe() throws Exception {
         // Create a second entry with its own file
         BibEntry entry2 = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("secondKey")
@@ -336,7 +336,7 @@ class EnhancedFileRenamerTest {
     }
 
     @Test
-    void testRenameWithBrokenFileLinks() throws Exception {
+    void renameWithBrokenFileLinks() throws Exception {
         // Create entry with non-existent file link
         LinkedFile brokenLink = new LinkedFile("", "non_existent.pdf", "PDF");
         entry.setFiles(List.of(brokenLink));

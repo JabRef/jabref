@@ -40,8 +40,9 @@ public class AutomaticCitationKeyGenerator {
 
     /**
      * Determines if a field is relevant for citation key generation.
-     * 
+     *
      * @param field The field to check
+     *
      * @return true if the field affects citation key generation
      */
     private boolean isRelevantField(Field field) {

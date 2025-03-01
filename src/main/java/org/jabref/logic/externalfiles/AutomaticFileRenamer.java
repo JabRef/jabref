@@ -83,7 +83,7 @@ public class AutomaticFileRenamer {
                     LOGGER.debug("Starting renaming execution...");
 
                     // First check if the entry has a citation key, if not don't perform renaming
-                    if (!entry.getCitationKey().isPresent() && entry.getFiles().size() > 0) {
+                    if (entry.getCitationKey().isEmpty() && !entry.getFiles().isEmpty()) {
                         LOGGER.debug("Entry has no citation key but has associated files, not performing renaming");
                     } else {
                         // Save the original file list for comparison
@@ -234,8 +234,7 @@ public class AutomaticFileRenamer {
                         renamedFiles.add(Optional.of(linkedFile));
                     }
                 } catch (Exception exception) {
-                    LOGGER.error("Exception occurred during renaming: {}", exception.getMessage());
-                    exception.printStackTrace();
+                    LOGGER.error("Exception occurred during renaming", exception);
                     renamedFiles.add(Optional.of(linkedFile));
                 }
             }

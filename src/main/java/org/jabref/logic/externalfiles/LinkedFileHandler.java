@@ -335,7 +335,7 @@ public class LinkedFileHandler {
             String extension = dotPosition < 0 ? "" : newName.substring(dotPosition);
 
             while (Files.exists(newPath)) {
-                String fileName = String.format("%s (%d)%s", fileNameWithoutExtension, counter, extension);
+                String fileName = "%s (%d)%s".formatted(fileNameWithoutExtension, counter, extension);
                 newPath = directory.resolve(fileName);
                 counter++;
             }
