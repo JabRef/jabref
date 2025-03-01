@@ -66,6 +66,7 @@ class DownloadLinkedFileActionTest {
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
+        when(filePreferences.shouldAutoRenameFilesOnEntryChange()).thenReturn(true);
         Path tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
 
