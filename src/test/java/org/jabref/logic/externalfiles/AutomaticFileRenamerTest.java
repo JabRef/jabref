@@ -64,7 +64,8 @@ class AutomaticFileRenamerTest {
                 Path.of(""), // backup directory
                 true, // confirm delete linked file
                 false, // move to trash
-                false  // keep download url
+                false, // keep download url
+                true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         // Create test entry and actual file
@@ -164,7 +165,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         // Create a new renamer using real preferences
@@ -225,7 +227,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         // Create file renamer
@@ -331,7 +334,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         // Create test files
@@ -426,7 +430,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         // Create test files
@@ -497,7 +502,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
         
         LOGGER.debug("Checking entry #1:");
@@ -613,7 +619,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         LOGGER.debug("Executing first renaming");
@@ -676,7 +683,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         LOGGER.debug("Testing 'Rename to defined pattern' functionality:");
@@ -751,7 +759,8 @@ class AutomaticFileRenamerTest {
             Path.of(""), // backup directory
             true, // confirm delete linked file
             false, // move to trash
-            false  // keep download url
+            false, // keep download url
+            true  // autoRenameFilesOnEntryChange - enable for tests
         );
 
         LOGGER.debug("File renaming test:");
