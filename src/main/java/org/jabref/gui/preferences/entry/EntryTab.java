@@ -1,11 +1,17 @@
 package org.jabref.gui.preferences.entry;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.gemsfx.TagsField;
+import java.util.function.UnaryOperator;
+
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -17,7 +23,8 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import java.util.function.UnaryOperator;
+import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.TagsField;
 
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
