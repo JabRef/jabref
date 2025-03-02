@@ -205,6 +205,7 @@ class ThemeManagerTest {
      * for the thread to start up and the changed css to reload.
      */
     @Test
+    @Disabled("Disabled due to Java 23 compatibility issues")
     void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
