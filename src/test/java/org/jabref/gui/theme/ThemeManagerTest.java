@@ -97,7 +97,6 @@ class ThemeManagerTest {
      *
      * @throws IOException when the testfile cannot be created
      */
-    @Disabled
     @Test
     void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
@@ -205,7 +204,6 @@ class ThemeManagerTest {
      * for the thread to start up and the changed css to reload.
      */
     @Test
-    @Disabled("Java 23 compatibility issue with file monitoring")
     void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);

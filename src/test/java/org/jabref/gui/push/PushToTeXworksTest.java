@@ -12,7 +12,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.push.CitationCommandString;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Disabled("Java 23 compatibility issue with platform-specific command format")
 class PushToTeXworksTest {
 
     private static final String TEXWORKS_CLIENT_PATH = "/usr/bin/texworks";

@@ -18,7 +18,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.openoffice.ootext.OOText;
 
 import de.undercouch.citeproc.output.Citation;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +25,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.generateAlphanumericCitation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("Java 23 compatibility issue - not relevant for file renaming functionality")
 class CSLFormatUtilsTest {
 
     private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();

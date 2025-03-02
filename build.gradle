@@ -609,12 +609,16 @@ test {
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
         showStandardStreams = true
+        exceptionFormat "full"
     }
     
     moduleOptions {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
+    
+    // Resolve JUnit module not found issue
+    jvmArgs = ['--add-opens', 'java.base/java.lang=ALL-UNNAMED']
 }
 
 testlogger {
