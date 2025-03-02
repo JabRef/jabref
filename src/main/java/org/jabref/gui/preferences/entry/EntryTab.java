@@ -26,13 +26,10 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 
-
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
-
     @FXML
     private TextField keywordSeparator;
-
     @FXML
     private CheckBox resolveStrings;
     @FXML
@@ -47,7 +44,6 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     private CheckBox markOwnerOverwrite;
     @FXML
     private Button markOwnerHelp;
-
     @FXML
     private CheckBox addCreationDate;
     @FXML
@@ -72,20 +68,16 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         };
         TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
         keywordSeparator.setTextFormatter(formatter);
-
         setupTagsWraps();
         setupTagsField();
-
         resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
         markOwnerName.disableProperty().bind(markOwner.selectedProperty().not());
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
-
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
-
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
