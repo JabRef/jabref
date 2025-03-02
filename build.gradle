@@ -584,7 +584,6 @@ run {
             main = 'org.jabref.http.server.Server'
         }
     }
-    jvmArgs += '--enable-preview'
 }
 
 javadoc {
@@ -616,7 +615,6 @@ test {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
-    jvmArgs += '--enable-preview'
 }
 
 testlogger {
@@ -638,7 +636,6 @@ tasks.withType(Test).configureEach {
     if (!providers.environmentVariable("CI").isPresent()) {
         maxParallelForks = Math.max(Runtime.runtime.availableProcessors() - 1, 1)
     }
-    jvmArgs += '--enable-preview'
 }
 
 tasks.withType(JavaExec).configureEach {

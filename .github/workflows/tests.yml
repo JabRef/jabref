@@ -182,7 +182,7 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer --add-modules javafx.controls,javafx.fxml
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
           DISABLE_AT_SPI: 1
