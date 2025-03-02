@@ -28,6 +28,6 @@ How to quickly provide feedback to contributors that checkstyle was not matched?
 ## Decision Outcome
 
 Chosen option: "Use Reviewdog's PullRequest review reporter", because resolves force to provide fast feedback.
-We do not want to use `comment-failure-action`, because [it might procude too much comments](https://github.com/quipper/comment-failure-action/issues/224).
+We do not want to use `comment-failure-action`, because [it might produce too many comments](https://github.com/quipper/comment-failure-action/issues/224).
 We accept that newcomers might be annoyed if quick automatic feedback by a bot is given:
 We value the time of our maintainers and want to keep them focused on the real challanges of the code changes.

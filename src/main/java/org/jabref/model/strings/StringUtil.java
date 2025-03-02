@@ -17,6 +17,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
+@SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
 public class StringUtil {
 

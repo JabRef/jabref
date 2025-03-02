@@ -12,17 +12,14 @@ public class FieldMergerFactory {
     }
 
     public FieldMerger create(Field field) {
-        if (field == StandardField.GROUPS) {
-            return new GroupMerger();
-        } else if (field == StandardField.KEYWORDS) {
-            return new KeywordMerger(bibEntryPreferences);
-        } else if (field == StandardField.COMMENT) {
-            return new CommentMerger();
-        } else if (field == StandardField.FILE) {
-            return new FileMerger();
-        } else {
-            throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
-        }
+        return switch (field) {
+            case StandardField.GROUPS -> new GroupMerger();
+            case StandardField.KEYWORDS -> new KeywordMerger(bibEntryPreferences);
+            case StandardField.COMMENT -> new CommentMerger();
+            case StandardField.FILE -> new FileMerger();
+            case null -> throw new IllegalArgumentException("Field must not be null");
+            default -> throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
+        };
     }
 
     public static boolean canMerge(Field field) {

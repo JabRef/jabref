@@ -24,6 +24,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private CheckBox overwriteAllow;
     @FXML private CheckBox overwriteWarning;
     @FXML private CheckBox generateOnSave;
+    @FXML private CheckBox generateNewKeyOnImport;
     @FXML private RadioButton letterStartA;
     @FXML private RadioButton letterStartB;
     @FXML private RadioButton letterAlwaysAdd;
@@ -45,11 +46,12 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences());
+        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
         generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());
+        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         letterStartA.selectedProperty().bindBidirectional(viewModel.letterStartAProperty());
         letterStartB.selectedProperty().bindBidirectional(viewModel.letterStartBProperty());
         letterAlwaysAdd.selectedProperty().bindBidirectional(viewModel.letterAlwaysAddProperty());

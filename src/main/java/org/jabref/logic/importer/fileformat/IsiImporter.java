@@ -188,7 +188,7 @@ public class IsiImporter extends Importer {
 
             EntryType type = BibEntry.DEFAULT_TYPE;
             String PT = "";
-            String pages = "";
+            StringBuilder pages = new StringBuilder();
             hm.clear();
 
             for (String field : fields) {
@@ -247,8 +247,8 @@ public class IsiImporter extends Importer {
                     }
                     case "AB" ->
                             hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
-                    case "BP", "BR", "SP" ->
-                            pages = value;
+                    case "BP", "BR", "SP", "AR" ->
+                            pages = new StringBuilder(value);
                     case "EP" -> {
                         int detpos = value.indexOf(' ');
 
@@ -256,12 +256,10 @@ public class IsiImporter extends Importer {
                         if ((detpos != -1) && !value.substring(0, detpos).trim().isEmpty()) {
                             value = value.substring(0, detpos);
                         }
-                        pages = pages + "--" + value;
+                        pages.append("--").append(value);
                     }
                     case "PS" ->
-                            pages = IsiImporter.parsePages(value);
-                    case "AR" ->
-                            pages = value;
+                            pages = new StringBuilder(IsiImporter.parsePages(value));
                     case "IS" ->
                             hm.put(StandardField.NUMBER, value);
                     case "PY" ->
@@ -299,8 +297,8 @@ public class IsiImporter extends Importer {
                 }
             }
 
-            if (!pages.isEmpty()) {
-                hm.put(StandardField.PAGES, pages);
+            if (pages.length() > 0) {
+                hm.put(StandardField.PAGES, pages.toString());
             }
 
             // Skip empty entries
