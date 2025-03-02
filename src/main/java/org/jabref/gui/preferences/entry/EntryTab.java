@@ -1,13 +1,11 @@
 package org.jabref.gui.preferences.entry;
 
-import java.util.function.UnaryOperator;
-
+import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -17,30 +15,41 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-
-import com.airhacks.afterburner.views.ViewLoader;
 import org.jabref.model.entry.field.Field;
+
+import java.util.function.UnaryOperator;
+
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
-    @FXML private TextField keywordSeparator;
+    @FXML
+    private TextField keywordSeparator;
 
-    @FXML private CheckBox resolveStrings;
-    @FXML private TagsField<Field> resolveStringsForFields;
-    @FXML private TagsField<Field> nonWrappableFields;
-    @FXML private CheckBox markOwner;
-    @FXML private TextField markOwnerName;
-    @FXML private CheckBox markOwnerOverwrite;
-    @FXML private Button markOwnerHelp;
+    @FXML
+    private CheckBox resolveStrings;
+    @FXML
+    private TagsField<Field> resolveStringsForFields;
+    @FXML
+    private TagsField<Field> nonWrappableFields;
+    @FXML
+    private CheckBox markOwner;
+    @FXML
+    private TextField markOwnerName;
+    @FXML
+    private CheckBox markOwnerOverwrite;
+    @FXML
+    private Button markOwnerHelp;
 
-    @FXML private CheckBox addCreationDate;
-    @FXML private CheckBox addModificationDate;
+    @FXML
+    private CheckBox addCreationDate;
+    @FXML
+    private CheckBox addModificationDate;
 
     public EntryTab() {
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     public void initialize() {
@@ -56,7 +65,6 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         };
         TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
         keywordSeparator.setTextFormatter(formatter);
-
 
         setupTagsWraps();
         setupTagsField();
@@ -74,6 +82,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
+
     private void setupTagsField() {
         resolveStringsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
         resolveStringsForFields.tagsProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
@@ -84,6 +93,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         resolveStringsForFields.getEditor().getStyleClass().clear();
         resolveStringsForFields.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> resolveStringsForFields.pseudoClassStateChanged(FOCUSED, newValue));
     }
+
     private void setupTagsWraps() {
         nonWrappableFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
         nonWrappableFields.tagsProperty().bindBidirectional(viewModel.nonWrappableFieldsProperty());
@@ -103,6 +113,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         return tagLabel;
     }
+
     private Node createWrapTag(Field field) {
         Label tagLabel = new Label();
         tagLabel.setText(field.getDisplayName());
