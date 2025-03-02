@@ -29,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 class AutomaticFileRenamerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticFileRenamerTest.class);
@@ -109,7 +111,7 @@ class AutomaticFileRenamerTest {
         entry.setCitationKey("oldKey");
 
         // Instantiate an object for file name generation to test
-        LinkedFile file = entry.getFiles().get(0);
+        LinkedFile file = entry.getFiles().stream().findFirst().orElse(null);
         LinkedFileHandler handler = new LinkedFileHandler(file, entry, databaseContext, filePreferences);
         String suggestedName = handler.getSuggestedFileName();
 
@@ -123,7 +125,7 @@ class AutomaticFileRenamerTest {
         String newSuggestedName = handler.getSuggestedFileName();
 
         // If the event did not trigger renaming, call the method directly
-        if (!"newKey.pdf".equals(entry.getFiles().getFirst().getLink())) {
+        if (!"newKey.pdf".equals(entry.getFiles().stream().findFirst().orElse(null).getLink())) {
             sut.renameAssociatedFiles(entry);
         }
 
@@ -147,7 +149,7 @@ class AutomaticFileRenamerTest {
 
         // Verify that the file has not changed
         assertTrue(Files.exists(oldFile));
-        assertEquals("oldKey.pdf", Path.of(entry.getFiles().getFirst().getLink()).getFileName().toString());
+        assertEquals("oldKey.pdf", Path.of(entry.getFiles().stream().findFirst().orElse(null).getLink()).getFileName().toString());
     }
 
     @Test
@@ -264,9 +266,9 @@ class AutomaticFileRenamerTest {
         assertTrue(Files.exists(expectedPath2), "File should exist: " + expectedPath2);
 
         // Verify links are updated
-        assertTrue(entry1.getFiles().getFirst().getLink().contains("entry1"),
+        assertTrue(entry1.getFiles().stream().findFirst().orElse(null).getLink().contains("entry1"),
             "Link should contain new filename: entry1");
-        assertTrue(entry2.getFiles().getFirst().getLink().contains("entry2"),
+        assertTrue(entry2.getFiles().stream().findFirst().orElse(null).getLink().contains("entry2"),
             "Link should contain new filename: entry2");
     }
 
@@ -357,7 +359,7 @@ class AutomaticFileRenamerTest {
         // Add entry to database
         databaseContext.getDatabase().insertEntry(entry);
 
-        // Create file renamer
+        // Create file renamer and listen to database
         AutomaticFileRenamer renamer = new AutomaticFileRenamer(databaseContext, filePreferences);
 
         // First trigger renaming to change file to Smith2020.pdf
@@ -516,7 +518,7 @@ class AutomaticFileRenamerTest {
         LOGGER.debug(" - Expected file: {}", expectedFile);
 
         // Display linked files in the entry
-        LOGGER.debug(" - Linked file: {}", entry.getFiles().get(0).getLink());
+        LOGGER.debug(" - Linked file: {}", entry.getFiles().stream().findFirst().orElse(null).getLink());
 
         // Call the renaming method
         AutomaticFileRenamer renamer = new AutomaticFileRenamer(
@@ -527,7 +529,7 @@ class AutomaticFileRenamerTest {
         renamer.renameAssociatedFiles(entry);
 
         // Verify if file has been renamed
-        LinkedFile newLinkedFile = entry.getFiles().getFirst();
+        LinkedFile newLinkedFile = entry.getFiles().stream().findFirst().orElse(null);
         String citationKey = entry.getCitationKey().orElse("");
 
         // Display files and links after renaming
@@ -640,13 +642,13 @@ class AutomaticFileRenamerTest {
         LOGGER.debug("Expected file: {}", expectedFile);
 
         // Output current linked file
-        LOGGER.debug("Current linked file: {}", entry.getFiles().getFirst().getLink());
+        LOGGER.debug("Current linked file: {}", entry.getFiles().stream().findFirst().orElse(null).getLink());
 
         // Confirm file has been renamed
         assertTrue(Files.exists(expectedFile), "File should exist: " + expectedFile);
 
         // Verify if link has been updated
-        LinkedFile linkedFile = entry.getFiles().getFirst();
+        LinkedFile linkedFile = entry.getFiles().stream().findFirst().orElse(null);
         assertTrue(linkedFile.getLink().contains("Einstein.pdf"),
             "Link should contain new filename: Einstein.pdf, but actually is: " + linkedFile.getLink());
     }
@@ -704,7 +706,7 @@ class AutomaticFileRenamerTest {
         LOGGER.debug("Expected file: {}", expectedFile);
 
         // Get the updated link
-        LinkedFile updatedFile = entry.getFiles().getFirst();
+        LinkedFile updatedFile = entry.getFiles().stream().findFirst().orElse(null);
         LOGGER.debug("Updated link: {}", updatedFile.getLink());
 
         // Verify if file has been renamed
@@ -777,7 +779,7 @@ class AutomaticFileRenamerTest {
         LOGGER.debug("Renaming successful: {}", renamed);
 
         // Get the new file link
-        LinkedFile updatedFile = entry.getFiles().getFirst();
+        LinkedFile updatedFile = entry.getFiles().stream().findFirst().orElse(null);
         LOGGER.debug("Updated file link: {}", updatedFile.getLink());
 
         // Verify if file has been renamed
@@ -799,7 +801,7 @@ class AutomaticFileRenamerTest {
         // If link is not updated, don't consider the test as failed
         // assertTrue(updatedFile.getLink().contains("Einstein1921") ||
         //            expectedLink.equals(updatedFile.getLink()),
-        //           "Link should contain citation key: Einstein1921, but actually is: " + updatedFile.getLink());
+        //           "Link should contain new filename: Einstein1921, but actually is: " + updatedFile.getLink());
     }
 
     private List<Path> createMultipleTestFiles(int count) throws IOException {
@@ -861,7 +863,7 @@ class AutomaticFileRenamerTest {
             assertTrue(Files.exists(expected), "New file not found: " + expected);
         }
 
-        LinkedFile linkedFile = entry.getFiles().getFirst();
+        LinkedFile linkedFile = entry.getFiles().stream().findFirst().orElse(null);
         LOGGER.debug("Current LinkedFile link: {}", linkedFile.getLink());
 
         String expectedFileName = expected.getFileName().toString();
