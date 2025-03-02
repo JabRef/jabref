@@ -193,6 +193,10 @@ dependencies {
     // region: LibreOffice
     implementation 'org.libreoffice:unoloader:24.8.4'
     implementation 'org.libreoffice:libreoffice:24.8.4'
+    implementation 'org.libreoffice:ridl:24.8.4'
+    implementation 'org.libreoffice:jurt:24.8.4'
+    implementation 'org.libreoffice:juh:24.8.4'
+    implementation 'org.libreoffice:unoil:24.8.4'
     // Required for ID generation
     implementation 'io.github.thibaultmeyer:cuid:2.0.3'
     // endregion
