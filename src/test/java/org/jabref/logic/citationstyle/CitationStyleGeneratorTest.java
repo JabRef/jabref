@@ -32,7 +32,10 @@ class CitationStyleGeneratorTest {
     @Test
     void aCMCitation() {
         context.setMode(BibDatabaseMode.BIBLATEX);
-        CitationStyle style = styleList.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
+        CitationStyle style = styleList.stream()
+                .filter(e -> "ACM SIGGRAPH".equals(e.getTitle()))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("ACM SIGGRAPH citation style not found"));
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).getFirst();
 
         // if the acm-siggraph.csl citation style changes this has to be modified
@@ -277,7 +280,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "number"),
                         "apa.csl"),
 
-                // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
+                // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                 Arguments.of(
                         "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, 9, 45–67.\n",
                         BibDatabaseMode.BIBTEX,
