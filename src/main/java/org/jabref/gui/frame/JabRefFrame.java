@@ -227,8 +227,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
-        sidePane.widthProperty().addListener(_ -> updateSidePane());
-        sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
+        sidePane.widthProperty().addListener(obs -> updateSidePane());
+        sidePane.getChildren().addListener((InvalidationListener) obs -> updateSidePane());
         updateSidePane();
         setCenter(splitPane);
     }
@@ -250,7 +250,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public void updateDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
             splitPane.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (_, _, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
+            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (obs, oldVal, newVal) -> preferences.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
         }
     }
 
@@ -394,8 +394,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
 
         // Hide tab bar
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
-        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) obs -> updateTabBarVisible());
+        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), obs -> updateTabBarVisible());
     }
 
     private void updateTabBarVisible() {
