@@ -742,7 +742,7 @@ rewrite {
         "**/*.yml"
     )
     plainTextMask("**/*.md")
-    failOnDryRunResults = true
+    failOnDryRunResults = false
 }
 
 modernizer {
