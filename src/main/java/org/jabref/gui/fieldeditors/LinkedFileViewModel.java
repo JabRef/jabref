@@ -266,6 +266,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(String targetFileName) {
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
+        boolean provideAltFileName= false; // placeholder to trigger functionality without button
 
         if (existingFile.isPresent()) {
             overwriteFile = dialogService.showConfirmationDialogAndWait(
@@ -273,9 +274,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
                     Localization.lang("Overwrite"));
 
+            if(provideAltFileName){ // will be triggered with added buttons
+                askForNameAndRename();
+            }
+
             if (!overwriteFile) {
                 return;
             }
+
         }
 
         try {
