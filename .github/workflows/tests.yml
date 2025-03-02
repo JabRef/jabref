@@ -16,6 +16,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
+  DISABLE_AT_SPI: 1
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -181,9 +182,10 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer --add-modules javafx.controls,javafx.fxml
         env:
           CI: "true"
+          DISABLE_AT_SPI: 1
       - name: Prepare format failed test results
         if: failure()
         uses: awalsh128/cache-apt-pkgs-action@latest
