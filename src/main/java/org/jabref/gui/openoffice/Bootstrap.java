@@ -20,23 +20,18 @@
 
 package org.jabref.gui.openoffice;
 
-// ATTENTION: This file is imported from LibreOffice sources and is not part of JabRef
-// It has been modified to use SLF4J instead of System.err for logging
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.star.bridge.UnoUrlResolver;
 import com.sun.star.bridge.XUnoUrlResolver;
@@ -77,8 +72,6 @@ import com.sun.star.uno.XComponentContext;
 */
 public class Bootstrap {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
-
     private static final Random RANDOM_PIPE_NAME = new Random();
     private static boolean M_LOADED_JUH = false;
 
@@ -113,7 +106,6 @@ public class Bootstrap {
      * </pre>
      *
      * @return an array of default commandline options
-     * @see #bootstrap(String[])
      * @since LibreOffice 5.1
      */
     public static String[] getDefaultOptions() {
@@ -298,14 +290,7 @@ public class Bootstrap {
             // start office process
             Process p = Runtime.getRuntime().exec(cmdArray);
             pipe(p.getInputStream(), System.out, "CO> ");
-            // Using a special LoggerPrintStream to capture error output
-            PrintStream loggerPrintStream = new PrintStream(System.err) {
-                @Override
-                public void println(String x) {
-                    LOGGER.error(x);
-                }
-            };
-            pipe(p.getErrorStream(), loggerPrintStream, "CE> ");
+            pipe(p.getErrorStream(), System.err, "CE> ");
 
             // initial service manager
             XMultiComponentFactory xLocalServiceManager = xLocalContext.getServiceManager();
@@ -361,8 +346,10 @@ public class Bootstrap {
                         }
                         out.println(prefix + s);
                     }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace(System.err);
                 } catch (IOException e) {
-                    LOGGER.error("IO error", e);
+                    e.printStackTrace(System.err);
                 }
             }
         }.start();
