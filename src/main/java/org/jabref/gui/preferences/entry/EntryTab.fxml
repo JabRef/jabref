@@ -29,9 +29,6 @@
                 <Insets top="-4.0"/>
             </HBox.margin>
         </TagsField>
-        <padding>
-            <Insets left="20.0"/>
-        </padding>
     </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
