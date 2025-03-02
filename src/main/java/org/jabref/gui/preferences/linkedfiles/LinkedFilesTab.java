@@ -77,7 +77,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
         autoRenameFiles.selectedProperty().bindBidirectional(viewModel.autoRenameFilesOnEntryChangeProperty());
-        autoRenameFiles.setText(Localization.lang("Auto rename files if entry changes (default: off)"));
+        autoRenameFiles.setText(Localization.lang("Auto rename files"));
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
