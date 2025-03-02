@@ -18,6 +18,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -268,14 +271,35 @@ public class LinkedFileViewModel extends AbstractViewModel {
         boolean overwriteFile = false;
 
         if (existingFile.isPresent()) {
-            overwriteFile = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Target file already exists"),
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                    Localization.lang("Overwrite"));
+//            overwriteFile = dialogService.showConfirmationDialogAndWait(
+//                    Localization.lang("Target file already exists"),
+//                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+//                    Localization.lang("Overwrite"));
+//
+//            if (!overwriteFile) {
+//                return;
+//            }
+            ButtonType overrideButton = new ButtonType("Override", ButtonBar.ButtonData.OTHER);
+            ButtonType keepBothButton = new ButtonType("Keep both", ButtonBar.ButtonData.OTHER);
+            ButtonType alternativeFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
+            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            if (!overwriteFile) {
-                return;
-            }
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
+                    AlertType.CONFIRMATION,
+                    Localization.lang("Target file already exists") ,
+                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    overrideButton, keepBothButton, alternativeFileNameButton
+            );
+
+            result.ifPresent(buttonType -> {
+                if (buttonType == overrideButton) {
+                    System.out.println("Override selected");
+                } else if (buttonType == keepBothButton) {
+                    System.out.println("Keep both selected");
+                } else if (buttonType == alternativeFileNameButton) {
+                    System.out.println("Provide alternative file name");
+                }
+            });
         }
 
         try {
