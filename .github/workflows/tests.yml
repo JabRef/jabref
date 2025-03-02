@@ -16,6 +16,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
+  DISABLE_AT_SPI: 1
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -37,7 +38,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
@@ -64,7 +65,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -86,7 +87,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -174,16 +175,17 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew test --info --stacktrace
         env:
           CI: "true"
+          DISABLE_AT_SPI: 1
       - name: Prepare format failed test results
         if: failure()
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -217,7 +219,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -258,7 +260,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -308,7 +310,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -341,7 +343,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4

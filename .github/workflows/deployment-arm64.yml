@@ -78,7 +78,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
+          java-version: 21
           distribution: 'temurin'
       - name: Clean up keychain
         run: |
@@ -134,7 +134,6 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \

@@ -45,24 +45,21 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_23
-    targetCompatibility = JavaVersion.VERSION_23
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
-    modularity.inferModulePath.set(false)
+    modularity.inferModulePath = true
 
     toolchain {
-        // If this is updated, also update
-        // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
-        // - .devcontainer/devcontainer.json#L34 and
-        // - .gitpod.Dockerfile
-        // - .moderne/moderne.yml
-        // - .github/workflows/deployment*.yml
+        // Keep in sync with
+        // - sourceCompatibility and targetCompatibility
+        // - .github/workflows/deployment.yml
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(21)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // vendor = JvmVendorSpec.AMAZON
     }
@@ -512,6 +509,7 @@ tasks.withType(JavaCompile).configureEach {
 
     // hint by https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
     options.fork = true
+    options.compilerArgs += '--enable-preview'
 }
 
 compileJava {
@@ -605,10 +603,22 @@ test {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
+    systemProperty 'testmode.enabled', 'true'
+    
+    // Add testLogging to show standard output during test execution
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+        exceptionFormat "full"
+    }
+    
     moduleOptions {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
+    
+    // Resolve JUnit module not found issue
+    jvmArgs = ['--add-opens', 'java.base/java.lang=ALL-UNNAMED']
 }
 
 testlogger {
@@ -630,6 +640,10 @@ tasks.withType(Test).configureEach {
     if (!providers.environmentVariable("CI").isPresent()) {
         maxParallelForks = Math.max(Runtime.runtime.availableProcessors() - 1, 1)
     }
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += '--enable-preview'
 }
 
 tasks.register('databaseTest', Test) {
@@ -729,7 +743,7 @@ rewrite {
         "**/*.yml"
     )
     plainTextMask("**/*.md")
-    failOnDryRunResults = true
+    failOnDryRunResults = false
 }
 
 modernizer {

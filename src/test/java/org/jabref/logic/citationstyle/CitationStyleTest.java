@@ -69,6 +69,7 @@ class CitationStyleTest {
     @MethodSource
     void titleMatches(String expectedTitle, String cslFileName) {
         Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+        assertTrue(citationStyle.isPresent(), "Citation style " + cslFileName + " should be present");
         CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
         assertEquals(expectedTitle, styleInfo.title());
     }
@@ -87,6 +88,7 @@ class CitationStyleTest {
     @MethodSource
     void numericPropertyMatches(boolean expectedNumericNature, String cslFileName) {
         Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+        assertTrue(citationStyle.isPresent(), "Citation style " + cslFileName + " should be present");
         CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
         assertEquals(expectedNumericNature, styleInfo.isNumericStyle());
     }

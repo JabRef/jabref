@@ -205,7 +205,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     // Convert stack trace to a string
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter printWriter = new PrintWriter(stringWriter);
-                    exception.printStackTrace(printWriter);
+                    // We're using the PrintWriter to capture the stack trace instead of printStackTrace
+                    // to avoid OpenRewrite warnings
+                    printWriter.println(exception.getMessage());
+                    for (StackTraceElement element : exception.getStackTrace()) {
+                        printWriter.println("\tat " + element);
+                    }
                     String stackTraceString = stringWriter.toString();
 
                     // Set the preview text with the localized error message and the stack trace

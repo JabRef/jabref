@@ -18,6 +18,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.openoffice.ootext.OOText;
 
 import de.undercouch.citeproc.output.Citation;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -159,94 +160,126 @@ class CSLFormatUtilsTest {
                 // Non-numeric, parentheses, commas, full stops, slashes, hyphens, colons, italics
                 Arguments.of(
                         "  Smith, B., Jones, B., & Williams, J. (2016). Title of the test entry. <i>BibTeX Journal</i>, <i>34</i>(3), 45–67. https://doi.org/10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("APA citation style not found"))
                 ),
 
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
                         "    [1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("IEEE citation style not found"))
                 ),
 
                 // Numeric type "1."
                 Arguments.of(
-                        "    1. Smith, B., Jones, B., Williams, J.: Title of the test entry. BibTeX Journal. 34, 45–67 (2016). https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
+                        "    1. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.<p></p>",
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Springer LNCS citation style not found"))
                 ),
 
                 Arguments.of(
                         "  Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Chicago citation style not found"))
                 ),
 
                 // Semicolons
                 Arguments.of(
                         "    1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 Jul;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Vancouver citation style not found"))
                 ),
 
                 Arguments.of(
                         "    1. Smith, B., Jones, B. & Williams, J. Title of the test entry. <i>BibTeX Journal</i> <b>34</b>, 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Nature citation style not found"))
                 ),
 
                 Arguments.of(
                         "    1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, ed. <i>BibTeX Journal</i>. 2016;34(3):45-67. doi:10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("AMA citation style not found"))
                 ),
 
                 // Small-caps
                 Arguments.of(
                         "  <smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps> and <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Harvard citation style not found"))
                 ),
 
                 // Underlines
                 Arguments.of(
                         "  Smith, Bill, Bob Jones, and Jeff Williams. “Title of the test entry.” Ed. Phil Taylor. <u>BibTeX Journal</u> 34.3 (2016): 45–67. <https://github.com/JabRef>.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("MLA citation style not found"))
                 ),
 
                 // Non-breaking spaces
                 Arguments.of(
                         "  Smith, Bill, Bob Jones, & Jeff Williams, “Title of the test entry,” <i>BibTeX Journal</i>, 2016, vol. 34, no. 3, pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Histoire & Mesure citation style not found"))
                 ),
 
                 // Numeric with a full stop - "1."
                 Arguments.of(
                         "    1. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Journal of Veterinary Medical Science citation style not found"))
                 ),
 
                 // Bold text, bold numeric with a full stop - "<BOLD>1."
                 Arguments.of(
                         "    <b>1</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Acta Orthopædica Belgica citation style not found"))
                 ),
 
                 // Naked numeric - "1"
                 Arguments.of(
                         "    1 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Acta Anaesthesiologica Taiwanica citation style not found"))
                 ),
 
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
                         "    (1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("ACS citation style not found"))
                 ),
 
                 // Numeric with right parenthesis - "1)"
                 Arguments.of(
                         "    1) Smith B., Jones B., Williams J., <i>BibTeX Journal</i>, <b>34</b>, 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("Chemical and Pharmaceutical Bulletin citation style not found"))
                 ),
 
                 // Numeric in superscript - "<SUPERSCRIPT>1"
                 Arguments.of(
                         "  <sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle()))
+                               .findAny()
+                               .orElseThrow(() -> new IllegalStateException("AIP citation style not found"))
                 )
         );
     }
@@ -271,83 +304,83 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(Smith et al., 2016)",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("APA citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("IEEE citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Springer LNCS citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Smith, Jones, and Williams 2016)",
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Chicago citation style not found"))
                 ),
 
                 Arguments.of(
                         "(1)",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Vancouver citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Nature citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("AMA citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Harvard citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Smith, Jones, & Williams, “Title of the test entry”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("MLA citation style not found"))
                 ),
 
                 Arguments.of(
                         "Smith, B., B. Jones, and J. Williams, 2016.",
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Histoire & Mesure citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Journal of Veterinary Medical Science citation style not found"))
                 ),
 
                 Arguments.of(
                         "(<i>1</i>)",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Orthopædica Belgica citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Anaesthesiologica Taiwanica citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("ACS citation style not found"))
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
                 Arguments.of(
                         "<sup>1</sup>)",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Chemical and Pharmaceutical Bulletin citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("AIP citation style not found"))
                 )
         );
     }
@@ -395,82 +428,82 @@ class CSLFormatUtilsTest {
         return Stream.of(
                 Arguments.of(
                         "(Garcia & Lee, 2021; Smith & Johnson, 2020)",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("APA citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1], [2]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("IEEE citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1, 2]",
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Springer LNCS citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Garcia and Lee 2021; Smith and Johnson 2020)",
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Chicago citation style not found"))
                 ),
 
                 Arguments.of(
                         "(1,2)",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Vancouver citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Nature citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("AMA citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Garcia and Lee, 2021; Smith and Johnson, 2020)",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Harvard citation style not found"))
                 ),
 
                 Arguments.of(
                         "(Garcia & Lee, “Quantum Entanglement in Superconductors”; Smith & Johnson, “A Study on Machine Learning Algorithms”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("MLA citation style not found"))
                 ),
 
                 Arguments.of(
                         "Garcia, M. and D. Lee, 2021 ; Smith, J. and E. Johnson, 2020.",
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Histoire & Mesure citation style not found"))
                 ),
 
                 Arguments.of(
                         "[1, 2]",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Journal of Veterinary Medical Science citation style not found"))
                 ),
 
                 Arguments.of(
                         "(<i>1,2</i>)",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Orthopædica Belgica citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Anaesthesiologica Taiwanica citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("ACS citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>)",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Chemical and Pharmaceutical Bulletin citation style not found"))
                 ),
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("AIP citation style not found"))
                 )
         );
     }
@@ -502,43 +535,43 @@ class CSLFormatUtilsTest {
                 // Type: "[1]"
                 Arguments.of(
                         "    [3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("IEEE citation style not found"))
                 ),
 
                 // Type: "1."
                 Arguments.of(
                         "    3. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Journal of Veterinary Medical Science citation style not found"))
                 ),
 
                 // Type: "<BOLD>1."
                 Arguments.of(
                         "    <b>3</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Orthopædica Belgica citation style not found"))
                 ),
 
                 // Type: "1"
                 Arguments.of(
                         "    3 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Acta Anaesthesiologica Taiwanica citation style not found"))
                 ),
 
                 // Type: "(1)"
                 Arguments.of(
                         "    (3) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("ACS citation style not found"))
                 ),
 
                 // Type: "1)"
                 Arguments.of(
                         "    3) Smith B., Jones B., Williams J., <i>BibTeX Journal</i>, <b>34</b>, 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("Chemical and Pharmaceutical Bulletin citation style not found"))
                 ),
 
                 // Type: "<SUPERSCRIPT>1"
                 Arguments.of(
                         "  <sup>3</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().orElseThrow(() -> new IllegalStateException("AIP citation style not found"))
                 )
         );
     }

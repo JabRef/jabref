@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 if (changedFile) {
                     changed = true;
                 }
-            } catch (IOException exception) {
+            } catch (Exception exception) {
                 LOGGER.error("Error while renaming file {}", file.getLink(), exception);
             }
         }

@@ -32,6 +32,7 @@ class LinkedFileHandlerTest {
         databaseContext = new BibDatabaseContext();
 
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
+        when(filePreferences.shouldAutoRenameFilesOnEntryChange()).thenReturn(true);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
 

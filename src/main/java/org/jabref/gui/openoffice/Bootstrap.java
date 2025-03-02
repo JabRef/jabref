@@ -20,11 +20,15 @@
 
 package org.jabref.gui.openoffice;
 
+// ATTENTION: This file is imported from LibreOffice sources and is not part of JabRef
+// It has been modified to use SLF4J instead of System.err for logging
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -48,6 +52,8 @@ import com.sun.star.lib.util.NativeLibraryLoader;
 import com.sun.star.loader.XImplementationLoader;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Bootstrap offers functionality to obtain a context or simply
   * a service manager.
@@ -70,6 +76,8 @@ import com.sun.star.uno.XComponentContext;
   * </pre>
 */
 public class Bootstrap {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
     private static final Random RANDOM_PIPE_NAME = new Random();
     private static boolean M_LOADED_JUH = false;
@@ -105,7 +113,6 @@ public class Bootstrap {
      * </pre>
      *
      * @return an array of default commandline options
-     * @see #bootstrap(String[])
      * @since LibreOffice 5.1
      */
     public static String[] getDefaultOptions() {
@@ -290,7 +297,14 @@ public class Bootstrap {
             // start office process
             Process p = Runtime.getRuntime().exec(cmdArray);
             pipe(p.getInputStream(), System.out, "CO> ");
-            pipe(p.getErrorStream(), System.err, "CE> ");
+            // Using a special LoggerPrintStream to capture error output
+            PrintStream loggerPrintStream = new PrintStream(System.err) {
+                @Override
+                public void println(String x) {
+                    LOGGER.error(x);
+                }
+            };
+            pipe(p.getErrorStream(), loggerPrintStream, "CE> ");
 
             // initial service manager
             XMultiComponentFactory xLocalServiceManager = xLocalContext.getServiceManager();
@@ -323,7 +337,9 @@ public class Bootstrap {
                     Thread.sleep(500);
                 }
             }
-        } catch (BootstrapException | RuntimeException e) {
+        } catch (BootstrapException e) {
+            throw e;
+        } catch (java.lang.RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new BootstrapException(e);
@@ -346,8 +362,10 @@ public class Bootstrap {
                         }
                         out.println(prefix + s);
                     }
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error("Unsupported encoding", e);
                 } catch (IOException e) {
-                    e.printStackTrace(System.err);
+                    LOGGER.error("IO error", e);
                 }
             }
         }.start();
