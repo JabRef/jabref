@@ -182,7 +182,7 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew test
         env:
           CI: "true"
           DISABLE_AT_SPI: 1
