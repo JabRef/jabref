@@ -55,6 +55,6 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Run fetcher tests
-        run: ./gradlew fetcherTest --enable-preview
+        run: ./gradlew fetcherTest
         env:
           CI: "true"

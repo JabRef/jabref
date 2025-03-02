@@ -181,7 +181,7 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer --enable-preview
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Prepare format failed test results
@@ -316,7 +316,7 @@ jobs:
           gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport --enable-preview
+        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
         env:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
