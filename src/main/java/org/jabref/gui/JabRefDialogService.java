@@ -61,6 +61,10 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputControl;
+
+
 /**
  * This class provides methods to create default
  * JavaFX dialogs which will also work on top of Swing
@@ -260,7 +264,10 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel) {
-        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
