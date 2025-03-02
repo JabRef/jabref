@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import com.dlsc.gemsfx.TagsField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -22,21 +23,24 @@
 
     <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="%Affected fields"/>
-        <TextField fx:id="resolveStringsForFields" HBox.hgrow="ALWAYS"
-                   disable="${!resolveStrings.selected}">
+        <Label text="%Affected fields" minWidth="150" maxWidth="200"/>
+        <TagsField fx:id="resolveStringsForFields" HBox.hgrow="ALWAYS" disable="${!resolveStrings.selected}">
             <HBox.margin>
                 <Insets top="-4.0"/>
             </HBox.margin>
-        </TextField>
+        </TagsField>
         <padding>
             <Insets left="20.0"/>
         </padding>
     </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="%Do not wrap when saving"/>
-        <TextField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS"/>
+        <Label text="%Do not wrap when saving" minWidth="150" maxWidth="200"/>
+        <TagsField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+                <Insets top="-4.0"/>
+            </HBox.margin>
+        </TagsField>
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Entry owner"/>
@@ -53,5 +57,6 @@
 
     <Label styleClass="sectionHeader" text="%Time stamp"/>
     <CheckBox fx:id="addCreationDate" text="%Add timestamp to new entries (field &quot;creationdate&quot;)"/>
-    <CheckBox fx:id="addModificationDate" text="%Add timestamp to modified entries (field &quot;modificationdate&quot;)"/>
+    <CheckBox fx:id="addModificationDate"
+              text="%Add timestamp to modified entries (field &quot;modificationdate&quot;)"/>
 </fx:root>
