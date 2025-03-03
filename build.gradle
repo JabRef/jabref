@@ -332,7 +332,7 @@ dependencies {
     implementation 'com.github.vatbub:mslinks:1.0.6.2'
 
     // YAML formatting
-    implementation 'org.yaml:snakeyaml:2.3'
+    implementation 'org.yaml:snakeyaml:2.4'
 
     // region AI
     implementation 'dev.langchain4j:langchain4j:0.36.2'
