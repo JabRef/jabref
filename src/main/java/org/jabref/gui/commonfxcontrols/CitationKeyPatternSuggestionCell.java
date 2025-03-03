@@ -67,6 +67,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
             this.suggestionsList = new ContextMenu();
+            // Initial reasonable estimate before the menu items are populated. We overwrite this dynamically
             this.heightOfMenuItem = 30;
 
             setListener();
