@@ -213,6 +213,10 @@ public class FilePreferences {
         return shouldKeepDownloadUrl;
     }
 
+    public boolean shouldAutoRenameFilesOnEntryChange() {
+        return autoRenameFilesOnEntryChange.get();
+    }
+
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
     }

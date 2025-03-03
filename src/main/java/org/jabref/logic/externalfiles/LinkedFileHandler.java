@@ -239,4 +239,20 @@ public class LinkedFileHandler {
         }
         return matchedByDiffCase;
     }
+
+    public LinkedFile refreshFileLink() {
+        // Calculate the correct relative path based on the current file path and database context
+        Optional<Path> filePath = linkedFile.findIn(databaseContext, filePreferences);
+        if (filePath.isPresent()) {
+            String relativeLink = FileUtil.relativize(filePath.get(), databaseContext, filePreferences).toString();
+            return new LinkedFile(
+                    linkedFile.getDescription(),
+                    relativeLink,
+                    linkedFile.getFileType()
+            );
+        } else {
+            // If the file cannot be found, return the original link
+            return linkedFile;
+        }
+    }
 }
