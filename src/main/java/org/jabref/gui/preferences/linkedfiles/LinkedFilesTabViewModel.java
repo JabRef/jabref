@@ -6,13 +6,17 @@ import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
+import org.jabref.gui.linkedfile.LinkedFileNamePatternsItemModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
@@ -41,6 +45,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+
+    private final ListProperty<LinkedFileNamePatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+            new LinkedFileNamePatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), ""));
 
     private final Validator mainFileDirValidator;
 
@@ -191,6 +199,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public ListProperty<LinkedFileNamePatternsItemModel> patternListProperty() {
+        return patternListProperty;
+    }
+
+    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty() {
+        return defaultKeyPatternProperty;
     }
 }
 

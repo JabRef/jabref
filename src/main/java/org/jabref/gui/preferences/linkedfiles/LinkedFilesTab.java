@@ -12,6 +12,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -39,6 +40,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private TextField fileDirectoryPattern;
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
+
+    @FXML private LinkedFileNamePatternsPanel linkedFileNamePatternTable;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -75,6 +78,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
+
+        linkedFileNamePatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
+        linkedFileNamePatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
