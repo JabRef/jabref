@@ -22,4 +22,12 @@ public class GitPreferences {
     public BooleanProperty getAutoPushEnabledProperty() {
         return autoPushEnabled;
     }
+
+    public void setAutoPushEnabled(boolean enabled) {
+        autoPushEnabled.set(enabled);
+    }
+
+    public GitPreferences withAutoPushEnabled(boolean enabled) {
+        return new GitPreferences(enabled);
+    }
 }
