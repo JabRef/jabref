@@ -36,7 +36,7 @@ public class JournalAbbreviationRepository {
      */
     public JournalAbbreviationRepository(Path journalList) {
         String journalPath = journalList.toAbsolutePath().toString();
-        store = new MVStore.Builder().fileName(journalPath).cacheSize(64).open();
+        store = new MVStore.Builder().fileName(journalPath).open();
 
         openMaps(store);
     }
@@ -126,10 +126,17 @@ public class JournalAbbreviationRepository {
         if (customAbbreviation.isPresent()) {
             return customAbbreviation;
         }
-        return Optional.ofNullable(fullToAbbreviationMap.get(journal))
-                       .or(() -> Optional.ofNullable(abbreviationToAbbreviationMap.get(journal)))
-                       .or(() -> Optional.ofNullable(dotlessToAbbreviationMap.get(journal)))
-                       .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationMap.get(journal)));
+
+        Abbreviation abbr = Optional.ofNullable(fullToAbbreviationMap.get(journal))
+                                    .or(() -> Optional.ofNullable(abbreviationToAbbreviationMap.get(journal)))
+                                    .or(() -> Optional.ofNullable(dotlessToAbbreviationMap.get(journal)))
+                                    .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationMap.get(journal)))
+                                    .orElse(null);
+        if (abbr != null) {
+            // Recreate the Abbreviation so that the dotless field is derived from the abbreviation.
+            abbr = new Abbreviation(abbr.getName(), abbr.getAbbreviation(), abbr.getShortestUniqueAbbreviation());
+        }
+        return Optional.ofNullable(abbr);
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
