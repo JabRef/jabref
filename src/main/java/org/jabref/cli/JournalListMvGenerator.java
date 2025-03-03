@@ -45,6 +45,7 @@ public class JournalListMvGenerator {
              MVStore store = new MVStore.Builder().
                      fileName(journalListMvFile.toString()).
                      compressHigh().
+                     cacheSize(128).
                      open()) {
             MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
             MVMap<String, Abbreviation> abbreviationToAbbreviation = store.openMap("AbbreviationToAbbreviation");
