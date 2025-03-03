@@ -264,10 +264,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
+        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
@@ -305,7 +302,11 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
                                                               ButtonType... buttonTypes) {
-        FXDialog alert = createDialog(type, title, content);
+        // does doing this mess up other use cases of this function? if so, it could just be moved to performRenameWithConflictCheck()
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
     }
