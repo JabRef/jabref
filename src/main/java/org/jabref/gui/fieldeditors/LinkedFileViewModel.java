@@ -40,6 +40,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -271,6 +272,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
         boolean overwriteFile = false;
 
         if (existingFile.isPresent()) {
+            Path existingFileVal = existingFile.get();
+            // show when hovering over "Keep both" button
+            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(
+                existingFileVal.getParent(),
+                existingFileVal.getFileName().toString()
+            );
+
 //            overwriteFile = dialogService.showConfirmationDialogAndWait(
 //                    Localization.lang("Target file already exists"),
 //                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
@@ -291,15 +299,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     overrideButton, keepBothButton, alternativeFileNameButton
             );
 
-            result.ifPresent(buttonType -> {
+            if (result.isPresent()) {
+                ButtonType buttonType = result.get();
                 if (buttonType == overrideButton) {
                     System.out.println("Override selected");
                 } else if (buttonType == keepBothButton) {
-                    System.out.println("Keep both selected");
+                    targetFileName = suggestedFileName;
                 } else if (buttonType == alternativeFileNameButton) {
                     System.out.println("Provide alternative file name");
                 }
-            });
+            }
         }
 
         try {
