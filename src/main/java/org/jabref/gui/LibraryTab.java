@@ -65,7 +65,9 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citationkeypattern.AutomaticCitationKeyGenerator;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.externalfiles.AutomaticFileRenamer;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -250,6 +252,19 @@ public class LibraryTab extends Tab {
         this.bibDatabaseContext.getDatabase().registerListener(this);
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
+
+        // Register automatic citation key generator
+        AutomaticCitationKeyGenerator citationKeyGenerator = new AutomaticCitationKeyGenerator(
+                bibDatabaseContext,
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getFilePreferences());
+        this.getDatabase().registerListener(citationKeyGenerator);
+
+        // Register automatic file renamer
+        AutomaticFileRenamer fileRenamer = new AutomaticFileRenamer(
+                bibDatabaseContext,
+                preferences.getFilePreferences());
+        this.getDatabase().registerListener(fileRenamer);
 
         this.entryEditor = createEntryEditor();
 
