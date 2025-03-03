@@ -43,56 +43,56 @@ public class AutomaticFileRenamer {
 
         new Thread(() -> {
             try {
-                Thread.sleep(500);
+                Thread.sleep(500); // avoid renaming the file too frequently
 
                 if (!isCurrentlyRenamingFile.compareAndSet(false, true)) {
                     return;
-                }
+                } // make sure only one thread is renaming the file at a time - Thread Safety
 
                 try {
-                    if (entry.getCitationKey().isEmpty() && !entry.getFiles().isEmpty()) {
-                        // No citation key but has files
-                    } else {
-                        List<LinkedFile> originalFiles = new ArrayList<>(entry.getFiles());
-                        List<LinkedFile> updatedFiles = new ArrayList<>();
-                        boolean anyFileRenamed = false;
+                    if (entry.getCitationKey().isEmpty()) {
+                        return;
+                    } // make sure the entry has a citation key
 
-                        for (LinkedFile linkedFile : entry.getFiles()) {
-                            if (linkedFile.isOnlineLink()) {
-                                updatedFiles.add(linkedFile);
-                                continue;
-                            }
+                    List<LinkedFile> updatedFiles = new ArrayList<>();
+                    boolean anyFileRenamed = false;
 
-                            Optional<Path> filePath = linkedFile.findIn(databaseContext, filePreferences);
-                            if (filePath.isEmpty()) {
-                                updatedFiles.add(linkedFile);
-                                continue;
-                            }
-
-                            LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
-                            try {
-                                boolean renamed = fileHandler.renameToSuggestedName();
-                                if (renamed) {
-                                    LinkedFile updatedFile = fileHandler.refreshFileLink();
-                                    updatedFiles.add(updatedFile);
-                                    anyFileRenamed = true;
-                                } else {
-                                    updatedFiles.add(linkedFile);
-                                }
-                            } catch (Exception e) {
-                                updatedFiles.add(linkedFile);
-                            }
+                    // handling every file in the entry
+                    for (LinkedFile linkedFile : entry.getFiles()) {
+                        if (linkedFile.isOnlineLink()) {
+                            updatedFiles.add(linkedFile);
+                            continue;
                         }
 
-                        if (anyFileRenamed) {
-                            entry.setFiles(updatedFiles);
+                        Optional<Path> filePath = linkedFile.findIn(databaseContext, filePreferences);
+                        if (filePath.isEmpty()) {
+                            updatedFiles.add(linkedFile);
+                            continue;
+                        }
+
+                        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+                        try {
+                            boolean renamed = fileHandler.renameToSuggestedName();
+                            if (renamed) {
+                                LinkedFile updatedFile = fileHandler.refreshFileLink();
+                                updatedFiles.add(updatedFile);
+                                anyFileRenamed = true;
+                            } else {
+                                updatedFiles.add(linkedFile);
+                            }
+                        } catch (Exception e) {
+                            updatedFiles.add(linkedFile);
                         }
                     }
+
+                    if (anyFileRenamed) {
+                        entry.setFiles(updatedFiles);
+                    }
                 } finally {
-                    isCurrentlyRenamingFile.set(false);
+                    isCurrentlyRenamingFile.set(false); // Make sure the flag is set to false after the renamer is done
                 }
             } catch (Exception e) {
-                // Silent catch
+                 // DO NOTHING FOR NOW
             }
         }).start();
     }
