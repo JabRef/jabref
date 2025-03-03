@@ -51,6 +51,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
@@ -421,6 +422,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private GitPreferences gitPreferences;
 
     private boolean autoPullEnabled;
 
@@ -1819,6 +1821,17 @@ public class JabRefCliPreferences implements CliPreferences {
         lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));
 
         return lastFilesOpenedPreferences;
+    }
+
+    @Override
+    public GitPreferences getGitPreferences() {
+        if (gitPreferences != null) {
+            return gitPreferences;
+        }
+
+        // TODO: Construct git preferences
+
+        return gitPreferences;
     }
 
     private FileHistory getFileHistory() {
