@@ -303,11 +303,17 @@ public class JabRefDialogService implements DialogService {
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
                                                               ButtonType... buttonTypes) {
         // does doing this mess up other use cases of this function? if so, it could just be moved to performRenameWithConflictCheck()
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getButtonTypes().setAll(buttonTypes);
+
+        // Ensure closing with "X" behaves like clicking "Cancel" (but without adding a visible Cancel button)
+        DialogPane dialogPane = alert.getDialogPane();
+        Stage stage = (Stage) dialogPane.getScene().getWindow();
+        stage.setOnCloseRequest(event -> alert.setResult(ButtonType.CANCEL));
+
         return alert.showAndWait();
     }
 
