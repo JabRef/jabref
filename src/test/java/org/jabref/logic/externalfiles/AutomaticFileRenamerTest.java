@@ -66,7 +66,8 @@ class AutomaticFileRenamerTest {
                 Path.of(""), // backup directory
                 true, // confirm delete linked file
                 false, // move to trash
-                false  // keep download url
+                false, // keep download url
+                false //// auto rename files on entry change
         );
 
         // Create test entry and actual file
@@ -166,7 +167,8 @@ class AutomaticFileRenamerTest {
                 Path.of(""), // backup directory
                 true, // confirm delete linked file
                 false, // move to trash
-                false  // keep download url
+                false, // keep download url
+                false // auto rename files on entry change
         );
 
         // Create a new renamer using real preferences
@@ -188,7 +190,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testFileRenameWhenTargetAlreadyExists() throws Exception {
+    void fileRenameWhenTargetAlreadyExists() throws Exception {
         // First create the target file to simulate conflict
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -232,10 +234,10 @@ class AutomaticFileRenamerTest {
             // Check if the corresponding file exists
             Path alternativeFile = tempDir.resolve(actualLink);
             assertTrue(Files.exists(alternativeFile), "Alternative file should exist");
-        } else if (actualLink.equals("oldKey.pdf")) {
+        } else if ("oldKey.pdf".equals(actualLink)) {
             // Case where old link is preserved
             assertTrue(Files.exists(oldFile), "Old file should still exist");
-        } else if (actualLink.equals("newKey.pdf")) {
+        } else if ("newKey.pdf".equals(actualLink)) {
             // Case where new filename is used (if implementation allows overwrite)
             assertTrue(Files.exists(targetFile), "Target file should exist");
         }
@@ -243,7 +245,7 @@ class AutomaticFileRenamerTest {
 
     @Disabled("This test is currently failing due to changes in LinkedFileHandler. TODO: Fix this test later")
     @Test
-    void testFileRenameWhenTargetExistsWithSameContent() throws Exception {
+    void fileRenameWhenTargetExistsWithSameContent() throws Exception {
         // First create the target file with same content
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -254,7 +256,7 @@ class AutomaticFileRenamerTest {
         Files.writeString(oldFile, sameContent);
 
         // Verify files have same content
-        assertTrue(Files.mismatch(oldFile, targetFile) == -1);
+        assertEquals(-1, Files.mismatch(oldFile, targetFile));
 
         // Set new citation key
         entry.setCitationKey("newKey");
@@ -274,7 +276,7 @@ class AutomaticFileRenamerTest {
     }
 
     @Test
-    void testFileRenameWithFallbackToAlternativeFileName() throws Exception {
+    void fileRenameWithFallbackToAlternativeFileName() throws Exception {
         // First create the target file with different content
         Path targetFile = tempDir.resolve("newKey.pdf");
         Files.createFile(targetFile);
@@ -314,8 +316,8 @@ class AutomaticFileRenamerTest {
         // 2. The link is to the target file (overwrite succeeded)
         // 3. The link is to an alternative file (fallback succeeded)
         assertTrue(
-                linkedFilePath.equals("oldKey.pdf") ||
-                        linkedFilePath.equals("newKey.pdf") ||
+                "oldKey.pdf".equals(linkedFilePath) ||
+                        "newKey.pdf".equals(linkedFilePath) ||
                         (alternativeFileExists && linkedFilePath.equals(alternativeFilePath)),
                 "Linked file should be one of the expected options, but was: " + linkedFilePath
         );
