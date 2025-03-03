@@ -106,6 +106,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final TrustStoreManager trustStoreManager;
 
+    private final BooleanProperty autoPushEnabled = new SimpleBooleanProperty();
+
     public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -439,5 +441,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
+    }
+
+    public BooleanProperty autoPushEnabledProperty() {
+        return autoPushEnabled;
     }
 }

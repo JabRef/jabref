@@ -51,6 +51,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
@@ -421,6 +422,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private GitPreferences gitPreferences;
+
+    private boolean autoPullEnabled;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -1819,6 +1823,17 @@ public class JabRefCliPreferences implements CliPreferences {
         return lastFilesOpenedPreferences;
     }
 
+    @Override
+    public GitPreferences getGitPreferences() {
+        if (gitPreferences != null) {
+            return gitPreferences;
+        }
+
+        // TODO: Construct git preferences
+
+        return gitPreferences;
+    }
+
     private FileHistory getFileHistory() {
         return FileHistory.of(getStringList(RECENT_DATABASES).stream()
                                                              .map(Path::of)
@@ -2232,6 +2247,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getXmpPreferences(),
                 getDOIPreferences(),
                 getGrobidPreferences());
+    }
+
+    public boolean shouldAutoPull() {
+        return autoPullEnabled;
     }
 
     // endregion
