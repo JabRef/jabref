@@ -2,8 +2,6 @@ package org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -14,111 +12,95 @@ import java.util.regex.Pattern;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
-/**
- * A repository for all journal abbreviations, including add and find methods.
- */
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
+    private final String fullToAbbreviationMapName = "fullToAbbreviationMap";
+    private final String abbreviationToAbbreviationMapName = "abbreviationToAbbreviationMap";
+    private final String dotlessToAbbreviationMapName = "dotlessToAbbreviationMap";
+    private final String shortestUniqueToAbbreviationMapName = "shortestUniqueToAbbreviationMap";
+    private final String persistentFullMapName = "FullToAbbreviation"; // the original persisted map name
+    private String journalPath;
+
+    private MVStore store;
+    private MVMap<String, Abbreviation> fullToAbbreviationMap;
+    private MVMap<String, Abbreviation> abbreviationToAbbreviationMap;
+    private MVMap<String, Abbreviation> dotlessToAbbreviationMap;
+    private MVMap<String, Abbreviation> shortestUniqueToAbbreviationMap;
+
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
-    /**
-     * Initializes the internal data based on the abbreviations found in the given MV file
-     */
     public JournalAbbreviationRepository(Path journalList) {
-        MVMap<String, Abbreviation> mvFullToAbbreviationObject;
-        try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
-            mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
-            mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
-                String abbrevationString = abbreviation.getAbbreviation();
-                String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
-                Abbreviation newAbbreviation = new Abbreviation(
-                        name,
-                        abbrevationString,
-                        shortestUniqueAbbreviation
-                );
-                fullToAbbreviationObject.put(name, newAbbreviation);
-                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
-                dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
-                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
+        journalPath = journalList.toAbsolutePath().toString();
+        store = new MVStore.Builder().fileName(journalPath).cacheSize(64).open();
+
+        openMaps(store);
+
+        MVMap<String, Abbreviation> mvFullToAbbreviation = store.openMap(persistentFullMapName);
+
+        if (mvFullToAbbreviation != null) {
+            mvFullToAbbreviation.forEach((name, abbreviation) -> {
+                String abbreviationString = abbreviation.getAbbreviation();
+                String shortestUnique = abbreviation.getShortestUniqueAbbreviation();
+
+                Abbreviation newAbbreviation = new Abbreviation(name, abbreviationString, shortestUnique);
+
+                fullToAbbreviationMap.put(name, newAbbreviation);
+                abbreviationToAbbreviationMap.put(newAbbreviation.getAbbreviation(), newAbbreviation);
+                dotlessToAbbreviationMap.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
+                shortestUniqueToAbbreviationMap.put(newAbbreviation.getShortestUniqueAbbreviation(), newAbbreviation);
             });
         }
+        store.commit();
     }
 
     /**
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public JournalAbbreviationRepository() {
+        // this will persist in memory
+        store = new MVStore.Builder().open();
+        openMaps(store);
+
         Abbreviation newAbbreviation = new Abbreviation(
                 "Demonstration",
                 "Demo",
                 "Dem"
         );
-        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
-        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
-        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
-        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+
+        fullToAbbreviationMap.put("Demonstration", newAbbreviation);
+        abbreviationToAbbreviationMap.put("Demo", newAbbreviation);
+        dotlessToAbbreviationMap.put("Demo", newAbbreviation);
+        shortestUniqueToAbbreviationMap.put("Dem", newAbbreviation);
     }
 
-    private static boolean isMatched(String name, Abbreviation abbreviation) {
-        return name.equalsIgnoreCase(abbreviation.getName())
-                || name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
-    }
-
-    private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
-        boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
-        if (isExpanded) {
-            return false;
-        }
-        return name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
-    }
-
-    /**
-     * Returns true if the given journal name is contained in the list either in its full form
-     * (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
-     */
+    // Keep the store open and reuse the maps for all queries.
     public boolean isKnownName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation))
-                || fullToAbbreviationObject.containsKey(journal)
-                || abbreviationToAbbreviationObject.containsKey(journal)
-                || dotlessToAbbreviationObject.containsKey(journal)
-                || shortestUniqueToAbbreviationObject.containsKey(journal);
+                || fullToAbbreviationMap.containsKey(journal)
+                || abbreviationToAbbreviationMap.containsKey(journal)
+                || dotlessToAbbreviationMap.containsKey(journal)
+                || shortestUniqueToAbbreviationMap.containsKey(journal);
     }
 
-    /**
-     * Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
-     * i.e., journals whose abbreviation is the same as the full name are not considered
-     */
     public boolean isAbbreviatedName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
-                || abbreviationToAbbreviationObject.containsKey(journal)
-                || dotlessToAbbreviationObject.containsKey(journal)
-                || shortestUniqueToAbbreviationObject.containsKey(journal);
+                || abbreviationToAbbreviationMap.containsKey(journal)
+                || dotlessToAbbreviationMap.containsKey(journal)
+                || shortestUniqueToAbbreviationMap.containsKey(journal);
     }
 
-    /**
-     * Attempts to get the abbreviation of the journal given.
-     *
-     * @param input The journal name (either full name or abbreviated name).
-     */
     public Optional<Abbreviation> get(String input) {
-        // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
@@ -127,19 +109,14 @@ public class JournalAbbreviationRepository {
         if (customAbbreviation.isPresent()) {
             return customAbbreviation;
         }
-
-        return Optional.ofNullable(fullToAbbreviationObject.get(journal))
-                .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+        return Optional.ofNullable(fullToAbbreviationMap.get(journal))
+                       .or(() -> Optional.ofNullable(abbreviationToAbbreviationMap.get(journal)))
+                       .or(() -> Optional.ofNullable(dotlessToAbbreviationMap.get(journal)))
+                       .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationMap.get(journal)));
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
-
-        // We do NOT want to keep duplicates
-        // The set automatically "removes" duplicates
-        // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)
         customAbbreviations.add(abbreviation);
     }
 
@@ -168,10 +145,40 @@ public class JournalAbbreviationRepository {
     }
 
     public Set<String> getFullNames() {
-        return fullToAbbreviationObject.keySet();
+        return fullToAbbreviationMap.keySet();
     }
 
     public Collection<Abbreviation> getAllLoaded() {
-        return fullToAbbreviationObject.values();
+        return fullToAbbreviationMap.values();
+    }
+
+    // Call this when the repository is no longer needed
+    public void close() {
+        store.commit();
+        store.close();
+    }
+
+    // Helper methods to match abbreviation variants.
+    private static boolean isMatched(String name, Abbreviation abbreviation) {
+        return name.equalsIgnoreCase(abbreviation.getName())
+                || name.equalsIgnoreCase(abbreviation.getAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
+    }
+
+    private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
+        if (name.equalsIgnoreCase(abbreviation.getName())) {
+            return false;
+        }
+        return name.equalsIgnoreCase(abbreviation.getAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
+    }
+
+    private void openMaps(MVStore store) {
+        fullToAbbreviationMap = store.openMap(fullToAbbreviationMapName);
+        abbreviationToAbbreviationMap = store.openMap(abbreviationToAbbreviationMapName);
+        dotlessToAbbreviationMap = store.openMap(dotlessToAbbreviationMapName);
+        shortestUniqueToAbbreviationMap = store.openMap(shortestUniqueToAbbreviationMapName);
     }
 }
