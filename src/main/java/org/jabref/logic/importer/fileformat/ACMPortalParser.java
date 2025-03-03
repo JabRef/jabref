@@ -1,19 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -30,6 +16,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -69,7 +68,7 @@ public class ACMPortalParser implements Parser {
 
         try {
             Document doc = Jsoup.parse(stream, null, HOST);
-            Elements doiHrefs = doc.select("div.issue-item__content-right > h5 > span > a");
+            Elements doiHrefs = doc.select("div.issue-item__content-right > h3 > span > a");
 
             for (Element elem : doiHrefs) {
                 String fullSegment = elem.attr("href");
