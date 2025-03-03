@@ -7,9 +7,9 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private String name;
+    private final String name;
     private final String abbreviation;
-    private String dotlessAbbreviation;
+    private final String dotlessAbbreviation;
 
     // Is the empty string if not available
     private String shortestUniqueAbbreviation;

@@ -15,14 +15,7 @@ import org.h2.mvstore.MVStore;
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final String fullToAbbreviationMapName = "fullToAbbreviationMap";
-    private final String abbreviationToAbbreviationMapName = "abbreviationToAbbreviationMap";
-    private final String dotlessToAbbreviationMapName = "dotlessToAbbreviationMap";
-    private final String shortestUniqueToAbbreviationMapName = "shortestUniqueToAbbreviationMap";
-    private final String persistentFullMapName = "FullToAbbreviation"; // the original persisted map name
-    private String journalPath;
-
-    private MVStore store;
+    private final MVStore store;
     private MVMap<String, Abbreviation> fullToAbbreviationMap;
     private MVMap<String, Abbreviation> abbreviationToAbbreviationMap;
     private MVMap<String, Abbreviation> dotlessToAbbreviationMap;
@@ -31,27 +24,10 @@ public class JournalAbbreviationRepository {
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
     public JournalAbbreviationRepository(Path journalList) {
-        journalPath = journalList.toAbsolutePath().toString();
+        String journalPath = journalList.toAbsolutePath().toString();
         store = new MVStore.Builder().fileName(journalPath).cacheSize(64).open();
 
         openMaps(store);
-
-        MVMap<String, Abbreviation> mvFullToAbbreviation = store.openMap(persistentFullMapName);
-
-        if (mvFullToAbbreviation != null) {
-            mvFullToAbbreviation.forEach((name, abbreviation) -> {
-                String abbreviationString = abbreviation.getAbbreviation();
-                String shortestUnique = abbreviation.getShortestUniqueAbbreviation();
-
-                Abbreviation newAbbreviation = new Abbreviation(name, abbreviationString, shortestUnique);
-
-                fullToAbbreviationMap.put(name, newAbbreviation);
-                abbreviationToAbbreviationMap.put(newAbbreviation.getAbbreviation(), newAbbreviation);
-                dotlessToAbbreviationMap.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
-                shortestUniqueToAbbreviationMap.put(newAbbreviation.getShortestUniqueAbbreviation(), newAbbreviation);
-            });
-        }
-        store.commit();
     }
 
     /**
@@ -60,6 +36,7 @@ public class JournalAbbreviationRepository {
     public JournalAbbreviationRepository() {
         // this will persist in memory
         store = new MVStore.Builder().open();
+
         openMaps(store);
 
         Abbreviation newAbbreviation = new Abbreviation(
@@ -152,12 +129,6 @@ public class JournalAbbreviationRepository {
         return fullToAbbreviationMap.values();
     }
 
-    // Call this when the repository is no longer needed
-    public void close() {
-        store.commit();
-        store.close();
-    }
-
     // Helper methods to match abbreviation variants.
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
@@ -176,6 +147,11 @@ public class JournalAbbreviationRepository {
     }
 
     private void openMaps(MVStore store) {
+        String fullToAbbreviationMapName = "FullToAbbreviation";
+        String abbreviationToAbbreviationMapName = "AbbreviationToAbbreviation";
+        String dotlessToAbbreviationMapName = "DotlessToAbbreviation";
+        String shortestUniqueToAbbreviationMapName = "ShortestUniqueToAbbreviation";
+
         fullToAbbreviationMap = store.openMap(fullToAbbreviationMapName);
         abbreviationToAbbreviationMap = store.openMap(abbreviationToAbbreviationMapName);
         dotlessToAbbreviationMap = store.openMap(dotlessToAbbreviationMapName);

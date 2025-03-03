@@ -47,6 +47,10 @@ public class JournalListMvGenerator {
                      compressHigh().
                      open()) {
             MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
+            MVMap<String, Abbreviation> abbreviationToAbbreviation = store.openMap("AbbreviationToAbbreviation");
+            MVMap<String, Abbreviation> dotlessToAbbreviation = store.openMap("DotlessToAbbreviation");
+            MVMap<String, Abbreviation> shortestUniqueToAbbreviation = store.openMap("ShortestUniqueToAbbreviation");
+
             stream.forEach(Unchecked.consumer(path -> {
                 String fileName = path.getFileName().toString();
                 System.out.print("Checking ");
@@ -67,7 +71,18 @@ public class JournalListMvGenerator {
                                         }
                                         return abbreviation2;
                                     }));
-                    fullToAbbreviation.putAll(abbreviationMap);
+
+                    abbreviationMap.forEach((name, abbr) -> {
+                        String abbreviationString = abbr.getAbbreviation();
+                        String shortestUnique = abbr.getShortestUniqueAbbreviation();
+
+                        Abbreviation newAbbreviation = new Abbreviation(name, abbreviationString, shortestUnique);
+
+                        fullToAbbreviation.put(name, newAbbreviation);
+                        abbreviationToAbbreviation.put(abbr.getAbbreviation(), newAbbreviation);
+                        dotlessToAbbreviation.put(abbr.getDotlessAbbreviation(), newAbbreviation);
+                        shortestUniqueToAbbreviation.put(abbr.getShortestUniqueAbbreviation(), newAbbreviation);
+                    });
                 }
             }));
         }
