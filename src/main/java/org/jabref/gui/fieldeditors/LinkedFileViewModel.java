@@ -18,6 +18,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -37,6 +40,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -266,20 +270,44 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(String targetFileName) {
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
-        boolean provideAltFileName= false; // placeholder to trigger functionality without button
 
         if (existingFile.isPresent()) {
-            overwriteFile = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Target file already exists"),
+            Path existingFileVal = existingFile.get();
+            // show when hovering over "Keep both" button
+            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(
+                existingFileVal.getParent(),
+                existingFileVal.getFileName().toString()
+            );
+
+//            overwriteFile = dialogService.showConfirmationDialogAndWait(
+//                    Localization.lang("Target file already exists"),
+//                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+//                    Localization.lang("Overwrite"));
+//
+//            if (!overwriteFile) {
+//                return;
+//            }
+            ButtonType overrideButton = new ButtonType("Override", ButtonBar.ButtonData.OTHER);
+            ButtonType keepBothButton = new ButtonType("Keep both", ButtonBar.ButtonData.OTHER);
+            ButtonType provideAltFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
+            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
+                    AlertType.CONFIRMATION,
+                    Localization.lang("Target file already exists") ,
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                    Localization.lang("Overwrite"));
+                    overrideButton, keepBothButton, provideAltFileNameButton
+            );
 
-            if(provideAltFileName){ // will be triggered with added buttons
-                askForNameAndRename();
-            }
-
-            if (!overwriteFile) {
-                return;
+            if (result.isPresent()) {
+                ButtonType buttonType = result.get();
+                if (buttonType == overrideButton) {
+                    System.out.println("Override selected");
+                } else if (buttonType == keepBothButton) {
+                    targetFileName = suggestedFileName;
+                } else if (buttonType == provideAltFileNameButton) {
+                    askForNameAndRename();
+                }
             }
 
         }
