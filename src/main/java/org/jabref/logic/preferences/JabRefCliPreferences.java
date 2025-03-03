@@ -165,6 +165,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String BACKUP_DIRECTORY = "backupDirectory";
     public static final String CREATE_BACKUP = "createBackup";
 
+
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -234,6 +235,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
+    public static final String AUTO_RENAME_FILES_ON_ENTRY_CHANGE = "autoRenameFilesOnEntryChange";
 
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
@@ -265,6 +267,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     public static final String SHOW_SCITE_TAB = "showSciteTab";
+
 
     /**
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
@@ -380,7 +383,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
-
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
     /**
@@ -1554,7 +1556,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(KEEP_DOWNLOAD_URL));
+                getBoolean(KEEP_DOWNLOAD_URL),
+                getBoolean(AUTO_RENAME_FILES_ON_ENTRY_CHANGE, false));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
