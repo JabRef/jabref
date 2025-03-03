@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CLI that supports txt, csv, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/issues/11984)
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- We added a new "Copy citation (text)" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
+- We added a new "Export to clipboard" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 
 ### Changed
@@ -29,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - For the Citation key generator patterns, we reverted how `[authorsAlpha]` would behave to the original pattern and renamed the LNI-based pattern introduced in V6.0-alpha to `[authorsAlphaLNI]`. [#12499](https://github.com/JabRef/jabref/pull/12499)
 - We keep the list of recent files if one files could not be found. [#12517](https://github.com/JabRef/jabref/pull/12517)
 - During the import process, the labels indicating individual paragraphs within an abstract returned by PubMed/Medline XML are preserved. [#12527](https://github.com/JabRef/jabref/issues/12527)
+- We changed the "Copy Preview" button to "Copy citation (html) in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - Pressing Tab in empty text fields of the entry editor now moves the focus to the next field instead of inserting a tab character. [#11938](https://github.com/JabRef/jabref/issues/11938)
 
 ### Fixed
