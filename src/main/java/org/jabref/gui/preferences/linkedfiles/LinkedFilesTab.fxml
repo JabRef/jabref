@@ -57,7 +57,6 @@
 
     <Label styleClass="sectionHeader" text="%Fulltext Index"/>
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
-
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
     <GridPane hgap="4.0" vgap="4.0">
         <columnConstraints>
@@ -76,7 +75,7 @@
         <TextField fx:id="fileDirectoryPattern" GridPane.columnIndex="1" GridPane.rowIndex="1"
                    prefWidth="300" minWidth="300" maxWidth="300"/>
     </GridPane>
-
+    <CheckBox fx:id="autoRenameFiles" text="%Auto rename files if entry changes"/>
     <Label styleClass="sectionHeader" text="%Attached files"/>
     <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
     <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
