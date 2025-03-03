@@ -32,7 +32,7 @@ public class FilePreferences {
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
-
+    private final BooleanProperty autoRenameFilesOnEntryChange = new SimpleBooleanProperty();
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
@@ -45,7 +45,8 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean shouldKeepDownloadUrl) {
+                           boolean shouldKeepDownloadUrl,
+                           boolean autoRenameFilesOnEntryChange) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -59,6 +60,7 @@ public class FilePreferences {
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
+        this.autoRenameFilesOnEntryChange.setValue(autoRenameFilesOnEntryChange);
     }
 
     public String getUserAndHost() {
@@ -215,6 +217,14 @@ public class FilePreferences {
 
     public boolean shouldAutoRenameFilesOnEntryChange() {
         return autoRenameFilesOnEntryChange.get();
+    }
+
+    public BooleanProperty autoRenameFilesOnEntryChangeProperty() {
+        return autoRenameFilesOnEntryChange;
+    }
+
+    public void setAutoRenameFilesOnEntryChange(boolean autoRenameFilesOnEntryChange) {
+        this.autoRenameFilesOnEntryChange.set(autoRenameFilesOnEntryChange);
     }
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
