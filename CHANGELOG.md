@@ -17,6 +17,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
+- We renamed "Rename file to a given name" to "Rename files to configured filename format pattern" in the entry editor. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move DOIs from note and URL field to DOI field and remove http prefix" to "Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move preprint information from 'URL' and 'journal' field to the 'eprint' field" to "Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move URL in note field to url field" to "Move URL in 'note' field to 'URL' field" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Rename PDFs to given filename format pattern" to "Rename files to configured filename format pattern" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Rename only PDFs having a relative path" to "Only rename files that have a relative path" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Filename format pattern: " to "Filename format pattern (from preferences)" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
 
 ### Fixed
 
