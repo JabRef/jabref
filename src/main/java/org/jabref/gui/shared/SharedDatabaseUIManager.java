@@ -114,7 +114,7 @@ public class SharedDatabaseUIManager {
         BibEntry sharedBibEntry = updateRefusedEvent.sharedBibEntry();
 
         String message = Localization.lang("Update could not be performed due to existing change conflicts.") + "\r\n" +
-                Localization.lang("You are not working on the newest version of BibEntry.") + "\r\n" +
+                Localization.lang("You are not working on the newest version of the entry.") + "\r\n" +
                 Localization.lang("Shared version: %0", String.valueOf(sharedBibEntry.getSharedBibEntryData().getVersion())) + "\r\n" +
                 Localization.lang("Local version: %0", String.valueOf(localBibEntry.getSharedBibEntryData().getVersion())) + "\r\n" +
                 Localization.lang("Press \"Merge entries\" to merge the changes and resolve this problem.") + "\r\n" +
