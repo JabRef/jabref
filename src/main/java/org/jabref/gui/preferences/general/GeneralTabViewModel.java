@@ -35,6 +35,7 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -82,6 +83,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
+    private final BooleanProperty autoPushEnabled = new SimpleBooleanProperty();
+    private final ObjectProperty<AutoPushMode> autoPushMode = new SimpleObjectProperty<>(AutoPushMode.MANUALLY);
 
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
@@ -389,6 +392,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return autosaveLocalLibraries;
     }
 
+    public BooleanProperty autoPushEnabledProperty() {
+        return autoPushEnabled;
+    }
+
+    public ObjectProperty<AutoPushMode> autoPushModeProperty() {
+        return autoPushMode;
+    }
+
     public BooleanProperty createBackupProperty() {
         return this.createBackupProperty;
     }
@@ -427,9 +438,5 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
-    }
-
-    public BooleanProperty autoPushEnabledProperty() {
-        return autoPushEnabled;
     }
 }
