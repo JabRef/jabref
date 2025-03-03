@@ -36,12 +36,10 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
         parserResult.getDatabaseContext().setVersioned(true); // tags as versioned
 
-        if (preferencesService.shouldAutoPull()) { // pulls only if preference allows
-            try {
-                this.gitHandler.pullOnCurrentBranch();
-            } catch (IOException e) {
-                LOGGER.error("Failed to pull.", e);
-            }
+        try {
+            this.gitHandler.pullOnCurrentBranch();
+        } catch (IOException e) {
+            LOGGER.error("Failed to pull.", e);
         }
     }
 }
