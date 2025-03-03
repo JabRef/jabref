@@ -18,6 +18,11 @@ import org.h2.mvstore.MVStore;
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
+    private static final String FULL_TO_ABBREVIATION_MAP_NAME = "FullToAbbreviation";
+    private static final String ABBREVIATION_TO_ABBREVIATION_MAP_NAME = "AbbreviationToAbbreviation";
+    private static final String DOTLESS_TO_ABBREVIATION_MAP_NAME = "DotlessToAbbreviation";
+    private static final String SHORTEST_UNIQUE_TO_ABBREVIATION_MAP_NAME = "ShortestUniqueToAbbreviation";
+
     private final MVStore store;
     private MVMap<String, Abbreviation> fullToAbbreviationMap;
     private MVMap<String, Abbreviation> abbreviationToAbbreviationMap;
@@ -169,14 +174,9 @@ public class JournalAbbreviationRepository {
     }
 
     private void openMaps(MVStore store) {
-        String fullToAbbreviationMapName = "FullToAbbreviation";
-        String abbreviationToAbbreviationMapName = "AbbreviationToAbbreviation";
-        String dotlessToAbbreviationMapName = "DotlessToAbbreviation";
-        String shortestUniqueToAbbreviationMapName = "ShortestUniqueToAbbreviation";
-
-        fullToAbbreviationMap = store.openMap(fullToAbbreviationMapName);
-        abbreviationToAbbreviationMap = store.openMap(abbreviationToAbbreviationMapName);
-        dotlessToAbbreviationMap = store.openMap(dotlessToAbbreviationMapName);
-        shortestUniqueToAbbreviationMap = store.openMap(shortestUniqueToAbbreviationMapName);
+        fullToAbbreviationMap = store.openMap(FULL_TO_ABBREVIATION_MAP_NAME);
+        abbreviationToAbbreviationMap = store.openMap(ABBREVIATION_TO_ABBREVIATION_MAP_NAME);
+        dotlessToAbbreviationMap = store.openMap(DOTLESS_TO_ABBREVIATION_MAP_NAME);
+        shortestUniqueToAbbreviationMap = store.openMap(SHORTEST_UNIQUE_TO_ABBREVIATION_MAP_NAME);
     }
 }
