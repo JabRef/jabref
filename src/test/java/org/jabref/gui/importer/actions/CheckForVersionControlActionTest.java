@@ -12,10 +12,15 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CheckForVersionControlActionTest {
     private CheckForVersionControlAction action;
@@ -62,7 +67,7 @@ class CheckForVersionControlActionTest {
     @Test
     void isActionNecessary_WhenDatabasePathExistsAndIsAGitRepo_ShouldReturnTrue() {
         Path mockPath = Path.of("test-repo");
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        //when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         when(gitHandlerMock.isGitRepository()).thenReturn(true);
@@ -76,7 +81,7 @@ class CheckForVersionControlActionTest {
     void performAction_WhenGitPullSucceeds_ShouldNotThrowException() throws IOException {
         Path mockPath = Path.of("test-repo");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        when(cliPreferences.shouldAutoPull()).thenReturn(true);
+        //when(cliPreferences.shouldAutoPull()).thenReturn(true);
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doNothing().when(gitHandlerMock).pullOnCurrentBranch();
@@ -89,7 +94,7 @@ class CheckForVersionControlActionTest {
     void performAction_WhenGitPullFails_ShouldLogError() throws IOException {
         Path mockPath = Path.of("test-repo");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        when(cliPreferences.shouldAutoPull()).thenReturn(true);
+        //when(cliPreferences.shouldAutoPull()).thenReturn(true);
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doThrow(new IOException("Git pull failed")).when(gitHandlerMock).pullOnCurrentBranch();

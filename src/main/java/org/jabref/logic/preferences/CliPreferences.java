@@ -117,6 +117,4 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
-
-    boolean shouldAutoPull();
 }
