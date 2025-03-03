@@ -367,10 +367,7 @@ public class Date {
     }
 
     public Optional<Season> getSeason() {
-        if (season == null) {
-            return Optional.empty();
-        }
-        return Optional.of(season);
+        return Optional.ofNullable(season);
     }
 
     public Optional<Integer> getDay() {
@@ -404,10 +401,15 @@ public class Date {
     @Override
     public String toString() {
         String formattedDate = date.toString();
+        // If there is a season, then only the year and month fields will have values,
+        // and the month corresponds to the season.
+        // Here is no need to check the second, hour, and month, day fields.
         if (season != null) {
+            // The Date standard library does not have any API for handling seasons,
+            // so here is no compact form.
             return "Date{" +
                     "date=" + formattedDate + ", " +
-                    "season=" + season +
+                    "season=" + season.getName() +
                     '}';
         }
         if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
