@@ -295,7 +295,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
                     AlertType.CONFIRMATION,
                     Localization.lang("Target file already exists") ,
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Target file name: \n'%0'", targetFileName),
                     overrideButton, keepBothButton, alternativeFileNameButton
             );
 
