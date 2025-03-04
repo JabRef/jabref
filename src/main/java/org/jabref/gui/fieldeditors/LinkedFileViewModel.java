@@ -289,14 +289,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
 //            }
             ButtonType overrideButton = new ButtonType("Override", ButtonBar.ButtonData.OTHER);
             ButtonType keepBothButton = new ButtonType("Keep both", ButtonBar.ButtonData.OTHER);
-            ButtonType alternativeFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
+            ButtonType provideAltFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
             ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
             Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
                     AlertType.CONFIRMATION,
                     Localization.lang("Target file already exists") ,
                     Localization.lang("Target file name: \n'%0'", targetFileName),
-                    overrideButton, keepBothButton, alternativeFileNameButton
+                    overrideButton, keepBothButton, provideAltFileNameButton
             );
 
             if (result.isPresent()) {
@@ -305,8 +305,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     System.out.println("Override selected");
                 } else if (buttonType == keepBothButton) {
                     targetFileName = suggestedFileName;
-                } else if (buttonType == alternativeFileNameButton) {
-                    System.out.println("Provide alternative file name");
+                } else if (buttonType == provideAltFileNameButton) {
+                    askForNameAndRename();
                 }
             }
         }
