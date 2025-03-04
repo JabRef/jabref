@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
@@ -53,6 +54,18 @@ public abstract class PdfImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
+            return new ParserResult(importDatabase(filePath, document));
+        } catch (EncryptedPdfsNotSupportedException e) {
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+        } catch (IOException | ParseException exception) {
+            return ParserResult.fromError(exception);
+        }
+    }
+
+    public ParserResult importDatabase(Path filePath, FilePreferences filePreferences) {
+        Path readPath = filePreferences.getWorkingDirectory().resolve(filePath);
+
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(readPath)) {
             return new ParserResult(importDatabase(filePath, document));
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));

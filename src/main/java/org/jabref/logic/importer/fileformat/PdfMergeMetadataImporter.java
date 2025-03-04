@@ -202,7 +202,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         filePath = FileUtil.relativize(filePath, directories);
 
-        return importDatabase(filePath);
+        return importDatabase(filePath, filePreferences);
     }
 
     @Override

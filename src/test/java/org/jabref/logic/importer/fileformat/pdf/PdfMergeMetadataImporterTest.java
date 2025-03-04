@@ -90,14 +90,16 @@ class PdfMergeMetadataImporterTest {
 
     @Test
     void importRelativizesFilePath() throws Exception {
-        // Initialize database and preferences
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        BibDatabaseContext database = new BibDatabaseContext();
-
-        // Initialize file and working directory
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
+
+        // If you use a mocked class, and then call `set`ters, they won't work... Thus, we have to create the class manually.
+        FilePreferences filePreferences = new FilePreferences("", "", false, "", "", false, false, Path.of(""), false, Path.of(""), false, false, false);
+        filePreferences.setStoreFilesRelativeToBibFile(true);
         filePreferences.setWorkingDirectory(directory);
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(directory.resolve("db.bib"));
 
         List<BibEntry> result = importer.importDatabase(file, database, filePreferences).getDatabase().getEntries();
 
