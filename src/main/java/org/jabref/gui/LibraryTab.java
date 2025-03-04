@@ -809,6 +809,7 @@ public class LibraryTab extends Tab {
         if (tableModel != null) {
             tableModel.unbind();
         }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }

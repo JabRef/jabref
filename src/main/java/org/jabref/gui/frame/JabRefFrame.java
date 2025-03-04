@@ -30,6 +30,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -122,6 +123,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
+        this.fileHistory = new FileHistoryMenu(
+                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
+                dialogService,
+                getOpenDatabaseAction());
+
+        this.setOnKeyTyped(key -> {
+            if (this.fileHistory.isShowing()) {
+                if (this.fileHistory.openFileByKey(key)) {
+                    this.fileHistory.getParentMenu().hide();
+                }
+            }
+        });
+
+        fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
+
         setId("frame");
 
         // Create components
@@ -171,18 +187,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this.preferences,
                 taskExecutor);
 
-        this.fileHistory = new FileHistoryMenu(
-                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
-                dialogService,
-                getOpenDatabaseAction());
-        this.setOnKeyTyped(key -> {
-            if (this.fileHistory.isShowing()) {
-                if (this.fileHistory.openFileByKey(key)) {
-                    this.fileHistory.getParentMenu().hide();
-                }
-            }
-        });
-
         initLayout();
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
@@ -225,7 +229,25 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        if (stateManager.getOpenDatabases().isEmpty()) {
+            WelcomeTab welcomeTab = new WelcomeTab(
+                    this,
+                    preferences,
+                    aiService,
+                    dialogService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    fileHistory
+            );
+
+            tabbedPane.getTabs().add(welcomeTab);
+        }
+
+        splitPane.getItems().add(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
@@ -350,8 +372,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
-            } else if (selectedTab == null) {
-                // All databases are closed
+            } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                // All databases are closed or Welcome Tab is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
             }
@@ -428,14 +450,39 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
-            return null;
-        }
-        return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
+        return (LibraryTab) Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
+                                    .filter(tab -> tab instanceof LibraryTab).orElse(null);
     }
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
         tabbedPane.getSelectionModel().select(libraryTab);
+    }
+
+    public void showWelcomeTab() {
+        // The loop iterates through all tabs in tabbedPane to check if a WelcomeTab already exists. If yes, it is selected
+        for (Tab tab : tabbedPane.getTabs()) {
+            if (!(tab instanceof LibraryTab)) {
+                tabbedPane.getSelectionModel().select(tab);
+                return;
+            }
+
+            // If the WelcomeTab is not found, a new instance is created and added
+            WelcomeTab welcomeTab = new WelcomeTab(
+                    this,
+                    preferences,
+                    aiService,
+                    dialogService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    fileHistory
+            );
+            tabbedPane.getTabs().add(welcomeTab);
+            tabbedPane.getSelectionModel().select(welcomeTab);
+        }
     }
 
     /**
