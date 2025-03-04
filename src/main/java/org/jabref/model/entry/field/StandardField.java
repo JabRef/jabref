@@ -131,6 +131,7 @@ public enum StandardField implements Field {
     VOLUME("volume", FieldProperty.NUMERIC),
     VOLUMES("volumes", FieldProperty.NUMERIC),
     YEAR("year", FieldProperty.NUMERIC),
+    YEARDIVISION("yeardivision", FieldProperty.YEARDIVISION),
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
     ZBL_NUMBER("zbl"), // needed for fetcher
