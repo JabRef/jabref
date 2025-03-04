@@ -61,6 +61,10 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputControl;
+
+
 /**
  * This class provides methods to create default
  * JavaFX dialogs which will also work on top of Swing
@@ -298,8 +302,18 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
                                                               ButtonType... buttonTypes) {
-        FXDialog alert = createDialog(type, title, content);
+        // does doing this mess up other use cases of this function? if so, it could just be moved to performRenameWithConflictCheck()
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
         alert.getButtonTypes().setAll(buttonTypes);
+
+        // Ensure closing with "X" behaves like clicking "Cancel" (but without adding a visible Cancel button)
+        DialogPane dialogPane = alert.getDialogPane();
+        Stage stage = (Stage) dialogPane.getScene().getWindow();
+        stage.setOnCloseRequest(event -> alert.setResult(ButtonType.CANCEL));
+
         return alert.showAndWait();
     }
 
