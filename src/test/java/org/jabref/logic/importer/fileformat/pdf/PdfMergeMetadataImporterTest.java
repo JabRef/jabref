@@ -91,15 +91,15 @@ class PdfMergeMetadataImporterTest {
     @Test
     void importRelativizesFilePath() throws Exception {
         // Initialize database and preferences
-        FilePreferences preferences = mock(FilePreferences.class);
+        FilePreferences filePreferences = mock(FilePreferences.class);
         BibDatabaseContext database = new BibDatabaseContext();
 
         // Initialize file and working directory
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
-        preferences.setWorkingDirectory(directory);
+        filePreferences.setWorkingDirectory(directory);
 
-        List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(file, database, filePreferences).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "1 ")
