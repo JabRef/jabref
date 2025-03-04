@@ -87,6 +87,7 @@ Code: `Localization.lang("Imported %0 entries", "Imported %0 entry.", "Imported 
 
 ## More Information
 
+- [Pluralization: A Guide to Localizing Plurals](https://phrase.com/blog/posts/pluralization/)
 - [Language Plural Rules](https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html)
 - [Unicode CLDR Project's Plural Rules](https://cldr.unicode.org/index/cldr-spec/plural-rules)
 - [Implementation in Mozilla Firefox](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules)
