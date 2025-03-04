@@ -151,7 +151,10 @@ public class GlobalSearchBar extends HBox {
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
                 searchField.clear();
                 if (searchType == SearchType.NORMAL_SEARCH) {
-                    Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).ifPresent(currentLibraryTab -> currentLibraryTab.getMainTable().requestFocus());
+                    LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
+                    if (currentLibraryTab != null) {
+                        currentLibraryTab.getMainTable().requestFocus();
+                    }
                 }
                 event.consume();
             }
@@ -255,7 +258,7 @@ public class GlobalSearchBar extends HBox {
             if (!filePreferences.shouldFulltextIndexLinkedFiles() && newVal) {
                 boolean enableFulltextSearch = dialogService.showConfirmationDialogAndWait(Localization.lang("Fulltext search"), Localization.lang("Fulltext search requires the setting 'Automatically index all linked files for fulltext search' to be enabled. Do you want to enable indexing now?"), Localization.lang("Enable indexing"), Localization.lang("Keep disabled"));
 
-                LibraryTab libraryTab = Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).orElse(null);
+                LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
                 if (libraryTab != null && enableFulltextSearch) {
                     filePreferences.setFulltextIndexLinkedFiles(true);
                     searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, true);

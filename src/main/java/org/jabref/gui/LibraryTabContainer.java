@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -14,7 +13,7 @@ public interface LibraryTabContainer {
     List<LibraryTab> getLibraryTabs();
 
     @Nullable
-    Optional<LibraryTab> getCurrentLibraryTab();
+    LibraryTab getCurrentLibraryTab();
 
     void showLibraryTab(LibraryTab libraryTab);
 

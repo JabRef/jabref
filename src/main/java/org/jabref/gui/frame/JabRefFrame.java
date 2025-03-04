@@ -16,7 +16,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -137,10 +136,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
         });
 
-        this.fileHistory.getItems().addListener((ListChangeListener<MenuItem>) change -> {
-            boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
-            fileHistory.setDisable(!hasRecentFiles);
-        });
+        fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
 
         setId("frame");
 
@@ -252,21 +248,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         splitPane.getItems().add(tabbedPane);
-        setCenter(splitPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
-        updateContent();
-    }
-
-    private void updateContent() {
-        boolean hasRecentFiles = !fileHistory.getItems().isEmpty();
-        fileHistory.setDisable(!hasRecentFiles);
-    }
-
-    private void bindDatabaseChanges() {
-        stateManager.getOpenDatabases().addListener((InvalidationListener) obs -> Platform.runLater(this::updateContent));
+        setCenter(splitPane);
     }
 
     private void updateSidePane() {
@@ -296,7 +282,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case FOCUS_ENTRY_TABLE:
-                        Objects.requireNonNull(getCurrentLibraryTab()).ifPresent(tab -> tab.getMainTable().requestFocus());
+                        getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
                         break;
                     case FOCUS_GROUP_LIST:
@@ -318,31 +304,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.Article, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.Book, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Book, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.InBook, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InBook, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.MastersThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.MastersThesis, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.PhdThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.PhdThesis, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.Proceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Proceedings, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.TechReport, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.TechReport, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.Unpublished, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Unpublished, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryAction(() -> Objects.requireNonNull(getCurrentLibraryTab()).orElse(null), StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
                         break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
@@ -366,15 +352,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         filteredTabs.setPredicate(LibraryTab.class::isInstance);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> Optional.of((LibraryTab) tab).map(LibraryTab::getBibDatabaseContext).orElse(null));
+        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), query -> {
-            if (getCurrentLibraryTab().isPresent()) {
-                getCurrentLibraryTab().ifPresent(tab -> tab.searchQueryProperty().set(query));
+            if (getCurrentLibraryTab() != null) {
+                getCurrentLibraryTab().searchQueryProperty().set(query);
             }
         });
 
@@ -386,8 +372,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
-            } else if (selectedTab == null) {
-                // All databases are closed
+            } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                // All databases are closed or Welcome Tab is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
             }
@@ -463,10 +449,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /**
      * Returns the currently viewed LibraryTab.
      */
-    public Optional<LibraryTab> getCurrentLibraryTab() {
-        return Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
-                       .filter(LibraryTab.class::isInstance)
-                       .map(LibraryTab.class::cast);
+    public LibraryTab getCurrentLibraryTab() {
+        return (LibraryTab) Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
+                                    .filter(tab -> tab instanceof LibraryTab).orElse(null);
     }
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
@@ -666,11 +651,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         public void execute() {
             Platform.runLater(() -> {
                 if (libraryTab == null) {
-                    if (Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).isEmpty()) {
+                    if (tabContainer.getCurrentLibraryTab() == null) {
                         LOGGER.error("No library tab to close");
                         return;
                     }
-                    tabContainer.getCurrentLibraryTab().ifPresent(tabContainer::closeTab);
+                    tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
                 } else {
                     tabContainer.closeTab(libraryTab);
                 }

@@ -125,10 +125,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                           .map(BibDatabaseContext::getDatabasePath)
                                           .flatMap(Optional::stream)
                                           .toList();
-        Path focusedLibraries = Objects.requireNonNull(tabContainer.getCurrentLibraryTab())
-                                       .map(LibraryTab::getBibDatabaseContext)
-                                       .flatMap(BibDatabaseContext::getDatabasePath)
-                                       .orElse(null);
+        Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
+                                        .map(LibraryTab::getBibDatabaseContext)
+                                        .flatMap(BibDatabaseContext::getDatabasePath)
+                                        .orElse(null);
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!tabContainer.closeTabs(tabContainer.getLibraryTabs())) {
@@ -380,7 +380,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private void addParserResult(ParserResult parserResult, boolean raisePanel) {
         if (parserResult.toOpenTab()) {
             LOGGER.trace("Adding the entries to the open tab.");
-            LibraryTab libraryTab = Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).orElse(null);
+            LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
             if (libraryTab == null) {
                 LOGGER.debug("No open tab found to add entries to. Creating a new tab.");
                 tabContainer.addTab(parserResult.getDatabaseContext(), raisePanel);
@@ -455,7 +455,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     private void jumpToEntry(String entryKey) {
         // check current library tab first
-        LibraryTab currentLibraryTab = Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).orElse(null);
+        LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
         List<LibraryTab> sortedTabs = tabContainer.getLibraryTabs().stream()
                                                   .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
                                                   .toList();

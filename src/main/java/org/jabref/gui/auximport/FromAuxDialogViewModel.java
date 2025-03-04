@@ -60,9 +60,7 @@ public class FromAuxDialogViewModel {
         this.stateManager = stateManager;
 
         librariesProperty.setAll(stateManager.getOpenDatabases());
-        selectedLibraryProperty.set(
-                Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).map(LibraryTab::getBibDatabaseContext).orElse(null)
-        );
+        selectedLibraryProperty.set(tabContainer.getCurrentLibraryTab().getBibDatabaseContext());
         EasyBind.listen(selectedLibraryProperty, (obs, oldValue, newValue) -> {
             if (auxParserResult != null) {
                 parse();
