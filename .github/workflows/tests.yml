@@ -151,11 +151,20 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
           fetch-depth: 0
-      - name: Install clparse
+      - name: Cache clparse jar
+        id: cache-clparse
+        uses: actions/cache@v4
+        with:
+          path: /tmp/clparse
+          key: clparse-0.9.1
+      - name: unzip
+        if: steps.cache-clparse.outputs.cache-hit != 'true'
         run: |
+          cd /tmp
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
-          sudo mv clparse /usr/local/bin/clparse
+      - name: Install clparse
+        run: sudo mv clparse /usr/local/bin/clparse
       - name: Check CHANGELOG.md diff
         run: |
           diff \
