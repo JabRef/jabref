@@ -6,7 +6,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
 If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 Before you start, get the JabRef code on your local machine.
-Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
+Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
 
 ## Table of Contents
 
