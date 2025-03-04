@@ -164,7 +164,7 @@ jobs:
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
-        run: sudo mv clparse /usr/local/bin/clparse
+        run: sudo mv /tmp/clparse /usr/local/bin/clparse
       - name: Check CHANGELOG.md diff
         run: |
           diff \
