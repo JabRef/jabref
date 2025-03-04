@@ -1,7 +1,6 @@
 package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -16,7 +15,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.FileDialogConfiguration;
