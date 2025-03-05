@@ -15,12 +15,13 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.linkedfile.LinkedFileNamePatternsItemModel;
+import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 
@@ -38,16 +39,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
     private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
-    private final ListProperty<String> defaultFileNamePatternsProperty =
-            new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
+    private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
-    private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
 
     private final ListProperty<LinkedFileNamePatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+    private final ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
             new LinkedFileNamePatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), ""));
 
     private final Validator mainFileDirValidator;
@@ -88,19 +87,27 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
-        fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
 
-        // Autolink preferences
-        switch (autoLinkPreferences.getCitationKeyDependency()) {
-            case START -> autolinkFileStartsBibtexProperty.setValue(true);
-            case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
-            case REGEX -> autolinkUseRegexProperty.setValue(true);
+        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
+
+        GlobalLinkedFileNamePatterns newKeyPattern =
+                new GlobalLinkedFileNamePatterns(filePreferences.fileNamePatternProperty().get().getDefaultValue());
+        patternListProperty.forEach(item -> {
+            String patternString = item.getPattern();
+            if (!"default".equals(item.getEntryType().getName())) {
+                if (!patternString.trim().isEmpty()) {
+                    newKeyPattern.addLinkedFileNamePattern(item.getEntryType(), patternString);
+                }
+            }
+        });
+        if (!defaultNamePatternProperty.getValue().getPattern().trim().isEmpty()) {
+            newKeyPattern.setDefaultValue(defaultNamePatternProperty.getValue().getPattern());
         }
 
-        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
+        filePreferences.setFileNamePattern(newKeyPattern);
     }
 
     @Override
@@ -108,7 +115,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         // External files preferences / Attached files preferences / File preferences
         filePreferences.setMainFileDirectory(mainFileDirectoryProperty.getValue());
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
-        filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
+        // filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
@@ -181,9 +188,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return defaultFileNamePatternsProperty;
     }
 
-    public StringProperty fileNamePatternProperty() {
+    /* public StringProperty fileNamePatternProperty() {
         return fileNamePatternProperty;
-    }
+    }*/
 
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPatternProperty;
@@ -205,8 +212,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return patternListProperty;
     }
 
-    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty() {
-        return defaultKeyPatternProperty;
+    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty() {
+        return defaultNamePatternProperty;
     }
 }
 

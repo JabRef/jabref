@@ -99,8 +99,8 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty() {
-        return viewModel.defaultKeyPatternProperty();
+    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty() {
+        return viewModel.defaultNamePatternProperty();
     }
 
     private void jumpToSearchKey(KeyEvent keypressed) {

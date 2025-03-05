@@ -74,7 +74,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         linkedFileNamePatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
-        linkedFileNamePatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
+        linkedFileNamePatternTable.defaultNamePatternProperty().bindBidirectional(viewModel.defaultNamePatternProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);

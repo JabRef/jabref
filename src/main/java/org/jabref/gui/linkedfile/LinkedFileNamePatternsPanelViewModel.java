@@ -9,9 +9,9 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
+import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
@@ -38,12 +38,12 @@ public class LinkedFileNamePatternsPanelViewModel {
 
     public LinkedFileNamePatternsPanelViewModel() { }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialKeyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialNamePattern) {
         String defaultPattern;
-        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+        if ((initialNamePattern.getDefaultValue() == null) || initialNamePattern.getDefaultValue().equals(LinkedFileNamePattern.NULL_LINKED_FILE_NAME_PATTERN)) {
             defaultPattern = "";
         } else {
-            defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();
+            defaultPattern = initialNamePattern.getDefaultValue().stringRepresentation();
         }
 
         defaultItemProperty.setValue(new LinkedFileNamePatternsItemModel(new DefaultEntryType(), defaultPattern));
@@ -54,10 +54,10 @@ public class LinkedFileNamePatternsPanelViewModel {
                      .map(BibEntryType::getType)
                      .forEach(entryType -> {
                          String pattern;
-                         if (initialKeyPattern.isDefaultValue(entryType)) {
+                         if (initialNamePattern.isDefaultValue(entryType)) {
                              pattern = "";
                          } else {
-                             pattern = initialKeyPattern.getPatterns().get(entryType).stringRepresentation();
+                             pattern = initialNamePattern.getPatterns().get(entryType).stringRepresentation();
                          }
                          patternListProperty.add(new LinkedFileNamePatternsItemModel(entryType, pattern));
                      });
@@ -76,7 +76,7 @@ public class LinkedFileNamePatternsPanelViewModel {
         return patternListProperty;
     }
 
-    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty() {
         return defaultItemProperty;
     }
 

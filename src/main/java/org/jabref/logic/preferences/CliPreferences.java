@@ -21,6 +21,7 @@ import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.linkedfile.LinkedFileNamePatternPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -92,6 +93,8 @@ public interface CliPreferences {
     ProxyPreferences getProxyPreferences();
 
     SSLPreferences getSSLPreferences();
+
+    LinkedFileNamePatternPreferences getLinkedFileNamePatternPreferences();
 
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
 
