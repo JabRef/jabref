@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -28,7 +29,7 @@ public class JournalInAbbreviationListChecker implements EntryChecker {
 
         final String journal = value.get();
         if (!abbreviationRepository.isKnownName(journal)) {
-            return Collections.singletonList(new IntegrityMessage(IntegrityIssue.JOURNAL_NOT_FOUND_IN_ABBREVIATION_LIST.getText(), entry, field));
+            return Collections.singletonList(new IntegrityMessage(Localization.lang("journal not found in abbreviation list"), entry, field));
         }
 
         return Collections.emptyList();

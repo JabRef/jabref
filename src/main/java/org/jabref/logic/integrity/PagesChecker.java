@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
@@ -55,9 +56,9 @@ public class PagesChecker implements ValueChecker {
         }
 
         if (Arrays.stream(value.split(","))
-                .map(String::trim)
-                .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))) {
-            return Optional.of(IntegrityIssue.SHOULD_CONTAIN_A_VALID_PAGE_NUMBER_RANGE.getText());
+                  .map(String::trim)
+                  .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))) {
+            return Optional.of(Localization.lang("should contain a valid page number range"));
         }
         return Optional.empty();
     }
