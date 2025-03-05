@@ -1,14 +1,19 @@
 package org.jabref.gui.groups;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -48,6 +53,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -59,7 +65,9 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -82,6 +90,9 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final UndoManager undoManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
+
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -92,6 +103,8 @@ public class GroupTreeView extends BorderPane {
     private CustomLocalDragboard localDragboard;
     private DragExpansionHandler dragExpansionHandler;
     private Timer scrollTimer;
+    private ImportHandler importHandler;
+    private BibDatabaseContext database;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;
     private double upperBorder;
@@ -105,13 +118,16 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService) {
+                         AiService aiService,
+                         UndoManager undoManager,
+                         FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-
+        this.undoManager = undoManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         createNodes();
         initialize();
     }
@@ -365,6 +381,23 @@ public class GroupTreeView extends BorderPane {
         if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();
             row.getItem().addEntriesToGroup(entries);
+            success = true;
+        }
+
+        if (dragboard.hasFiles()) {
+            this.database = stateManager.getActiveDatabase().orElse(null);
+            this.importHandler = new ImportHandler(
+                    database,
+                    preferences,
+                    fileUpdateMonitor,
+                    undoManager,
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+            List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            stateManager.setSelectedGroups(database, Collections.singletonList(row.getItem().getGroupNode()));
+            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), event.getTransferMode())
+                         .executeWith(taskExecutor);
             success = true;
         }
         event.setDropCompleted(success);
