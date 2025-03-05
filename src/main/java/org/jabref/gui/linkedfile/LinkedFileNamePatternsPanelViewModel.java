@@ -46,8 +46,7 @@ public class LinkedFileNamePatternsPanelViewModel {
             defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();
         }
 
-         // defaultItemProperty.setValue(new LinkedFileNamePatternsItemModel(new LinkedFileNamePatternPanelViewModel().DefaultEntryType(), defaultPattern));
-         defaultItemProperty.setValue(new LinkedFileNamePatternsItemModel(new DefaultEntryType(), defaultPattern));
+        defaultItemProperty.setValue(new LinkedFileNamePatternsItemModel(new DefaultEntryType(), defaultPattern));
         patternListProperty.setValue(FXCollections.observableArrayList());
         patternListProperty.add(defaultItemProperty.getValue());
 
