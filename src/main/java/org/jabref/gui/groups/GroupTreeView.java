@@ -48,6 +48,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -82,6 +84,7 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final KeyBindingRepository keyBindingRepository;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -111,13 +114,14 @@ public class GroupTreeView extends BorderPane {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
+        this.keyBindingRepository = preferences.getKeyBindingRepository();
 
         createNodes();
         initialize();
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(preferences.getKeyBindingRepository());
+        searchField = SearchTextField.create(keyBindingRepository);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
         this.setTop(searchField);
@@ -142,6 +146,14 @@ public class GroupTreeView extends BorderPane {
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
+        groupTree.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
+                TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && selectedItem.getParent() != null) { 
+                    viewModel.editGroup(selectedItem.getValue());
+                }
+            }
+        });
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
@@ -555,6 +567,7 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
@@ -632,7 +645,7 @@ public class GroupTreeView extends BorderPane {
 
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
-                        case GROUP_EDIT ->
+                        case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
                                 group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
@@ -661,7 +674,7 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT -> {
+                case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
