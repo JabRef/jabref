@@ -9,9 +9,9 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
@@ -38,7 +38,7 @@ public class LinkedFileNamePatternsPanelViewModel {
 
     public LinkedFileNamePatternsPanelViewModel() { }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialKeyPattern) {
         String defaultPattern;
         if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             defaultPattern = "";

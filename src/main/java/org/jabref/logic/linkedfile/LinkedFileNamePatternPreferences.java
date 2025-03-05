@@ -8,8 +8,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-
 import com.google.common.annotations.VisibleForTesting;
 
 public class LinkedFileNamePatternPreferences {
@@ -21,7 +19,7 @@ public class LinkedFileNamePatternPreferences {
     private final StringProperty keyPatternRegex = new SimpleStringProperty();
     private final StringProperty keyPatternReplacement = new SimpleStringProperty();
     private final StringProperty unwantedCharacters = new SimpleStringProperty();
-    private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns = new SimpleObjectProperty<>();
+    private final ObjectProperty<GlobalLinkedFileNamePatterns> keyPatterns = new SimpleObjectProperty<>();
     private final String defaultPattern;
     private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
@@ -32,7 +30,7 @@ public class LinkedFileNamePatternPreferences {
                                          String keyPatternRegex,
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
-                                         GlobalCitationKeyPatterns keyPatterns,
+                                            GlobalLinkedFileNamePatterns keyPatterns,
                                          String defaultPattern,
                                          ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
@@ -57,7 +55,7 @@ public class LinkedFileNamePatternPreferences {
                                          String keyPatternRegex,
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
-                                         GlobalCitationKeyPatterns keyPatterns,
+                                            GlobalLinkedFileNamePatterns keyPatterns,
                                          String defaultPattern,
                                          Character keywordDelimiter) {
 
@@ -157,15 +155,15 @@ public class LinkedFileNamePatternPreferences {
         this.unwantedCharacters.set(unwantedCharacters);
     }
 
-    public GlobalCitationKeyPatterns getKeyPatterns() {
+    public GlobalLinkedFileNamePatterns getKeyPatterns() {
         return keyPatterns.get();
     }
 
-    public ObjectProperty<GlobalCitationKeyPatterns> keyPatternsProperty() {
+    public ObjectProperty<GlobalLinkedFileNamePatterns> keyPatternsProperty() {
         return keyPatterns;
     }
 
-    public void setKeyPatterns(GlobalCitationKeyPatterns keyPatterns) {
+    public void setKeyPatterns(GlobalLinkedFileNamePatterns keyPatterns) {
         this.keyPatterns.set(keyPatterns);
     }
 

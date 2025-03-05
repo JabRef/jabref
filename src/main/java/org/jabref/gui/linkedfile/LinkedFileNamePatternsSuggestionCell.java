@@ -13,14 +13,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 
 public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<LinkedFileNamePatternsItemModel, String> {
     private final LinkedFileNamePatternSuggestionTextField searchField;
 
-    public LinkedFileNamePatternsSuggestionCell(List<String> citationKeyPatterns) {
-        this.searchField = new LinkedFileNamePatternSuggestionTextField(citationKeyPatterns);
+    public LinkedFileNamePatternsSuggestionCell(List<String> linkedFileNamePatterns) {
+        this.searchField = new LinkedFileNamePatternSuggestionTextField(linkedFileNamePatterns);
         searchField.setOnAction(event -> commitEdit(searchField.getText()));
     }
 
@@ -60,11 +60,11 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
         // Maximum number of entries that can be displayed in the popup menu.
         private static final int MAX_ENTRIES = 7;
 
-        private final List<String> citationKeyPatterns;
+        private final List<String> linkedFileNamePatterns;
         private final ContextMenu suggestionsList;
 
-        public LinkedFileNamePatternSuggestionTextField(List<String> citationKeyPatterns) {
-            this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
+        public LinkedFileNamePatternSuggestionTextField(List<String> linkedFileNamePatterns) {
+            this.linkedFileNamePatterns = new ArrayList<>(linkedFileNamePatterns);
             this.suggestionsList = new ContextMenu();
 
             setListener();
@@ -76,7 +76,7 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
                 if (enteredText == null || enteredText.isEmpty()) {
                     suggestionsList.hide();
                 } else {
-                    List<String> filteredEntries = citationKeyPatterns.stream()
+                    List<String> filteredEntries = linkedFileNamePatterns.stream()
                                                                       .filter(e -> e.toLowerCase().contains(enteredText.toLowerCase()))
                                                                       .collect(Collectors.toList());
 
@@ -131,26 +131,26 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
         private Menu createPatternsSubMenu() {
             Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
-            Map<CitationKeyPattern.Category, List<CitationKeyPattern>> categorizedPatterns =
-                    CitationKeyPattern.getAllPatterns().stream()
-                                      .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
+            Map<LinkedFileNamePattern.Category, List<LinkedFileNamePattern>> categorizedPatterns =
+                    LinkedFileNamePattern.getAllPatterns().stream()
+                                      .collect(Collectors.groupingBy(LinkedFileNamePattern::getCategory));
 
-            Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
-                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
-                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
-                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
-                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
+            Map<LinkedFileNamePattern.Category, String> categoryNames = Map.of(
+                    LinkedFileNamePattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    LinkedFileNamePattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    LinkedFileNamePattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    LinkedFileNamePattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    LinkedFileNamePattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
             );
 
-            for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
-                CitationKeyPattern.Category category = entry.getKey();
+            for (Map.Entry<LinkedFileNamePattern.Category, String> entry : categoryNames.entrySet()) {
+                LinkedFileNamePattern.Category category = entry.getKey();
                 String categoryName = entry.getValue();
 
                 Menu categoryMenu = new Menu(categoryName);
-                List<CitationKeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+                List<LinkedFileNamePattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
 
-                for (CitationKeyPattern pattern : patterns) {
+                for (LinkedFileNamePattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
                     menuItem.setOnAction(event -> {
                         setText(pattern.stringRepresentation());

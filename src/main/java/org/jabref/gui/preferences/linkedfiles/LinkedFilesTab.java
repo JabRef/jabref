@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
@@ -36,8 +35,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private CheckBox fulltextIndex;
 
-    @FXML private ComboBox<String> fileNamePattern;
-    @FXML private TextField fileDirectoryPattern;
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
 
@@ -74,9 +71,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
         fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
-        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
-        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
-        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         linkedFileNamePatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
@@ -91,5 +85,10 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     public void mainFileDirBrowse() {
         viewModel.mainFileDirBrowse();
+    }
+
+    @FXML
+    public void resetAllKeyPatterns() {
+        linkedFileNamePatternTable.resetAll();
     }
 }
