@@ -32,6 +32,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
+import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
+
+    private boolean isSortedTagsField = false;
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
@@ -84,6 +87,15 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             if (event.getText().equals(keywordSeparator)) {
                 keywordTagsField.commit();
                 event.consume();
+            }
+        });
+
+        this.viewModel.keywordListProperty().addListener((observable, oldValue, newValue) -> {
+            if (keywordTagsField.getTags().size() < 2) {
+                isSortedTagsField = false;
+            } else if ((Comparators.isInOrder(keywordTagsField.getTags(), Comparator.comparing(Keyword::get))) || isSortedTagsField) {
+                isSortedTagsField = true;
+                keywordTagsField.getTags().sort(Comparator.comparing(Keyword::get));
             }
         });
 
@@ -148,18 +160,18 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 case COPY -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(keyword.get())));
+                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
                 }
                 case CUT -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(keyword.get())));
+                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
                     keywordTagsField.removeTags(keyword);
                 }
                 case DELETE ->
-                        keywordTagsField.removeTags(keyword);
+                    keywordTagsField.removeTags(keyword);
                 default ->
-                        LOGGER.info("Action {} not defined", command.getText());
+                    LOGGER.info("Action {} not defined", command.getText());
             }
         }
     }
