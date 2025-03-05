@@ -104,6 +104,13 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.DELETE, new KeywordsEditor.TagContextAction(StandardActions.DELETE, keyword))
         );
         tagLabel.setContextMenu(contextMenu);
+        tagLabel.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                keywordTagsField.removeTags(keyword);
+                keywordTagsField.getEditor().setText(keyword.get());
+                keywordTagsField.getEditor().positionCaret(keyword.get().length());
+            }
+        });
         return tagLabel;
     }
 
