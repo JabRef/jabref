@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -35,7 +36,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    IntegrityIssue.CITATION_KEY_DEVIATES_FROM_GENERATED_KEY.getText(), entry, InternalField.KEY_FIELD));
+                    Localization.lang("Citation key deviates from generated key"), entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();

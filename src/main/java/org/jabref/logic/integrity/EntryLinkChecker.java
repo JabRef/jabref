@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -28,7 +29,7 @@ public class EntryLinkChecker implements EntryChecker {
                 entry.getEntryLinkList(field.getKey(), database).stream()
                      .filter(parsedEntryLink -> parsedEntryLink.getLinkedEntry().isEmpty())
                      .forEach(parsedEntryLink -> result.add(new IntegrityMessage(
-                             IntegrityIssue.REFERENCED_CITATION_KEY_DOES_NOT_EXIST.getText(),
+                             Localization.lang("Referenced citation key '%0' does not exist", parsedEntryLink.getKey()),
                              entry, field.getKey())));
             }
         }

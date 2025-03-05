@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -29,7 +30,7 @@ public class DoiDuplicationChecker implements DatabaseChecker {
         return duplicateMap.inverse().keySet().stream()
                            .filter(list -> list.size() > 1)
                            .flatMap(Collection::stream)
-                           .map(item -> new IntegrityMessage(IntegrityIssue.SAME_DOI_USED_IN_MULTIPLE_ENTRIES.getText(), item, StandardField.DOI))
+                           .map(item -> new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), item, StandardField.DOI))
                            .collect(Collectors.toList());
     }
 }
