@@ -19,7 +19,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -297,15 +296,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Label contentLabel = new Label(Localization.lang("Target file name: \n'%0'", targetFileName));
             contentLabel.setWrapText(true);
             DialogPane dialogPane = new DialogPane();
-            dialogPane.setPrefSize(500, 200);
+            dialogPane.setPrefSize(700, 200);
             dialogPane.setContent(contentLabel);
 
             ButtonType overrideButton = new ButtonType("Override", ButtonBar.ButtonData.OTHER);
             ButtonType keepBothButton = new ButtonType("Keep both", ButtonBar.ButtonData.OTHER);
             ButtonType alternativeFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
-            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            dialogPane.getButtonTypes().addAll(overrideButton, keepBothButton, alternativeFileNameButton, cancelButton);
+            dialogPane.getButtonTypes().addAll(overrideButton, keepBothButton, alternativeFileNameButton);
 
             dialogPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene != null) {
@@ -324,7 +322,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Optional<ButtonType> result = dialogService.showCustomDialogAndWait(
                     Localization.lang("Target file already exists"),
                     dialogPane,
-                    overrideButton, keepBothButton, alternativeFileNameButton, cancelButton
+                    overrideButton, keepBothButton, alternativeFileNameButton
             );
 
             if (result.isPresent()) {
