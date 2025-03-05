@@ -285,14 +285,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 existingFileVal.getFileName().toString()
             );
 
-//            overwriteFile = dialogService.showConfirmationDialogAndWait(
-//                    Localization.lang("Target file already exists"),
-//                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-//                    Localization.lang("Overwrite"));
-//
-//            if (!overwriteFile) {
-//                return;
-//            }
             Label contentLabel = new Label(Localization.lang("Target file name: \n'%0'", targetFileName));
             contentLabel.setWrapText(true);
             DialogPane dialogPane = new DialogPane();
@@ -328,11 +320,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (result.isPresent()) {
                 ButtonType buttonType = result.get();
                 if (buttonType == overrideButton) {
-                    System.out.println("Override selected");
+                    overwriteFile = true;
                 } else if (buttonType == keepBothButton) {
                     targetFileName = suggestedFileName;
                 } else if (buttonType == provideAltFileNameButton) {
                     askForNameAndRename();
+                    return;
                 }
             }
         }
