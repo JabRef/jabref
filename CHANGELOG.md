@@ -19,6 +19,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new "Copy citation (text)" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added a new "Export to clipboard" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
+- We added "Keep both" and "Provide alternative file name" options and improved dialog when renaming a file to an existing file. [#12565] (https://github.com/JabRef/jabref/issues/12565)
+
 
 ### Changed
 
