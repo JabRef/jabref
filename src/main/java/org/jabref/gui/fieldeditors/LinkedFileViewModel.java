@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -18,10 +19,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 
+
+import javafx.util.Duration;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -287,15 +293,35 @@ public class LinkedFileViewModel extends AbstractViewModel {
 //            if (!overwriteFile) {
 //                return;
 //            }
+            Label contentLabel = new Label(Localization.lang("Target file name: \n'%0'", targetFileName));
+            contentLabel.setWrapText(true);
+            DialogPane dialogPane = new DialogPane();
+            dialogPane.setPrefSize(700, 200);
+            dialogPane.setContent(contentLabel);
+
             ButtonType overrideButton = new ButtonType("Override", ButtonBar.ButtonData.OTHER);
             ButtonType keepBothButton = new ButtonType("Keep both", ButtonBar.ButtonData.OTHER);
             ButtonType provideAltFileNameButton = new ButtonType("Provide alternative file name", ButtonBar.ButtonData.OTHER);
-            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
-                    AlertType.CONFIRMATION,
-                    Localization.lang("Target file already exists") ,
-                    Localization.lang("Target file name: \n'%0'", targetFileName),
+            dialogPane.getButtonTypes().addAll(overrideButton, keepBothButton, provideAltFileNameButton);
+
+            dialogPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    Platform.runLater(() -> {
+                        Button btnKeepBoth = (Button) dialogPane.lookupButton(keepBothButton);
+                        if (btnKeepBoth != null) {
+                            Tooltip tooltip = new Tooltip(Localization.lang("New name: %0", suggestedFileName));
+                            tooltip.setShowDelay(Duration.millis(100));
+                            tooltip.setStyle("-fx-max-width: 20px; -fx-wrap-text: true; -fx-background-color: #FFFFE0;");
+                            Tooltip.install(btnKeepBoth, tooltip);
+                        }
+                    });
+                }
+            });
+
+            Optional<ButtonType> result = dialogService.showCustomDialogAndWait(
+                    Localization.lang("Target file already exists"),
+                    dialogPane,
                     overrideButton, keepBothButton, provideAltFileNameButton
             );
 
