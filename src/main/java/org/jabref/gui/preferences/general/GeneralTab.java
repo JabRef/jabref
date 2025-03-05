@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -136,10 +137,23 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         autoPushCheckbox.selectedProperty().bindBidirectional(viewModel.autoPushEnabledProperty());
 
         new ViewModelListCellFactory<AutoPushMode>()
-                .withText(AutoPushMode::toString)
+                .withText(AutoPushMode::getMode) // Use getDisplayName() instead of toString()
                 .install(autoPushModeComboBox);
 
         autoPushModeComboBox.setItems(FXCollections.observableArrayList(AutoPushMode.values()));
+
+        autoPushModeComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(AutoPushMode mode) {
+                return (mode != null) ? mode.getMode() : "";
+            }
+
+            @Override
+            public AutoPushMode fromString(String text) {
+                return AutoPushMode.fromString(text);
+            }
+        });
+
         autoPushModeComboBox.valueProperty().bindBidirectional(viewModel.autoPushModeProperty());
 
         ActionFactory actionFactory = new ActionFactory();

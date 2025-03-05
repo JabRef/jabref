@@ -2,7 +2,7 @@ package org.jabref.logic.preferences;
 
 public enum AutoPushMode {
     MANUALLY("Manually"),
-    AUTOMATICALLY("Automatically");
+    ON_SAVE("On Save");
 
     private final String mode;
 
