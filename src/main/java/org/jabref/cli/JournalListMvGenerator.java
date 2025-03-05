@@ -48,9 +48,9 @@ public class JournalListMvGenerator {
                      cacheSize(128).
                      open()) {
             MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
-            MVMap<String, Abbreviation> abbreviationToAbbreviation = store.openMap("AbbreviationToAbbreviation");
-            MVMap<String, Abbreviation> dotlessToAbbreviation = store.openMap("DotlessToAbbreviation");
-            MVMap<String, Abbreviation> shortestUniqueToAbbreviation = store.openMap("ShortestUniqueToAbbreviation");
+            MVMap<String, String> abbreviationToName = store.openMap("AbbreviationToName");
+            MVMap<String, String> dotlessToName = store.openMap("DotlessToName");
+            MVMap<String, String> shortestUniqueToName = store.openMap("ShortestUniqueToName");
 
             stream.forEach(Unchecked.consumer(path -> {
                 String fileName = path.getFileName().toString();
@@ -74,15 +74,10 @@ public class JournalListMvGenerator {
                                     }));
 
                     abbreviationMap.forEach((name, abbr) -> {
-                        String abbreviationString = abbr.getAbbreviation();
-                        String shortestUnique = abbr.getShortestUniqueAbbreviation();
-
-                        Abbreviation newAbbreviation = new Abbreviation(name, abbreviationString, shortestUnique);
-
-                        fullToAbbreviation.put(name, newAbbreviation);
-                        abbreviationToAbbreviation.put(abbr.getAbbreviation(), newAbbreviation);
-                        dotlessToAbbreviation.put(abbr.getDotlessAbbreviation(), newAbbreviation);
-                        shortestUniqueToAbbreviation.put(abbr.getShortestUniqueAbbreviation(), newAbbreviation);
+                        fullToAbbreviation.put(name, abbr);
+                        abbreviationToName.put(abbr.getAbbreviation(), name);
+                        dotlessToName.put(abbr.getDotlessAbbreviation(), name);
+                        shortestUniqueToName.put(abbr.getShortestUniqueAbbreviation(), name);
                     });
                 }
             }));
