@@ -379,7 +379,7 @@ public class GroupTreeView extends BorderPane {
             // expand node and all children on drag over
             dragExpansionHandler.expandGroup(row.getTreeItem());
 
-            if (localDragboard.hasBibEntries()) {
+            if (localDragboard.hasBibEntries() || dragboard.hasFiles()) {
                 ControlHelper.setDroppingPseudoClasses(row);
             } else {
                 ControlHelper.setDroppingPseudoClasses(row, event);

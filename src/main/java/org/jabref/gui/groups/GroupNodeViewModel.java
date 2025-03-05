@@ -344,7 +344,8 @@ public class GroupNodeViewModel {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
         boolean canDropEntries = localDragBoard.hasBibEntries() && (groupNode.getGroup() instanceof GroupEntryChanger);
-        return canDropOtherGroup || canDropEntries;
+        boolean canDropFiles = dragboard.hasFiles();
+        return canDropOtherGroup || canDropEntries || canDropFiles;
     }
 
     public void moveTo(GroupNodeViewModel target) {
