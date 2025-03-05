@@ -61,10 +61,6 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextInputControl;
-
-
 /**
  * This class provides methods to create default
  * JavaFX dialogs which will also work on top of Swing
