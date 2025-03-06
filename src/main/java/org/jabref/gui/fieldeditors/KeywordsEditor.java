@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Comparator;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
@@ -12,6 +10,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.ClipBoardManager;
@@ -33,6 +35,7 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import jakarta.inject.Inject;
+import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +50,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
+
+    private Keyword draggedKeyword;
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
@@ -104,6 +109,39 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.DELETE, new KeywordsEditor.TagContextAction(StandardActions.DELETE, keyword))
         );
         tagLabel.setContextMenu(contextMenu);
+        tagLabel.setOnDragOver(event -> {
+            if (event.getGestureSource() != tagLabel && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+        tagLabel.setOnDragDetected(event -> {
+            Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString(keyword.get());
+            db.setContent(content);
+            draggedKeyword = keyword;
+            event.consume();
+        });
+        tagLabel.setOnDragEntered(event -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
+        tagLabel.setOnDragExited(event -> tagLabel.setStyle(""));
+        tagLabel.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasString() && draggedKeyword != null) {
+                int oldIndex = keywordTagsField.getTags().indexOf(draggedKeyword);
+                int dropIndex = keywordTagsField.getTags().indexOf(keyword);
+                if (oldIndex != dropIndex) {
+                    keywordTagsField.removeTags(draggedKeyword);
+                    keywordTagsField.getTags().add(dropIndex, draggedKeyword);
+                }
+                event.setDropCompleted(true);
+            } else {
+                event.setDropCompleted(false);
+            }
+            draggedKeyword = null;
+            event.consume();
+        });
+        tagLabel.setOnDragDone(DragEvent::consume);
         return tagLabel;
     }
 
