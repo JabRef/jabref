@@ -54,6 +54,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -92,6 +93,7 @@ public class GroupTreeView extends BorderPane {
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final KeyBindingRepository keyBindingRepository;
 
 
     private TreeTableView<GroupNodeViewModel> groupTree;
@@ -128,6 +130,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.keyBindingRepository = preferences.getKeyBindingRepository();
         createNodes();
         initialize();
     }
