@@ -272,7 +272,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    private void performRenameWithConflictCheck(String targetFileName) {
+    public void performRenameWithConflictCheck(String targetFileName) {
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
 
