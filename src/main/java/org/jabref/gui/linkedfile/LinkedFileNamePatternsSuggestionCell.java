@@ -1,10 +1,13 @@
 package org.jabref.gui.linkedfile;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -12,6 +15,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Window;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.LinkedFileNamePattern;
@@ -57,15 +61,15 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
     }
 
     static class LinkedFileNamePatternSuggestionTextField extends TextField {
-        // Maximum number of entries that can be displayed in the popup menu.
-        private static final int MAX_ENTRIES = 7;
-
         private final List<String> linkedFileNamePatterns;
         private final ContextMenu suggestionsList;
+        private int heightOfMenuItem;
 
         public LinkedFileNamePatternSuggestionTextField(List<String> linkedFileNamePatterns) {
             this.linkedFileNamePatterns = new ArrayList<>(linkedFileNamePatterns);
             this.suggestionsList = new ContextMenu();
+            // Initial reasonable estimate before the menu items are populated. We overwrite this dynamically
+            this.heightOfMenuItem = 30;
 
             setListener();
         }
@@ -100,7 +104,11 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
 
         private void populatePopup(List<String> searchResult) {
             List<CustomMenuItem> menuItems = new ArrayList<>();
-            int count = Math.min(searchResult.size(), MAX_ENTRIES);
+
+            double space = getAvailableSpaceBelow(this);
+            int maxItems = (int) (space / heightOfMenuItem) - 1;
+
+            int count = Math.min(searchResult.size(), maxItems);
 
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
@@ -119,6 +127,10 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
                 });
             }
 
+            if (!menuItems.isEmpty()) {
+                Platform.runLater(() -> heightOfMenuItem = (int) menuItems.getFirst().getContent().getBoundsInLocal().getHeight());
+            }
+
             suggestionsList.getItems().clear();
             suggestionsList.getItems().add(createPatternsSubMenu());
             suggestionsList.getItems().addAll(menuItems);
@@ -128,6 +140,23 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
             }
         }
 
+        public static double getAvailableSpaceBelow(TextField textField) {
+            if (textField.getScene() == null || textField.getScene().getWindow() == null) {
+                return 0;
+            }
+
+            Window window = textField.getScene().getWindow();
+            if (window == null) {
+                return 0;
+            }
+
+            Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
+            double screenHeight = window.getHeight();
+            double textFieldBottom = bounds.getMinY() + textField.getHeight();
+
+            return screenHeight - (textFieldBottom - window.getY());
+        }
+
         private Menu createPatternsSubMenu() {
             Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
@@ -135,13 +164,12 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
                     LinkedFileNamePattern.getAllPatterns().stream()
                                       .collect(Collectors.groupingBy(LinkedFileNamePattern::getCategory));
 
-            Map<LinkedFileNamePattern.Category, String> categoryNames = Map.of(
-                    LinkedFileNamePattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
-                    LinkedFileNamePattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
-                    LinkedFileNamePattern.Category.TITLE_RELATED, Localization.lang("Title related"),
-                    LinkedFileNamePattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    LinkedFileNamePattern.Category.BIBENTRY_FIELDS, Localization.lang("BibEntry fields")
-            );
+            Map<LinkedFileNamePattern.Category, String> categoryNames = new LinkedHashMap<>();
+            categoryNames.put(LinkedFileNamePattern.Category.AUTHOR_RELATED, Localization.lang("Author related"));
+            categoryNames.put(LinkedFileNamePattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
+            categoryNames.put(LinkedFileNamePattern.Category.TITLE_RELATED, Localization.lang("Title related"));
+            categoryNames.put(LinkedFileNamePattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
+            categoryNames.put(LinkedFileNamePattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
 
             for (Map.Entry<LinkedFileNamePattern.Category, String> entry : categoryNames.entrySet()) {
                 LinkedFileNamePattern.Category category = entry.getKey();

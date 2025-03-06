@@ -32,6 +32,49 @@ public record LinkedFileNamePattern(String stringRepresentation, Category catego
     public static final LinkedFileNamePattern AUTHORS_LAST_FORE_INI = new LinkedFileNamePattern("[authorsLastForeIni]", Category.AUTHOR_RELATED);
     // endregion
 
+    // region - Editor-related field markers
+    public static final LinkedFileNamePattern EDTR = new LinkedFileNamePattern("[edtr]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTR_INI_N = new LinkedFileNamePattern("[edtrIniN]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDITORS = new LinkedFileNamePattern("[editors]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDITOR_LAST = new LinkedFileNamePattern("[editorLast]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDITOR_INI = new LinkedFileNamePattern("[editorIni]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTR_N = new LinkedFileNamePattern("[edtrN]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTR_N_M = new LinkedFileNamePattern("[edtrN_M]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTR_EDTR_EA = new LinkedFileNamePattern("[edtr.edtr.ea]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTRSHORT = new LinkedFileNamePattern("[edtrshort]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDTR_FORE_INI = new LinkedFileNamePattern("[edtrForeIni]", Category.EDITOR_RELATED);
+    public static final LinkedFileNamePattern EDITOR_LAST_FORE_INI = new LinkedFileNamePattern("[editorLastForeIni]", Category.EDITOR_RELATED);
+    // endregion
+
+    // region - Title-related field markers
+    public static final LinkedFileNamePattern SHORTTITLE = new LinkedFileNamePattern("[shorttitle]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern SHORTTITLE_INI = new LinkedFileNamePattern("[shorttitleINI]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern VERYSHORTTITLE = new LinkedFileNamePattern("[veryshorttitle]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern CAMEL = new LinkedFileNamePattern("[camel]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern CAMEL_N = new LinkedFileNamePattern("[camelN]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern TITLE = new LinkedFileNamePattern("[title]", Category.TITLE_RELATED);
+    public static final LinkedFileNamePattern FULLTITLE = new LinkedFileNamePattern("[fulltitle]", Category.TITLE_RELATED);
+    // endregion
+
+    // region - Other field markers
+    public static final LinkedFileNamePattern ENTRYTYPE = new LinkedFileNamePattern("[entrytype]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern FIRSTPAGE = new LinkedFileNamePattern("[firstpage]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern PAGEPREFIX = new LinkedFileNamePattern("[pageprefix]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern KEYWORD_N = new LinkedFileNamePattern("[keywordN]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern KEYWORDS_N = new LinkedFileNamePattern("[keywordsN]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern LASTPAGE = new LinkedFileNamePattern("[lastpage]", Category.OTHER_FIELDS);
+    public static final LinkedFileNamePattern SHORTYEAR = new LinkedFileNamePattern("[shortyear]", Category.OTHER_FIELDS);
+    // endregion
+
+    // region - Bibentry fields
+    public static final LinkedFileNamePattern AUTHOR = new LinkedFileNamePattern("[AUTHOR]", Category.BIBENTRY_FIELDS);
+    public static final LinkedFileNamePattern DATE = new LinkedFileNamePattern("[DATE]", Category.BIBENTRY_FIELDS);
+    public static final LinkedFileNamePattern DAY = new LinkedFileNamePattern("[DAY]", Category.BIBENTRY_FIELDS);
+    public static final LinkedFileNamePattern GROUPS = new LinkedFileNamePattern("[GROUPS]", Category.BIBENTRY_FIELDS);
+    public static final LinkedFileNamePattern MONTH = new LinkedFileNamePattern("[MONTH]", Category.BIBENTRY_FIELDS);
+    public static final LinkedFileNamePattern YEAR = new LinkedFileNamePattern("[YEAR]", Category.BIBENTRY_FIELDS);
+    // endregion
+
     public LinkedFileNamePattern(String stringRepresentation) {
         this(stringRepresentation, Category.OTHER_FIELDS);
     }
