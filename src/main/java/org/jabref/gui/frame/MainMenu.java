@@ -3,6 +3,7 @@ package org.jabref.gui.frame;
 import java.util.function.Supplier;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -154,6 +155,10 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
+
+                new SeparatorMenuItem(),
+
+                createGitUIMenuItem(),
 
                 new SeparatorMenuItem(),
 
@@ -386,4 +391,49 @@ public class MainMenu extends MenuBar {
 
         return sendMenu;
     }
+
+//    private MenuItem createGitUIMenuItem() {
+//        MenuItem gitUIItem = new MenuItem("Git");
+//
+//        // Define what happens when Git UI is clicked
+//        gitUIItem.setOnAction(event -> {
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("Git");
+//            alert.setHeaderText(null);
+//            alert.setContentText("Git UI will be implemented here! ---TEST");
+//            alert.showAndWait();
+//        });
+//
+//        return gitUIItem;
+//    }
+    private Menu createGitUIMenuItem() {
+        Menu gitUIMenu = new Menu("Git");
+
+        // Create "Git Pull" menu item
+        MenuItem gitPullItem = new MenuItem("Git Pull");
+        gitPullItem.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Git Pull");
+            alert.setHeaderText(null);
+            alert.setContentText("Git Pull action will be implemented here!");
+            alert.showAndWait();
+        });
+
+        // Create "Git Push" menu item
+        MenuItem gitPushItem = new MenuItem("Git Push");
+        gitPushItem.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Git Push");
+            alert.setHeaderText(null);
+            alert.setContentText("Git Push action will be implemented here!");
+            alert.showAndWait();
+        });
+
+        // Add subitems to Git UI Menu
+        gitUIMenu.getItems().addAll(gitPullItem, gitPushItem);
+
+        return gitUIMenu;
+    }
 }
+
+
