@@ -24,14 +24,18 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import jakarta.inject.Inject;
@@ -89,6 +93,20 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             if (event.getText().equals(keywordSeparator)) {
                 keywordTagsField.commit();
                 event.consume();
+            }
+        });
+
+        keywordTagsField.getEditor().setOnKeyPressed(evt -> {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, evt)) {
+                String clipboardText = clipBoardManager.getContents();
+                if (!clipboardText.isEmpty()) {
+                    KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());
+                    keywordsList.stream().forEach(keyword -> keywordTagsField.addTags(keyword));
+                    keywordTagsField.getEditor().clear();
+                    evt.consume();
+                }
             }
         });
 
