@@ -40,7 +40,7 @@ All of them are intended to
 a) bring you closer to a larger code base with a dedicated issue and
 b) be clear in their description of work.
 Sometimes, you need to refine the requirements:
-We see contributors as software developer and [not as programmer](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html).
+We see contributors as software developers and [not as programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html).
 Thus, you really need work on requirements refinement.
 
 Take a look at [JabRef's candidates for university projects](https://github.com/orgs/JabRef/projects/3).
