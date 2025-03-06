@@ -17,7 +17,9 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
@@ -85,6 +87,20 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     public void mainFileDirBrowse() {
         viewModel.mainFileDirBrowse();
+    }
+
+    @Override
+    public void setValues() {
+        viewModel.setValues();
+        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+        linkedFileNamePatternTable.setValues(
+                entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
+                preferences.getFilePreferences().fileNamePatternProperty().get());
+    }
+
+    @Override
+    public void storeSettings() {
+        viewModel.storeSettings();
     }
 
     @FXML
