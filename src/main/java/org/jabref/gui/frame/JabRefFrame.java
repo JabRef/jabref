@@ -123,21 +123,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
-        this.fileHistory = new FileHistoryMenu(
-                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
-                dialogService,
-                getOpenDatabaseAction());
-
-        this.setOnKeyTyped(key -> {
-            if (this.fileHistory.isShowing()) {
-                if (this.fileHistory.openFileByKey(key)) {
-                    this.fileHistory.getParentMenu().hide();
-                }
-            }
-        });
-
-        fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
-
         setId("frame");
 
         // Create components
@@ -186,6 +171,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 this.preferences,
                 taskExecutor);
+
+        this.fileHistory = new FileHistoryMenu(
+                this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
+                dialogService,
+                getOpenDatabaseAction());
+
+        fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
+
+        this.setOnKeyTyped(key -> {
+            if (this.fileHistory.isShowing()) {
+                if (this.fileHistory.openFileByKey(key)) {
+                    this.fileHistory.getParentMenu().hide();
+                }
+            }
+        });
 
         initLayout();
         initKeyBindings();
@@ -450,8 +450,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        return (LibraryTab) Optional.ofNullable(tabbedPane.getSelectionModel().getSelectedItem())
-                                    .filter(tab -> tab instanceof LibraryTab).orElse(null);
+        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
+            return null;
+        }
+        return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
     }
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
