@@ -49,10 +49,10 @@ public class GitHandler {
         if (Files.isRegularFile(repositoryPath)) {
             repositoryPath = repositoryPath.getParent();
         }
-        
+
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        
+
         if (createRepo && !isGitRepository()) {
             try {
                 Git.init()
@@ -200,7 +200,7 @@ public class GitHandler {
         }
     }
 
-    public void pullOnCurrentBranch() throws IOException {
+    public boolean pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
@@ -210,6 +210,7 @@ public class GitHandler {
                 LOGGER.info("Failed to push");
             }
         }
+        return false;
     }
 
     public String getCurrentlyCheckedOutBranch() throws IOException {
@@ -217,7 +218,7 @@ public class GitHandler {
             return git.getRepository().getBranch();
         }
     }
-    
+
     /**
      * Represents the Git status of a file within a repository
      */
@@ -241,7 +242,7 @@ public class GitHandler {
             return displayName;
         }
     }
-    
+
     /**
      * Gets the Git status of a file
      *
@@ -293,7 +294,7 @@ public class GitHandler {
             return GitStatus.UNKNOWN;
         }
     }
-    
+
     /**
      * Gets the relative path of a file to the repository root
      *
@@ -329,3 +330,4 @@ public class GitHandler {
         }
     }
 }
+
