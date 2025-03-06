@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +36,6 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -86,18 +86,14 @@ public class PerformRenameWithConflictCheckTest {
 
         // Create temporary file
         Path existingFile = tempDir.resolve("existingFile.pdf");
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             Files.createFile(existingFile);  // Create the real file
-        } catch (IOException e) {
-            fail("Failed to create temporary file: " + e.getMessage());
-        }
+        }, "Failed to create temporary file: ");
 
         Path fileToRename = tempDir.resolve("fileToRename.pdf");
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             Files.createFile(fileToRename);  // Create the real file
-        } catch (IOException e) {
-            fail("Failed to create temporary file: " + e.getMessage());
-        }
+        }, "Failed to create temporary file: ");
 
         // Create a real LinkedFile object
         LinkedFile linkedFile = new LinkedFile("desc", fileToRename, "pdf");
