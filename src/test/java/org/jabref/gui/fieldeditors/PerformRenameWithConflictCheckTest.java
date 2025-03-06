@@ -1,7 +1,5 @@
 package test.java.org.jabref.gui.fieldeditors;
 
-import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +13,7 @@ import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
@@ -31,22 +30,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-
 import org.mockito.MockitoAnnotations;
+import org.testfx.framework.junit5.ApplicationExtension;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.testfx.framework.junit5.ApplicationExtension;
 
 @ExtendWith(ApplicationExtension.class)
 public class PerformRenameWithConflictCheckTest {
+
+    @TempDir
+    Path tempDir;  // JUnit 5 annotation for creating temporary files/folders
 
     private LinkedFile linkedFile;
     private BibEntry entry;
@@ -58,9 +57,6 @@ public class PerformRenameWithConflictCheckTest {
 
     private final DialogService dialogServiceMock = mock(DialogService.class);
     private final LinkedFileHandler linkedFileHandlerMock = mock(LinkedFileHandler.class);
-
-    @TempDir
-    Path tempDir;  // JUnit 5 annotation for creating temporary files/folders
 
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
@@ -186,7 +182,6 @@ public class PerformRenameWithConflictCheckTest {
     // Test 4: File exists, user chooses to provide an alternative file name
     @Test
     void performRenameWithConflictCheckWhenProvideAlternativeFileNameChosenUsesUserInput() {
-
         Path existingFilePath = tempDir.resolve("existingFile.pdf");
         Path fileToRename = tempDir.resolve("fileToRename.pdf");
 
