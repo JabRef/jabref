@@ -1,14 +1,19 @@
 package org.jabref.gui.groups;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -48,8 +53,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
@@ -61,7 +65,9 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -84,7 +90,9 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
-    private final KeyBindingRepository keyBindingRepository;
+    private final UndoManager undoManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
+
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -95,6 +103,8 @@ public class GroupTreeView extends BorderPane {
     private CustomLocalDragboard localDragboard;
     private DragExpansionHandler dragExpansionHandler;
     private Timer scrollTimer;
+    private ImportHandler importHandler;
+    private BibDatabaseContext database;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;
     private double upperBorder;
@@ -108,20 +118,22 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
-                         AiService aiService) {
+                         AiService aiService,
+                         UndoManager undoManager,
+                         FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.keyBindingRepository = preferences.getKeyBindingRepository();
-
+        this.undoManager = undoManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         createNodes();
         initialize();
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(keyBindingRepository);
+        searchField = SearchTextField.create(preferences.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
         this.setTop(searchField);
@@ -146,14 +158,6 @@ public class GroupTreeView extends BorderPane {
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
-        groupTree.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
-                TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
-                if (selectedItem != null && selectedItem.getParent() != null) { 
-                    viewModel.editGroup(selectedItem.getValue());
-                }
-            }
-        });
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
@@ -379,6 +383,23 @@ public class GroupTreeView extends BorderPane {
             row.getItem().addEntriesToGroup(entries);
             success = true;
         }
+
+        if (dragboard.hasFiles()) {
+            this.database = stateManager.getActiveDatabase().orElse(null);
+            this.importHandler = new ImportHandler(
+                    database,
+                    preferences,
+                    fileUpdateMonitor,
+                    undoManager,
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+            List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            stateManager.setSelectedGroups(database, Collections.singletonList(row.getItem().getGroupNode()));
+            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), event.getTransferMode())
+                         .executeWith(taskExecutor);
+            success = true;
+        }
         event.setDropCompleted(success);
         event.consume();
     }
@@ -567,7 +588,6 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
@@ -645,7 +665,7 @@ public class GroupTreeView extends BorderPane {
 
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
-                        case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
+                        case GROUP_EDIT ->
                                 group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
@@ -674,7 +694,7 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
+                case GROUP_EDIT -> {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
