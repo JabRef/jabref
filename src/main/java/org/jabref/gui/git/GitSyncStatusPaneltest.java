@@ -122,7 +122,6 @@ public class GitSyncStatusPanelTest {
             assertEquals("⚠ Diverged: Local and remote branches have different changes.", status);
         }
     }
-
     @Test
     void testErrorHandling() {
         try (MockedStatic<Git> gitMock = mockStatic(Git.class)) {
