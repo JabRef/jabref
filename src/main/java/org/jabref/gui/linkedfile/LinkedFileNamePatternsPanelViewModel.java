@@ -64,7 +64,7 @@ public class LinkedFileNamePatternsPanelViewModel {
     }
 
     public void setItemToDefaultPattern(LinkedFileNamePatternsItemModel item) {
-        item.setPattern("Default Pattern");
+        item.setPattern(LinkedFileNamePattern.AUTHOR_YEAR.stringRepresentation());
     }
 
     public void resetAll() {
