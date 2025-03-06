@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Comparator;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
@@ -12,6 +10,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.ClipBoardManager;
@@ -22,18 +24,23 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
+import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +57,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private ClipBoardManager clipBoardManager;
 
     private boolean isSortedTagsField = false;
+    private Keyword draggedKeyword;
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
@@ -99,6 +107,20 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
+        keywordTagsField.getEditor().setOnKeyPressed(evt -> {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, evt)) {
+                String clipboardText = clipBoardManager.getContents();
+                if (!clipboardText.isEmpty()) {
+                    KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());
+                    keywordsList.stream().forEach(keyword -> keywordTagsField.addTags(keyword));
+                    keywordTagsField.getEditor().clear();
+                    evt.consume();
+                }
+            }
+        });
+
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 
@@ -123,6 +145,39 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 keywordTagsField.getEditor().positionCaret(keyword.get().length());
             }
         });
+        tagLabel.setOnDragOver(event -> {
+            if (event.getGestureSource() != tagLabel && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+        tagLabel.setOnDragDetected(event -> {
+            Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString(keyword.get());
+            db.setContent(content);
+            draggedKeyword = keyword;
+            event.consume();
+        });
+        tagLabel.setOnDragEntered(event -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
+        tagLabel.setOnDragExited(event -> tagLabel.setStyle(""));
+        tagLabel.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasString() && draggedKeyword != null) {
+                int oldIndex = keywordTagsField.getTags().indexOf(draggedKeyword);
+                int dropIndex = keywordTagsField.getTags().indexOf(keyword);
+                if (oldIndex != dropIndex) {
+                    keywordTagsField.removeTags(draggedKeyword);
+                    keywordTagsField.getTags().add(dropIndex, draggedKeyword);
+                }
+                event.setDropCompleted(true);
+            } else {
+                event.setDropCompleted(false);
+            }
+            draggedKeyword = null;
+            event.consume();
+        });
+        tagLabel.setOnDragDone(DragEvent::consume);
         return tagLabel;
     }
 
