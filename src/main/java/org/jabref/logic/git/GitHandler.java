@@ -91,7 +91,7 @@ public class GitHandler {
     /**
      * Returns true if the given path points to a directory that is a git repository (contains a .git folder)
      */
-    boolean isGitRepository() {
+    public boolean isGitRepository() {
         // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
         // This solution is quite simple but might not work in special cases, for us it should suffice.
         return Files.exists(Path.of(repositoryPath.toString(), ".git"));
