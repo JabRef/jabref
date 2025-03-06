@@ -170,17 +170,12 @@ public class BibDatabaseContext {
         Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
         librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
-        // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
-        //   1) no user-specific file directory set (in the metadata of the bib file) and
-        //   2) no library-specific file directory is set (in the metadata of the bib file)
-
         // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
-                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                 fileDirs.add(parentPath.toAbsolutePath());
@@ -264,16 +259,79 @@ public class BibDatabaseContext {
 
         if (getDatabasePath().isPresent()) {
             Path databasePath = getDatabasePath().get();
-            // Eventually, this leads to filenames as "40daf3b0--fuu.bib--2022-09-04--01.36.25.bib" --> "--" is used as separator between "groups"
             String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
-            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
 
         indexPath = appData.resolve("unsaved");
-        LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
+    }
+
+    /**
+     * Get the Git status of the database file.
+     *
+     * @return The Git status if the database is under version control, or empty if not.
+     */
+    public Optional<GitHandler.GitStatus> getGitStatus() {
+        if (!isUnderVersionControl() || !getDatabasePath().isPresent()) {
+            return Optional.empty();
+        }
+
+        try {
+            // Important: do NOT create a new repository when checking status
+            GitHandler gitHandler = new GitHandler(getDatabasePath().get(), false);
+            return Optional.of(gitHandler.getFileStatus(getDatabasePath().get()));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns whether this database is under version control (e.g., git).
+     */
+    public boolean isUnderVersionControl() {
+        if (underVersionControl == null) {
+            if (!getDatabasePath().isPresent()) {
+                underVersionControl = false;
+                return false;
+            }
+
+            Path databasePath = getDatabasePath().get();
+
+            // If the file doesn't exist, it can't be under version control
+            if (!Files.exists(databasePath)) {
+                underVersionControl = false;
+                return false;
+            }
+
+            try {
+                // Try direct file system check first - faster way to detect git repositories
+                Path gitDir = databasePath.getParent().resolve(".git");
+                if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
+                    underVersionControl = true;
+                    return true;
+                }
+
+                // Use GitHandler for complete check if simple check fails
+                GitHandler gitHandler = new GitHandler(databasePath, false);
+                underVersionControl = gitHandler.isGitRepository();
+            } catch (Exception e) {
+                // Silent fail if error occurs during repository check
+                underVersionControl = false;
+            }
+        }
+        return underVersionControl;
+    }
+
+    /**
+     * Set the version control status of this database.
+     *
+     * @param underVersionControl true if this database is under version control
+     *
+     */
+    public void setUnderVersionControl(boolean underVersionControl) {
+        this.underVersionControl = underVersionControl;
     }
 
     @Override
@@ -316,20 +374,5 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
-    }
-
-    public boolean isUnderVersionControl() {
-        if (underVersionControl == null) {
-            underVersionControl = getDatabasePath().map(GitHandler::isUnderVersionControl).orElse(false);
-        }
-        return underVersionControl;
-    }
-
-    public void pullLatestChanges() {
-        getDatabasePath().ifPresent(path -> {
-            if (isUnderVersionControl()) {
-                GitHandler.pullChanges(path);
-            }
-        });
     }
 }
