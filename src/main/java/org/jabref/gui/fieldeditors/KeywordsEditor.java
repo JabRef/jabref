@@ -38,6 +38,7 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
+import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private ClipBoardManager clipBoardManager;
 
+    private boolean isSortedTagsField = false;
     private Keyword draggedKeyword;
 
     public KeywordsEditor(Field field,
@@ -96,6 +98,15 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
+        this.viewModel.keywordListProperty().addListener((observable, oldValue, newValue) -> {
+            if (keywordTagsField.getTags().size() < 2) {
+                isSortedTagsField = false;
+            } else if ((Comparators.isInOrder(keywordTagsField.getTags(), Comparator.comparing(Keyword::get))) || isSortedTagsField) {
+                isSortedTagsField = true;
+                keywordTagsField.getTags().sort(Comparator.comparing(Keyword::get));
+            }
+        });
+
         keywordTagsField.getEditor().setOnKeyPressed(evt -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
@@ -127,6 +138,13 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.DELETE, new KeywordsEditor.TagContextAction(StandardActions.DELETE, keyword))
         );
         tagLabel.setContextMenu(contextMenu);
+        tagLabel.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                keywordTagsField.removeTags(keyword);
+                keywordTagsField.getEditor().setText(keyword.get());
+                keywordTagsField.getEditor().positionCaret(keyword.get().length());
+            }
+        });
         tagLabel.setOnDragOver(event -> {
             if (event.getGestureSource() != tagLabel && event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.MOVE);
@@ -197,18 +215,18 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 case COPY -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(keyword.get())));
+                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
                 }
                 case CUT -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(keyword.get())));
+                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
                     keywordTagsField.removeTags(keyword);
                 }
                 case DELETE ->
-                        keywordTagsField.removeTags(keyword);
+                    keywordTagsField.removeTags(keyword);
                 default ->
-                        LOGGER.info("Action {} not defined", command.getText());
+                    LOGGER.info("Action {} not defined", command.getText());
             }
         }
     }
