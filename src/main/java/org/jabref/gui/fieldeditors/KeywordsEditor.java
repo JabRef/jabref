@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.Comparator;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
@@ -40,7 +42,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
-import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
