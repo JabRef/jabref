@@ -450,7 +450,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
+        if (tabbedPane.getSelectionModel().getSelectedItem() == null
+                || !(tabbedPane.getSelectionModel().getSelectedItem() instanceof LibraryTab)) {
             return null;
         }
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
@@ -467,24 +468,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 tabbedPane.getSelectionModel().select(tab);
                 return;
             }
-
-            // If the WelcomeTab is not found, a new instance is created and added
-            WelcomeTab welcomeTab = new WelcomeTab(
-                    this,
-                    preferences,
-                    aiService,
-                    dialogService,
-                    stateManager,
-                    fileUpdateMonitor,
-                    entryTypesManager,
-                    undoManager,
-                    clipBoardManager,
-                    taskExecutor,
-                    fileHistory
-            );
-            tabbedPane.getTabs().add(welcomeTab);
-            tabbedPane.getSelectionModel().select(welcomeTab);
         }
+
+        // If the WelcomeTab is not found, a new instance is created and added
+        WelcomeTab welcomeTab = new WelcomeTab(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor,
+                fileHistory
+        );
+        tabbedPane.getTabs().add(welcomeTab);
+        tabbedPane.getSelectionModel().select(welcomeTab);
     }
 
     /**
