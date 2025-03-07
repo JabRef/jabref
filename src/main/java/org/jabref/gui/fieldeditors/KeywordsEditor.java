@@ -42,6 +42,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private ClipBoardManager clipBoardManager;
 
     private boolean isSortedTagsField = false;
-    private Keyword draggedKeyword;
+    private Optional<Keyword> draggedKeyword = Optional.empty();
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
@@ -108,16 +109,16 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-        keywordTagsField.getEditor().setOnKeyPressed(evt -> {
+        keywordTagsField.getEditor().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, evt)) {
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
                 String clipboardText = clipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
                     KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());
                     keywordsList.stream().forEach(keyword -> keywordTagsField.addTags(keyword));
                     keywordTagsField.getEditor().clear();
-                    evt.consume();
+                    event.consume();
                 }
             }
         });
@@ -157,25 +158,25 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             ClipboardContent content = new ClipboardContent();
             content.putString(keyword.get());
             db.setContent(content);
-            draggedKeyword = keyword;
+            draggedKeyword = Optional.of(keyword);
             event.consume();
         });
         tagLabel.setOnDragEntered(event -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
         tagLabel.setOnDragExited(event -> tagLabel.setStyle(""));
         tagLabel.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
-            if (db.hasString() && draggedKeyword != null) {
-                int oldIndex = keywordTagsField.getTags().indexOf(draggedKeyword);
+            if (db.hasString() && draggedKeyword.isPresent()) {
+                int oldIndex = keywordTagsField.getTags().indexOf(draggedKeyword.get());
                 int dropIndex = keywordTagsField.getTags().indexOf(keyword);
                 if (oldIndex != dropIndex) {
-                    keywordTagsField.removeTags(draggedKeyword);
-                    keywordTagsField.getTags().add(dropIndex, draggedKeyword);
+                    keywordTagsField.removeTags(draggedKeyword.get());
+                    keywordTagsField.getTags().add(dropIndex, draggedKeyword.get());
                 }
                 event.setDropCompleted(true);
             } else {
                 event.setDropCompleted(false);
             }
-            draggedKeyword = null;
+            draggedKeyword = Optional.empty();
             event.consume();
         });
         tagLabel.setOnDragDone(DragEvent::consume);
