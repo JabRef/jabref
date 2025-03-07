@@ -145,18 +145,13 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     @VisibleForTesting
     Path getInitialDirectory() {
-        if (tabContainer.getLibraryTabs().isEmpty()) {
+        if (tabContainer.getLibraryTabs().isEmpty() || tabContainer.getCurrentLibraryTab() == null) {
+            // currentTab might not be a LibraryTab but the WelcomeTab
             return preferences.getFilePreferences().getWorkingDirectory();
+        } else {
+            Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
+            return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
         }
-
-        // This is because of the WelcomeTab class.
-        LibraryTab currentTab = tabContainer.getCurrentLibraryTab();
-        if (currentTab == null) {
-            return preferences.getFilePreferences().getWorkingDirectory();
-        }
-
-        Optional<Path> databasePath = currentTab.getBibDatabaseContext().getDatabasePath();
-        return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
     }
 
     /**
