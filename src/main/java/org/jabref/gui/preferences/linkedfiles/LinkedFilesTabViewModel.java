@@ -187,10 +187,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return defaultFileNamePatternsProperty;
     }
 
-    /* public StringProperty fileNamePatternProperty() {
-        return fileNamePatternProperty;
-    }*/
-
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPatternProperty;
     }
