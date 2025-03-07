@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new "Copy citation (text)" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added a new "Export to clipboard" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
+- Added batch fetching of bibliographic data for multiple entries in the "Lookup" menu. [koppor#372](https://github.com/koppor/jabref/issues/372)
 
 ### Changed
 
