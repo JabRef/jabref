@@ -24,7 +24,7 @@ jobs:
           echo "expected_files=(${FILES})" >> $GITHUB_ENV
 
       - name: ProductMap Map Generation
-        uses: product-map/product-map-action@v1.0.19
+        uses: product-map/product-map-action@main
         # disabled because of https://github.com/product-map/product-map-action/issues/7
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
         with:
