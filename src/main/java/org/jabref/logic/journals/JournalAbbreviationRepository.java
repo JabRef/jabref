@@ -2,6 +2,7 @@ package org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -25,6 +28,7 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
+    private final StringSimilarity similarity = new StringSimilarity();
 
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
@@ -114,6 +118,7 @@ public class JournalAbbreviationRepository {
 
     /**
      * Attempts to get the abbreviation of the journal given.
+     * if no exact match is found, attempts a fuzzy match on full journal names.
      *
      * @param input The journal name (either full name or abbreviated name).
      */
@@ -128,10 +133,22 @@ public class JournalAbbreviationRepository {
             return customAbbreviation;
         }
 
-        return Optional.ofNullable(fullToAbbreviationObject.get(journal))
+        Optional<Abbreviation> abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
                 .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
                 .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
                 .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+
+        if (abbreviation.isEmpty()) {
+            abbreviation = findAbbreviationFuzzyMatched(journal);
+        }
+
+        return abbreviation;
+    }
+
+    private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
+        return customAbbreviations.stream()
+                                  .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                                  .min(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())));
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
