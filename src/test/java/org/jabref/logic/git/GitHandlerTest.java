@@ -10,7 +10,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.jabref.logic.git.GitHandler.GitStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -55,31 +54,5 @@ class GitHandlerTest {
     @Test
     void getCurrentlyCheckedOutBranch() throws IOException {
         assertEquals("main", gitHandler.getCurrentlyCheckedOutBranch());
-    }
-
-    @Test
-    void getFileStatusForNewFile() throws IOException, GitAPIException {
-        // Create a new file
-        Path filePath = Path.of(repositoryPath.toString(), "NewTest.txt");
-        Files.createFile(filePath);
-
-        // Check status (should be UNKNOWN as it's untracked)
-        GitStatus status = gitHandler.getFileStatus(filePath);
-        assertEquals(GitStatus.UNKNOWN, status);
-    }
-
-    @Test
-    void getFileStatusForModifiedFile() throws IOException, GitAPIException {
-        // Create a file and commit it first
-        Path filePath = Path.of(repositoryPath.toString(), "ModifiedTest.txt");
-        Files.createFile(filePath);
-        gitHandler.createCommitOnCurrentBranch("Add test file", false);
-
-        // Modify the file
-        Files.writeString(filePath, "Modified content");
-
-        // Check status (should be MODIFIED)
-        GitStatus status = gitHandler.getFileStatus(filePath);
-        assertEquals(GitStatus.MODIFIED, status);
     }
 }

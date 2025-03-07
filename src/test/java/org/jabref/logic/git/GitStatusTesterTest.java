@@ -113,6 +113,39 @@ class GitStatusTesterTest {
     }
 
     @Test
+    @DisplayName("Test status for newly created file")
+    void getFileStatusForNewFile() throws IOException, GitAPIException {
+        // Create a new file
+        Path filePath = tempDir.resolve("NewTest.txt");
+        Files.createFile(filePath);
+
+        // Check status (should be UNKNOWN as it's untracked)
+        GitHandler.GitStatus status = gitHandler.getFileStatus(filePath);
+        assertEquals(GitHandler.GitStatus.UNTRACKED, status, "Newly created file status should be UNTRACKED");
+    }
+
+    @Test
+    @DisplayName("Test status for file modified after commit")
+    void getFileStatusForModifiedFile() throws IOException, GitAPIException {
+        // Create a file and commit it first
+        Path filePath = tempDir.resolve("ModifiedTest.txt");
+        Files.createFile(filePath);
+        Files.writeString(filePath, "Initial content");
+        
+        try (Git git = Git.open(tempDir.toFile())) {
+            git.add().addFilepattern(filePath.getFileName().toString()).call();
+        }
+        gitHandler.createCommitOnCurrentBranch("Add test file", false);
+
+        // Modify the file
+        Files.writeString(filePath, "Modified content");
+
+        // Check status (should be MODIFIED)
+        GitHandler.GitStatus status = gitHandler.getFileStatus(filePath);
+        assertEquals(GitHandler.GitStatus.MODIFIED, status, "Modified file after commit should have MODIFIED status");
+    }
+
+    @Test
     @DisplayName("Test Git status detection in BibDatabaseContext")
     void testBibDatabaseContextGitStatus() throws IOException, GitAPIException {
         // Create test file
