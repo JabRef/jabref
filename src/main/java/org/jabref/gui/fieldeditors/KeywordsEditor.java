@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -42,7 +43,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
