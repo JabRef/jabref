@@ -3,6 +3,10 @@ package org.jabref.logic.journals;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * This class provides functionality for managing journal abbreviations.
+ * <a href="https://docs.jabref.org/setup/journal-abbreviations">JabRef Journal Abbreviations Documentation</a>
+ */
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
@@ -71,6 +75,10 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         return getShortestUniqueAbbreviation().compareTo(toCompare.getShortestUniqueAbbreviation());
     }
 
+    /**
+     * @param current the current representation of the journal abbreviation.
+     * @return The next representation in the abbreviation cycle.
+     */
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
