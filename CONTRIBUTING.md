@@ -5,7 +5,7 @@ General overview about contributing for non-programmers is available at <https:/
 We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below.
 If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
-**JabRef regards contributors as [software developers not as programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
+**JabRef regards its contributors as [software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
 As one consequence, for non-basic issues, you will have to work on the requirements side, too.
 
 Before you start, get the JabRef code on your local machine.
@@ -34,20 +34,20 @@ We collect good issues to start with at our [list of unassigned good first issue
 
 ### I am a student and I want to choose from a curated list of university projects
 
-Additionally to "good first issues", we offer curated issues to work from.
-We categorize them in "small", "medium", and "large".
+Apart from "good first issues", we also offer collections of curated issues to work on.
+We categorize them into "small", "medium", and "large".
 All of them are intended to
 a) bring you closer to a larger code base with a dedicated issue and
 b) be clear in their description of work.
-Sometimes, you need to refine the requirements:
-We see contributors as software developers and [not as programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html).
-Thus, you really need work on requirements refinement.
+Sometimes, you may need to refine the requirements:
+We see contributors as software engineers and [not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html).
+Thus, requirement engineering inherently comes up as a part of the process.
 
 Take a look at [JabRef's candidates for university projects](https://github.com/orgs/JabRef/projects/3).
-Here, you get a table of curated issues.
+Here, you will get a table of curated issues.
 The table offers filtering for small, medium, and large projects.
 You can check the main focus (UI, logic, or both), the issue understanding effort, the implementation effort, and testing effort.
-The "issue understanding effort" is an indication how much time you will need to issue before you can do any coding.
+The "issue understanding effort" is an indication of how much time you will need to understand the issue before you can do any coding. It may depend on how easy it is to reproduce the issue, how much background knowledge is needed, etc.
 The "implementation effort" is based on our experience of JabRef development.
 Note that there may be issues with a high effort in understanding, but low implementation effort.
 The challenge of these issues is to understand **where** in the code base something needs to be modified.
