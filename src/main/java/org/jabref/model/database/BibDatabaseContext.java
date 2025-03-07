@@ -275,14 +275,16 @@ public class BibDatabaseContext {
      */
     public Optional<GitHandler.GitStatus> getGitStatus() {
         if (!isUnderVersionControl() || !getDatabasePath().isPresent()) {
+            // if the file is not under version control or does not have a datapath return empty
             return Optional.empty();
         }
 
         try {
-            // Important: do NOT create a new repository when checking status
+            //get the path of the current file, then set false to not create a repo by default
             GitHandler gitHandler = new GitHandler(getDatabasePath().get(), false);
-            return Optional.of(gitHandler.getFileStatus(getDatabasePath().get()));
+            return gitHandler.getFileStatus(getDatabasePath().get());
         } catch (Exception e) {
+            // Silent fail on Git status errors
             return Optional.empty();
         }
     }

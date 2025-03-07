@@ -50,8 +50,9 @@ class GitStatusTesterTest {
         Files.writeString(untrackedFile, "This is an untracked file");
         
         // Verify file status should be UNTRACKED
-        GitHandler.GitStatus status = gitHandler.getFileStatus(untrackedFile);
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status, "Untracked file status should be UNTRACKED");
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(untrackedFile);
+        assertTrue(status.isPresent(), "Status should be present for untracked file");
+        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get(), "Untracked file status should be UNTRACKED");
     }
 
     @Test
@@ -73,8 +74,9 @@ class GitStatusTesterTest {
         }
         
         // Verify file status is STAGED
-        GitHandler.GitStatus status = gitHandler.getFileStatus(stagedFile);
-        assertEquals(GitHandler.GitStatus.STAGED, status, "Newly staged file status should be STAGED");
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(stagedFile);
+        assertTrue(status.isPresent(), "Status should be present for staged file");
+        assertEquals(GitHandler.GitStatus.STAGED, status.get(), "Newly staged file status should be STAGED");
     }
 
     @Test
@@ -92,8 +94,9 @@ class GitStatusTesterTest {
         Files.writeString(modifiedFile, "\nThis is modified content", StandardOpenOption.APPEND);
         
         // Verify file status is MODIFIED
-        GitHandler.GitStatus status = gitHandler.getFileStatus(modifiedFile);
-        assertEquals(GitHandler.GitStatus.MODIFIED, status, "Modified but unstaged file status should be MODIFIED");
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(modifiedFile);
+        assertTrue(status.isPresent(), "Status should be present for modified file");
+        assertEquals(GitHandler.GitStatus.MODIFIED, status.get(), "Modified but unstaged file status should be MODIFIED");
     }
 
     @Test
@@ -108,8 +111,9 @@ class GitStatusTesterTest {
         gitHandler.createCommitOnCurrentBranch("Add committed file", false);
         
         // Verify file status is COMMITTED
-        GitHandler.GitStatus status = gitHandler.getFileStatus(committedFile);
-        assertEquals(GitHandler.GitStatus.COMMITTED, status, "Committed and unmodified file status should be COMMITTED");
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(committedFile);
+        assertTrue(status.isPresent(), "Status should be present for committed file");
+        assertEquals(GitHandler.GitStatus.COMMITTED, status.get(), "Committed and unmodified file status should be COMMITTED");
     }
 
     @Test
@@ -119,9 +123,10 @@ class GitStatusTesterTest {
         Path filePath = tempDir.resolve("NewTest.txt");
         Files.createFile(filePath);
 
-        // Check status (should be UNKNOWN as it's untracked)
-        GitHandler.GitStatus status = gitHandler.getFileStatus(filePath);
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status, "Newly created file status should be UNTRACKED");
+        // Check status for newly created file
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
+        assertTrue(status.isPresent(), "Status should be present for newly created file");
+        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get(), "Newly created file status should be UNTRACKED");
     }
 
     @Test
@@ -141,8 +146,9 @@ class GitStatusTesterTest {
         Files.writeString(filePath, "Modified content");
 
         // Check status (should be MODIFIED)
-        GitHandler.GitStatus status = gitHandler.getFileStatus(filePath);
-        assertEquals(GitHandler.GitStatus.MODIFIED, status, "Modified file after commit should have MODIFIED status");
+        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
+        assertTrue(status.isPresent(), "Status should be present for modified file");
+        assertEquals(GitHandler.GitStatus.MODIFIED, status.get(), "Modified file after commit should have MODIFIED status");
     }
 
     @Test
@@ -185,6 +191,10 @@ class GitStatusTesterTest {
         
         // Verify it's not a Git repository
         assertFalse(nonGitHandler.isGitRepository(), "Should recognize as non-Git repository");
+        
+        // Verify file status is empty for non-Git repository
+        Optional<GitHandler.GitStatus> status = nonGitHandler.getFileStatus(testFile);
+        assertFalse(status.isPresent(), "Status should be empty for file in non-Git repository");
         
         // Clean up
         Files.delete(testFile);

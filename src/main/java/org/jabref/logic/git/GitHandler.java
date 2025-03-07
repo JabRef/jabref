@@ -223,7 +223,6 @@ public class GitHandler {
      * Represents the Git status of a file within a repository
      */
     public enum GitStatus {
-        UNKNOWN("Unknown"),
         MODIFIED("Modified"),
         STAGED("Staged"),
         COMMITTED("Committed"),
@@ -247,24 +246,25 @@ public class GitHandler {
      * Gets the Git status of a file
      *
      * @param filePath The path to the file to check
-     * @return The Git status of the file
+     * @return Optional containing the Git status of the file, or empty if status cannot be determined
      */
-    public GitStatus getFileStatus(Path filePath) {
+    public Optional<GitStatus> getFileStatus(Path filePath) {
         try {
             if (!isGitRepository()) {
-                return GitStatus.UNKNOWN;
+                // if the file is not in a git repository return empty
+                return Optional.empty();
             }
 
             // Check if file exists
             Path absoluteFilePath = filePath.toAbsolutePath().normalize();
             if (!Files.exists(absoluteFilePath)) {
-                return GitStatus.UNKNOWN;
+                return Optional.empty();
             }
 
             // Get relative path in repository
             String relativePath = getRelativePath(filePath);
             if (relativePath.isEmpty()) {
-                return GitStatus.UNKNOWN;
+                return Optional.empty();
             }
 
             try (Git git = Git.open(repositoryPathAsFile)) {
@@ -272,26 +272,26 @@ public class GitHandler {
 
                 // Check for untracked files
                 if (status.getUntracked().contains(relativePath)) {
-                    return GitStatus.UNTRACKED;
+                    return Optional.of(GitStatus.UNTRACKED);
                 }
 
                 // Check for staged files
                 if (status.getAdded().contains(relativePath) || status.getChanged().contains(relativePath)) {
-                    return GitStatus.STAGED;
+                    return Optional.of(GitStatus.STAGED);
                 }
 
                 // Check for modified files
                 if (status.getModified().contains(relativePath)) {
-                    return GitStatus.MODIFIED;
+                    return Optional.of(GitStatus.MODIFIED);
                 }
 
                 // If file is in the repository but not modified, staged, or untracked, it must be committed
-                return GitStatus.COMMITTED;
+                return Optional.of(GitStatus.COMMITTED);
             } catch (GitAPIException | IOException e) {
-                return GitStatus.UNKNOWN;
+                return Optional.empty();
             }
         } catch (Exception e) {
-            return GitStatus.UNKNOWN;
+            return Optional.empty();
         }
     }
 

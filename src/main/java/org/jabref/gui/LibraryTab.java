@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -119,6 +118,16 @@ public class LibraryTab extends Tab {
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    // Mapping of Git status indicators, as a static constant of the class
+    private static final Map<GitHandler.GitStatus, String> GIT_STATUS_INDICATORS = Map.of(
+        GitHandler.GitStatus.MODIFIED, "[Modified]",
+        GitHandler.GitStatus.STAGED, "[Staged]",
+        GitHandler.GitStatus.AHEAD_OF_REMOTE, "[Ahead]",
+        GitHandler.GitStatus.BEHIND_REMOTE, "[Behind]",
+        GitHandler.GitStatus.UP_TO_DATE, "[Up to date]",
+        GitHandler.GitStatus.COMMITTED, "[Committed]",
+        GitHandler.GitStatus.UNTRACKED, "[Untracked]"
+    );
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -294,14 +303,6 @@ public class LibraryTab extends Tab {
         text.append("]");
     }
 
-    private static void addGitStatusInfo(StringBuilder text, GitHandler.GitStatus gitStatus) {
-        if (gitStatus != GitHandler.GitStatus.UNKNOWN) {
-            text.append(" [");
-            text.append(gitStatus.getDisplayName());
-            text.append("]");
-        }
-    }
-
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
@@ -410,58 +411,53 @@ public class LibraryTab extends Tab {
      * <p>
      * Example: *jabref-authors.bib – testbib
      */
+
     public void updateTabTitle(boolean isModified) {
+        // initialize string joiner separate different elements by braces
         StringJoiner tabTitle = new StringJoiner(" ");
 
         try {
             if (bibDatabaseContext.getDatabasePath().isPresent()) {
+                // get the database path
                 Path databasePath = bibDatabaseContext.getDatabasePath().get();
-
                 // Try to get Git status if available
-                if (bibDatabaseContext.isUnderVersionControl() && bibDatabaseContext.getDatabasePath().isPresent()) {
-                    try {
-                        Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
-
-                        if (status.isPresent()) {
-                            GitHandler.GitStatus statusValue = status.get();
-
-                            // Use a map for cleaner code and easier maintenance of status indicators
-                            Map<GitHandler.GitStatus, String> statusIndicators = new HashMap<>();
-                            statusIndicators.put(GitHandler.GitStatus.MODIFIED, "[Modified]");
-                            statusIndicators.put(GitHandler.GitStatus.STAGED, "[Staged]");
-                            statusIndicators.put(GitHandler.GitStatus.AHEAD_OF_REMOTE, "[Ahead]");
-                            statusIndicators.put(GitHandler.GitStatus.BEHIND_REMOTE, "[Behind]");
-                            statusIndicators.put(GitHandler.GitStatus.UP_TO_DATE, "[Up to date]");
-                            statusIndicators.put(GitHandler.GitStatus.COMMITTED, "[Committed]");
-                            statusIndicators.put(GitHandler.GitStatus.UNTRACKED, "[Untracked]");
-
-                            String indicator = statusIndicators.get(statusValue);
-                            if (indicator != null) {
-                                tabTitle.add(indicator);
-                            }
-                        }
-                    } catch (Exception e) {
-                        // Silent fail on Git status errors
-                    }
-                }
-
+                addGitStatusToTitle(tabTitle);
                 // Regular tab title with file name
                 String fileNamePart = databasePath.getFileName().toString();
                 tabTitle.add(fileNamePart);
-        } else {
+            } else {
                 tabTitle.add(Localization.lang("untitled"));
             }
         } catch (Exception e) {
             tabTitle.add(Localization.lang("untitled"));
-            }
+        }
 
         if (isModified) {
             tabTitle.add("*");
         }
 
-        String finalTitle = tabTitle.toString();
+        setText(tabTitle.toString());
         setGraphic(null);
-        setText(finalTitle);
+    }
+
+    /**
+     * Helper method to add Git status indicator to the tab title
+     *
+     * @param tabTitle The StringJoiner for building the tab title
+     */
+    private void addGitStatusToTitle(StringJoiner tabTitle) {
+        //if the .bib file is not under version control or does not has a datapath then return
+        if (!bibDatabaseContext.isUnderVersionControl() || !bibDatabaseContext.getDatabasePath().isPresent()) {
+            return;
+        }
+
+        try {
+            Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
+            status.map(GIT_STATUS_INDICATORS::get)
+                  .ifPresent(tabTitle::add);
+        } catch (Exception e) {
+            // Silent fail on Git status errors
+        }
     }
 
     @Subscribe
@@ -1210,56 +1206,39 @@ public class LibraryTab extends Tab {
         return tabContainer;
     }
 
+    /**
+     * Starts periodic monitoring of Git status for the database file
+     */
     private void startGitStatusMonitoring() {
-        if (!bibDatabaseContext.isUnderVersionControl()) {
+        if (!bibDatabaseContext.isUnderVersionControl() || !bibDatabaseContext.getDatabasePath().isPresent()) {
             return;
         }
 
         try {
-            if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                Path path = bibDatabaseContext.getDatabasePath().get();
+            // Create a unified status check task
+            Runnable checkGitStatusAndUpdateUI = () -> {
+                try {
+                    // Force refresh of Git status cache
+                    bibDatabaseContext.getGitStatus();
 
-                // Force initial status check
-                bibDatabaseContext.getGitStatus();
+                    // Update UI on JavaFX thread
+                    Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
+                } catch (Exception e) {
+                    // Silent fail
+                }
+            };
 
-                // Update UI immediately with initial status
-                Platform.runLater(() -> {
-                    boolean isModified = changedProperty.getValue();
-                    updateTabTitle(isModified);
-                });
+            // Run initial check
+            checkGitStatusAndUpdateUI.run();
 
-                // Create task for Git status checking
-                Runnable checkGitStatus = () -> {
-                    try {
-                        // Force refresh of Git status cache
-                        bibDatabaseContext.getGitStatus();
-
-                        // Update UI on JavaFX thread
-                        Platform.runLater(() -> {
-                            boolean isModified = changedProperty.getValue();
-                            updateTabTitle(isModified);
-                        });
-                    } catch (Exception e) {
-                        // Silent fail
-                    }
-                };
-
-                // Create the scheduled task as a pausable timer using JavaFX
-                PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(5));
-                gitStatusTimer.setOnFinished(event -> {
-                    // Run the check
-                    checkGitStatus.run();
-
-                    // Reset the timer duration to 30 seconds for subsequent checks
-                    gitStatusTimer.setDuration(Duration.seconds(10));
-
-                    // Restart the timer
-                    gitStatusTimer.play();
-                });
-
-                // Start the timer
-                gitStatusTimer.play();
-            }
+            // Create the scheduled task for periodic updates
+            PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(10));
+            gitStatusTimer.setOnFinished(event -> {
+                checkGitStatusAndUpdateUI.run();
+                gitStatusTimer.play(); // Restart the timer
+            });
+            // Start periodic monitoring
+            gitStatusTimer.play();
         } catch (Exception e) {
             // Silent fail
         }
