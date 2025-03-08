@@ -12,7 +12,7 @@ import org.jabref.model.strings.StringUtil;
  * */
 public class GroupMerger implements FieldMerger {
     public static final String GROUPS_SEPARATOR = ", ";
-    public static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
+    public static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("[;,]\\s*");
 
     @Override
     public String merge(String groupsA, String groupsB) {
@@ -23,9 +23,13 @@ public class GroupMerger implements FieldMerger {
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
         } else {
+            groupsA = groupsA.trim();
+            groupsB = groupsB.trim();
+
             return Arrays.stream(GROUPS_SEPARATOR_REGEX.split(groupsA + GROUPS_SEPARATOR + groupsB))
-                         .distinct()
-                         .collect(Collectors.joining(GROUPS_SEPARATOR));
+                    .map(String::trim)
+                    .distinct()
+                    .collect(Collectors.joining(GROUPS_SEPARATOR));
         }
     }
 }
