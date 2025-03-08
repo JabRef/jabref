@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import javafx.animation.PauseTransition;
@@ -149,7 +148,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return null;
         }
         // Convert the string path to a Path object
-        Path resolvedPath = Paths.get(path);
+        Path resolvedPath = Path.of(path);
 
         // Check if the path is absolute
         if (resolvedPath.isAbsolute()) {
