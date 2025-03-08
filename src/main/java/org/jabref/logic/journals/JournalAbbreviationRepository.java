@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -146,9 +147,24 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
-        return customAbbreviations.stream()
-                                  .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
-                                  .min(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())));
+        List<Abbreviation> candidates = customAbbreviations.stream()
+                                                           .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                                                           .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
+                                                           .toList();
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (candidates.size() > 1) {
+            double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.get(0).getName());
+            double secondDistance = similarity.editDistanceIgnoreCase(input, candidates.get(1).getName());
+
+            if (Math.abs(bestDistance - secondDistance) < 1.0) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(candidates.get(0));
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
