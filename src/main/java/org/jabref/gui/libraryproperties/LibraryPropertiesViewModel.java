@@ -14,11 +14,7 @@ public class LibraryPropertiesViewModel {
 
     private final List<PropertiesTab> propertiesTabs;
 
-    private final GeneralPropertiesView generalPropertiesView;  // Reference to GeneralPropertiesView
-
     public LibraryPropertiesViewModel(BibDatabaseContext databaseContext) {
-        generalPropertiesView = new GeneralPropertiesView(databaseContext);  // Initialize the GeneralPropertiesView
-
         propertiesTabs = List.of(
                 new GeneralPropertiesView(databaseContext),
                 new SavingPropertiesView(databaseContext),
