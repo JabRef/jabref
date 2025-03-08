@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.util.strings.StringSimilarity;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
@@ -69,6 +70,16 @@ public class JournalAbbreviationRepository {
         shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
     }
 
+    /**
+     * Constructor for testing purposes, allowing a predefined abbreviations to be injected.
+     *
+     * @param abbreviations The Map of abbreviations to use for testing.
+     */
+    @VisibleForTesting
+    public JournalAbbreviationRepository(Map<String, Abbreviation> abbreviations) {
+        this.fullToAbbreviationObject.putAll(abbreviations);
+    }
+
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
                 || name.equalsIgnoreCase(abbreviation.getAbbreviation())
@@ -89,17 +100,25 @@ public class JournalAbbreviationRepository {
     /**
      * Returns true if the given journal name is contained in the list either in its full form
      * (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
+     * If the exact match is not found, attempts a fuzzy match to recognize minor input errors.
      */
     public boolean isKnownName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
-        return customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation))
+        boolean exactMatch = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation))
                 || fullToAbbreviationObject.containsKey(journal)
                 || abbreviationToAbbreviationObject.containsKey(journal)
                 || dotlessToAbbreviationObject.containsKey(journal)
                 || shortestUniqueToAbbreviationObject.containsKey(journal);
+
+        if (exactMatch) {
+            return true;
+        }
+
+        // If no exact match is found, attempt fuzzy matching
+        return findAbbreviationFuzzyMatched(journal).isPresent();
     }
 
     /**
@@ -147,10 +166,11 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
-        List<Abbreviation> candidates = customAbbreviations.stream()
-                                                           .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
-                                                           .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
-                                                           .toList();
+        List<Abbreviation> candidates = fullToAbbreviationObject.values().stream()
+                .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
+                .toList();
+
         if (candidates.isEmpty()) {
             return Optional.empty();
         }
