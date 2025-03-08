@@ -1,13 +1,16 @@
 package org.jabref.gui;
 
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.frame.FileHistoryMenu;
@@ -70,6 +73,19 @@ public class WelcomeTab extends Tab {
 
         HBox welcomeMainContainer = new HBox(20);
         welcomeMainContainer.setAlignment(Pos.CENTER);
+
+        welcomeMainContainer.setPadding(new Insets(10, 10, 10, 50));
+
+        ScrollPane scrollPane = new ScrollPane(welcomeMainContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        scrollPane.widthProperty().addListener((_, _, newWidth) -> {
+            double dynamicPadding = Math.max(20, newWidth.doubleValue() * 0.05);
+            welcomeMainContainer.setPadding(new Insets(10, 10, 10, dynamicPadding));
+        });
+
+        setContent(new StackPane(scrollPane));
 
         VBox welcomeBox = createWelcomeBox();
         VBox startBox = createWelcomeStartBox();
