@@ -280,7 +280,7 @@ public class BibDatabaseContext {
         }
 
         try {
-            //get the path of the current file, then set false to not create a repo by default
+            // get the path of the current file, then set false to not create a repo by default
             GitHandler gitHandler = new GitHandler(getDatabasePath().get(), false);
             return gitHandler.getFileStatus(getDatabasePath().get());
         } catch (Exception e) {

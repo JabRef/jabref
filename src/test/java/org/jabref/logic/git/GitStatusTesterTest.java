@@ -39,6 +39,7 @@ class GitStatusTesterTest {
     @DisplayName("Test Git repository initialization and detection")
     void testGitRepositoryInitialization() {
         // Verify GitHandler correctly initializes repository
+        // test isGitRepository()
         assertTrue(gitHandler.isGitRepository(), "Repository should be successfully initialized");
     }
 
