@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -92,6 +93,49 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         databaseContext.setMetaData(newMetaData);
+    }
+
+    // Method to validate each directory path
+    private boolean validateDirectory(String path, String pathType) {
+        if (path == null || path.isEmpty()) {
+            return true; // Allow empty input (default path)
+        }
+
+        Path resolvedPath = resolvePath(path);
+        if (resolvedPath != null && Files.exists(resolvedPath)) {
+            return true;
+        } else {
+            // Show error notification
+            dialogService.notify(Localization.lang("The path for %0 ('%1') does not exist.", pathType, path));
+            return false;
+        }
+    }
+
+    private Path resolvePath(String path) {
+        if (path == null || path.isEmpty()) {
+            // Handle null or empty path
+            return null;
+        }
+        // Convert the string path to a Path object
+        Path resolvedPath = Paths.get(path);
+
+        // Check if the path is absolute
+        if (resolvedPath.isAbsolute()) {
+            return resolvedPath; // Return absolute path as is
+        }
+        // Get the Optional<Path> from the databaseContext
+        Optional<Path> optionalBasePath = databaseContext.getDatabasePath();
+
+        // Check if the basePath is present
+        // If the path is relative, resolve it against the databasePath (if available)
+        if (optionalBasePath.isPresent()) {
+            Path filePath = optionalBasePath.get();
+            Path basePath = filePath.getParent();
+            return basePath.resolve(resolvedPath).normalize(); // Resolve and normalize
+        } else {
+            // If there's no base path, treat the relative path as invalid
+            return null;
+        }
     }
 
     public void browseLibrarySpecificDir() {
