@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
@@ -44,12 +46,19 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
+    private PauseTransition pauseTransition;
 
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
+
+        this.pauseTransition = new PauseTransition(Duration.millis(1200)); // Adjust delay as needed
+
+        addValidationListener(librarySpecificDirectoryProperty, "Library Specific");
+        addValidationListener(userSpecificFileDirectoryProperty, "User Specific");
+        addValidationListener(laTexFileDirectoryProperty, "LaTeX");
     }
 
     @Override
@@ -93,6 +102,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         databaseContext.setMetaData(newMetaData);
+    }
+
+    private void addValidationListener(StringProperty pathProperty, String pathType) {
+        pathProperty.addListener((observable, oldValue, newValue) -> {
+            pauseTransition.stop();
+            pauseTransition.setOnFinished(event -> validateDirectory(newValue, pathType));
+            pauseTransition.playFromStart(); // Reset and start the delay timer
+        });
+    }
+
+    // Method to validate all directory paths
+    public boolean validatePaths() {
+        return validateDirectory(librarySpecificDirectoryProperty.get(), "Library Specific") &&
+                validateDirectory(userSpecificFileDirectoryProperty.get(), "User Specific") &&
+                validateDirectory(laTexFileDirectoryProperty.get(), "LaTeX");
     }
 
     // Method to validate each directory path
