@@ -446,7 +446,7 @@ public class LibraryTab extends Tab {
      * @param tabTitle The StringJoiner for building the tab title
      */
     private void addGitStatusToTitle(StringJoiner tabTitle) {
-        //if the .bib file is not under version control or does not has a datapath then return
+        // if the .bib file is not under version control or does not has a datapath then return
         if (!bibDatabaseContext.isUnderVersionControl() || !bibDatabaseContext.getDatabasePath().isPresent()) {
             return;
         }

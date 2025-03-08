@@ -250,14 +250,15 @@ public class GitHandler {
      */
     public Optional<GitStatus> getFileStatus(Path filePath) {
         try {
-            if (!isGitRepository()) {
-                // if the file is not in a git repository return empty
-                return Optional.empty();
-            }
 
             // Check if file exists
             Path absoluteFilePath = filePath.toAbsolutePath().normalize();
             if (!Files.exists(absoluteFilePath)) {
+                return Optional.empty();
+            }
+
+            if (!isGitRepository()) {
+                // if the file is not in a git repository return empty
                 return Optional.empty();
             }
 

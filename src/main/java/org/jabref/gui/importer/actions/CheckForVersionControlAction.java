@@ -68,23 +68,6 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             // Check if file is in a git repository
             if (gitHandler.isGitRepository()) {
                 parserResult.getDatabaseContext().setUnderVersionControl(true);
-
-                // Mark that the database is under version control
-                if (parserResult.getDatabaseContext().getDatabase().hasEntries() && gitHandler.isGitRepository()) {
-                    try {
-                        boolean pullSuccessful = gitHandler.pullOnCurrentBranch();
-
-                        if (pullSuccessful) {
-                            dialogService.showInformationDialogAndWait(
-                                    "Git Repository",
-                                    "Successfully synchronized with Git repository");
-                        }
-                    } catch (Exception e) {
-                        dialogService.showErrorDialogAndWait(
-                                "Git Repository Error",
-                                "Could not pull changes from Git repository: " + e.getMessage());
-                    }
-                }
             }
         } catch (Exception e) {
             dialogService.showErrorDialogAndWait(
