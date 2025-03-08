@@ -176,7 +176,7 @@ public class JournalAbbreviationRepository {
         }
 
         if (candidates.size() > 1) {
-            double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.get(0).getName());
+            double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.getFirst().getName());
             double secondDistance = similarity.editDistanceIgnoreCase(input, candidates.get(1).getName());
 
             if (Math.abs(bestDistance - secondDistance) < 1.0) {
@@ -184,7 +184,7 @@ public class JournalAbbreviationRepository {
             }
         }
 
-        return Optional.of(candidates.get(0));
+        return Optional.of(candidates.getFirst());
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
