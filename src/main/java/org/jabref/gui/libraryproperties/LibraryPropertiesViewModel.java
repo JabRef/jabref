@@ -14,7 +14,11 @@ public class LibraryPropertiesViewModel {
 
     private final List<PropertiesTab> propertiesTabs;
 
+    private final GeneralPropertiesView generalPropertiesView;  // Reference to GeneralPropertiesView
+
     public LibraryPropertiesViewModel(BibDatabaseContext databaseContext) {
+        generalPropertiesView = new GeneralPropertiesView(databaseContext);  // Initialize the GeneralPropertiesView
+
         propertiesTabs = List.of(
                 new GeneralPropertiesView(databaseContext),
                 new SavingPropertiesView(databaseContext),
@@ -31,10 +35,20 @@ public class LibraryPropertiesViewModel {
         }
     }
 
-    public void storeAllSettings() {
+    public boolean storeAllSettings() {
+        boolean allValid = true;
+
+        // Loop through all properties tabs
         for (PropertiesTab propertiesTab : propertiesTabs) {
-            propertiesTab.storeSettings();
+            if (!propertiesTab.validateSettings()) {
+                allValid = false;  // If any validation fails, mark as invalid
+                continue;
+            }
+
+            propertiesTab.storeSettings();  // If valid, store settings for this tab
         }
+
+        return allValid;  // Return true if all tabs were valid and settings were stored, otherwise false
     }
 
     public List<PropertiesTab> getPropertiesTabs() {

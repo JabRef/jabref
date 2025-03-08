@@ -104,6 +104,14 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         databaseContext.setMetaData(newMetaData);
     }
 
+    /**
+     * @noinspection checkstyle:WhitespaceAround
+     * * */
+    @Override
+    public boolean validateSettings() {
+        return validatePaths();
+    }
+
     private void addValidationListener(StringProperty pathProperty, String pathType) {
         pathProperty.addListener((observable, oldValue, newValue) -> {
             pauseTransition.stop();
