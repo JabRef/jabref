@@ -7,16 +7,42 @@ grand_parent: Code Howtos
 
 For user documentation, see <https://docs.jabref.org/collaborative-work/sqldatabase>.
 
+## Involved classes
+
+* `org.jabref.logic.shared.listener.PostgresSQLNotificationListener`: handles and routes notifications from the PostgreSQL database to the `DBMSSynchronizer`.
+
+## Flow of calls
+
+The idea is to "publish" the change event with data both locally and remotely.
+The change event should contain the new value, which can be directly applied remotely.
+The change event should contain the old value to enable sanity checks while applying the change.
+
+```mermaid
+sequenceDiagram
+  BibEntry (A)->>DBMSSynchronizer (A): "FieldChangedEvent"
+```
+
 ## Handling large shared databases
 
-Synchronization times may get long when working with a large database containing several thousand entries. Therefore, synchronization only happens if several conditions are fulfilled:
+Synchronization times may get long when working with a large database containing several thousand entries.
+Therefore, we use PostgreSQL's `LISTEN` and `NOTIFY` commands to inform the client about changes in the database on an entry level.
+
+Background reading: <https://www.baeldung.com/spring-postgresql-message-broker>.
+
+## Handling synchronization of "micro-edits"
+
+It causes too much load both on the server and at all subscribed clients to synchronize every single letter change.
+Therefore, synchronization only happens if several conditions are fulfilled:
 
 * Edit to another field.
 * Major changes have been made (pasting or deleting more than one character).
 
 Class `org.jabref.logic.util.CoarseChangeFilter.java` checks both conditions.
 
-Remaining changes that have not been synchronized yet are saved at closing the database rendering additional closing time. Saving is realized in `org.jabref.logic.shared.DBMSSynchronizer.java`. Following methods account for synchronization modes:
+Remaining changes that have not been synchronized yet are saved at closing the database rendering additional closing time.
+Saving is realized in `org.jabref.logic.shared.DBMSSynchronizer.java`.
+
+Following methods account for synchronization modes:
 
 * `pullChanges` synchronizes the database unconditionally.
 * `pullLastEntryChanges` synchronizes only if there are remaining entry changes. It is invoked when closing the shared database (`closeSharedDatabase`).
@@ -61,3 +87,8 @@ PostgreSQL supports to register listeners on the database on changes.
 The listening is implemented at [`org.jabref.logic.shared.listener.PostgresSQLNotificationListener`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/logic/shared/listener/PostgresSQLNotificationListener.java#L16).
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.
+
+## Tests
+
+Tests are executed using [Zonky Embedded Postgres](https://github.com/zonkyio/embedded-postgres).
+This installs and runs a PostgreSQL server and frees the developer from the need to install a PostgreSQL server on the local machine.
