@@ -25,6 +25,8 @@ public enum FieldProperty {
 
     MONTH,
 
+    YEARDIVISION,
+
     MULTILINE_TEXT,
     NUMERIC,
     PAGINATION,
