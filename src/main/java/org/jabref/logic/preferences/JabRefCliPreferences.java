@@ -424,6 +424,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
     private GitPreferences gitPreferences;
 
+    private boolean autoPullEnabled;
+
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
      */
@@ -2252,6 +2254,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getXmpPreferences(),
                 getDOIPreferences(),
                 getGrobidPreferences());
+    }
+
+    public boolean shouldAutoPull() {
+        return autoPullEnabled;
     }
 
     // endregion

@@ -68,7 +68,8 @@ public interface CliPreferences {
     ImportFormatPreferences getImportFormatPreferences();
 
     /**
-     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+     * Returns the export configuration. The contained SaveConfiguration is a
+     * {@link org.jabref.model.metadata.SelfContainedSaveOrder}
      */
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
@@ -117,6 +118,6 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
-
+  
     GitPreferences getGitPreferences();
 }
