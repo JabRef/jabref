@@ -106,19 +106,7 @@ public class JournalAbbreviationRepository {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
-        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
-        boolean exactMatch = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation))
-                || fullToAbbreviationObject.containsKey(journal)
-                || abbreviationToAbbreviationObject.containsKey(journal)
-                || dotlessToAbbreviationObject.containsKey(journal)
-                || shortestUniqueToAbbreviationObject.containsKey(journal);
-
-        if (exactMatch) {
-            return true;
-        }
-
-        // If no exact match is found, attempt fuzzy matching
-        return findAbbreviationFuzzyMatched(journal).isPresent();
+        return get(journalName).isPresent();
     }
 
     /**
