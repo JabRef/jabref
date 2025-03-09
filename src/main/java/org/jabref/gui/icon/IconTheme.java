@@ -298,6 +298,8 @@ public class IconTheme {
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
+        MASTODON(MaterialDesignM.MASTODON),
+        LINKEDIN(MaterialDesignL.LINKEDIN),
         TWITTER(MaterialDesignT.TWITTER),
         BLOG(MaterialDesignR.RSS),
         DATE_PICKER(MaterialDesignC.CALENDAR),
@@ -364,7 +366,7 @@ public class IconTheme {
         CONSISTENCY_UNSET_FIELD(MaterialDesignM.MINUS),
         CONSISTENCY_REQUIRED_FIELD(MaterialDesignC.CLOSE),
         CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
-        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP);
+        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),;
 
         private final JabRefIcon icon;
 

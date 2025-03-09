@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the "Copy Preview" button to "Copy citation (html) in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - Pressing Tab in empty text fields of the entry editor now moves the focus to the next field instead of inserting a tab character. [#11938](https://github.com/JabRef/jabref/issues/11938)
 - The embedded PostgresSQL server for the search now supports Linux and macOS ARM based distributions natively [#12607](https://github.com/JabRef/jabref/pull/12607)
+- Replaced Twitter with Mastodon and added LinkedIn link in the social media section. [#12660](https://github.com/JabRef/jabref/issues/12660)
 
 ### Fixed
 
