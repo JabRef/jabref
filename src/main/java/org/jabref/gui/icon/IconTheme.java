@@ -298,6 +298,8 @@ public class IconTheme {
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
+        MASTODON(MaterialDesignM.MASTODON),
+        LINKEDIN(MaterialDesignL.LINKEDIN),
         TWITTER(MaterialDesignT.TWITTER),
         BLOG(MaterialDesignR.RSS),
         DATE_PICKER(MaterialDesignC.CALENDAR),
