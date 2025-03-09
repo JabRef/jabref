@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+
+import org.jabref.logic.util.Directories;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +74,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, new SimpleStringProperty(Directories.getJournalAbbreviationsDirectory().toString())));
     }
 }
