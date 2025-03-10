@@ -214,4 +214,13 @@ public class GitHandler {
             return git.getRepository().getBranch();
         }
     }
+
+    public void postSaveDatabaseAction() {
+        try {
+            this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+            this.pushCommitsToRemoteRepository();
+        } catch (Exception e) {
+            LOGGER.info("Failed to push");
+        }
+    }
 }
