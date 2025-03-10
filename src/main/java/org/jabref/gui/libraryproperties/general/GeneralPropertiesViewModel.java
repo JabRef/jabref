@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
@@ -45,16 +44,11 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
 
-    private final ObjectProperty<Tooltip> userSpecificFileDirectoryTooltip = new SimpleObjectProperty<>(new Tooltip());
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
-    }
-
-    public ObjectProperty<Tooltip> userSpecificFileDirectoryTooltipProperty() {
-        return this.userSpecificFileDirectoryTooltip;
     }
 
     @Override
@@ -67,9 +61,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
-        Tooltip tooltip = new Tooltip();
-        tooltip.setStyle("-fx-font-size: 12px;"); // Optional styling
-        userSpecificFileDirectoryTooltip.set(tooltip);
     }
 
     @Override
