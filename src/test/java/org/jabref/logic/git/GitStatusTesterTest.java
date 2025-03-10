@@ -177,6 +177,97 @@ class GitStatusTesterTest {
         assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
     }
+    
+    @Test
+    @DisplayName("Test isUnderVersionControl method with git repository")
+    void isUnderVersionControlWithGitRepo() throws IOException {
+        // Create test file in git repository
+        Path testFile = tempDir.resolve("version_control_test.bib");
+        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
+        
+        // Set up BibDatabaseContext
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(testFile);
+        
+        // Test auto-detection of version control
+        assertTrue(context.isUnderVersionControl());
+        
+        // Test explicit setting
+        context.setUnderVersionControl(false);
+        assertFalse(context.isUnderVersionControl());
+        
+        context.setUnderVersionControl(true);
+        assertTrue(context.isUnderVersionControl());
+    }
+    
+    @Test
+    @DisplayName("Test isUnderVersionControl method with non-git repository")
+    void isUnderVersionControlWithNonGitRepo() throws IOException {
+        // Create a temporary directory (non-Git repository)
+        Path nonGitDir = Files.createTempDirectory("non-git-dir-test");
+        Path testFile = nonGitDir.resolve("non_git_test.bib");
+        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
+        
+        // Set up BibDatabaseContext
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(testFile);
+        
+        // Test auto-detection of version control
+        assertFalse(context.isUnderVersionControl());
+        
+        // Test explicit setting overrides auto-detection
+        context.setUnderVersionControl(true);
+        assertTrue(context.isUnderVersionControl());
+        
+        // Clean up
+        Files.delete(testFile);
+        Files.delete(nonGitDir);
+    }
+    
+    @Test
+    @DisplayName("Test getGitStatus method with various file states")
+    void getGitStatusMethodTest() throws IOException, GitAPIException {
+        // Create and commit a file
+        Path bibFile = tempDir.resolve("git_status_test.bib");
+        Files.writeString(bibFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
+        
+        try (Git git = Git.open(tempDir.toFile())) {
+            git.add().addFilepattern(bibFile.getFileName().toString()).call();
+        }
+        gitHandler.createCommitOnCurrentBranch("Add test bib file", false);
+        
+        // 1. Test with committed file (should be COMMITTED)
+        BibDatabaseContext committedContext = new BibDatabaseContext();
+        committedContext.setDatabasePath(bibFile);
+        Optional<GitHandler.GitStatus> committedStatus = committedContext.getGitStatus();
+        assertTrue(committedStatus.isPresent());
+        assertEquals(GitHandler.GitStatus.COMMITTED, committedStatus.get());
+        
+        // 2. Test with modified file (should be MODIFIED)
+        Files.writeString(bibFile, "\n@Book{modified, author = {Modified Author}, title = {Modified Title}}", StandardOpenOption.APPEND);
+        BibDatabaseContext modifiedContext = new BibDatabaseContext();
+        modifiedContext.setDatabasePath(bibFile);
+        Optional<GitHandler.GitStatus> modifiedStatus = modifiedContext.getGitStatus();
+        assertTrue(modifiedStatus.isPresent());
+        assertEquals(GitHandler.GitStatus.MODIFIED, modifiedStatus.get());
+        
+        // 3. Test with staged file
+        try (Git git = Git.open(tempDir.toFile())) {
+            git.add().addFilepattern(bibFile.getFileName().toString()).call();
+        }
+        BibDatabaseContext stagedContext = new BibDatabaseContext();
+        stagedContext.setDatabasePath(bibFile);
+        Optional<GitHandler.GitStatus> stagedStatus = stagedContext.getGitStatus();
+        assertTrue(stagedStatus.isPresent());
+        assertEquals(GitHandler.GitStatus.STAGED, stagedStatus.get());
+        
+        // 4. Test with non-existent file
+        Path nonExistentFile = tempDir.resolve("non_existent.bib");
+        BibDatabaseContext nonExistentContext = new BibDatabaseContext();
+        nonExistentContext.setDatabasePath(nonExistentFile);
+        Optional<GitHandler.GitStatus> nonExistentStatus = nonExistentContext.getGitStatus();
+        assertFalse(nonExistentStatus.isPresent());
+    }
 
     @Test
     @DisplayName("Test file status in non-Git repository")
