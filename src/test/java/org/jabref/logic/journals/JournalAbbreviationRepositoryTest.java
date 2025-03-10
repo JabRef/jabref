@@ -1,7 +1,6 @@
 package org.jabref.logic.journals;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.undo.CompoundEdit;
@@ -319,11 +318,12 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void fuzzyMatchEnglish() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("Journal of Physics A", new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"));
-        testAbbreviations.put("Journal of Physics B", new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"));
-        testAbbreviations.put("Journal of Physics C", new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
+        List<Abbreviation> abbreviationsList = List.of(
+                new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"),
+                new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"),
+                new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC")
+        );
+        repository.addCustomAbbreviations(abbreviationsList);
 
         // Ambiguous cases: "Journal of Physics" is too general
         assertTrue(repository.getDefaultAbbreviation("Journal of Physics").isEmpty());
@@ -343,11 +343,13 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void fuzzyMatchChinese() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("中国物理学报", new Abbreviation("中国物理学报", "物理学报", "ZWP"));
-        testAbbreviations.put("中国物理学理", new Abbreviation("中国物理学理", "物理学报报", "ZWP"));
-        testAbbreviations.put("中国科学: 物理学", new Abbreviation("中国科学: 物理学", "中科物理", "ZKP"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
+        List<Abbreviation> abbreviationsList = List.of(
+                new Abbreviation("中国物理学报", "物理学报", "ZWP"),
+                new Abbreviation("中国物理学理", "物理学报报", "ZWP"),
+                new Abbreviation("中国科学: 物理学", "中科物理", "ZKP")
+        );
+        repository.addCustomAbbreviations(abbreviationsList);
+
         // Ambiguous case: "中国物理学" alone is too general
         assertTrue(repository.getDefaultAbbreviation("中国物理学").isEmpty());
 
@@ -363,10 +365,11 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void fuzzyMatchGerman() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("Zeitschrift für Physikalische Chemie", new Abbreviation("Zeitschrift für Physikalische Chemie", "Z. Phys. Chem.", "ZPC"));
-        testAbbreviations.put("Zeitschrift für Angewandte Chemie", new Abbreviation("Zeitschrift für Angewandte Chemie", "Z. Angew. Chem.", "ZAC"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
+        List<Abbreviation> abbreviationsList = List.of(
+                new Abbreviation("Zeitschrift für Physikalische Chemie", "Z. Phys. Chem.", "ZPC"),
+                new Abbreviation("Zeitschrift für Angewandte Chemie", "Z. Angew. Chem.", "ZAC")
+        );
+        repository.addCustomAbbreviations(abbreviationsList);
 
         // Ambiguous case: "Zeitschrift für Chemie" is too general
         assertTrue(repository.getDefaultAbbreviation("Zeitschrift für Chemie").isEmpty());
