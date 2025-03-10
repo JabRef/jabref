@@ -1,6 +1,9 @@
 YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT.
+
 Describe the changes you have made here: what, why, ...
-Closes #xyz. <!-- number of the issue that will be closed -->
+
+<!-- PLEASE LINK THE ISSUE WITH THE "Closes" KEYWORD -->
+<!-- Example: Closes (link) OR Closes #xyz -->
 
 ### Mandatory checks
 
