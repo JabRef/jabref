@@ -13,7 +13,7 @@ public class FieldMergerFactory {
 
     public FieldMerger create(Field field) {
         return switch (field) {
-            case StandardField.GROUPS -> new GroupMerger();
+            case StandardField.GROUPS -> new GroupMerger(bibEntryPreferences);
             case StandardField.KEYWORDS -> new KeywordMerger(bibEntryPreferences);
             case StandardField.COMMENT -> new CommentMerger();
             case StandardField.FILE -> new FileMerger();
