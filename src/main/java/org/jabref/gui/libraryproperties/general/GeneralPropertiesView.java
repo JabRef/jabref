@@ -1,10 +1,13 @@
 package org.jabref.gui.libraryproperties.general;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -22,6 +25,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
+    @FXML private Tooltip userSpecificFileTooltip;
 
     @Inject private CliPreferences preferences;
 
@@ -57,6 +61,17 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        String username = System.getProperty("user.name"); // Get system username
+        // Get hostname
+        String hostname = "Unknown Host"; // Default value in case of error
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace(); // Print error if hostname retrieval fails
+        }
+
+        userSpecificFileTooltip.setText("User: " + username + " | Host: " + hostname);
+       // userSpecificFileTooltip.textProperty().bind(viewModel.userSpecificFileDirectoryTooltipProperty().get().textProperty());
     }
 
     @FXML

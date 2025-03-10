@@ -47,9 +47,19 @@
         </Button>
 
         <Label text="%User-specific file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+               fx:id="userSpecificFileLabel"
+               GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip fx:id="userSpecificFileTooltip"/>
+            </tooltip>
+        </Label>
+
         <TextField fx:id="userSpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"
+        />
+
+
+
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="2">
@@ -86,6 +96,5 @@
                GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <ComboBox fx:id="encoding" prefWidth="150.0"
                   GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6"/>
-
     </GridPane>
 </fx:root>
