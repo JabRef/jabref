@@ -1,6 +1,8 @@
 package org.jabref.logic.journals;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.swing.undo.CompoundEdit;
 
@@ -16,6 +18,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -313,5 +317,59 @@ class JournalAbbreviationRepositoryTest {
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "Physical Review B");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAbbreviationTestCases")
+    void fuzzyMatch(List<Abbreviation> abbreviationList, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
+        repository.addCustomAbbreviations(abbreviationList);
+
+        assertEquals(expectedAbbreviation, repository.getDefaultAbbreviation(input).orElse("WRONG"));
+
+        assertEquals(expectedDotless, repository.getDotless(input).orElse("WRONG"));
+
+        assertEquals(expectedShortest, repository.getShortestUniqueAbbreviation(input).orElse("WRONG"));
+
+        assertTrue(repository.getDefaultAbbreviation(ambiguousInput).isEmpty());
+    }
+
+    static Stream<Object[]> provideAbbreviationTestCases() {
+        return Stream.of(
+                new Object[]{
+                        List.of(
+                                new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"),
+                                new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"),
+                                new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC")
+                        ),
+                        "ournal f hysics A",
+                        "J. Phys. A",
+                        "J Phys A",
+                        "JPA",
+                        "Journal of Physics"
+                },
+                new Object[]{
+                        List.of(
+                                new Abbreviation("中国物理学报", "物理学报", "ZWP"),
+                                new Abbreviation("中国物理学理", "物理学报报", "ZWP"),
+                                new Abbreviation("中国科学: 物理学", "中科物理", "ZKP")
+                        ),
+                        "国物理学报",
+                        "物理学报",
+                        "物理学报",
+                        "ZWP",
+                        "中国物理学"
+                },
+                new Object[]{
+                        List.of(
+                                new Abbreviation("Zeitschrift für Chem", "Z. Phys. Chem.", "ZPC"),
+                                new Abbreviation("Zeitschrift für Phys", "Z. Angew. Chem.", "ZAC")
+                        ),
+                        "eitschrift ür Chem",
+                        "Z. Phys. Chem.",
+                        "Z Phys Chem",
+                        "ZPC",
+                        "Zeitschrift für "
+                }
+        );
     }
 }
