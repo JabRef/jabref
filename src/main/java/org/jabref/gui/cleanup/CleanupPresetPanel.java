@@ -68,8 +68,7 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
-        String currentPattern = Localization.lang("Filename format pattern")
-                                            .concat(": ")
+        String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
 

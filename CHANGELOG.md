@@ -11,18 +11,30 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a feature to rename the subgroup, with the keybinding (<kbd>F2</kbd>) for quick access. [#11896](https://github.com/JabRef/jabref/issues/11896)
 - We added a new functionality that displays a drop-down list of matching suggestions when typing a citation key pattern. [#12502](https://github.com/JabRef/jabref/issues/12502)
 - We added a new CLI that supports txt, csv, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/issues/11984)
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
+- We added a new "Copy citation (text)" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
+- We added a new "Export to clipboard" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 - We added batch fetching of bibliographic data for multiple entries in the "Lookup" menu. [#12275](https://github.com/JabRef/jabref/issues/12275)
+- We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
+- We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 
 ### Changed
 
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
+- We renamed "Rename file to a given name" to "Rename files to configured filename format pattern" in the entry editor. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move DOIs from note and URL field to DOI field and remove http prefix" to "Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move preprint information from 'URL' and 'journal' field to the 'eprint' field" to "Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Move URL in note field to url field" to "Move URL in 'note' field to 'URL' field" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Rename PDFs to given filename format pattern" to "Rename files to configured filename format pattern" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Rename only PDFs having a relative path" to "Only rename files that have a relative path" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
+- We renamed "Filename format pattern: " to "Filename format pattern (from preferences)" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
 - When working with CSL styles in LibreOffice, citing with a new style now updates all other citations in the document to have the currently selected style. [#12472](https://github.com/JabRef/jabref/pull/12472)
 - We improved the user comments field visibility so that it remains displayed if it contains text. Additionally, users can now easily toggle the field on or off via buttons unless disabled in preferences. [#11021](https://github.com/JabRef/jabref/issues/11021)
 - The LibreOffice integration for CSL styles is now more performant. [#12472](https://github.com/JabRef/jabref/pull/12472)
@@ -30,7 +42,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - For the Citation key generator patterns, we reverted how `[authorsAlpha]` would behave to the original pattern and renamed the LNI-based pattern introduced in V6.0-alpha to `[authorsAlphaLNI]`. [#12499](https://github.com/JabRef/jabref/pull/12499)
 - We keep the list of recent files if one files could not be found. [#12517](https://github.com/JabRef/jabref/pull/12517)
 - During the import process, the labels indicating individual paragraphs within an abstract returned by PubMed/Medline XML are preserved. [#12527](https://github.com/JabRef/jabref/issues/12527)
+- We changed the "Copy Preview" button to "Copy citation (html) in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - Pressing Tab in empty text fields of the entry editor now moves the focus to the next field instead of inserting a tab character. [#11938](https://github.com/JabRef/jabref/issues/11938)
+- The embedded PostgresSQL server for the search now supports Linux and macOS ARM based distributions natively [#12607](https://github.com/JabRef/jabref/pull/12607)
 
 ### Fixed
 
@@ -50,8 +64,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where CSL style citations with citation keys having special characters (such as hyphens or colons) would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
 - We fixed an issue where the `[authorsAlpha]` pattern in Citation key generator would not behave as per the user documentation. [#12312](https://github.com/JabRef/jabref/issues/12312)
 - We fixed an issue where import at "Search for unlinked local files" would re-add already imported files. [#12274](https://github.com/JabRef/jabref/issues/12274)
+- We fixed an issue where month values 21–24 (ISO 8601-2019 season codes) in Biblatex date fields were not recognized as seasons during parsing. [#12437](https://github.com/JabRef/jabref/issues/12437)
 - We fixed an issue where migration of "Search groups" would fail with an exception when the search query is invalid. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
+- We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
+
 
 ### Removed
 
