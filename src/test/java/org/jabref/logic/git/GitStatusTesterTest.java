@@ -51,7 +51,7 @@ class GitStatusTesterTest {
 
         // Verify file status should be UNTRACKED
         Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(untrackedFile);
-        assertTrue(status.isPresent(), "Status should be present for untracked file");
+        assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.UNTRACKED, status.get(), "Untracked file status should be UNTRACKED");
     }
 
@@ -75,7 +75,7 @@ class GitStatusTesterTest {
 
         // Verify file status is STAGED
         Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(stagedFile);
-        assertTrue(status.isPresent(), "Status should be present for staged file");
+        assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.STAGED, status.get(), "Newly staged file status should be STAGED");
     }
 
