@@ -154,6 +154,7 @@ You can click on failing checks to see more information about why they failed.
 Then, please look into them and handle accordingly.
 
 Afterwards, you will receive comments on your pull request.
+Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
 The pull request may be approved immediatly, or a reviewer may request changes.
 In that case, please implement the requested changes.
 
