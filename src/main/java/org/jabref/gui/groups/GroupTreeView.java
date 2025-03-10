@@ -172,6 +172,7 @@ public class GroupTreeView extends BorderPane {
                 }
             }
         });
+        groupTree.disableProperty().bind(groupsDisabledProperty());
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
