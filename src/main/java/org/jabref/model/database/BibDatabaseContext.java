@@ -274,7 +274,7 @@ public class BibDatabaseContext {
      * @return The Git status if the database is under version control, or empty if not.
      */
     public Optional<GitHandler.GitStatus> getGitStatus() {
-        if (!isUnderVersionControl() || !getDatabasePath().isPresent()) {
+        if (!isUnderVersionControl() || getDatabasePath().isEmpty()) {
             // if the file is not under version control or does not have a datapath return empty
             return Optional.empty();
         }
@@ -294,7 +294,7 @@ public class BibDatabaseContext {
      */
     public boolean isUnderVersionControl() {
         if (underVersionControl == null) {
-            if (!getDatabasePath().isPresent()) {
+            if (getDatabasePath().isEmpty()) {
                 underVersionControl = false;
                 return false;
             }

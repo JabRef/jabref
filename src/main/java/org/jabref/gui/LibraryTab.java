@@ -447,7 +447,7 @@ public class LibraryTab extends Tab {
      */
     private void addGitStatusToTitle(StringJoiner tabTitle) {
         // if the .bib file is not under version control or does not has a datapath then return
-        if (!bibDatabaseContext.isUnderVersionControl() || !bibDatabaseContext.getDatabasePath().isPresent()) {
+        if (!bibDatabaseContext.isUnderVersionControl() || bibDatabaseContext.getDatabasePath().isEmpty()) {
             return;
         }
 
@@ -1210,7 +1210,7 @@ public class LibraryTab extends Tab {
      * Starts periodic monitoring of Git status for the database file
      */
     private void startGitStatusMonitoring() {
-        if (!bibDatabaseContext.isUnderVersionControl() || !bibDatabaseContext.getDatabasePath().isPresent()) {
+        if (!bibDatabaseContext.isUnderVersionControl() || bibDatabaseContext.getDatabasePath().isEmpty()) {
             return;
         }
 

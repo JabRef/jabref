@@ -22,7 +22,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         try {
-            if (!parserResult.getDatabaseContext().getDatabasePath().isPresent()) {
+            if (parserResult.getDatabaseContext().getDatabasePath().isEmpty()) {
                 return false;
             }
 
@@ -56,7 +56,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
 
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        if (!parserResult.getDatabaseContext().getDatabasePath().isPresent()) {
+        if (parserResult.getDatabaseContext().getDatabasePath().isEmpty()) {
             return;
         }
 
