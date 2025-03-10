@@ -45,7 +45,7 @@ public class LibraryResource {
         ParserResult parserResult = getParserResult(id);
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         List<BibEntryDTO> list = parserResult.getDatabase().getEntries().stream()
-                                             .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
+                                             .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedId(Objects.hash(bibEntry)))
                                              .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                              .toList();
         return gson.toJson(list);
