@@ -105,7 +105,7 @@ public class Bootstrap {
      * </pre>
      *
      * @return an array of default commandline options
-     * @see #bootstrap(String[])
+     * @see #bootstrap(String[], Path)
      * @since LibreOffice 5.1
      */
     public static String[] getDefaultOptions() {
