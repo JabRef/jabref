@@ -361,14 +361,14 @@ class JournalAbbreviationRepositoryTest {
                 },
                 new Object[]{
                         List.of(
-                                new Abbreviation("Zeitschrift für Physikalische Chemie", "Z. Phys. Chem.", "ZPC"),
-                                new Abbreviation("Zeitschrift für Angewandte Chemie", "Z. Angew. Chem.", "ZAC")
+                                new Abbreviation("Zeitschrift für Chem", "Z. Phys. Chem.", "ZPC"),
+                                new Abbreviation("Zeitschrift für Phys", "Z. Angew. Chem.", "ZAC")
                         ),
-                        "eitschrift ür hysikalische Chemie",
+                        "eitschrift ür Chem",
                         "Z. Phys. Chem.",
                         "Z Phys Chem",
                         "ZPC",
-                        "Zeitschrift für Chemie"
+                        "Zeitschrift für "
                 }
         );
     }
