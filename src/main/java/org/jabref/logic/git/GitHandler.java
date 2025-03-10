@@ -11,8 +11,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -36,28 +38,40 @@ public class GitHandler {
      * @param repositoryPath The root of the initialized git repository
      */
     public GitHandler(Path repositoryPath) {
+        this(repositoryPath, true);
+    }
+
+    /**
+     * Initialize the handler for the given repository
+     *
+     * @param repositoryPath The root of the initialized git repository
+     * @param createRepo If true, initializes a repository if the file path does not contain a repository
+     */
+    public GitHandler(Path repositoryPath, boolean createRepo) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
-            try {
-                Git.init()
-                   .setDirectory(repositoryPathAsFile)
-                   .setInitialBranch("main")
-                   .call();
-                setupGitIgnore();
-                String initialCommit = "Initial commit";
-                if (!createCommitOnCurrentBranch(initialCommit, false)) {
-                    // Maybe, setupGitIgnore failed and did not add something
-                    // Then, we create an empty commit
-                    try (Git git = Git.open(repositoryPathAsFile)) {
-                        git.commit()
-                           .setAllowEmpty(true)
-                           .setMessage(initialCommit)
-                           .call();
+            if (createRepo) {
+                try {
+                    Git.init()
+                       .setDirectory(repositoryPathAsFile)
+                       .setInitialBranch("main")
+                       .call();
+                    setupGitIgnore();
+                    String initialCommit = "Initial commit";
+                    if (!createCommitOnCurrentBranch(initialCommit, false)) {
+                        // Maybe, setupGitIgnore failed and did not add something
+                        // Then, we create an empty commit
+                        try (Git git = Git.open(repositoryPathAsFile)) {
+                            git.commit()
+                               .setAllowEmpty(true)
+                               .setMessage(initialCommit)
+                               .call();
+                        }
                     }
+                } catch (GitAPIException | IOException e) {
+                    LOGGER.error("Initialization failed");
                 }
-            } catch (GitAPIException | IOException e) {
-                LOGGER.error("Initialization failed");
             }
         }
     }
@@ -76,7 +90,7 @@ public class GitHandler {
     /**
      * Returns true if the given path points to a directory that is a git repository (contains a .git folder)
      */
-    boolean isGitRepository() {
+    public boolean isGitRepository() {
         // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
         // This solution is quite simple but might not work in special cases, for us it should suffice.
         return Files.exists(Path.of(repositoryPath.toString(), ".git"));
@@ -200,6 +214,29 @@ public class GitHandler {
     public String getCurrentlyCheckedOutBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
+        }
+    }
+
+    public static boolean isUnderVersionControl(Path path) {
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+        try {
+            builder.findGitDir(path.toFile());
+            return builder.getGitDir() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static void pullChanges(Path repoPath) {
+        try (Git git = Git.open(repoPath.toFile())) {
+            System.out.println("Pulling latest changes...");
+            git.pull().call();
+            System.out.println("Repository updated successfully.");
+        } catch (RepositoryNotFoundException e) {
+            System.err.println("Not a valid Git repository: " + repoPath);
+        } catch (GitAPIException | IOException e) {
+            System.err.println("Error while pulling changes: " + e.getMessage());
         }
     }
 }

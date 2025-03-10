@@ -116,4 +116,6 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+
+    Object isGitAutoPullEnabled();
 }

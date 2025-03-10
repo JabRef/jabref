@@ -1,14 +1,11 @@
 open module org.jabref {
     // Swing
-    requires java.desktop;
 
     // SQL
     requires java.sql;
     requires java.sql.rowset;
 
     // region JavaFX
-    requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
@@ -193,5 +190,9 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires org.junit.jupiter.api;
+    requires org.mockito;
+    requires org.mockito.junit.jupiter;
+    requires javafx.swing;
     // endregion
 }
