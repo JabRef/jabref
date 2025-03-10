@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -26,6 +25,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -62,13 +62,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
     }
 
-    private void onSelectionChanged(ListChangeListener.Change<? extends ConsistencyMessage> change) {
-        if (change.next()) {
-            change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.showAndEdit(message.bibEntry()));
-        }
-    }
-
     public ConsistencyCheckDialogViewModel getViewModel() {
         return viewModel;
     }
@@ -76,8 +69,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
-
-        tableView.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
 
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
@@ -124,6 +115,22 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                                                  setText(item);
                                              }
                                      );
+
+                    this.setOnMouseClicked(event -> {
+                        if (!isEmpty()) {
+                            TableColumn<?, ?> clickedColumn = getTableColumn();
+
+                            ConsistencyMessage selectedMessage = getTableRow().getItem();
+                            Optional<StandardField> field = StandardField.fromName(clickedColumn.getText());
+
+                            if (field.isPresent()) {
+                                libraryTab.editEntryAndFocusField(selectedMessage.bibEntry(), field.get());
+                            } else {
+                                libraryTab.showAndEdit(selectedMessage.bibEntry());
+                                dialogService.notify(Localization.lang("Field does not exist in the editor!"));
+                            }
+                        }
+                    });
                 }
             });
 
