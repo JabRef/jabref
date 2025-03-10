@@ -33,10 +33,6 @@ public class GitPreferences {
         autoPushEnabled.set(enabled);
     }
 
-    public GitPreferences withAutoPushEnabled(boolean enabled) {
-        return new GitPreferences(enabled);
-    }
-
     public AutoPushMode getAutoPushMode() {
         return autoPushMode.get();
     }
