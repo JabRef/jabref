@@ -143,7 +143,16 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
-        List<Abbreviation> candidates = fullToAbbreviationObject.values().stream()
+        Optional<Abbreviation> customMatch = findBestFuzzyMatched(customAbbreviations, input);
+        if (customMatch.isPresent()) {
+            return customMatch;
+        }
+
+        return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);
+    }
+
+    private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
+        List<Abbreviation> candidates = abbreviations.stream()
                 .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
                 .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
                 .toList();
