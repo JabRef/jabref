@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.util.strings.StringSimilarity;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
@@ -68,16 +67,6 @@ public class JournalAbbreviationRepository {
         abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
         dotlessToAbbreviationObject.put("Demo", newAbbreviation);
         shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
-    }
-
-    /**
-     * Constructor for testing purposes, allowing a predefined abbreviations to be injected.
-     *
-     * @param abbreviations The Map of abbreviations to use for testing.
-     */
-    @VisibleForTesting
-    public JournalAbbreviationRepository(Map<String, Abbreviation> abbreviations) {
-        this.fullToAbbreviationObject.putAll(abbreviations);
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
