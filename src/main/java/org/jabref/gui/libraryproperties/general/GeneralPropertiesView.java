@@ -71,7 +71,6 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         }
 
         userSpecificFileTooltip.setText("User: " + username + " | Host: " + hostname);
-       // userSpecificFileTooltip.textProperty().bind(viewModel.userSpecificFileDirectoryTooltipProperty().get().textProperty());
     }
 
     @FXML
