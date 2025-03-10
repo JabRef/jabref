@@ -1,7 +1,6 @@
 package org.jabref.logic.journals;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.undo.CompoundEdit;
@@ -317,67 +316,57 @@ class JournalAbbreviationRepositoryTest {
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
-    @Test
-    void fuzzyMatchEnglish() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("Journal of Physics A", new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"));
-        testAbbreviations.put("Journal of Physics B", new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"));
-        testAbbreviations.put("Journal of Physics C", new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
+    @ParameterizedTest
+    @MethodSource("provideAbbreviationTestCases")
+    void fuzzyMatch(List<Abbreviation> abbreviationList, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
+        repository.addCustomAbbreviations(abbreviationList);
 
-        // Ambiguous cases: "Journal of Physics" is too general
-        assertTrue(repository.getDefaultAbbreviation("Journal of Physics").isEmpty());
+        assertEquals(expectedAbbreviation, repository.getDefaultAbbreviation(input).orElse("WRONG"));
 
-        assertEquals("J. Phys. A", repository.getDefaultAbbreviation("ournal of Physic A").orElse("WRONG"));
-        assertEquals("J. Phys. B", repository.getDefaultAbbreviation("Journal f Physic B").orElse("WRONG"));
-        assertEquals("J. Phys. C", repository.getDefaultAbbreviation("Journal of hysic C").orElse("WRONG"));
+        assertEquals(expectedDotless, repository.getDotless(input).orElse("WRONG"));
 
-        assertEquals("J Phys A", repository.getDotless("ournal of Physic A").orElse("WRONG"));
-        assertEquals("J Phys B", repository.getDotless("Journal f Physic B").orElse("WRONG"));
-        assertEquals("J Phys C", repository.getDotless("Journal of hysic C").orElse("WRONG"));
+        assertEquals(expectedShortest, repository.getShortestUniqueAbbreviation(input).orElse("WRONG"));
 
-        assertEquals("JPA", repository.getShortestUniqueAbbreviation("ournal of Physic A").orElse("WRONG"));
-        assertEquals("JPB", repository.getShortestUniqueAbbreviation("Journal f Physic B").orElse("WRONG"));
-        assertEquals("JPC", repository.getShortestUniqueAbbreviation("Journal of hysic C").orElse("WRONG"));
+        assertTrue(repository.getDefaultAbbreviation(ambiguousInput).isEmpty());
     }
 
-    @Test
-    void fuzzyMatchChinese() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("中国物理学报", new Abbreviation("中国物理学报", "物理学报", "ZWP"));
-        testAbbreviations.put("中国物理学理", new Abbreviation("中国物理学理", "物理学报报", "ZWP"));
-        testAbbreviations.put("中国科学: 物理学", new Abbreviation("中国科学: 物理学", "中科物理", "ZKP"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
-        // Ambiguous case: "中国物理学" alone is too general
-        assertTrue(repository.getDefaultAbbreviation("中国物理学").isEmpty());
-
-        assertEquals("物理学报", repository.getDefaultAbbreviation("中物理学报").orElse("WRONG"));
-        assertEquals("中科物理", repository.getDefaultAbbreviation("中国科学 物理").orElse("WRONG"));
-
-        assertEquals("物理学报", repository.getDotless("中物理学报").orElse("WRONG"));
-        assertEquals("中科物理", repository.getDotless("中国科学 物理").orElse("WRONG"));
-
-        assertEquals("ZWP", repository.getShortestUniqueAbbreviation("中物理学报").orElse("WRONG"));
-        assertEquals("ZKP", repository.getShortestUniqueAbbreviation("中国科学 物理").orElse("WRONG"));
-    }
-
-    @Test
-    void fuzzyMatchGerman() {
-        Map<String, Abbreviation> testAbbreviations = new HashMap<>();
-        testAbbreviations.put("Zeitschrift für Physikalische Chemie", new Abbreviation("Zeitschrift für Physikalische Chemie", "Z. Phys. Chem.", "ZPC"));
-        testAbbreviations.put("Zeitschrift für Angewandte Chemie", new Abbreviation("Zeitschrift für Angewandte Chemie", "Z. Angew. Chem.", "ZAC"));
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository(testAbbreviations);
-
-        // Ambiguous case: "Zeitschrift für Chemie" is too general
-        assertTrue(repository.getDefaultAbbreviation("Zeitschrift für Chemie").isEmpty());
-
-        assertEquals("Z. Phys. Chem.", repository.getDefaultAbbreviation("eitschrift fur Physikalische Chemie").orElse("WRONG"));
-        assertEquals("Z. Angew. Chem.", repository.getDefaultAbbreviation("Zeitschrift ur Angewandte Chemie").orElse("WRONG"));
-
-        assertEquals("Z Phys Chem", repository.getDotless("Zeitschrift fur hysikalische Chemie").orElse("WRONG"));
-        assertEquals("Z Angew Chem", repository.getDotless("eitschrift fur ngewandte Chemie").orElse("WRONG"));
-
-        assertEquals("ZPC", repository.getShortestUniqueAbbreviation("Zeitschrift fur Physikalische emie").orElse("WRONG"));
-        assertEquals("ZAC", repository.getShortestUniqueAbbreviation("Zeitschrift fur Angewandte emie").orElse("WRONG"));
+    static Stream<Object[]> provideAbbreviationTestCases() {
+        return Stream.of(
+                new Object[]{
+                        List.of(
+                                new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"),
+                                new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"),
+                                new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC")
+                        ),
+                        "ournal f hysics A",
+                        "J. Phys. A",
+                        "J Phys A",
+                        "JPA",
+                        "Journal of Physics"
+                },
+                new Object[]{
+                        List.of(
+                                new Abbreviation("中国物理学报", "物理学报", "ZWP"),
+                                new Abbreviation("中国物理学理", "物理学报报", "ZWP"),
+                                new Abbreviation("中国科学: 物理学", "中科物理", "ZKP")
+                        ),
+                        "国物理学报",
+                        "物理学报",
+                        "物理学报",
+                        "ZWP",
+                        "中国物理学"
+                },
+                new Object[]{
+                        List.of(
+                                new Abbreviation("Zeitschrift für Physikalische Chemie", "Z. Phys. Chem.", "ZPC"),
+                                new Abbreviation("Zeitschrift für Angewandte Chemie", "Z. Angew. Chem.", "ZAC")
+                        ),
+                        "eitschrift ür hysikalische Chemie",
+                        "Z. Phys. Chem.",
+                        "Z Phys Chem",
+                        "ZPC",
+                        "Zeitschrift für Chemie"
+                }
+        );
     }
 }
