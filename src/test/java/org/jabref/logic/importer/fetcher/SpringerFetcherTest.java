@@ -9,11 +9,13 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -32,8 +34,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         fetcher = new SpringerFetcher(importerPreferences);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(fetcher.getName())).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
     }
 
     @Test

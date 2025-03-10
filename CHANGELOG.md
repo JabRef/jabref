@@ -44,6 +44,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the "Copy Preview" button to "Copy citation (html) in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - Pressing Tab in empty text fields of the entry editor now moves the focus to the next field instead of inserting a tab character. [#11938](https://github.com/JabRef/jabref/issues/11938)
 - The embedded PostgresSQL server for the search now supports Linux and macOS ARM based distributions natively [#12607](https://github.com/JabRef/jabref/pull/12607)
+- We disabled the search and group fields in the sidebar when no library is opened. [#12657](https://github.com/JabRef/jabref/issues/12657)
+- We removed the obsolete Twitter link and added Mastodon and LinkedIn links in Help -> JabRef resources. [#12660](https://github.com/JabRef/jabref/issues/12660)
 - We improved the Check Integrity dialog entry interaction so that a single click focuses on the corresponding entry and a double-click both focuses on the entry and closes the dialog. [#12245](https://github.com/JabRef/jabref/issues/12245)
 
 ### Fixed
