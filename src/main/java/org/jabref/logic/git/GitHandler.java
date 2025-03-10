@@ -36,9 +36,25 @@ public class GitHandler {
      * @param repositoryPath The root of the initialized git repository
      */
     public GitHandler(Path repositoryPath) {
-        this.repositoryPath = repositoryPath;
+        this(repositoryPath, true);
+    }
+
+    /**
+     * Initialize the handler for the given repository
+     *
+     * @param repositoryPath The root of the initialized git repository
+     * @param createRepo If true, initializes a repository if the file path does not contain a repository
+     */
+    public GitHandler(Path repositoryPath, boolean createRepo) {
+        if (Files.isRegularFile(repositoryPath)) {
+            repositoryPath = repositoryPath.getParent();
+        }
+
+        // Normalize the path to ensure consistent path handling
+        this.repositoryPath = repositoryPath.toAbsolutePath().normalize();
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        if (!isGitRepository()) {
+
+        if (createRepo && !isGitRepository()) {
             try {
                 Git.init()
                    .setDirectory(repositoryPathAsFile)
@@ -76,7 +92,7 @@ public class GitHandler {
     /**
      * Returns true if the given path points to a directory that is a git repository (contains a .git folder)
      */
-    boolean isGitRepository() {
+    public boolean isGitRepository() {
         // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
         // This solution is quite simple but might not work in special cases, for us it should suffice.
         return Files.exists(Path.of(repositoryPath.toString(), ".git"));
@@ -185,14 +201,16 @@ public class GitHandler {
         }
     }
 
-    public void pullOnCurrentBranch() throws IOException {
+    public boolean pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
                    .setCredentialsProvider(credentialsProvider)
                    .call();
+                return true;
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
+                LOGGER.info("Failed to pull");
+                return false;
             }
         }
     }
@@ -202,4 +220,116 @@ public class GitHandler {
             return git.getRepository().getBranch();
         }
     }
+
+    /**
+     * Represents the Git status of a file within a repository
+     */
+    public enum GitStatus {
+        MODIFIED("Modified"),
+        STAGED("Staged"),
+        COMMITTED("Committed"),
+        UP_TO_DATE("Up to date"),
+        BEHIND_REMOTE("Behind remote"),
+        AHEAD_OF_REMOTE("Ahead of remote"),
+        UNTRACKED("Untracked");
+
+        private final String displayName;
+
+        GitStatus(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+    /**
+     * Gets the Git status of a file
+     *
+     * @param filePath The path to the file to check
+     * @return Optional containing the Git status of the file, or empty if status cannot be determined
+     */
+    public Optional<GitStatus> getFileStatus(Path filePath) {
+        try {
+
+            // Check if file exists
+            Path absoluteFilePath = filePath.toAbsolutePath().normalize();
+            if (!Files.exists(absoluteFilePath)) {
+                return Optional.empty();
+            }
+
+            if (!isGitRepository()) {
+                // if the file is not in a git repository return empty
+                return Optional.empty();
+            }
+
+            // Get relative path in repository
+            String relativePath = getRelativePath(filePath);
+            if (relativePath.isEmpty()) {
+                return Optional.empty();
+            }
+
+            try (Git git = Git.open(repositoryPathAsFile)) {
+                Status status = git.status().call();
+
+                // Check for untracked files
+                if (status.getUntracked().contains(relativePath)) {
+                    return Optional.of(GitStatus.UNTRACKED);
+                }
+
+                // Check for staged files
+                if (status.getAdded().contains(relativePath) || status.getChanged().contains(relativePath)) {
+                    return Optional.of(GitStatus.STAGED);
+                }
+
+                // Check for modified files
+                if (status.getModified().contains(relativePath)) {
+                    return Optional.of(GitStatus.MODIFIED);
+                }
+
+                // If file is in the repository but not modified, staged, or untracked, it must be committed
+                return Optional.of(GitStatus.COMMITTED);
+            } catch (GitAPIException | IOException e) {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets the relative path of a file to the repository root
+     *
+     * @param filePath The absolute path to the file
+     * @return The relative path to the repository, or empty string if the file is not in the repository
+     */
+    private String getRelativePath(Path filePath) {
+        try {
+            Path absoluteFilePath = filePath.toAbsolutePath().normalize();
+            Path absoluteRepoPath = repositoryPath.toAbsolutePath().normalize();
+
+            // First try simple relativize
+            if (absoluteFilePath.startsWith(absoluteRepoPath)) {
+                String relativePathStr = absoluteRepoPath.relativize(absoluteFilePath).toString();
+                return relativePathStr;
+            }
+
+            // Try with canonical paths for symlinks
+            try {
+                absoluteFilePath = absoluteFilePath.toFile().getCanonicalFile().toPath();
+                absoluteRepoPath = absoluteRepoPath.toFile().getCanonicalFile().toPath();
+
+                if (absoluteFilePath.startsWith(absoluteRepoPath)) {
+                    return absoluteRepoPath.relativize(absoluteFilePath).toString();
+                }
+                return "";
+            } catch (IOException e) {
+                return "";
+            }
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }
+

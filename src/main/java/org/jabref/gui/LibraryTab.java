@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
@@ -63,9 +64,9 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -77,7 +78,6 @@ import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -118,6 +118,16 @@ public class LibraryTab extends Tab {
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    // Mapping of Git status indicators, as a static constant of the class
+    private static final Map<GitHandler.GitStatus, String> GIT_STATUS_INDICATORS = Map.of(
+        GitHandler.GitStatus.MODIFIED, "[Modified]",
+        GitHandler.GitStatus.STAGED, "[Staged]",
+        GitHandler.GitStatus.AHEAD_OF_REMOTE, "[Ahead]",
+        GitHandler.GitStatus.BEHIND_REMOTE, "[Behind]",
+        GitHandler.GitStatus.UP_TO_DATE, "[Up to date]",
+        GitHandler.GitStatus.COMMITTED, "[Committed]",
+        GitHandler.GitStatus.UNTRACKED, "[Untracked]"
+    );
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -260,6 +270,11 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+
+        // Start Git status monitoring if the database is under version control
+        if (bibDatabaseContext.isUnderVersionControl()) {
+            startGitStatusMonitoring();
+        }
     }
 
     private EntryEditor createEntryEditor() {
@@ -396,68 +411,63 @@ public class LibraryTab extends Tab {
      * <p>
      * Example: *jabref-authors.bib – testbib
      */
-    public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
-        DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
-        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+    public void updateTabTitle(boolean isModified) {
+        // initialize string joiner separate different elements by braces
+        StringJoiner tabTitle = new StringJoiner(" ");
 
-        StringBuilder tabTitle = new StringBuilder();
-        StringBuilder toolTipText = new StringBuilder();
-
-        if (file.isPresent()) {
-            // Modification asterisk
-            if (isChanged && !isAutosaveEnabled) {
-                tabTitle.append('*');
-            }
-
-            // Filename
-            Path databasePath = file.get();
-            String fileName = databasePath.getFileName().toString();
-            tabTitle.append(fileName);
-            toolTipText.append(databasePath.toAbsolutePath());
-
-            if (databaseLocation == DatabaseLocation.SHARED) {
-                tabTitle.append(" \u2013 ");
-                addSharedDbInformation(tabTitle, bibDatabaseContext);
-                toolTipText.append(' ');
-                addSharedDbInformation(toolTipText, bibDatabaseContext);
-            }
-
-            // Database mode
-            addModeInfo(toolTipText, bibDatabaseContext);
-
-            // Changed information (tooltip)
-            if (isChanged && !isAutosaveEnabled) {
-                addChangedInformation(toolTipText, fileName);
-            }
-
-            // Unique path fragment
-            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.collectAllDatabasePaths(), databasePath);
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
-        } else {
-            if (databaseLocation == DatabaseLocation.LOCAL) {
-                tabTitle.append('*');
-                tabTitle.append(Localization.lang("untitled"));
+        try {
+            if (bibDatabaseContext.getDatabasePath().isPresent()) {
+                // get the database path
+                Path databasePath = bibDatabaseContext.getDatabasePath().get();
+                // Try to get Git status if available
+                addGitStatusToTitle(tabTitle);
+                // Regular tab title with file name
+                String fileNamePart = databasePath.getFileName().toString();
+                tabTitle.add(fileNamePart);
             } else {
-                addSharedDbInformation(tabTitle, bibDatabaseContext);
-                addSharedDbInformation(toolTipText, bibDatabaseContext);
+                tabTitle.add(Localization.lang("untitled"));
             }
-            addModeInfo(toolTipText, bibDatabaseContext);
-            if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
-                addChangedInformation(toolTipText, Localization.lang("untitled"));
-            }
+        } catch (Exception e) {
+            tabTitle.add(Localization.lang("untitled"));
         }
 
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            textProperty().setValue(tabTitle.toString());
-            setTooltip(new Tooltip(toolTipText.toString()));
-        });
+        if (isModified) {
+            tabTitle.add("*");
+        }
+
+        setText(tabTitle.toString());
+        setGraphic(null);
+    }
+
+    /**
+     * Helper method to add Git status indicator to the tab title
+     *
+     * @param tabTitle The StringJoiner for building the tab title
+     */
+    private void addGitStatusToTitle(StringJoiner tabTitle) {
+        // if the .bib file is not under version control or does not has a datapath then return
+        if (!bibDatabaseContext.isUnderVersionControl() || bibDatabaseContext.getDatabasePath().isEmpty()) {
+            return;
+        }
+
+        try {
+            Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
+            status.map(GIT_STATUS_INDICATORS::get)
+                  .ifPresent(tabTitle::add);
+        } catch (Exception e) {
+            // Silent fail on Git status errors
+        }
     }
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
         this.changedProperty.setValue(true);
+
+        // Update Git status when database context changes
+        if (bibDatabaseContext.isUnderVersionControl()) {
+            updateTabTitle(true);
+        }
     }
 
     /**
@@ -637,6 +647,11 @@ public class LibraryTab extends Tab {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
+
+            // Update the Git status when the database is marked as unchanged (likely after a save operation)
+            if (bibDatabaseContext.isUnderVersionControl()) {
+                updateTabTitle(false);
+            }
         }
     }
 
@@ -1191,5 +1206,43 @@ public class LibraryTab extends Tab {
 
     public LibraryTabContainer getLibraryTabContainer() {
         return tabContainer;
+    }
+
+    /**
+     * Starts periodic monitoring of Git status for the database file
+     */
+    private void startGitStatusMonitoring() {
+        if (!bibDatabaseContext.isUnderVersionControl() || bibDatabaseContext.getDatabasePath().isEmpty()) {
+            return;
+        }
+
+        try {
+            // Create a unified status check task
+            Runnable checkGitStatusAndUpdateUI = () -> {
+                try {
+                    // Force refresh of Git status cache
+                    bibDatabaseContext.getGitStatus();
+
+                    // Update UI on JavaFX thread
+                    Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
+                } catch (Exception e) {
+                    // Silent fail
+                }
+            };
+
+            // Run initial check
+            checkGitStatusAndUpdateUI.run();
+
+            // Create the scheduled task for periodic updates
+            PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(10));
+            gitStatusTimer.setOnFinished(event -> {
+                checkGitStatusAndUpdateUI.run();
+                gitStatusTimer.play(); // Restart the timer
+            });
+            // Start periodic monitoring
+            gitStatusTimer.play();
+        } catch (Exception e) {
+            // Silent fail
+        }
     }
 }
