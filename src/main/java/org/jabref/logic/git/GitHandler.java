@@ -206,11 +206,12 @@ public class GitHandler {
                 git.pull()
                    .setCredentialsProvider(credentialsProvider)
                    .call();
+                return true;
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
+                LOGGER.info("Failed to pull");
+                return false;
             }
         }
-        return false;
     }
 
     public String getCurrentlyCheckedOutBranch() throws IOException {
@@ -320,9 +321,8 @@ public class GitHandler {
 
                 if (absoluteFilePath.startsWith(absoluteRepoPath)) {
                     return absoluteRepoPath.relativize(absoluteFilePath).toString();
-                } else {
-                    return "";
                 }
+                return "";
             } catch (IOException e) {
                 return "";
             }
