@@ -359,6 +359,7 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_MASTODON, new OpenBrowserAction("https://foojay.social/@jabref", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://x.com/JabRef_org", dialogService, preferences.getExternalApplicationsPreferences())),
 
                         new SeparatorMenuItem(),
 
