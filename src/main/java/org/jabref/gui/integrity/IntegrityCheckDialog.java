@@ -8,15 +8,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -54,16 +55,13 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void addRowMouseEvent(TableRow<IntegrityMessage> row) {
-        row.setOnMouseClicked(event -> {
-            if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY) {
-                IntegrityMessage message = row.getItem();
-                libraryTab.editEntryAndFocusField(message.entry(), message.field());
-                if (event.getClickCount() == 2) {
-                    this.close();
-                }
+    private void handleRowClick(IntegrityMessage message, MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY) {
+            libraryTab.editEntryAndFocusField(message.entry(), message.field());
+            if (event.getClickCount() == 2) {
+                this.close();
             }
-        });
+        }
     }
 
     public IntegrityCheckDialogViewModel getViewModel() {
@@ -74,11 +72,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new IntegrityCheckDialogViewModel(messages);
 
-        messagesTable.setRowFactory(tableView -> {
-            TableRow<IntegrityMessage> row = new TableRow<>();
-            addRowMouseEvent(row);
-            return row;
-        });
+        new ViewModelTableRowFactory<IntegrityMessage>()
+                .withOnMouseClickedEvent(this::handleRowClick)
+                .install(messagesTable);
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
