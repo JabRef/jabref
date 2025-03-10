@@ -18,6 +18,7 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -132,6 +133,7 @@ public class GroupTreeView extends BorderPane {
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
+        this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
         initialize();
     }
@@ -641,6 +643,16 @@ public class GroupTreeView extends BorderPane {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
         }
+    }
+
+    /**
+     * Creates an observable boolean value that is true if no database is open
+     */
+    private ObservableBooleanValue groupsDisabledProperty() {
+        return Bindings.createBooleanBinding(
+                () -> stateManager.getOpenDatabases().isEmpty(),
+                stateManager.getOpenDatabases()
+        );
     }
 
     private static class DragExpansionHandler {
