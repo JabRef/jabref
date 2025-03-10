@@ -18,6 +18,8 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.mariadb.jdbc.internal.logging.Logger;
+import org.mariadb.jdbc.internal.logging.LoggerFactory;
 
 public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> {
     @FXML private ComboBox<Charset> encoding;
@@ -28,7 +30,6 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Tooltip userSpecificFileTooltip;
 
     @Inject private CliPreferences preferences;
-
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
 
@@ -64,10 +65,11 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         String username = System.getProperty("user.name"); // Get system username
         // Get hostname
         String hostname = "Unknown Host"; // Default value in case of error
+        Logger logger = LoggerFactory.getLogger(GeneralPropertiesView.class);
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            e.printStackTrace(); // Print error if hostname retrieval fails
+            logger.error("Failed to retrieve the hostname", e); // Use the logger instead of printStackTrace
         }
 
         userSpecificFileTooltip.setText("User: " + username + " | Host: " + hostname);
