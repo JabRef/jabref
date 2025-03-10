@@ -54,6 +54,7 @@ public class WebSearchPaneView extends VBox {
                 createQueryField(),
                 createSearchButton()
         );
+        this.disableProperty().bind(searchDisabledProperty());
     }
 
     /**
@@ -92,7 +93,6 @@ public class WebSearchPaneView extends VBox {
         fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
         HBox.setHgrow(fetchers, Priority.ALWAYS);
-        fetchers.disableProperty().bind(searchDisabledProperty());
         return fetchers;
     }
 
@@ -105,7 +105,6 @@ public class WebSearchPaneView extends VBox {
         addQueryValidationHints(query);
         enableEnterToTriggerSearch(query);
         ClipBoardManager.addX11Support(query);
-        query.disableProperty().bind(searchDisabledProperty());
         return query;
     }
 
@@ -118,7 +117,7 @@ public class WebSearchPaneView extends VBox {
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
-        search.disableProperty().bind(Bindings.or(importerEnabled.not(), searchDisabledProperty()));
+        search.disableProperty().bind(importerEnabled.not());
         return search;
     }
 
@@ -136,7 +135,6 @@ public class WebSearchPaneView extends VBox {
                 helpButtonContainer.getChildren().clear();
             }
         });
-        helpButtonContainer.disableProperty().bind(searchDisabledProperty());
         return helpButtonContainer;
     }
 

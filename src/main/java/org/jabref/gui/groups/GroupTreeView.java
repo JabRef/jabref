@@ -133,6 +133,7 @@ public class GroupTreeView extends BorderPane {
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
+        this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
         initialize();
     }
@@ -141,7 +142,6 @@ public class GroupTreeView extends BorderPane {
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
-        searchField.disableProperty().bind(groupsDisabledProperty());
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -172,7 +172,6 @@ public class GroupTreeView extends BorderPane {
                 }
             }
         });
-        groupTree.disableProperty().bind(groupsDisabledProperty());
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
@@ -182,7 +181,6 @@ public class GroupTreeView extends BorderPane {
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
         addNewGroup.setOnAction(event -> addNewGroup());
-        addNewGroup.disableProperty().bind(groupsDisabledProperty());
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("groupBar");
