@@ -18,6 +18,7 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -140,6 +141,7 @@ public class GroupTreeView extends BorderPane {
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
+        searchField.disableProperty().bind(groupsDisabledProperty());
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -179,6 +181,7 @@ public class GroupTreeView extends BorderPane {
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
         addNewGroup.setOnAction(event -> addNewGroup());
+        addNewGroup.disableProperty().bind(groupsDisabledProperty());
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("groupBar");
@@ -641,6 +644,16 @@ public class GroupTreeView extends BorderPane {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
         }
+    }
+
+    /**
+     * Creates an observable boolean value that is true if no database is open
+     */
+    private ObservableBooleanValue groupsDisabledProperty() {
+        return Bindings.createBooleanBinding(
+                () -> stateManager.getOpenDatabases().isEmpty(),
+                stateManager.getOpenDatabases()
+        );
     }
 
     private static class DragExpansionHandler {
