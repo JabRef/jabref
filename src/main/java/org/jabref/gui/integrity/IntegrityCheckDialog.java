@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.function.Function;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
@@ -54,11 +54,16 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
-        if (change.next()) {
-            change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.editEntryAndFocusField(message.entry(), message.field()));
-        }
+    private void addRowMouseEvent(TableRow<IntegrityMessage> row) {
+        row.setOnMouseClicked(event -> {
+            if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY) {
+                IntegrityMessage message = row.getItem();
+                libraryTab.editEntryAndFocusField(message.entry(), message.field());
+                if (event.getClickCount() == 2) {
+                    this.close();
+                }
+            }
+        });
     }
 
     public IntegrityCheckDialogViewModel getViewModel() {
@@ -69,7 +74,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new IntegrityCheckDialogViewModel(messages);
 
-        messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
+        messagesTable.setRowFactory(tableView -> {
+            TableRow<IntegrityMessage> row = new TableRow<>();
+            addRowMouseEvent(row);
+            return row;
+        });
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
