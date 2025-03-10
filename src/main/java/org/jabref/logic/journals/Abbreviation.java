@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /**
  * The class provides functionality for managing journal abbreviations.
- * <a href="https://docs.jabref.org/setup/journal-abbreviations">JabRef Journal Abbreviations Documentation</a>
+ * <a href="https://docs.jabref.org/advanced/journalabbreviations">JabRef Journal Abbreviations Documentation</a>
  */
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
