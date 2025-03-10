@@ -21,7 +21,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
-- We added the property that the search and group fields on the sidebar are disabled if there is no open database. [#12657](https://github.com/JabRef/jabref/issues/12657)
 
 ### Changed
 
@@ -45,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the "Copy Preview" button to "Copy citation (html) in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - Pressing Tab in empty text fields of the entry editor now moves the focus to the next field instead of inserting a tab character. [#11938](https://github.com/JabRef/jabref/issues/11938)
 - The embedded PostgresSQL server for the search now supports Linux and macOS ARM based distributions natively [#12607](https://github.com/JabRef/jabref/pull/12607)
+- We disabled the search and group fields in the sidebar when no library is opened. [#12657](https://github.com/JabRef/jabref/issues/12657)
 
 ### Fixed
 
