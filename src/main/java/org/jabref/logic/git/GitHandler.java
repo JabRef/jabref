@@ -50,7 +50,8 @@ public class GitHandler {
             repositoryPath = repositoryPath.getParent();
         }
 
-        this.repositoryPath = repositoryPath;
+        // Normalize the path to ensure consistent path handling
+        this.repositoryPath = repositoryPath.toAbsolutePath().normalize();
         this.repositoryPathAsFile = this.repositoryPath.toFile();
 
         if (createRepo && !isGitRepository()) {

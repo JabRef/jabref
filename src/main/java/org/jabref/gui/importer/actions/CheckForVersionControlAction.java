@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * When opening a file that is under Git version control, a pull operation is
- * attempted.
+ * When opening a file, this action checks if it is under Git version control
+ * and marks the database context accordingly if it is.
  */
 public class CheckForVersionControlAction implements GUIPostOpenAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckForVersionControlAction.class);

@@ -293,36 +293,39 @@ public class BibDatabaseContext {
      * Returns whether this database is under version control (e.g., git).
      */
     public boolean isUnderVersionControl() {
-        if (underVersionControl == null) {
-            if (getDatabasePath().isEmpty()) {
-                underVersionControl = false;
-                return false;
-            }
-
-            Path databasePath = getDatabasePath().get();
-
-            // If the file doesn't exist, it can't be under version control
-            if (!Files.exists(databasePath)) {
-                underVersionControl = false;
-                return false;
-            }
-
-            try {
-                // Try direct file system check first - faster way to detect git repositories
-                Path gitDir = databasePath.getParent().resolve(".git");
-                if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
-                    underVersionControl = true;
-                    return true;
-                }
-
-                // Use GitHandler for complete check if simple check fails
-                GitHandler gitHandler = new GitHandler(databasePath, false);
-                underVersionControl = gitHandler.isGitRepository();
-            } catch (Exception e) {
-                // Silent fail if error occurs during repository check
-                underVersionControl = false;
-            }
+        if (underVersionControl != null) {
+            return underVersionControl;
         }
+
+        if (getDatabasePath().isEmpty()) {
+            underVersionControl = false;
+            return false;
+        }
+
+        Path databasePath = getDatabasePath().get();
+
+        // If the file doesn't exist, it can't be under version control
+        if (!Files.exists(databasePath)) {
+            underVersionControl = false;
+            return false;
+        }
+
+        try {
+            // Try direct file system check first - faster way to detect git repositories
+            Path gitDir = databasePath.getParent().resolve(".git");
+            if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
+                underVersionControl = true;
+                return true;
+            }
+
+            // Use GitHandler for complete check if simple check fails
+            GitHandler gitHandler = new GitHandler(databasePath, false);
+            underVersionControl = gitHandler.isGitRepository();
+        } catch (Exception e) {
+            // Silent fail if error occurs during repository check
+            underVersionControl = false;
+        }
+        
         return underVersionControl;
     }
 
