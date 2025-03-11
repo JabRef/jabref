@@ -19,6 +19,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -333,9 +334,9 @@ class JournalAbbreviationRepositoryTest {
         assertTrue(repository.getDefaultAbbreviation(ambiguousInput).isEmpty());
     }
 
-    static Stream<Object[]> provideAbbreviationTestCases() {
+    static Stream<Arguments> provideAbbreviationTestCases() {
         return Stream.of(
-                new Object[]{
+                Arguments.of(
                         List.of(
                                 new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"),
                                 new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"),
@@ -346,8 +347,8 @@ class JournalAbbreviationRepositoryTest {
                         "J Phys A",
                         "JPA",
                         "Journal of Physics"
-                },
-                new Object[]{
+                ),
+                Arguments.of(
                         List.of(
                                 new Abbreviation("中国物理学报", "物理学报", "ZWP"),
                                 new Abbreviation("中国物理学理", "物理学报报", "ZWP"),
@@ -358,18 +359,18 @@ class JournalAbbreviationRepositoryTest {
                         "物理学报",
                         "ZWP",
                         "中国物理学"
-                },
-                new Object[]{
+                ),
+                Arguments.of(
                         List.of(
                                 new Abbreviation("Zeitschrift für Chem", "Z. Phys. Chem.", "ZPC"),
-                                new Abbreviation("Zeitschrift für Phys", "Z. Angew. Chem.", "ZAC")
+                                new Abbreviation("Zeitschrift für Chys", "Z. Angew. Chem.", "ZAC")
                         ),
                         "eitschrift ür Chem",
                         "Z. Phys. Chem.",
                         "Z Phys Chem",
                         "ZPC",
-                        "Zeitschrift für "
-                }
+                        "Zeitschrift für C"
+                )
         );
     }
 }
