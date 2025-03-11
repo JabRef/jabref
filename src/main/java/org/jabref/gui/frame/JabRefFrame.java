@@ -51,6 +51,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -241,7 +242,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     undoManager,
                     clipBoardManager,
                     taskExecutor,
-                    fileHistory
+                    fileHistory,
+                    new BuildInfo()
             );
 
             tabbedPane.getTabs().add(welcomeTab);
@@ -482,7 +484,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 undoManager,
                 clipBoardManager,
                 taskExecutor,
-                fileHistory
+                fileHistory,
+                new BuildInfo()
         );
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);

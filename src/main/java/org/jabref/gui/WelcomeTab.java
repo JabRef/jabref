@@ -9,17 +9,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -38,6 +44,7 @@ public class WelcomeTab extends Tab {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
+    private final BuildInfo buildInfo;
 
     public WelcomeTab(LibraryTabContainer tabContainer,
                       GuiPreferences preferences,
@@ -49,7 +56,8 @@ public class WelcomeTab extends Tab {
                       CountingUndoManager undoManager,
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
-                      FileHistoryMenu fileHistoryMenu) {
+                      FileHistoryMenu fileHistoryMenu,
+                      BuildInfo buildInfo) {
 
         super(Localization.lang("Welcome"));
         setClosable(true);
@@ -65,6 +73,7 @@ public class WelcomeTab extends Tab {
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.fileHistoryMenu = fileHistoryMenu;
+        this.buildInfo = buildInfo;
 
         this.recentLibrariesBox = new VBox(5);
 
@@ -94,7 +103,14 @@ public class WelcomeTab extends Tab {
         welcomePageContainer.getChildren().addAll(welcomeBox, startBox, recentBox);
         welcomeMainContainer.getChildren().add(welcomePageContainer);
 
-        setContent(welcomeMainContainer);
+        BorderPane rootLayout = new BorderPane();
+        rootLayout.setCenter(welcomeMainContainer);
+        rootLayout.setBottom(createFooter());
+
+        VBox container = new VBox();
+        container.getChildren().add(rootLayout);
+        VBox.setVgrow(rootLayout, Priority.ALWAYS);
+        setContent(container);
     }
 
     private VBox createWelcomeBox() {
@@ -158,5 +174,77 @@ public class WelcomeTab extends Tab {
         box.setAlignment(Pos.TOP_LEFT);
         box.getChildren().addAll(nodes);
         return box;
+    }
+
+    private VBox createFooter() {
+        Label communityLabel = new Label(Localization.lang("Community"));
+        communityLabel.getStyleClass().add("welcome-footer-label");
+
+        HBox iconLinksContainer = new HBox(15);
+        iconLinksContainer.setAlignment(Pos.CENTER);
+
+        Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
+        Hyperlink forumLink = createFooterLink(Localization.lang("Forum for support"), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
+        Hyperlink mastodonLink = createFooterLink(Localization.lang("Mastodon"), StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
+        Hyperlink linkedInLink = createFooterLink(Localization.lang("LinkedIn"), StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
+        Hyperlink donationLink = createFooterLink(Localization.lang("Donation"), StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
+
+        iconLinksContainer.getChildren().addAll(onlineHelpLink, forumLink, mastodonLink, linkedInLink, donationLink);
+
+        HBox textLinksContainer = new HBox(15);
+        textLinksContainer.setAlignment(Pos.CENTER);
+
+        Hyperlink devVersionLink = createFooterLink(Localization.lang("Download Development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
+        Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
+
+        textLinksContainer.getChildren().addAll(devVersionLink, changelogLink);
+
+        HBox versionContainer = new HBox(15);
+        versionContainer.setAlignment(Pos.CENTER);
+        Label versionLabel = new Label(Localization.lang("Current JabRef Version: ") + buildInfo.version);
+        versionLabel.getStyleClass().add("welcome-footer-version");
+        versionContainer.getChildren().add(versionLabel);
+
+        VBox footerBox = new VBox(10);
+        footerBox.setAlignment(Pos.CENTER);
+        footerBox.getChildren().addAll(communityLabel, iconLinksContainer, textLinksContainer, versionContainer);
+        footerBox.setPadding(new Insets(10, 0, 10, 0));
+        footerBox.getStyleClass().add("welcome-footer-container");
+
+        return footerBox;
+    }
+
+    private Hyperlink createFooterLink(String text, StandardActions action, IconTheme.JabRefIcons icon) {
+        Hyperlink link = new Hyperlink(text);
+        link.getStyleClass().add("welcome-footer-link");
+
+        String url = switch (action) {
+            case HELP ->
+                    "https://help.jabref.org/";
+            case OPEN_FORUM ->
+                    "https://discourse.jabref.org/";
+            case OPEN_MASTODON ->
+                    "https://foojay.social/@jabref";
+            case OPEN_LINKEDIN ->
+                    "https://linkedin.com/company/jabref/";
+            case DONATE ->
+                    "https://donate.jabref.org";
+            case OPEN_DEV_VERSION_LINK ->
+                    "https://builds.jabref.org/master/";
+            case OPEN_CHANGELOG ->
+                    "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md";
+            default ->
+                    null;
+        };
+
+        if (url != null) {
+            link.setOnAction(e -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+        }
+
+        if (icon != null) {
+            link.setGraphic(icon.getGraphicNode());
+        }
+
+        return link;
     }
 }
