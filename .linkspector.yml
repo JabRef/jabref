@@ -3,6 +3,9 @@ files:
   - PRIVACY.md
 dirs:
   - docs/
+excludedFiles:
+  - docs/teaching.md
+  - docs/code-howtos/openoffice/overview.md
 useGitIgnore: true
 ignorePatterns:
   - pattern: '^http(s)?://localhost'
