@@ -136,7 +136,7 @@ The order of appearance of citations (as considered during numbering and adding 
 1. Their order within each citation group (`localOrder`), and
 2. the order of the citation groups (citation markers) in the text (`globalOrder`).
 
-#### Sorting within a citation group (`localOrder`) <a id="localOrder"></a>
+#### Sorting within a citation group (`localOrder`) <a id="localorder"></a>
 
 The order of citations within a citation group is controlled by `jstyle:MultiCiteChronological`.
 
