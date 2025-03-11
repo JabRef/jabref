@@ -15,7 +15,7 @@ jobs:
       issues: write
     steps:
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -25,7 +25,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Assigned" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -59,7 +59,7 @@ jobs:
 
           Happy coding! 🚀
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      uses: m7kvqbe1/github-action-move-issues@main
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -69,7 +69,7 @@ jobs:
         default-column: "Free to take"
         skip-if-not-in-project: true
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      uses: m7kvqbe1/github-action-move-issues@main
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/5"

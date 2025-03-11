@@ -14,7 +14,7 @@ jobs:
       issues: write
     steps:
       - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -24,7 +24,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Free to take" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"

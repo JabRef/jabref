@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Assign the user or unassign stale assignments
         id: assign
-        uses: takanome-dev/assign-issue-action@beta
+        uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           days_until_unassign: 45
@@ -34,7 +34,7 @@ jobs:
 
             ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**"" label to prevent automatic unassignment.
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         # Action currently works for issues only - pre-condition: https://github.com/takanome-dev/assign-issue-action/issues/269 fixed
         if: github.event_name == 'issue_comment'
         with:
@@ -46,7 +46,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Assigned" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+        uses: m7kvqbe1/github-action-move-issues@main
         if: github.event_name == 'issue_comment'
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
