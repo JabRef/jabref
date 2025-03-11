@@ -75,10 +75,6 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         return getShortestUniqueAbbreviation().compareTo(toCompare.getShortestUniqueAbbreviation());
     }
 
-    /**
-     * @param current the current representation of the journal abbreviation.
-     * @return The next representation in the abbreviation cycle.
-     */
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
