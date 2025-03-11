@@ -152,6 +152,9 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
+        // threshold for edit distance similarity comparison
+        final double SIMILARITY_THRESHOLD = 1.0;
+
         List<Abbreviation> candidates = abbreviations.stream()
                 .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
                 .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
@@ -165,7 +168,8 @@ public class JournalAbbreviationRepository {
             double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.getFirst().getName());
             double secondDistance = similarity.editDistanceIgnoreCase(input, candidates.get(1).getName());
 
-            if (Math.abs(bestDistance - secondDistance) < 1.0) {
+            // If there is a very close match of two abbreviations, do not use any of them, because they are too close.
+            if (Math.abs(bestDistance - secondDistance) < SIMILARITY_THRESHOLD) {
                 return Optional.empty();
             }
         }
