@@ -183,25 +183,25 @@ public class WelcomeTab extends Tab {
         HBox iconLinksContainer = new HBox(15);
         iconLinksContainer.setAlignment(Pos.CENTER);
 
-        Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
-        Hyperlink forumLink = createFooterLink(Localization.lang("Forum for support"), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
-        Hyperlink mastodonLink = createFooterLink(Localization.lang("Mastodon"), StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
-        Hyperlink linkedInLink = createFooterLink(Localization.lang("LinkedIn"), StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
-        Hyperlink donationLink = createFooterLink(Localization.lang("Donation"), StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
+        Hyperlink onlineHelpLink = createFooterLink("Online help", StandardActions.HELP, IconTheme.JabRefIcons.HELP);
+        Hyperlink forumLink = createFooterLink("Forum for support", StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
+        Hyperlink mastodonLink = createFooterLink("Mastodon", StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
+        Hyperlink linkedInLink = createFooterLink("LinkedIn", StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
+        Hyperlink donationLink = createFooterLink("Donation", StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
 
         iconLinksContainer.getChildren().addAll(onlineHelpLink, forumLink, mastodonLink, linkedInLink, donationLink);
 
         HBox textLinksContainer = new HBox(15);
         textLinksContainer.setAlignment(Pos.CENTER);
 
-        Hyperlink devVersionLink = createFooterLink(Localization.lang("Download Development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
-        Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
+        Hyperlink devVersionLink = createFooterLink("Download Development version", StandardActions.OPEN_DEV_VERSION_LINK, null);
+        Hyperlink changelogLink = createFooterLink("CHANGELOG", StandardActions.OPEN_CHANGELOG, null);
 
         textLinksContainer.getChildren().addAll(devVersionLink, changelogLink);
 
         HBox versionContainer = new HBox(15);
         versionContainer.setAlignment(Pos.CENTER);
-        Label versionLabel = new Label(Localization.lang("Current JabRef Version: ") + buildInfo.version);
+        Label versionLabel = new Label(Localization.lang("Current JabRef version") + ": " + buildInfo.version);
         versionLabel.getStyleClass().add("welcome-footer-version");
         versionContainer.getChildren().add(versionLabel);
 
