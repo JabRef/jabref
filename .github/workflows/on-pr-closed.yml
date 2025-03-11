@@ -1,0 +1,57 @@
+name: Mark issue as available
+
+on:
+  pull_request_target:
+    types: [ closed ]
+
+jobs:
+  unassign_issue:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && !github.event.pull_request.merged
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/:owner)(\/:repo)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - name: Move issue to "Free to take" in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - name: Move issue to "Free to take" in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - uses: actions/checkout@v4
+      - name: Remove assigned status
+        run : gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove assigned label
+        run : gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

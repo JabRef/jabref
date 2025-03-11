@@ -47,6 +47,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox inspectionWarningDuplicate;
 
     @FXML private CheckBox confirmDelete;
+    @FXML private CheckBox shouldAskForIncludingCrossReferences;
     @FXML private CheckBox confirmHideTabBar;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox alwaysReformatBib;
@@ -120,6 +121,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
+        shouldAskForIncludingCrossReferences.selectedProperty().bindBidirectional(viewModel.shouldAskForIncludingCrossReferences());
         confirmHideTabBar.selectedProperty().bindBidirectional(viewModel.confirmHideTabBarProperty());
 
         new ViewModelListCellFactory<BibDatabaseMode>()

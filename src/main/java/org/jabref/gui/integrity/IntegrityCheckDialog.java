@@ -11,7 +11,6 @@ import java.util.function.Function;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,6 +20,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
@@ -29,6 +29,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.integrity.IntegrityIssue;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -74,10 +75,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
-        if (change.next()) {
-            change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.editEntryAndFocusField(message.entry(), message.field()));
+    private void handleRowClick(IntegrityMessage message, MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY) {
+            libraryTab.editEntryAndFocusField(message.entry(), message.field());
+            if (event.getClickCount() == 2) {
+                this.close();
+            }
         }
     }
 
@@ -89,7 +92,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new IntegrityCheckDialogViewModel(messages);
 
-        messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
+        new ViewModelTableRowFactory<IntegrityMessage>()
+                .withOnMouseClickedEvent(this::handleRowClick)
+                .install(messagesTable);
         messagesTable.setItems(viewModel.getMessages());
         updateEntryTypeCombo();
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
