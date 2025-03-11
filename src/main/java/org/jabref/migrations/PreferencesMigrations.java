@@ -68,6 +68,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
+        upgradeFileImportPatternToLinkedFileNamePattern(preferences, mainPrefsNode);
     }
 
     /**
@@ -554,5 +555,23 @@ public class PreferencesMigrations {
      */
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
+    }
+
+    /**
+     * Migrated from a single file name pattern to a file name pattern for each type.
+     */
+    private static void upgradeFileImportPatternToLinkedFileNamePattern(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
+        String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null);
+
+        GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
+                prefs.get(JabRefCliPreferences.DEFAULT_CITATION_KEY_PATTERN));
+
+        if (preferenceFileNamePattern != null) {
+            mainPrefsNode.put(JabRefCliPreferences.LINKED_FILE_NAME_PATTERNS_NODE, "[auth_year]");
+            if (prefs.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)) {
+                prefs.put(JabRefCliPreferences.LINKED_FILE_NAME_PATTERNS_NODE, "[auth_year]");
+                LOGGER.info("migrated single file name pattern to file name pattern for each type");
+            }
+        }
     }
 }
