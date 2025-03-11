@@ -33,6 +33,12 @@ jobs:
             Happy coding! 🚀
 
             ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**"" label to prevent automatic unassignment.
+          assignment_suggestion_comment: >
+            👋 Hey @{{ handle }}, it looks like you're interested in working on this issue! 🎉
+            
+            It also looks like that you did not find our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing).
+            Please read on there.
+            Then, you will also learn how to assign an issue to yourself.
       - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
         uses: m7kvqbe1/github-action-move-issues@main
         # Action currently works for issues only - pre-condition: https://github.com/takanome-dev/assign-issue-action/issues/269 fixed
