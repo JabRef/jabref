@@ -159,10 +159,10 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR), 201
 
 ## References
 
- {: #Ayaankazerouni}
+<a id="Ayaankazerouni"></a>
 [1]: [@ayaankazerouni](https://github.com/ayaankazerouni): [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f)
 
-{: #LientzSwanson}
+<a id="LientzSwanson"></a>
 [2]: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
 
 <!-- markdownlint-disable-file MD012 -->
