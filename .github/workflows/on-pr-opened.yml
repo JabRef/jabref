@@ -37,7 +37,7 @@ jobs:
         uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-          project-url: "https://github.com/orgs/JabRef/projects/7"
+          project-url: "https://github.com/orgs/JabRef/projects/3"
           target-labels: "📍 Assigned"
           target-column: "In Progress"
           ignored-columns: ""
