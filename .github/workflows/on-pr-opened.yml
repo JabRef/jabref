@@ -1,0 +1,55 @@
+name: Mark issue as in progress
+
+on:
+  # _target is required
+  pull_request_target:
+
+jobs:
+  move_issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/:owner)(\/:repo)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - name: Move issue to "In Progress" in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "In Progress"
+          ignored-columns: ""
+          default-column: "In Progress"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - name: Move issue to "In Progress" in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/7"
+          target-labels: "📍 Assigned"
+          target-column: "In Progress"
+          ignored-columns: ""
+          default-column: "In Progress"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt
