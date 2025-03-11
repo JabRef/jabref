@@ -7,7 +7,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests"]
+    workflows: ["Tests", "Mark issue as in progress"]
     types:
       - completed
 
@@ -56,7 +56,7 @@ jobs:
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: jbangdev/jbang-action@v0.124.0
         with:
-          script: ghprcomment@koppor/ghprcomment
+          script: https://github.com/koppor/ghprcomment/blob/fix-4/ghprcomment.java
           scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
           trust: https://github.com/koppor/ghprcomment/
         env:
