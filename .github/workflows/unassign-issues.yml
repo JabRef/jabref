@@ -7,7 +7,7 @@ on:
 
 jobs:
   unassign_issues:
-    if: github.repository_owner == 'JabRef'
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
       issues: write
