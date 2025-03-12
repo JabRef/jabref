@@ -71,7 +71,18 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             if (gitHandler.isGitRepository()) {
                 parserResult.getDatabaseContext().setUnderVersionControl(true);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            LOGGER.error("IO error when checking Git repository status", e);
+            dialogService.showErrorDialogAndWait(
+                    "Git Repository Error",
+                    "Error accessing Git repository: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Invalid path when checking Git repository status", e);
+            dialogService.showErrorDialogAndWait(
+                    "Git Repository Error",
+                    "Invalid file path for Git repository: " + e.getMessage());
+        } catch (RuntimeException e) {
+            LOGGER.error("Unexpected error when checking Git repository status", e);
             dialogService.showErrorDialogAndWait(
                     "Git Repository Error",
                     "Error checking Git repository status: " + e.getMessage());
