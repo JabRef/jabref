@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -19,6 +17,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -109,7 +108,7 @@ public class AbbreviateAction extends SimpleCommand {
         // Collect all callables to execute in one collection.
         Set<Callable<Boolean>> tasks = entries.stream().<Callable<Boolean>>map(entry -> () ->
                 FieldFactory.getJournalNameFields().stream().anyMatch(journalField ->
-                        runOnUIThread(() ->
+                        UiTaskExecutor.runInJavaFXThread(() ->
                             undoableAbbreviator.abbreviate(databaseContext.getDatabase(), entry, journalField, ce)
                         )))
                 .collect(Collectors.toSet());
@@ -135,30 +134,6 @@ public class AbbreviateAction extends SimpleCommand {
         undoManager.addEdit(ce);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
-    }
-
-    /**
-     * Helper method to run a task on the JavaFX Application Thread and wait for its result.
-     */
-    private boolean runOnUIThread(Callable<Boolean> task) {
-        final boolean[] resultHolder = new boolean[1];
-        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
-        Platform.runLater(() -> {
-            try {
-                resultHolder[0] = task.call();
-            } catch (Exception e) {
-                LOGGER.error("Error while executing task on UI thread", e);
-            } finally {
-                latch.countDown();
-            }
-        });
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.error("Thread interrupted while waiting for UI task to complete", e);
-        }
-        return resultHolder[0];
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
