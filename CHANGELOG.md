@@ -72,7 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where migration of "Search groups" would fail with an exception when the search query is invalid. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
-- We fixed an issue where JabRef displayed "Cleanup entries" instead of "Clean up entries" https://github.com/JabRef/jabref/issues/12703
+- We fixed an issue where JabRef displayed "Cleanup entries" instead of "Clean up entries" [#12710](https://github.com/JabRef/jabref/issues/12710)
 
 
 ### Removed
