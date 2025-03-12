@@ -32,7 +32,7 @@ Some are simpler, while others are more complex. Our primary aim is to guide you
 
 - Select an issue to work on from the [Issues Page](https://github.com/JabRef/jabref/issues). If you are a newcomer, we have a few issues labeled as https://github.com/JabRef/jabref/labels/good%20first%20issue to help you get started. You can start with any of the [unassigned good first issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22%20no%3Aassignee).
 
-- Once you get your first PR merged, you can move on to https://github.com/JabRef/jabref/labels/good%20second%20issue, https://github.com/JabRef/jabref/labels/good%20third%20issue, and finally https://github.com/JabRef/jabref/labels/good%20fourth%20issue before taking up some major bug fixes or features.
+- Once you get your first PR merged, you can move on to https://github.com/JabRef/jabref/labels/good%20second%20issue, https://github.com/JabRef/jabref/labels/good%20third%20issue, and finally https://github.com/JabRef/jabref/labels/good%20fourth%20issue before taking up some more major bug fixes or features. Note that not all beginner friendly issues are labeled, so you may find suitable untagged issues to solve as well.
   
 Always make sure that the issue you select is not presently assigned to anyone.
 
