@@ -121,6 +121,8 @@ import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.compress.harmony.archive.internal.nls.Messages.getString;
+
 /**
  * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
  * class.
@@ -1830,14 +1832,24 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false); // Loads stored preference, initially false
+        String storedMode = getString("gitAutoPushMode", AutoPushMode.MANUALLY.name());
+        AutoPushMode autoPushMode = AutoPushMode.valueOf(storedMode);
 
-        gitPreferences = new GitPreferences(autoPushEnabled, AutoPushMode.MANUALLY);
+        gitPreferences = new GitPreferences(autoPushEnabled, autoPushMode);
 
         EasyBind.listen(gitPreferences.getAutoPushEnabledProperty(), (obs, oldValue, newValue) -> {
             putBoolean("gitAutoPushEnabled", newValue);
         }); // listener automatically saves changes
 
+        EasyBind.listen(gitPreferences.getAutoPushModeProperty(), (obs, oldValue, newValue) -> {
+            putString("gitAutoPushMode", newValue.name());
+        });
+
         return gitPreferences;
+    }
+
+    private void putString(String key, String value) {
+        prefs.put(key, value);
     }
 
     private FileHistory getFileHistory() {
