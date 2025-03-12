@@ -118,6 +118,12 @@ public class LibraryTab extends Tab {
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    
+    /**
+     * The interval in seconds between Git status checks.
+     * 10 seconds provides a good balance between UI responsiveness and reducing system load.
+     */
+    private static final int GIT_STATUS_REFRESH_INTERVAL_SECONDS = 10;
     // Mapping of Git status indicators, as a static constant of the class
     /**
      * Returns the text representation of a Git status for display in the UI.
@@ -1238,7 +1244,7 @@ public class LibraryTab extends Tab {
             checkGitStatusAndUpdateUI.run();
 
             // Create the scheduled task for periodic updates
-            PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(10));
+            PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(GIT_STATUS_REFRESH_INTERVAL_SECONDS));
             gitStatusTimer.setOnFinished(event -> {
                 checkGitStatusAndUpdateUI.run();
                 gitStatusTimer.play(); // Restart the timer
