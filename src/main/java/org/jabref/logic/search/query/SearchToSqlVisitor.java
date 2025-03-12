@@ -221,6 +221,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     }
 
     private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
+        if (field.equalsIgnoreCase(StandardField.DATE.getName()) || field.equalsIgnoreCase(StandardField.YEAR.getName())) {
+            return buildMultiFieldQuery(List.of(StandardField.DATE.getName(), StandardField.YEAR.getName()), term, searchFlags);
+        }
         String sqlOperator = getSqlOperator(searchFlags);
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
@@ -259,6 +262,84 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
+    }
+
+    private SqlQueryNode buildMultiFieldQuery(List<String> fields, String term, EnumSet<SearchFlags> searchFlags) {
+        String sqlOperator = getSqlOperator(searchFlags);
+        String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
+
+        if (!searchFlags.contains(REGULAR_EXPRESSION)) {
+            term = escapeTermForSql(term);
+        }
+
+        StringBuilder sql = new StringBuilder();
+        List<String> params = new ArrayList<>();
+
+        if (searchFlags.contains(NEGATION)) {
+            sql.append("""
+            SELECT %s.%s
+            FROM %s AS %s
+            WHERE %s.%s NOT IN (
+                SELECT %s.%s
+                FROM %s AS %s
+                WHERE (
+        """.formatted(
+                    MAIN_TABLE, ENTRY_ID,
+                    mainTableName, MAIN_TABLE,
+                    MAIN_TABLE, ENTRY_ID,
+                    INNER_TABLE, ENTRY_ID,
+                    mainTableName, INNER_TABLE));
+
+            for (int i = 0; i < fields.size(); i++) {
+                if (i > 0) {
+                    sql.append(" OR ");
+                }
+                String field = fields.get(i);
+                sql.append("""
+                (%s.%s = '%s' AND (%s.%s %s ? OR %s.%s %s ?))
+            """.formatted(
+                        INNER_TABLE, FIELD_NAME, field,
+                        INNER_TABLE, FIELD_VALUE_LITERAL, sqlOperator,
+                        INNER_TABLE, FIELD_VALUE_TRANSFORMED, sqlOperator));
+                params.add(prefixSuffix + term + prefixSuffix);
+                params.add(prefixSuffix + term + prefixSuffix);
+            }
+
+            sql.append("""
+                )
+            )
+        """);
+        } else {
+            for (String field : fields) {
+                if (!sql.isEmpty()) {
+                    sql.append(" UNION ");
+                }
+                sql.append("""
+                SELECT %s.%s
+                FROM %s AS %s
+                WHERE (
+                    (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
+                )
+            """.formatted(
+                        MAIN_TABLE, ENTRY_ID,
+                        mainTableName, MAIN_TABLE,
+                        MAIN_TABLE, FIELD_NAME, field,
+                        MAIN_TABLE, FIELD_VALUE_LITERAL, sqlOperator,
+                        MAIN_TABLE, FIELD_VALUE_TRANSFORMED, sqlOperator));
+                params.add(prefixSuffix + term + prefixSuffix);
+                params.add(prefixSuffix + term + prefixSuffix);
+            }
+        }
+
+        String cte = """
+        cte%d AS (
+            %s
+        )
+        """.formatted(cteCounter, sql);
+
+        SqlQueryNode node = new SqlQueryNode(cte, params);
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
     }
 
     private SqlQueryNode buildEntryIdQuery(String entryId) {
