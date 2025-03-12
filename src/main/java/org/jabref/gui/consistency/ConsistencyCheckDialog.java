@@ -25,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
