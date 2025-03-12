@@ -346,6 +346,7 @@ public class LibraryTab extends Tab {
 
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) throws GitAPIException, IOException {
         TabPane tabPane = this.getTabPane();
+
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
@@ -976,7 +977,9 @@ public class LibraryTab extends Tab {
      */
     public void deleteEntry() {
         int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
-        dialogService.notify(Localization.lang("Deleted %0 entry(s)", entriesDeleted));
+        if (entriesDeleted > 0) {
+            dialogService.notify(Localization.lang("Deleted %0 entry(s)", entriesDeleted));
+        }
     }
 
     public void deleteEntry(BibEntry entry) {

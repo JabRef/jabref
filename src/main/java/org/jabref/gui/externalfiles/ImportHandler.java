@@ -351,7 +351,7 @@ public class ImportHandler {
      * @param entries entries to generate keys for
      */
     private void generateKeys(List<BibEntry> entries) {
-        if (!preferences.getImporterPreferences().isGenerateNewKeyOnImport()) {
+        if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(

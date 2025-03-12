@@ -17,6 +17,7 @@ import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
+import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -238,6 +239,11 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new JabRefFrame.OpenDatabaseFolder(dialogService, stateManager, preferences, () -> stateManager.getActiveDatabase().orElse(null))),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService)),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(stateManager))
         );
 
@@ -245,6 +251,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
@@ -348,8 +355,9 @@ public class MainMenu extends MenuBar {
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_LINKEDIN, new OpenBrowserAction("https://linkedin.com/company/jabref/", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, preferences.getExternalApplicationsPreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_MASTODON, new OpenBrowserAction("https://foojay.social/@jabref", dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences())),
 
                         new SeparatorMenuItem(),

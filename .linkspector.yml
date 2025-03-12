@@ -1,0 +1,17 @@
+files:
+  - README.md
+  - PRIVACY.md
+dirs:
+  - docs/
+excludedFiles:
+  # checking blocked by https://github.com/UmbrellaDocs/linkspector/issues/103
+  - docs/teaching.md
+  - docs/code-howtos/openoffice/overview.md
+useGitIgnore: true
+ignorePatterns:
+  - pattern: '^http(s)?://localhost'
+  - pattern: '^http(s)?://127.0.0.1'
+  - pattern: "^ftp://[^\\s/$?#]*\\.[^\\s]*$"
+  - pattern: "^https://github.com/JabRef/jabref-issue-melting-pot"
+  # works locally, but not in the checker
+  - pattern: "^https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator"

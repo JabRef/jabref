@@ -99,10 +99,9 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ProtectedTermsList)) {
+        if (!(o instanceof ProtectedTermsList otherList)) {
             return false;
         }
-        ProtectedTermsList otherList = (ProtectedTermsList) o;
         return (this.location.equals(otherList.location)) && (this.description.equals(otherList.description));
     }
 

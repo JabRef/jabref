@@ -5,8 +5,9 @@ gradlew text eol=lf
 # windows line endings at windows files
 *.bat text eol=crlf
 
-# ensure that line endings of *.bib, *.fxml, *.java, *.properties are normalized to LF
+# ensure that line endings of certain files are normalized to LF
 *.bib text eol=lf
+*.bak text eol=lf
 *.fxml text eol=lf
 *.java text eol=lf
 *.properties text eol=lf
