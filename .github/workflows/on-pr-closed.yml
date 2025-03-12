@@ -1,4 +1,4 @@
-name: Mark issue as available
+name: On PR closed
 
 on:
   pull_request_target:
@@ -6,6 +6,7 @@ on:
 
 jobs:
   unassign_issue:
+    name: Mark issue as available
     runs-on: ubuntu-latest
     if: github.event.action == 'closed' && !github.event.pull_request.merged
     permissions:
