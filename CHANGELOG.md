@@ -8,6 +8,8 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+- Fixed validation issue for library-specific, user-specific, and LaTeX file directory paths. (#11840)
+
 
 ### Added
 

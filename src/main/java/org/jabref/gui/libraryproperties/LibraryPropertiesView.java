@@ -1,8 +1,11 @@
 package org.jabref.gui.libraryproperties;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
 import org.jabref.gui.libraryproperties.general.GeneralPropertiesViewModel;
@@ -70,16 +73,6 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
                 .filter(tab -> tab instanceof GeneralPropertiesView)
                 .findFirst()
                 .orElse(null);
-
-//        GeneralPropertiesViewModel generalView = null;
-//        for (PropertiesTab tab : viewModel.getPropertiesTabs()) {
-//            if (tab instanceof GeneralPropertiesView) {
-//                generalView = ((GeneralPropertiesView) tab).getViewModel();
-//                break;
-//            }
-//        }
-
-
         if (generalView == null) {
             dialogService.showErrorDialogAndWait(
                     "Error",

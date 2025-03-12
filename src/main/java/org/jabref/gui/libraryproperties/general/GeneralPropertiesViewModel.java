@@ -72,7 +72,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     public boolean validatePaths() {
         boolean isValid = true;
 
-        // Validate library-specific directory
+        //Validate library-specific directory
         String libraryPath = librarySpecificDirectoryProperty.getValue().trim();
         if (!libraryPath.isEmpty() && !validatePath(libraryPath)) {
             librarySpecificDirectoryError.setValue("Invalid path: " + libraryPath);
@@ -81,7 +81,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             librarySpecificDirectoryError.setValue("");
         }
 
-        // Validate user-specific directory
+        //Validate user-specific directory
         String userPath = userSpecificFileDirectoryProperty.getValue().trim();
         if (!userPath.isEmpty() && !validatePath(userPath)) {
             userSpecificFileDirectoryError.setValue("Invalid path: " + userPath);
@@ -90,7 +90,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             userSpecificFileDirectoryError.setValue("");
         }
 
-        // Validate LaTeX directory
+        //Validate LaTeX directory
         String latexPath = laTexFileDirectoryProperty.getValue().trim();
         if (!latexPath.isEmpty() && !validatePath(latexPath)) {
             laTexFileDirectoryError.setValue("Invalid path: " + latexPath);
@@ -126,29 +126,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         return Files.exists(resolvedPath); // The path must exist to be valid
     }
-
-
-/*
-public boolean validatePath(String path) {
-    if (path == null || path.trim().isEmpty()) {
-        return true; // Empty path is considered valid (falls back to default behavior)
-    }
-
-    Path resolvedPath;
-    if (Path.of(path).isAbsolute()) {
-        resolvedPath = Path.of(path);
-    } else {
-        resolvedPath = databaseContext.getDatabasePath()
-                .map(dbPath -> dbPath.getParent().resolve(path))
-                .orElse(Path.of(path)); // Fallback if database path is not set
-    }
-
-    return Files.exists(resolvedPath); // The path must exist to be valid
-}
-*/
-
-
-
 
 
     @Override
