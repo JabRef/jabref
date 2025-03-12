@@ -45,6 +45,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
+      - name: Remove all comments by "github-actions[bot]"
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
+        uses: maheshrayas/action-pr-comment-delete@v3.0
+        with:
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          org: JabRef
+          repo: jabref
+          user: 'github-actions[bot]' #commented by the userid
+          issue: '${{ steps.read-pr_number.outputs.pr_number }}'
       - name: Checkout
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: actions/checkout@v4
