@@ -203,7 +203,7 @@ public class GitHandler {
 
     /**
      * Pulls the latest changes from the remote repository into the current branch.
-     * 
+     *
      * @return {@code true} if the pull operation was successful, {@code false} if the pull failed due to
      *         Git API exceptions such as conflicts, authentication issues, or network problems
      * @throws IOException if an I/O error occurs while accessing the repository, such as when the
@@ -303,37 +303,24 @@ public class GitHandler {
      * @return The relative path to the repository, or empty string if the file is not in the repository
      */
     private String getRelativePath(Path filePath) {
+        if (filePath == null) {
+            LOGGER.debug("Null path provided");
+            return "";
+        }
+
         try {
-            Path absoluteFilePath = filePath.toAbsolutePath().normalize();
-            Path absoluteRepoPath = repositoryPath.toAbsolutePath().normalize();
+            Path absoluteFilePath = filePath.toRealPath();
+            Path absoluteRepoPath = repositoryPath.toRealPath();
 
-            // First try simple relativize
             if (absoluteFilePath.startsWith(absoluteRepoPath)) {
-                String relativePathStr = absoluteRepoPath.relativize(absoluteFilePath).toString();
-                return relativePathStr;
+                return absoluteRepoPath.relativize(absoluteFilePath).toString();
             }
-
-            // Try with canonical paths for symlinks
-            try {
-                absoluteFilePath = absoluteFilePath.toFile().getCanonicalFile().toPath();
-                absoluteRepoPath = absoluteRepoPath.toFile().getCanonicalFile().toPath();
-
-                if (absoluteFilePath.startsWith(absoluteRepoPath)) {
-                    return absoluteRepoPath.relativize(absoluteFilePath).toString();
-                }
-                return "";
-            } catch (IOException e) {
-                LOGGER.debug("IO error when getting canonical path", e);
-                return "";
-            }
-        } catch (SecurityException e) {
-            LOGGER.debug("Security error when accessing file path", e);
             return "";
-        } catch (IllegalArgumentException e) {
-            LOGGER.debug("Invalid path argument", e);
+        } catch (IOException e) {
+            LOGGER.debug("IO error when resolving real path", e);
             return "";
-        } catch (NullPointerException e) {
-            LOGGER.debug("Null path provided", e);
+        } catch (Exception e) {
+            LOGGER.debug("Unexpected error in path handling", e);
             return "";
         }
     }

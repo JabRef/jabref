@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,6 +32,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
@@ -63,6 +63,7 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.git.GitHandler;
@@ -77,6 +78,7 @@ import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -423,7 +425,6 @@ public class LibraryTab extends Tab {
                 tabTitle.append('*');
             }
 
-            // Git status
             if (bibDatabaseContext.isUnderVersionControl()) {
                 Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
                 status.ifPresent(gitStatus -> {
@@ -441,7 +442,6 @@ public class LibraryTab extends Tab {
                 });
             }
 
-            // Filename
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
@@ -454,15 +454,12 @@ public class LibraryTab extends Tab {
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
 
-            // Database mode
             addModeInfo(toolTipText, bibDatabaseContext);
 
-            // Changed information (tooltip)
             if (isModified && !isAutosaveEnabled) {
                 addChangedInformation(toolTipText, fileName);
             }
 
-            // Unique path fragment
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.collectAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
