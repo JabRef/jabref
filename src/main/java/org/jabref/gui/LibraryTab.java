@@ -119,15 +119,24 @@ public class LibraryTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     // Mapping of Git status indicators, as a static constant of the class
-    private static final Map<GitHandler.GitStatus, String> GIT_STATUS_INDICATORS = Map.of(
-        GitHandler.GitStatus.MODIFIED, "[Modified]",
-        GitHandler.GitStatus.STAGED, "[Staged]",
-        GitHandler.GitStatus.AHEAD_OF_REMOTE, "[Ahead]",
-        GitHandler.GitStatus.BEHIND_REMOTE, "[Behind]",
-        GitHandler.GitStatus.UP_TO_DATE, "[Up to date]",
-        GitHandler.GitStatus.COMMITTED, "[Committed]",
-        GitHandler.GitStatus.UNTRACKED, "[Untracked]"
-    );
+    /**
+     * Returns the text representation of a Git status for display in the UI.
+     * This implementation ensures that all enum values are handled.
+     * 
+     * @param status the Git status
+     * @return the text representation of the status
+     */
+    private static String getGitStatusText(GitHandler.GitStatus status) {
+        return switch (status) {
+            case MODIFIED -> "[Modified]";
+            case STAGED -> "[Staged]";
+            case AHEAD_OF_REMOTE -> "[Ahead]";
+            case BEHIND_REMOTE -> "[Behind]";
+            case UP_TO_DATE -> "[Up to date]";
+            case COMMITTED -> "[Committed]";
+            case UNTRACKED -> "[Untracked]";
+        };
+    }
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -416,19 +425,12 @@ public class LibraryTab extends Tab {
         // initialize string joiner separate different elements by braces
         StringJoiner tabTitle = new StringJoiner(" ");
 
-        try {
-            if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                // get the database path
-                Path databasePath = bibDatabaseContext.getDatabasePath().get();
-                // Try to get Git status if available
-                addGitStatusToTitle(tabTitle);
-                // Regular tab title with file name
-                String fileNamePart = databasePath.getFileName().toString();
-                tabTitle.add(fileNamePart);
-            } else {
-                tabTitle.add(Localization.lang("untitled"));
-            }
-        } catch (Exception e) {
+        if (bibDatabaseContext.getDatabasePath().isPresent()) {
+            Path databasePath = bibDatabaseContext.getDatabasePath().get();
+            addGitStatusToTitle(tabTitle);
+            String fileNamePart = databasePath.getFileName().toString();
+            tabTitle.add(fileNamePart);
+        } else {
             tabTitle.add(Localization.lang("untitled"));
         }
 
@@ -453,10 +455,12 @@ public class LibraryTab extends Tab {
 
         try {
             Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
-            status.map(GIT_STATUS_INDICATORS::get)
+            status.map(LibraryTab::getGitStatusText)
                   .ifPresent(tabTitle::add);
-        } catch (Exception e) {
-            // Silent fail on Git status errors
+        } catch (IOException e) {
+            LOGGER.debug("IO error when getting Git status", e);
+        } catch (GitAPIException e) {
+            LOGGER.debug("Git API error when getting status", e);
         }
     }
 
@@ -1223,8 +1227,10 @@ public class LibraryTab extends Tab {
 
                     // Update UI on JavaFX thread
                     Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
-                } catch (Exception e) {
-                    // Silent fail
+                } catch (IOException e) {
+                    LOGGER.debug("IO error when checking Git status during monitoring", e);
+                } catch (GitAPIException e) {
+                    LOGGER.debug("Git API error when checking Git status during monitoring", e);
                 }
             };
 
@@ -1239,8 +1245,12 @@ public class LibraryTab extends Tab {
             });
             // Start periodic monitoring
             gitStatusTimer.play();
-        } catch (Exception e) {
-            // Silent fail
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Could not start Git status monitoring timer", e);
+        } catch (NullPointerException e) {
+            LOGGER.error("Null reference in Git status monitoring", e);
+        } catch (RuntimeException e) {
+            LOGGER.error("Runtime error in Git status monitoring", e);
         }
     }
 }

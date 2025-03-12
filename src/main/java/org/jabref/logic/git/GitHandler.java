@@ -225,23 +225,13 @@ public class GitHandler {
      * Represents the Git status of a file within a repository
      */
     public enum GitStatus {
-        MODIFIED("Modified"),
-        STAGED("Staged"),
-        COMMITTED("Committed"),
-        UP_TO_DATE("Up to date"),
-        BEHIND_REMOTE("Behind remote"),
-        AHEAD_OF_REMOTE("Ahead of remote"),
-        UNTRACKED("Untracked");
-
-        private final String displayName;
-
-        GitStatus(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
+        MODIFIED,
+        STAGED,
+        COMMITTED,
+        UP_TO_DATE,
+        BEHIND_REMOTE,
+        AHEAD_OF_REMOTE,
+        UNTRACKED
     }
 
     /**

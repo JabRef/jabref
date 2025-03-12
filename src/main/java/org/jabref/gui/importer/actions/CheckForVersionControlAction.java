@@ -46,10 +46,12 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
                     parserResult.getDatabaseContext().setUnderVersionControl(true);
                 }
                 return isGitRepo;
-            } catch (Exception e) {
+            } catch (IOException e) {
+                LOGGER.debug("IO error checking Git repository", e);
                 return false;
             }
-        } catch (Exception e) {
+        } catch (NullPointerException | SecurityException e) {
+            LOGGER.debug("Error accessing repository path", e);
             return false;
         }
     }
