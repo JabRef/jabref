@@ -1831,7 +1831,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return gitPreferences;
         }
 
-        boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false); // Loads stored preference, initially false
+        boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
         String storedMode = getString("gitAutoPushMode", AutoPushMode.MANUALLY.name());
         AutoPushMode autoPushMode = AutoPushMode.valueOf(storedMode);
 
@@ -1839,7 +1839,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(gitPreferences.getAutoPushEnabledProperty(), (obs, oldValue, newValue) -> {
             putBoolean("gitAutoPushEnabled", newValue);
-        }); // listener automatically saves changes
+        });
 
         EasyBind.listen(gitPreferences.getAutoPushModeProperty(), (obs, oldValue, newValue) -> {
             putString("gitAutoPushMode", newValue.name());
