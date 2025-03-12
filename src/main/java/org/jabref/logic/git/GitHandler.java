@@ -193,6 +193,7 @@ public class GitHandler {
                    .call();
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to push");
+                LOGGER.info(e.toString());
             }
         }
     }

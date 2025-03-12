@@ -60,7 +60,7 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
-import org.jabref.gui.shared.GitPullAction;
+import org.jabref.gui.shared.GitPushAction;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -411,17 +411,17 @@ public class MainMenu extends MenuBar {
         Menu gitUIMenu = new Menu("Git");
 
         // Create "Git Pull" menu item
-        MenuItem gitPullItem = factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(preferences, dialogService, stateManager));
-
-        // Create "Git Push" menu item
-        MenuItem gitPushItem = new MenuItem("Git Push");
-        gitPushItem.setOnAction(event -> {
+        MenuItem gitPullItem = new MenuItem("Git Pull");
+        gitPullItem.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Git Push");
+            alert.setTitle("Git Pull");
             alert.setHeaderText(null);
-            alert.setContentText("Git Push action will be implemented here!");
+            alert.setContentText("Git Pull action will be implemented here!");
             alert.showAndWait();
         });
+
+        // Create "Git Push" menu item
+        MenuItem gitPushItem = factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(preferences, dialogService, stateManager));
 
         // Add subitems to Git UI Menu
         gitUIMenu.getItems().addAll(gitPullItem, gitPushItem);

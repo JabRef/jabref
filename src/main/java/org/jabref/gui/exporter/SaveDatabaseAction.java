@@ -244,7 +244,7 @@ public class SaveDatabaseAction {
                         preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
                         preferences.getGitPreferences().getAutoPushEnabled()
                 ) {
-                    GitHandler gitHandler = new GitHandler(targetPath, false);
+                    GitHandler gitHandler = new GitHandler(targetPath.getParent(), false);
                     if (gitHandler.isGitRepository()) {
                         gitHandler.postSaveDatabaseAction();
                     }

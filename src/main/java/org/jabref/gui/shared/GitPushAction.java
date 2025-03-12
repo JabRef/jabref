@@ -13,14 +13,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GitPullAction extends SimpleCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitPullAction.class);
+public class GitPushAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitPushAction.class);
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public GitPullAction(
+    public GitPushAction(
             GuiPreferences preferences,
             DialogService dialogService,
             StateManager stateManager) {
@@ -41,14 +41,15 @@ public class GitPullAction extends SimpleCommand {
             return;
         }
 
-        GitHandler gitHandler = new GitHandler(path.get(), false);
+        GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
         if (gitHandler.isGitRepository()) {
             try {
-                gitHandler.pullOnCurrentBranch();
+                gitHandler.pushCommitsToRemoteRepository();
             } catch (Exception e) {
                 dialogService.showErrorDialogAndWait(e);
             }
         } else {
+            LOGGER.info(String.valueOf(path.get()));
             LOGGER.info("Not a git repository");
         }
     }
