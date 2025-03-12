@@ -28,9 +28,21 @@ These tasks provide an opportunity to learn how to set up your local workspace, 
 It is essential to note that JabRef's issues vary in difficulty.
 Some are simpler, while others are more complex. Our primary aim is to guide you through the code, ensuring that the understanding scope remains manageable. Sometimes, grasping the code might demand more effort than actually writing lines of code.
 
-### I am a student and I want to start with something easy
+### I am a student (or a beginner to Open Source)
 
-We collect good issues to start with at our [list of unassigned good first issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22%20no%3Aassignee).
+- Select an issue to work on from the
+  [Issues Page](https://github.com/JabRef/jabref/issues). If you are a newcomer, we
+  have a few issues labeled as
+  https://github.com/JabRef/jabref/labels/good%20first%20issue to
+  help you get started. You can start with any of the [unassigned good first issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22%20no%3Aassignee).
+
+- Once you get your first PR merged, you can move on to
+  https://github.com/JabRef/jabref/labels/good%20second%20issue,
+  https://github.com/JabRef/jabref/labels/good%20third%20issue,
+  and finally https://github.com/JabRef/jabref/labels/good%20fourth%20issue
+  before taking up some major bug fixes or features.
+  
+  Always make sure that the issue you select is not presently assigned to anyone.
 
 ### I am a student and I want to choose from a curated list of university projects
 
