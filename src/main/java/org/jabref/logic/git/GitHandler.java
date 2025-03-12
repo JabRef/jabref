@@ -192,8 +192,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
-                LOGGER.info(e.toString());
+                LOGGER.info("Failed to push: ".concat(e.toString()));
             }
         }
     }
