@@ -71,7 +71,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where migration of "Search groups" would fail with an exception when the search query is invalid. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
--Fixed tooltip delay and improved tooltip styling in the main table[#12649](https://github.com/JabRef/jabref/issues/12649)
+-Fixed tooltip delay from 2sec to 500ms in the main table[#12649](https://github.com/JabRef/jabref/issues/12649)
 
 
 ### Removed
