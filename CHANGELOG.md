@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the obsolete Twitter link and added Mastodon and LinkedIn links in Help -> JabRef resources. [#12660](https://github.com/JabRef/jabref/issues/12660)
 - We improved the Check Integrity dialog entry interaction so that a single click focuses on the corresponding entry and a double-click both focuses on the entry and closes the dialog. [#12245](https://github.com/JabRef/jabref/issues/12245)
 - We improved journal abbreviation lookup with fuzzy matching to handle minor input errors and variations. [#12467](https://github.com/JabRef/jabref/issues/12467)
+- We changed a text JabRef displayed "Cleanup entries" instead of "Clean up entries" [#12710](https://github.com/JabRef/jabref/issues/12710)
 
 ### Fixed
 
@@ -72,7 +73,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where migration of "Search groups" would fail with an exception when the search query is invalid. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
-- We fixed an issue where JabRef displayed "Cleanup entries" instead of "Clean up entries" [#12710](https://github.com/JabRef/jabref/issues/12710)
 
 
 ### Removed
