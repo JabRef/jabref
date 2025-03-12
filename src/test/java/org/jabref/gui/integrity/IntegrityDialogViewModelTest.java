@@ -39,12 +39,6 @@ class IntegrityCheckDialogViewModelTest {
     }
 
     @Test
-    void removeField() {
-        viewModel.removeField(message, StandardField.AUTHOR);
-        verify(entry).setField(Map.of(StandardField.AUTHOR, ""));
-    }
-
-    @Test
     void correctDateFormat() {
         when(message.entry()).thenReturn(entry);
         when(entry.getField(StandardField.DATE)).thenReturn(Optional.of("25-02-2025"));

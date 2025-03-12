@@ -64,9 +64,6 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
             case CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS:
                 maskTitle(message);
                 break;
-            case BIBTEX_FIELD_ONLY:
-                removeField(message, message.field());
-                break;
             case INCORRECT_FORMAT:
                 correctDateFormat(message);
                 break;
@@ -108,12 +105,6 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         }
         Map<Field, String> fields = new HashMap<>();
         fields.put(StandardField.TITLE, result.toString());
-        message.entry().setField(fields);
-    }
-
-    public void removeField(IntegrityMessage message, Field field) {
-        Map<Field, String> fields = new HashMap<>();
-        fields.put(field, "");
         message.entry().setField(fields);
     }
 

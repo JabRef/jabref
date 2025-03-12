@@ -28,8 +28,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.integrity.IntegrityIssue;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.integrity.IntegrityIssue;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -127,6 +127,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     configureButton(issue.get().getFix(), () -> {
                         viewModel.fix(issue.get(), message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
                     });
                     setGraphic(button);
                     return;
