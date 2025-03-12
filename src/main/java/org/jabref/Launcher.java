@@ -15,12 +15,12 @@ import org.jabref.migrations.PreferencesMigrations;
 
 import com.airhacks.afterburner.injection.Injector;
 
-/// The main entry point for the JabRef application.
-///
-/// It has two main functions:
-///
-/// - Handle the command line arguments
-/// - Start the JavaFX application (if not in CLI mode)
+    /// The main entry point for the JabRef application.
+    ///
+    /// It has two main functions:
+    ///
+    /// - Handle the command line arguments
+    /// - Start the JavaFX application (if not in CLI mode)
 public class Launcher {
 
     public static void main(String[] args) {

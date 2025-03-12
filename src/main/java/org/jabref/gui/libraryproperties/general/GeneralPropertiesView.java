@@ -73,4 +73,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     void browseLatexFileDirectory() {
         viewModel.browseLatexDir();
     }
+    public GeneralPropertiesViewModel getViewModel() {
+        return viewModel;
+    }
 }

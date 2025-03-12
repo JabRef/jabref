@@ -1,11 +1,11 @@
 package org.jabref.gui.libraryproperties;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
+import org.jabref.gui.libraryproperties.general.GeneralPropertiesViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -21,6 +21,7 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private ThemeManager themeManager;
+    @Inject private DialogService dialogService; // Injected DialogService
 
     private final BibDatabaseContext databaseContext;
     private LibraryPropertiesViewModel viewModel;
@@ -29,16 +30,14 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
         this.databaseContext = databaseContext;
 
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                .load()
+                .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
-        if (databaseContext.getDatabasePath().isPresent()) {
-            setTitle(Localization.lang("%0 - Library properties", databaseContext.getDatabasePath().get().getFileName()));
-        } else {
-            setTitle(Localization.lang("Library properties"));
-        }
+        setTitle(databaseContext.getDatabasePath()
+                .map(path -> Localization.lang("%0 - Library properties", path.getFileName()))
+                .orElse(Localization.lang("Library properties")));
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
@@ -51,7 +50,9 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
             ScrollPane scrollPane = new ScrollPane(pane.getBuilder());
             scrollPane.setFitToHeight(true);
             scrollPane.setFitToWidth(true);
-            tabPane.getTabs().add(new Tab(pane.getTabName(), scrollPane));
+            Tab tab = new Tab(pane.getTabName(), scrollPane);
+            tabPane.getTabs().add(tab);
+
             if (pane instanceof AbstractPropertiesTabView<?> propertiesTab) {
                 propertiesTab.prefHeightProperty().bind(tabPane.tabMaxHeightProperty());
                 propertiesTab.prefWidthProperty().bind(tabPane.widthProperty());
@@ -62,7 +63,43 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
         viewModel.setValues();
     }
 
+    @FXML
     private void savePreferencesAndCloseDialog() {
+        // Step 1: Retrieve the GeneralPropertiesViewModel
+        GeneralPropertiesView generalView = (GeneralPropertiesView) viewModel.getPropertiesTabs().stream()
+                .filter(tab -> tab instanceof GeneralPropertiesView)
+                .findFirst()
+                .orElse(null);
+
+//        GeneralPropertiesViewModel generalView = null;
+//        for (PropertiesTab tab : viewModel.getPropertiesTabs()) {
+//            if (tab instanceof GeneralPropertiesView) {
+//                generalView = ((GeneralPropertiesView) tab).getViewModel();
+//                break;
+//            }
+//        }
+
+
+        if (generalView == null) {
+            dialogService.showErrorDialogAndWait(
+                    "Error",
+                    "General properties tab is missing. Unable to save settings."
+            );
+            return;
+        }
+
+        GeneralPropertiesViewModel generalViewModel = generalView.getViewModel();
+
+        // Step 2: Validate paths
+        if (!generalViewModel.validatePaths()) {
+            dialogService.showErrorDialogAndWait(
+                    "Invalid Paths",
+                    "One or more paths are invalid. Please correct them before saving."
+            );
+            return;
+        }
+
+        // Step 3: Save settings if validation is successful
         viewModel.storeAllSettings();
         close();
     }

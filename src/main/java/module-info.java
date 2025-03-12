@@ -1,6 +1,5 @@
 open module org.jabref {
     // Swing
-    requires java.desktop;
 
     // SQL
     requires java.sql;
@@ -58,7 +57,6 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
-    requires java.prefs;
     requires com.fasterxml.aalto;
 
     // YAML
@@ -193,5 +191,8 @@ open module org.jabref {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires org.jetbrains.annotations;
+    requires java.desktop;
+    requires java.prefs;
     // endregion
 }

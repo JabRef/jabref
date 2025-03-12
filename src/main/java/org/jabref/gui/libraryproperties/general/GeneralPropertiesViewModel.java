@@ -26,6 +26,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
+import org.jetbrains.annotations.NotNull;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -44,12 +45,111 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
 
+
+
+    private final StringProperty librarySpecificDirectoryError = new SimpleStringProperty("");
+    private final StringProperty userSpecificFileDirectoryError = new SimpleStringProperty("");
+    private final StringProperty laTexFileDirectoryError = new SimpleStringProperty("");
+
+
+
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
     }
+
+
+
+
+    /**
+     * Validates all paths and returns true if all paths are valid.
+     * If a path is invalid, an error message is stored in the corresponding error property.
+     *
+     * @return True if all paths are valid, false otherwise.
+     */
+    public boolean validatePaths() {
+        boolean isValid = true;
+
+        // Validate library-specific directory
+        String libraryPath = librarySpecificDirectoryProperty.getValue().trim();
+        if (!libraryPath.isEmpty() && !validatePath(libraryPath)) {
+            librarySpecificDirectoryError.setValue("Invalid path: " + libraryPath);
+            isValid = false;
+        } else {
+            librarySpecificDirectoryError.setValue("");
+        }
+
+        // Validate user-specific directory
+        String userPath = userSpecificFileDirectoryProperty.getValue().trim();
+        if (!userPath.isEmpty() && !validatePath(userPath)) {
+            userSpecificFileDirectoryError.setValue("Invalid path: " + userPath);
+            isValid = false;
+        } else {
+            userSpecificFileDirectoryError.setValue("");
+        }
+
+        // Validate LaTeX directory
+        String latexPath = laTexFileDirectoryProperty.getValue().trim();
+        if (!latexPath.isEmpty() && !validatePath(latexPath)) {
+            laTexFileDirectoryError.setValue("Invalid path: " + latexPath);
+            isValid = false;
+        } else {
+            laTexFileDirectoryError.setValue("");
+        }
+
+        return isValid;
+    }
+
+
+
+    /**
+     * Validates if the given path exists.
+     *
+     * @param path The path to validate.
+     * @return True if the path exists or is empty, false otherwise.
+     */
+    public boolean validatePath(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            return true; // Empty path is considered valid (falls back to default behavior)
+        }
+
+        Path resolvedPath;
+        if (Path.of(path).isAbsolute()) {
+            resolvedPath = Path.of(path);
+        } else {
+            resolvedPath = databaseContext.getDatabasePath()
+                    .map(dbPath -> dbPath.getParent().resolve(path))
+                    .orElse(Path.of(path)); // Fallback if database path is not set
+        }
+
+        return Files.exists(resolvedPath); // The path must exist to be valid
+    }
+
+
+/*
+public boolean validatePath(String path) {
+    if (path == null || path.trim().isEmpty()) {
+        return true; // Empty path is considered valid (falls back to default behavior)
+    }
+
+    Path resolvedPath;
+    if (Path.of(path).isAbsolute()) {
+        resolvedPath = Path.of(path);
+    } else {
+        resolvedPath = databaseContext.getDatabasePath()
+                .map(dbPath -> dbPath.getParent().resolve(path))
+                .orElse(Path.of(path)); // Fallback if database path is not set
+    }
+
+    return Files.exists(resolvedPath); // The path must exist to be valid
+}
+*/
+
+
+
+
 
     @Override
     public void setValues() {
@@ -65,17 +165,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        MetaData newMetaData = databaseContext.getMetaData();
-
-        newMetaData.setEncoding(selectedEncodingProperty.getValue());
-        newMetaData.setMode(selectedDatabaseModeProperty.getValue());
-
-        String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
-        if (librarySpecificFileDirectory.isEmpty()) {
-            newMetaData.clearLibrarySpecificFileDirectory();
-        } else {
-            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
-        }
+        MetaData newMetaData = getMetaData();
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
@@ -92,6 +182,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         databaseContext.setMetaData(newMetaData);
+    }
+
+    private @NotNull MetaData getMetaData() {
+        MetaData newMetaData = databaseContext.getMetaData();
+
+        newMetaData.setEncoding(selectedEncodingProperty.getValue());
+        newMetaData.setMode(selectedDatabaseModeProperty.getValue());
+
+        String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
+        if (librarySpecificFileDirectory.isEmpty()) {
+            newMetaData.clearLibrarySpecificFileDirectory();
+        } else {
+            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
+        }
+        return newMetaData;
     }
 
     public void browseLibrarySpecificDir() {
@@ -162,3 +267,4 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return foundPath.get();
     }
 }
+
