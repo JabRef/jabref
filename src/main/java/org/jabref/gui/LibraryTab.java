@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -118,7 +117,7 @@ public class LibraryTab extends Tab {
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
-    
+
     /**
      * The interval in seconds between Git status checks.
      * 10 seconds provides a good balance between UI responsiveness and reducing system load.
@@ -128,21 +127,11 @@ public class LibraryTab extends Tab {
     /**
      * Returns the text representation of a Git status for display in the UI.
      * This implementation ensures that all enum values are handled.
-     * 
+     *
      * @param status the Git status
      * @return the text representation of the status
      */
-    private static String getGitStatusText(GitHandler.GitStatus status) {
-        return switch (status) {
-            case MODIFIED -> "[Modified]";
-            case STAGED -> "[Staged]";
-            case AHEAD_OF_REMOTE -> "[Ahead]";
-            case BEHIND_REMOTE -> "[Behind]";
-            case UP_TO_DATE -> "[Up to date]";
-            case COMMITTED -> "[Committed]";
-            case UNTRACKED -> "[Untracked]";
-        };
-    }
+
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -459,15 +448,10 @@ public class LibraryTab extends Tab {
             return;
         }
 
-        try {
-            Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
-            status.map(LibraryTab::getGitStatusText)
-                  .ifPresent(tabTitle::add);
-        } catch (IOException e) {
-            LOGGER.debug("IO error when getting Git status", e);
-        } catch (GitAPIException e) {
-            LOGGER.debug("Git API error when getting status", e);
-        }
+        // getGitStatus() already handles exceptions internally and returns Optional.empty() in case of errors
+        Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
+        status.map(LibraryTab::getGitStatusText)
+              .ifPresent(tabTitle::add);
     }
 
     @Subscribe
@@ -1227,17 +1211,12 @@ public class LibraryTab extends Tab {
         try {
             // Create a unified status check task
             Runnable checkGitStatusAndUpdateUI = () -> {
-                try {
-                    // Force refresh of Git status cache
-                    bibDatabaseContext.getGitStatus();
+                // Force refresh of Git status cache
+                // getGitStatus() already handles exceptions internally
+                bibDatabaseContext.getGitStatus();
 
-                    // Update UI on JavaFX thread
-                    Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
-                } catch (IOException e) {
-                    LOGGER.debug("IO error when checking Git status during monitoring", e);
-                } catch (GitAPIException e) {
-                    LOGGER.debug("Git API error when checking Git status during monitoring", e);
-                }
+                // Update UI on JavaFX thread
+                Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
             };
 
             // Run initial check
@@ -1258,5 +1237,17 @@ public class LibraryTab extends Tab {
         } catch (RuntimeException e) {
             LOGGER.error("Runtime error in Git status monitoring", e);
         }
+    }
+
+        private static String getGitStatusText(GitHandler.GitStatus status) {
+        return switch (status) {
+            case MODIFIED -> "[Modified]";
+            case STAGED -> "[Staged]";
+            case AHEAD_OF_REMOTE -> "[Ahead]";
+            case BEHIND_REMOTE -> "[Behind]";
+            case UP_TO_DATE -> "[Up to date]";
+            case COMMITTED -> "[Committed]";
+            case UNTRACKED -> "[Untracked]";
+        };
     }
 }
