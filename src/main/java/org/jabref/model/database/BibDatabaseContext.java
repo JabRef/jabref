@@ -168,6 +168,10 @@ public class BibDatabaseContext {
         userFileDirectory.ifPresent(fileDirs::add);
 
         Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
+
+        // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
+        //   1) no user-specific file directory set (in the metadata of the bib file) and
+        //   2) no library-specific file directory is set (in the metadata of the bib file)
         librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // BIB file directory or main file directory (according to (global) preferences)
@@ -176,6 +180,7 @@ public class BibDatabaseContext {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
+                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                 fileDirs.add(parentPath.toAbsolutePath());
@@ -259,12 +264,15 @@ public class BibDatabaseContext {
 
         if (getDatabasePath().isPresent()) {
             Path databasePath = getDatabasePath().get();
+            // Eventually, this leads to filenames as "40daf3b0--fuu.bib--2022-09-04--01.36.25.bib" --> "--" is used as separator between "groups"
             String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
 
         indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
     }
 
