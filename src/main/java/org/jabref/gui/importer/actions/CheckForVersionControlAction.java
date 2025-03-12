@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
  */
 public class CheckForVersionControlAction implements GUIPostOpenAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckForVersionControlAction.class);
-    private GitHandler gitHandler;
 
     /**
      * Checks if the file is in a Git repository and marks the database context accordingly.
@@ -64,17 +63,26 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             LOGGER.error("Invalid path when checking Git repository status", e);
             if (dialogService != null) {
                 dialogService.showErrorDialogAndWait(
-                        "Git Repository Error",
-                        "Invalid file path for Git repository: " + e.getMessage());
+                        Localization.lang("Git Repository Error"),
+                        Localization.lang("Invalid file path for Git repository: %0", e.getMessage()));
             }
             return false;
-        } catch (RuntimeException e) {
-            // Catch other runtime exceptions
-            LOGGER.error("Unexpected error when checking Git repository status", e);
+        } catch (UnsupportedOperationException e) {
+            // File system doesn't support needed operations
+            LOGGER.error("Unsupported operation when checking Git repository", e);
             if (dialogService != null) {
                 dialogService.showErrorDialogAndWait(
-                        "Git Repository Error",
-                        "Error checking Git repository status: " + e.getMessage());
+                        Localization.lang("Git Repository Error"),
+                        Localization.lang("Unsupported file system operation: %0", e.getMessage()));
+            }
+            return false;
+        } catch (IllegalStateException e) {
+            // Handle issues with state assumptions
+            LOGGER.error("Invalid state when checking Git repository", e);
+            if (dialogService != null) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Git Repository Error"),
+                        Localization.lang("Invalid application state: %0", e.getMessage()));
             }
             return false;
         }

@@ -201,6 +201,14 @@ public class GitHandler {
         }
     }
 
+    /**
+     * Pulls the latest changes from the remote repository into the current branch.
+     * 
+     * @return {@code true} if the pull operation was successful, {@code false} if the pull failed due to
+     *         Git API exceptions such as conflicts, authentication issues, or network problems
+     * @throws IOException if an I/O error occurs while accessing the repository, such as when the
+     *         repository directory cannot be read or does not exist
+     */
     public boolean pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {

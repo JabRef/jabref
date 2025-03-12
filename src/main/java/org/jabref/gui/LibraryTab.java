@@ -123,14 +123,6 @@ public class LibraryTab extends Tab {
      * 10 seconds provides a good balance between UI responsiveness and reducing system load.
      */
     private static final int GIT_STATUS_REFRESH_INTERVAL_SECONDS = 10;
-    // Mapping of Git status indicators, as a static constant of the class
-    /**
-     * Returns the text representation of a Git status for display in the UI.
-     * This implementation ensures that all enum values are handled.
-     *
-     * @param status the Git status
-     * @return the text representation of the status
-     */
 
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
@@ -1230,16 +1222,16 @@ public class LibraryTab extends Tab {
             });
             // Start periodic monitoring
             gitStatusTimer.play();
-        } catch (IllegalStateException e) {
-            LOGGER.warn("Could not start Git status monitoring timer", e);
         } catch (NullPointerException e) {
             LOGGER.error("Null reference in Git status monitoring", e);
-        } catch (RuntimeException e) {
-            LOGGER.error("Runtime error in Git status monitoring", e);
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Could not start Git status monitoring timer", e);
+        } catch (Exception e) {
+            LOGGER.error("Error in Git status monitoring", e);
         }
     }
 
-        private static String getGitStatusText(GitHandler.GitStatus status) {
+    private static String getGitStatusText(GitHandler.GitStatus status) {
         return switch (status) {
             case MODIFIED -> "[Modified]";
             case STAGED -> "[Staged]";
