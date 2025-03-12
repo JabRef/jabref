@@ -315,9 +315,17 @@ public class GitHandler {
                 }
                 return "";
             } catch (IOException e) {
+                LOGGER.debug("IO error when getting canonical path", e);
                 return "";
             }
-        } catch (Exception e) {
+        } catch (SecurityException e) {
+            LOGGER.debug("Security error when accessing file path", e);
+            return "";
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Invalid path argument", e);
+            return "";
+        } catch (NullPointerException e) {
+            LOGGER.debug("Null path provided", e);
             return "";
         }
     }

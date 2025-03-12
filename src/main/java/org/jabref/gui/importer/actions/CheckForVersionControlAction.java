@@ -19,15 +19,21 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckForVersionControlAction.class);
     private GitHandler gitHandler;
 
-    @Override
-    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+    /**
+     * Checks if the file is in a Git repository and marks the database context accordingly.
+     *
+     * @param parserResult  The parser result containing the database context
+     * @param dialogService The dialog service to show error messages, can be null if no error dialogs should be shown
+     * @return true if the file is in a Git repository, false otherwise
+     */
+    private boolean checkAndMarkGitRepository(ParserResult parserResult, DialogService dialogService) {
+        if (parserResult.getDatabaseContext().getDatabasePath().isEmpty()) {
+            return false;
+        }
+
+        Path databasePath = parserResult.getDatabaseContext().getDatabasePath().get();
+
         try {
-            if (parserResult.getDatabaseContext().getDatabasePath().isEmpty()) {
-                return false;
-            }
-
-            Path databasePath = parserResult.getDatabaseContext().getDatabasePath().get();
-
             // First do a quick check if .git directory exists
             Path gitDir = databasePath.getParent().resolve(".git");
             boolean gitDirExists = Files.exists(gitDir) && Files.isDirectory(gitDir);
@@ -39,12 +45,28 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             }
 
             // Fallback to more thorough check
-            this.gitHandler = new GitHandler(databasePath);
-            boolean isGitRepo = this.gitHandler.isGitRepository();
+            GitHandler gitHandler = new GitHandler(databasePath);
+            boolean isGitRepo = gitHandler.isGitRepository();
             if (isGitRepo) {
                 parserResult.getDatabaseContext().setUnderVersionControl(true);
             }
             return isGitRepo;
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Invalid path when checking Git repository status", e);
+            if (dialogService != null) {
+                dialogService.showErrorDialogAndWait(
+                        "Git Repository Error",
+                        "Invalid file path for Git repository: " + e.getMessage());
+            }
+            return false;
+        } catch (RuntimeException e) {
+            LOGGER.error("Unexpected error when checking Git repository status", e);
+            if (dialogService != null) {
+                dialogService.showErrorDialogAndWait(
+                        "Git Repository Error",
+                        "Error checking Git repository status: " + e.getMessage());
+            }
+            return false;
         } catch (NullPointerException | SecurityException e) {
             LOGGER.debug("Error accessing repository path", e);
             return false;
@@ -52,30 +74,14 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
     }
 
     @Override
+    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        // We don't need to show error dialogs here, just return the result
+        return checkAndMarkGitRepository(parserResult, null);
+    }
+
+    @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        if (parserResult.getDatabaseContext().getDatabasePath().isEmpty()) {
-            return;
-        }
-
-        Path databasePath = parserResult.getDatabaseContext().getDatabasePath().get();
-
-        try {
-            GitHandler gitHandler = new GitHandler(databasePath);
-
-            // Check if file is in a git repository
-            if (gitHandler.isGitRepository()) {
-                parserResult.getDatabaseContext().setUnderVersionControl(true);
-            }
-        } catch (IllegalArgumentException e) {
-            LOGGER.error("Invalid path when checking Git repository status", e);
-            dialogService.showErrorDialogAndWait(
-                    "Git Repository Error",
-                    "Invalid file path for Git repository: " + e.getMessage());
-        } catch (RuntimeException e) {
-            LOGGER.error("Unexpected error when checking Git repository status", e);
-            dialogService.showErrorDialogAndWait(
-                    "Git Repository Error",
-                    "Error checking Git repository status: " + e.getMessage());
-        }
+        // Here we want to show error dialogs if something goes wrong
+        checkAndMarkGitRepository(parserResult, dialogService);
     }
 }
