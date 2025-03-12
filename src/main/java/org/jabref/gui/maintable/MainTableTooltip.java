@@ -23,7 +23,7 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.setShowDelay(Duration.seconds(1));
+        this.setShowDelay(Duration.millis(500));
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
     }
 

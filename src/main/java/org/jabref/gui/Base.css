@@ -364,6 +364,9 @@ TextFlow > .hyperlink:visited,
     -fx-opacity: 95%;
     -fx-text-fill: -jr-tooltip-fg;
     -fx-font-size: 1em;
+    -fx-show-delay: 500ms;
+    -fx-show-duration: 5s;
+    -fx-hide-delay: 200ms;
 }
 
 .tooltip > TextFlow > Text {
