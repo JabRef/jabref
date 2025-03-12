@@ -51,7 +51,16 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
                 parserResult.getDatabaseContext().setUnderVersionControl(true);
             }
             return isGitRepo;
+        } catch (NullPointerException e) {
+            // Specific handling for null pointer
+            LOGGER.debug("Null pointer encountered when checking Git repository", e);
+            return false;
+        } catch (SecurityException e) {
+            // Specific handling for security issues
+            LOGGER.debug("Security error when accessing repository path", e);
+            return false;
         } catch (IllegalArgumentException e) {
+            // Specific handling for invalid arguments
             LOGGER.error("Invalid path when checking Git repository status", e);
             if (dialogService != null) {
                 dialogService.showErrorDialogAndWait(
@@ -60,15 +69,13 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             }
             return false;
         } catch (RuntimeException e) {
+            // Catch other runtime exceptions
             LOGGER.error("Unexpected error when checking Git repository status", e);
             if (dialogService != null) {
                 dialogService.showErrorDialogAndWait(
                         "Git Repository Error",
                         "Error checking Git repository status: " + e.getMessage());
             }
-            return false;
-        } catch (NullPointerException | SecurityException e) {
-            LOGGER.debug("Error accessing repository path", e);
             return false;
         }
     }
