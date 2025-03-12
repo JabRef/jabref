@@ -99,6 +99,29 @@ class GitStatusTesterTest {
         assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
     }
+    
+    @Test
+    @DisplayName("BibDatabaseContext.getGitStatus integration test")
+    void bibDatabaseContextGetGitStatusTest() throws IOException, GitAPIException {
+        // Create a test file in the repository
+        Path bibFile = tempDir.resolve("database.bib");
+        Files.writeString(bibFile, "@Article{test, author={Test}}\n");
+        
+        // Add and commit the file
+        try (Git git = Git.open(tempDir.toFile())) {
+            git.add().addFilepattern(bibFile.getFileName().toString()).call();
+            git.commit().setMessage("Add test file").call();
+        }
+        
+        // Setup BibDatabaseContext with the file
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(bibFile);
+        
+        // Test getGitStatus
+        Optional<GitHandler.GitStatus> status = database.getGitStatus();
+        assertTrue(status.isPresent());
+        assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
+    }
 
     @Test
     @DisplayName("Test status for newly created file")
