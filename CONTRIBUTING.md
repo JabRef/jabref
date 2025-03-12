@@ -34,7 +34,7 @@ Some are simpler, while others are more complex. Our primary aim is to guide you
 
 - Once you get your first PR merged, you can move on to https://github.com/JabRef/jabref/labels/good%20second%20issue, https://github.com/JabRef/jabref/labels/good%20third%20issue, and finally https://github.com/JabRef/jabref/labels/good%20fourth%20issue before taking up some major bug fixes or features.
   
-  Always make sure that the issue you select is not presently assigned to anyone.
+Always make sure that the issue you select is not presently assigned to anyone.
 
 ### I am a student and I want to choose from a curated list of university projects
 
