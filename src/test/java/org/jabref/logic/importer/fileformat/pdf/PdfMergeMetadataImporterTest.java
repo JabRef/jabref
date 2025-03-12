@@ -93,10 +93,9 @@ class PdfMergeMetadataImporterTest {
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
 
-        // If you use a mocked class, and then call `set`ters, they won't work... Thus, we have to create the class manually.
-        FilePreferences filePreferences = new FilePreferences("", "", false, "", "", false, false, Path.of(""), false, Path.of(""), false, false, false);
-        filePreferences.setStoreFilesRelativeToBibFile(true);
-        filePreferences.setWorkingDirectory(directory);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.getWorkingDirectory()).thenReturn(directory);
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(directory.resolve("db.bib"));
