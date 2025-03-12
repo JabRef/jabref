@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: read
+      contents: write
       pull-requests: write
     timeout-minutes: 10
     steps:
@@ -45,6 +45,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           pr_number: ${{ steps.read-pr_number.outputs.pr_number }}
+      - name: Remove all comments by "github-actions[bot]"
+        uses: izhangzhihao/delete-comment@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_user_name: github-actions[bot]
+          issue_number: ${{ steps.read-pr_number.outputs.pr_number }}
       - name: Checkout
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: actions/checkout@v4
