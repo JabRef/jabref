@@ -1,4 +1,4 @@
-name: Unassign issues
+name: Unassign stale issue assignments
 
 on:
   schedule:
