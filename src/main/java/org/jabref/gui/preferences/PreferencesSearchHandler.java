@@ -83,6 +83,13 @@ class PreferencesSearchHandler {
 
     /**
      * Checks if a control contains the given query in its content.
+     * <p>
+     * Matching criteria based on control type:
+     * <ul>
+     *     <li><b>Labeled</b> (e.g., Label, Button): Matches if its text contains the query (case-insensitive).</li>
+     *     <li><b>ComboBox</b>: Matches if any item (converted to string) contains the query (case-insensitive).</li>
+     *     <li><b>TextField</b>: Matches if its content contains the query (case-insensitive).</li>
+     * </ul>
      *
      * @param control The control to check.
      * @param query   The search query.
