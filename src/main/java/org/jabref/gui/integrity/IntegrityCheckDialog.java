@@ -126,18 +126,19 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
              */
             private void configureAction(IntegrityMessage message) {
                 Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(message);
-                if (issue.isPresent()) {
-                    if (issue.get().getFix() == null) {
-                        setGraphic(new Label(Localization.lang("No fix available")));
-                        return;
-                    }
-                    configureButton(issue.get().getFix(), () -> {
-                        viewModel.fix(issue.get(), message);
-                        viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
-                    });
-                    setGraphic(button);
+                if (issue.isEmpty()) {
+                    return;
                 }
+                if (issue.get().getFix() == null) {
+                    setGraphic(new Label(Localization.lang("No fix available")));
+                    return;
+                }
+                configureButton(issue.get().getFix(), () -> {
+                    viewModel.fix(issue.get(), message);
+                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
+                    Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+                });
+                setGraphic(button);
             }
 
             private void configureButton(String text, Runnable action) {
