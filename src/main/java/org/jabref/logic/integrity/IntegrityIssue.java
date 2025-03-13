@@ -63,7 +63,7 @@ public enum IntegrityIssue {
     }
 
     public String getText(Object... args) {
-        return String.format(text.replace("%0", "%s"), args);
+        return text.replace("%0", "%s").formatted(args);
     }
 
     public Optional<String> getFix() {
