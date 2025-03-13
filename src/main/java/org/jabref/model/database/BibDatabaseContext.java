@@ -294,9 +294,6 @@ public class BibDatabaseContext {
         } catch (SecurityException e) {
             LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage());
             return Optional.empty();
-        } catch (IOException e) {
-            LOGGER.warn("IO error while checking Git status at {}: {}", getDatabasePath().get(), e.getMessage());
-            return Optional.empty();
         }
     }
 
