@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -123,16 +124,18 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
              */
             private void configureAction(IntegrityMessage message) {
                 Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(message);
-                if (issue.isPresent() && issue.get().getFix() != null) {
+                if (issue.isPresent()) {
+                    if (issue.get().getFix() == null) {
+                        setGraphic(new Label(Localization.lang("No fix available")));
+                        return;
+                    }
                     configureButton(issue.get().getFix(), () -> {
                         viewModel.fix(issue.get(), message);
                         viewModel.removeFromEntryTypes(message.field().getDisplayName());
                         Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
                     });
                     setGraphic(button);
-                    return;
                 }
-                setGraphic(null);
             }
 
             private void configureButton(String text, Runnable action) {
@@ -192,13 +195,15 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getItems().clear();
 
         Arrays.stream(IntegrityIssue.values())
+              .filter(issue -> issue.getFix() != null)
               .filter(issue -> entryTypes.contains(issue.getText()))
               .filter(issue -> uniqueTexts.add(issue.getText()))
               .forEach(issue -> entryTypeCombo.getItems().add(issue.getText()));
 
-        if (!entryTypeCombo.getItems().isEmpty()) {
-            entryTypeCombo.getSelectionModel().selectFirst();
+        if (entryTypeCombo.getItems().isEmpty()) {
+            entryTypeCombo.getItems().add(Localization.lang("No fix available"));
         }
+        entryTypeCombo.getSelectionModel().selectFirst();
     }
 
     /**

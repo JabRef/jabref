@@ -12,8 +12,8 @@ import org.jabref.logic.l10n.Localization;
  */
 public enum IntegrityIssue {
     ABBREVIATION_DETECTED(Localization.lang("abbreviation detected")),
-    BIBLATEX_FIELD_ONLY(Localization.lang("biblatex field only"), Localization.lang("Remove field")),
-    BIBTEX_FIELD_ONLY(Localization.lang("bibtex field only"), Localization.lang("Remove field")),
+    BIBLATEX_FIELD_ONLY(Localization.lang("biblatex field only")),
+    BIBTEX_FIELD_ONLY(Localization.lang("bibtex field only")),
     BOOKTITLE_ENDS_WITH_CONFERENCE_ON(Localization.lang("booktitle ends with 'conference on'")),
     CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS(Localization.lang("capital letters are not masked using curly brackets {}"), Localization.lang("Mask letters")),
     CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(Localization.lang("Citation key deviates from generated key")),
