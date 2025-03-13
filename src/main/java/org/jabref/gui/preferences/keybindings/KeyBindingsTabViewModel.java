@@ -65,7 +65,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
             keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -> {
                 if (keyBinding.getCategory() != category) return;
-                if (matchesQuery(keyBinding, term.toLowerCase())) {
+                if (matchesSearchTerm(keyBinding, term.toLowerCase())) {
                     KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);
                     categoryItem.getChildren().add(keyBindViewModel);
                 }
@@ -80,16 +80,16 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
      * Searches for the term in the keybinding's localization, category, or key combination
      *
      * @param keyBinding keybinding to search in
-     * @param term      term to search for
+     * @param searchTerm      term to search for
      * @return true if the term is found in the keybinding
      */
-    private boolean matchesQuery(KeyBinding keyBinding, String term) {
-        if (keyBinding.getLocalization().toLowerCase().contains(term) ||
-                keyBinding.getCategory().getName().toLowerCase().contains(term)) {
+    private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
+        if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
+                keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
             return true;
         }
         if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {
-            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(term);
+            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(searchTerm);
         }
         return false;
     }

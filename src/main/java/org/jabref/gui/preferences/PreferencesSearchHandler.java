@@ -31,7 +31,7 @@ class PreferencesSearchHandler {
      */
     PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
-        this.preferenceTabsControls = buildPreferenceTabsControlsMap(preferenceTabs);
+        this.preferenceTabsControls = getPreferenceTabsControlsMap(preferenceTabs);
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
     }
 
@@ -142,7 +142,7 @@ class PreferencesSearchHandler {
      * @param tabs The list of preferences tabs.
      * @return A map of preferences tabs to their controls.
      */
-    private ArrayListMultimap<PreferencesTab, Control> buildPreferenceTabsControlsMap(List<PreferencesTab> tabs) {
+    private ArrayListMultimap<PreferencesTab, Control> getPreferenceTabsControlsMap(List<PreferencesTab> tabs) {
         ArrayListMultimap<PreferencesTab, Control> controlMap = ArrayListMultimap.create();
         tabs.forEach(tab -> scanControls(tab.getBuilder(), controlMap, tab));
         return controlMap;

@@ -30,7 +30,7 @@
             </columnResizePolicy>
         </TreeTableView>
     </VBox>
-    
+
     <HBox>
         <HBox spacing="10.0" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <Button text="%Expand all" onAction="#expandAll"/>

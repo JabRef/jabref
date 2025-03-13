@@ -24,20 +24,13 @@ import org.jabref.logic.l10n.Localization;
 
 public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> implements PreferencesTab {
 
-    @FXML
-    private CustomTextField searchBox;
-    @FXML
-    private TreeTableView<KeyBindingViewModel> keyBindingsTable;
-    @FXML
-    private TreeTableColumn<KeyBindingViewModel, String> actionColumn;
-    @FXML
-    private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
-    @FXML
-    private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> resetColumn;
-    @FXML
-    private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn;
-    @FXML
-    private MenuButton presetsButton;
+    @FXML private CustomTextField searchBox;
+    @FXML private TreeTableView<KeyBindingViewModel> keyBindingsTable;
+    @FXML private TreeTableColumn<KeyBindingViewModel, String> actionColumn;
+    @FXML private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
+    @FXML private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> resetColumn;
+    @FXML private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn;
+    @FXML private MenuButton presetsButton;
 
     @Inject
     private KeyBindingRepository keyBindingRepository;
