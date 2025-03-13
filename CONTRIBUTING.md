@@ -171,12 +171,15 @@ In that case, please implement the requested changes.
 
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
-Your commits will also be automatically squashed upon the pull request being accepted.
+To maintain a clean git history, your commits will also be automatically squashed upon the pull request being accepted.
+Thus, no need to worry about WIP commits or [fixing of git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules).
 
-Please – **Never ever close a pull request and open a new one** -
+Please – **never ever close a pull request and open a new one** -
 This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
 You can push any changes you need to make to the branch your pull request is *from*.
 These changes will be automatically added to your pull request.
+
+> **If you close your pull request, you will be unassigned from the issue automatically.**
 
 ### Development hints
 
