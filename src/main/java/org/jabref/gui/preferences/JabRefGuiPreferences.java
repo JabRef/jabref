@@ -59,7 +59,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
-import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.push.CitationCommandString;
@@ -171,8 +170,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
-    private static final String AUTO_PUSH_ENABLED = "autoPushEnabled";
-    private static final String AUTO_PUSH_MODE = "autoPushMode";
     // endregion
 
     private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
@@ -275,8 +272,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
-        defaults.put(AUTO_PUSH_ENABLED, Boolean.FALSE);
-        defaults.put(AUTO_PUSH_MODE, "manual");
         // endregion
 
         // region unlinkedFilesDialogPreferences
@@ -657,9 +652,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getStringList(SELECTED_SLR_CATALOGS),
-                getBoolean(AUTO_PUSH_ENABLED), // <-- New parameter
-                AutoPushMode.fromString(get(AUTO_PUSH_MODE)));
+                getStringList(SELECTED_SLR_CATALOGS));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -1242,21 +1235,5 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     @Override
     protected boolean moveToTrashSupported() {
         return NativeDesktop.get().moveToTrashSupported();
-    }
-
-    public boolean isAutoPushEnabled() {
-        return getBoolean(AUTO_PUSH_ENABLED);
-    }
-
-    public void setAutoPushEnabled(boolean enabled) {
-        putBoolean(AUTO_PUSH_ENABLED, enabled);
-    }
-
-    public String getAutoPushMode() {
-        return get(AUTO_PUSH_MODE);
-    }
-
-    public void setAutoPushMode(String mode) {
-        put(AUTO_PUSH_MODE, mode);
     }
 }

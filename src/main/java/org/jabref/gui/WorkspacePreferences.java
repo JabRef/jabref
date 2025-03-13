@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
-import org.jabref.logic.preferences.AutoPushMode;
 
 public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
@@ -27,8 +26,6 @@ public class WorkspacePreferences {
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
     private final ObservableList<String> selectedSlrCatalogs;
-    private final BooleanProperty autoPushEnabled;
-    private final ObjectProperty<AutoPushMode> autoPushMode;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -40,9 +37,7 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
-                                List<String> selectedSlrCatalogs,
-                                boolean autoPushEnabled,
-                                AutoPushMode autoPushMode) {
+                                List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -54,8 +49,6 @@ public class WorkspacePreferences {
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
-        this.autoPushEnabled = new SimpleBooleanProperty(autoPushEnabled);
-        this.autoPushMode = new SimpleObjectProperty<>(autoPushMode);
     }
 
     public Language getLanguage() {
@@ -176,29 +169,5 @@ public class WorkspacePreferences {
 
     public void setSelectedSlrCatalogs(List<String> catalogs) {
         selectedSlrCatalogs.setAll(catalogs);
-    }
-
-    public boolean isAutoPushEnabled() {
-        return autoPushEnabled.get();
-    }
-
-    public void setAutoPushEnabled(boolean enabled) {
-        this.autoPushEnabled.set(enabled);
-    }
-
-    public BooleanProperty autoPushEnabledProperty() {
-        return autoPushEnabled;
-    }
-
-    public AutoPushMode getAutoPushMode() {
-        return autoPushMode.get();
-    }
-
-    public void setAutoPushMode(AutoPushMode mode) {
-        this.autoPushMode.set(mode);
-    }
-
-    public ObjectProperty<AutoPushMode> autoPushModeProperty() {
-        return autoPushMode;
     }
 }
