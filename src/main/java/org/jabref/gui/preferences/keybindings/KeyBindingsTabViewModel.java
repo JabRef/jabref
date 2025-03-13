@@ -65,7 +65,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         for (KeyBindingCategory category : KeyBindingCategory.values()) {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
             keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -> {
-                if (keyBinding.getCategory() != category) return;
+                if (keyBinding.getCategory() != category) {
+                    return;
+                }
                 if (matchesSearchTerm(keyBinding, term.toLowerCase())) {
                     KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);
                     categoryItem.getChildren().add(keyBindViewModel);
