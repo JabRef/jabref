@@ -136,6 +136,7 @@ jobs:
           grep -q "1 problem" heylogs.txt || exit 1
 
   changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
     steps:
@@ -365,26 +366,6 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
-
-  conflicts_with_target:
-    if: github.event_name == 'pull_request'
-    name: Conflicts with target branch
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
-      - name: Check PR mergeability
-        id: check_mergeable
-        run: |
-          MERGEABLE=$(gh pr view --json mergeable 12574 --template '{{.mergeable}}')
-          if [ "$MERGEABLE" == "CONFLICTING" ]; then
-            echo "❌ Merge conflicts"
-            exit 1
-          fi
-          echo "✅ No merge conflicts"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   no-force-push:
     if: github.event_name == 'pull_request'
