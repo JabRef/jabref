@@ -61,7 +61,7 @@ public enum IntegrityIssue {
     }
 
     public Optional<String> getFix() {
-        return fix;
+        return Optional.ofNullable(fix);
     }
 
     public static Optional<IntegrityIssue> fromMessage(IntegrityMessage message) {
