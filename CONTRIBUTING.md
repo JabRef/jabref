@@ -83,6 +83,12 @@ One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/
 Comment on the issue you want to work at with `/assign-me`.
 GitHub will then automatically assign you.
 
+## Give JabRef a Star!
+
+JabRef is primarily maintained by volunteers in their free time.
+Keep them motivated by giving the project a GitHub star:
+Simply navigate to <https://github.com/jabref/jabref/> and click on the Star button!
+
 ## Pull Request Process
 
 1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.html) to a) create a fork and b) have the fork checked out on your local machine
