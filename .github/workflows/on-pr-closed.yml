@@ -49,10 +49,14 @@ jobs:
           skip-if-not-in-project: true
       - uses: actions/checkout@v4
       - name: Remove assigned status
-        run : gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove assigned label
-        run : gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove FirstTimeCodeContribution label
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
