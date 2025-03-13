@@ -60,7 +60,7 @@ public enum IntegrityIssue {
         return text;
     }
 
-    public String getFix() {
+    public Optional<String> getFix() {
         return fix;
     }
 

@@ -253,9 +253,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         updateEntryTypeCombo();
 
         if (fixed.get()) {
-            dialogService.notify(Localization.lang("Fixed successfully!"));
+            dialogService.notify(Localization.lang("Fixed successfully."));
         } else {
-            dialogService.notify(Localization.lang("No fixes available!"));
+            dialogService.notify(Localization.lang("No fixes available."));
         }
     }
 
