@@ -49,7 +49,7 @@
     Commits will be lost, comments on commits will loose their context.
     This makes it harder to review.
     In the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) either way before being merged into the `main`` branch.
-- jobName: move_issue
+- jobName: 'Mark issue as in progress'
   message: |
     Your pull request needs to link an issue.
 
