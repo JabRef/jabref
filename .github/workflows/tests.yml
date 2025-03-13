@@ -136,6 +136,7 @@ jobs:
           grep -q "1 problem" heylogs.txt || exit 1
 
   changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
     steps:
