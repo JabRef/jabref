@@ -92,7 +92,7 @@ public class GitHandler {
     /**
      * Returns true if the given path points to a directory that is a git repository (contains a .git folder)
      */
-    public boolean isGitRepository() {
+    boolean isGitRepository() {
         // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
         // This solution is quite simple but might not work in special cases, for us it should suffice.
         return Files.exists(Path.of(repositoryPath.toString(), ".git"));
@@ -201,24 +201,14 @@ public class GitHandler {
         }
     }
 
-    /**
-     * Pulls the latest changes from the remote repository into the current branch.
-     *
-     * @return {@code true} if the pull operation was successful, {@code false} if the pull failed due to
-     *         Git API exceptions such as conflicts, authentication issues, or network problems
-     * @throws IOException if an I/O error occurs while accessing the repository, such as when the
-     *         repository directory cannot be read or does not exist
-     */
-    public boolean pullOnCurrentBranch() throws IOException {
+    public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
                    .setCredentialsProvider(credentialsProvider)
                    .call();
-                return true;
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to pull");
-                return false;
             }
         }
     }
@@ -291,8 +281,6 @@ public class GitHandler {
             } catch (GitAPIException | IOException e) {
                 return Optional.empty();
             }
-        } catch (Exception e) {
-            return Optional.empty();
         }
     }
 

@@ -1232,38 +1232,26 @@ public class LibraryTab extends Tab {
      * Starts periodic monitoring of Git status for the database file
      */
     private void startGitStatusMonitoring() {
-        if (!bibDatabaseContext.isUnderVersionControl() || bibDatabaseContext.getDatabasePath().isEmpty()) {
+        if (!bibDatabaseContext.isUnderVersionControl()) {
             return;
         }
 
         try {
-            // Create a unified status check task
             Runnable checkGitStatusAndUpdateUI = () -> {
-                // Force refresh of Git status cache
-                // getGitStatus() already handles exceptions internally
                 bibDatabaseContext.getGitStatus();
-
-                // Update UI on JavaFX thread
                 Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
             };
 
-            // Run initial check
             checkGitStatusAndUpdateUI.run();
 
-            // Create the scheduled task for periodic updates
             PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(GIT_STATUS_REFRESH_INTERVAL_SECONDS));
             gitStatusTimer.setOnFinished(event -> {
                 checkGitStatusAndUpdateUI.run();
-                gitStatusTimer.play(); // Restart the timer
+                gitStatusTimer.play();
             });
-            // Start periodic monitoring
             gitStatusTimer.play();
-        } catch (NullPointerException e) {
-            LOGGER.error("Null reference in Git status monitoring", e);
         } catch (IllegalStateException e) {
             LOGGER.warn("Could not start Git status monitoring timer", e);
-        } catch (Exception e) {
-            LOGGER.error("Error in Git status monitoring", e);
         }
     }
 }

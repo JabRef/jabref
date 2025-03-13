@@ -99,24 +99,24 @@ class GitStatusTesterTest {
         assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
     }
-    
+
     @Test
     @DisplayName("BibDatabaseContext.getGitStatus integration test")
     void bibDatabaseContextGetGitStatusTest() throws IOException, GitAPIException {
         // Create a test file in the repository
         Path bibFile = tempDir.resolve("database.bib");
         Files.writeString(bibFile, "@Article{test, author={Test}}\n");
-        
+
         // Add and commit the file
         try (Git git = Git.open(tempDir.toFile())) {
             git.add().addFilepattern(bibFile.getFileName().toString()).call();
             git.commit().setMessage("Add test file").call();
         }
-        
+
         // Setup BibDatabaseContext with the file
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(bibFile);
-        
+
         // Test getGitStatus
         Optional<GitHandler.GitStatus> status = database.getGitStatus();
         assertTrue(status.isPresent());
@@ -149,61 +149,6 @@ class GitStatusTesterTest {
         Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
         assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
-    }
-
-    @Test
-    @DisplayName("Test Git status detection in BibDatabaseContext")
-    void bibDatabaseContextGitStatus() throws IOException, GitAPIException {
-        Path testFile = tempDir.resolve("test_database.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(testFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Add bib file", false);
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-        context.setUnderVersionControl(true);
-
-        Files.writeString(testFile, "\n@Book{test2, author = {Another Author}, title = {Another Title}}", StandardOpenOption.APPEND);
-
-        Optional<GitHandler.GitStatus> status = context.getGitStatus();
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.MODIFIED, status.get());
-    }
-
-    @Test
-    @DisplayName("Test isUnderVersionControl method with git repository")
-    void isUnderVersionControlWithGitRepo() throws IOException {
-        Path testFile = tempDir.resolve("version_control_test.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-
-        assertTrue(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(false);
-        assertFalse(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(true);
-        assertTrue(context.isUnderVersionControl());
-    }
-
-    @Test
-    @DisplayName("Test isUnderVersionControl method with non-git repository")
-    void isUnderVersionControlWithNonGitRepo() throws IOException {
-        Path testFile = nonGitTempDir.resolve("non_git_test.bib");
-        Files.writeString(testFile, "@Article{test, author = {Test Author}, title = {Test Title}}");
-
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(testFile);
-
-        assertFalse(context.isUnderVersionControl());
-
-        context.setUnderVersionControl(true);
-        assertTrue(context.isUnderVersionControl());
     }
 
     @Test

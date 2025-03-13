@@ -44,7 +44,6 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
-    private boolean underVersionControl = false;
 
     /**
      * Generate a random UID for unique of the concrete context
@@ -289,7 +288,7 @@ public class BibDatabaseContext {
 
         try {
             // get the path of the current file, then set false to not create a repo by default
-            GitHandler gitHandler = new GitHandler(getDatabasePath().get(), false);
+            GitHandler gitHandler = new GitHandler(getDatabasePath().get());
             return gitHandler.getFileStatus(getDatabasePath().get());
         } catch (SecurityException e) {
             LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage());
@@ -323,16 +322,6 @@ public class BibDatabaseContext {
             return false;
         }
         return false;
-    }
-
-    /**
-     * Set the version control status of this database.
-     *
-     * @param underVersionControl true if this database is under version control
-     *
-     */
-    public void setUnderVersionControl(boolean underVersionControl) {
-        this.underVersionControl = underVersionControl;
     }
 
     @Override
