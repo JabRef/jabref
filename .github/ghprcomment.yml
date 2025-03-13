@@ -87,4 +87,4 @@
 
     Please merge `upstream/main` with your code.
     Preferrably, do this using `git` in your machine.
-    Conflicts in `CHANGELOG.md`` will be handled by a union of changes.
+    Conflicts in `CHANGELOG.md` will be handled by a union of changes.
