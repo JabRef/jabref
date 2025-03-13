@@ -26,15 +26,14 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         Optional<Path> path = parserResult.getDatabaseContext().getDatabasePath();
         if (path.isEmpty()) {
             return false;
-        } else {
-            this.gitHandler = new GitHandler(path.get());
-            return gitHandler.isGitRepository();
         }
+        this.gitHandler = new GitHandler(path.get());
+        return gitHandler.isGitRepository();
     }
 
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
-        parserResult.getDatabaseContext().setVersioned(true); // tags as versioned
+        parserResult.getDatabaseContext().setVersioned(true);
 
         try {
             this.gitHandler.pullOnCurrentBranch();

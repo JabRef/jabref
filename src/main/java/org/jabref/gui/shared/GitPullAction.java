@@ -13,14 +13,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GitPushAction extends SimpleCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitPushAction.class);
+public class GitPullAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitPullAction.class);
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public GitPushAction(
+    public GitPullAction(
             GuiPreferences preferences,
             DialogService dialogService,
             StateManager stateManager) {
@@ -44,9 +44,7 @@ public class GitPushAction extends SimpleCommand {
         GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
         if (gitHandler.isGitRepository()) {
             try {
-                gitHandler.stageAllFiles();
-                gitHandler.createCommitOnCurrentBranch("Automatic update via JabRef)", false);
-                gitHandler.pushCommitsToRemoteRepository();
+                gitHandler.pullOnCurrentBranch();
             } catch (Exception e) {
                 dialogService.showErrorDialogAndWait(e);
             }

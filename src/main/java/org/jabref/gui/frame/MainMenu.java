@@ -3,7 +3,6 @@ package org.jabref.gui.frame;
 import java.util.function.Supplier;
 
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -60,6 +59,7 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
+import org.jabref.gui.shared.GitPullAction;
 import org.jabref.gui.shared.GitPushAction;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
@@ -159,7 +159,9 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                createGitUIMenuItem(factory),
+               factory.createSubMenu(StandardActions.GIT,
+                       factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(preferences, dialogService, stateManager)),
+                       factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(preferences, dialogService, stateManager))),
 
                 new SeparatorMenuItem(),
 
@@ -391,42 +393,6 @@ public class MainMenu extends MenuBar {
         );
 
         return sendMenu;
-    }
-
-//    private MenuItem createGitUIMenuItem() {
-//        MenuItem gitUIItem = new MenuItem("Git");
-//
-//        // Define what happens when Git UI is clicked
-//        gitUIItem.setOnAction(event -> {
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Git");
-//            alert.setHeaderText(null);
-//            alert.setContentText("Git UI will be implemented here! ---TEST");
-//            alert.showAndWait();
-//        });
-//
-//        return gitUIItem;
-//    }
-    private Menu createGitUIMenuItem(ActionFactory factory) {
-        Menu gitUIMenu = new Menu("Git");
-
-        // Create "Git Pull" menu item
-        MenuItem gitPullItem = new MenuItem("Git Pull");
-        gitPullItem.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Git Pull");
-            alert.setHeaderText(null);
-            alert.setContentText("Git Pull action will be implemented here!");
-            alert.showAndWait();
-        });
-
-        // Create "Git Push" menu item
-        MenuItem gitPushItem = factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(preferences, dialogService, stateManager));
-
-        // Add subitems to Git UI Menu
-        gitUIMenu.getItems().addAll(gitPullItem, gitPushItem);
-
-        return gitUIMenu;
     }
 }
 

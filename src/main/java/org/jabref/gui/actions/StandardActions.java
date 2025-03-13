@@ -205,6 +205,7 @@ public enum StandardActions implements Action {
     GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
+    GIT(Localization.lang("Git")),
     GIT_PULL(Localization.lang("Git pull")),
     GIT_PUSH(Localization.lang("Git Push")),
 
