@@ -86,7 +86,8 @@ GitHub will then automatically assign you.
 <!-- markdownlint-disable-next-line MD026 -->
 ## Give JabRef a Star!
 
-JabRef is primarily maintained by volunteers in their free time.
+JabRef is completely free and used by students and researchers all over the world.
+It is actively developed and maintained primarily by volunteers in their free time.
 Keep them motivated by giving the project a GitHub star:
 Simply navigate to <https://github.com/jabref/jabref/> and click on the Star button!
 
