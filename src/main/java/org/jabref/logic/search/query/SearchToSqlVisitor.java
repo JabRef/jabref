@@ -230,9 +230,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         if (field.equalsIgnoreCase(StandardField.DATE.getName()) || field.equalsIgnoreCase(StandardField.YEAR.getName())) {
             if (searchFlags.contains(NEGATION)) {
-                return buildTwoFieldNegationQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
+                return buildTwoFieldsNegationQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
             } else {
-                return buildTwoFieldQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
+                return buildTwoFieldsUnionQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
             }
         }
 
@@ -269,7 +269,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
     }
 
-    private SqlQueryNode buildTwoFieldQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
+    private SqlQueryNode buildTwoFieldsUnionQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
         String cte = """
             cte%d AS (
                 SELECT %s.%s
@@ -303,7 +303,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         return new SqlQueryNode("cte" + cteCounter++);
     }
 
-    private SqlQueryNode buildTwoFieldNegationQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
+    private SqlQueryNode buildTwoFieldsNegationQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
         String cte = """
             cte%d AS (
                 SELECT %s.%s
