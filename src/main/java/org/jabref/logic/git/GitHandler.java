@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
@@ -215,56 +212,6 @@ public class GitHandler {
     public String getCurrentlyCheckedOutBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
-        }
-    }
-
-    /**
-     * Returns a list of unstaged (modified or untracked) files in the repository.
-     *
-     * @return List of unstaged file paths
-     * @throws GitAPIException If an error occurs while fetching the status
-     * @throws IOException If an error occurs while accessing the repository
-     */
-    public List<String> getUnstagedFiles() throws GitAPIException, IOException {
-        try (Git git = Git.open(repositoryPathAsFile)) {
-            Status status = git.status().call();
-            Set<String> modifiedFiles = status.getModified();
-            Set<String> untrackedFiles = status.getUntracked();
-
-            List<String> unstagedFiles = new ArrayList<>();
-            unstagedFiles.addAll(modifiedFiles);
-            unstagedFiles.addAll(untrackedFiles);
-
-            return unstagedFiles;
-        }
-    }
-
-    /**
-     * Stages a specific file.
-     *
-     * @param filePath The relative path of the file to stage
-     * @throws GitAPIException If an error occurs while staging the file
-     * @throws IOException If an error occurs while accessing the repository
-     */
-    public void stageFile(String filePath) throws GitAPIException, IOException {
-        try (Git git = Git.open(repositoryPathAsFile)) {
-            git.add().addFilepattern(filePath).call();
-        } catch (GitAPIException | IOException e) {
-            LOGGER.info("Failed to stage file: ".concat(e.toString()));
-        }
-    }
-
-    /**
-     * Stages all unstaged files in the repository.
-     *
-     * @throws GitAPIException If an error occurs while staging files
-     * @throws IOException If an error occurs while accessing the repository
-     */
-    public void stageAllFiles() throws GitAPIException, IOException {
-        try (Git git = Git.open(repositoryPathAsFile)) {
-            git.add().addFilepattern(".").call();
-        } catch (GitAPIException | IOException e) {
-            LOGGER.info("Failed to stage all files: ".concat(e.toString()));
         }
     }
 
