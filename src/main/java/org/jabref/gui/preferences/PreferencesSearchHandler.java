@@ -1,17 +1,21 @@
 package org.jabref.gui.preferences;
 
-import com.google.common.collect.ArrayListMultimap;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextField;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
+import com.google.common.collect.ArrayListMultimap;
 
 /**
  * This class is responsible for filtering and searching inside the preferences view based on a search query.
@@ -95,11 +99,9 @@ class PreferencesSearchHandler {
                     .anyMatch(item -> item.toLowerCase(Locale.ROOT).contains(query));
         }
 
-        if(control instanceof TextField textField && textField.getText() != null) {
+        if (control instanceof TextField textField && textField.getText() != null) {
             return textField.getText().toLowerCase(Locale.ROOT).contains(query);
         }
-
-        //add other control elements to check for query match
 
         return false;
     }

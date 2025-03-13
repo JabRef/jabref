@@ -1,16 +1,19 @@
 package org.jabref.gui.preferences.keybindings;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.paint.Color;
-import org.controlsfx.control.textfield.CustomTextField;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -21,6 +24,11 @@ import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+
+import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
+import org.controlsfx.control.textfield.CustomTextField;
 
 public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> implements PreferencesTab {
 
@@ -74,8 +82,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
         viewModel.keyBindingPresets().forEach(preset -> presetsButton.getItems().add(createMenuItem(preset)));
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) ->
-        {
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
             viewModel.filterValues(searchTerm);
             setCategoriesExpanded(!searchTerm.isEmpty() || previousText.isEmpty());
         });
@@ -113,7 +120,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     }
 
     private void setCategoriesExpanded(boolean expanded) {
-        if(keyBindingsTable.getRoot() == null) {
+        if (keyBindingsTable.getRoot() == null) {
             return;
         }
         for (TreeItem<KeyBindingViewModel> child : keyBindingsTable.getRoot().getChildren()) {
