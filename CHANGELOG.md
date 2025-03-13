@@ -74,7 +74,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
 
-
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
@@ -608,7 +607,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We renamed "Medline abbreviation" to "dotless abbreviation". [#9504](https://github.com/JabRef/jabref/pull/9504)
 - We now have more "dots" in the offered journal abbreviations. [#9504](https://github.com/JabRef/jabref/pull/9504)
 - We now disable the button "Full text search" in the Searchbar by default [#9527](https://github.com/JabRef/jabref/pull/9527)
-
 
 ### Fixed
 
@@ -1574,4 +1572,5 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
-<!-- markdownlint-disable-file MD012 MD024 MD033 MD053 -->
+
+<!-- markdownlint-disable-file MD024 MD033 MD053 -->
