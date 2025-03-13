@@ -172,7 +172,7 @@ In that case, please implement the requested changes.
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
 To maintain a clean git history, your commits will also be automatically squashed upon acceptance of the pull request, during merging.
-Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules), and force-pushing should be avoided.
+Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules), and force-pushing should be **avoided**.
 
 Please – **never ever close a pull request and open a new one** -
 This causes unessesary work on our side, and is not in the the style of the GitHub Open Source community.
