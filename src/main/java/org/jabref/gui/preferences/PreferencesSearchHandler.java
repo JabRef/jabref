@@ -85,7 +85,7 @@ class PreferencesSearchHandler {
      * @return true if the control contains the query, otherwise false.
      */
     private boolean controlMatchesQuery(Control control, String query) {
-        if (control instanceof Labeled labeled) {
+        if (control instanceof Labeled labeled && labeled.getText() != null) {
             return labeled.getText().toLowerCase(Locale.ROOT).contains(query);
         }
 
@@ -95,7 +95,7 @@ class PreferencesSearchHandler {
                     .anyMatch(item -> item.toLowerCase(Locale.ROOT).contains(query));
         }
 
-        if(control instanceof TextField textField) {
+        if(control instanceof TextField textField && textField.getText() != null) {
             return textField.getText().toLowerCase(Locale.ROOT).contains(query);
         }
 
