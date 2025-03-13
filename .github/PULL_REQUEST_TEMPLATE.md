@@ -1,10 +1,13 @@
-YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT.
+<!-- YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+
 Describe the changes you have made here: what, why, ...
-Link the issue that will be closed. Example: "Closes #333".
+
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
+<!-- Example: Closes (link) OR Closes #xyz -->
 
 ### Mandatory checks
 
-<!-- 
+<!--
 - Go through the list below. Please don't remove any items.
 - [x] done; [ ] not done / not applicable
 -->

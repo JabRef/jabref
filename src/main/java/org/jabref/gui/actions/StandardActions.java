@@ -150,7 +150,7 @@ public enum StandardActions implements Action {
     GENERATE_CITE_KEY(Localization.lang("Generate citation key"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_CITATION_KEYS),
     GENERATE_CITE_KEYS(Localization.lang("Generate citation keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_CITATION_KEYS),
     DOWNLOAD_FULL_TEXT(Localization.lang("Search full text documents online"), IconTheme.JabRefIcons.FILE_SEARCH, KeyBinding.DOWNLOAD_FULL_TEXT),
-    CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
+    CLEANUP_ENTRIES(Localization.lang("Clean up entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), KeyBinding.AUTOMATICALLY_LINK_FILES),
 
     EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
@@ -174,7 +174,8 @@ public enum StandardActions implements Action {
     WEB_MENU(Localization.lang("JabRef resources")),
     OPEN_WEBPAGE(Localization.lang("Website"), Localization.lang("Opens JabRef's website"), IconTheme.JabRefIcons.HOME),
     OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),
-    OPEN_TWITTER("Twitter", Localization.lang("Opens JabRef's Twitter page"), IconTheme.JabRefIcons.TWITTER),
+    OPEN_LINKEDIN("LinkedIn", Localization.lang("Opens JabRef's LinkedIn page"), IconTheme.JabRefIcons.LINKEDIN),
+    OPEN_MASTODON("Mastodon", Localization.lang("Opens JabRef's Mastodon page"), IconTheme.JabRefIcons.MASTODON),
     OPEN_BLOG(Localization.lang("Blog"), Localization.lang("Opens JabRef's blog"), IconTheme.JabRefIcons.BLOG),
     OPEN_DEV_VERSION_LINK(Localization.lang("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
