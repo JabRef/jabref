@@ -32,6 +32,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -83,8 +84,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
-    private final BooleanProperty autoPushEnabled = new SimpleBooleanProperty();
-    private final ObjectProperty<AutoPushMode> autoPushMode = new SimpleObjectProperty<>(AutoPushMode.MANUALLY);
 
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
@@ -95,6 +94,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final GitPreferences gitPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -113,6 +113,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
+        this.gitPreferences = preferences.getGitPreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -194,6 +195,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
 
+        autoPushEnabledProperty().setValue(gitPreferences.getAutoPushEnabled());
+        autoPushModeProperty().setValue(gitPreferences.getAutoPushMode());
+
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
 
@@ -233,6 +237,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
+
+        gitPreferences.setAutoPushEnabled(autoPushEnabledProperty().get());
+        gitPreferences.getAutoPushModeProperty().set(autoPushModeProperty().get());
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
@@ -390,14 +397,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return autosaveLocalLibraries;
     }
 
-    public BooleanProperty autoPushEnabledProperty() {
-        return autoPushEnabled;
-    }
-
-    public ObjectProperty<AutoPushMode> autoPushModeProperty() {
-        return autoPushMode;
-    }
-
     public BooleanProperty createBackupProperty() {
         return this.createBackupProperty;
     }
@@ -436,5 +435,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
+    }
+
+    public BooleanProperty autoPushEnabledProperty() {
+        return gitPreferences.getAutoPushEnabledProperty();
+    }
+
+    public ObjectProperty<AutoPushMode> autoPushModeProperty() {
+        return gitPreferences.getAutoPushModeProperty();
     }
 }
