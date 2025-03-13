@@ -127,10 +127,6 @@ DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.p
 JabRef development is powered by YourKit Java Profiler  
 [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
 
-
-
-
-<p align="center"><a href="https://product-map.ai" target="_blank"><img src="https://product-map.ai/product_map_logo.png" width="50%"></a></p>
 ## ProductMap File Analysis Result
 
 This section contains an analysis of ProductMap files. Each file has a link to its source.
@@ -139,6 +135,6 @@ This section contains an analysis of ProductMap files. Each file has a link to i
 |-------------|---------------------|
 | [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
 
-## ProductMap - Contact Us
-For any inquiries, feel free to [contact us](https://product-map.ai).
-\n\n Last updated on Thu Mar 13 18:45:58 UTC 2025
+### ProductMap - Contact Us
+
+For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
