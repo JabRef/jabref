@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved journal abbreviation lookup with fuzzy matching to handle minor input errors and variations. [#12467](https://github.com/JabRef/jabref/issues/12467)
 - We changed the phrase "Cleanup entries" to "Clean up entries". [#12703](https://github.com/JabRef/jabref/issues/12703)
 - A tooltip now appears after 300ms (instead of 2s). [#12649](https://github.com/JabRef/jabref/issues/12649)
+- Improved search in preferences and keybindings: You can now find settings by entering values from dropdowns or text fields (like "VScode"), easily locate shortcuts by entering keys (like "ctrl+w"), and matching categories automatically expand—with new "Expand all"/"Collapse all" buttons for quicker navigation. [#12647](https://github.com/JabRef/jabref/issues/12647)
 
 ### Fixed
 
