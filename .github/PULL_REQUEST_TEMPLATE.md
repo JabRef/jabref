@@ -1,8 +1,8 @@
-YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT.
+<!-- YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
 
 Describe the changes you have made here: what, why, ...
 
-<!-- PLEASE LINK THE ISSUE WITH THE "Closes" KEYWORD -->
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
 <!-- Example: Closes (link) OR Closes #xyz -->
 
 ### Mandatory checks
