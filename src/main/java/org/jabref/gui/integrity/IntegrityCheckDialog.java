@@ -129,11 +129,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 if (issue.isEmpty()) {
                     return;
                 }
-                if (issue.get().getFix() == null) {
+                if (issue.get().getFix().isEmpty()) {
                     setGraphic(new Label(Localization.lang("No fix available")));
                     return;
                 }
-                configureButton(issue.get().getFix(), () -> {
+                configureButton(issue.get().getFix().get(), () -> {
                     viewModel.fix(issue.get(), message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
                     Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
@@ -198,7 +198,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getItems().clear();
 
         Arrays.stream(IntegrityIssue.values())
-              .filter(issue -> issue.getFix() != null)
+              .filter(issue -> issue.getFix().isPresent())
               .filter(issue -> entryTypes.contains(issue.getText()))
               .filter(issue -> uniqueTexts.add(issue.getText()))
               .forEach(issue -> entryTypeCombo.getItems().add(issue.getText()));
@@ -223,7 +223,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      */
     private boolean hasFix(IntegrityMessage message) {
         return message != null && message.field() != null && IntegrityIssue.fromMessage(message)
-                                                                           .map(issue -> issue.getFix() != null)
+                                                                           .map(issue -> issue.getFix().isPresent())
                                                                            .orElse(false);
     }
 
