@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the message displayed in the Integrity Check Progress dialog to "Waiting for the check to finish...". [#12694](https://github.com/JabRef/jabref/issues/12694)
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
@@ -49,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the obsolete Twitter link and added Mastodon and LinkedIn links in Help -> JabRef resources. [#12660](https://github.com/JabRef/jabref/issues/12660)
 - We improved the Check Integrity dialog entry interaction so that a single click focuses on the corresponding entry and a double-click both focuses on the entry and closes the dialog. [#12245](https://github.com/JabRef/jabref/issues/12245)
 - We improved journal abbreviation lookup with fuzzy matching to handle minor input errors and variations. [#12467](https://github.com/JabRef/jabref/issues/12467)
+- We changed the phrase "Cleanup entries" to "Clean up entries". [#12703](https://github.com/JabRef/jabref/issues/12703)
 
 ### Fixed
 

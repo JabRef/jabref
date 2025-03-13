@@ -1,15 +1,12 @@
-name: Assign Issue
+name: On isuse comment
 
 on:
-  schedule:
-    - cron: 4 12 * * *
   issue_comment:
     types: [created]
-  workflow_dispatch:
 
 jobs:
   assign:
-    if: github.repository_owner == 'JabRef'
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -32,17 +29,14 @@ jobs:
 
             Happy coding! 🚀
 
-            ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**"" label to prevent automatic unassignment.
+            ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**" label to prevent automatic unassignment.
           assignment_suggestion_comment: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue—great! 🎉
-
             It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
-
             Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
-      - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
+      - name: Move issue corresponding column in "Candidates for University Projects"
         uses: m7kvqbe1/github-action-move-issues@main
-        # Action currently works for issues only - pre-condition: https://github.com/takanome-dev/assign-issue-action/issues/269 fixed
-        if: github.event_name == 'issue_comment'
+        if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -51,9 +45,9 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - name: Move Issue to "Assigned" Column in "Good First Issues"
+      - name: Move issue corresponding column in "Good First Issues"
         uses: m7kvqbe1/github-action-move-issues@main
-        if: github.event_name == 'issue_comment'
+        if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
