@@ -49,11 +49,9 @@
 - jobName: no-force-push
   message: >
     Do not force-push!
-    Force push is off limits and very bad style when working together on a project.
-    ([Mainly because it is not supported well by GitHub istself.](https://github.com/orgs/community/discussions/3478))
-    Commits will be lost, comments on commits will loose their context.
-    This makes it harder to review.
-    In the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) either way before being merged into the `main`` branch.
+    Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
+    Commits are lost and comments on commits lose their context, thus making it harder to review changes.
+    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
 - jobName: 'Mark issue as in progress'
   message: |
     Your pull request needs to link an issue.
