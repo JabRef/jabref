@@ -36,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * More tests are located at {@link org.jabref.logic.shared.SynchronizationSimulatorTest} and {@link org.jabref.logic.shared.DBMSProcessorTest}.
+ */
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class DBMSSynchronizerTest {
@@ -45,21 +48,21 @@ class DBMSSynchronizerTest {
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
-    private DBMSType dbmsType;
+    private ConnectorTest connectorTest;
 
     private BibEntry createExampleBibEntry(int index) {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J" + index)
                 .withField(StandardField.TITLE, "The nano processor" + index);
-        bibEntry.getSharedBibEntryData().setSharedID(index);
+        bibEntry.getSharedBibEntryData().setSharedId(index);
         return bibEntry;
     }
 
     @BeforeEach
     void setup() throws Exception {
-        this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
+        this.connectorTest = new ConnectorTest();
+        this.dbmsConnection = connectorTest.getTestDBMSConnection();
+        this.dbmsProcessor = new DBMSProcessor(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
 
@@ -76,8 +79,8 @@ class DBMSSynchronizerTest {
     }
 
     @AfterEach
-    void clear() {
-        dbmsSynchronizer.closeSharedDatabase();
+    void closeDbmsConnection() throws Exception {
+        connectorTest.close();
     }
 
     @Test
@@ -100,6 +103,7 @@ class DBMSSynchronizerTest {
         expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
+
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer");
 
@@ -203,7 +207,7 @@ class DBMSSynchronizerTest {
         modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedIdAsInt());
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());
