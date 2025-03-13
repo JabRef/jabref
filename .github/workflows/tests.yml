@@ -379,16 +379,10 @@ jobs:
         run: |
           MERGEABLE=$(gh pr view --json mergeable 12574 --template '{{.mergeable}}')
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
-            echo "conflicting=yes" >> $GITHUB_OUTPUT
-          else
-            echo "conflicting==no" >> $GITHUB_OUTPUT
+            echo "❌ Merge conflicts"
+            exit 1
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: React if conflicting
-        if: steps.check_mergeable.outputs.conflicting == 'yes'
-        run: |
-          gh pr comment ${{ github.event.number }} --body "⚠️ PR has merge conflicts. Please resolve."
+          echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
