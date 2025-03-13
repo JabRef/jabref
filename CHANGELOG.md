@@ -50,8 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the Check Integrity dialog entry interaction so that a single click focuses on the corresponding entry and a double-click both focuses on the entry and closes the dialog. [#12245](https://github.com/JabRef/jabref/issues/12245)
 - We improved journal abbreviation lookup with fuzzy matching to handle minor input errors and variations. [#12467](https://github.com/JabRef/jabref/issues/12467)
 - We changed the phrase "Cleanup entries" to "Clean up entries". [#12703](https://github.com/JabRef/jabref/issues/12703)
-- Changed tooltip delay from 2sec to 500ms in the main table. [#12649](https://github.com/JabRef/jabref/issues/12649)
-
+- A tooltip now appears after 300ms (instead of 2s). [#12649](https://github.com/JabRef/jabref/issues/12649)
 
 ### Fixed
 
