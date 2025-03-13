@@ -28,6 +28,7 @@ public enum IntegrityIssue {
     JOURNAL_NOT_FOUND_IN_ABBREVIATION_LIST(Localization.lang("journal not found in abbreviation list")),
     LAST_FOUR_NONPUNCTUATION_CHARACTERS_SHOULD_BE_NUMERALS(Localization.lang("last four nonpunctuation characters should be numerals")),
     LINK_SHOULD_REFER_TO_A_CORRECT_FILE_PATH(Localization.lang("link should refer to a correct file path")),
+    NAMES_ARE_NOT_IN_THE_STANDARD_FORMAT(Localization.lang("Names are not in the standard %0 format.")),
     NON_ASCII_ENCODED_CHARACTER_FOUND(Localization.lang("Non-ASCII encoded character found")),
     NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED(Localization.lang("no integer as values for edition allowed")),
     ODD_NUMBER_OF_UNESCAPED(Localization.lang("odd number of unescaped '#'")),
@@ -41,7 +42,8 @@ public enum IntegrityIssue {
     SHOULD_HAVE_THE_FIRST_CHARACTER_CAPITALIZED(Localization.lang("should have the first letter capitalized")),
     SHOULD_HAVE_THE_FIRST_LETTER_CAPITALIZED(Localization.lang("should have the first letter capitalized")),
     UNEXPECTED_CLOSING_CURLY_BRACKET(Localization.lang("unexpected closing curly bracket")),
-    UNEXPECTED_OPENING_CURLY_BRACKET(Localization.lang("unexpected opening curly bracket"));
+    UNEXPECTED_OPENING_CURLY_BRACKET(Localization.lang("unexpected opening curly bracket")),
+    VALUE_IS_NOT_IN_UNICODES_NORMALIZATION_FORM_CANONICAL_COMPOSITION_NFC_FORMAT(Localization.lang("Value is not in Unicode's Normalization Form \"Canonical Composition\" (NFC) format"));
 
     private final String text;
     private final String fix;
