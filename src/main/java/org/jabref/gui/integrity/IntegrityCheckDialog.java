@@ -59,6 +59,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
+    private final double FIX_BUTTON_HEIGHT = 20.0;
+
     public IntegrityCheckDialog(List<IntegrityMessage> messages,
                                 LibraryTab libraryTab,
                                 DialogService dialogService) {
@@ -140,7 +142,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
             private void configureButton(String text, Runnable action) {
                 button.setText(text);
-                button.setPrefHeight(20.0);
+                button.setPrefHeight(FIX_BUTTON_HEIGHT);
                 button.setOnAction(event -> action.run());
             }
         });
