@@ -1,10 +1,5 @@
 package org.jabref.gui.preferences.keybindings;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -14,8 +9,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
-
 import org.jabref.gui.DialogService;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -25,6 +20,11 @@ import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
@@ -64,9 +64,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         for (KeyBindingCategory category : KeyBindingCategory.values()) {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
             keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -> {
-                if (keyBinding.getCategory() == category &&
-                        (keyBinding.getLocalization().toLowerCase().contains(term.toLowerCase()) ||
-                                keyBinding.getCategory().getName().toLowerCase().contains(term.toLowerCase()))) {
+                if (keyBinding.getCategory() != category) return;
+                if (matchesQuery(keyBinding, term.toLowerCase())) {
                     KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);
                     categoryItem.getChildren().add(keyBindViewModel);
                 }
@@ -75,6 +74,24 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
                 root.getChildren().add(categoryItem);
             }
         }
+    }
+
+    /**
+     * Searches for the term in the keybinding's localization, category, or key combination
+     *
+     * @param keyBinding keybinding to search in
+     * @param term      term to search for
+     * @return true if the term is found in the keybinding
+     */
+    private boolean matchesQuery(KeyBinding keyBinding, String term) {
+        if (keyBinding.getLocalization().toLowerCase().contains(term) ||
+                keyBinding.getCategory().getName().toLowerCase().contains(term)) {
+            return true;
+        }
+        if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {
+            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(term);
+        }
+        return false;
     }
 
     public void setNewBindingForCurrent(KeyEvent event) {
