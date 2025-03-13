@@ -94,8 +94,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir (macOS)
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-13') || (steps.checksecrets.outputs.secretspresent == 'NO')

@@ -43,6 +43,7 @@ permissions:
 
 jobs:
   fetchertests:
+    if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
     name: Fetcher tests
     runs-on: ubuntu-latest
     steps:
@@ -58,8 +59,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:
