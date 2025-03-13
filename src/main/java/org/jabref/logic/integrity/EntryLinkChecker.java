@@ -28,7 +28,7 @@ public class EntryLinkChecker implements EntryChecker {
                 entry.getEntryLinkList(field.getKey(), database).stream()
                      .filter(parsedEntryLink -> parsedEntryLink.getLinkedEntry().isEmpty())
                      .forEach(parsedEntryLink -> result.add(new IntegrityMessage(
-                             IntegrityIssue.REFERENCED_CITATION_KEY_DOES_NOT_EXIST.getText(),
+                             IntegrityIssue.REFERENCED_CITATION_KEY_DOES_NOT_EXIST.getText(parsedEntryLink.getKey()),
                              entry, field.getKey())));
             }
         }

@@ -31,7 +31,7 @@ public enum IntegrityIssue {
     NON_ASCII_ENCODED_CHARACTER_FOUND(Localization.lang("Non-ASCII encoded character found")),
     NO_INTEGER_AS_VALUE_FOR_EDITION_ALLOWED(Localization.lang("no integer as values for edition allowed")),
     ODD_NUMBER_OF_UNESCAPED(Localization.lang("odd number of unescaped '#'")),
-    REFERENCED_CITATION_KEY_DOES_NOT_EXIST(Localization.lang("Referenced citation key does not exist")),
+    REFERENCED_CITATION_KEY_DOES_NOT_EXIST(Localization.lang("Referenced citation key '%0' does not exist")),
     SAME_DOI_USED_IN_MULTIPLE_ENTRIES(Localization.lang("Same DOI used in multiple entries")),
     SHOULD_BE_AN_INTEGER_OR_NORMALIZED(Localization.lang("should be an integer or normalized")),
     SHOULD_BE_NORMALIZED(Localization.lang("should be normalized")),
@@ -58,6 +58,10 @@ public enum IntegrityIssue {
 
     public String getText() {
         return text;
+    }
+
+    public String getText(Object... args) {
+        return String.format(text.replace("%0", "%s"), args);
     }
 
     public Optional<String> getFix() {
