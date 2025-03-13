@@ -1,9 +1,9 @@
-package org.jabref.logic.preferences;
+package org.jabref.logic.git;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 
-import org.jabref.logic.git.GitPreferences;
+import org.jabref.logic.preferences.AutoPushMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
