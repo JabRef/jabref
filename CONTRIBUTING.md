@@ -83,6 +83,7 @@ One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/
 Comment on the issue you want to work at with `/assign-me`.
 GitHub will then automatically assign you.
 
+<!-- markdownlint-disable-next-line MD026 -->
 ## Give JabRef a Star!
 
 JabRef is primarily maintained by volunteers in their free time.
