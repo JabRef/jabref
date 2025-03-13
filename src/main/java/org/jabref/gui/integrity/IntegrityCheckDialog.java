@@ -206,6 +206,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getSelectionModel().selectFirst();
     }
 
+    public void fix(IntegrityIssue issue, IntegrityMessage message) {
+        viewModel.fix(issue, message);
+        viewModel.removeFromEntryTypes(message.field().getDisplayName());
+        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+    }
+
     /**
      * Checks if a given {@link IntegrityMessage} has a fix available.
      *
@@ -236,9 +242,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
             messagesTable.getItems().stream()
                     .filter(message -> message.message().equals(issue.getText()) && hasFix(message)) // Filter messages matching the selected issue type and have a fix
                     .forEach(message -> {
-                        viewModel.fix(issue, message);
-                        viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+                        fix(issue, message);
                         fixed.set(true);
                     });
         });
@@ -260,11 +264,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void fixAll() {
         messagesTable.getItems().stream()
                 .filter(this::hasFix)   // Filter all messages that have a fix
-                .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> {
-                    viewModel.fix(issue, message);
-                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                    Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
-                }));
+                .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> fix(issue, message)));
 
         updateEntryTypeCombo();
     }
