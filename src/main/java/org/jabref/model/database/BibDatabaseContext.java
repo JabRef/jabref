@@ -282,7 +282,7 @@ public class BibDatabaseContext {
      * @return The Git status if the database is under version control, or empty if not.
      */
     public Optional<GitHandler.GitStatus> getGitStatus() {
-        if (!isUnderVersionControl() || getDatabasePath().isEmpty()) {
+        if (!isUnderVersionControl()) {
             // if the file is not under version control or does not have a datapath return empty
             return Optional.empty();
         }
@@ -291,8 +291,11 @@ public class BibDatabaseContext {
             // get the path of the current file, then set false to not create a repo by default
             GitHandler gitHandler = new GitHandler(getDatabasePath().get(), false);
             return gitHandler.getFileStatus(getDatabasePath().get());
-        } catch (Exception e) {
-            // Silent fail on Git status errors
+        } catch (SecurityException e) {
+            LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage());
+            return Optional.empty();
+        } catch (IOException e) {
+            LOGGER.warn("IO error while checking Git status at {}: {}", getDatabasePath().get(), e.getMessage());
             return Optional.empty();
         }
     }
@@ -302,7 +305,6 @@ public class BibDatabaseContext {
      */
     public boolean isUnderVersionControl() {
         if (getDatabasePath().isEmpty()) {
-            underVersionControl = false;
             return false;
         }
 
@@ -310,7 +312,6 @@ public class BibDatabaseContext {
 
         // If the file doesn't exist, it can't be under version control
         if (!Files.exists(databasePath)) {
-            underVersionControl = false;
             return false;
         }
 
@@ -318,19 +319,13 @@ public class BibDatabaseContext {
             // Try direct file system check first - faster way to detect git repositories
             Path gitDir = databasePath.getParent().resolve(".git");
             if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
-                underVersionControl = true;
                 return true;
             }
-
-            // Use GitHandler for complete check if simple check fails
-            GitHandler gitHandler = new GitHandler(databasePath, false);
-            underVersionControl = gitHandler.isGitRepository();
-        } catch (Exception e) {
-            // Silent fail if error occurs during repository check
-            underVersionControl = false;
+        } catch (SecurityException e) {
+            LOGGER.warn("No permission to check for Git repository at {}: {}", getDatabasePath().get(), e.getMessage());
+            return false;
         }
-        
-        return underVersionControl;
+        return false;
     }
 
     /**
