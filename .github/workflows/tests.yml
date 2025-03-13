@@ -366,14 +366,40 @@ jobs:
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
 
+  conflicts_with_target:
+    if: github.event_name == 'pull_request'
+    name: Conflicts with target branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Check PR mergeability
+        id: check_mergeable
+        run: |
+          MERGEABLE=$(gh pr view --json mergeable 12574 --template '{{.mergeable}}')
+          if [ "$MERGEABLE" == "CONFLICTING" ]; then
+            echo "conflicting=yes" >> $GITHUB_OUTPUT
+          else
+            echo "conflicting==no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: React if conflicting
+        if: steps.check_mergeable.outputs.conflicting == 'yes'
+        run: |
+          gh pr comment ${{ github.event.number }} --body "⚠️ PR has merge conflicts. Please resolve."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   no-force-push:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Check force push
         id: force_push_check
         run: |
@@ -390,6 +416,7 @@ jobs:
           fi
 
   other_than_main:
+    if: github.event_name == 'pull_request'
     name: Source branch is other than "main"
     runs-on: ubuntu-latest
     steps:
@@ -400,6 +427,7 @@ jobs:
               core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
 
   upload-pr-number:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
