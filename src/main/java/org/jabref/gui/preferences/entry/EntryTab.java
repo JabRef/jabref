@@ -27,27 +27,22 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
+
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
-    @FXML
-    private TextField keywordSeparator;
-    @FXML
-    private CheckBox resolveStrings;
-    @FXML
-    private TagsField<Field> resolveStringsForFields;
-    @FXML
-    private TagsField<Field> nonWrappableFields;
-    @FXML
-    private CheckBox markOwner;
-    @FXML
-    private TextField markOwnerName;
-    @FXML
-    private CheckBox markOwnerOverwrite;
-    @FXML
-    private Button markOwnerHelp;
-    @FXML
-    private CheckBox addCreationDate;
-    @FXML
-    private CheckBox addModificationDate;
+
+    @FXML private TextField keywordSeparator;
+
+    @FXML private CheckBox resolveStrings;
+    @FXML private TagsField<Field> resolveStringsForFields;
+    @FXML private TagsField<Field> nonWrappableFields;
+
+    @FXML private CheckBox markOwner;
+    @FXML private TextField markOwnerName;
+    @FXML private CheckBox markOwnerOverwrite;
+    @FXML private Button markOwnerHelp;
+
+    @FXML private CheckBox addCreationDate;
+    @FXML private CheckBox addModificationDate;
 
     public EntryTab() {
         ViewLoader.view(this)
@@ -57,6 +52,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     public void initialize() {
         this.viewModel = new EntryTabViewModel(preferences);
+
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
@@ -67,17 +63,23 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
             return null; // null means the change is rejected
         };
         TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
+
         keywordSeparator.setTextFormatter(formatter);
+
         setupTagsWraps();
         setupTagsField();
+
         resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
         markOwnerName.disableProperty().bind(markOwner.selectedProperty().not());
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
+
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
+
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
@@ -90,7 +92,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         resolveStringsForFields.setShowSearchIcon(false);
         resolveStringsForFields.setOnMouseClicked(event -> resolveStringsForFields.getEditor().requestFocus());
         resolveStringsForFields.getEditor().getStyleClass().clear();
-        resolveStringsForFields.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> resolveStringsForFields.pseudoClassStateChanged(FOCUSED, newValue));
+        resolveStringsForFields.getEditor().focusedProperty().addListener((_, _, newValue) -> resolveStringsForFields.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
     private void setupTagsWraps() {
@@ -101,7 +103,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         nonWrappableFields.setShowSearchIcon(false);
         nonWrappableFields.setOnMouseClicked(event -> nonWrappableFields.getEditor().requestFocus());
         nonWrappableFields.getEditor().getStyleClass().clear();
-        nonWrappableFields.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> nonWrappableFields.pseudoClassStateChanged(FOCUSED, newValue));
+        nonWrappableFields.getEditor().focusedProperty().addListener((_, _, newValue) -> nonWrappableFields.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
     private Node createTag(Field field) {
