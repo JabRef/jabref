@@ -453,7 +453,7 @@ public class LibraryTab extends Tab {
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
-
+            // Database mode
             addModeInfo(toolTipText, bibDatabaseContext);
 
             if (isModified && !isAutosaveEnabled) {
