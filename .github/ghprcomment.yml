@@ -81,3 +81,10 @@
     - ✅ `Fixes https://github.com/JabRef/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
     - ✅ `Fixes https://github.com/Koppor/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
     - ❌ `Fixes [#xyz](https://github.com/JabRef/jabref/issues/xyz)` links pull-request to issue. Merging the PR will **NOT** close the issue.
+- jobName: 'Conflicts with target branch'
+  message: >
+    Your pull request conflicts with the target branch.
+
+    Please merge `upstream/main` with your code.
+    Preferrably, do this using `git` in your machine.
+    Conflicts in `CHANGELOG.md` will be handled by a union of changes.
