@@ -113,6 +113,9 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     }
 
     private void setCategoriesExpanded(boolean expanded) {
+        if(keyBindingsTable.getRoot() == null) {
+            return;
+        }
         for (TreeItem<KeyBindingViewModel> child : keyBindingsTable.getRoot().getChildren()) {
             child.setExpanded(expanded);
         }
