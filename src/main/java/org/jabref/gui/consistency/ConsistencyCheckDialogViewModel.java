@@ -1,5 +1,7 @@
 package org.jabref.gui.consistency;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -54,6 +56,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final List<Field> allReportedFields;
     private final int columnCount;
     private final int EXTRA_COLUMNS_COUNT = 2;
+    private int CITATION_KEY_COLUMN_INDEX = -1;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
 
@@ -95,13 +98,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     public List<String> getColumnNames() {
-        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
+        Set<String> result = new LinkedHashSet<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
         result.add("Citation Key");
-        allReportedFields.forEach(field -> {
-            result.add(field.getDisplayName());
-        });
-        return result;
+        allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
+        return new ArrayList<>(result);
     }
 
     private void writeMapEntry(Map.Entry<EntryType, BibliographyConsistencyCheck.EntryTypeResult> mapEntry) {
