@@ -12,6 +12,9 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -24,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.ClipBoardManager;
@@ -54,6 +58,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -188,6 +194,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
+
+        Button addExampleButton = new Button("Add Example Entry");
+        addExampleButton.setOnAction(event -> addExampleEntry());
+
+        VBox placeholderBox = new VBox(10, new Label("No entries available"), addExampleButton);
+        placeholderBox.setAlignment(Pos.CENTER);
+
+        // Initial check
+        updatePlaceholder(placeholderBox);
+
+        // Listen for database changes
+        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox));
+
+        // Listener for filtering to remove the button
+        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox));
+
+
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -523,4 +546,31 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void setCitationMergeMode(boolean citationMerge) {
         this.citationMergeMode = citationMerge;
     }
+
+    private void updatePlaceholder(VBox placeholderBox) {
+        LOGGER.info("Update place holder ran ");
+       if (database.getDatabase().getEntries().isEmpty()) {
+           this.setPlaceholder(placeholderBox);
+       } else {
+           this.setPlaceholder(null);
+       }
+    }
+
+    private void addExampleEntry() {
+        BibEntry exampleEntry = new BibEntry(StandardEntryType.Article);
+        exampleEntry.setField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker");
+        exampleEntry.setField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
+        exampleEntry.setField(StandardField.JOURNAL, "TUGboat");
+        exampleEntry.setField(StandardField.VOLUME, "44");
+        exampleEntry.setField(StandardField.NUMBER, "3");
+        exampleEntry.setField(StandardField.PAGES, "441--447");
+        exampleEntry.setField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
+        exampleEntry.setField(StandardField.ISSN, "0896-3207");
+        exampleEntry.setField(StandardField.ISSUE, "138");
+        exampleEntry.setField(StandardField.YEAR, "2023");
+
+        database.getDatabase().insertEntry(exampleEntry);
+    }
 }
+
+
