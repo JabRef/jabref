@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISSN;
 import org.jabref.model.strings.StringUtil;
 
@@ -19,11 +18,11 @@ public class ISSNChecker implements ValueChecker {
 
         ISSN issn = new ISSN(issnString);
         if (!issn.isValidFormat()) {
-            return Optional.of(Localization.lang("incorrect format"));
+            return Optional.of(IntegrityIssue.INCORRECT_FORMAT.getText());
         }
 
         if (!issn.isValidChecksum()) {
-            return Optional.of(Localization.lang("incorrect control digit"));
+            return Optional.of(IntegrityIssue.INCORRECT_CONTROL_DIGIT.getText());
         }
         return Optional.empty();
     }
