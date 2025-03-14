@@ -1,10 +1,9 @@
 package org.jabref.gui.ai.components.aichat;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
+import com.airhacks.afterburner.views.ViewLoader;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.UserMessage;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +13,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-
+import org.controlsfx.control.PopOver;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
 import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
@@ -35,14 +34,13 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
-
-import com.airhacks.afterburner.views.ViewLoader;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.UserMessage;
-import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
@@ -66,6 +64,7 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion1;
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
+    @FXML private Label exQuestionLabel;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -98,7 +97,7 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
-        sendExampleQuestions();
+        initializeExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -116,18 +115,16 @@ public class AiChatComponent extends VBox {
         noticeText.setText(newNotice);
     }
 
-    private void sendExampleQuestions() {
-        exQuestion1.setOnAction(event -> {
-            onSendMessage(exQuestion1.getText());
-        });
+    private void initializeExampleQuestions() {
+        String newExampleLabel = exQuestionLabel.getText();
+        String newExQuestion1 = exQuestion1.getText();
+        String newExQuestion2 = exQuestion2.getText();
+        String newExQuestion3 = exQuestion3.getText();
 
-        exQuestion2.setOnAction(event -> {
-            onSendMessage(exQuestion2.getText());
-        });
-
-        exQuestion3.setOnAction(event -> {
-            onSendMessage(exQuestion3.getText());
-        });
+        exQuestion1.setText(newExQuestion1);
+        exQuestion2.setText(newExQuestion2);
+        exQuestion3.setText(newExQuestion3);
+        exQuestionLabel.setText(newExampleLabel);
     }
 
     private void initializeChatPrompt() {
@@ -206,8 +203,7 @@ public class AiChatComponent extends VBox {
                     ));
                 }
 
-                case SUCCESS -> {
-                }
+                case SUCCESS -> { }
             }
         });
 
@@ -288,6 +284,24 @@ public class AiChatComponent extends VBox {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
         }
+    }
+
+    @FXML
+    private void sendExampleQuestion1Prompt() {
+        String questionText = exQuestion1.getText();
+        onSendMessage(questionText);
+    }
+
+    @FXML
+    private void sendExampleQuestion2Prompt() {
+        String questionText = exQuestion2.getText();
+        onSendMessage(questionText);
+    }
+
+    @FXML
+    private void sendExampleQuestion3Prompt() {
+        String questionText = exQuestion3.getText();
+        onSendMessage(questionText);
     }
 }
 
