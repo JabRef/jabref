@@ -282,12 +282,10 @@ public class BibDatabaseContext {
      */
     public Optional<GitHandler.GitStatus> getGitStatus() {
         if (!isUnderVersionControl()) {
-            // if the file is not under version control or does not have a datapath return empty
             return Optional.empty();
         }
 
         try {
-            // get the path of the current file, then set false to not create a repo by default
             GitHandler gitHandler = new GitHandler(getDatabasePath().get());
             return gitHandler.getFileStatus(getDatabasePath().get());
         } catch (SecurityException e) {
@@ -306,13 +304,11 @@ public class BibDatabaseContext {
 
         Path databasePath = getDatabasePath().get();
 
-        // If the file doesn't exist, it can't be under version control
         if (!Files.exists(databasePath)) {
             return false;
         }
 
         try {
-            // Try direct file system check first - faster way to detect git repositories
             Path gitDir = databasePath.getParent().resolve(".git");
             if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
                 return true;
