@@ -106,7 +106,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 List<String> message = row.getValue().message();
                 if (currentIndex<message.size()){
                     return new ReadOnlyStringWrapper(message.get(currentIndex));
-                } else{
+                } else {
                     return new ReadOnlyStringWrapper("");
                 }
             });
