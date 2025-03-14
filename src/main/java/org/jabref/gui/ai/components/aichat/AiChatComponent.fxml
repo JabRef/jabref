@@ -23,6 +23,13 @@
         <ChatHistoryComponent fx:id="uiChatHistory" VBox.vgrow="ALWAYS" fitToWidth="true" />
     </Loadable>
 
+    
+     <HBox spacing="10" alignment="CENTER">
+        <Hyperlink text="What is the goal of the paper?" onAction="#onQuestionClicked"/>
+        <Hyperlink text="Which methods were used in the research?" onAction="#onQuestionClicked"/>
+        <Hyperlink text="What are the key findings?" onAction="#onQuestionClicked"/>
+    </HBox>
+
     <HBox spacing="10">
         <Button alignment="CENTER"
                 fx:id="notificationsButton"
