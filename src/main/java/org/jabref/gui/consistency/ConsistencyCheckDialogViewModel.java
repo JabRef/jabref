@@ -1,6 +1,5 @@
 package org.jabref.gui.consistency;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -10,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,12 +97,12 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return tableData;
     }
 
-    public List<String> getColumnNames() {
+    public Set<String> getColumnNames() {
         Set<String> result = new LinkedHashSet<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
         result.add("Citation Key");
         allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
-        return new ArrayList<>(result);
+        return result;
     }
 
     private void writeMapEntry(Map.Entry<EntryType, BibliographyConsistencyCheck.EntryTypeResult> mapEntry) {

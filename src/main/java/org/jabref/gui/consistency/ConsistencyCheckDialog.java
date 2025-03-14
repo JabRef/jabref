@@ -97,14 +97,20 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(filteredData);
 
-        for (int i = 0; i < viewModel.getColumnNames().size(); i++) {
-            int columnIndex = i;
-            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
+        int columnIndex = 0;
+        for (String columnName : viewModel.getColumnNames()) {
+           final int currentIndex = columnIndex;
+            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
 
             tableColumn.setCellValueFactory(row -> {
                 List<String> message = row.getValue().message();
-                return new ReadOnlyStringWrapper(message.get(columnIndex));
+                if (currentIndex<message.size()){
+                    return new ReadOnlyStringWrapper(message.get(currentIndex));
+                } else{
+                    return new ReadOnlyStringWrapper("");
+                }
             });
+            columnIndex++;
 
             tableColumn.setCellFactory(_ -> new TableCell<>() {
                 @Override
