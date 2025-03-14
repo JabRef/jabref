@@ -159,9 +159,9 @@ We reserve the right to reject pull requests that contain little or no genuine a
 
 ### After submission of a pull request
 
-After you submitted a pull request, automated checks will run and bots will check your code.
-You will get comments on your pull request after about 5 minutes.
-Reacing in them in a timely manner is a good style.
+Once you submit a pull request, automated checks will run and bots will perform a preliminary review on your code.
+You will get automated comments on your pull request within about 5 minutes.
+Acting on them in a timely manner is expected.
 
 You may also see "Some checks were not successful".
 You can click on failing checks to see more information about why they failed.
@@ -174,8 +174,8 @@ Thus, no need to worry about WIP commits or [fixing git submodule issues](https:
 
 After all the basic checks are green, maintainers will look at your pull request.
 Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
-The pull request may be approved immediatly, or a reviewer may request changes.
-In that case, please implement the requested changes.
+The pull request may be approved immediatly, or a reviewer may request changes and/or have discussions regarding your approach.
+In that case, you are expected to answer any questions and implement the requested changes.
 
 Please – **never ever close a pull request and open a new one** -
 This causes unessesary work on our side, and is not in the the style of the GitHub Open Source community.
