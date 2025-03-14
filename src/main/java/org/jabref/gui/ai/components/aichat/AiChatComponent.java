@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -57,11 +58,24 @@ public class AiChatComponent extends VBox {
 
     private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
 
-    @FXML private Loadable uiLoadableChatHistory;
-    @FXML private ChatHistoryComponent uiChatHistory;
-    @FXML private Button notificationsButton;
-    @FXML private ChatPromptComponent chatPrompt;
-    @FXML private Label noticeText;
+    @FXML
+    private Loadable uiLoadableChatHistory;
+    @FXML
+    private ChatHistoryComponent uiChatHistory;
+    @FXML
+    private Button notificationsButton;
+    @FXML
+    private ChatPromptComponent chatPrompt;
+    @FXML
+    private Label noticeText;
+    @FXML
+    private Hyperlink exQuestion1;
+    @FXML
+    private Hyperlink exQuestion2;
+    @FXML
+    private Hyperlink exQuestion3;
+    @FXML
+    private Label exQuestionLabel;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -94,6 +108,7 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
+        initializeExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -109,6 +124,18 @@ public class AiChatComponent extends VBox {
                 .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
         noticeText.setText(newNotice);
+    }
+
+    private void initializeExampleQuestions() {
+        String newExampleLabel = exQuestionLabel.getText();
+        String newExQuestion1 = exQuestion1.getText();
+        String newExQuestion2 = exQuestion2.getText();
+        String newExQuestion3 = exQuestion3.getText();
+
+        exQuestion1.setText(newExQuestion1);
+        exQuestion2.setText(newExQuestion2);
+        exQuestion3.setText(newExQuestion3);
+        exQuestionLabel.setText(newExampleLabel);
     }
 
     private void initializeChatPrompt() {
@@ -174,8 +201,8 @@ public class AiChatComponent extends VBox {
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
                 case PROCESSING -> notifications.add(new Notification(
-                    Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                    Localization.lang("After the file will be ingested, you will be able to chat with it.")
+                        Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                        Localization.lang("After the file will be ingested, you will be able to chat with it.")
                 ));
 
                 case ERROR -> {
@@ -187,7 +214,8 @@ public class AiChatComponent extends VBox {
                     ));
                 }
 
-                case SUCCESS -> { }
+                case SUCCESS -> {
+                }
             }
         });
 
@@ -269,4 +297,23 @@ public class AiChatComponent extends VBox {
             aiChatLogic.getChatHistory().remove(index);
         }
     }
+
+    @FXML
+    private void sendExampleQuestion1Prompt() {
+        String questionText = exQuestion1.getText();
+        onSendMessage(questionText);
+    }
+
+    @FXML
+    private void sendExampleQuestion2Prompt() {
+        String questionText = exQuestion2.getText();
+        onSendMessage(questionText);
+    }
+
+    @FXML
+    private void sendExampleQuestion3Prompt() {
+        String questionText = exQuestion3.getText();
+        onSendMessage(questionText);
+    }
 }
+
