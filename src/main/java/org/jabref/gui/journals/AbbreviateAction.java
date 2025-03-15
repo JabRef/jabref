@@ -1,12 +1,7 @@
 package org.jabref.gui.journals;
 
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -21,7 +16,6 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -81,13 +75,13 @@ public class AbbreviateAction extends SimpleCommand {
                 || (action == StandardActions.ABBREVIATE_DOTLESS)
                 || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)) {
             dialogService.notify(Localization.lang("Abbreviating..."));
-            stateManager.getActiveDatabase().ifPresent(databaseContext ->
+            stateManager.getActiveDatabase().ifPresent(_ ->
                     BackgroundTask.wrap(() -> abbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
         } else if (action == StandardActions.UNABBREVIATE) {
             dialogService.notify(Localization.lang("Unabbreviating..."));
-            stateManager.getActiveDatabase().ifPresent(databaseContext ->
+            stateManager.getActiveDatabase().ifPresent(_ ->
                     BackgroundTask.wrap(() -> unabbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
