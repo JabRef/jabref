@@ -136,6 +136,7 @@ jobs:
           grep -q "1 problem" heylogs.txt || exit 1
 
   changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
     steps:
@@ -367,13 +368,13 @@ jobs:
         uses: olivernybroe/action-conflict-finder@v4.0
 
   no-force-push:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Check force push
         id: force_push_check
         run: |
@@ -390,6 +391,7 @@ jobs:
           fi
 
   other_than_main:
+    if: github.event_name == 'pull_request'
     name: Source branch is other than "main"
     runs-on: ubuntu-latest
     steps:

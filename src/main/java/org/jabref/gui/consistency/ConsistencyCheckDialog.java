@@ -132,7 +132,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         EnumSet<ConsistencySymbol> targetSymbols = EnumSet.of(
                 ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
-                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
+                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
         );
 
         targetSymbols.stream()

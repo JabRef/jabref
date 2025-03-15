@@ -7,14 +7,14 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests", "Mark issue as in progress"]
+    workflows: ["Tests", "On PR opened"]
     types:
       - completed
 
 jobs:
   comment:
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
-    if: ${{ github.event.workflow_run.conclusion == 'failure' && (github.repository_owner == 'JabRef') }}
+    if: ${{ github.repository == 'JabRef/jabref' }}
     runs-on: ubuntu-latest
     permissions:
       actions: read

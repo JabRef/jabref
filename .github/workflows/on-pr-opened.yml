@@ -1,4 +1,4 @@
-name: Mark issue as in progress
+name: On PR opened
 
 on:
   # _target is required
@@ -6,6 +6,7 @@ on:
 
 jobs:
   move_issue:
+    name: Mark issue as in progress
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -44,6 +45,24 @@ jobs:
           default-column: "In Progress"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
+  conflicts_with_target:
+    name: Conflicts with target branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Check PR mergeability
+        id: check_mergeable
+        run: |
+          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
+          if [ "$MERGEABLE" == "CONFLICTING" ]; then
+            echo "❌ Merge conflicts"
+            exit 1
+          fi
+          echo "✅ No merge conflicts"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
     runs-on: ubuntu-latest
     steps:
