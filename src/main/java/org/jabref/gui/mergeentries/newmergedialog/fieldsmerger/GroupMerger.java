@@ -1,5 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
+import java.util.Objects;
+
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
@@ -15,10 +17,7 @@ public class GroupMerger implements FieldMerger {
     private final @NonNull BibEntryPreferences bibEntryPreferences;
 
     public GroupMerger(@NonNull BibEntryPreferences bibEntryPreferences) {
-        if (bibEntryPreferences == null) {
-            throw new IllegalArgumentException("bibEntryPreferences cannot be null");
-        }
-        this.bibEntryPreferences = bibEntryPreferences;
+        this.bibEntryPreferences = Objects.requireNonNull(bibEntryPreferences);
     }
 
     @Override
