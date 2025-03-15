@@ -99,7 +99,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         int columnIndex = 0;
         for (String columnName : viewModel.getColumnNames()) {
-           final int currentIndex = columnIndex;
+            final int currentIndex = columnIndex;
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
 
             tableColumn.setCellValueFactory(row -> {

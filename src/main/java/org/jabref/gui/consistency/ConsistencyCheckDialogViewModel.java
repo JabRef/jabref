@@ -1,6 +1,5 @@
 package org.jabref.gui.consistency;
 
-import java.util.Set;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
