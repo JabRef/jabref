@@ -70,8 +70,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where duplicate items cannot be removed correctly when merging groups or keywords. [#12585](https://github.com/JabRef/jabref/issues/12585)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
 
-
-
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)

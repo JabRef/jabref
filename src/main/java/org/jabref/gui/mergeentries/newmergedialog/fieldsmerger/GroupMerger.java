@@ -11,14 +11,11 @@ import org.jabref.model.strings.StringUtil;
  * A merger for the {@link StandardField#GROUPS} field
  * */
 public class GroupMerger implements FieldMerger {
-//    public static final String GROUPS_SEPARATOR = ", ";
-//    public static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
 
     private final BibEntryPreferences bibEntryPreferences;
 
     public GroupMerger(BibEntryPreferences bibEntryPreferences) {
-        Objects.requireNonNull(bibEntryPreferences);
-        this.bibEntryPreferences = bibEntryPreferences;
+        this.bibEntryPreferences = Objects.requireNonNull(bibEntryPreferences);
     }
 
     @Override
