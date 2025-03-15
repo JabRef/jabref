@@ -104,7 +104,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
             tableColumn.setCellValueFactory(row -> {
                 List<String> message = row.getValue().message();
-                if (currentIndex<message.size()){
+                if (currentIndex<message.size()) {
                     return new ReadOnlyStringWrapper(message.get(currentIndex));
                 } else {
                     return new ReadOnlyStringWrapper("");
