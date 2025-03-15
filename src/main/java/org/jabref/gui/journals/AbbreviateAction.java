@@ -104,24 +104,9 @@ public class AbbreviateAction extends SimpleCommand {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
 
-        // Collect all callables to execute in one collection.
-        Set<Callable<Boolean>> tasks = entries.stream().<Callable<Boolean>>map(entry -> () ->
-                FieldFactory.getJournalNameFields().stream().anyMatch(journalField ->
-                        undoableAbbreviator.abbreviate(databaseContext.getDatabase(), entry, journalField, ce)))
-                .collect(Collectors.toSet());
-
-        // Execute the callables and wait for the results.
-        List<Future<Boolean>> futures = HeadlessExecutorService.INSTANCE.executeAll(tasks);
-
-        // Evaluate the results of the callables.
-        long count = futures.stream().filter(future -> {
-            try {
-                return future.get();
-            } catch (InterruptedException | ExecutionException exception) {
-                LOGGER.error("Unable to retrieve value.", exception);
-                return false;
-            }
-        }).count();
+        int count = entries.stream().mapToInt(entry ->
+                (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
+                        undoableAbbreviator.abbreviate(databaseContext.getDatabase(), entry, journalField, ce)).count()).sum();
 
         if (count == 0) {
             return Localization.lang("No journal names could be abbreviated.");
