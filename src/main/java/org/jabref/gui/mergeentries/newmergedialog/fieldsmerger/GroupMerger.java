@@ -15,6 +15,9 @@ public class GroupMerger implements FieldMerger {
     private final @NonNull BibEntryPreferences bibEntryPreferences;
 
     public GroupMerger(@NonNull BibEntryPreferences bibEntryPreferences) {
+        if (bibEntryPreferences == null) {
+            throw new IllegalArgumentException("bibEntryPreferences cannot be null");
+        }
         this.bibEntryPreferences = bibEntryPreferences;
     }
 
