@@ -98,7 +98,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     public Set<String> getColumnNames() {
         Set<String> result = new LinkedHashSet<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
-        result.add("Citation Key");
+        result.add("CitationKey");
         allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
         return result;
     }

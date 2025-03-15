@@ -149,8 +149,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         Arrays.stream(SpecialField.values())
               .map(SpecialField::getDisplayName)
               .forEach(this::removeColumnByTitle);
-
-        removeColumnByTitle(InternalField.KEY_FIELD.getName());
     }
 
     private void removeColumnWithUniformValue(String symbol) {
