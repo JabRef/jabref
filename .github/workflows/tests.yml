@@ -403,8 +403,11 @@ jobs:
         id: check_submodule
         run: |
           git fetch origin ${{ github.base_ref }}
-          DIFF=$(git diff --submodule=log origin/${{ github.base_ref }} HEAD)
-          if [ -n "$DIFF" ]; then
+
+          # enable diffing of submodules
+          sed -i "s/ all/ untracked/" .gitmodules
+
+          if [ ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vqz "Submodule src" ]; then
             echo "❌ Submodule modifications detected"
             exit 1
           fi
