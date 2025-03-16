@@ -10,7 +10,6 @@ If your work is not yet complete, please open a draft pull request. In that case
 
 <!--
 Go throgh the checklist below. It is mandatory, even if you submit a draft pull request.
-For instance, a screenshot helps in reviewing - even if your code is not 100% complete.
 
 Keep ALL the items. Mark them as follows: 
 [x] done 
