@@ -70,7 +70,7 @@ public class JournalAbbreviationPreferences {
             // Iterate through the directory and add all .mv files to externalJournalLists
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, "*.mv")) {
                 for (Path mvFile : stream) {
-                    if (!mvFile.getFileName().toString().equals("timestamps.mv")) { // Exclude timestamps.mv
+                    if (!"timestamps.mv".equals(mvFile.getFileName().toString())) { // Exclude timestamps.mv
                         externalJournalLists.add(mvFile.toString());
                     }
                 }

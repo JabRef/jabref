@@ -76,7 +76,7 @@ public class JournalAbbreviationMvGenerator {
             // Commit changes to the timestamp map
             store.commit();
         } catch (IOException e) {
-            LOGGER.error("Error while processing abbreviation files in directory: " + abbreviationsDirectory, e);
+            LOGGER.error("Error while processing abbreviation files in directory: {}", abbreviationsDirectory, e);
         }
     }
     /**
@@ -116,7 +116,7 @@ public class JournalAbbreviationMvGenerator {
             store.commit();
             LOGGER.info("Saved MV file: {}", mvFile.getFileName());
         } catch (IOException e) {
-            LOGGER.error("Failed to convert CSV file: " + csvFile, e);
+            LOGGER.error("Failed to convert CSV file: {}", csvFile, e);
         }
     }
 
