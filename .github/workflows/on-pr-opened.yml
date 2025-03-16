@@ -45,6 +45,13 @@ jobs:
           default-column: "In Progress"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Assign PR creator to issue
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-assignee ${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   conflicts_with_target:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
