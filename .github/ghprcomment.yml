@@ -97,3 +97,8 @@
 
 
     Please ensure that only one empty line is used as separation.
+- jobName: 'Submodules not modified'
+  message: >
+    Your pull request modified git submodules.
+
+    Please follow our [FAQ on submodules](https://devdocs.jabref.org/code-howtos/faq.html#submodules) to fix.
