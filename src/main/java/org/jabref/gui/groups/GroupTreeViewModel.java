@@ -51,6 +51,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 
 public class GroupTreeViewModel extends AbstractViewModel {
+    private static final String ENTRIES_WITHOUT_LINKED_FILES = Localization.lang("Entries without linked files");
+    private static final String ENTRIES_WITHOUT_GROUPS = Localization.lang("Entries without groups");
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -205,7 +207,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             if (!hasEntriesWithoutFiles) {
                 SearchGroup withoutFilesGroup = new SearchGroup(
-                        Localization.lang("Entries without linked files"),
+                        Localization.lang(ENTRIES_WITHOUT_LINKED_FILES),
                         GroupHierarchyType.INDEPENDENT,
                         "file !=~.*",
                         EnumSet.of(SearchFlags.CASE_INSENSITIVE)
@@ -217,7 +219,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             if (!hasEntriesWithoutGroups) {
                 SearchGroup withoutGroupsGroup = new SearchGroup(
-                        Localization.lang("Entries without groups"),
+                        Localization.lang(ENTRIES_WITHOUT_GROUPS),
                         GroupHierarchyType.INDEPENDENT,
                         "groups !=~.*",
                         EnumSet.of(SearchFlags.CASE_INSENSITIVE)

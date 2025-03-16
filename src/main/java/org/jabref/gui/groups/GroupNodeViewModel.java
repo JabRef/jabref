@@ -251,11 +251,6 @@ public class GroupNodeViewModel {
         return groupNode;
     }
 
-    /**
-     * Checks if this group is the "All Entries" group.
-     *
-     * @return true if the group is an instance of AllEntriesGroup, false otherwise.
-     */
     public boolean isAllEntriesGroup() {
         return groupNode.getGroup() instanceof AllEntriesGroup;
     }
