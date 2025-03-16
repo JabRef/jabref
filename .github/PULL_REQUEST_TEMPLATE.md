@@ -3,7 +3,7 @@
 <!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
 <!-- Example: Closes (link) OR Closes #xyz -->
 
-Closes ____
+Closes _____
 Describe the changes you have made here: what, where, why, ...
 If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ...
 
