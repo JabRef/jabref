@@ -1,7 +1,7 @@
 <!-- YOU HAVE TO MODIFY THIS TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
 
-Describe the changes you have made here: what, why, ...
-For a draft pull request, please outline what is your next steps. Do you need feedback? Will you continue in parallel? ...
+Describe the changes you have made here: what, where, why, ...
+If it is WIP, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ...
 
 <!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
 <!-- Example: Closes (link) OR Closes #xyz -->
@@ -10,9 +10,9 @@ For a draft pull request, please outline what is your next steps. Do you need fe
 
 <!--
 This checklist is mandatory even if you submit a draft pull request.
-For instance, when adding a UUI functionality, a screenshot helps reviewing - even if your code is not 100% complete.
+For instance, when adding a UI functionality, a screenshot helps in reviewing - even if your code is not 100% complete.
 
-Go through the list below. Keep all items. Mark them as follows: [x] done or [ ] not done / not applicable
+Go through the list below. Keep all the items. Mark them as follows: [x] done or [ ] not done / not applicable.
 -->
 
 - [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
