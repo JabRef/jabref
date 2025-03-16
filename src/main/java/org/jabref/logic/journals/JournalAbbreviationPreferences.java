@@ -20,6 +20,10 @@ import org.slf4j.LoggerFactory;
 
 public class JournalAbbreviationPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationPreferences.class);
+
+    private static final String CUSTOM_CSV_FILE = "custom.csv";
+    private static final String MV_FILE_PATTERN = "*.mv";
+    private static final String TIMESTAMPS_FILE = "timestamps.mv";
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private StringProperty journalsDir;
@@ -43,9 +47,6 @@ public class JournalAbbreviationPreferences {
     }
 
     public void updateJournalsDir(String directory) {
-        if (directory == null) {
-            return;
-        }
         // Remove old .mv paths if exist
         externalJournalLists.removeIf(path -> path.endsWith(".mv"));
 
@@ -59,9 +60,9 @@ public class JournalAbbreviationPreferences {
      * <p>
      * This method performs the following steps:
      * - Creates the journal abbreviation directory if it does not already exist.
-     * - Ensures the existence of the "custom.csv" file, creating an empty one if missing.
+     * - Ensures the existence of the "CUSTOM_CSV_FILE" file, creating an empty one if missing.
      * - Converts all `.csv` files in the directory to `.mv` format using {@link JournalAbbreviationMvGenerator#convertAllCsvToMv}.
-     * - Scans the directory for `.mv` files (excluding "timestamps.mv") and adds them to {@code externalJournalLists}.
+     * - Scans the directory for `.mv` files (excluding TIMESTAMPS_FILE) and adds them to {@code externalJournalLists}.
      * <p>
      * If any I/O errors occur during these operations, they are logged.
      *
@@ -70,7 +71,7 @@ public class JournalAbbreviationPreferences {
     private void initializeDirectory(Path journalsDir) {
         try {
             Files.createDirectories(journalsDir);
-            Path customCsv = journalsDir.resolve("custom.csv");
+            Path customCsv = journalsDir.resolve(CUSTOM_CSV_FILE);
             if (!Files.exists(customCsv)) {
                 Files.createFile(customCsv);
             }
@@ -78,9 +79,9 @@ public class JournalAbbreviationPreferences {
             JournalAbbreviationMvGenerator.convertAllCsvToMv(journalsDir);
 
             // Iterate through the directory and add all .mv files to externalJournalLists
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, "*.mv")) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, MV_FILE_PATTERN)) {
                 for (Path mvFile : stream) {
-                    if (!"timestamps.mv".equals(mvFile.getFileName().toString())) { // Exclude timestamps.mv
+                    if (!TIMESTAMPS_FILE.equals(mvFile.getFileName().toString())) { // Exclude TIMESTAMPS_FILE
                         externalJournalLists.add(mvFile.toString());
                     }
                 }
