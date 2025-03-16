@@ -116,7 +116,7 @@ public class JournalAbbreviationPreferences {
 
     public String getJournalAbbreviationDir() {
         if (journalsDir == null) {
-             setJournalAbbreviationDir(Directories.getJournalAbbreviationsDirectory().toString()); // default directory
+             setJournalAbbreviationDir(Directories.getJournalAbbreviationsDirectory().toString());
         }
         return journalsDir.get();
     }
