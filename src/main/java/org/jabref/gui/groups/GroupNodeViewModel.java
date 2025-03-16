@@ -28,6 +28,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -248,6 +249,41 @@ public class GroupNodeViewModel {
 
     public GroupTreeNode getGroupNode() {
         return groupNode;
+    }
+
+    /**
+     * Checks if this group is the "All Entries" group.
+     *
+     * @return true if the group is an instance of AllEntriesGroup, false otherwise.
+     */
+    public boolean isAllEntriesGroup() {
+        return groupNode.getGroup() instanceof AllEntriesGroup;
+    }
+
+    /**
+     * Checks if all suggested groups already exist under this group.
+     *
+     * @return true if both "Entries without linked files" and "Entries without groups" already exist, false otherwise.
+     */
+    public boolean hasSuggestedGroups() {
+        if (!isAllEntriesGroup()) {
+            return false;
+        }
+
+        boolean hasEntriesWithoutFiles = false;
+        boolean hasEntriesWithoutGroups = false;
+
+        for (GroupNodeViewModel child : getChildren()) {
+            String name = child.getDisplayName();
+            if (Localization.lang("Entries without linked files").equals(name)) {
+                hasEntriesWithoutFiles = true;
+            }
+            if (Localization.lang("Entries without groups").equals(name)) {
+                hasEntriesWithoutGroups = true;
+            }
+        }
+
+        return hasEntriesWithoutFiles && hasEntriesWithoutGroups;
     }
 
     /**

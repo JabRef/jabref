@@ -3,6 +3,7 @@ package org.jabref.gui.groups;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,12 +38,14 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.SearchFlags;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
@@ -173,6 +176,66 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(null);
         }
         currentDatabase = newDatabase;
+    }
+
+    /**
+     * Adds JabRef suggested subgroups under the "All Entries" parent node.
+     * Assumes the parent is already validated as "All Entries" by the caller.
+     *
+     * @param parent The "All Entries" parent node.
+     */
+    public void addSuggestedSubGroup(GroupNodeViewModel parent) {
+        currentDatabase.ifPresent(database -> {
+            // Check for existing suggested subgroups to avoid duplicates
+            boolean hasEntriesWithoutFiles = false;
+            boolean hasEntriesWithoutGroups = false;
+            for (GroupNodeViewModel child : parent.getChildren()) {
+                String name = child.getGroupNode().getName();
+                // Check if "Entries without linked files" already exists
+                if (Localization.lang("Entries without linked files").equals(name)) {
+                    hasEntriesWithoutFiles = true;
+                }
+                // Check if "Entries without groups" already exists
+                if (Localization.lang("Entries without groups").equals(name)) {
+                    hasEntriesWithoutGroups = true;
+                }
+            }
+
+            List<GroupTreeNode> newSubgroups = new ArrayList<>();
+
+            if (!hasEntriesWithoutFiles) {
+                SearchGroup withoutFilesGroup = new SearchGroup(
+                        Localization.lang("Entries without linked files"),
+                        GroupHierarchyType.INDEPENDENT,
+                        "file !=~.*",
+                        EnumSet.of(SearchFlags.CASE_INSENSITIVE)
+                );
+                GroupTreeNode newSubgroup = parent.addSubgroup(withoutFilesGroup);
+                newSubgroups.add(newSubgroup);
+                dialogService.notify(Localization.lang("Added group \"%0\".", withoutFilesGroup.getName()));
+            }
+
+            if (!hasEntriesWithoutGroups) {
+                SearchGroup withoutGroupsGroup = new SearchGroup(
+                        Localization.lang("Entries without groups"),
+                        GroupHierarchyType.INDEPENDENT,
+                        "groups !=~.*",
+                        EnumSet.of(SearchFlags.CASE_INSENSITIVE)
+                );
+                GroupTreeNode newSubgroup = parent.addSubgroup(withoutGroupsGroup);
+                newSubgroups.add(newSubgroup);
+                dialogService.notify(Localization.lang("Added group \"%0\".", withoutGroupsGroup.getName()));
+            }
+
+            if (!newSubgroups.isEmpty()) {
+                selectedGroups.setAll(newSubgroups.stream()
+                                                  .map(node -> new GroupNodeViewModel(database, stateManager, taskExecutor, node, localDragboard, preferences))
+                                                  .collect(Collectors.toList()));
+                writeGroupChangesToMetaData();
+            } else {
+                dialogService.notify(Localization.lang("All suggested groups already exist."));
+            }
+        });
     }
 
     /**
