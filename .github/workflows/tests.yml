@@ -367,6 +367,7 @@ jobs:
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
 
+
   no-multiple-consecutive-empty-lines:
     if: github.event_name == 'pull_request'
     name: No multiple consecutive empty lines
