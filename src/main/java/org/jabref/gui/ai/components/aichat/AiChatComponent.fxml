@@ -31,19 +31,19 @@
                    BorderPane.alignment="CENTER"
                    onAction="#sendExampleQuestion1Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                  />
         <Hyperlink fx:id="exQuestion2"
                    text="Which methods were used in the research?"
                    BorderPane.alignment="CENTER"
                    onAction="#sendExampleQuestion2Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                  />
         <Hyperlink fx:id="exQuestion3"
                    text="What are the key findings?"
                    BorderPane.alignment="CENTER"
                    onAction="#sendExampleQuestion3Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                  />
     </HBox>
 
     <HBox spacing="10">

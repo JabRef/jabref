@@ -2432,18 +2432,6 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
 
-exampleQuestionLabelStyle {
-    -fx-background-color: #f1f1f1;
-    -fx-padding: 2px 10px;
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
-    -fx-border-width: 0px;
-    -fx-font-weight: bold;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-}
-
-
 .exampleQuestionStyle {
     -fx-background-color: #d8d8d8;
     -fx-padding: 2px 10px;
@@ -2451,8 +2439,12 @@ exampleQuestionLabelStyle {
     -fx-border-radius: 20px;
     -fx-border-width: 0px;
     -fx-font-weight: bold;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
+    -fx-underline: false !important;
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.exampleQuestionStyle:visited {
+    -fx-text-fill: -fx-dark-text-color !important;
 }
 
 .exampleQuestionStyle:hover {
