@@ -9,7 +9,7 @@ If your work is not yet complete, please open a draft pull request. In that case
 ### Mandatory checks
 
 <!--
-Go throgh the checklist below. It is mandatory, even if you submit a draft pull request.
+Go throgh the checklist below. It is mandatory, even for a draft pull request.
 
 Keep ALL the items. Mark them as follows: 
 [x] done 
