@@ -9,7 +9,7 @@ If it is WIP, please open a draft pull request. In that case, outline your inten
 ### Mandatory checks
 
 <!--
-This checklist is mandatory even if you submit a draft pull request.
+The following checklist is mandatory, even if you submit a draft pull request.
 For instance, a screenshot helps in reviewing - even if your code is not 100% complete.
 
 Go through the list below. Keep all the items. Mark them as follows: 
