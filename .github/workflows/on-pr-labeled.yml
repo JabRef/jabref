@@ -1,4 +1,4 @@
-name: On labeled PR
+name: On PR labeled
 
 on:
   pull_request:
@@ -8,7 +8,10 @@ on:
 jobs:
   automerge:
     name: Auto Merge
-    if: "${{ github.event.label.name == 'automerge' && github.repository_owner == 'JabRef' }}"
+    if: >
+      github.event.label.name == 'automerge' &&
+      github.repository == 'JabRef/jabref' &&
+      github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Approve PR

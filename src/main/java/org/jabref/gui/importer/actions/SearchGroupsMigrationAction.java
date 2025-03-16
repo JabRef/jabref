@@ -69,19 +69,27 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     private void migrateGroups(GroupTreeNode node, DialogService dialogService) {
         if (node.getGroup() instanceof SearchGroup searchGroup) {
             try {
-                String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchQuery());
-                searchGroup.setSearchExpression(newSearchExpression);
+                if (searchGroup.getSearchQuery().isValid()) {
+                    String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchQuery());
+                    searchGroup.setSearchExpression(newSearchExpression);
+                } else {
+                    showAskForNewSearchExpressionDialog(dialogService, searchGroup);
+                }
             } catch (ParseCancellationException e) {
-                Optional<String> newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
-                        Localization.lang("Search group migration failed"),
-                        Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.",
-                        searchGroup.getName()),
-                        searchGroup.getSearchExpression());
-                newSearchExpression.ifPresent(searchGroup::setSearchExpression);
+                showAskForNewSearchExpressionDialog(dialogService, searchGroup);
             }
         }
         for (GroupTreeNode child : node.getChildren()) {
             migrateGroups(child, dialogService);
         }
+    }
+
+    private void showAskForNewSearchExpressionDialog(DialogService dialogService, SearchGroup searchGroup) {
+        Optional<String> newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Search group migration failed"),
+                Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.",
+                        searchGroup.getName()),
+                searchGroup.getSearchExpression());
+        newSearchExpression.ifPresent(searchGroup::setSearchExpression);
     }
 }

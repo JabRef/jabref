@@ -36,12 +36,18 @@
         </TreeTableView>
     </VBox>
 
-    <HBox spacing="10.0" alignment="CENTER_RIGHT">
-        <MenuButton fx:id="presetsButton" text="%Presets" styleClass="button"/>
-        <Button text="%Reset all" onAction="#resetBindings">
-            <graphic>
-                <JabRefIconView glyph="REFRESH"/>
-            </graphic>
-        </Button>
+    <HBox>
+        <HBox spacing="10.0" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Button text="%Expand all" onAction="#expandAll"/>
+            <Button text="%Collapse all" onAction="#collapseAll"/>
+        </HBox>
+        <HBox spacing="10.0" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <MenuButton fx:id="presetsButton" text="%Presets" styleClass="button"/>
+            <Button text="%Reset all" onAction="#resetBindings">
+                <graphic>
+                    <JabRefIconView glyph="REFRESH"/>
+                </graphic>
+            </Button>
+        </HBox>
     </HBox>
 </fx:root>

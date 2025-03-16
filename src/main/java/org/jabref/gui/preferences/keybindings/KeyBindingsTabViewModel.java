@@ -16,6 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -64,9 +65,10 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         for (KeyBindingCategory category : KeyBindingCategory.values()) {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
             keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -> {
-                if (keyBinding.getCategory() == category &&
-                        (keyBinding.getLocalization().toLowerCase().contains(term.toLowerCase()) ||
-                                keyBinding.getCategory().getName().toLowerCase().contains(term.toLowerCase()))) {
+                if (keyBinding.getCategory() != category) {
+                    return;
+                }
+                if (matchesSearchTerm(keyBinding, term.toLowerCase())) {
                     KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);
                     categoryItem.getChildren().add(keyBindViewModel);
                 }
@@ -75,6 +77,24 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
                 root.getChildren().add(categoryItem);
             }
         }
+    }
+
+    /**
+     * Searches for the term in the keybinding's localization, category, or key combination
+     *
+     * @param keyBinding keybinding to search in
+     * @param searchTerm      term to search for
+     * @return true if the term is found in the keybinding
+     */
+    private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
+        if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
+                keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
+            return true;
+        }
+        if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {
+            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(searchTerm);
+        }
+        return false;
     }
 
     public void setNewBindingForCurrent(KeyEvent event) {

@@ -81,8 +81,10 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
         viewModel.keyBindingPresets().forEach(preset -> presetsButton.getItems().add(createMenuItem(preset)));
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) ->
-                viewModel.filterValues(searchTerm));
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
+            viewModel.filterValues(searchTerm);
+            setCategoriesExpanded(!searchTerm.isEmpty() || previousText.isEmpty());
+        });
 
         ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
         StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
@@ -104,5 +106,21 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     @FXML
     private void resetBindings() {
         viewModel.resetToDefault();
+    }
+
+    @FXML
+    private void expandAll() {
+        setCategoriesExpanded(true);
+    }
+
+    @FXML
+    private void collapseAll() {
+        setCategoriesExpanded(false);
+    }
+
+    private void setCategoriesExpanded(boolean expanded) {
+        for (TreeItem<KeyBindingViewModel> child : keyBindingsTable.getRoot().getChildren()) {
+            child.setExpanded(expanded);
+        }
     }
 }

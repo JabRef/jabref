@@ -11,7 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class CleanupDialog extends BaseDialog<CleanupPreferences> {
     public CleanupDialog(BibDatabaseContext databaseContext, CleanupPreferences initialPreset, FilePreferences filePreferences) {
-        setTitle(Localization.lang("Cleanup entries"));
+        setTitle(Localization.lang("Clean up entries"));
         getDialogPane().setPrefSize(600, 650);
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 

@@ -61,7 +61,7 @@ The import statement for all the classes using this class will be automatically 
 
 More information on the architecture can be found at [../getting-into-the-code/high-level-documentation.md](High-level documentation).
 
-### `Check external href links in the documentation / lychee (push)` <span style="color:red">FAILED</span>
+### `Check external href links in the documentation / check-links (push)` <span style="color:red">FAILED</span>
 
 This test is triggered when any kind of documentation is touched (be it the JabRef docs, or JavaDoc in code). If you changed something in the documentation, and particularly added/changed any links (to external files or websites), check if the links are correct and working. If you didn't change/add any link, or added correct links, the test is most probably failing due to any of the existing links being broken, and thus can be ignored (in the context of your contribution).
 

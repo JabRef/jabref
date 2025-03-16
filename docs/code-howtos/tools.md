@@ -69,4 +69,4 @@ Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
 
 ### Tools for working with XMP
 
-* Validate XMP: [https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/](https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/)
+* Validate XMP: <https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator>

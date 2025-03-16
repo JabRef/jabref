@@ -85,7 +85,7 @@ public class IntegrityCheckAction extends SimpleCommand {
 
         dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),
-                Localization.lang("Checking integrity..."),
+                Localization.lang("Waiting for the check to finish..."),
                 task);
         taskExecutor.execute(task);
     }

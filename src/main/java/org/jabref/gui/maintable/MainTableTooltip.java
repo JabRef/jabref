@@ -3,7 +3,6 @@ package org.jabref.gui.maintable;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -23,7 +22,6 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.setShowDelay(Duration.seconds(1));
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
     }
 

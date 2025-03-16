@@ -7,7 +7,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-This is a follow-up to [ADR-031](0032-store-chats-in-local-user-folder).
+This is a follow-up to [ADR-032](0032-store-chats-in-local-user-folder.md).
 
 The chats with AI should be saved on exit from JabRef and retrieved on launch. We need to decide the format of
 the serialized messages.
