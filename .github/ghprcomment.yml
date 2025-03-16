@@ -90,5 +90,4 @@
 
 
     Please merge `upstream/main` with your code.
-    Preferrably, do this using `git` in your machine:
-    Conflicts in `CHANGELOG.md` will be handled by a union of changes.
+    You find a step-by-step guide at <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
