@@ -1,7 +1,7 @@
 <!-- YOU HAVE TO MODIFY THE TEXT BELOW TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
 
 <!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
-<!-- Example: Closes (link) OR Closes #xyz -->
+<!-- Example: Closes (link) OR Closes #12345 -->
 
 Closes _____
 Describe the changes you have made here: what, where, why, ...
