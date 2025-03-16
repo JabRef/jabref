@@ -55,7 +55,17 @@ public class JournalAbbreviationPreferences {
     }
 
     /**
-     * Creates the journal abbreviation directory and custom.csv if they don't exist.
+     * Ensures the journal abbreviation directory exists and initializes necessary files.
+     * <p>
+     * This method performs the following steps:
+     * - Creates the journal abbreviation directory if it does not already exist.
+     * - Ensures the existence of the "custom.csv" file, creating an empty one if missing.
+     * - Converts all `.csv` files in the directory to `.mv` format using {@link JournalAbbreviationMvGenerator#convertAllCsvToMv}.
+     * - Scans the directory for `.mv` files (excluding "timestamps.mv") and adds them to {@code externalJournalLists}.
+     * <p>
+     * If any I/O errors occur during these operations, they are logged.
+     *
+     * @param journalsDir The path to the journal abbreviation directory.
      */
     private void initializeDirectory(Path journalsDir) {
         try {
