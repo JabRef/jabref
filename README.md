@@ -83,7 +83,7 @@ Check out the ways you can contribute, below:
 - You are welcome to fix bugs, contribute new features or add documentation. To get your contribution included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and submit a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
 - Not a programmer? Help translating JabRef at [Crowdin](https://crowdin.com/project/jabref) or improve the user documentation. Learn how to help at [contribute.jabref.org](https://contribute.jabref.org).
-
+- To report an issue, request a feature or suggest enhancements, please open an issue at our [issues page](https://github.com/JabRef/jabref/issues).
 
 We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit.
 For developing, it is sufficient to only run the associated test locally (see example [here](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)) for the classes you changed.
