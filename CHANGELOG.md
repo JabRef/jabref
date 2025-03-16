@@ -78,6 +78,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where user-defined keyword separator does not apply to Merge Groups. [#12535](https://github.com/JabRef/jabref/issues/12535)
 - We fixed an issue where duplicate items cannot be removed correctly when merging groups or keywords. [#12585](https://github.com/JabRef/jabref/issues/12585)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
+- We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion. [#12645](https://github.com/JabRef/jabref/issues/12645)
+- We fixed an issue where an exception would occur when running abbreviate journals for multiple entries. [#12634](https://github.com/JabRef/jabref/issues/12634)
 
 ### Removed
 
