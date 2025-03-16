@@ -367,6 +367,38 @@ jobs:
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
 
+  no-multiple-consecutive-empty-lines:
+    if: github.event_name == 'pull_request'
+    name: No multiple consecutive empty lines
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: |
+          error_found=0
+          for file in $(git ls-files); do
+            if [ "$file" = "ghcomment.yml" ]; then
+              continue
+            fi
+            if file "$file" | grep -q 'text'; then
+              if ! awk 'BEGIN { count=0 }
+                        /^[[:space:]]*$/ { count++; if (count>=2) exit 1 }
+                        /^[^[:space:]]/ { count=0 }
+                        END { exit 0 }' "$file"; then
+                echo "❌ $file contains multiple consecutive empty lines."
+                error_found=1
+              fi
+            fi
+          done
+          if [ $error_found -eq 0 ]; then
+            echo "✅ No files contain multiple consecutive empty lines."
+          else
+            echo "❌ Files contain multiple consecutive empty lines."
+            exit 1
+          fi
+
   no-force-push:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
