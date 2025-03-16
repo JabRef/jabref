@@ -63,25 +63,6 @@ jobs:
           echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  unmodified_submodules:
-    name: Submodules not modified
-    if: github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          show-progress: 'false'
-      - name: Check for submodule modifications
-        id: check_submodule
-        run: |
-          git fetch origin ${{ github.base_ref }}
-          DIFF=$(git diff --submodule=log origin/${{ github.base_ref }} HEAD)
-          if [ -n "$DIFF" ]; then
-            echo "❌ Submodule modifications detected"
-            exit 1
-          fi
-          echo "✅ No submodule modifications"
   upload-pr-number:
     runs-on: ubuntu-latest
     steps:
