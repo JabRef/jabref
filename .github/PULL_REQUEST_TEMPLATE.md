@@ -9,10 +9,13 @@ If it is WIP, please open a draft pull request. In that case, outline your inten
 ### Mandatory checks
 
 <!--
-This checklist is mandatory even if you submit a draft pull request.
-For instance, when adding a UI functionality, a screenshot helps in reviewing - even if your code is not 100% complete.
+This checklist is mandatory even if you submit a draft pull request. Try to ensure and mark whatever is applicable.
+For instance, a screenshot helps in reviewing - even if your code is not 100% complete.
 
-Go through the list below. Keep all the items. Mark them as follows: [x] done or [ ] not done / not applicable.
+Go through the list below. Keep all the items. Mark them as follows: 
+[x] done 
+[ ] not done 
+[/] not applicable
 -->
 
 - [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
