@@ -95,4 +95,5 @@
   message: >
     Your pull request modified git submodules.
 
+
     Please follow our [FAQ on submodules](https://devdocs.jabref.org/code-howtos/faq.html#submodules) to fix.
