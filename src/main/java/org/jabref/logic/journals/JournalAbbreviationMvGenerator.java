@@ -58,13 +58,13 @@ public class JournalAbbreviationMvGenerator {
                         long currentTimestamp = Files.getLastModifiedTime(csvFile).toMillis();
                         Long storedTimestamp = timestampMap.get(fileName);
 
-                        // If the file is new or modified, process it.
-                        if (storedTimestamp == null || storedTimestamp != currentTimestamp) {
-                            // Compute the MV file path by replacing the .csv extension with .mv
-                            Path mvFile = csvFile.resolveSibling(fileName.replaceFirst("\\.csv$", ".mv"));
-                            LOGGER.info("Processing {} -> Creating MV file: {}", fileName, mvFile.getFileName());
+                        // Compute the MV file path by replacing the .csv extension with .mv
+                        Path mvFile = csvFile.resolveSibling(fileName.replaceFirst("\\.csv$", ".mv"));
 
+                        // If MV file is missing OR the CSV file has been updated, process it
+                        if (!Files.exists(mvFile) || storedTimestamp == null || storedTimestamp != currentTimestamp) {
                             convertCsvToMv(csvFile, mvFile);
+                            LOGGER.info("Processing {} -> Creating MV file: {}", fileName, mvFile.getFileName());
                             // Update the timestamp in the persistent map
                             timestampMap.put(fileName, currentTimestamp);
                         } else {

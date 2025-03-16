@@ -51,7 +51,11 @@ public class JournalAbbreviationPreferences {
         externalJournalLists.removeIf(path -> path.endsWith(".mv"));
 
         Path dirPath = Path.of(directory);
-        initializeDirectory(dirPath);
+        try {
+            initializeDirectory(dirPath);
+        } catch (IOException e) {
+            LOGGER.error("Error initializing the journal directory", e);
+        }
         setJournalAbbreviationDir(directory);
     }
 
@@ -68,28 +72,22 @@ public class JournalAbbreviationPreferences {
      *
      * @param journalsDir The path to the journal abbreviation directory.
      */
-    private void initializeDirectory(Path journalsDir) {
-        try {
-            Files.createDirectories(journalsDir);
-            Path customCsv = journalsDir.resolve(CUSTOM_CSV_FILE);
-            if (!Files.exists(customCsv)) {
-                Files.createFile(customCsv);
-            }
+    private void initializeDirectory(Path journalsDir) throws IOException {
+        Files.createDirectories(journalsDir);
+        Path customCsv = journalsDir.resolve(CUSTOM_CSV_FILE);
+        if (!Files.exists(customCsv)) {
+            Files.createFile(customCsv);
+        }
 
-            JournalAbbreviationMvGenerator.convertAllCsvToMv(journalsDir);
+        JournalAbbreviationMvGenerator.convertAllCsvToMv(journalsDir);
 
-            // Iterate through the directory and add all .mv files to externalJournalLists
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, MV_FILE_PATTERN)) {
-                for (Path mvFile : stream) {
-                    if (!TIMESTAMPS_FILE.equals(mvFile.getFileName().toString())) { // Exclude TIMESTAMPS_FILE
-                        externalJournalLists.add(mvFile.toString());
-                    }
+        // Iterate through the directory and add all .mv files to externalJournalLists
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, MV_FILE_PATTERN)) {
+            for (Path mvFile : stream) {
+                if (!TIMESTAMPS_FILE.equals(mvFile.getFileName().toString())) { // Exclude TIMESTAMPS_FILE
+                    externalJournalLists.add(mvFile.toString());
                 }
-            } catch (IOException e) {
-                LOGGER.error("Error reading MV files from directory: {}", journalsDir, e);
             }
-        } catch (IOException e) {
-            LOGGER.error("Failed to create journal abbreviation directory", e);
         }
     }
 
@@ -116,7 +114,9 @@ public class JournalAbbreviationPreferences {
 
     public String getJournalAbbreviationDir() {
         if (journalsDir == null) {
-             setJournalAbbreviationDir(Directories.getJournalAbbreviationsDirectory().toString());
+            String defaultDir = Directories.getJournalAbbreviationsDirectory().toString();
+            setJournalAbbreviationDir(defaultDir);
+            return defaultDir;
         }
         return journalsDir.get();
     }
