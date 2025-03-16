@@ -51,8 +51,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 
 public class GroupTreeViewModel extends AbstractViewModel {
-    private static final String ENTRIES_WITHOUT_LINKED_FILES = Localization.lang("Entries without linked files");
-    private static final String ENTRIES_WITHOUT_GROUPS = Localization.lang("Entries without groups");
+    private static final String ENTRIES_WITHOUT_LINKED_FILES = "Entries without linked files";
+    private static final String ENTRIES_WITHOUT_GROUPS = "Entries without groups";
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
