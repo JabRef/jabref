@@ -15,6 +15,8 @@ import org.jabref.logic.util.Directories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.logic.journals.JournalAbbreviationMvGenerator.loadAbbreviationsFromMv;
+
 /**
  * <p>
  *   This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
@@ -37,7 +39,6 @@ public class JournalAbbreviationLoader {
 
     public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         JournalAbbreviationRepository repository;
-
         // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
@@ -56,6 +57,8 @@ public class JournalAbbreviationLoader {
             return null;
         }
 
+        journalAbbreviationPreferences.updateJournalsDir(journalAbbreviationPreferences.getJournalAbbreviationDir());
+
         // Read external lists
         List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         // might produce NPE in tests
@@ -64,7 +67,12 @@ public class JournalAbbreviationLoader {
             Collections.reverse(lists);
             for (String filename : lists) {
                 try {
-                    repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));
+                    Path filePath = Path.of(filename);
+                    if (filename.endsWith(".mv")) {
+                        repository.addCustomAbbreviations(loadAbbreviationsFromMv(filePath));
+                    } else if (filename.endsWith(".csv")) {
+                        repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(filePath));
+                    }
                 } catch (IOException e) {
                     LOGGER.error("Cannot read external journal list file {}", filename, e);
                 }

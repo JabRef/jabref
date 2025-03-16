@@ -75,7 +75,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
-            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get();
+            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get() && !currentFile.get().isMvFile();
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
@@ -127,7 +127,15 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      */
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
-        externalFiles.forEach(name -> openFile(Path.of(name)));
+        externalFiles.forEach(name -> {
+            Path filePath = Path.of(name);
+
+            if (name.endsWith(".mv")) {
+                openMvFile(filePath);
+            } else { // .csv file
+                openFile(filePath);
+            }
+        });
     }
 
     /**
@@ -196,6 +204,23 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         journalFiles.add(abbreviationsFile);
     }
 
+    private void openMvFile(Path filePath) {
+        AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
+        if (journalFiles.contains(abbreviationsFile)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
+                    Localization.lang("Journal file %s already added", filePath.toString()));
+            return;
+        }
+        if (abbreviationsFile.exists()) {
+            try {
+                abbreviationsFile.readAbbreviationsFromMv();
+            } catch (IOException e) {
+                LOGGER.debug("Could not read abbreviations file", e);
+            }
+        }
+        journalFiles.add(abbreviationsFile);
+    }
+
     public void openFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSV)
@@ -234,7 +259,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
             abbreviationsPreferences.setJournalAbbreviationDir(path.toString());
             updateJournalFiles();
             storeSettings();
-            // Optionally trigger any updates needed due to directory change
         });
     }
 
@@ -243,11 +267,15 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
         // Remove files that are no longer in the external lists
         journalFiles.removeIf(file -> !externalLists.contains(file.getAbsolutePath().map(Path::toString).orElse("")));
-
         // Add new files
         for (String filePath : externalLists) {
             if (journalFiles.stream().noneMatch(file -> file.getAbsolutePath().map(Path::toString).orElse("").equals(filePath))) {
-                openFile(Path.of(filePath));
+                Path path = Path.of(filePath);
+                if (filePath.endsWith(".mv")) {
+                    openMvFile(path);
+                } else {
+                    openFile(path);
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package org.jabref.logic.journals;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -41,20 +42,14 @@ public class JournalAbbreviationPreferences {
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
     }
 
-    private void updateJournalsDir(String directory) {
+    public void updateJournalsDir(String directory) {
         if (directory == null) {
             return;
         }
-        // Remove old custom.csv path if it exists
-        externalJournalLists.removeIf(path -> path.endsWith("custom.csv"));
-        // Add new custom.csv path
+        // Remove old .mv paths if exist
+        externalJournalLists.removeIf(path -> path.endsWith(".mv"));
+
         Path dirPath = Path.of(directory);
-        String newCsvPath = dirPath.resolve("custom.csv").toString();
-
-        if (!externalJournalLists.contains(newCsvPath)) {
-            externalJournalLists.add(newCsvPath);
-        }
-
         initializeDirectory(dirPath);
         setJournalAbbreviationDir(directory);
     }
@@ -68,6 +63,19 @@ public class JournalAbbreviationPreferences {
             Path customCsv = journalsDir.resolve("custom.csv");
             if (!Files.exists(customCsv)) {
                 Files.createFile(customCsv);
+            }
+
+            JournalAbbreviationMvGenerator.convertAllCsvToMv(journalsDir);
+
+            // Iterate through the directory and add all .mv files to externalJournalLists
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(journalsDir, "*.mv")) {
+                for (Path mvFile : stream) {
+                    if (!mvFile.getFileName().toString().equals("timestamps.mv")) { // Exclude timestamps.mv
+                        externalJournalLists.add(mvFile.toString());
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error reading MV files from directory: {}", journalsDir, e);
             }
         } catch (IOException e) {
             LOGGER.error("Failed to create journal abbreviation directory", e);
@@ -97,7 +105,7 @@ public class JournalAbbreviationPreferences {
 
     public String getJournalAbbreviationDir() {
         if (journalsDir == null) {
-            journalsDir = new SimpleStringProperty(Directories.getJournalAbbreviationsDirectory().toString());
+             setJournalAbbreviationDir(Directories.getJournalAbbreviationsDirectory().toString()); // default directory
         }
         return journalsDir.get();
     }
