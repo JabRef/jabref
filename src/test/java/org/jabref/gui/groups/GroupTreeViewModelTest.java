@@ -31,6 +31,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -166,23 +167,23 @@ class GroupTreeViewModelTest {
 
         assertEquals(2, children.size());
 
-        GroupNodeViewModel firstGroup = children.get(0);
+        GroupNodeViewModel firstGroup = children.getFirst();
         assertEquals(Localization.lang("Entries without linked files"), firstGroup.getDisplayName());
 
         GroupNodeViewModel secondGroup = children.get(1);
         assertEquals(Localization.lang("Entries without groups"), secondGroup.getDisplayName());
 
         AbstractGroup firstGroupObj = firstGroup.getGroupNode().getGroup();
-        assertTrue(firstGroupObj instanceof SearchGroup);
+        assertInstanceOf(SearchGroup.class, firstGroupObj);
         SearchGroup firstSearchGroup = (SearchGroup) firstGroupObj;
         assertEquals("file !=~.*", firstSearchGroup.getSearchExpression());
-        assertTrue(firstSearchGroup.getSearchFlags().contains(SearchFlags.CASE_INSENSITIVE));
+        assertEquals(EnumSet.of(SearchFlags.CASE_INSENSITIVE), firstSearchGroup.getSearchFlags());
 
         AbstractGroup secondGroupObj = secondGroup.getGroupNode().getGroup();
-        assertTrue(secondGroupObj instanceof SearchGroup);
+        assertInstanceOf(SearchGroup.class, secondGroupObj);
         SearchGroup secondSearchGroup = (SearchGroup) secondGroupObj;
         assertEquals("groups !=~.*", secondSearchGroup.getSearchExpression());
-        assertTrue(secondSearchGroup.getSearchFlags().contains(SearchFlags.CASE_INSENSITIVE));
+        assertEquals(EnumSet.of(SearchFlags.CASE_INSENSITIVE), secondSearchGroup.getSearchFlags());
     }
 
     @Test
