@@ -6,10 +6,14 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
@@ -36,6 +40,9 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         setWrapText(true);
 
         ClipBoardManager.addX11Support(this);
+
+        // Add our custom Tab key event handler to traverse focus when empty.
+        addEventFilter(KeyEvent.KEY_PRESSED, new FieldTraversalEventHandler());
     }
 
     @Override
@@ -69,5 +76,26 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     public void paste() {
         super.paste();
         pasteActionHandler.run();
+    }
+
+    // Custom event handler for Tab key presses.
+    private static class FieldTraversalEventHandler implements EventHandler<KeyEvent> {
+        @Override
+        public void handle(KeyEvent event) {
+            if (event.getCode() == KeyCode.TAB && !event.isShiftDown() && !event.isControlDown()) {
+                event.consume();
+
+                // Get the current text area
+                Node node = (Node) event.getSource();
+                KeyEvent newEvent = new KeyEvent(node,
+                        event.getTarget(), event.getEventType(),
+                        event.getCharacter(), event.getText(),
+                        event.getCode(), event.isShiftDown(),
+                        true, event.isAltDown(),
+                        event.isMetaDown());
+
+                node.fireEvent(newEvent);
+            }
+        }
     }
 }

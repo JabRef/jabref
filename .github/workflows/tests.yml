@@ -47,11 +47,8 @@ jobs:
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
-
 
   openrewrite:
     name: OpenRewrite
@@ -69,8 +66,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
@@ -91,8 +86,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -143,6 +136,7 @@ jobs:
           grep -q "1 problem" heylogs.txt || exit 1
 
   changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
     steps:
@@ -152,11 +146,20 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
           fetch-depth: 0
-      - name: Install clparse
+      - name: Cache clparse jar
+        id: cache-clparse
+        uses: actions/cache@v4
+        with:
+          path: /tmp/clparse
+          key: clparse-0.9.1
+      - name: unzip
+        if: steps.cache-clparse.outputs.cache-hit != 'true'
         run: |
+          cd /tmp
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
-          sudo mv clparse /usr/local/bin/clparse
+      - name: Install clparse
+        run: sudo mv /tmp/clparse /usr/local/bin/clparse
       - name: Check CHANGELOG.md diff
         run: |
           diff \
@@ -179,8 +182,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -213,8 +214,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -236,8 +235,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -286,8 +283,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -345,7 +340,54 @@ jobs:
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
 
+  no-force-push:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check force push
+        id: force_push_check
+        run: |
+          if [[ -z "${{ github.event.before }}" ]]; then
+            echo "✅ New PR created."
+            exit 0
+          fi
+          if git cat-file -e ${{ github.event.before }} 2>/dev/null; then
+            echo "✅ Regular push detected."
+            exit 0
+          else
+            echo "❌ Force push detected"
+            exit 1
+          fi
+
+  unmodified_submodules:
+    name: Submodules not modified
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          show-progress: 'false'
+      - name: Check for submodule modifications
+        id: check_submodule
+        run: |
+          git fetch origin ${{ github.base_ref }}
+
+          # enable diffing of submodules
+          sed -i "s/ all/ untracked/" .gitmodules
+
+          if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vzq "Submodule src"; then
+            echo "❌ Submodule modifications detected"
+            exit 1
+          fi
+          echo "✅ No submodule modifications"
+
   other_than_main:
+    if: github.event_name == 'pull_request'
     name: Source branch is other than "main"
     runs-on: ubuntu-latest
     steps:

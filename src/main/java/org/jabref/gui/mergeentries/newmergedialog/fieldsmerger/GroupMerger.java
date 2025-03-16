@@ -1,21 +1,29 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
-import java.util.Arrays;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
+import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A merger for the {@link StandardField#GROUPS} field
  * */
 public class GroupMerger implements FieldMerger {
-    public static final String GROUPS_SEPARATOR = ", ";
-    public static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
+
+    private final @NonNull BibEntryPreferences bibEntryPreferences;
+
+    public GroupMerger(@NonNull BibEntryPreferences bibEntryPreferences) {
+        this.bibEntryPreferences = Objects.requireNonNull(bibEntryPreferences);
+    }
 
     @Override
     public String merge(String groupsA, String groupsB) {
+        Character delimiter = bibEntryPreferences.getKeywordSeparator();
+
         if (StringUtil.isBlank(groupsA) && StringUtil.isBlank(groupsB)) {
             return "";
         } else if (StringUtil.isBlank(groupsA)) {
@@ -23,9 +31,7 @@ public class GroupMerger implements FieldMerger {
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
         } else {
-            return Arrays.stream(GROUPS_SEPARATOR_REGEX.split(groupsA + GROUPS_SEPARATOR + groupsB))
-                         .distinct()
-                         .collect(Collectors.joining(GROUPS_SEPARATOR));
+            return KeywordList.merge(groupsA, groupsB, delimiter).getAsString(delimiter);
         }
     }
 }

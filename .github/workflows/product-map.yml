@@ -22,9 +22,10 @@ jobs:
           FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.java' | sed 's|^|\"|' | sed 's|$|\"|' | paste -sd "," -)
           if [ -z "$FILES" ]; then FILES="\"dummy.java\""; fi
           echo "expected_files=(${FILES})" >> $GITHUB_ENV
+          echo "Files: ${FILES}"
 
       - name: ProductMap Map Generation
-        uses: product-map/product-map-action@v1.0.15
+        uses: product-map/product-map-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           expected_files: ${{ env.expected_files }}
