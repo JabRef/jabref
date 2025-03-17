@@ -39,9 +39,9 @@ public class AuthorListParser {
 
     private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile("^[A-Z](\\.[ -]| ?-)");
 
-    private static final Pattern multipleSpacesPattern = Pattern.compile("\\s{2,}");
+    private static final Pattern MULTIPLE_SPACE_PATTERN = Pattern.compile("\\s{2,}");
 
-    private static final Pattern newlinePattern = Pattern.compile("\\s*\\n\\s*");
+    private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\\s*\\n\\s*");
 
     /**
      * the raw bibtex author/editor field
@@ -104,9 +104,9 @@ public class AuthorListParser {
 
     private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
         listOfNames = listOfNames.replace(" -", "-").trim();
-        if (!listOfNames.contains(",") && (multipleSpacesPattern.matcher(listOfNames).find() || listOfNames.contains("\n"))) {
-            listOfNames = newlinePattern.matcher(listOfNames).replaceAll(" and ");
-            listOfNames = multipleSpacesPattern.matcher(listOfNames).replaceAll(" and ");
+        if (!listOfNames.contains(",") && (MULTIPLE_SPACE_PATTERN.matcher(listOfNames).find() || listOfNames.contains("\n"))) {
+            listOfNames = NEW_LINE_PATTERN.matcher(listOfNames).replaceAll(" and ");
+            listOfNames = MULTIPLE_SPACE_PATTERN.matcher(listOfNames).replaceAll(" and ");
         }
 
         // Handling of "and others"
