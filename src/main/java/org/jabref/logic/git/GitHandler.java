@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
@@ -27,8 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
-    CliPreferences preferences;
-    GitPreferences gitPreferences;
     final Path repositoryPath;
     final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_USERNAME")).orElse("");
@@ -51,8 +48,6 @@ public class GitHandler {
      * @param createRepo If true, initializes a repository if the file path does not contain a repository
      */
     public GitHandler(Path repositoryPath, boolean createRepo) {
-        this.gitPreferences = preferences.getGitPreferences();
-
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
