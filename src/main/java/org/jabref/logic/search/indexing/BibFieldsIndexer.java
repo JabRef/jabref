@@ -40,6 +40,7 @@ public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
+    private static final Set<Field> DATE_FIELDS = new HashSet<>(Arrays.asList(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY));
 
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
@@ -49,7 +50,6 @@ public class BibFieldsIndexer {
     private final String splitValuesTable;
     private final String schemaSplitValuesTableReference;
     private final Character keywordSeparator;
-    private final Set<Field> dateFields = new HashSet<>(Arrays.asList(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY));
 
     public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.databaseContext = databaseContext;
@@ -219,7 +219,7 @@ public class BibFieldsIndexer {
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 // Skip indexing of date-related fields separately to ensure proper handling later in the process.
-                if (!dateFields.contains(field)) {
+                if (!DATE_FIELDS.contains(field)) {
                     Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
                     assert resolvedFieldLatexFree.isPresent();
                     addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
@@ -245,7 +245,7 @@ public class BibFieldsIndexer {
                 // endregion
             }
             // ensure all date-related fields are indexed.
-            for (Field dateField : dateFields) {
+            for (Field dateField : DATE_FIELDS) {
                 Optional<String> resolvedDateValue = bibEntry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
                 resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
             }
@@ -331,9 +331,9 @@ public class BibFieldsIndexer {
 
         String entryId = entry.getId();
         // If the updated field is date-related,iterate through all date fields and update the index accordingly.
-        if (dateFields.contains(field)) {
+        if (DATE_FIELDS.contains(field)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
-                for (Field dateField : dateFields) {
+                for (Field dateField : DATE_FIELDS) {
                     Optional<String> resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
                     resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
                 }
