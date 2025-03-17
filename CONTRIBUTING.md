@@ -1,16 +1,21 @@
 # Contributing
+<!-- markdownlint-disable MD001 -->
+### For programmers
 
-General overview about contributing for non-programmers is available at <https://docs.jabref.org/contributing>.
+A detailed guide on contributing for programmers is available at <https://devdocs.jabref.org>.
 
-We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below.
-If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
 
-**JabRef regards its contributors as [software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
+We welcome contributions to JabRef and encourage you to follow the [GitHub workflow](https://docs.github.com/en/get-started/using-github/github-flow).
+You can also check out the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+
+JabRef regards its contributors as **[software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
 As one consequence, for non-basic issues, you will have to work on the requirements side, too.
 
-Before you start, get the JabRef code on your local machine.
-Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
+### For non-programmers
 
+For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
+<!-- markdownlint-enable MD001 -->
 ## Table of Contents
 
 * [Choosing a task](#choosing-a-task-)
@@ -159,20 +164,23 @@ We reserve the right to reject pull requests that contain little or no genuine a
 
 ### After submission of a pull request
 
-After you submitted a pull request, automated checks will run.
-You may see "Some checks were not successful".
-You can click on failing checks to see more information about why they failed.
-Then, please look into them and handle accordingly.
+Once you submit a pull request, automated checks will run and bots will perform a preliminary review on your code.
+You will get automated comments on your pull request within about 5 minutes.
+Acting on them in a timely manner is expected.
 
-Afterwards, you will receive comments on your pull request.
-Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
-The pull request may be approved immediatly, or a reviewer may request changes.
-In that case, please implement the requested changes.
+You may also see "Some checks were not successful".
+You can click on failing checks to see more information about why they failed.
+Please look into them and handle accordingly.
 
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
 To maintain a clean git history, your commits will also be automatically squashed upon acceptance of the pull request, during merging.
 Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules), and force-pushing should be **avoided**.
+
+After all the basic checks are green, maintainers will look at your pull request.
+Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
+The pull request may be approved immediatly, or a reviewer may request changes and/or have discussions regarding your approach.
+In that case, you are expected to answer any questions and implement the requested changes.
 
 Please – **never ever close a pull request and open a new one** -
 This causes unessesary work on our side, and is not in the the style of the GitHub Open Source community.

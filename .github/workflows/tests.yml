@@ -390,6 +390,29 @@ jobs:
             exit 1
           fi
 
+  unmodified_submodules:
+    name: Submodules not modified
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          show-progress: 'false'
+      - name: Check for submodule modifications
+        id: check_submodule
+        run: |
+          git fetch origin ${{ github.base_ref }}
+
+          # enable diffing of submodules
+          sed -i "s/ all/ untracked/" .gitmodules
+
+          if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vzq "Submodule src"; then
+            echo "❌ Submodule modifications detected"
+            exit 1
+          fi
+          echo "✅ No submodule modifications"
+
   other_than_main:
     if: github.event_name == 'pull_request'
     name: Source branch is other than "main"
