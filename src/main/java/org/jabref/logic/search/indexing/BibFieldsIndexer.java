@@ -330,7 +330,6 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
 
         String entryId = entry.getId();
-        // If the updated field is date-related,iterate through all date fields and update the index accordingly.
         if (DATE_FIELDS.contains(field)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
                 for (Field dateField : DATE_FIELDS) {
