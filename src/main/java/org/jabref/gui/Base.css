@@ -2431,3 +2431,24 @@ journalInfo .grid-cell-b {
 #styleSelectDialog .currentStyleNameLabel {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
+
+
+
+
+
+.dynamic-tooltip {
+    -fx-max-width: 70vw;
+    -fx-max-height: 50vh;
+    -fx-background-color: #B0C4DE;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+    -fx-padding: 8px;
+    -fx-background-radius: 6px;
+    -fx-border-color: #B0B8D9;
+    -fx-border-width: 0.8px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
+}
+
+
+
+
