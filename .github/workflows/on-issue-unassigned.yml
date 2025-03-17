@@ -1,14 +1,13 @@
-name: On issue unlabeled
+name: On issue unassigned
 
 on:
   issues:
      types:
-       - unlabeled
+       - unassigned
 
 jobs:
   ensure_column:
-    name: "📍 Assigned or FirstTimeCodeContribution"
-    if: ${{ (github.event.label.name == '📍 Assigned' || github.event.label.name == 'FirstTimeCodeContribution') && github.repository_owner == 'JabRef' }}
+    if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -18,8 +17,8 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
-          target-labels: "📍 Assigned"
-          target-column: "Assigned"
+          target-labels: ""
+          target-column: "Free to take"
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
@@ -28,12 +27,12 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
-          target-labels: "📍 Assigned"
-          target-column: "Assigned"
+          target-labels: ""
+          target-column: "Free to take"
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-  remove_assignees:
+  remove_labels:
     if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
@@ -41,11 +40,11 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Remove all assignees
-        run: |
-          ASSIGNEES=$(gh issue view ${{ github.event.issue.number }} --json assignees --template '{{range .assignees}}{{.login}} {{end}}')
-          for user in $ASSIGNEES; do
-            gh issue edit ${{ github.event.issue.number }} --remove-assignee "$user"
-          done
+      - name: Remove assigned label
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove FirstTimeCodeContribution label
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
