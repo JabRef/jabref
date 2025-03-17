@@ -1,6 +1,6 @@
  ﻿
 TY  - BOOK
-TY  - JOUR
+TY  - JOUR 
 TY  - MGZN
 TY  - THES
 TY  - UNPB
@@ -12,10 +12,10 @@ JF  - Empirical Software Engineering
 T1  - Editorial: Open Source and Empirical Software Engineering:
 TI  - Editorial.
 T1  - Editorial?
-T1  - Editorial
-T1  - Editorials
-VL  - 6
-IS  -
+T1  - Editorial 
+T1  - Editorials 
+VL  - 6 
+IS  - 
 SP  - 193
 EP  - 194
 PY  - 99
@@ -25,8 +25,8 @@ PY  - 2001/00/00/
 PY  - ///
 PY  - 2001///
 Y1  - 2001/09/01/
-AU  - Cocke
-A1  - Harrison, Warren
+AU  - Cocke 
+A1  - Harrison, Warren 
 Levenshtein
         Morris
 A2  - Rives
@@ -41,7 +41,7 @@ JO  - kmptnd
 
 PB  - kmptnv
 TY  - THES
-PB  - kmptvf
+PB  - kmptvf  
 ID  - 123456
 sxdbgsd
 AD  - 32 peralta avenue los gatos ca
