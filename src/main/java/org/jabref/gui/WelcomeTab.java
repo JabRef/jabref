@@ -159,16 +159,23 @@ public class WelcomeTab extends Tab {
             Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
             noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
             recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
-        } else {
-            for (MenuItem item : fileHistoryMenu.getItems()) {
-                Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-                recentLibraryLink.getStyleClass().add("welcome-hyperlink");
-                recentLibraryLink.setOnAction(item.getOnAction());
-                recentLibrariesBox.getChildren().add(recentLibraryLink);
-            }
+
+            fileHistoryMenu.disableProperty().unbind();
+            fileHistoryMenu.setDisable(true);
+            return;
+        }
+
+        fileHistoryMenu.disableProperty().unbind();
+        fileHistoryMenu.setDisable(false);
+
+        for (MenuItem item : fileHistoryMenu.getItems()) {
+            Hyperlink recentLibraryLink = new Hyperlink(item.getText());
+            recentLibraryLink.getStyleClass().add("welcome-hyperlink");
+            recentLibraryLink.setOnAction(item.getOnAction());
+            recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
     }
-
+    
     private VBox createVBoxContainer(Node... nodes) {
         VBox box = new VBox(5);
         box.setAlignment(Pos.TOP_LEFT);
