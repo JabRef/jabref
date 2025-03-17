@@ -131,7 +131,7 @@ class CrossRefTest {
         entry.setField(StandardField.YEAR, "1999");
         entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
         entry.setField(StandardField.NUMBER, "2");
-        entry.setField(StandardField.PUBLISHER, "Brill");
+        entry.setField(StandardField.PUBLISHER, "Walter de Gruyter GmbH");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
