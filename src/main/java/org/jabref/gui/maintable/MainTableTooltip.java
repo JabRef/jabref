@@ -22,11 +22,25 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+
+        // Ensure tooltip does not exceed a reasonable size
+        tooltipContent.setMaxWidth(Double.MAX_VALUE);
+        tooltipContent.setMaxHeight(Double.MAX_VALUE);
+        tooltipContent.setPrefWidth(300);
+        tooltipContent.setPrefHeight(200);
+
+        // Enable text wrapping to prevent overflow
+        fieldValueLabel.setWrapText(true);
+        fieldValueLabel.setMaxWidth(300);
+
+        this.getStyleClass().add("dynamic-tooltip");
+
+        tooltipContent.getChildren().addAll(fieldValueLabel, preview);
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
         fieldValueLabel.setText(fieldValue + "\n");
+
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
@@ -35,6 +49,7 @@ public class MainTableTooltip extends Tooltip {
         } else {
             this.setGraphic(fieldValueLabel);
         }
+
         return this;
     }
 }
