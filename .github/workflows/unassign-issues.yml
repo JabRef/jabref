@@ -23,7 +23,7 @@ jobs:
           unassigned_comment: |
             ### 📋 Assignment Update
 
-            Hi @{{ handle }}, due to inactivity, you are no longer assigned to this issue.
+            Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
 
             <details open>
             <summary>Next steps</summary>
