@@ -44,7 +44,7 @@ public class GitPullAction extends SimpleCommand {
         GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
         if (gitHandler.isGitRepository()) {
             try {
-                gitHandler.updateCredentials(preferences);
+                gitHandler.updateCredentials(preferences.getGitPreferences());
                 gitHandler.pullOnCurrentBranch();
             } catch (Exception e) {
                 dialogService.showErrorDialogAndWait(e);
