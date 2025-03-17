@@ -175,7 +175,7 @@ public class WelcomeTab extends Tab {
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
     }
-    
+
     private VBox createVBoxContainer(Node... nodes) {
         VBox box = new VBox(5);
         box.setAlignment(Pos.TOP_LEFT);
@@ -184,33 +184,11 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createFooter() {
-        Label communityLabel = new Label(Localization.lang("Community"));
-        communityLabel.getStyleClass().add("welcome-footer-label");
+        Label communityLabel = createFooterLabel("Community");
 
-        HBox iconLinksContainer = new HBox(15);
-        iconLinksContainer.setAlignment(Pos.CENTER);
-
-        Hyperlink onlineHelpLink = createFooterLink("Online help", StandardActions.HELP, IconTheme.JabRefIcons.HELP);
-        Hyperlink forumLink = createFooterLink("Forum for support", StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
-        Hyperlink mastodonLink = createFooterLink("Mastodon", StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
-        Hyperlink linkedInLink = createFooterLink("LinkedIn", StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
-        Hyperlink donationLink = createFooterLink("Donation", StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
-
-        iconLinksContainer.getChildren().addAll(onlineHelpLink, forumLink, mastodonLink, linkedInLink, donationLink);
-
-        HBox textLinksContainer = new HBox(15);
-        textLinksContainer.setAlignment(Pos.CENTER);
-
-        Hyperlink devVersionLink = createFooterLink("Download Development version", StandardActions.OPEN_DEV_VERSION_LINK, null);
-        Hyperlink changelogLink = createFooterLink("CHANGELOG", StandardActions.OPEN_CHANGELOG, null);
-
-        textLinksContainer.getChildren().addAll(devVersionLink, changelogLink);
-
-        HBox versionContainer = new HBox(15);
-        versionContainer.setAlignment(Pos.CENTER);
-        Label versionLabel = new Label(Localization.lang("Current JabRef version") + ": " + buildInfo.version);
-        versionLabel.getStyleClass().add("welcome-footer-version");
-        versionContainer.getChildren().add(versionLabel);
+        HBox iconLinksContainer = createIconLinksContainer();
+        HBox textLinksContainer = createTextLinksContainer();
+        HBox versionContainer = createVersionContainer();
 
         VBox footerBox = new VBox(10);
         footerBox.setAlignment(Pos.CENTER);
@@ -219,6 +197,37 @@ public class WelcomeTab extends Tab {
         footerBox.getStyleClass().add("welcome-footer-container");
 
         return footerBox;
+    }
+
+    private Label createFooterLabel(String text) {
+        Label label = new Label(Localization.lang(text));
+        label.getStyleClass().add("welcome-footer-label");
+        return label;
+    }
+
+    private HBox createIconLinksContainer() {
+        HBox container = new HBox(15);
+        container.setAlignment(Pos.CENTER);
+
+        Hyperlink onlineHelpLink = createFooterLink("Online help", StandardActions.HELP, IconTheme.JabRefIcons.HELP);
+        Hyperlink forumLink = createFooterLink("Forum for support", StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
+        Hyperlink mastodonLink = createFooterLink("Mastodon", StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
+        Hyperlink linkedInLink = createFooterLink("LinkedIn", StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
+        Hyperlink donationLink = createFooterLink("Donation", StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
+
+        container.getChildren().addAll(onlineHelpLink, forumLink, mastodonLink, linkedInLink, donationLink);
+        return container;
+    }
+
+    private HBox createTextLinksContainer() {
+        HBox container = new HBox(15);
+        container.setAlignment(Pos.CENTER);
+
+        Hyperlink devVersionLink = createFooterLink("Download Development version", StandardActions.OPEN_DEV_VERSION_LINK, null);
+        Hyperlink changelogLink = createFooterLink("CHANGELOG", StandardActions.OPEN_CHANGELOG, null);
+
+        container.getChildren().addAll(devVersionLink, changelogLink);
+        return container;
     }
 
     private Hyperlink createFooterLink(String text, StandardActions action, IconTheme.JabRefIcons icon) {
@@ -253,5 +262,16 @@ public class WelcomeTab extends Tab {
         }
 
         return link;
+    }
+
+    private HBox createVersionContainer() {
+        HBox container = new HBox(15);
+        container.setAlignment(Pos.CENTER);
+
+        Label versionLabel = new Label(Localization.lang("Current JabRef version") + ": " + buildInfo.version);
+        versionLabel.getStyleClass().add("welcome-footer-version");
+
+        container.getChildren().add(versionLabel);
+        return container;
     }
 }
