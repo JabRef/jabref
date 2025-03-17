@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.Git;
@@ -192,7 +193,6 @@ public class GitHandler {
      * If pushing to remote fails, it fails silently.
      */
     public void pushCommitsToRemoteRepository() throws IOException {
-        updateCredentials();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.push()
@@ -205,7 +205,6 @@ public class GitHandler {
     }
 
     public void pullOnCurrentBranch() throws IOException {
-        updateCredentials();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
@@ -232,10 +231,10 @@ public class GitHandler {
         }
     }
 
-    public void updateCredentials() {
+    public void updateCredentials(GuiPreferences preferences) {
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                this.gitPreferences.getUsername(),
-                this.gitPreferences.getPassword()
+                preferences.getGitPreferences().getUsername(),
+                preferences.getGitPreferences().getPassword()
         );
     }
 }
