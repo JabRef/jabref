@@ -228,14 +228,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             term = escapeTermForSql(term);
         }
 
-        if (field.equalsIgnoreCase(StandardField.DATE.getName()) || field.equalsIgnoreCase(StandardField.YEAR.getName())) {
-            if (searchFlags.contains(NEGATION)) {
-                return buildTwoFieldsNegationQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
-            } else {
-                return buildTwoFieldsUnionQuery(StandardField.DATE.getName(), StandardField.YEAR.getName(), sqlOperator, prefixSuffix, term);
-            }
-        }
-
         // Pseudo-fields
         field = switch (field) {
             case "key" -> InternalField.KEY_FIELD.getName();
@@ -267,75 +259,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
-    }
-
-    private SqlQueryNode buildTwoFieldsUnionQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
-        String cte = """
-            cte%d AS (
-                SELECT %s.%s
-                FROM %s AS %s
-                WHERE (
-                    (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
-                )
-                UNION
-                SELECT %s.%s
-                FROM %s AS %s
-                WHERE (
-                    (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
-                )
-            )
-            """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, field1,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, field2,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
-
-        List<String> params = Collections.nCopies(4, prefixSuffix + term + prefixSuffix);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
-    }
-
-    private SqlQueryNode buildTwoFieldsNegationQuery(String field1, String field2, String operator, String prefixSuffix, String term) {
-        String cte = """
-            cte%d AS (
-                SELECT %s.%s
-                FROM %s AS %s
-                WHERE %s.%s NOT IN (
-                    SELECT %s.%s
-                    FROM %s AS %s
-                    WHERE (
-                        (%s.%s = '%s' AND (%s.%s %s ? OR %s.%s %s ?))
-                        OR
-                        (%s.%s = '%s' AND (%s.%s %s ? OR %s.%s %s ?))
-                    )
-                )
-            )
-            """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                INNER_TABLE, FIELD_NAME, field1,
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                INNER_TABLE, FIELD_NAME, field2,
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator);
-
-        List<String> params = Collections.nCopies(4, prefixSuffix + term + prefixSuffix);
-        SqlQueryNode node = new SqlQueryNode(cte, params);
-        nodes.add(node);
-        return new SqlQueryNode("cte" + cteCounter++);
     }
 
     private SqlQueryNode buildEntryIdQuery(String entryId) {

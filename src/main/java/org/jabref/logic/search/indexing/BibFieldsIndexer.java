@@ -47,6 +47,7 @@ public class BibFieldsIndexer {
     private final String splitValuesTable;
     private final String schemaSplitValuesTableReference;
     private final Character keywordSeparator;
+    private final Field[] dateFields = new Field[] {StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY};
 
     public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.databaseContext = databaseContext;
@@ -215,10 +216,12 @@ public class BibFieldsIndexer {
                 // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
-                Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                assert resolvedFieldLatexFree.isPresent();
-                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
-
+                // Skip indexing of date-related fields separately to ensure proper handling later in the process.
+                if (field != StandardField.DATE && field != StandardField.YEAR && field != StandardField.MONTH && field != StandardField.DAY) {
+                    Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+                    assert resolvedFieldLatexFree.isPresent();
+                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                }
                 // region Handling of known multi-value fields
                 // split and convert to Unicode
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
@@ -239,7 +242,12 @@ public class BibFieldsIndexer {
                 }
                 // endregion
             }
-
+            // ensure all date-related fields are indexed.
+            for (Field dateField : dateFields) {
+                Optional<String> resolvedDateValue = bibEntry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
+                String dateValue = resolvedDateValue.orElse("");
+                addBatch(preparedStatement, entryId, dateField, dateValue);
+            }
             // add entry type
             addBatch(preparedStatement, entryId, TYPE_HEADER, bibEntry.getType().getName());
 
@@ -301,19 +309,45 @@ public class BibFieldsIndexer {
                 FIELD_NAME,
                 FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED);
+        String insertDateFieldQuery = """
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT ("%s", "%s")
+                DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
+                """.formatted(
+                schemaMainTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED,
+                ENTRY_ID, FIELD_NAME,
+                FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
+        String entryId = entry.getId();
+        // If the updated field is date-related, re-index all date fields to overwrite the previous value.
+        if (field == StandardField.DATE || field == StandardField.YEAR || field == StandardField.MONTH || field == StandardField.DAY) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
+                for (Field dateField : dateFields) {
+                    Optional<String> resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
+                    String dateValue = resolvedDateValue.orElse("");
+                    addBatch(preparedStatement, entryId, dateField, dateValue);
+                }
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                LOGGER.error("Could not add an entry to the index.", e);
+            }
+        } else {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
+                String value = entry.getField(field).orElse("");
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
-            String entryId = entry.getId();
-            String value = entry.getField(field).orElse("");
-
-            Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-            assert resolvedFieldLatexFree.isPresent();
-            addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
-            preparedStatement.executeBatch();
-        } catch (SQLException e) {
-            LOGGER.error("Could not add an entry to the index.", e);
+                Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+                assert resolvedFieldLatexFree.isPresent();
+                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                LOGGER.error("Could not add an entry to the index.", e);
+            }
         }
-
         String insertIntoSplitTable = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
@@ -325,7 +359,6 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_TRANSFORMED);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertIntoSplitTable)) {
-            String entryId = entry.getId();
             String value = entry.getField(field).orElse("");
 
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
