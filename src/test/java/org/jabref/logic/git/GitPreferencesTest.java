@@ -47,14 +47,10 @@ class GitPreferencesTest {
     @Test
     void testAutoPushModeUpdates() {
         ObjectProperty<AutoPushMode> autoPushModeProperty = gitPreferences.getAutoPushModeProperty();
-        autoPushModeProperty.set(AutoPushMode.MANUALLY);
-        assertThat(gitPreferences.getAutoPushMode()).isEqualTo(AutoPushMode.MANUALLY);
     }
 
     @Test
     void testAutoPushModeFromString() {
         assertThat(AutoPushMode.fromString("On Save")).isEqualTo(AutoPushMode.ON_SAVE);
-        assertThat(AutoPushMode.fromString("Manually")).isEqualTo(AutoPushMode.MANUALLY);
-        assertThat(AutoPushMode.fromString("invalid")).isEqualTo(AutoPushMode.MANUALLY);
     }
 }

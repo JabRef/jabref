@@ -1,7 +1,6 @@
 package org.jabref.logic.preferences;
 
 public enum AutoPushMode {
-    MANUALLY("Manually"),
     ON_SAVE("On Save");
 
     private final String displayName;
@@ -25,6 +24,6 @@ public enum AutoPushMode {
                 return mode;
             }
         }
-        return MANUALLY;
+        return ON_SAVE;
     }
 }

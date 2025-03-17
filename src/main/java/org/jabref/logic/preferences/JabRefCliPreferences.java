@@ -1832,7 +1832,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
-        String storedMode = getString("gitAutoPushMode", AutoPushMode.MANUALLY.name());
+        String storedMode = getString("gitAutoPushMode", AutoPushMode.ON_SAVE.name());
         AutoPushMode autoPushMode = AutoPushMode.fromString(storedMode);
 
         String gitHubUsername = getString("gitHubUsername", "");
