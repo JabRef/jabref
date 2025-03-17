@@ -56,6 +56,10 @@ jobs:
         run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove pinned label
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove FirstTimeCodeContribution label
         run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
         env:
