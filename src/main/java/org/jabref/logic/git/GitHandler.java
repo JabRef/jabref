@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.preferences.AutoPushMode;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * This class handles the updating of the local and remote git repository that is located at the repository path
  * This provides an easy-to-use interface to manage a git repository
  */
+@SuppressWarnings("checkstyle:RegexpMultiline")
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
@@ -217,19 +218,24 @@ public class GitHandler {
         }
     }
 
-    public void postSaveDatabaseAction() {
-        try {
-            this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-            this.pushCommitsToRemoteRepository();
-        } catch (Exception e) {
-            LOGGER.info("Failed to push".concat(e.toString()));
+    public void postSaveDatabaseAction(GitPreferences preferences) {
+        if (this.isGitRepository() &&
+                preferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
+                preferences.getAutoPushEnabled()) {
+            this.updateCredentials(preferences);
+            try {
+                this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+                this.pushCommitsToRemoteRepository();
+            } catch (Exception e) {
+                LOGGER.info("Failed to push".concat(e.toString()));
+            }
         }
     }
 
-    public void updateCredentials(GuiPreferences preferences) {
+    public void updateCredentials(GitPreferences preferences) {
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                preferences.getGitPreferences().getGitHubUsername(),
-                preferences.getGitPreferences().getGitHubPasskey()
+                preferences.getGitHubUsername(),
+                preferences.getGitHubPasskey()
         );
     }
 }
