@@ -69,7 +69,7 @@ public class ACMPortalParser implements Parser {
 
         try {
             Document doc = Jsoup.parse(stream, null, HOST);
-            Elements doiHrefs = doc.select("div.issue-item__content-right > h5 > span > a");
+            Elements doiHrefs = doc.select("div.issue-item__content-right > h3 > span > a");
 
             for (Element elem : doiHrefs) {
                 String fullSegment = elem.attr("href");

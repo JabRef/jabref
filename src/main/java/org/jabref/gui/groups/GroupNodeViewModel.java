@@ -11,6 +11,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -59,7 +60,7 @@ import io.github.adr.linked.ADR;
 
 public class GroupNodeViewModel {
 
-    private final String displayName;
+    private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -87,7 +88,7 @@ public class GroupNodeViewModel {
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
         this.preferences = preferences;
 
-        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
+        displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
             children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
@@ -175,7 +176,11 @@ public class GroupNodeViewModel {
     }
 
     public String getDisplayName() {
-        return displayName;
+        return displayName.get();
+    }
+
+    public void setDisplayName(String newName) {
+        displayName.set(newName);
     }
 
     public boolean isRoot() {
@@ -344,7 +349,8 @@ public class GroupNodeViewModel {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
         boolean canDropEntries = localDragBoard.hasBibEntries() && (groupNode.getGroup() instanceof GroupEntryChanger);
-        return canDropOtherGroup || canDropEntries;
+        boolean canDropFiles = dragboard.hasFiles();
+        return canDropOtherGroup || canDropEntries || canDropFiles;
     }
 
     public void moveTo(GroupNodeViewModel target) {

@@ -3,6 +3,10 @@ package org.jabref.logic.journals;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * The class provides functionality for managing journal abbreviations.
+ * <a href="https://docs.jabref.org/advanced/journalabbreviations">JabRef Journal Abbreviations Documentation</a>
+ */
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
