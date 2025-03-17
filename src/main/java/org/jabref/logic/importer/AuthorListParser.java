@@ -100,11 +100,9 @@ public class AuthorListParser {
 
     private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
         listOfNames = listOfNames.replace(" -", "-").trim();
-        if ((listOfNames.contains(" ") && listOfNames.matches(".*\\s{2,}.*")) || listOfNames.contains("\n")) {
+        if (!listOfNames.contains(",") && ((listOfNames.contains(" ") && listOfNames.matches(".*\\s{2,}.*")) || listOfNames.contains("\n"))) {
             listOfNames = listOfNames.replaceAll("\\s*\\n\\s*", " and ").replaceAll("\\s{2,}", " and ").trim();
         }
-
-
 
         // Handling of "and others"
         // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS

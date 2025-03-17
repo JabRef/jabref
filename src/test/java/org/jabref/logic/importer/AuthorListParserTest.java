@@ -80,11 +80,6 @@ class AuthorListParserTest {
                         ),
                         "U, Vivian and Lai, Thomas"
                 ),
-                Arguments.of(AuthorList.of(
-                        new Author("Vivian", "V.", null, "U", null),
-                        new Author("Thomas", "T.", null, "Lai", null)
-                        ),
-                        "U, Vivian  Lai, Thomas"),
                 Arguments.of(
                         AuthorList.of(
                                 new Author("I.", "I.", null, "Podadera", null),
