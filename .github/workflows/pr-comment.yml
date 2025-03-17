@@ -7,7 +7,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests", "Mark issue as in progress"]
+    workflows: ["Tests", "On PR opened"]
     types:
       - completed
 
