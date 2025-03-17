@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.preferences.CliPreferences;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -24,11 +26,13 @@ import org.slf4j.LoggerFactory;
  */
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
+    CliPreferences preferences;
+    GitPreferences gitPreferences;
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    String gitUsername = Optional.ofNullable(System.getenv("GIT_USERNAME")).orElse("");
+    String gitPassword = Optional.ofNullable(System.getenv("GIT_PASSWORD")).orElse("");
+    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
      * Initialize the handler for the given repository
@@ -46,6 +50,8 @@ public class GitHandler {
      * @param createRepo If true, initializes a repository if the file path does not contain a repository
      */
     public GitHandler(Path repositoryPath, boolean createRepo) {
+        this.gitPreferences = preferences.getGitPreferences();
+
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
@@ -186,6 +192,7 @@ public class GitHandler {
      * If pushing to remote fails, it fails silently.
      */
     public void pushCommitsToRemoteRepository() throws IOException {
+        updateCredentials();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.push()
@@ -198,6 +205,7 @@ public class GitHandler {
     }
 
     public void pullOnCurrentBranch() throws IOException {
+        updateCredentials();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
@@ -222,5 +230,12 @@ public class GitHandler {
         } catch (Exception e) {
             LOGGER.info("Failed to push".concat(e.toString()));
         }
+    }
+
+    public void updateCredentials() {
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(
+                this.gitPreferences.getUsername(),
+                this.gitPreferences.getPassword()
+        );
     }
 }
