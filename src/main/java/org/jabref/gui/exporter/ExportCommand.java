@@ -133,23 +133,19 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    boolean currentTabIsLibraryTab = tabSupplier.get() != null;
-                    // libraryTab is null in case of Welcome Tab
-                    if (currentTabIsLibraryTab) {
-                        LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
-                        notificationPane.notify(
-                                IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
-                                Localization.lang("Export operation finished successfully."),
-                                List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
-                                    try {
-                                        NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
-                                    } catch (IOException e) {
-                                        LOGGER.error("Could not open export folder.", e);
-                                    }
-                                    notificationPane.hide();
-                                })),
-                                Duration.seconds(5));
-                    }
+                    LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
+                    notificationPane.notify(
+                            IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
+                            Localization.lang("Export operation finished successfully."),
+                            List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
+                                try {
+                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
+                                } catch (IOException e) {
+                                    LOGGER.error("Could not open export folder.", e);
+                                }
+                                notificationPane.hide();
+                            })),
+                            Duration.seconds(5));
                 })
                 .onFailure(this::handleError)
                 .executeWith(taskExecutor);

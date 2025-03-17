@@ -153,18 +153,12 @@ public class WelcomeTab extends Tab {
     }
 
     private void updateWelcomeRecentLibraries() {
-        recentLibrariesBox.getChildren().clear();
-
         if (fileHistoryMenu.getItems().isEmpty()) {
-            Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
-            noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
-            recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
-
-            fileHistoryMenu.disableProperty().unbind();
-            fileHistoryMenu.setDisable(true);
+            displayNoRecentLibrariesMessage();
             return;
         }
 
+        recentLibrariesBox.getChildren().clear();
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
 
@@ -174,6 +168,16 @@ public class WelcomeTab extends Tab {
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
+    }
+
+    private void displayNoRecentLibrariesMessage() {
+        recentLibrariesBox.getChildren().clear();
+        Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
+        noRecentLibrariesLabel.getStyleClass().add("welcome-no-recent-label");
+        recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
+
+        fileHistoryMenu.disableProperty().unbind();
+        fileHistoryMenu.setDisable(true);
     }
 
     private VBox createVBoxContainer(Node... nodes) {
