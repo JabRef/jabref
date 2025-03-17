@@ -392,7 +392,7 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -407,7 +407,10 @@ jobs:
           # enable diffing of submodules
           sed -i "s/ all/ untracked/" .gitmodules
 
-          if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -q "Submodule src"; then
+          if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vzq "Submodule src"; then
+            echo "Debug:"
+            echo git diff --submodule=log origin/${{ github.base_ref }} HEAD
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD
             echo "❌ Submodule modifications detected"
             exit 1
           fi
