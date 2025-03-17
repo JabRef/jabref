@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 45
+          days_until_unassign: 14
   move_unassigned_issues:
     needs: unassign_issues
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}

@@ -53,6 +53,10 @@ jobs:
         run: gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} -f assignee=${{ github.event.pull_request.user.login }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add label "📌 Pinned"
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   conflicts_with_target:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
