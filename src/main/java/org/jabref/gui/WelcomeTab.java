@@ -205,7 +205,7 @@ public class WelcomeTab extends Tab {
     }
 
     private Label createFooterLabel(String text) {
-        Label label = new Label(Localization.lang(text));
+        Label label = new Label(text);
         label.getStyleClass().add("welcome-footer-label");
         return label;
     }
