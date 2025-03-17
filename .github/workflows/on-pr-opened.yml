@@ -77,7 +77,7 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
