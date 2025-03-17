@@ -265,7 +265,7 @@ public class WelcomeTab extends Tab {
         HBox container = new HBox(15);
         container.setAlignment(Pos.CENTER);
 
-        Label versionLabel = new Label(Localization.lang("Current JabRef version") + ": " + buildInfo.version);
+        Label versionLabel = new Label("Current JabRef version: " + buildInfo.version);
         versionLabel.getStyleClass().add("welcome-footer-version");
 
         container.getChildren().add(versionLabel);
