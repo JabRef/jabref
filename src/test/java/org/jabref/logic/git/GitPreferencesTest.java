@@ -16,7 +16,7 @@ class GitPreferencesTest {
 
     @BeforeEach
     void setUp() {
-        gitPreferences = new GitPreferences(true, AutoPushMode.ON_SAVE);
+        gitPreferences = new GitPreferences(true, AutoPushMode.ON_SAVE, "", "");
     }
 
     @Test
