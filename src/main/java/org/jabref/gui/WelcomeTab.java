@@ -23,6 +23,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
@@ -188,7 +189,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createFooter() {
-        Label communityLabel = createFooterLabel("Community");
+        Label communityLabel = createFooterLabel(Localization.lang("Community"));
 
         HBox iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
@@ -239,22 +240,14 @@ public class WelcomeTab extends Tab {
         link.getStyleClass().add("welcome-footer-link");
 
         String url = switch (action) {
-            case HELP ->
-                    "https://help.jabref.org/";
-            case OPEN_FORUM ->
-                    "https://discourse.jabref.org/";
-            case OPEN_MASTODON ->
-                    "https://foojay.social/@jabref";
-            case OPEN_LINKEDIN ->
-                    "https://linkedin.com/company/jabref/";
-            case DONATE ->
-                    "https://donate.jabref.org";
-            case OPEN_DEV_VERSION_LINK ->
-                    "https://builds.jabref.org/master/";
-            case OPEN_CHANGELOG ->
-                    "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md";
-            default ->
-                    null;
+            case HELP -> URLs.HELP_URL;
+            case OPEN_FORUM -> URLs.FORUM_URL;
+            case OPEN_MASTODON -> URLs.MASTODON_URL;
+            case OPEN_LINKEDIN -> URLs.LINKEDIN_URL;
+            case DONATE -> URLs.DONATE_URL;
+            case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
+            case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
+            default -> null;
         };
 
         if (url != null) {
