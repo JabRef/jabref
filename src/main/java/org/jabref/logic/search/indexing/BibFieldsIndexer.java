@@ -310,7 +310,10 @@ public class BibFieldsIndexer {
                 FIELD_NAME,
                 FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED);
-        // Inserts a new record into the table, or updates the existing record if there's a conflict
+
+        // Inserts or updates date-related fields (e.g., date, year, month, day) into the index.
+        // If a conflict occurs (e.g., the same ENTRY_ID and FIELD_NAME already exist),
+        // the existing values are overwritten with the new ones to ensure the latest data is stored.
         String insertDateFieldQuery = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
@@ -325,8 +328,9 @@ public class BibFieldsIndexer {
                 ENTRY_ID, FIELD_NAME,
                 FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
+
         String entryId = entry.getId();
-        // If the updated field is date-related, re-index all date fields to overwrite the previous value.
+        // If the updated field is date-related,iterate through all date fields and update the index accordingly.
         if (dateFields.contains(field)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
                 for (Field dateField : dateFields) {
