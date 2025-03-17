@@ -273,8 +273,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 Path path = Path.of(filePath);
                 if (filePath.endsWith(".mv")) {
                     openMvFile(path);
-                } else {
-                    openFile(path);
                 }
             }
         }
