@@ -431,9 +431,6 @@ public class LibraryTab extends Tab {
                     String statusText = switch (gitStatus) {
                         case MODIFIED -> "[" + Localization.lang("Modified") + "]";
                         case STAGED -> "[" + Localization.lang("Staged") + "]";
-                        case AHEAD_OF_REMOTE -> "[" + Localization.lang("Ahead") + "]";
-                        case BEHIND_REMOTE -> "[" + Localization.lang("Behind") + "]";
-                        case UP_TO_DATE -> "[" + Localization.lang("Up to date") + "]";
                         case COMMITTED -> "[" + Localization.lang("Committed") + "]";
                         case UNTRACKED -> "[" + Localization.lang("Untracked") + "]";
                     };

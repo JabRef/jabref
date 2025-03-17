@@ -226,9 +226,6 @@ public class GitHandler {
         MODIFIED,
         STAGED,
         COMMITTED,
-        UP_TO_DATE,
-        BEHIND_REMOTE,
-        AHEAD_OF_REMOTE,
         UNTRACKED
     }
 
