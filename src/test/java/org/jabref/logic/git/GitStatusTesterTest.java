@@ -28,21 +28,24 @@ class GitStatusTesterTest {
     Path nonGitTempDir;
 
     private GitHandler gitHandler;
+    private GitHandler nonGitHandler;
 
     @BeforeEach
     void setUp() {
         gitHandler = new GitHandler(tempDir, true);
+        nonGitHandler = new GitHandler(nonGitTempDir, false);
     }
 
     @Test
     @DisplayName("Test Git repository initialization and detection")
     void gitRepositoryInitialization() {
         assertTrue(gitHandler.isGitRepository());
+        assertFalse(nonGitHandler.isGitRepository());
     }
 
     @Test
     @DisplayName("Test status of untracked files")
-    void untrackedFileStatus() throws IOException {
+    void untrackedFileStatus() throws IOException, GitAPIException {
         Path untrackedFile = tempDir.resolve("untracked.txt");
         Files.writeString(untrackedFile, "This is an untracked file");
         Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(untrackedFile);

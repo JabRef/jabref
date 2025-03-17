@@ -279,8 +279,12 @@ public class GitHandler {
                 // If file is in the repository but not modified, staged, or untracked, it must be committed
                 return Optional.of(GitStatus.COMMITTED);
             } catch (GitAPIException | IOException e) {
+                LOGGER.error("Failed to get file status", e);
                 return Optional.empty();
             }
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to get file status", e);
+            return Optional.empty();
         }
     }
 
@@ -304,11 +308,8 @@ public class GitHandler {
                 return absoluteRepoPath.relativize(absoluteFilePath).toString();
             }
             return "";
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.debug("IO error when resolving real path", e);
-            return "";
-        } catch (Exception e) {
-            LOGGER.debug("Unexpected error in path handling", e);
             return "";
         }
     }
