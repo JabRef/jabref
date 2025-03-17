@@ -8,9 +8,6 @@ import java.util.Objects;
  * <a href="https://docs.jabref.org/advanced/journalabbreviations">JabRef Journal Abbreviations Documentation</a>
  */
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
-
-    private static final long serialVersionUID = 1;
-
     private final String name;
     private final String abbreviation;
     private final String dotlessAbbreviation;

@@ -41,7 +41,7 @@ public class JournalAbbreviationRepository {
      */
     public JournalAbbreviationRepository(Path journalList) {
         String journalPath = journalList.toAbsolutePath().toString();
-        store = new MVStore.Builder().fileName(journalPath).cacheSize(128).open();
+        store = new MVStore.Builder().fileName(journalPath).open();
 
         openMaps(store);
     }
