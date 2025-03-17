@@ -45,6 +45,7 @@ public class GitPushAction extends SimpleCommand {
         if (gitHandler.isGitRepository()) {
             try {
                 gitHandler.createCommitOnCurrentBranch("Automatic update via JabRef)", false);
+                gitHandler.updateCredentials(preferences);
                 gitHandler.pushCommitsToRemoteRepository();
             } catch (Exception e) {
                 dialogService.showErrorDialogAndWait(e);

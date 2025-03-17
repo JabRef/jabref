@@ -26,11 +26,9 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-//    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-//    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    String gitUsername = "SihasA";
-    String gitPassword = "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";
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    String gitUsername = Optional.ofNullable(System.getenv("GIT_USERNAME")).orElse("");
+    String gitPassword = Optional.ofNullable(System.getenv("GIT_PASSWORD")).orElse("");
+    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
      * Initialize the handler for the given repository
@@ -224,5 +222,12 @@ public class GitHandler {
         } catch (Exception e) {
             LOGGER.info("Failed to push".concat(e.toString()));
         }
+    }
+
+    public void updateCredentials(GuiPreferences preferences) {
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(
+                preferences.getGitPreferences().getUsername(),
+                preferences.getGitPreferences().getPassword()
+        );
     }
 }
