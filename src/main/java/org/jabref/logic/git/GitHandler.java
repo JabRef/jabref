@@ -26,8 +26,10 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+//    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+//    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+    String gitUsername = "SihasA";
+    String gitPassword = "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";
     final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
