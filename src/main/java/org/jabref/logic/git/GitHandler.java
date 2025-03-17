@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.preferences.GuiPreferences;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -28,7 +30,7 @@ public class GitHandler {
     final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
      * Initialize the handler for the given repository
@@ -226,8 +228,8 @@ public class GitHandler {
 
     public void updateCredentials(GuiPreferences preferences) {
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                preferences.getGitPreferences().getUsername(),
-                preferences.getGitPreferences().getPassword()
+                preferences.getGitPreferences().getGitHubUsername(),
+                preferences.getGitPreferences().getGitHubPasskey()
         );
     }
 }
