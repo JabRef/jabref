@@ -289,7 +289,7 @@ public class BibDatabaseContext {
             GitHandler gitHandler = new GitHandler(getDatabasePath().get());
             return gitHandler.getFileStatus(getDatabasePath().get());
         } catch (SecurityException e) {
-            LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage());
+            LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage(), e);
             return Optional.empty();
         }
     }
@@ -314,7 +314,7 @@ public class BibDatabaseContext {
                 return true;
             }
         } catch (SecurityException e) {
-            LOGGER.warn("No permission to check for Git repository at {}: {}", getDatabasePath().get(), e.getMessage());
+            LOGGER.warn("No permission to check for Git repository at {}: {}", getDatabasePath().get(), e.getMessage(), e);
             return false;
         }
         return false;
