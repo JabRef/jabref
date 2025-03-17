@@ -101,7 +101,8 @@ recipeList:
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
   - org.openrewrite.java.migrate.net.JavaNetAPIs
-  - org.openrewrite.java.migrate.net.URLConstructorsToURIRecipes
+  # Got missing: https://rewriteoss.slack.com/archives/C01A843MWG5/p1742246698423949
+  # - org.openrewrite.java.migrate.net.URLConstructorsToURIRecipes
   - org.openrewrite.java.migrate.util.OptionalNotEmptyToIsPresent
   - org.openrewrite.java.migrate.util.OptionalNotPresentToIsEmpty
   - org.openrewrite.java.migrate.util.SequencedCollection
