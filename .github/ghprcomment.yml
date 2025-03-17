@@ -5,6 +5,13 @@
 
     Please start with a proper branch name.
     See [https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process](CONTRIBUTING.md) for details.
+- jobName: windows installer and portable version
+  message: >
+    Your code does not compile.
+    Please ensure your changes compile successfully before pushing changes.
+   
+    
+    To verify compilation locally, run `./gradlew build` or try running JabRef.
 - jobName: 'Conflicts with target branch'
   message: >
     Your pull request conflicts with the target branch.
