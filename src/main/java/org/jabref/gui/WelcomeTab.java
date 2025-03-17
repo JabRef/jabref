@@ -228,8 +228,8 @@ public class WelcomeTab extends Tab {
         HBox container = new HBox(15);
         container.setAlignment(Pos.CENTER);
 
-        Hyperlink devVersionLink = createFooterLink("Download Development version", StandardActions.OPEN_DEV_VERSION_LINK, null);
-        Hyperlink changelogLink = createFooterLink("CHANGELOG", StandardActions.OPEN_CHANGELOG, null);
+        Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
+        Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
 
         container.getChildren().addAll(devVersionLink, changelogLink);
         return container;
