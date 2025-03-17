@@ -99,9 +99,11 @@ class AuthorListParserTest {
                                 new Author("I.", "I.", null, "Podadera", null),
                                 new Author("J. M.", "J. M.", null, "Carmona", null)
                         ),
-                        "Alexander Artemenko\n" +
-                                "  I. Podadera\n" +
-                                "  J. M. Carmona")
+                        """
+                        Alexander Artemenko
+                        I. Podadera
+                        J. M. Carmona
+                        """)
         );
     }
 
