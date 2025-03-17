@@ -2429,3 +2429,7 @@ journalInfo .grid-cell-b {
 #styleSelectDialog .currentStyleNameLabel {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
+
+.refresh {
+    -fx-background-color: transparent;
+}
