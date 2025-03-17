@@ -76,12 +76,12 @@ public class WelcomeTab extends Tab {
         this.fileHistoryMenu = fileHistoryMenu;
         this.buildInfo = buildInfo;
 
-        this.recentLibrariesBox = new VBox(5);
+        this.recentLibrariesBox = new VBox(10);
 
-        VBox welcomePageContainer = new VBox(20);
+        VBox welcomePageContainer = new VBox(10);
         welcomePageContainer.setAlignment(Pos.CENTER);
 
-        HBox welcomeMainContainer = new HBox(20);
+        HBox welcomeMainContainer = new HBox(10);
         welcomeMainContainer.setAlignment(Pos.CENTER);
 
         welcomeMainContainer.setPadding(new Insets(10, 10, 10, 50));
@@ -182,7 +182,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createVBoxContainer(Node... nodes) {
-        VBox box = new VBox(5);
+        VBox box = new VBox(10);
         box.setAlignment(Pos.TOP_LEFT);
         box.getChildren().addAll(nodes);
         return box;
@@ -211,7 +211,7 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createIconLinksContainer() {
-        HBox container = new HBox(15);
+        HBox container = new HBox(10);
         container.setAlignment(Pos.CENTER);
 
         Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
@@ -225,7 +225,7 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox(15);
+        HBox container = new HBox(10);
         container.setAlignment(Pos.CENTER);
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
@@ -262,10 +262,10 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createVersionContainer() {
-        HBox container = new HBox(15);
+        HBox container = new HBox(10);
         container.setAlignment(Pos.CENTER);
 
-        Label versionLabel = new Label(Localization.lang("Current JabRef version") + ": " + buildInfo.version);
+        Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
         versionLabel.getStyleClass().add("welcome-footer-version");
 
         container.getChildren().add(versionLabel);
