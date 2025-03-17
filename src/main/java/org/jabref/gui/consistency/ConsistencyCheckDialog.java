@@ -123,12 +123,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             ConsistencyMessage selectedMessage = getTableRow().getItem();
                             Optional<StandardField> field = StandardField.fromName(clickedColumn.getText());
 
-                            if (field.isPresent()) {
-                                libraryTab.editEntryAndFocusField(selectedMessage.bibEntry(), field.get());
-                            } else {
-                                libraryTab.showAndEdit(selectedMessage.bibEntry());
-                                dialogService.notify(Localization.lang("Field does not exist in the editor!"));
-                            }
+                            field.ifPresent(standardField -> libraryTab.editEntryAndFocusField(selectedMessage.bibEntry(), standardField));
                         }
                     });
                 }
