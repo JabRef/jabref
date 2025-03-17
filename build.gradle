@@ -8,7 +8,7 @@ plugins {
 
     id 'com.github.andygoossens.modernizer' version '1.10.0'
 
-    id 'me.champeau.jmh' version '0.7.2'
+    id 'me.champeau.jmh' version '0.7.3'
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id 'com.github.koppor.gradle-modules-plugin' version 'v1.8.15-cmd-1'
@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '7.1.4'
+    id 'org.openrewrite.rewrite' version '7.2.0'
 
     id "org.itsallcode.openfasttrace" version "3.0.1"
 }
@@ -277,7 +277,7 @@ dependencies {
     implementation 'org.tinylog:tinylog-impl:2.7.0'
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.16'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.17'
     // route all requests to log4j to SLF4J
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.3'
 
@@ -382,7 +382,7 @@ dependencies {
     implementation 'io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.179'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.11.4'
 
     testImplementation 'org.mockito:mockito-core:5.16.0'
