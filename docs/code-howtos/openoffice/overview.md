@@ -86,7 +86,7 @@ From the user's point of view, citation groups can be created by
        * deleting individual citations
        * moving individual citations around (between citation groups)
        * (copy does not work)
-       * (Moving a citation within a group has no effect on the final output due to sorting of citations within groups. See [Sorting within a citation group](overview.md#localOrder))
+       * (Moving a citation within a group has no effect on the final output due to sorting of citations within groups. See [Sorting within a citation group](#localorder))
 
 In order to manage single citations and groups uniformly, we consider each citation in the document to belong to a citation group, even if it means a group containing a single citation.
 
@@ -123,7 +123,7 @@ Four major types citation of styles can be described by a jstyle.
 
 ## Sorting
 
-### Sorting te bibliography
+### Sorting the bibliography
 
 The bibliography is sorted in (author, year, title) order
 
@@ -136,7 +136,7 @@ The order of appearance of citations (as considered during numbering and adding 
 1. Their order within each citation group (`localOrder`), and
 2. the order of the citation groups (citation markers) in the text (`globalOrder`).
 
-#### Sorting within a citation group (`localOrder`) <a href="#localorder" id="localorder"></a>
+#### Sorting within a citation group (`localOrder`) <a id="localorder"></a>
 
 The order of citations within a citation group is controlled by `jstyle:MultiCiteChronological`.
 

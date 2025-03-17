@@ -1,5 +1,7 @@
 package org.jabref.gui.journals;
 
+import java.util.Optional;
+
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -44,11 +46,13 @@ public class UndoableAbbreviator {
             text = database.resolveForStrings(text);
         }
 
-        if (!journalAbbreviationRepository.isKnownName(text)) {
+        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+
+        if (foundAbbreviation.isEmpty()) {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
+        Abbreviation abbreviation = foundAbbreviation.get();
         String newText = getAbbreviatedName(abbreviation);
 
         if (newText.equals(origText)) {
