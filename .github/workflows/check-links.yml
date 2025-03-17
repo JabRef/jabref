@@ -1,11 +1,10 @@
 name: Check external href links in the documentation
 
 on:
-  push:
+  pull_request:
     paths:
       - '.github/workflows/check-links.yml'
-      - '.lycheeignore'
-      - 'lychee.toml'
+      - '.linkspector.yml'
       - '**/*.md'
   schedule:
     # Run on the first of each month at 9:00 AM (See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07)
@@ -17,22 +16,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lychee:
-    if: github.repository_owner == 'JabRef'
+  check-links:
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - name: Restore lychee cache
-        uses: actions/cache@v4
+      - name: Run linkspector
+        uses: umbrelladocs/action-linkspector@v1
         with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      - name: Link Checker
-        id: lychee
-        uses: lycheeverse/lychee-action@v2.2.0
-        with:
-          fail: true
-          args: --accept '200,201,202,203,204,403,429,500' --max-concurrency 1 --cache --no-progress --exclude-all-private './**/*.md'
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          fail_level: any

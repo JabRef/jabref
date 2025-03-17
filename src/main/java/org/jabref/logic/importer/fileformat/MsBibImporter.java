@@ -116,7 +116,7 @@ public class MsBibImporter extends Importer {
             dBuild.setXIncludeAware(false);
             dBuild.setExpandEntityReferences(false);
         } catch (ParserConfigurationException e) {
-            LOGGER.warn("Builder not fully configured. Feature:'{}' is probably not supported by current XML processor. {}", feature, e);
+            LOGGER.warn("Builder not fully configured. Feature:'{}' is probably not supported by current XML processor.", feature, e);
         }
 
         return dBuild;

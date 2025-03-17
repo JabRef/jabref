@@ -63,7 +63,9 @@ public class SidePaneContentFactory {
                     stateManager,
                     preferences,
                     dialogService,
-                    aiService);
+                    aiService,
+                    undoManager,
+                    fileUpdateMonitor);
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
