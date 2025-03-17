@@ -83,7 +83,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception would occur when running abbreviate journals for multiple entries. [#12634](https://github.com/JabRef/jabref/issues/12634)
 - We fixed an issue Where JabRef displayed an inconsistent search results for date-related queries[#12296](https://github.com/JabRef/jabref/issues/12296)
 
-
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
