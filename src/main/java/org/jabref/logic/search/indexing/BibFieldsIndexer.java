@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
@@ -47,7 +49,7 @@ public class BibFieldsIndexer {
     private final String splitValuesTable;
     private final String schemaSplitValuesTableReference;
     private final Character keywordSeparator;
-    private final Field[] dateFields = new Field[] {StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY};
+    private final Set<Field> dateFields = new HashSet<>(Arrays.asList(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY));
 
     public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.databaseContext = databaseContext;
@@ -217,7 +219,7 @@ public class BibFieldsIndexer {
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 // Skip indexing of date-related fields separately to ensure proper handling later in the process.
-                if (field != StandardField.DATE && field != StandardField.YEAR && field != StandardField.MONTH && field != StandardField.DAY) {
+                if (!dateFields.contains(field)) {
                     Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
                     assert resolvedFieldLatexFree.isPresent();
                     addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
@@ -245,8 +247,7 @@ public class BibFieldsIndexer {
             // ensure all date-related fields are indexed.
             for (Field dateField : dateFields) {
                 Optional<String> resolvedDateValue = bibEntry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
-                String dateValue = resolvedDateValue.orElse("");
-                addBatch(preparedStatement, entryId, dateField, dateValue);
+                resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
             }
             // add entry type
             addBatch(preparedStatement, entryId, TYPE_HEADER, bibEntry.getType().getName());
@@ -309,6 +310,7 @@ public class BibFieldsIndexer {
                 FIELD_NAME,
                 FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED);
+        // Inserts a new record into the table, or updates the existing record if there's a conflict
         String insertDateFieldQuery = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
@@ -325,12 +327,11 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
         String entryId = entry.getId();
         // If the updated field is date-related, re-index all date fields to overwrite the previous value.
-        if (field == StandardField.DATE || field == StandardField.YEAR || field == StandardField.MONTH || field == StandardField.DAY) {
+        if (dateFields.contains(field)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
                 for (Field dateField : dateFields) {
                     Optional<String> resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
-                    String dateValue = resolvedDateValue.orElse("");
-                    addBatch(preparedStatement, entryId, dateField, dateValue);
+                    resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
                 }
                 preparedStatement.executeBatch();
             } catch (SQLException e) {
@@ -348,6 +349,7 @@ public class BibFieldsIndexer {
                 LOGGER.error("Could not add an entry to the index.", e);
             }
         }
+
         String insertIntoSplitTable = """
                 INSERT INTO %s ("%s", "%s", "%s", "%s")
                 VALUES (?, ?, ?, ?)
