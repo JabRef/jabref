@@ -29,7 +29,7 @@ jobs:
 
             Happy coding! 🚀
 
-            ⏳ Please note, you will be automatically unassigned if the issue isn't closed within **{{ total_days }} days** (by **{{ unassigned_date }}**). A maintainer can also add the "**{{ pin_label }}**" label to prevent automatic unassignment.
+            ⏳ Please note, you will be automatically unassigned if there is not a (draft) pull request within **{{ total_days }} days** (by **{{ unassigned_date }}**).
           assignment_suggestion_comment: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue—great! 🎉
             It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
