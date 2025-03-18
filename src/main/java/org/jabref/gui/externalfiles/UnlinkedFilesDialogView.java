@@ -275,9 +275,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         // Already imported files should not be re-added at a second click on "Import". Therefore, all imported files are unchecked.
         unlinkedFilesList.getCheckModel().clearChecks();
 
-        // Changes below are done for the issue - https://github.com/JabRef/jabref/issues/12713
-        // JavaFx is not re-rendering everything necessary after the file import, and hence it ends up with some misalignment
-        // The below change removing and adding css property forces it to re-render
+        // JavaFX does not re-render everything necessary after the file import, and hence it ends up with some misalignment (see https://github.com/JabRef/jabref/issues/12713). Thus, we remove and add the CSS property to force it to re-render.
         Platform.runLater(() -> {
             accordion.getStyleClass().remove(REFRESH_CLASS);
             accordion.getStyleClass().add(REFRESH_CLASS);
