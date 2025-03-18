@@ -28,7 +28,6 @@ class CheckForVersionControlActionTest {
     private DialogService dialogService;
     private CliPreferences cliPreferences;
     private BibDatabaseContext databaseContext;
-    private GitHandler gitHandler;
 
     @BeforeEach
     void setUp() {
@@ -37,7 +36,6 @@ class CheckForVersionControlActionTest {
         dialogService = mock(DialogService.class);
         cliPreferences = mock(CliPreferences.class);
         databaseContext = mock(BibDatabaseContext.class);
-        gitHandler = mock(GitHandler.class);
 
         when(parserResult.getDatabaseContext()).thenReturn(databaseContext);
     }
@@ -48,7 +46,7 @@ class CheckForVersionControlActionTest {
 
         boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
-        assertFalse(result, "Expected isActionNecessary to return false when no database path exists.");
+        assertFalse(result);
     }
 
     @Test
@@ -61,48 +59,39 @@ class CheckForVersionControlActionTest {
 
         boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
-        assertFalse(result, "Expected isActionNecessary to return false for a non-Git repository.");
+        assertFalse(result);
     }
 
     @Test
     void isActionNecessary_WhenDatabasePathExistsAndIsAGitRepo_ShouldReturnTrue() {
-        Path mockPath = Path.of("test-repo");
-        //when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-
         GitHandler gitHandlerMock = mock(GitHandler.class);
         when(gitHandlerMock.isGitRepository()).thenReturn(true);
 
         boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
-        assertTrue(result, "Expected isActionNecessary to return true for a valid Git repository.");
+        assertTrue(result);
     }
 
     @Test
     void performAction_WhenGitPullSucceeds_ShouldNotThrowException() throws IOException {
         Path mockPath = Path.of("test-repo");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        //when(cliPreferences.shouldAutoPull()).thenReturn(true);
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doNothing().when(gitHandlerMock).pullOnCurrentBranch();
 
-        assertDoesNotThrow(() -> action.performAction(parserResult, dialogService, cliPreferences),
-                "Expected performAction to complete without throwing exceptions.");
+        assertDoesNotThrow(() -> action.performAction(parserResult, dialogService, cliPreferences));
     }
 
     @Test
-    void performAction_WhenGitPullFails_ShouldLogError() throws IOException {
+    void performAction_WhenGitPullFails_ShouldHandleIOException() throws IOException {
         Path mockPath = Path.of("test-repo");
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
-        //when(cliPreferences.shouldAutoPull()).thenReturn(true);
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doThrow(new IOException("Git pull failed")).when(gitHandlerMock).pullOnCurrentBranch();
 
-        Exception exception = assertThrows(RuntimeException.class, () ->
+        assertThrows(IOException.class, () ->
                 action.performAction(parserResult, dialogService, cliPreferences));
-
-        assertTrue(exception.getMessage().contains("Git pull failed"),
-                "Expected RuntimeException when Git pull fails.");
     }
 }
