@@ -277,23 +277,23 @@ public class GitHandler {
 
                 // If file is in the repository but not modified, staged, or untracked, it must be committed
                 return Optional.of(GitStatus.COMMITTED);
-            } catch (IllegalStateException | NullPointerException | GitAPIException | IOException e) {
-                LOGGER.error("Path processing error when getting file status: {}", e.getMessage());
+            } catch (AccessDeniedException | NoSuchFileException | GitAPIException e) {
+                LOGGER.error("Access or file not found error when getting file status: {}", e.getMessage());
                 return Optional.empty();
             }
-        } catch (AccessDeniedException | NoSuchFileException | IOException e) {
-            LOGGER.error("Path processing error when getting file status: {}", e.getMessage());
+        } catch (IOException e) {
+            LOGGER.error("IO error when getting file status: {}", e.getMessage());
             return Optional.empty();
         }
     }
-
     /**
      * Gets the relative path of a file to the repository root
      *
      * @param filePath The absolute path to the file
      * @return The relative path to the repository, or empty string if the file is not in the repository
      */
-    private String getRelativePath(Path filePath) {
+
+    public String getRelativePath(Path filePath) {
         if (filePath == null) {
             LOGGER.debug("Null path provided");
             return "";
