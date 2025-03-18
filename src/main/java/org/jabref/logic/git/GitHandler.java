@@ -278,11 +278,11 @@ public class GitHandler {
                 // If file is in the repository but not modified, staged, or untracked, it must be committed
                 return Optional.of(GitStatus.COMMITTED);
             } catch (AccessDeniedException | NoSuchFileException | GitAPIException e) {
-                LOGGER.error("Access or file not found error when getting file status: {}", e.getMessage());
+                LOGGER.error("Access or file not found error when getting file status: {}", e.getMessage(), e);
                 return Optional.empty();
             }
         } catch (IOException e) {
-            LOGGER.error("IO error when getting file status: {}", e.getMessage());
+            LOGGER.error("IO error when getting file status: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }
