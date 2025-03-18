@@ -27,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
@@ -54,6 +55,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -195,22 +197,37 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.setItems(model.getEntriesFilteredAndSorted());
 
-        Button addExampleButton = new Button("Add Example Entry");
-        addExampleButton.setOnAction(event -> addExampleEntry());
+        Button addExampleButton = new Button(Localization.lang("Add example Entry"));
+        addExampleButton.getStyleClass().add("text-button-blue");
+        addExampleButton.setOnAction(event -> {
+            BibEntry entry = addExampleEntry();
+            libraryTab.showAndEdit(entry);
+        });
 
-        VBox placeholderBox = new VBox(10, new Label("No entries available"), addExampleButton);
+        Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
+        importPdfsButton.getStyleClass().add("text-button-blue");
+        importPdfsButton.setOnAction(event -> {
+           importPdfsButton();
+        });
+
+        Label noContentLabel = new Label(Localization.lang("No content in table"));
+
+        // Create horizontal box for buttons
+        HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // Create a VBox with the label and horizontal button box
+        VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
         placeholderBox.setAlignment(Pos.CENTER);
 
-        // Initial check
+        // Initial placeholder based on database content
         updatePlaceholder(placeholderBox);
 
         // Listen for database changes
         database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox));
 
-        // Listener for filtering to remove the button
+        // Listen for filter changes
         this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox));
-
-
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -548,7 +565,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void updatePlaceholder(VBox placeholderBox) {
-        LOGGER.info("Update place holder ran ");
        if (database.getDatabase().getEntries().isEmpty()) {
            this.setPlaceholder(placeholderBox);
        } else {
@@ -556,7 +572,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
        }
     }
 
-    private void addExampleEntry() {
+    private BibEntry addExampleEntry() {
         BibEntry exampleEntry = new BibEntry(StandardEntryType.Article);
         exampleEntry.setField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker");
         exampleEntry.setField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
@@ -570,6 +586,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         exampleEntry.setField(StandardField.YEAR, "2023");
 
         database.getDatabase().insertEntry(exampleEntry);
+        return exampleEntry;
+    }
+
+    private void importPdfsButton() {
+        System.out.println("Import PDF flow");
     }
 }
 
