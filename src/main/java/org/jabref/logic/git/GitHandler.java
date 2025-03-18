@@ -210,7 +210,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to pull");
+                LOGGER.info("Failed to push");
             }
         }
     }

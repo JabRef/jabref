@@ -286,8 +286,9 @@ public class BibDatabaseContext {
         }
 
         try {
-            GitHandler gitHandler = new GitHandler(getDatabasePath().get());
-            return gitHandler.getFileStatus(getDatabasePath().get());
+            Path databasePath = getDatabasePath().get();
+            GitHandler gitHandler = new GitHandler(databasePath);
+            return gitHandler.getFileStatus(databasePath);
         } catch (SecurityException e) {
             LOGGER.warn("No permission to check Git status at {}: {}", getDatabasePath().get(), e.getMessage(), e);
             return Optional.empty();
