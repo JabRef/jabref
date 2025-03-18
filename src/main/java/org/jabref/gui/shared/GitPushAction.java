@@ -1,5 +1,6 @@
 package org.jabref.gui.shared;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +49,11 @@ public class GitPushAction extends SimpleCommand {
                 gitHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
                 gitHandler.updateCredentials(preferences.getGitPreferences());
                 gitHandler.pushCommitsToRemoteRepository();
-            } catch (Exception e) {
+            } catch (IOException | GitAPIException e) {
                 dialogService.showErrorDialogAndWait(e);
             }
         } else {
-            LOGGER.info(String.valueOf(path.get()));
-            LOGGER.info("Not a git repository");
+            LOGGER.info("Not a git repository at path: {}", path.get());
         }
     }
 }

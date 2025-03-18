@@ -1,5 +1,6 @@
 package org.jabref.gui.shared;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -46,12 +47,11 @@ public class GitPullAction extends SimpleCommand {
             try {
                 gitHandler.updateCredentials(preferences.getGitPreferences());
                 gitHandler.pullOnCurrentBranch();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 dialogService.showErrorDialogAndWait(e);
             }
         } else {
-            LOGGER.info(String.valueOf(path.get()));
-            LOGGER.info("Not a git repository");
+            LOGGER.info("Not a git repository at path: {}", path.get());
         }
     }
 }
