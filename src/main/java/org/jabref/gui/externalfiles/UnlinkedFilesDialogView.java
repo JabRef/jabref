@@ -60,6 +60,8 @@ import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
+    private static final String REFRESH_CLASS = "refresh";
+
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
     @FXML private ComboBox<DateRange> fileDateCombo;
@@ -93,8 +95,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private UnlinkedFilesDialogViewModel viewModel;
 
     private BibDatabaseContext bibDatabaseContext;
-
-    private static final String REFRESH_CLASS = "refresh";
 
     public UnlinkedFilesDialogView() {
         this.validationVisualizer = new ControlsFxVisualizer();
