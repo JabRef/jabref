@@ -221,6 +221,7 @@ public class GitHandler {
     /**
      * Contains logic for commiting and pushing after a database is saved locally,
      * if the relevant preferences are present.
+     *
      * @param preferences preferences for git
      */
     public void postSaveDatabaseAction(GitPreferences preferences) {

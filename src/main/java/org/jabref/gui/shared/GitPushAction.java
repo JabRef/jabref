@@ -53,7 +53,7 @@ public class GitPushAction extends SimpleCommand {
                 dialogService.showErrorDialogAndWait(e);
             }
         } else {
-            LOGGER.info("Not a git repository at path: {}", path.get());
+            LOGGER.info("Not a git repository at path: {}", path);
         }
     }
 }

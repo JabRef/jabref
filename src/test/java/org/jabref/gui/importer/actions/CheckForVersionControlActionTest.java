@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CheckForVersionControlActionTest {
+    @TempDir
+    Path tempDir;
+
     private CheckForVersionControlAction action;
     private ParserResult parserResult;
     private DialogService dialogService;
@@ -51,8 +55,8 @@ class CheckForVersionControlActionTest {
 
     @Test
     void isActionNecessary_WhenDatabasePathExistsButNotAGitRepo_ShouldReturnFalse() {
-        Path mockPath = Path.of("test-repo");
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        Path testRepo = tempDir.resolve("test-repo");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(testRepo));
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         when(gitHandlerMock.isGitRepository()).thenReturn(false);
@@ -74,8 +78,8 @@ class CheckForVersionControlActionTest {
 
     @Test
     void performAction_WhenGitPullSucceeds_ShouldNotThrowException() throws IOException {
-        Path mockPath = Path.of("test-repo");
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        Path testRepo = tempDir.resolve("test-repo");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(testRepo));
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doNothing().when(gitHandlerMock).pullOnCurrentBranch();
@@ -85,8 +89,8 @@ class CheckForVersionControlActionTest {
 
     @Test
     void performAction_WhenGitPullFails_ShouldHandleIOException() throws IOException {
-        Path mockPath = Path.of("test-repo");
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(mockPath));
+        Path testRepo = tempDir.resolve("test-repo");
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(testRepo));
 
         GitHandler gitHandlerMock = mock(GitHandler.class);
         doThrow(new IOException("Git pull failed")).when(gitHandlerMock).pullOnCurrentBranch();

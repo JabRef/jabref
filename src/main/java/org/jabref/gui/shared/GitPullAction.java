@@ -32,10 +32,10 @@ public class GitPullAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         Optional<Path> path = databaseContext.getDatabasePath();
         if (path.isEmpty()) {
@@ -51,7 +51,7 @@ public class GitPullAction extends SimpleCommand {
                 dialogService.showErrorDialogAndWait(e);
             }
         } else {
-            LOGGER.info("Not a git repository at path: {}", path.get());
+            LOGGER.info("Not a git repository at path: {}", path);
         }
     }
 }
