@@ -41,10 +41,12 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
@@ -54,6 +56,7 @@ import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -61,6 +64,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -370,6 +374,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenExternalFileAction openExternalFileActionFileAction = new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -422,6 +428,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     case OPEN_FILE:
                         openExternalFileActionFileAction.execute();
                         event.consume();
+                        break;
+                    case MERGE_WITH_FETCHED_ENTRY:
+                        mergeWithFetchedEntryAction.execute();
+                        event.consume();
+                        break;
+                    case LOOKUP_DOC_IDENTIFIER:
+                        lookupIdentifierAction.execute();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
@@ -590,7 +605,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void importPdfsButton() {
-        System.out.println("Import PDF flow");
+        System.out.println("Flow for pdfs");
     }
 }
 
