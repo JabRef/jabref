@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.general;
 import java.util.regex.Pattern;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -139,7 +138,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
 
         autoPushCheckbox.selectedProperty().bindBidirectional(viewModel.autoPushEnabledProperty());
-        autoPushModeComboBox.setItems(FXCollections.observableArrayList(AutoPushMode.values()));
+        autoPushModeComboBox.setItems(viewModel.autoPushModeListProperty());
         autoPushModeComboBox.valueProperty().bindBidirectional(viewModel.autoPushModeProperty());
 
         ActionFactory actionFactory = new ActionFactory();

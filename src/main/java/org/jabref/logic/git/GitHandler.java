@@ -218,6 +218,11 @@ public class GitHandler {
         }
     }
 
+    /**
+     * Contains logic for commiting and pushing after a database is saved locally,
+     * if the relevant preferences are present.
+     * @param preferences preferences for git
+     */
     public void postSaveDatabaseAction(GitPreferences preferences) {
         if (this.isGitRepository() &&
                 preferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
@@ -226,7 +231,7 @@ public class GitHandler {
             try {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
                 this.pushCommitsToRemoteRepository();
-            } catch (Exception e) {
+            } catch (GitAPIException | IOException e) {
                 LOGGER.info("Failed to push".concat(e.toString()));
             }
         }

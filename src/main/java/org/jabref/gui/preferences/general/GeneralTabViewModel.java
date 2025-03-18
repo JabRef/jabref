@@ -66,6 +66,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
 
+    private final ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AutoPushMode.values()));
+    private final ObjectProperty<AutoPushMode> autoPushModeProperty = new SimpleObjectProperty<>();
+
     private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
 
     // init with empty string to avoid npe in accessing
@@ -445,8 +449,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return gitPreferences.getAutoPushEnabledProperty();
     }
 
+    public ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty() {
+        return this.autoPushModeListProperty;
+    }
+
     public ObjectProperty<AutoPushMode> autoPushModeProperty() {
-        return gitPreferences.getAutoPushModeProperty();
+        return this.autoPushModeProperty;
     }
 
     public StringProperty gitHubUsernameProperty() {

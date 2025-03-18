@@ -31,10 +31,10 @@ public class GitPushAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         Optional<Path> path = databaseContext.getDatabasePath();
         if (path.isEmpty()) {

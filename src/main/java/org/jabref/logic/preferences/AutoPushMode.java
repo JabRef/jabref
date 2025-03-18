@@ -1,7 +1,9 @@
 package org.jabref.logic.preferences;
 
+import org.jabref.logic.l10n.Localization;
+
 public enum AutoPushMode {
-    ON_SAVE("On Save");
+    ON_SAVE(Localization.lang("On save"));
 
     private final String displayName;
 
