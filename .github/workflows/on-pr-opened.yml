@@ -1,4 +1,4 @@
-name: Mark issue as in progress
+name: On PR opened
 
 on:
   # _target is required
@@ -6,6 +6,7 @@ on:
 
 jobs:
   move_issue:
+    name: Mark issue as in progress
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -44,6 +45,36 @@ jobs:
           default-column: "In Progress"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Assign PR creator to issue
+        # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
+        run: gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} -f assignee=${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add label "📌 Pinned"
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  conflicts_with_target:
+    name: Conflicts with target branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Check PR mergeability
+        id: check_mergeable
+        run: |
+          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
+          if [ "$MERGEABLE" == "CONFLICTING" ]; then
+            echo "❌ Merge conflicts"
+            exit 1
+          fi
+          echo "✅ No merge conflicts"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
     runs-on: ubuntu-latest
     steps:

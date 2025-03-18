@@ -1,4 +1,4 @@
-name: On labeled issue
+name: On issue labeled
 
 on:
   issues:
