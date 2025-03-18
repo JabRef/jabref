@@ -40,10 +40,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
@@ -63,8 +65,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -605,7 +607,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void importPdfsButton() {
-        System.out.println("Flow for pdfs");
+        // check if file directories is not empty
+        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
+
+        if (fileDirectories.isEmpty()) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("File directory doesn't exist's"),
+                    Localization.lang("Please configure a file directory now"));
+
+            LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
+            libraryPropertiesAction.execute();
+        } else {
+            FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
+            findUnlinkedFilesAction.execute();
+        }
     }
 }
 
