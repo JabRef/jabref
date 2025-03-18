@@ -1,16 +1,21 @@
 # Contributing
+<!-- markdownlint-disable MD001 -->
+### For programmers
 
-General overview about contributing for non-programmers is available at <https://docs.jabref.org/contributing>.
+A detailed guide on contributing for programmers is available at <https://devdocs.jabref.org>.
 
-We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below.
-If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
 
-**JabRef regards its contributors as [software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
+We welcome contributions to JabRef and encourage you to follow the [GitHub workflow](https://docs.github.com/en/get-started/using-github/github-flow).
+You can also check out the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+
+JabRef regards its contributors as **[software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
 As one consequence, for non-basic issues, you will have to work on the requirements side, too.
 
-Before you start, get the JabRef code on your local machine.
-Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
+### For non-programmers
 
+For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
+<!-- markdownlint-enable MD001 -->
 ## Table of Contents
 
 * [Choosing a task](#choosing-a-task-)

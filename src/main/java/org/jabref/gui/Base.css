@@ -2449,3 +2449,7 @@ journalInfo .grid-cell-b {
 
 
 
+
+.refresh {
+    -fx-background-color: transparent;
+}
