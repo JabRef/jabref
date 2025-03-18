@@ -94,6 +94,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     private BibDatabaseContext bibDatabaseContext;
 
+    private static final String REFRESH_CLASS = "refresh";
+
     public UnlinkedFilesDialogView() {
         this.validationVisualizer = new ControlsFxVisualizer();
 
@@ -275,8 +277,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         // Changes below are done for the issue - https://github.com/JabRef/jabref/issues/12713
         Platform.runLater(() -> {
-            accordion.getStyleClass().remove("refresh");
-            accordion.getStyleClass().add("refresh");
+            accordion.getStyleClass().remove(REFRESH_CLASS);
+            accordion.getStyleClass().add(REFRESH_CLASS);
         });
     }
 
