@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -66,7 +67,7 @@ public class AiChatComponent extends VBox {
     @FXML private Hyperlink exQuestion1;
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
-    @FXML private Label exQuestionLabel;
+    @FXML private HBox exQuestionBox;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -99,7 +100,7 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
-        initializeExampleQuestions();
+        sendExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -117,16 +118,27 @@ public class AiChatComponent extends VBox {
         noticeText.setText(newNotice);
     }
 
-    private void initializeExampleQuestions() {
-        String newExampleLabel = exQuestionLabel.getText();
-        String newExQuestion1 = exQuestion1.getText();
-        String newExQuestion2 = exQuestion2.getText();
-        String newExQuestion3 = exQuestion3.getText();
+    private void sendExampleQuestions() {
+        addExampleQuestionAction(exQuestion1);
+        addExampleQuestionAction(exQuestion2);
+        addExampleQuestionAction(exQuestion3);
+    }
 
-        exQuestion1.setText(newExQuestion1);
-        exQuestion2.setText(newExQuestion2);
-        exQuestion3.setText(newExQuestion3);
-        exQuestionLabel.setText(newExampleLabel);
+    private void addExampleQuestionAction(Hyperlink hyperlink) {
+        if (chatPrompt.getHistory().contains(hyperlink.getText())) {
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+            return;
+        }
+        hyperlink.setOnAction(event -> {
+            onSendMessage(hyperlink.getText());
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+        });
     }
 
     private void initializeChatPrompt() {
@@ -286,24 +298,6 @@ public class AiChatComponent extends VBox {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
         }
-    }
-
-    @FXML
-    private void sendExampleQuestion1Prompt() {
-        String questionText = exQuestion1.getText();
-        onSendMessage(questionText);
-    }
-
-    @FXML
-    private void sendExampleQuestion2Prompt() {
-        String questionText = exQuestion2.getText();
-        onSendMessage(questionText);
-    }
-
-    @FXML
-    private void sendExampleQuestion3Prompt() {
-        String questionText = exQuestion3.getText();
-        onSendMessage(questionText);
     }
 }
 

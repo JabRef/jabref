@@ -19,31 +19,26 @@
         <ChatHistoryComponent fx:id="uiChatHistory" VBox.vgrow="ALWAYS" fitToWidth="true"/>
     </Loadable>
 
-    <HBox spacing="10" alignment="CENTER">
+    <HBox spacing="10" alignment="CENTER" fx:id="exQuestionBox">
         <Label
-                fx:id="exQuestionLabel"
                 text="Try with examples"
                 BorderPane.alignment="CENTER"
-                styleClass="exampleQuestionLabelStyle"
         />
         <Hyperlink fx:id="exQuestion1"
                    text="What is the goal of the paper?"
                    BorderPane.alignment="CENTER"
-                   onAction="#sendExampleQuestion1Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                  />
         <Hyperlink fx:id="exQuestion2"
                    text="Which methods were used in the research?"
                    BorderPane.alignment="CENTER"
-                   onAction="#sendExampleQuestion2Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                   />
         <Hyperlink fx:id="exQuestion3"
                    text="What are the key findings?"
                    BorderPane.alignment="CENTER"
-                   onAction="#sendExampleQuestion3Prompt"
                    styleClass="exampleQuestionStyle"
-                   style="-fx-underline: false; -fx-text-fill: -fx-mid-text-color;"/>
+                  />
     </HBox>
 
     <HBox spacing="10">
