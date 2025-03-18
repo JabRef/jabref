@@ -65,8 +65,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -203,7 +203,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.setItems(model.getEntriesFilteredAndSorted());
 
-        Button addExampleButton = new Button(Localization.lang("Add example Entry"));
+        Button addExampleButton = new Button(Localization.lang("Add example entry"));
         addExampleButton.getStyleClass().add("text-button-blue");
         addExampleButton.setOnAction(event -> {
             BibEntry entry = addExampleEntry();
@@ -612,8 +612,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (fileDirectories.isEmpty()) {
             dialogService.showWarningDialogAndWait(
-                    Localization.lang("File directory doesn't exist's"),
-                    Localization.lang("Please configure a file directory now"));
+                    Localization.lang("File directory is not set or does not exist!"),
+                    Localization.lang("Please configure a file directory"));
 
             LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
             libraryPropertiesAction.execute();
