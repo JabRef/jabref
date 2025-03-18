@@ -275,7 +275,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         // Already imported files should not be re-added at a second click on "Import". Therefore, all imported files are unchecked.
         unlinkedFilesList.getCheckModel().clearChecks();
 
-        // Changes below are done for the issue - https://github.com/JabRef/jabref/issues/12713
+        // Changes below are done for the issue - https://github.com/JabRef/jabref/issues/12713 to forcefully re-render by removing and adding css property.
         Platform.runLater(() -> {
             accordion.getStyleClass().remove(REFRESH_CLASS);
             accordion.getStyleClass().add(REFRESH_CLASS);
