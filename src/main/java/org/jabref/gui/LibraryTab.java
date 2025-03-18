@@ -1251,6 +1251,8 @@ public class LibraryTab extends Tab {
             gitStatusTimer.play();
         } catch (IllegalStateException e) {
             LOGGER.warn("Could not start Git status monitoring timer", e);
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not start Git status monitoring timer", e);
         }
     }
 }

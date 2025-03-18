@@ -3,7 +3,9 @@ package org.jabref.logic.git;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -275,12 +277,12 @@ public class GitHandler {
 
                 // If file is in the repository but not modified, staged, or untracked, it must be committed
                 return Optional.of(GitStatus.COMMITTED);
-            } catch (GitAPIException | IOException e) {
-                LOGGER.error("Failed to get file status", e);
+            } catch (IllegalStateException | NullPointerException | GitAPIException | IOException e) {
+                LOGGER.error("Path processing error when getting file status: {}", e.getMessage());
                 return Optional.empty();
             }
-        } catch (RuntimeException e) {
-            LOGGER.error("Failed to get file status", e);
+        } catch (AccessDeniedException | NoSuchFileException | IOException e) {
+            LOGGER.error("Path processing error when getting file status: {}", e.getMessage());
             return Optional.empty();
         }
     }
@@ -305,8 +307,14 @@ public class GitHandler {
                 return absoluteRepoPath.relativize(absoluteFilePath).toString();
             }
             return "";
-        } catch (IOException | RuntimeException e) {
-            LOGGER.debug("IO error when resolving real path", e);
+        } catch (AccessDeniedException e) {
+            LOGGER.debug("Access denied when getting relative path", e);
+            return "";
+        } catch (NoSuchFileException e) {
+            LOGGER.debug("File not found when getting relative path", e);
+            return "";
+        } catch (IOException e) {
+            LOGGER.debug("IO error when getting relative path", e);
             return "";
         }
     }
