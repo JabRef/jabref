@@ -241,11 +241,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         selectedIssue.ifPresent(issue -> {
             messagesTable.getItems().stream()
-                    .filter(message -> message.message().equals(issue.getText()) && hasFix(message)) // Filter messages matching the selected issue type and have a fix
-                    .forEach(message -> {
-                        fix(issue, message);
-                        fixed.set(true);
-                    });
+                         // Filter messages matching the selected issue type and have a fix
+                         .filter(message -> message.message().equals(issue.getText()) && hasFix(message))
+                         .forEach(message -> {
+                             fix(issue, message);
+                             fixed.set(true);
+                         });
         });
 
         updateEntryTypeCombo();
