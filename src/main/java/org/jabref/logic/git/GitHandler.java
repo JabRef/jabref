@@ -242,7 +242,7 @@ public class GitHandler {
             createCommitOnCurrentBranch("Automatic update via JabRef", false);
             pushCommitsToRemoteRepository();
         } catch (GitAPIException | IOException e) {
-            LOGGER.info("Failed to push: {}", e.toString());
+            LOGGER.error("Failed to push", e);
         }
     }
 
