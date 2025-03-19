@@ -295,8 +295,7 @@ public class GitHandler {
 
     public String getRelativePath(Path filePath) {
         if (filePath == null) {
-            LOGGER.debug("Null path provided");
-            return "";
+            throw new IllegalArgumentException("File path cannot be null");
         }
 
         try {

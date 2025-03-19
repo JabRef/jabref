@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GitHandlerTest {
     @TempDir
@@ -75,14 +76,17 @@ class GitHandlerTest {
     }
 
     @Test
-    void getRelativePathForNonExistentFile() throws IOException {
+    void getRelativePathForNonExistentFile() {
         Path nonExistentFile = repositoryPath.resolve("non-existent.txt");
         assertEquals("", gitHandler.getRelativePath(nonExistentFile));
     }
 
     @Test
-    void getRelativePathWithNullPath() throws IOException {
-        assertEquals("", gitHandler.getRelativePath(null));
+    void getRelativePathWithNullPath() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            gitHandler.getRelativePath(null);
+        });
+        assertEquals("File path cannot be null", exception.getMessage());
     }
 
     @Test
