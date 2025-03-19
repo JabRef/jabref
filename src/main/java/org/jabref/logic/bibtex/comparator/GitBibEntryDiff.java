@@ -10,13 +10,13 @@ import java.util.stream.Stream;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class ThreeWayBibEntryDiff {
+public class GitBibEntryDiff {
     private final BibEntry baseEntry;
     private final BibEntry localEntry;
     private final BibEntry remoteEntry;
     private final Map<Field, FieldChange> fieldChanges;
 
-    public ThreeWayBibEntryDiff(BibEntry baseEntry, BibEntry localEntry, BibEntry remoteEntry) {
+    public GitBibEntryDiff(BibEntry baseEntry, BibEntry localEntry, BibEntry remoteEntry) {
         this.baseEntry = baseEntry;
         this.localEntry = localEntry;
         this.remoteEntry = remoteEntry;

@@ -16,6 +16,8 @@ public class ConflictDetector {
         return Optional.empty();
     }
 
+
+
     public static boolean hasConflicts(BibDatabaseContext local, BibDatabaseContext remote) {
         return detectConflicts(local, remote).isPresent();
     }

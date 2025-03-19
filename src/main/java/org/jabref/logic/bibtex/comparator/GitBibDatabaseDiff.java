@@ -7,13 +7,13 @@ import java.util.Optional;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class ThreeWayBibDatabaseDiff {
+public class GitBibDatabaseDiff {
     private final BibDatabaseDiff baseToLocalDiff;
     private final BibDatabaseDiff baseToRemoteDiff;
-    private final List<ThreeWayBibEntryDiff> entryDifferences;
+    private final List<GitBibEntryDiff> entryDifferences;
     private final Optional<MetaDataDiff> metaDataDifferences;
 
-    private ThreeWayBibDatabaseDiff(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+    private GitBibDatabaseDiff(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         this.baseToLocalDiff = BibDatabaseDiff.compare(base, local);
         this.baseToRemoteDiff = BibDatabaseDiff.compare(base, remote);
 
@@ -21,12 +21,12 @@ public class ThreeWayBibDatabaseDiff {
         this.metaDataDifferences = findMetaDataDifferences();
     }
 
-    public static ThreeWayBibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
-        return new ThreeWayBibDatabaseDiff(base, local, remote);
+    public static GitBibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+        return new GitBibDatabaseDiff(base, local, remote);
     }
 
-    private List<ThreeWayBibEntryDiff> findEntryDifferences(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
-        List<ThreeWayBibEntryDiff> result = new ArrayList<>();
+    private List<GitBibEntryDiff> findEntryDifferences(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+        List<GitBibEntryDiff> result = new ArrayList<>();
 
         List<BibEntryDiff> localDiffs = baseToLocalDiff.getEntryDifferences();
         List<BibEntryDiff> remoteDiffs = baseToRemoteDiff.getEntryDifferences();
@@ -34,14 +34,14 @@ public class ThreeWayBibDatabaseDiff {
         for (BibEntryDiff localDiff : localDiffs) {
             BibEntryDiff matchingRemoteDiff = findMatchingDiff(localDiff, remoteDiffs);
             if (matchingRemoteDiff != null) {
-                result.add(new ThreeWayBibEntryDiff(
+                result.add(new GitBibEntryDiff(
                         localDiff.originalEntry(),
                         localDiff.newEntry(),
                         matchingRemoteDiff.newEntry()
 
                 ));
             } else {
-                result.add(new ThreeWayBibEntryDiff(
+                result.add(new GitBibEntryDiff(
                         localDiff.originalEntry(),
                         localDiff.newEntry(),
                         localDiff.originalEntry()
@@ -50,11 +50,10 @@ public class ThreeWayBibDatabaseDiff {
         }
         for (BibEntryDiff remoteDiff : remoteDiffs) {
             if (findMatchingDiff(remoteDiff, localDiffs) == null) {
-                // Entry changed only in remote
-                result.add(new ThreeWayBibEntryDiff(
-                        remoteDiff.originalEntry(),  // Base entry
-                        remoteDiff.originalEntry(),  // Local is same as base
-                        remoteDiff.newEntry()        // Remote entry
+                result.add(new GitBibEntryDiff(
+                        remoteDiff.originalEntry(),
+                        remoteDiff.originalEntry(),
+                        remoteDiff.newEntry()
                 ));
             }
         }
@@ -87,7 +86,7 @@ public class ThreeWayBibDatabaseDiff {
         return baseToLocalDiff.getMetaDataDifferences();
     }
 
-    public List<ThreeWayBibEntryDiff> getEntryDifferences() {
+    public List<GitBibEntryDiff> getEntryDifferences() {
         return this.entryDifferences;
     }
 
