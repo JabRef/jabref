@@ -3,11 +3,11 @@ package org.jabref.logic.journals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,8 @@ public class JournalAbbreviationLoader {
             for (String filename : lists) {
                 try {
                     repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));
-                } catch (IOException e) {
+                    // invalid path might come from unix/windows mixup of prefs
+                } catch (IOException | InvalidPathException e) {
                     LOGGER.error("Cannot read external journal list file {}", filename, e);
                 }
             }
