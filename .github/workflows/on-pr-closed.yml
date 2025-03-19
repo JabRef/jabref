@@ -33,7 +33,7 @@ jobs:
       - name: Check assignees
         id: check_assignee
         run: |
-          issue=$(gh issue view 12345 --json assignees)
+          issue=$(gh issue view ${{ steps.get_issue_number.outputs.ticketNumber }} --json assignees)
           count=$(echo "$issue" | jq '.assignees | length')
           if [ "$count" -gt 0 ]; then
             echo "assigned=yes" >> $GITHUB_OUTPUT
