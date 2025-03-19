@@ -88,9 +88,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static BackgroundTask<List<BibEntry>> citingTask;
     private static BackgroundTask<List<BibEntry>> citedByTask;
     private final DialogService dialogService;
-    private final BibDatabaseContext databaseContext;
     private final GuiPreferences preferences;
-    private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
@@ -100,18 +98,14 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final UndoManager undoManager;
 
     public CitationRelationsTab(DialogService dialogService,
-                                BibDatabaseContext databaseContext,
                                 UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
-                                LibraryTab libraryTab,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
-        this.databaseContext = databaseContext;
         this.preferences = preferences;
-        this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -123,7 +117,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferences.getImporterPreferences()),
                 new BibEntryRelationsCache());
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
     /**
@@ -318,7 +312,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void jumpToEntry(CitationRelationItem entry) {
         citingTask.cancel();
         citedByTask.cancel();
-        libraryTab.showAndEdit(entry.localEntry());
+        stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
     /**
@@ -335,7 +329,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void showEntrySourceDialog(BibEntry entry) {
         CodeArea ca = new CodeArea();
         try {
-            ca.appendText(getSourceString(entry, databaseContext.getMode(), preferences.getFieldPreferences(), this.entryTypesManager));
+            BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                               .orElse(BibDatabaseMode.BIBLATEX);
+            ca.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
         } catch (IOException e) {
             LOGGER.warn("Incorrect entry, could not load source:", e);
             return;
@@ -452,8 +448,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         task.onRunning(() -> prepareToSearchForRelations(abortButton, refreshButton, importButton, progress, task))
-            .onSuccess(fetchedList -> onSearchForRelationsSucceed(entry, listView, abortButton, refreshButton,
-                    searchType, importButton, progress, fetchedList, observableList))
+            .onSuccess(fetchedList -> onSearchForRelationsSucceed(entry, listView, abortButton, refreshButton, searchType, importButton, progress, fetchedList, observableList))
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching citing Articles", exception);
                 hideNodes(abortButton, progress, importButton);
@@ -473,16 +468,18 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
+        BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase)
+                                           .orElse(new BibDatabase());
         observableList.setAll(
-        fetchedList.stream()
-            .map(entr -> duplicateCheck.containsDuplicate(
-                    databaseContext.getDatabase(),
-                    entr,
-                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
-                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
-                .orElseGet(() -> new CitationRelationItem(entr, false)))
-            .toList()
-    );
+                fetchedList.stream().map(entr ->
+                                   duplicateCheck.containsDuplicate(
+                                                         database,
+                                                         entr,
+                                                         BibDatabaseModeDetection.inferMode(database))
+                                                 .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                                                 .orElseGet(() -> new CitationRelationItem(entr, false)))
+                           .toList()
+        );
 
         if (!observableList.isEmpty()) {
             listView.refresh();
@@ -554,14 +551,20 @@ public class CitationRelationsTab extends EntryEditorTab {
             listView.getItems().set(listView.getItems().indexOf(citationRelationItem), new CitationRelationItem(citationRelationItem.entry(), mergedEntry, true));
 
             // Merge method is similar to MergeTwoEntriesAction#execute
-            BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
+            Optional<LibraryTab> libraryTab = stateManager.activeTabProperty().get();
+            if (libraryTab.isEmpty()) {
+                dialogService.notify(Localization.lang("No library present"));
+                return;
+            }
+
+            BibDatabase database = libraryTab.get().getDatabase();
             database.removeEntry(mergeResult.originalLeftEntry());
-            libraryTab.getMainTable().setCitationMergeMode(true);
+            libraryTab.get().getMainTable().setCitationMergeMode(true);
             database.insertEntry(mergedEntry);
 
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
             ce.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), mergedEntry));
+            ce.addEdit(new UndoableInsertEntries(database, mergedEntry));
             ce.end();
 
             undoManager.addEdit(ce);

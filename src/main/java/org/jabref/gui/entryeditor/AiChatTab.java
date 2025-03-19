@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
@@ -20,6 +21,7 @@ import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -28,33 +30,30 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 public class AiChatTab extends EntryEditorTab {
-    private final BibDatabaseContext bibDatabaseContext;
     private final AiService aiService;
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final CitationKeyGenerator citationKeyGenerator;
+    private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     private Optional<BibEntry> previousBibEntry = Optional.empty();
 
-    public AiChatTab(BibDatabaseContext bibDatabaseContext,
-                     AiService aiService,
+    public AiChatTab(AiService aiService,
                      DialogService dialogService,
                      GuiPreferences preferences,
-                     TaskExecutor taskExecutor
-    ) {
-        this.bibDatabaseContext = bibDatabaseContext;
-
+                     StateManager stateManager,
+                     TaskExecutor taskExecutor) {
         this.aiService = aiService;
         this.dialogService = dialogService;
 
         this.aiPreferences = preferences.getAiPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-
-        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferences.getCitationKeyPatternPreferences());
+        this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
+        this.stateManager = stateManager;
 
         this.taskExecutor = taskExecutor;
 
@@ -74,6 +73,7 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         previousBibEntry.ifPresent(previousBibEntry -> aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry));
         previousBibEntry = Optional.of(entry);
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
 
         if (!aiPreferences.getEnableAi()) {
             showPrivacyNotice(entry);
@@ -82,9 +82,9 @@ public class AiChatTab extends EntryEditorTab {
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
             showErrorNotPdfs();
         } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
-            tryToGenerateCitationKeyThenBind(entry);
+            tryToGenerateCitationKeyThenBind(bibDatabaseContext, entry);
         } else {
-            bindToCorrectEntry(entry);
+            showChatPanel(bibDatabaseContext, entry);
         }
     }
 
@@ -110,7 +110,8 @@ public class AiChatTab extends EntryEditorTab {
         );
     }
 
-    private void tryToGenerateCitationKeyThenBind(BibEntry entry) {
+    private void tryToGenerateCitationKeyThenBind(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
             setContent(
                     new ErrorStateComponent(
@@ -123,7 +124,7 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
-    private void bindToCorrectEntry(BibEntry entry) {
+    private void showChatPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         // We omit the localization here, because it is only a chat with one entry in the {@link EntryEditor}.
         // See documentation for {@link AiChatGuardedComponent#name}.
         StringProperty chatName = new SimpleStringProperty("entry " + entry.getCitationKey().orElse("<no citation key>"));
