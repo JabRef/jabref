@@ -24,7 +24,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -33,6 +32,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.integrity.IntegrityIssue;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -51,10 +51,10 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private ComboBox<String> entryTypeCombo;
 
     @Inject private ThemeManager themeManager;
+    @Inject private NotificationService notificationService;
 
     private final List<IntegrityMessage> messages;
     private final LibraryTab libraryTab;
-    private final DialogService dialogService;
 
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
@@ -62,11 +62,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private final double FIX_BUTTON_HEIGHT = 20.0;
 
     public IntegrityCheckDialog(List<IntegrityMessage> messages,
-                                LibraryTab libraryTab,
-                                DialogService dialogService) {
+                                LibraryTab libraryTab) {
         this.messages = messages;
         this.libraryTab = libraryTab;
-        this.dialogService = dialogService;
 
         this.setTitle(Localization.lang("Check integrity"));
         this.initModality(Modality.NONE);
@@ -253,9 +251,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         updateEntryTypeCombo();
 
         if (fixed.get()) {
-            dialogService.notify(Localization.lang("Fixed successfully."));
+            notificationService.notify(Localization.lang("Fixed successfully."));
         } else {
-            dialogService.notify(Localization.lang("No fixes available."));
+            notificationService.notify(Localization.lang("No fixes available."));
         }
     }
 

@@ -37,6 +37,7 @@ import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -162,6 +163,7 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(NotificationService.class, dialogService);
 
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
