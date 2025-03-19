@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a new Welcome tab which shows a welcome screen if no database is open. [#12272](https://github.com/JabRef/jabref/issues/12272)
 - We added <kbd>F5</kbd> as a shortcut key for fetching data and <kbd>Alt+F</kbd> as a shortcut for looking up data using DOI. [#11802](https://github.com/JabRef/jabref/issues/11802)
 - We added a feature to rename the subgroup, with the keybinding (<kbd>F2</kbd>) for quick access. [#11896](https://github.com/JabRef/jabref/issues/11896)
 - We added a new functionality that displays a drop-down list of matching suggestions when typing a citation key pattern. [#12502](https://github.com/JabRef/jabref/issues/12502)
@@ -22,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
+- We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
 
 ### Changed
 
@@ -76,8 +78,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where migration of "Search groups" would fail with an exception when the search query is invalid. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where not all linked files from BibDesk in the field `bdsk-file-...` were parsed. [#12555](https://github.com/JabRef/jabref/issues/12555)
 - We fixed an issue where it was possible to select "Search for unlinked local files" for a new (unsaved) library. [#12558](https://github.com/JabRef/jabref/issues/12558)
+- We fixed an issue where user-defined keyword separator does not apply to Merge Groups. [#12535](https://github.com/JabRef/jabref/issues/12535)
+- We fixed an issue where duplicate items cannot be removed correctly when merging groups or keywords. [#12585](https://github.com/JabRef/jabref/issues/12585)
+- We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion. [#12645](https://github.com/JabRef/jabref/issues/12645)
 - We fixed an issue where an exception would occur when running abbreviate journals for multiple entries. [#12634](https://github.com/JabRef/jabref/issues/12634)
+- We fixed an issue where JabRef displayed dropdown triangle in wrong place in "Search for unlinked local files" dialog [#12713](https://github.com/JabRef/jabref/issues/12713)
+- We fixed an issue where JabRef would not open if an invalid external journal abbreviation path was encountered. [#12776](https://github.com/JabRef/jabref/issues/12776)
 
 ### Removed
 
