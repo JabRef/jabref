@@ -452,8 +452,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 return;
             }
         }
+        // WelcomeTab not found
 
-        // If the WelcomeTab is not found, a new instance is created and added
         WelcomeTab welcomeTab = new WelcomeTab(
                 this,
                 preferences,
