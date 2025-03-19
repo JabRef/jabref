@@ -70,7 +70,7 @@ public class GitHandler {
                         }
                     }
                 } catch (GitAPIException | IOException e) {
-                    LOGGER.error("Initialization failed");
+                    LOGGER.error("Initialization failed.", e);
                 }
             }
         }
@@ -194,7 +194,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push: ");
+                LOGGER.error("Git push failed", e);
             }
         }
     }
@@ -206,7 +206,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to pull");
+                LOGGER.error("Git pull failed", e);
             }
         }
     }
