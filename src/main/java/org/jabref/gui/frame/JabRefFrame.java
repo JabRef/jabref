@@ -464,7 +464,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void showWelcomeTab() {
-        // The loop iterates through all tabs in tabbedPane to check if a WelcomeTab already exists. If yes, it is selected
+        // The loop iterates through all tabs in tabbedPane to check if a WelcomeTab already exists. If yes, it is selected.
         for (Tab tab : tabbedPane.getTabs()) {
             if (!(tab instanceof LibraryTab)) {
                 tabbedPane.getSelectionModel().select(tab);
