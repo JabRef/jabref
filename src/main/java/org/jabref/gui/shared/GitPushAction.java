@@ -8,7 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -43,12 +43,12 @@ public class GitPushAction extends SimpleCommand {
             return;
         }
 
-        GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
-        if (gitHandler.isGitRepository()) {
+        GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent());
+        if (gitClientHandler.isGitRepository()) {
             try {
-                gitHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-                gitHandler.updateCredentials(preferences.getGitPreferences());
-                gitHandler.pushCommitsToRemoteRepository();
+                gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+                gitClientHandler.updateCredentials(preferences.getGitPreferences());
+                gitClientHandler.pushCommitsToRemoteRepository();
             } catch (IOException | GitAPIException e) {
                 dialogService.showErrorDialogAndWait(e);
             }

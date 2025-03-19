@@ -32,7 +32,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -238,7 +238,7 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
-                new GitHandler(targetPath.getParent(), false).postSaveDatabaseAction(preferences.getGitPreferences());
+                new GitClientHandler(targetPath.getParent()).postSaveDatabaseAction(preferences.getGitPreferences());
             }
             dialogService.notify(Localization.lang("Library saved"));
             return success;

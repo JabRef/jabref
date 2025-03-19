@@ -8,7 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -42,11 +42,11 @@ public class GitPullAction extends SimpleCommand {
             return;
         }
 
-        GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
-        if (gitHandler.isGitRepository()) {
+        GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent());
+        if (gitClientHandler.isGitRepository()) {
             try {
-                gitHandler.updateCredentials(preferences.getGitPreferences());
-                gitHandler.pullOnCurrentBranch();
+                gitClientHandler.updateCredentials(preferences.getGitPreferences());
+                gitClientHandler.pullOnCurrentBranch();
             } catch (IOException e) {
                 dialogService.showErrorDialogAndWait(e);
             }
