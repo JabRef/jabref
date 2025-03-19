@@ -2,7 +2,6 @@ package org.jabref.model.database;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -291,7 +290,7 @@ public class BibDatabaseContext {
             GitHandler gitHandler = new GitHandler(databasePath);
             return gitHandler.getFileStatus(databasePath);
         } catch (SecurityException e) {
-            LOGGER.warn("No permission to check Git status at {}", getDatabasePath().orElse(Paths.get("unknown")), e);
+            LOGGER.warn("No permission to check Git status at {}", getDatabasePath().orElse(Path.of("unknown")), e);
             return Optional.empty();
         } catch (IllegalStateException e) {
             LOGGER.warn("Failed to retrieve database path: {}", e);
