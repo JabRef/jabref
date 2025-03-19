@@ -215,7 +215,7 @@ public class WelcomeTab extends Tab {
         container.setAlignment(Pos.CENTER);
 
         Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
-        Hyperlink forumLink = createFooterLink(Localization.lang("Forum for support"), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
+        Hyperlink forumLink = createFooterLink(Localization.lang("Forum"), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
         Hyperlink mastodonLink = createFooterLink(Localization.lang("Mastodon"), StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
         Hyperlink linkedInLink = createFooterLink(Localization.lang("LinkedIn"), StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
         Hyperlink donationLink = createFooterLink(Localization.lang("Donation"), StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
