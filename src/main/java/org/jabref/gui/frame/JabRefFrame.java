@@ -375,7 +375,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
             } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
-                /// All databases are closed or [WelcomeTab] is open
+                // All databases are closed or {@link WelcomeTab} is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
             }
