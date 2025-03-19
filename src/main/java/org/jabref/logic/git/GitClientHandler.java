@@ -33,8 +33,9 @@ public class GitClientHandler extends GitHandler {
 
     /**
      * Contains logic for commiting and pushing after a database is saved locally,
-     * if the relevant preferences are present.
-     *
+     * if the relevant preferences are present.<p>
+     * A git commit is created and a 'git pull --rebase' is executed. In the case of
+     * an error, the repository is reverted to the commit and a regular pull is executed.
      */
     public void postSaveDatabaseAction() {
         if (this.isGitRepository() &&
