@@ -1,5 +1,6 @@
 # Contributing
-<!-- markdownlint-disable MD001 -->
+
+<!-- markdownlint-disable-next-line MD001 -->
 ### For programmers
 
 A detailed guide on contributing for programmers is available at <https://devdocs.jabref.org>.
@@ -15,7 +16,7 @@ As one consequence, for non-basic issues, you will have to work on the requireme
 ### For non-programmers
 
 For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
-<!-- markdownlint-enable MD001 -->
+
 ## Table of Contents
 
 * [Choosing a task](#choosing-a-task-)
@@ -101,15 +102,26 @@ Simply navigate to <https://github.com/jabref/jabref/> and click on the Star but
 1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.html) to a) create a fork and b) have the fork checked out on your local machine
 2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
 3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-4. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
-5. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
+4. Read our [high-level documentation](https://devdocs.jabref.org/getting-into-the-code/high-level-documentation).
+5. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
+6. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
    1. Ensure that you followed the requirements listed below. They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious.
    2. For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
    3. In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
-6. Wait for feedback of the developers
-7. Address the feedback of the developers
-8. After two developers gave their green flag, the pull request will be merged.
+7. Wait for automatic checks to run and bots commenting.
+8. Address the feedback of the automated checks. To find solutions to the most common errors that lead to such failures, check our [FAQ page](https://devdocs.jabref.org/code-howtos/faq).
+9. Wait for feedback of one of the developers.
+10. Address the feedback of the developer.
+11. Wait for feedback of a second developer.
+12. Address the feedback of the second developer.
+13. After two developers gave their green flag, the pull request will be merged.
+
+We view pull requests as a collaborative process.
+Submit a pull request early to enable feedback from the team while you continue working.
+Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
+Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
+After a pull request is ready for review, we will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
 
 In case you have any questions, please
 
