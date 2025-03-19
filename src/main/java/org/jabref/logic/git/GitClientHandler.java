@@ -21,16 +21,25 @@ public class GitClientHandler extends GitHandler {
      * @param preferences preferences for git
      */
     public void postSaveDatabaseAction(GitPreferences preferences) {
-        if (this.isGitRepository() &&
-                preferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
-                preferences.getAutoPushEnabled()) {
-            this.updateCredentials(preferences);
-            try {
-                this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-                this.pushCommitsToRemoteRepository();
-            } catch (GitAPIException | IOException e) {
-                LOGGER.info("Failed to push".concat(e.toString()));
-            }
+        if (!isGitRepository()) {
+            return;
+        }
+
+        if (preferences.getAutoPushMode() != AutoPushMode.ON_SAVE) {
+            return;
+        }
+
+        if (!preferences.getAutoPushEnabled()) {
+            return;
+        }
+
+        updateCredentials(preferences);
+
+        try {
+            createCommitOnCurrentBranch("Automatic update via JabRef", false);
+            pushCommitsToRemoteRepository();
+        } catch (GitAPIException | IOException e) {
+            LOGGER.info("Failed to push: {}", e.toString());
         }
     }
 
