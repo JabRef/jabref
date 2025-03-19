@@ -48,10 +48,10 @@ public class GitPullAction extends SimpleCommand {
             try {
                 gitClientHandler.pullOnCurrentBranch();
             } catch (IOException e) {
-                dialogService.showErrorDialogAndWait(e);
+                LOGGER.error("Failed to Pull", e);
             }
         } else {
-            LOGGER.info("Not a git repository at path: {}", path);
+            LOGGER.info("Not a git repository at path: {}", path.get());
         }
     }
 }
