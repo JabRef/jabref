@@ -1,0 +1,122 @@
+name: On PR opened
+
+on:
+  # _target is required
+  pull_request_target:
+
+jobs:
+  determine_issue_number:
+    name: Determine issue number
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Determine issue number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+  move_issue:
+    name: Mark issue as in progress
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - name: Move issue to "In Progress" in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "In Progress"
+          ignored-columns: ""
+          default-column: "In Progress"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - name: Move issue to "In Progress" in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "In Progress"
+          ignored-columns: ""
+          default-column: "In Progress"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+  ensure_assignment:
+    name: Ensure that contributor is assigned (fails if not commented on issue)
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Assign PR creator to issue
+        # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
+        run: gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} -f assignee=${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add label "📌 Pinned"
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  conflicts_with_target:
+    name: Conflicts with target branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Check PR mergeability
+        id: check_mergeable
+        run: |
+          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
+          if [ "$MERGEABLE" == "CONFLICTING" ]; then
+            echo "❌ Merge conflicts"
+            exit 1
+          fi
+          echo "✅ No merge conflicts"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt

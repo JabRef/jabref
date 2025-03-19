@@ -1,8 +1,8 @@
 package org.jabref.gui.preferences;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -10,92 +10,165 @@ import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.TextField;
 
 import com.google.common.collect.ArrayListMultimap;
 
+/**
+ * This class is responsible for filtering and searching inside the preferences view based on a search query.
+ */
 class PreferencesSearchHandler {
 
-    private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
+    private static final PseudoClass CONTROL_HIGHLIGHT = PseudoClass.getPseudoClass("search-highlight");
+
     private final List<PreferencesTab> preferenceTabs;
     private final ListProperty<PreferencesTab> filteredPreferenceTabs;
-    private final ArrayListMultimap<PreferencesTab, Labeled> preferenceTabsLabelNames;
-    private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
+    private final ArrayListMultimap<PreferencesTab, Control> preferenceTabsControls;
 
+    /**
+     * Initializes the PreferencesSearchHandler with the given list of preference tabs.
+     *
+     * @param preferenceTabs The list of preference tabs.
+     */
     PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
-        this.preferenceTabsLabelNames = getPrefsTabLabelMap();
+        this.preferenceTabsControls = getPreferenceTabsControlsMap(preferenceTabs);
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
     }
 
-    public void filterTabs(String text) {
+    /**
+     * Filters the preference tabs based on the provided search query.
+     * Highlights matching controls within tabs.
+     *
+     * @param query The search query to filter tabs.
+     */
+    public void filterTabs(String query) {
         clearHighlights();
-        if (text.isEmpty()) {
-            clearSearch();
+
+        if (query.isBlank()) {
+            resetSearch();
             return;
         }
 
-        filteredPreferenceTabs.clear();
-        for (PreferencesTab tab : preferenceTabsLabelNames.keySet()) {
-            boolean tabContainsLabel = false;
-            for (Labeled labeled : preferenceTabsLabelNames.get(tab)) {
-                if (labelContainsText(labeled, text)) {
-                    tabContainsLabel = true;
-                    highlightLabel(labeled);
-                }
-            }
-            boolean tabNameIsMatchedByQuery = tab.getTabName().toLowerCase(Locale.ROOT).contains(text);
-            if (tabContainsLabel || tabNameIsMatchedByQuery) {
-                filteredPreferenceTabs.add(tab);
-            }
+        String searchQuery = query.toLowerCase(Locale.ROOT);
+
+        List<PreferencesTab> matchedTabs = preferenceTabs.stream()
+                .filter(tab -> tabMatchesQuery(tab, searchQuery))
+                .collect(Collectors.toList());
+
+        filteredPreferenceTabs.setAll(matchedTabs);
+    }
+
+    /**
+     * Checks if a tab matches the given search query either by its name or by its controls.
+     *
+     * @param tab The preferences tab to check.
+     * @param query The search query.
+     * @return True if the tab matches the query.
+     */
+    private boolean tabMatchesQuery(PreferencesTab tab, String query) {
+        boolean tabNameMatches = tab.getTabName().toLowerCase(Locale.ROOT).contains(query);
+
+        boolean controlMatches = preferenceTabsControls.get(tab).stream()
+                .filter(control -> controlMatchesQuery(control, query))
+                .peek(this::highlightControl)
+                .findAny()
+                .isPresent();
+
+        return tabNameMatches || controlMatches;
+    }
+
+    /**
+     * Checks if a control contains the given query in its content.
+     * <p>
+     * Matching criteria based on control type:
+     * <ul>
+     *     <li><b>Labeled</b> (e.g., Label, Button): Matches if its text contains the query (case-insensitive).</li>
+     *     <li><b>ComboBox</b>: Matches if any item (converted to string) contains the query (case-insensitive).</li>
+     *     <li><b>TextField</b>: Matches if its content contains the query (case-insensitive).</li>
+     * </ul>
+     *
+     * @param control The control to check.
+     * @param query   The search query.
+     * @return true if the control contains the query, otherwise false.
+     */
+    private boolean controlMatchesQuery(Control control, String query) {
+        if (control instanceof Labeled labeled && labeled.getText() != null) {
+            return labeled.getText().toLowerCase(Locale.ROOT).contains(query);
         }
+
+        if (control instanceof ComboBox<?> comboBox && !comboBox.getItems().isEmpty()) {
+            return comboBox.getItems().stream()
+                    .map(Object::toString)
+                    .anyMatch(item -> item.toLowerCase(Locale.ROOT).contains(query));
+        }
+
+        if (control instanceof TextField textField && textField.getText() != null) {
+            return textField.getText().toLowerCase(Locale.ROOT).contains(query);
+        }
+
+        return false;
     }
 
-    private boolean labelContainsText(Labeled labeled, String text) {
-        return labeled.getText().toLowerCase(Locale.ROOT).contains(text);
+    /**
+     * Highlights the given control to indicate a match.
+     *
+     * @param control The control to highlight.
+     */
+    private void highlightControl(Control control) {
+        control.pseudoClassStateChanged(CONTROL_HIGHLIGHT, true);
     }
 
-    private void highlightLabel(Labeled labeled) {
-        labeled.pseudoClassStateChanged(labelHighlight, true);
-        highlightedLabels.add(labeled);
-    }
-
+    /**
+     * Clears all highlights from controls.
+     */
     private void clearHighlights() {
-        highlightedLabels.forEach(labeled -> labeled.pseudoClassStateChanged(labelHighlight, false));
+        preferenceTabsControls.values().forEach(control -> control.pseudoClassStateChanged(CONTROL_HIGHLIGHT, false));
     }
 
-    private void clearSearch() {
+    /**
+     * Resets the search, displaying all preference tabs.
+     */
+    private void resetSearch() {
         filteredPreferenceTabs.setAll(preferenceTabs);
     }
 
-    /*
-     * Traverse all nodes of a PreferencesTab and return a
-     * mapping from PreferencesTab to all its Labeled type nodes.
+    /**
+     * Provides the property representing the filtered list of preferences tabs.
+     *
+     * @return The filtered preference tabs as a ListProperty.
      */
-    private ArrayListMultimap<PreferencesTab, Labeled> getPrefsTabLabelMap() {
-        ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
-        for (PreferencesTab preferencesTab : preferenceTabs) {
-            Node builder = preferencesTab.getBuilder();
-            if (builder instanceof Parent parentBuilder) {
-                scanLabeledControls(parentBuilder, prefsTabLabelMap, preferencesTab);
-            }
-        }
-        return prefsTabLabelMap;
-    }
-
     protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
 
-    private static void scanLabeledControls(Parent parent, ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap, PreferencesTab preferencesTab) {
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof Labeled labeled) {
-                if (!labeled.getText().isEmpty()) {
-                    prefsTabLabelMap.put(preferencesTab, labeled);
-                }
-            } else if (child instanceof Parent parentChild) {
-                scanLabeledControls(parentChild, prefsTabLabelMap, preferencesTab);
-            }
+    /**
+     * Builds a map of controls for each preferences tab.
+     *
+     * @param tabs The list of preferences tabs.
+     * @return A map of preferences tabs to their controls.
+     */
+    private ArrayListMultimap<PreferencesTab, Control> getPreferenceTabsControlsMap(List<PreferencesTab> tabs) {
+        ArrayListMultimap<PreferencesTab, Control> controlMap = ArrayListMultimap.create();
+        tabs.forEach(tab -> scanControls(tab.getBuilder(), controlMap, tab));
+        return controlMap;
+    }
+
+    /**
+     * Recursively scans nodes and collects all controls.
+     *
+     * @param node The current node being scanned.
+     * @param controlMap Map storing tabs and their corresponding controls.
+     * @param tab The PreferencesTab associated with the current node.
+     */
+    private void scanControls(Node node, ArrayListMultimap<PreferencesTab, Control> controlMap, PreferencesTab tab) {
+        if (node instanceof Control control) {
+            controlMap.put(tab, control);
+        } else if (node instanceof Parent parent) {
+            parent.getChildrenUnmodifiable().forEach(child -> scanControls(child, controlMap, tab));
         }
     }
 }

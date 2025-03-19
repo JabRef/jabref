@@ -1,0 +1,83 @@
+name: On PR closed
+
+on:
+  pull_request_target:
+    types: [ closed ]
+
+jobs:
+  unassign_issue:
+    name: Mark issue as available
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && !github.event.pull_request.merged
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/:owner)(\/:repo)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - uses: actions/checkout@v4
+      - name: Remove assignee
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check assignees
+        id: check_assignee
+        run: |
+          issue=$(gh issue view 12345 --json assignees)
+          count=$(echo "$issue" | jq '.assignees | length')
+          if [ "$count" -gt 0 ]; then
+            echo "assigned=yes" >> $GITHUB_OUTPUT
+          else
+            echo "assigned=no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove assigned label
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove pinned label
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove FirstTimeCodeContribution label
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Move issue to "Free to take" in "Good First Issues"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - name: Move issue to "Free to take" in "Candidates for University Projects"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
