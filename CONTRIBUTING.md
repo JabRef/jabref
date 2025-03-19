@@ -183,7 +183,7 @@ The pull request may be approved immediatly, or a reviewer may request changes a
 In that case, you are expected to answer any questions and implement the requested changes.
 
 Please – **never ever close a pull request and open a new one** -
-This causes unessesary work on our side, and is not in the the style of the GitHub Open Source community.
+This causes unnecessary work on our side, and is not in the style of the GitHub Open Source community.
 You can push any changes you need to make to the branch your pull request is *from*.
 These changes will be automatically reflected in your pull request.
 
