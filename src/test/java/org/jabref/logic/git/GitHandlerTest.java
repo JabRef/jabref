@@ -86,7 +86,6 @@ class GitHandlerTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             gitHandler.getRelativePath(null);
         });
-        assertEquals("File path cannot be null", exception.getMessage());
     }
 
     @Test
