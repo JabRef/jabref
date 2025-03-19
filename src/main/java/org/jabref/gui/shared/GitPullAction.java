@@ -51,7 +51,7 @@ public class GitPullAction extends SimpleCommand {
                 LOGGER.error("Failed to Pull", e);
             }
         } else {
-            LOGGER.info("Not a git repository at path: {}", path);
+            LOGGER.info("Not a git repository at path: {}", path.get());
         }
     }
 }
