@@ -29,7 +29,7 @@ public class GitClientHandler extends GitHandler {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
                 this.pushCommitsToRemoteRepository();
             } catch (GitAPIException | IOException e) {
-                LOGGER.info("Failed to push".concat(e.toString()));
+                LOGGER.error("Failed to push", e);
             }
         }
     }
