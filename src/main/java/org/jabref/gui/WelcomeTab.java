@@ -7,12 +7,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.actions.StandardActions;
@@ -78,30 +76,18 @@ public class WelcomeTab extends Tab {
 
         this.recentLibrariesBox = new VBox(10);
 
-        VBox welcomePageContainer = new VBox(10);
-        welcomePageContainer.setAlignment(Pos.CENTER);
-
-        HBox welcomeMainContainer = new HBox(10);
-        welcomeMainContainer.setAlignment(Pos.CENTER);
-
-        welcomeMainContainer.setPadding(new Insets(10, 10, 10, 50));
-
-        ScrollPane scrollPane = new ScrollPane(welcomeMainContainer);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        scrollPane.widthProperty().addListener((_, _, newWidth) -> {
-            double dynamicPadding = Math.max(20, newWidth.doubleValue() * 0.05);
-            welcomeMainContainer.setPadding(new Insets(10, 10, 10, dynamicPadding));
-        });
-
-        setContent(new StackPane(scrollPane));
-
         VBox welcomeBox = createWelcomeBox();
         VBox startBox = createWelcomeStartBox();
         VBox recentBox = createWelcomeRecentBox();
 
+        VBox welcomePageContainer = new VBox(10);
+        welcomePageContainer.setAlignment(Pos.CENTER);
         welcomePageContainer.getChildren().addAll(welcomeBox, startBox, recentBox);
+
+        HBox welcomeMainContainer = new HBox(10);
+        welcomeMainContainer.setAlignment(Pos.CENTER);
+        welcomeMainContainer.setPadding(new Insets(10, 10, 10, 50));
+
         welcomeMainContainer.getChildren().add(welcomePageContainer);
 
         BorderPane rootLayout = new BorderPane();
