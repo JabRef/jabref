@@ -175,6 +175,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createFooter() {
+        // Heading for the footer area
         Label communityLabel = createFooterLabel(Localization.lang("Community"));
 
         HBox iconLinksContainer = createIconLinksContainer();
