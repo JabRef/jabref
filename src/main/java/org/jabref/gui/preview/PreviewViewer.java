@@ -107,7 +107,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
-        this.searchQueryProperty = searchQueryProperty; // FIXME Runaway process?
+        this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(true);

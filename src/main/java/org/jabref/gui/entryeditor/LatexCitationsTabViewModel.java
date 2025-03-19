@@ -160,7 +160,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         citationList.clear();
         latexFiles.clear();
 
-        directoryMonitorManager.removeObserver(observer);
+        directoryMonitorManager.removeObserver(observer); // FIXME Runaway process
         directory.set(newDirectory);
         observer = FileAlterationObserver.builder()
                                          .setRootEntry(new FileEntry(directory.get().toFile()))
