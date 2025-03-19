@@ -7,8 +7,11 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Objects;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -22,7 +25,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -77,7 +79,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
     // Used for resolving strings and pdf directories for links.
@@ -93,14 +95,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
+        this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
-                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                         StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
@@ -234,11 +236,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         if (layoutText == null) {
             return;
         }
-        if (searchQueryProperty.get().isPresent()) {
-            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQueryProperty.get().get());
-            previewView.getEngine().loadContent(highlightedHtml);
+
+        if (!searchQueryProperty.get().isBlank()) {
+            SearchQuery searchQuery = new SearchQuery(searchQueryProperty.get());
+            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQuery);
+            Platform.runLater(() -> previewView.getEngine().loadContent(highlightedHtml));
         } else {
-            previewView.getEngine().loadContent(layoutText);
+            Platform.runLater(() -> previewView.getEngine().loadContent(layoutText));
         }
     }
 

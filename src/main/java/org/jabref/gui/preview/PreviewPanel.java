@@ -25,7 +25,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.search.SearchType;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.l10n.Localization;
@@ -63,7 +62,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         this.stateManager = stateManager;
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
+        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);

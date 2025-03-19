@@ -14,6 +14,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -66,6 +68,7 @@ public class StateManager {
     private final ObservableMap<String, IndexManager> indexManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
+    private final StringProperty searchQueryProperty = new SimpleStringProperty();
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
@@ -104,6 +107,10 @@ public class StateManager {
 
     public OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type) {
         return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;
+    }
+
+    public StringProperty searchQueryProperty() {
+        return searchQueryProperty;
     }
 
     public IntegerProperty searchResultSize(SearchType type) {
