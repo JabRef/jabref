@@ -66,6 +66,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -118,6 +119,13 @@ public class LibraryTab extends Tab {
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+
+    /**
+     * The interval in seconds between Git status checks.
+     * 10 seconds provides a good balance between UI responsiveness and reducing system load.
+     */
+    private static final int GIT_STATUS_REFRESH_INTERVAL_SECONDS = 10;
+
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -260,6 +268,11 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+
+        // Start Git status monitoring if the database is under version control
+        if (bibDatabaseContext.isUnderVersionControl()) {
+            startGitStatusMonitoring();
+        }
     }
 
     private EntryEditor createEntryEditor() {
@@ -396,7 +409,8 @@ public class LibraryTab extends Tab {
      * <p>
      * Example: *jabref-authors.bib – testbib
      */
-    public void updateTabTitle(boolean isChanged) {
+
+    public void updateTabTitle(boolean isModified) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
@@ -407,11 +421,24 @@ public class LibraryTab extends Tab {
 
         if (file.isPresent()) {
             // Modification asterisk
-            if (isChanged && !isAutosaveEnabled) {
+            if (isModified && !isAutosaveEnabled) {
                 tabTitle.append('*');
             }
 
-            // Filename
+            if (bibDatabaseContext.isUnderVersionControl()) {
+                Optional<GitHandler.GitStatus> status = bibDatabaseContext.getGitStatus();
+                status.ifPresent(gitStatus -> {
+                    String statusText = switch (gitStatus) {
+                        case MODIFIED -> "[" + Localization.lang("Modified") + "]";
+                        case STAGED -> "[" + Localization.lang("Staged") + "]";
+                        case COMMITTED -> "[" + Localization.lang("Committed") + "]";
+                        case UNTRACKED -> "[" + Localization.lang("Untracked") + "]";
+                    };
+                    tabTitle.append(statusText).append(" ");
+                    toolTipText.append(statusText).append(" ");
+                });
+            }
+
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
@@ -423,16 +450,13 @@ public class LibraryTab extends Tab {
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
-
             // Database mode
             addModeInfo(toolTipText, bibDatabaseContext);
 
-            // Changed information (tooltip)
-            if (isChanged && !isAutosaveEnabled) {
+            if (isModified && !isAutosaveEnabled) {
                 addChangedInformation(toolTipText, fileName);
             }
 
-            // Unique path fragment
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.collectAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
@@ -458,6 +482,11 @@ public class LibraryTab extends Tab {
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
         this.changedProperty.setValue(true);
+
+        // Update Git status when database context changes
+        if (bibDatabaseContext.isUnderVersionControl()) {
+            updateTabTitle(true);
+        }
     }
 
     /**
@@ -637,6 +666,11 @@ public class LibraryTab extends Tab {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
+
+            // Update the Git status when the database is marked as unchanged (likely after a save operation)
+            if (bibDatabaseContext.isUnderVersionControl()) {
+                updateTabTitle(false);
+            }
         }
     }
 
@@ -1191,5 +1225,34 @@ public class LibraryTab extends Tab {
 
     public LibraryTabContainer getLibraryTabContainer() {
         return tabContainer;
+    }
+
+    /**
+     * Starts periodic monitoring of Git status for the database file
+     */
+    private void startGitStatusMonitoring() {
+        if (!bibDatabaseContext.isUnderVersionControl()) {
+            return;
+        }
+
+        try {
+            Runnable checkGitStatusAndUpdateUI = () -> {
+                bibDatabaseContext.getGitStatus();
+                Platform.runLater(() -> updateTabTitle(changedProperty.getValue()));
+            };
+
+            checkGitStatusAndUpdateUI.run();
+
+            PauseTransition gitStatusTimer = new PauseTransition(Duration.seconds(GIT_STATUS_REFRESH_INTERVAL_SECONDS));
+            gitStatusTimer.setOnFinished(event -> {
+                checkGitStatusAndUpdateUI.run();
+                gitStatusTimer.play();
+            });
+            gitStatusTimer.play();
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Could not start Git status monitoring timer", e);
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not start Git status monitoring timer", e);
+        }
     }
 }
