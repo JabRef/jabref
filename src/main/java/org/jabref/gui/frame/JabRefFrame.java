@@ -230,25 +230,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        if (stateManager.getOpenDatabases().isEmpty()) {
-            WelcomeTab welcomeTab = new WelcomeTab(
-                    this,
-                    preferences,
-                    aiService,
-                    dialogService,
-                    stateManager,
-                    fileUpdateMonitor,
-                    entryTypesManager,
-                    undoManager,
-                    clipBoardManager,
-                    taskExecutor,
-                    fileHistory,
-                    new BuildInfo()
-            );
-
-            tabbedPane.getTabs().add(welcomeTab);
-        }
-
         splitPane.getItems().add(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
@@ -485,7 +466,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 taskExecutor,
                 fileHistory,
-                new BuildInfo()
+                Injector.instantiateModelOrService(BuildInfo.class)
         );
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);
