@@ -282,13 +282,13 @@ public class AuthorListParser {
                     if (vonStart < 0) {
                         if (!tokenCase) {
                             int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
-                            if ((previousTermToken >= 0) && '-'.equals(tokens.get(previousTermToken))) {
+                            if ((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
                                 // We are in a first name which contained a hyphen
                                 break;
                             }
 
                             int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
-                            if ((thisTermToken >= 0) && '-'.equals(tokens.get(thisTermToken))) {
+                            if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
                                 // We are in a name which contained a hyphen
                                 break;
                             }
