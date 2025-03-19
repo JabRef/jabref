@@ -43,11 +43,12 @@ public class GitPushAction extends SimpleCommand {
             return;
         }
 
-        GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent());
+        GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
+                dialogService,
+                preferences.getGitPreferences());
         if (gitClientHandler.isGitRepository()) {
             try {
                 gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-                gitClientHandler.updateCredentials(preferences.getGitPreferences());
                 gitClientHandler.pushCommitsToRemoteRepository();
             } catch (IOException | GitAPIException e) {
                 dialogService.showErrorDialogAndWait(e);

@@ -238,7 +238,10 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
-                new GitClientHandler(targetPath.getParent()).postSaveDatabaseAction(preferences.getGitPreferences());
+                new GitClientHandler(targetPath.getParent(),
+                        dialogService,
+                        preferences.getGitPreferences())
+                        .postSaveDatabaseAction();
             }
             dialogService.notify(Localization.lang("Library saved"));
             return success;

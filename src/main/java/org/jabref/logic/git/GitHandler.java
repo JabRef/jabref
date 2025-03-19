@@ -7,8 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.logic.preferences.AutoPushMode;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -215,41 +213,5 @@ public class GitHandler {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
         }
-    }
-
-    /**
-     * Contains logic for commiting and pushing after a database is saved locally,
-     * if the relevant preferences are present.
-     *
-     * @param preferences preferences for git
-     */
-    public void postSaveDatabaseAction(GitPreferences preferences) {
-        if (!isGitRepository()) {
-            return;
-        }
-
-        if (preferences.getAutoPushMode() != AutoPushMode.ON_SAVE) {
-            return;
-        }
-
-        if (!preferences.getAutoPushEnabled()) {
-            return;
-        }
-
-        updateCredentials(preferences);
-
-        try {
-            createCommitOnCurrentBranch("Automatic update via JabRef", false);
-            pushCommitsToRemoteRepository();
-        } catch (GitAPIException | IOException e) {
-            LOGGER.error("Failed to push", e);
-        }
-    }
-
-    public void updateCredentials(GitPreferences preferences) {
-        this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                preferences.getGitHubUsername(),
-                preferences.getGitHubPasskey()
-        );
     }
 }

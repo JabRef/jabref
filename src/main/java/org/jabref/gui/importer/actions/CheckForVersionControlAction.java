@@ -27,7 +27,9 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         if (path.isEmpty()) {
             return false;
         }
-        this.gitClientHandler = new GitClientHandler(path.get());
+        this.gitClientHandler = new GitClientHandler(path.get(),
+                dialogService,
+                preferences.getGitPreferences());
         return gitClientHandler.isGitRepository();
     }
 
