@@ -607,9 +607,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void importPdfsButton() {
-        // check if file directories is not empty
         List<Path> fileDirectories = database.getFileDirectories(filePreferences);
 
+        // check if file directories is not empty
         if (fileDirectories.isEmpty()) {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("File directory is not set or does not exist!"),
