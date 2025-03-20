@@ -12,7 +12,7 @@ If your work is not yet complete, please open a draft pull request. In that case
 <!--
 Go through the checklist below. It is mandatory, even for a draft pull request.
 
-Keep ALL the items. Replace the dots inside and mark them as follows: 
+Keep ALL the items. Replace the dots inside [.] and mark them as follows: 
 [x] done 
 [ ] not done 
 [/] not applicable
