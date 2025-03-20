@@ -204,8 +204,8 @@ public class AiChatComponent extends VBox {
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
                 case PROCESSING -> notifications.add(new Notification(
-                        Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                        Localization.lang("After the file will be ingested, you will be able to chat with it.")
+                    Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                    Localization.lang("After the file will be ingested, you will be able to chat with it.")
                 ));
 
                 case ERROR -> {
