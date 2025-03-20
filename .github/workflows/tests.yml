@@ -377,6 +377,7 @@ jobs:
           # Ensure the section exists
           if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
               echo "❌ '### Mandatory checks' section is missing!"
+              echo "::error '### Mandatory checks' section is missing!"
               exit 1
           fi
 
@@ -386,12 +387,14 @@ jobs:
           # Ensure at least one checkbox exists
           if [ -z "$BOXES" ]; then
               echo "❌ No checkboxes found in '### Mandatory checks'!"
+              echo "::error No checkboxes found in '### Mandatory checks'!"
               exit 1
           fi
 
           while IFS= read -r line; do
               if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
                   echo "❌ Found improperly formatted checkbox: '$line'"
+                  echo "::error Found improperly formatted checkbox: '$line'"
                   exit 1
               fi
           done <<< "$BOXES"
