@@ -49,7 +49,6 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
-                dialogService.notify(Localization.lang("Successfully pulled"));
             } catch (IOException e) {
                 // In the case that rebase fails, try revert to previous commit
                 // and execute regular pull
@@ -78,6 +77,7 @@ public class GitClientHandler extends GitHandler {
                     return;
                 }
             }
+            dialogService.notify(Localization.lang("Successfully pulled"));
 
             try {
                 this.pushCommitsToRemoteRepository();
@@ -100,7 +100,7 @@ public class GitClientHandler extends GitHandler {
                    .setRef(commit.toString())
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.error("Failed to rever to commit");
+                LOGGER.error("Failed to revert to commit", e);
             }
         }
     }
@@ -113,7 +113,7 @@ public class GitClientHandler extends GitHandler {
                    .setRebase(true)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.error("Failed to pull and rebase");
+                LOGGER.error("Failed to pull and rebase", e);
             }
         }
     }
