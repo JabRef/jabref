@@ -130,7 +130,7 @@ public class FileUtil {
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
      * <p>
-     * <em>Warning! If "ext" is passed, this is literally added. Thus addExtension("tmp.txt", "ext") leads to "tmp.txtext"</em>
+     * <em>Warning: If "ext" is passed, this is literally added. Thus {@code addExtension("tmp.txt", "ext")} leads to "tmp.txtext".</em>
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
@@ -499,7 +499,7 @@ public class FileUtil {
 
     /**
      * Detect illegal characters in given filename.
-     * <p>
+     *
      * @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
      *
      * @param fileName the fileName to detect

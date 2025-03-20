@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
- * @see https://tinylog.org/v2/configuration
+ * See https://tinylog.org/v2/configuration.
  */
 public class Windows extends NativeDesktop {
 
