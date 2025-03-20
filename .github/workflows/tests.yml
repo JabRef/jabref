@@ -436,3 +436,22 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
+
+  changelog_modified:
+    name: CHANGELOG.md was modified
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for CHANGELOG.md modifications
+        id: check_changelog_modification
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^CHANGELOG\.md$'; then
+            echo "✅ CHANGELOG.md was modified"
+          else
+            echo "❌ CHANGELOG.md was NOT modified"
+            exit 1
+          fi
