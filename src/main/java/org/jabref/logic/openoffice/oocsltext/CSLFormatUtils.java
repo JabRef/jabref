@@ -28,8 +28,8 @@ public class CSLFormatUtils {
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
 
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = OpenOfficePreferences.BIBLIOGRAPHY_TITLE;
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = OpenOfficePreferences.HEADER_FORMAT;
+    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = OpenOfficePreferences.CSL_BIBLIOGRAPHY_TITLE;
+    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = OpenOfficePreferences.CSL_HEADER_FORMAT;
 
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");

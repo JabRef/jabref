@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -27,8 +26,8 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
-    public static final String BIBLIOGRAPHY_TITLE = "References";
-    public static final String HEADER_FORMAT = "Heading 1";
+    public static final String CSL_BIBLIOGRAPHY_TITLE = "References";
+    public static final String CSL_HEADER_FORMAT = "Heading 1";
 
     private final StringProperty executablePath;
     private final BooleanProperty useAllDatabases;
@@ -168,15 +167,7 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle;
     }
 
-    public Optional<String> getCslBibliographyTitle() {
-        return Optional.ofNullable(cslBibliographyTitle.get());
-    }
-
     public ObjectProperty<Format> headerFormat() {
         return cslHeaderFormat;
-    }
-
-    public Optional<String> getCslHeaderFormat() {
-        return Optional.ofNullable(cslHeaderFormat.get().getFormat());
     }
 }
