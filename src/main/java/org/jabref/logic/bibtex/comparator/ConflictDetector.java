@@ -16,13 +16,30 @@ public class ConflictDetector {
         return Optional.empty();
     }
 
+    public static Optional<GitBibDatabaseDiff> detectGitConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+        GitBibDatabaseDiff diff = GitBibDatabaseDiff.compare(base, local, remote);
 
+        boolean hasConflicts = diff.getEntryDifferences().stream().anyMatch(GitBibEntryDiff::hasConflicts);
+
+        if (hasConflicts || diff.getMetaDataDifferences().isPresent()) {
+            return Optional.of(diff);
+        }
+        return Optional.empty();
+    }
 
     public static boolean hasConflicts(BibDatabaseContext local, BibDatabaseContext remote) {
         return detectConflicts(local, remote).isPresent();
     }
 
+    public static boolean hasGitConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+        return detectGitConflicts(base, local, remote).isPresent();
+    }
+
     public static List<BibEntryDiff> getEntryConflicts(BibDatabaseContext local, BibDatabaseContext remote) {
         return BibDatabaseDiff.compare(local, remote).getEntryDifferences();
+    }
+
+    public static List<GitBibEntryDiff> getGitEntryConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+        return GitBibDatabaseDiff.compare(base, local, remote).getEntryDifferences();
     }
 }
