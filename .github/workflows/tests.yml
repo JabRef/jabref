@@ -395,6 +395,8 @@ jobs:
               echo "❌ Found improperly checked checkboxes."
               exit 1
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
