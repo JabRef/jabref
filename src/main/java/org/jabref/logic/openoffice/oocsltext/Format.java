@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice;
+package org.jabref.logic.openoffice.oocsltext;
 
 public enum Format {
     TITLE("Title"),

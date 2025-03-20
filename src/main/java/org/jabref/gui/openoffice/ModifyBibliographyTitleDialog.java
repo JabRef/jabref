@@ -8,7 +8,7 @@ import javafx.stage.Modality;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.Format;
+import org.jabref.logic.openoffice.oocsltext.Format;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;

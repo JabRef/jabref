@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.openoffice.Format;
+import org.jabref.logic.openoffice.oocsltext.Format;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class ModifyBibliographyTitleDialogViewModel {
