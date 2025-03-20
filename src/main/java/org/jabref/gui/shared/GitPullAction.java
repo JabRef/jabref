@@ -29,6 +29,13 @@ public class GitPullAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
     }
+    /**
+     * Contains logic for performing Git operations on the active database repository.
+     * The method verifies that an active database exists and is not empty
+     * then creates a GitClientHandler with the parent directory of the database path.
+     * If the directory is a Git repository, performs a pull operation on the current branch.
+     * Will log any errors that occur during the pull operation.
+     */
 
     @Override
     public void execute() {
