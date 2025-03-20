@@ -374,8 +374,20 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A5000 '### Mandatory checks')
           echo "Found body: $BODY"
 
+          # Ensure the section exists
+          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checklist"; then
+              echo "❌ '### Mandatory checklist' section is missing!"
+              exit 1
+          fi
+
           BOXES=$(printf '%s\n' "$BODY" | grep "^- \[")
           echo "Found boxes: $BOXES"
+
+          # Ensure at least one checkbox exists
+          if [ -z "$BOXES" ]; then
+              echo "❌ No checkboxes found in '### Mandatory checklist'!"
+              exit 1
+          fi
 
           if ! printf '%s\n' "$BOXES" | grep -Eqv "^- \[(x|/| )\]"; then
               echo "✅ All checkboxes are in the correct format."
