@@ -2432,10 +2432,6 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
 
-
-
-
-
 .dynamic-tooltip {
     -fx-max-width: 70vw;
     -fx-max-height: 50vh;
@@ -2448,7 +2444,3 @@ journalInfo .grid-cell-b {
     -fx-border-width: 0.8px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
 }
-
-
-
-
