@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
-    private static final Set<Field> DATE_FIELDS = new Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
+    private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
