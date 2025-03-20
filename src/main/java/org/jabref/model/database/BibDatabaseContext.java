@@ -13,6 +13,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -43,7 +44,6 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
-    private Boolean underVersionControl;
 
     /**
      * Generate a random UID for unique of the concrete context
@@ -167,11 +167,11 @@ public class BibDatabaseContext {
         userFileDirectory.ifPresent(fileDirs::add);
 
         Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
-        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
         //   2) no library-specific file directory is set (in the metadata of the bib file)
+        librarySpecificFileDirectory.ifPresent(fileDirs::add);
 
         // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -275,6 +275,55 @@ public class BibDatabaseContext {
         return indexPath;
     }
 
+    /**
+     * Get the Git status of the database file.
+     *
+     * @return The Git status if the database is under version control, or empty if not.
+     */
+    public Optional<GitHandler.GitStatus> getGitStatus() {
+        if (!isUnderVersionControl()) {
+            return Optional.empty();
+        }
+
+        try {
+            Path databasePath = getDatabasePath().orElseThrow(() -> new IllegalStateException("Database path is missing"));
+            GitHandler gitHandler = new GitHandler(databasePath);
+            return gitHandler.getFileStatus(databasePath);
+        } catch (SecurityException e) {
+            LOGGER.warn("No permission to check Git status at {}", getDatabasePath().orElse(Path.of("unknown")), e);
+            return Optional.empty();
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Failed to retrieve database path: {}", e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns whether this database is under version control (e.g., git).
+     */
+    public boolean isUnderVersionControl() {
+        if (getDatabasePath().isEmpty()) {
+            return false;
+        }
+
+        Path databasePath = getDatabasePath().get();
+
+        if (!Files.exists(databasePath)) {
+            return false;
+        }
+
+        try {
+            Path gitDir = databasePath.getParent().resolve(".git");
+            if (Files.exists(gitDir) && Files.isDirectory(gitDir)) {
+                return true;
+            }
+        } catch (SecurityException e) {
+            LOGGER.warn("No permission to check for Git repository at {}: {}", getDatabasePath().get(), e.getMessage(), e);
+            return false;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "BibDatabaseContext{" +
@@ -315,13 +364,5 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
-    }
-
-    public boolean isVersioned() {
-        return Boolean.TRUE.equals(underVersionControl);
-    }
-
-    public void setVersioned(boolean versioned) {
-        this.underVersionControl = versioned;
     }
 }
