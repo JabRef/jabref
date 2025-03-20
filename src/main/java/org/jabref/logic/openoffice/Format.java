@@ -1,6 +1,6 @@
-package org.jabref.gui.openoffice;
+package org.jabref.logic.openoffice;
 
-public enum Formats {
+public enum Format {
     TITLE("Title"),
     BODY_TEXT("Body Text"),
     SUBTITLE("Subtitle"),
@@ -12,7 +12,7 @@ public enum Formats {
 
     private final String format;
 
-    Formats(String format) {
+    Format(String format) {
         this.format = format;
     }
 

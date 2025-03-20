@@ -8,14 +8,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.openoffice.Format;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class ModifyBibliographyTitleDialogViewModel {
 
-    public final StringProperty bibliographyTitle = new SimpleStringProperty("");
-    public final ObjectProperty<Formats> selectedFormat = new SimpleObjectProperty<>();
-    private final ReadOnlyListProperty<Formats> formatListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Formats.values()));
+    private final StringProperty bibliographyTitle = new SimpleStringProperty("");
+    private final ObjectProperty<Format> selectedFormat = new SimpleObjectProperty<>();
+    private final ReadOnlyListProperty<Format> formatListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Format.values()));
 
     public ModifyBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
         this.bibliographyTitle.set(preferences.bibliographyTitle().get());
@@ -25,11 +26,15 @@ public class ModifyBibliographyTitleDialogViewModel {
         selectedFormat.bindBidirectional(preferences.headerFormat());
     }
 
-    public ObjectProperty<Formats> selectedFormat() {
+    public StringProperty bibliographyTitle() {
+        return bibliographyTitle;
+    }
+
+    public ObjectProperty<Format> selectedFormat() {
         return this.selectedFormat;
     }
 
-    public ReadOnlyListProperty<Formats> formatListProperty() {
+    public ReadOnlyListProperty<Format> formatListProperty() {
         return this.formatListProperty;
     }
 }

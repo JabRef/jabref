@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,7 +12,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.openoffice.Formats;
 import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
@@ -37,7 +37,7 @@ public class OpenOfficePreferences {
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty bibliographyTitle;
-    private final ObjectProperty<Formats> headerFormat;
+    private final ObjectProperty<Format> headerFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -56,7 +56,7 @@ public class OpenOfficePreferences {
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.bibliographyTitle = new SimpleStringProperty(defaultBibliographyTitle);
-        this.headerFormat = new SimpleObjectProperty<>(Formats.HEADING_2);
+        this.headerFormat = new SimpleObjectProperty<>(Format.HEADING_2);
     }
 
     public void clearConnectionSettings() {
@@ -167,15 +167,15 @@ public class OpenOfficePreferences {
         return bibliographyTitle;
     }
 
-    public String getBibliographyTitle() {
-        return bibliographyTitle.get();
+    public Optional<String> getBibliographyTitle() {
+        return Optional.ofNullable(bibliographyTitle.get());
     }
 
-    public ObjectProperty<Formats> headerFormat() {
+    public ObjectProperty<Format> headerFormat() {
         return headerFormat;
     }
 
-    public String getHeaderFormat() {
-        return headerFormat.get().getFormat();
+    public Optional<String> getHeaderFormat() {
+        return Optional.ofNullable(headerFormat.get().getFormat());
     }
 }
