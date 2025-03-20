@@ -100,7 +100,9 @@ application {
         '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref',
 
         '--add-opens=javafx.base/javafx.collections=org.jabref',
-        '--add-opens=javafx.base/javafx.collections.transformation=org.jabref'
+        '--add-opens=javafx.base/javafx.collections.transformation=org.jabref',
+
+        '--enable-native-access=javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core'
     ]
 }
 
@@ -148,7 +150,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "23.0.2"
+    version = "24"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
