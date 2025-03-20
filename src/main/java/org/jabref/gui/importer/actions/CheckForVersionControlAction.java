@@ -39,6 +39,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
 
         try {
             this.gitClientHandler.pullOnCurrentBranch();
+            dialogService.notify("Successfully pull");
         } catch (IOException e) {
             LOGGER.error("Failed to pull.", e);
         }

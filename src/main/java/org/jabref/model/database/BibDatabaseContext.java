@@ -44,6 +44,7 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
+    private Boolean underVersionControl;
 
     /**
      * Generate a random UID for unique of the concrete context
@@ -364,5 +365,13 @@ public class BibDatabaseContext {
      */
     public String getUid() {
         return uid;
+    }
+
+    public boolean isVersioned() {
+        return Boolean.TRUE.equals(underVersionControl);
+    }
+
+    public void setVersioned(boolean versioned) {
+        this.underVersionControl = versioned;
     }
 }
