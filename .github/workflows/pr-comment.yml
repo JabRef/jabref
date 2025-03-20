@@ -7,18 +7,18 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests"]
+    workflows: ["Tests", "On PR opened"]
     types:
       - completed
 
 jobs:
   comment:
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
-    if: ${{ github.event.workflow_run.conclusion == 'failure' && (github.repository_owner == 'JabRef') }}
+    if: ${{ github.repository == 'JabRef/jabref' }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: read
+      contents: write
       pull-requests: write
     timeout-minutes: 10
     steps:
@@ -49,14 +49,13 @@ jobs:
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: actions/checkout@v4
         with:
-          fetch-depth: '0'
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: jbang
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
         uses: jbangdev/jbang-action@v0.124.0
         with:
-          script: ghprcomment@koppor/ghprcomment
+          script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
           trust: https://github.com/koppor/ghprcomment/
         env:

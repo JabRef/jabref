@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,13 +95,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return tableData;
     }
 
-    public List<String> getColumnNames() {
-        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
+    public Set<String> getColumnNames() {
+        Set<String> result = new LinkedHashSet<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
-        result.add("Citation Key");
-        allReportedFields.forEach(field -> {
-            result.add(field.getDisplayName());
-        });
+        result.add("CitationKey");
+        allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
         return result;
     }
 
