@@ -25,10 +25,6 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
-
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
 
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
