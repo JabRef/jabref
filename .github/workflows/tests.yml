@@ -375,8 +375,8 @@ jobs:
           echo "Found body: $BODY"
 
           # Ensure the section exists
-          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checklist"; then
-              echo "❌ '### Mandatory checklist' section is missing!"
+          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
+              echo "❌ '### Mandatory checks' section is missing!"
               exit 1
           fi
 
@@ -385,7 +385,7 @@ jobs:
 
           # Ensure at least one checkbox exists
           if [ -z "$BOXES" ]; then
-              echo "❌ No checkboxes found in '### Mandatory checklist'!"
+              echo "❌ No checkboxes found in '### Mandatory checks'!"
               exit 1
           fi
 
