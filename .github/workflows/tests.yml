@@ -408,6 +408,9 @@ jobs:
           sed -i "s/ all/ untracked/" .gitmodules
 
           if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vzq "Submodule src"; then
+            echo "Debug:"
+            echo git diff --submodule=log origin/${{ github.base_ref }} HEAD
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD
             echo "❌ Submodule modifications detected"
             exit 1
           fi

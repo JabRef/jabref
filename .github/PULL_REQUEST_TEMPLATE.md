@@ -18,7 +18,7 @@ Keep ALL the items. Mark them as follows:
 [/] not applicable
 -->
 
-- [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
+- [x] I own the copyright of the code submitted and I license it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if change is visible to the user)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
