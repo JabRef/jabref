@@ -22,8 +22,8 @@ public class PdfXmpImporter extends PdfImporter {
         this.xmpPreferences = xmpPreferences;
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
-        return new XmpUtilReader().readXmp(filePath, xmpPreferences);
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException {
+        return new XmpUtilReader().readXmp(fullPath, xmpPreferences);
     }
 
     @Override

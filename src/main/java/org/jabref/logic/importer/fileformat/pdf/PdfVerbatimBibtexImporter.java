@@ -24,7 +24,7 @@ public class PdfVerbatimBibtexImporter extends PdfImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> result;
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         BibtexParser parser = new BibtexParser(importFormatPreferences);

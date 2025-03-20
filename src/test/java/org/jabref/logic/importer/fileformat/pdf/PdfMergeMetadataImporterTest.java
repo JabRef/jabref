@@ -95,7 +95,6 @@ class PdfMergeMetadataImporterTest {
 
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.getWorkingDirectory()).thenReturn(directory);
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(directory.resolve("db.bib"));

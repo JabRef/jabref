@@ -20,11 +20,7 @@ public class ExternalFilesContentImporter {
     }
 
     public ParserResult importPDFContent(Path file, BibDatabaseContext context, FilePreferences filePreferences) {
-        try {
-            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, context, filePreferences);
-        } catch (IOException e) {
-           return ParserResult.fromError(e);
-        }
+        return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, context, filePreferences);
     }
 
     public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
