@@ -88,6 +88,21 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return List.of(entry);
     }
 
+    /**
+     * Enhanced {@link PdfImporter#importDatabase(Path)} method that relativizes paths of PDF files (if turned on in the preferences).
+     */
+    public ParserResult importDatabase(Path filePath, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        ParserResult parserResult = importDatabase(filePath);
+
+        if (filePreferences.shouldStoreFilesRelativeToBibFile() && bibDatabaseContext.getDatabasePath().isPresent()) {
+            Path storePath = bibDatabaseContext.getDatabasePath().get().getParent().relativize(filePath);
+            parserResult.getDatabase().getEntries().forEach(entry ->
+                    entry.addFile(new LinkedFile("", storePath, StandardField.PDF.getName())));
+        }
+
+        return parserResult;
+    }
+
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
         List<BibEntry> candidates = new ArrayList<>();
 

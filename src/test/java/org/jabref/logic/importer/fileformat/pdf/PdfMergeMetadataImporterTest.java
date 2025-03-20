@@ -105,7 +105,7 @@ class PdfMergeMetadataImporterTest {
                 .withField(StandardField.AUTHOR, "1 ")
                 .withField(StandardField.TITLE, "Hello World")
                 // Expecting relative path
-                .withField(StandardField.FILE, ":minimal.pdf:PDF");
+                .withField(StandardField.FILE, ":minimal.pdf:pdf");
 
         assertEquals(List.of(expected), result);
     }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
@@ -14,9 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -34,6 +31,13 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  * {@link PdfImporter#importDatabase(Path)} or {@link PdfMergeMetadataImporter}.
  */
 public abstract class PdfImporter extends Importer {
+    /**
+     * Abstract method that inheritors should define.
+     * <p>
+     * It contains two arguments: `fullPath`, which you can use to read file again for other properties
+     * (like XMP metadata); and `document`, which is a parsed PDF file. Many importers parse PDF files,
+     * so it was decided to parse it only once and provide the parsed data structure as an argument.
+     */
     public abstract List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException;
 
     @Override
@@ -55,28 +59,8 @@ public abstract class PdfImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) {
-        return importDatabase(filePath, filePath);
-    }
-
-    public ParserResult importDatabase(Path filePath, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        Path storePath = filePath;
-
-        if (filePreferences.shouldStoreFilesRelativeToBibFile() && bibDatabaseContext.getDatabasePath().isPresent()) {
-            storePath = bibDatabaseContext.getDatabasePath().get().getParent().relativize(filePath);
-        }
-
-        return importDatabase(storePath, filePath);
-    }
-
-    private ParserResult importDatabase(Path storePath, Path readPath) {
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(readPath)) {
-            List<BibEntry> entries = importDatabase(readPath, document);
-
-            entries.forEach(entry -> {
-                entry.addFile(new LinkedFile("", storePath, StandardFileType.PDF.getName()));
-            });
-
-            return new ParserResult(entries);
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
+            return new ParserResult(importDatabase(filePath, document));
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException | ParseException exception) {
