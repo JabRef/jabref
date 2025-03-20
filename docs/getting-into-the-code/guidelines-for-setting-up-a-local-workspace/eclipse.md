@@ -7,7 +7,6 @@ nav_order: 90
 # Advanced: Eclipse as IDE
 
 For advanced users, [Eclipse](https://eclipse.org) (`2023-03` or newer) is also possible.
-For JDK20 you need to install the additional [support for jdk20 as extension](https://marketplace.eclipse.org/content/java-20-support-eclipse-2023-03-427)).
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse.
 On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
