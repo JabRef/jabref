@@ -389,12 +389,13 @@ jobs:
               exit 1
           fi
 
-          if ! printf '%s\n' "$BOXES" | grep -Eqv "^- \[(x|/| )\]"; then
-              echo "✅ All checkboxes are in the correct format."
-          else
-              echo "❌ Found improperly checked checkboxes."
-              exit 1
-          fi
+          while IFS= read -r line; do
+              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
+                  echo "❌ Found improperly formatted checkbox: '$line'"
+                  exit 1
+              fi
+          done <<< "$BOXES"
+          echo "✅ All checkboxes are in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
