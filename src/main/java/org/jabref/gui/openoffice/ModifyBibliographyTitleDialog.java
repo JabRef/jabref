@@ -38,12 +38,12 @@ public class ModifyBibliographyTitleDialog extends BaseDialog<Void> {
     public void initialize() {
         viewModel = new ModifyBibliographyTitleDialogViewModel(openOfficePreferences);
 
-        titleField.textProperty().bindBidirectional(viewModel.bibliographyTitle());
+        titleField.textProperty().bindBidirectional(viewModel.cslBibliographyTitle());
 
         new ViewModelListCellFactory<Format>()
                 .withText(Format::getFormat)
                 .install(formats);
         formats.itemsProperty().bind(viewModel.formatListProperty());
-        formats.valueProperty().bindBidirectional(viewModel.selectedFormat());
+        formats.valueProperty().bindBidirectional(viewModel.cslSelectedFormat());
     }
 }

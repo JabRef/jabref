@@ -163,11 +163,11 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);
     }
 
-    public StringProperty bibliographyTitle() {
+    public StringProperty cslBibliographyTitle() {
         return cslBibliographyTitle;
     }
 
-    public ObjectProperty<Format> headerFormat() {
+    public ObjectProperty<Format> cslHeaderFormat() {
         return cslHeaderFormat;
     }
 }

@@ -8,8 +8,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.openoffice.oocsltext.Format;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.oocsltext.Format;
 
 public class ModifyBibliographyTitleDialogViewModel {
 
@@ -19,18 +19,18 @@ public class ModifyBibliographyTitleDialogViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Format.values()));
 
     public ModifyBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
-        this.bibliographyTitle.set(preferences.bibliographyTitle().get());
-        this.selectedFormat.set(preferences.headerFormat().get());
+        this.bibliographyTitle.set(preferences.cslBibliographyTitle().get());
+        this.selectedFormat.set(preferences.cslHeaderFormat().get());
 
-        bibliographyTitle.bindBidirectional(preferences.bibliographyTitle());
-        selectedFormat.bindBidirectional(preferences.headerFormat());
+        bibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
+        selectedFormat.bindBidirectional(preferences.cslHeaderFormat());
     }
 
-    public StringProperty bibliographyTitle() {
+    public StringProperty cslBibliographyTitle() {
         return bibliographyTitle;
     }
 
-    public ObjectProperty<Format> selectedFormat() {
+    public ObjectProperty<Format> cslSelectedFormat() {
         return this.selectedFormat;
     }
 
