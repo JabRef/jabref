@@ -54,10 +54,11 @@ public class ChatHistoryComponent extends ScrollPane {
                 });
                 if (chatMessage instanceof AiMessage) {
                     component.setOnRegenerate(comp -> {
-                        if (!items.isEmpty() && items.getLast() == chatMessage && items.size() > 1) {
+                        if (items.size() > 1 && items.getLast() == chatMessage) {
                             ChatMessage previous = items.get(items.size() - 2);
                             if (previous instanceof UserMessage message) {
                                 String userText = message.singleText();
+                                // Remove the last two messages: first the AI message, then the corresponding user message
                                 items.removeLast();
                                 items.removeLast();
                                 if (regenerateCallback != null) {

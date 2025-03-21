@@ -92,6 +92,7 @@ public class AiChatComponent extends VBox {
     public void initialize() {
         uiChatHistory.setItems(aiChatLogic.getChatHistory());
         uiChatHistory.setRegenerateCallback(userPrompt -> {
+            // Remove the last two messages: first the AI response, then the corresponding user message
             deleteLastMessage();
             deleteLastMessage();
             chatPrompt.switchToNormalState();
@@ -128,6 +129,7 @@ public class AiChatComponent extends VBox {
         chatPrompt.setCancelCallback(() -> chatPrompt.switchToNormalState());
 
         chatPrompt.setRetryCallback(userMessage -> {
+            // Remove the last two messages: first the AI response, then the corresponding user message
             deleteLastMessage();
             deleteLastMessage();
             chatPrompt.switchToNormalState();
