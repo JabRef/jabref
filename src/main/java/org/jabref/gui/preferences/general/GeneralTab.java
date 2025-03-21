@@ -24,6 +24,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -53,6 +54,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox alwaysReformatBib;
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
+    @FXML private TextField gitHubUsernameField;
+    @FXML private TextField gitHubPasskeyField;
+    @FXML private CheckBox autoPushCheckbox;
+    @FXML private ComboBox<AutoPushMode> autoPushModeComboBox;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
     @FXML private CheckBox remoteServer;
@@ -132,6 +137,14 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+
+        gitHubUsernameField.textProperty().bindBidirectional(viewModel.gitHubUsernameProperty());
+        gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
+
+        autoPushCheckbox.selectedProperty().bindBidirectional(viewModel.autoPushEnabledProperty());
+        autoPushModeComboBox.setItems(viewModel.autoPushModeListProperty());
+        autoPushModeComboBox.valueProperty().bindBidirectional(viewModel.autoPushModeProperty());
+
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);
