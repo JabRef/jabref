@@ -95,6 +95,10 @@ public class CleanupWorker {
                     new ISSNCleanup();
             case ABBREVIATE_JOURNAL_DEFAULT ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJounalField);
+            case ABBREVIATE_JOURNAL_DOTLESS ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DOTLESS, useFJounalField);
+            case ABBREVIATE_JOURNAL_SHORTEST_UNIQUE ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJounalField);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };
