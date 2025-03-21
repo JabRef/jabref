@@ -1,4 +1,4 @@
-package org.jabref.gui.linkedfile;
+package org.jabref.gui.commonfxcontrols;
 
 import java.util.Objects;
 
@@ -9,11 +9,11 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.entry.types.EntryType;
 
-public class LinkedFileNamePatternsItemModel {
+public class PatternsItemModel {
     private final ObjectProperty<EntryType> entryType = new SimpleObjectProperty<>();
     private final StringProperty pattern = new SimpleStringProperty("");
 
-    public LinkedFileNamePatternsItemModel(EntryType entryType, String pattern) {
+    public PatternsItemModel(EntryType entryType, String pattern) {
         Objects.requireNonNull(entryType);
         Objects.requireNonNull(pattern);
         this.entryType.setValue(entryType);

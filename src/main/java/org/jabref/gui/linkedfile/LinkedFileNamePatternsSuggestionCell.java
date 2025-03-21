@@ -17,10 +17,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Window;
 
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
 
-public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<LinkedFileNamePatternsItemModel, String> {
+public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<PatternsItemModel, String> {
     private final LinkedFileNamePatternSuggestionTextField searchField;
 
     public LinkedFileNamePatternsSuggestionCell(List<String> linkedFileNamePatterns) {

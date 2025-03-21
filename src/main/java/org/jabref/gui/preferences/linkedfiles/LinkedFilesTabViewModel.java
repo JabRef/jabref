@@ -15,7 +15,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.linkedfile.LinkedFileNamePatternsItemModel;
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -45,9 +45,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
 
-    private final ListProperty<LinkedFileNamePatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
-            new LinkedFileNamePatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), ""));
+    private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<PatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
+            new PatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), ""));
 
     private final Validator mainFileDirValidator;
 
@@ -203,11 +203,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.moveToTrashProperty;
     }
 
-    public ListProperty<LinkedFileNamePatternsItemModel> patternListProperty() {
+    public ListProperty<PatternsItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<PatternsItemModel> defaultNamePatternProperty() {
         return defaultNamePatternProperty;
     }
 }

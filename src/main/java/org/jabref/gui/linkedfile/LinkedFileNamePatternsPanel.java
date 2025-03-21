@@ -12,6 +12,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.Pattern;
@@ -22,11 +23,11 @@ import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePatternsItemModel> {
+public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
 
-    @FXML public TableColumn<LinkedFileNamePatternsItemModel, EntryType> entryTypeColumn;
-    @FXML public TableColumn<LinkedFileNamePatternsItemModel, String> patternColumn;
-    @FXML public TableColumn<LinkedFileNamePatternsItemModel, EntryType> actionsColumn;
+    @FXML public TableColumn<PatternsItemModel, EntryType> entryTypeColumn;
+    @FXML public TableColumn<PatternsItemModel, String> patternColumn;
+    @FXML public TableColumn<PatternsItemModel, EntryType> actionsColumn;
 
     private LinkedFileNamePatternsPanelViewModel viewModel;
 
@@ -56,7 +57,7 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
         entryTypeColumn.setSortable(true);
         entryTypeColumn.setReorderable(false);
         entryTypeColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<LinkedFileNamePatternsItemModel, EntryType>()
+        new ValueTableCellFactory<PatternsItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
         this.setOnSort(event ->
@@ -68,13 +69,13 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
         patternColumn.setCellFactory(a -> new LinkedFileNamePatternsSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<LinkedFileNamePatternsItemModel, String> event) ->
+                (TableColumn.CellEditEvent<PatternsItemModel, String> event) ->
                         event.getRowValue().setPattern(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<LinkedFileNamePatternsItemModel, EntryType>()
+        new ValueTableCellFactory<PatternsItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
                         Localization.lang("Reset %s to default value").formatted(entryType.getDisplayName()))
@@ -95,11 +96,11 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
         viewModel.resetAll();
     }
 
-    public ListProperty<LinkedFileNamePatternsItemModel> patternListProperty() {
+    public ListProperty<PatternsItemModel> patternListProperty() {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<LinkedFileNamePatternsItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<PatternsItemModel> defaultNamePatternProperty() {
         return viewModel.defaultNamePatternProperty();
     }
 
@@ -120,9 +121,9 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
             .findFirst().ifPresent(this::scrollTo);
     }
 
-    private static class HighlightTableRow extends TableRow<LinkedFileNamePatternsItemModel> {
+    private static class HighlightTableRow extends TableRow<PatternsItemModel> {
         @Override
-        public void updateItem(LinkedFileNamePatternsItemModel item, boolean empty) {
+        public void updateItem(PatternsItemModel item, boolean empty) {
             super.updateItem(item, empty);
             if (item == null || item.getEntryType() == null) {
                 setStyle("");
