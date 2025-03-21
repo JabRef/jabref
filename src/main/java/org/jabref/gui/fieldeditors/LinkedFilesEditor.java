@@ -1,9 +1,12 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import jakarta.ws.rs.core.Link;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -98,8 +101,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         this.fieldCheckers = fieldCheckers;
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
@@ -120,7 +123,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
-                .withContextMenu(this::createContextMenuForFile)
+                .withContextMenu(this::getContextMenuForSelection)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -133,6 +136,16 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
+    }
+
+    private ContextMenu getContextMenuForSelection(LinkedFileViewModel linkedFile) {
+        ObservableList<LinkedFileViewModel> selectedFiles = listView.getSelectionModel().getSelectedItems();
+
+        if (selectedFiles.size() > 1) {
+            return createMultiSelectionContextMenu(selectedFiles);
+        }
+
+        return createContextMenuForFile(linkedFile);
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
@@ -312,6 +325,18 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return 3;
     }
 
+    private ContextMenu createMultiSelectionContextMenu(ObservableList<LinkedFileViewModel> selectedFiles) {
+        ContextMenu menu = new ContextMenu();
+        ActionFactory factory = new ActionFactory();
+
+        menu.getItems().addAll(
+                factory.createMenuItem(StandardActions.REMOVE_LINKS, new MultiContextAction(StandardActions.REMOVE_LINKS, selectedFiles, preferences))
+        );
+
+        return menu;
+    }
+
+
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
@@ -334,6 +359,39 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         );
 
         return menu;
+    }
+
+    private class MultiContextAction extends SimpleCommand {
+
+        private final StandardActions command;
+        private final ObservableList<LinkedFileViewModel> selectedFiles;
+        private final CliPreferences preferences;
+
+        public MultiContextAction(StandardActions command, ObservableList<LinkedFileViewModel> selectedFiles, CliPreferences preferences) {
+            this.command = command;
+            this.selectedFiles = selectedFiles;
+            this.preferences = preferences;
+
+            this.executable.bind(Bindings.createBooleanBinding(
+                    () -> !selectedFiles.isEmpty(),
+                    selectedFiles
+            ));
+        }
+
+        @Override
+        public void execute() {
+            System.out.println("Executing MultiContextAction: " + command);
+            List<LinkedFileViewModel> selectedFilesCopy = new ArrayList<>(selectedFiles);
+            for (LinkedFileViewModel linkedFile : selectedFilesCopy) {
+                System.out.println("Processing file: " + linkedFile.getFile().getLink());
+                new ContextAction(command, linkedFile, preferences).execute();
+                System.out.println("Finished processing: " + linkedFile.getFile().getLink());
+            }
+
+            System.out.println("MultiContextAction completed");
+        }
+
+
     }
 
     private class ContextAction extends SimpleCommand {
@@ -384,7 +442,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
                 case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
                 case DELETE_FILE -> viewModel.deleteFile(linkedFile);
-                case REMOVE_LINK -> viewModel.removeFileLink(linkedFile);
+                case REMOVE_LINK, REMOVE_LINKS -> viewModel.removeFileLink(linkedFile);
             }
         }
     }
