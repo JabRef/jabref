@@ -145,10 +145,6 @@ public class PatternSuggestionCell extends TextFieldTableCell<PatternsItemModel,
             }
 
             Window window = textField.getScene().getWindow();
-            if (window == null) {
-                return 0;
-            }
-
             Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
             double screenHeight = window.getHeight();
             double textFieldBottom = bounds.getMinY() + textField.getHeight();
