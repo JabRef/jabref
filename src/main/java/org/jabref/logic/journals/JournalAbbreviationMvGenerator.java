@@ -87,7 +87,7 @@ public class JournalAbbreviationMvGenerator {
      * @param mvFile  the target MV file.
      */
 
-    public static void convertCsvToMv(Path csvFile, Path mvFile) throws IOException, InterruptedException {
+    public static void convertCsvToMv(Path csvFile, Path mvFile) throws IOException {
 
         try (MVStore store = new MVStore.Builder()
                 .fileName(mvFile.toString())

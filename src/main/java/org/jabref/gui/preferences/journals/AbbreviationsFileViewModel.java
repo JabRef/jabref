@@ -58,13 +58,24 @@ public class AbbreviationsFileViewModel {
             throw new FileNotFoundException();
         }
     }
+    /**
+     * Reads journal abbreviations from the specified MV file and populates the abbreviations list.
+     * <p>
+     * If a valid file path is provided, this method loads abbreviations using
+     * {@link JournalAbbreviationMvGenerator#loadAbbreviationsFromMv(Path)} and converts them
+     * into {@link AbbreviationViewModel} objects before adding them to the  abbreviations list.
+     * </p>
+     *
+     * @throws IOException if the MV file cannot be found or read.
+     * @throws FileNotFoundException if no MV file path is specified.
+     */
 
     public void readAbbreviationsFromMv() throws IOException {
         if (path.isPresent()) {
             // Load abbreviations from the MV file using MV processor.
             Collection<Abbreviation> abbreviationList = JournalAbbreviationMvGenerator.loadAbbreviationsFromMv(path.get());
 
-            // Convert each Abbreviation into an AbbreviationViewModel and add it to the internal list.
+            // Convert each Abbreviation into an AbbreviationViewModel and add it to the  abbreviations list.
             for (Abbreviation abbreviation : abbreviationList) {
                 abbreviations.add(new AbbreviationViewModel(abbreviation));
             }

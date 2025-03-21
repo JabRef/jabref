@@ -39,12 +39,12 @@ public class JournalAbbreviationMvGeneratorTest {
         JournalAbbreviationMvGenerator.convertCsvToMv(csvFile, mvFile);
 
         // Verify the MV file is created
-        assertTrue(Files.exists(mvFile), "MV file should be created after conversion");
+        assertTrue(Files.exists(mvFile));
 
         // Load abbreviations from the MV file
         Collection<Abbreviation> abbreviations = JournalAbbreviationMvGenerator.loadAbbreviationsFromMv(mvFile);
         // Expecting 2 abbreviations as in the CSV file
-        assertEquals(2, abbreviations.size(), "MV file should contain 2 abbreviations");
+        assertEquals(2, abbreviations.size());
 
         // Check that the abbreviations match expected values
         boolean foundTestJournal = abbreviations.stream()
