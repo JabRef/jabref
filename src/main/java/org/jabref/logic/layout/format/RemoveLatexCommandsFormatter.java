@@ -1,3 +1,4 @@
+
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
