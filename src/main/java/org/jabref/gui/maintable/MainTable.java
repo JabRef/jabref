@@ -218,21 +218,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
 
-        // Create horizontal box for buttons
         HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Create a VBox with the label and horizontal button box
         VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
         placeholderBox.setAlignment(Pos.CENTER);
 
-        // Initial placeholder based on database content
         updatePlaceholder(placeholderBox);
 
-        // Listen for database changes
         database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox));
 
-        // Listen for filter changes
         this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox));
 
         // Enable sorting
@@ -591,16 +586,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private BibEntry addExampleEntry() {
         BibEntry exampleEntry = new BibEntry(StandardEntryType.Article);
-        exampleEntry.setField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker");
-        exampleEntry.setField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
-        exampleEntry.setField(StandardField.JOURNAL, "TUGboat");
-        exampleEntry.setField(StandardField.VOLUME, "44");
-        exampleEntry.setField(StandardField.NUMBER, "3");
-        exampleEntry.setField(StandardField.PAGES, "441--447");
-        exampleEntry.setField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
-        exampleEntry.setField(StandardField.ISSN, "0896-3207");
-        exampleEntry.setField(StandardField.ISSUE, "138");
-        exampleEntry.setField(StandardField.YEAR, "2023");
+        exampleEntry.withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker");
+        exampleEntry.withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
+        exampleEntry.withField(StandardField.JOURNAL, "TUGboat");
+        exampleEntry.withField(StandardField.VOLUME, "44");
+        exampleEntry.withField(StandardField.NUMBER, "3");
+        exampleEntry.withField(StandardField.PAGES, "441--447");
+        exampleEntry.withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
+        exampleEntry.withField(StandardField.ISSN, "0896-3207");
+        exampleEntry.withField(StandardField.ISSUE, "138");
+        exampleEntry.withField(StandardField.YEAR, "2023");
 
         database.getDatabase().insertEntry(exampleEntry);
         return exampleEntry;
@@ -609,10 +604,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void importPdfsButton() {
         List<Path> fileDirectories = database.getFileDirectories(filePreferences);
 
-        // check if file directories is not empty
         if (fileDirectories.isEmpty()) {
             dialogService.showWarningDialogAndWait(
-                    Localization.lang("File directory is not set or does not exist!"),
+                    Localization.lang("File directory is not set or does not exist"),
                     Localization.lang("Please configure a file directory"));
 
             LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
