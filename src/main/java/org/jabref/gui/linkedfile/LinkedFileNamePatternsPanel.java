@@ -12,6 +12,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.commonfxcontrols.PatternSuggestionCell;
 import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -66,7 +67,7 @@ public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
-        patternColumn.setCellFactory(a -> new LinkedFileNamePatternsSuggestionCell(patterns));
+        patternColumn.setCellFactory(a -> new PatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<PatternsItemModel, String> event) ->

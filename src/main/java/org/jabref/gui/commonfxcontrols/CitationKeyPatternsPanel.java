@@ -69,7 +69,7 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
-        patternColumn.setCellFactory(_ -> new CitationKeyPatternSuggestionCell(patterns));
+        patternColumn.setCellFactory(_ -> new PatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<PatternsItemModel, String> event) ->

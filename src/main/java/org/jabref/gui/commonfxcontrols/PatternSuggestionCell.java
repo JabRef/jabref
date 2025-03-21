@@ -1,7 +1,6 @@
-package org.jabref.gui.linkedfile;
+package org.jabref.gui.commonfxcontrols;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,15 +16,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Window;
 
-import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
 
-public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<PatternsItemModel, String> {
-    private final LinkedFileNamePatternSuggestionTextField searchField;
+public class PatternSuggestionCell extends TextFieldTableCell<PatternsItemModel, String> {
+    private final CitationKeyPatternSuggestionTextField searchField;
 
-    public LinkedFileNamePatternsSuggestionCell(List<String> linkedFileNamePatterns) {
-        this.searchField = new LinkedFileNamePatternSuggestionTextField(linkedFileNamePatterns);
+    public PatternSuggestionCell(List<String> citationKeyPatterns) {
+        this.searchField = new CitationKeyPatternSuggestionTextField(citationKeyPatterns);
         searchField.setOnAction(event -> commitEdit(searchField.getText()));
     }
 
@@ -61,13 +59,13 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Pat
         }
     }
 
-    static class LinkedFileNamePatternSuggestionTextField extends TextField {
-        private final List<String> linkedFileNamePatterns;
+    static class CitationKeyPatternSuggestionTextField extends TextField {
+        private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
         private int heightOfMenuItem;
 
-        public LinkedFileNamePatternSuggestionTextField(List<String> linkedFileNamePatterns) {
-            this.linkedFileNamePatterns = new ArrayList<>(linkedFileNamePatterns);
+        public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
+            this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
             this.suggestionsList = new ContextMenu();
             // Initial reasonable estimate before the menu items are populated. We overwrite this dynamically
             this.heightOfMenuItem = 30;
@@ -81,7 +79,7 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Pat
                 if (enteredText == null || enteredText.isEmpty()) {
                     suggestionsList.hide();
                 } else {
-                    List<String> filteredEntries = linkedFileNamePatterns.stream()
+                    List<String> filteredEntries = citationKeyPatterns.stream()
                                                                       .filter(e -> e.toLowerCase().contains(enteredText.toLowerCase()))
                                                                       .collect(Collectors.toList());
 
@@ -163,14 +161,15 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Pat
 
             Map<Pattern.Category, List<Pattern>> categorizedPatterns =
                     Pattern.getAllPatterns().stream()
-                                      .collect(Collectors.groupingBy(Pattern::getCategory));
+                           .collect(Collectors.groupingBy(Pattern::getCategory));
 
-            Map<Pattern.Category, String> categoryNames = new LinkedHashMap<>();
-            categoryNames.put(Pattern.Category.AUTHOR_RELATED, Localization.lang("Author related"));
-            categoryNames.put(Pattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
-            categoryNames.put(Pattern.Category.TITLE_RELATED, Localization.lang("Title related"));
-            categoryNames.put(Pattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
-            categoryNames.put(Pattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
+            Map<Pattern.Category, String> categoryNames = Map.of(
+                    Pattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    Pattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    Pattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    Pattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    Pattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
+            );
 
             for (Map.Entry<Pattern.Category, String> entry : categoryNames.entrySet()) {
                 Pattern.Category category = entry.getKey();
