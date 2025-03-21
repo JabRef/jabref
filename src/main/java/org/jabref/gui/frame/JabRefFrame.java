@@ -30,6 +30,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -50,6 +51,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -175,6 +177,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this.preferences.getLastFilesOpenedPreferences().getFileHistory(),
                 dialogService,
                 getOpenDatabaseAction());
+
+        fileHistory.disableProperty().bind(Bindings.isEmpty(fileHistory.getItems()));
+
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -225,7 +230,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(tabbedPane);
+        splitPane.getItems().add(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
@@ -350,8 +355,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
-            } else if (selectedTab == null) {
-                // All databases are closed
+            } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                // All databases are closed or {@link WelcomeTab} is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
             }
@@ -428,7 +433,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
+        if (tabbedPane.getSelectionModel().getSelectedItem() == null
+                || !(tabbedPane.getSelectionModel().getSelectedItem() instanceof LibraryTab)) {
             return null;
         }
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
@@ -436,6 +442,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
         tabbedPane.getSelectionModel().select(libraryTab);
+    }
+
+    public void showWelcomeTab() {
+        // The loop iterates through all tabs in tabbedPane to check if a WelcomeTab already exists. If yes, it is selected.
+        for (Tab tab : tabbedPane.getTabs()) {
+            if (!(tab instanceof LibraryTab)) {
+                tabbedPane.getSelectionModel().select(tab);
+                return;
+            }
+        }
+        // WelcomeTab not found
+
+        WelcomeTab welcomeTab = new WelcomeTab(
+                this,
+                preferences,
+                aiService,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                clipBoardManager,
+                taskExecutor,
+                fileHistory,
+                Injector.instantiateModelOrService(BuildInfo.class)
+        );
+        tabbedPane.getTabs().add(welcomeTab);
+        tabbedPane.getSelectionModel().select(welcomeTab);
     }
 
     /**

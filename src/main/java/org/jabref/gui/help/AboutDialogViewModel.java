@@ -15,6 +15,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.URLs;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
@@ -23,14 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
-
-    private static final String HOMEPAGE_URL = "https://www.jabref.org";
-    private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
-    private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
-    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE";
-    private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
-    private static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
@@ -123,15 +116,15 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openJabrefWebsite() {
-        openWebsite(HOMEPAGE_URL);
+        openWebsite(URLs.HOMEPAGE_URL);
     }
 
     public void openExternalLibrariesWebsite() {
-        openWebsite(LIBRARIES_URL);
+        openWebsite(URLs.LIBRARIES_URL);
     }
 
     public void openGithub() {
-        openWebsite(GITHUB_URL);
+        openWebsite(URLs.GITHUB_URL);
     }
 
     public void openChangeLog() {
@@ -139,15 +132,15 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openLicense() {
-        openWebsite(LICENSE_URL);
+        openWebsite(URLs.LICENSE_URL);
     }
 
     public void openContributors() {
-        openWebsite(CONTRIBUTORS_URL);
+        openWebsite(URLs.CONTRIBUTORS_URL);
     }
 
     public void openDonation() {
-        openWebsite(DONATION_URL);
+        openWebsite(URLs.DONATION_URL);
     }
 
     private void openWebsite(String url) {
@@ -160,6 +153,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openPrivacyPolicy() {
-        openWebsite(PRIVACY_POLICY_URL);
+        openWebsite(URLs.PRIVACY_POLICY_URL);
     }
 }
