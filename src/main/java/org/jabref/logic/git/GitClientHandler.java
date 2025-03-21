@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -139,12 +138,6 @@ public class GitClientHandler extends GitHandler {
                 LOGGER.error("Git push failed", e);
             }
         }
-    }
-
-    private Set<String> getChanged() throws IOException, GitAPIException {
-        Git git = Git.open(this.repositoryPathAsFile);
-
-        return git.status().call().getChanged();
     }
 
     /**
