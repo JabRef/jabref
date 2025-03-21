@@ -104,9 +104,9 @@ public class CleanupPreferences {
         /**
          * Abbreviate or unabbreviate journal titles
          */
-        ABBREVIATE_JOURNAL_DEFAULT,
-        ABBREVIATE_JOURNAL_DOTLESS,
-        ABBREVIATE_JOURNAL_SHORTEST_UNIQUE,
-        UNABBREVIATE_JOURNAL
+        ABBREVIATE_DEFAULT,
+        ABBREVIATE_DOTLESS,
+        ABBREVIATE_SHORTEST_UNIQUE,
+        UNABBREVIATE
     }
 }

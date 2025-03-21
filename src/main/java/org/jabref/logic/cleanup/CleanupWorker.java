@@ -93,12 +93,14 @@ public class CleanupWorker {
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
                     new ISSNCleanup();
-            case ABBREVIATE_JOURNAL_DEFAULT ->
+            case ABBREVIATE_DEFAULT ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJounalField);
-            case ABBREVIATE_JOURNAL_DOTLESS ->
+            case ABBREVIATE_DOTLESS ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DOTLESS, useFJounalField);
-            case ABBREVIATE_JOURNAL_SHORTEST_UNIQUE ->
+            case ABBREVIATE_SHORTEST_UNIQUE ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJounalField);
+            case UNABBREVIATE ->
+                    new UnabbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.VBox?>
@@ -44,6 +45,14 @@
          </VBox.margin>
          </VBox>
          <CheckBox fx:id="cleanUpDeletedFiles" text="Remove links to non existent files" />
+      </VBox>
+      <Label text="%Journal-related" />
+      <VBox>
+          <VBox.margin>
+            <Insets left="20.0" />
+          </VBox.margin>
+          <Label text="Choose how to handle journal names:" />
+          <ComboBox fx:id="journalCleanupSelector" />
       </VBox>
             <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
  <padding>
