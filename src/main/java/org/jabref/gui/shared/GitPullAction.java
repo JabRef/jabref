@@ -1,5 +1,6 @@
 package org.jabref.gui.shared;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -7,7 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -31,26 +32,27 @@ public class GitPullAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         Optional<Path> path = databaseContext.getDatabasePath();
         if (path.isEmpty()) {
             return;
         }
 
-        GitHandler gitHandler = new GitHandler(path.get().getParent(), false);
-        if (gitHandler.isGitRepository()) {
+        GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
+                dialogService,
+                preferences.getGitPreferences());
+        if (gitClientHandler.isGitRepository()) {
             try {
-                gitHandler.pullOnCurrentBranch();
-            } catch (Exception e) {
-                dialogService.showErrorDialogAndWait(e);
+                gitClientHandler.pullOnCurrentBranch();
+            } catch (IOException e) {
+                LOGGER.error("Failed to Pull", e);
             }
         } else {
-            LOGGER.info(String.valueOf(path.get()));
-            LOGGER.info("Not a git repository");
+            LOGGER.info("Not a git repository at path: {}", path.get());
         }
     }
 }

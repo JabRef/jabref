@@ -32,10 +32,9 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -239,16 +238,10 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
-                // Push if path is a repository
-                if (
-                        preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
-                        preferences.getGitPreferences().getAutoPushEnabled()
-                ) {
-                    GitHandler gitHandler = new GitHandler(targetPath.getParent(), false);
-                    if (gitHandler.isGitRepository()) {
-                        gitHandler.postSaveDatabaseAction();
-                    }
-                }
+                new GitClientHandler(targetPath.getParent(),
+                        dialogService,
+                        preferences.getGitPreferences())
+                        .postSaveDatabaseAction();
             }
             dialogService.notify(Localization.lang("Library saved"));
             return success;

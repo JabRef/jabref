@@ -100,6 +100,16 @@
             <Insets top="-8.0"/>
         </padding>
     </HBox>
+
+    <HBox spacing="10">
+        <Label text="GitHub Username:"/>
+        <TextField fx:id="gitHubUsernameField"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="GitHub Passkey:"/>
+        <TextField fx:id="gitHubPasskeyField"/>
+    </HBox>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <CheckBox fx:id="autoPushCheckbox" text="Auto Push"/>
         <ComboBox fx:id="autoPushModeComboBox"/>

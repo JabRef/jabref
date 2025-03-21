@@ -1,8 +1,9 @@
 package org.jabref.logic.preferences;
 
+import org.jabref.logic.l10n.Localization;
+
 public enum AutoPushMode {
-    MANUALLY("Manually"),
-    ON_SAVE("On Save");
+    ON_SAVE(Localization.lang("On save"));
 
     private final String displayName;
 
@@ -25,6 +26,6 @@ public enum AutoPushMode {
                 return mode;
             }
         }
-        return MANUALLY;
+        return ON_SAVE;
     }
 }

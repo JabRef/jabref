@@ -28,7 +28,7 @@ public class GitHandler {
     final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
      * Initialize the handler for the given repository
@@ -68,7 +68,7 @@ public class GitHandler {
                         }
                     }
                 } catch (GitAPIException | IOException e) {
-                    LOGGER.error("Initialization failed");
+                    LOGGER.error("Initialization failed.", e);
                 }
             }
         }
@@ -192,7 +192,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push: ".concat(e.toString()));
+                LOGGER.error("Git push failed", e);
             }
         }
     }
@@ -204,7 +204,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to pull".concat(e.toString()));
+                LOGGER.error("Git pull failed", e);
             }
         }
     }
@@ -212,15 +212,6 @@ public class GitHandler {
     public String getCurrentlyCheckedOutBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
-        }
-    }
-
-    public void postSaveDatabaseAction() {
-        try {
-            this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-            this.pushCommitsToRemoteRepository();
-        } catch (Exception e) {
-            LOGGER.info("Failed to push".concat(e.toString()));
         }
     }
 }

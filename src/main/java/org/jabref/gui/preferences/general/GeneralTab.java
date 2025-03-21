@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.general;
 import java.util.regex.Pattern;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -53,6 +52,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox alwaysReformatBib;
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
+    @FXML private TextField gitHubUsernameField;
+    @FXML private TextField gitHubPasskeyField;
     @FXML private CheckBox autoPushCheckbox;
     @FXML private ComboBox<AutoPushMode> autoPushModeComboBox;
     @FXML private CheckBox createBackup;
@@ -133,8 +134,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
+        gitHubUsernameField.textProperty().bindBidirectional(viewModel.gitHubUsernameProperty());
+        gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
+
         autoPushCheckbox.selectedProperty().bindBidirectional(viewModel.autoPushEnabledProperty());
-        autoPushModeComboBox.setItems(FXCollections.observableArrayList(AutoPushMode.values()));
+        autoPushModeComboBox.setItems(viewModel.autoPushModeListProperty());
         autoPushModeComboBox.valueProperty().bindBidirectional(viewModel.autoPushModeProperty());
 
         ActionFactory actionFactory = new ActionFactory();

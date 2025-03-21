@@ -1831,18 +1831,30 @@ public class JabRefCliPreferences implements CliPreferences {
             return gitPreferences;
         }
 
-        boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false); // Loads stored preference, initially false
-        String storedMode = getString("gitAutoPushMode", AutoPushMode.MANUALLY.name());
-        AutoPushMode autoPushMode = AutoPushMode.fromString(storedMode); // Safely parse
+        boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
+        String storedMode = getString("gitAutoPushMode", AutoPushMode.ON_SAVE.name());
+        AutoPushMode autoPushMode = AutoPushMode.fromString(storedMode);
 
-        gitPreferences = new GitPreferences(autoPushEnabled, autoPushMode);
+        String gitHubUsername = getString("gitHubUsername", "");
+        String gitHubPasskey = getString("gitHubPasskey", "");
 
-        // Automatically save changes when properties are updated
-        EasyBind.listen(gitPreferences.getAutoPushEnabledProperty(),
-                (obs, oldValue, newValue) -> putBoolean("gitAutoPushEnabled", newValue));
+        gitPreferences = new GitPreferences(autoPushEnabled, autoPushMode, gitHubUsername, gitHubPasskey);
 
-        EasyBind.listen(gitPreferences.getAutoPushModeProperty(),
-                (obs, oldValue, newValue) -> putString("gitAutoPushMode", newValue.name()));
+        EasyBind.listen(gitPreferences.getAutoPushEnabledProperty(), (obs, oldValue, newValue) ->
+                putBoolean("gitAutoPushEnabled", newValue)
+        );
+
+        EasyBind.listen(gitPreferences.getAutoPushModeProperty(), (obs, oldValue, newValue) ->
+                putString("gitAutoPushMode", newValue.name())
+        );
+
+        EasyBind.listen(gitPreferences.gitHubUsernameProperty(), (obs, oldValue, newValue) ->
+                putString("gitHubUsername", newValue)
+        );
+
+        EasyBind.listen(gitPreferences.gitHubPasskeyProperty(), (obs, oldValue, newValue) ->
+                putString("gitHubPasskey", newValue)
+        );
 
         return gitPreferences;
     }

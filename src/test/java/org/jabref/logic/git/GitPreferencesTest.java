@@ -1,7 +1,6 @@
 package org.jabref.logic.git;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 
 import org.jabref.logic.preferences.AutoPushMode;
 
@@ -16,45 +15,36 @@ class GitPreferencesTest {
 
     @BeforeEach
     void setUp() {
-        gitPreferences = new GitPreferences(true, AutoPushMode.ON_SAVE);
+        gitPreferences = new GitPreferences(true, AutoPushMode.ON_SAVE, "", "");
     }
 
     @Test
-    void testConstructorInitialisesValues() {
+    void constructorInitialisesValues() {
         assertThat(gitPreferences.getAutoPushEnabled()).isTrue();
         assertThat(gitPreferences.getAutoPushMode()).isEqualTo(AutoPushMode.ON_SAVE);
     }
 
     @Test
-    void testGettersReturnCorrectValues() {
+    void gettersReturnCorrectValues() {
         assertThat(gitPreferences.getAutoPushEnabled()).isTrue();
         assertThat(gitPreferences.getAutoPushMode()).isEqualTo(AutoPushMode.ON_SAVE);
     }
 
     @Test
-    void testSetAutoPushEnabledUpdatesValue() {
+    void setAutoPushEnabledUpdatesValue() {
         gitPreferences.setAutoPushEnabled(false);
         assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
     }
 
     @Test
-    void testJavaFXBooleanPropertyUpdates() {
+    void javaFXBooleanPropertyUpdates() {
         BooleanProperty autoPushProperty = gitPreferences.getAutoPushEnabledProperty();
         autoPushProperty.set(false);
         assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
     }
 
     @Test
-    void testAutoPushModeUpdates() {
-        ObjectProperty<AutoPushMode> autoPushModeProperty = gitPreferences.getAutoPushModeProperty();
-        autoPushModeProperty.set(AutoPushMode.MANUALLY);
-        assertThat(gitPreferences.getAutoPushMode()).isEqualTo(AutoPushMode.MANUALLY);
-    }
-
-    @Test
-    void testAutoPushModeFromString() {
+    void autoPushModeFromString() {
         assertThat(AutoPushMode.fromString("On Save")).isEqualTo(AutoPushMode.ON_SAVE);
-        assertThat(AutoPushMode.fromString("Manually")).isEqualTo(AutoPushMode.MANUALLY);
-        assertThat(AutoPushMode.fromString("invalid")).isEqualTo(AutoPushMode.MANUALLY);
     }
 }

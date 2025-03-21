@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitClientHandler;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CheckForVersionControlAction implements GUIPostOpenAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckForVersionControlAction.class);
-    private GitHandler gitHandler;
+    private GitClientHandler gitClientHandler;
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
@@ -27,8 +27,10 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         if (path.isEmpty()) {
             return false;
         }
-        this.gitHandler = new GitHandler(path.get());
-        return gitHandler.isGitRepository();
+        this.gitClientHandler = new GitClientHandler(path.get(),
+                dialogService,
+                preferences.getGitPreferences());
+        return gitClientHandler.isGitRepository();
     }
 
     @Override
@@ -36,7 +38,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         parserResult.getDatabaseContext().setVersioned(true);
 
         try {
-            this.gitHandler.pullOnCurrentBranch();
+            this.gitClientHandler.pullOnCurrentBranch();
         } catch (IOException e) {
             LOGGER.error("Failed to pull.", e);
         }

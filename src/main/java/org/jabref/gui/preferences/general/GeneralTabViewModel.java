@@ -66,6 +66,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
 
+    private final ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AutoPushMode.values()));
+    private final ObjectProperty<AutoPushMode> autoPushModeProperty = new SimpleObjectProperty<>();
+
     private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
 
     // init with empty string to avoid npe in accessing
@@ -197,6 +201,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         autoPushEnabledProperty().setValue(gitPreferences.getAutoPushEnabled());
         autoPushModeProperty().setValue(gitPreferences.getAutoPushMode());
+        gitHubUsernameProperty().setValue(gitPreferences.getGitHubUsername());
+        gitHubPasskeyProperty().setValue(gitPreferences.getGitHubPasskey());
 
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
@@ -239,7 +245,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
         gitPreferences.setAutoPushEnabled(autoPushEnabledProperty().get());
-        gitPreferences.getAutoPushModeProperty().set(autoPushModeProperty().get());
+        gitPreferences.setAutoPushMode(autoPushModeProperty().get());
+        gitPreferences.setGitHubUsername(gitHubUsernameProperty().get());
+        gitPreferences.setGitHubPasskey(gitHubPasskeyProperty().get());
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
@@ -441,7 +449,19 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return gitPreferences.getAutoPushEnabledProperty();
     }
 
+    public ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty() {
+        return this.autoPushModeListProperty;
+    }
+
     public ObjectProperty<AutoPushMode> autoPushModeProperty() {
-        return gitPreferences.getAutoPushModeProperty();
+        return this.autoPushModeProperty;
+    }
+
+    public StringProperty gitHubUsernameProperty() {
+        return gitPreferences.gitHubUsernameProperty();
+    }
+
+    public StringProperty gitHubPasskeyProperty() {
+        return gitPreferences.gitHubPasskeyProperty();
     }
 }
