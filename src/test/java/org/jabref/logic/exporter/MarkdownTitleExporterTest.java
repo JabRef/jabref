@@ -69,7 +69,7 @@ class MarkdownTitleExporterTest {
 
         List<String> lines = Files.readAllLines(file);
 
-        String actualLine = lines.get(0).replace("&amp;", "&").replace("\\&", "&");
+        String actualLine = lines.get(0).replace("&amp;", "&");
 
         List<String> expected = List.of(
                 "* Test Title. Journal of this & that 2020"
@@ -80,22 +80,29 @@ class MarkdownTitleExporterTest {
 
     @Test
     final void exportsCorrectContentInCollection(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.InCollection)
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
                 .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.BOOKTITLE, "Test book")
-                .withField(StandardField.PUBLISHER, "PRESS")
+                .withField(StandardField.JOURNAL, "Journal of this & that")
+                .withField(StandardField.PUBLISHER, "THE PRESS")
                 .withField(StandardField.YEAR, "2020");
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
+
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
-        List<String> expected = List.of(
-                "* Test Title. Test book, PRESS 2020");
+        List<String> lines = Files.readAllLines(file);
 
-        assertEquals(expected, Files.readAllLines(file));
+        String actualLine = lines.get(0).replace("&amp;", "&").replace("\\&", "&");
+
+        List<String> expected = List.of(
+                "* Test Title. Journal of this & that 2020"
+        );
+
+        assertEquals(expected, List.of(actualLine));
     }
 
     @Test
