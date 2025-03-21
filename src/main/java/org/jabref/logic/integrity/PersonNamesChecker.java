@@ -39,7 +39,7 @@ public class PersonNamesChecker implements ValueChecker {
         AuthorList authorList = AuthorList.parse(value);
         if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
                 && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
-            return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
+            return Optional.of(IntegrityIssue.NAMES_ARE_NOT_IN_THE_STANDARD_FORMAT.getText(bibMode.getFormattedName()));
         }
 
         return Optional.empty();
