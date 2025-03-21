@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -93,7 +94,7 @@ public class CleanupWorker {
             case CLEAN_UP_ISSN ->
                     new ISSNCleanup();
             case ABBREVIATE_JOURNAL_DEFAULT ->
-                    new AbbreviateJournalDefaultCleanup(databaseContext.getDatabase(), abbreviationRepository, useFJounalField);
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJounalField);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

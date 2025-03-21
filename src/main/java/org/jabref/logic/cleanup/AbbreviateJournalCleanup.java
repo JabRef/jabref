@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
@@ -14,14 +15,16 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-public class AbbreviateJournalDefaultCleanup implements CleanupJob {
+public class AbbreviateJournalCleanup implements CleanupJob {
     private final BibDatabase database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationType abbreviationType;
     private final boolean useFJournalField;
 
-    public AbbreviateJournalDefaultCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, boolean useFJournalField) {
+    public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
         this.database = database;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.abbreviationType = abbreviationType;
         this.useFJournalField = useFJournalField;
     }
 
@@ -52,7 +55,7 @@ public class AbbreviateJournalDefaultCleanup implements CleanupJob {
         }
 
         Abbreviation abbreviation = foundAbbrev.get();
-        String newText = abbreviation.getAbbreviation(); // “default” abbreviation
+        String newText = getAbbreviatedName(abbreviation);
 
         if (newText.equals(originalText)) {
             return Collections.emptyList();
@@ -71,5 +74,18 @@ public class AbbreviateJournalDefaultCleanup implements CleanupJob {
         changes.add(new FieldChange(entry, fieldName, originalText, newText));
 
         return changes;
+    }
+
+    private String getAbbreviatedName(Abbreviation text) {
+        return switch (abbreviationType) {
+            case DEFAULT ->
+                    text.getAbbreviation();
+            case DOTLESS ->
+                    text.getDotlessAbbreviation();
+            case SHORTEST_UNIQUE ->
+                    text.getShortestUniqueAbbreviation();
+            default ->
+                    throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
+        };
     }
 }

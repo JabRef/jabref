@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
@@ -20,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 
-class AbbreviateJournalDefaultCleanupTest {
+class AbbreviateJournalCleanupTest {
 
-    private AbbreviateJournalDefaultCleanup cleanupWithoutFJournal;
-    private AbbreviateJournalDefaultCleanup cleanupWithFJournal;
+    private AbbreviateJournalCleanup cleanupWithoutFJournal;
+    private AbbreviateJournalCleanup cleanupWithFJournal;
     private JournalAbbreviationRepository repositoryMock;
     private BibDatabase databaseMock;
 
@@ -37,8 +38,9 @@ class AbbreviateJournalDefaultCleanupTest {
         repositoryMock = Mockito.mock(JournalAbbreviationRepository.class);
         Mockito.when(repositoryMock.get(Mockito.anyString())).thenReturn(Optional.empty());
 
-        cleanupWithoutFJournal = new AbbreviateJournalDefaultCleanup(databaseMock, repositoryMock, false);
-        cleanupWithFJournal = new AbbreviateJournalDefaultCleanup(databaseMock, repositoryMock, true);
+        cleanupWithoutFJournal = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT,
+                false);
+        cleanupWithFJournal = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, true);
     }
 
     @Test
