@@ -8,16 +8,19 @@ import java.util.Optional;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 public class AbbreviateJournalDefaultCleanup implements CleanupJob {
+    private final BibDatabase database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final boolean useFJournalField;
 
-    public AbbreviateJournalDefaultCleanup(JournalAbbreviationRepository journalAbbreviationRepository, boolean useFJournalField) {
+    public AbbreviateJournalDefaultCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, boolean useFJournalField) {
+        this.database = database;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.useFJournalField = useFJournalField;
     }
@@ -37,17 +40,21 @@ public class AbbreviateJournalDefaultCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        String oldValue = entry.getField(fieldName).orElse(null);
-        Optional<Abbreviation> foundAbbrev = journalAbbreviationRepository.get(oldValue);
+        String text = entry.getField(fieldName).orElse(null);
+        String originalText = text;
+        if (database != null) {
+            text = database.resolveForStrings(text);
+        }
+        Optional<Abbreviation> foundAbbrev = journalAbbreviationRepository.get(text);
 
         if (foundAbbrev.isEmpty()) {
             return Collections.emptyList();
         }
 
         Abbreviation abbreviation = foundAbbrev.get();
-        String newValue = abbreviation.getAbbreviation(); // “default” abbreviation
+        String newText = abbreviation.getAbbreviation(); // “default” abbreviation
 
-        if (newValue.equals(oldValue)) {
+        if (newText.equals(originalText)) {
             return Collections.emptyList();
         }
 
@@ -60,8 +67,8 @@ public class AbbreviateJournalDefaultCleanup implements CleanupJob {
             changes.add(new FieldChange(entry, AMSField.FJOURNAL, oldFjournalValue, newFjournalValue));
         }
 
-        entry.setField(fieldName, newValue);
-        changes.add(new FieldChange(entry, fieldName, oldValue, newValue));
+        entry.setField(fieldName, newText);
+        changes.add(new FieldChange(entry, fieldName, originalText, newText));
 
         return changes;
     }

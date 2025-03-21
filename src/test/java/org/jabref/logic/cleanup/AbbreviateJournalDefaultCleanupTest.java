@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
@@ -17,31 +18,32 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
-/**
- * Tests for {@link AbbreviateJournalDefaultCleanup}.
- */
 class AbbreviateJournalDefaultCleanupTest {
 
     private AbbreviateJournalDefaultCleanup cleanupWithoutFjournal;
     private AbbreviateJournalDefaultCleanup cleanupWithFjournal;
     private JournalAbbreviationRepository repositoryMock;
+    private BibDatabase databaseMock;
 
     @BeforeEach
     void setUp() {
+        databaseMock = Mockito.mock(BibDatabase.class);
+
+        Mockito.when(databaseMock.resolveForStrings(anyString()))
+               .thenAnswer(invocation -> invocation.getArgument(0, String.class));
+
         repositoryMock = Mockito.mock(JournalAbbreviationRepository.class);
+        Mockito.when(repositoryMock.get(Mockito.anyString())).thenReturn(Optional.empty());
 
-        Mockito.when(repositoryMock.get(any())).thenReturn(Optional.empty());
-
-        cleanupWithoutFjournal = new AbbreviateJournalDefaultCleanup(repositoryMock, false);
-        cleanupWithFjournal = new AbbreviateJournalDefaultCleanup(repositoryMock, true);
+        cleanupWithoutFjournal = new AbbreviateJournalDefaultCleanup(databaseMock, repositoryMock, false);
+        cleanupWithFjournal = new AbbreviateJournalDefaultCleanup(databaseMock, repositoryMock, true);
     }
 
     @Test
     void noJournalFieldsMeansNoChange() {
         BibEntry entry = new BibEntry();
-
         List<FieldChange> changes = cleanupWithoutFjournal.cleanup(entry);
         assertTrue(changes.isEmpty(), "Expected no changes when neither field is present");
     }
@@ -125,5 +127,17 @@ class AbbreviateJournalDefaultCleanupTest {
         assertEquals("Phys. Rev. Lett.", c.getNewValue());
 
         assertEquals(Optional.of("Phys. Rev. Lett."), entry.getField(StandardField.JOURNALTITLE));
+    }
+
+    @Test
+    void testResolveForStringsIsCalled() {
+        Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
+        Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
+
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Journal of Foo");
+
+        cleanupWithoutFjournal.cleanup(entry);
+
+        Mockito.verify(databaseMock).resolveForStrings("Journal of Foo");
     }
 }
