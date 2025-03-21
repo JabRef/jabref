@@ -9,8 +9,8 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;

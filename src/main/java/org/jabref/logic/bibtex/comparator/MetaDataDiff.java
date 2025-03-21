@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.GroupTreeNode;

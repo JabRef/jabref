@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.preferences.CliPreferences;

@@ -15,9 +15,9 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;

@@ -10,8 +10,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
