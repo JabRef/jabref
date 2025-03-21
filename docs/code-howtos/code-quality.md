@@ -33,6 +33,11 @@ We use [GitHub's dependabot](https://docs.github.com/en/code-security/getting-st
 Moreover, we try to test JabRef with the latest Java Development Kit (JDK) builds.
 Our results can be seen at the [Quality Outreach page](https://wiki.openjdk.org/display/quality/Quality+Outreach).
 
+## Statistics
+
+* [![Test Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
+* [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=main)
+
 ## Background literature
 
 We strongly recommend reading following two books on code quality:

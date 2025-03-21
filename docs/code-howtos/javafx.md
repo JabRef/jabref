@@ -212,7 +212,7 @@ DialogService dialogService = Injector.instantiateModelOrService(DialogService.c
 ## Properties and Bindings
 
 JabRef makes heavy use of Properties and Bindings. These are wrappers around Observables. A good explanation on the concept can be found here:
-[JavaFX Bindings and Properties](https://edencoding.com/javafx-properties-and-binding-a-complete-guide/)
+[JavaFX Bindings and Properties](https://web.archive.org/web/20240921154452/https://edencoding.com/javafx-properties-and-binding-a-complete-guide/)
 
 ## Features missing in JavaFX
 
