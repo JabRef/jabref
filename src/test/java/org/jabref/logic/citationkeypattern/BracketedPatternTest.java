@@ -68,7 +68,8 @@ class BracketedPatternTest {
                 Arguments.of("AachenBerlinChemnitzDüsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AachenBerlinChemnitzDüsseldorfEssen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -78,6 +79,25 @@ class BracketedPatternTest {
     }
 
     static Stream<Arguments> authorsAlpha() {
+        return Stream.of(
+                Arguments.of("A+", "Alexander Artemenko and others"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authorsAlpha(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    }
+
+    static Stream<Arguments> authorsAlphaLNI() {
         return Stream.of(
                 Arguments.of("Ar", "Alexander Artemenko and others"),
                 Arguments.of("Aa", "Aachen and others"),
@@ -104,8 +124,8 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @MethodSource
-    void authorsAlpha(String expected, AuthorList list) {
-        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    void authorsAlphaLNI(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlphaLNI(list));
     }
 
     /**
@@ -128,7 +148,8 @@ class BracketedPatternTest {
                 Arguments.of("AacheBCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AacheBCD+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AacheBCDE", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -152,7 +173,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -176,7 +198,8 @@ class BracketedPatternTest {
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -201,7 +224,8 @@ class BracketedPatternTest {
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -226,7 +250,8 @@ class BracketedPatternTest {
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -250,7 +275,8 @@ class BracketedPatternTest {
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -274,7 +300,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -298,7 +325,8 @@ class BracketedPatternTest {
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
                 Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others")
+        );
     }
 
     @ParameterizedTest
@@ -321,7 +349,8 @@ class BracketedPatternTest {
             "'New', '[auth3]', 'Isaac Newton'",
             "'New', '[auth3_1]', 'Isaac Newton'",
             "'Newton', '[authshort]', 'Isaac Newton'",
-            "'Ne', '[authorsAlpha]', 'Isaac Newton'",
+            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Ne', '[authorsAlphaLNI]', 'Isaac Newton'",
             "'Newton', '[authorLast]', 'Isaac Newton'",
             "'I', '[authorLastForeIni]', 'Isaac Newton'",
 

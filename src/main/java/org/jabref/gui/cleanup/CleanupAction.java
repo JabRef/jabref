@@ -145,7 +145,7 @@ public class CleanupAction extends SimpleCommand {
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
         this.failures.clear();
-        NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entries"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Clean up entries"));
 
         for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level

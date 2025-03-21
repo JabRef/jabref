@@ -27,6 +27,7 @@
         </padding>
     </CheckBox>
     <CheckBox fx:id="generateOnSave" text="%Generate keys before saving (for entries without a key)"/>
+    <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
 
     <Label text="%Letters after duplicate generated keys"/>
     <VBox spacing="10.0">

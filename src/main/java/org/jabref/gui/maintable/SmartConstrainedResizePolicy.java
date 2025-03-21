@@ -41,7 +41,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             double totalPrefWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();
             double currPrefWidth = 0;
             if (totalPrefWidth > 0) {
-                for (TableColumnBase col : visibleLeafColumns) {
+                for (TableColumnBase<?, ?> col : visibleLeafColumns) {
                     double share = col.getPrefWidth() / totalPrefWidth;
                     double newSize = tableWidth * share;
 
@@ -60,7 +60,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         return false;
     }
 
-    private void resize(TableColumnBase column, double delta) {
+    private void resize(TableColumnBase<?, ?> column, double delta) {
         // We have to use reflection since TableUtil is not visible to us
         try {
             // TODO: reflective access, should be removed
@@ -82,7 +82,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                 visibleLeafColumns);
     }
 
-    private Boolean constrainedResize(TableView.ResizeFeatures prop, Boolean isFirstRun, Double contentWidth, List<? extends TableColumnBase<?, ?>> visibleLeafColumns) {
+    private Boolean constrainedResize(TableView.ResizeFeatures<?> prop, Boolean isFirstRun, Double contentWidth, List<? extends TableColumnBase<?, ?>> visibleLeafColumns) {
         // We have to use reflection since TableUtil is not visible to us
         try {
             // TODO: reflective access, should be removed

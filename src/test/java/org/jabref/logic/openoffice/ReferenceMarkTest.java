@@ -43,6 +43,12 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_key5 CID_11111, JABREF_key6 CID_22222, JABREF_key7 CID_33333 uniqueId4",
                         List.of("key5", "key6", "key7"), List.of(11111, 22222, 33333), "uniqueId4"
+                ),
+
+                // Non-standard citation key
+                Arguments.of(
+                        "JABREF_willberg-forssman:1997b CID_5 yov3b0su",
+                        List.of("willberg-forssman:1997b"), List.of(5), "yov3b0su"
                 )
         );
     }

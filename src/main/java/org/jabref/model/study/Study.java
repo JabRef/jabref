@@ -116,7 +116,7 @@ public class Study {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this);
+        return Objects.hash(authors, title, researchQuestions, queries, databases);
     }
 }
 
