@@ -1,4 +1,4 @@
-package org.jabref.gui.commonfxcontrols;
+package org.jabref.gui.linkedfile;
 
 import java.util.Collection;
 
@@ -12,33 +12,31 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.commonfxcontrols.PatternSuggestionCell;
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
-public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
+public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
 
     @FXML public TableColumn<PatternsItemModel, EntryType> entryTypeColumn;
     @FXML public TableColumn<PatternsItemModel, String> patternColumn;
     @FXML public TableColumn<PatternsItemModel, EntryType> actionsColumn;
 
-    @Inject private CliPreferences preferences;
-
-    private CitationKeyPatternsPanelViewModel viewModel;
+    private LinkedFileNamePatternsPanelViewModel viewModel;
 
     private long lastKeyPressTime;
     private String tableSearchTerm;
     private final ObservableList<String> patterns;
 
-    public CitationKeyPatternsPanel() {
+    public LinkedFileNamePatternsPanel() {
         super();
         this.patterns = FXCollections.observableArrayList(
                 Pattern.getAllPatterns().stream()
@@ -53,7 +51,7 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
 
     @FXML
     private void initialize() {
-        viewModel = new CitationKeyPatternsPanelViewModel(preferences.getCitationKeyPatternPreferences());
+        viewModel = new LinkedFileNamePatternsPanelViewModel();
 
         this.setEditable(true);
 
@@ -64,12 +62,12 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
         this.setOnSort(event ->
-                viewModel.patternListProperty().sort(CitationKeyPatternsPanelViewModel.defaultOnTopComparator));
+                viewModel.patternListProperty().sort(LinkedFileNamePatternsPanelViewModel.defaultOnTopComparator));
 
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
-        patternColumn.setCellFactory(_ -> new PatternSuggestionCell(patterns));
+        patternColumn.setCellFactory(a -> new PatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<PatternsItemModel, String> event) ->
@@ -91,7 +89,7 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns keyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns keyPattern) {
         viewModel.setValues(entryTypeList, keyPattern);
     }
 
@@ -103,8 +101,8 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<PatternsItemModel> defaultKeyPatternProperty() {
-        return viewModel.defaultKeyPatternProperty();
+    public ObjectProperty<PatternsItemModel> defaultNamePatternProperty() {
+        return viewModel.defaultNamePatternProperty();
     }
 
     private void jumpToSearchKey(KeyEvent keypressed) {
@@ -132,7 +130,7 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
                 setStyle("");
             } else if (isSelected()) {
                 setStyle("-fx-background-color: -fx-selection-bar");
-            } else if (CitationKeyPatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME.equals(item.getEntryType().getName())) {
+            } else if (LinkedFileNamePatternsPanelViewModel.ENTRY_TYPE_DEFAULT_NAME.equals(item.getEntryType().getName())) {
                 setStyle("-fx-background-color: -fx-default-button");
             } else {
                 setStyle("");

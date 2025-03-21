@@ -1,4 +1,4 @@
-package org.jabref.gui.commonfxcontrols;
+package org.jabref.gui.linkedfile;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -9,15 +9,14 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
-public class CitationKeyPatternsPanelViewModel {
-
+public class LinkedFileNamePatternsPanelViewModel {
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
     public static Comparator<PatternsItemModel> defaultOnTopComparator = (o1, o2) -> {
@@ -38,18 +37,14 @@ public class CitationKeyPatternsPanelViewModel {
     private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PatternsItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
+    public LinkedFileNamePatternsPanelViewModel() { }
 
-    public CitationKeyPatternsPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
-        this.keyPatternPreferences = keyPatternPreferences;
-    }
-
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialNamePattern) {
         String defaultPattern;
-        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
+        if ((initialNamePattern.getDefaultValue() == null) || initialNamePattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
             defaultPattern = "";
         } else {
-            defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();
+            defaultPattern = initialNamePattern.getDefaultValue().stringRepresentation();
         }
 
         defaultItemProperty.setValue(new PatternsItemModel(new DefaultEntryType(), defaultPattern));
@@ -60,29 +55,29 @@ public class CitationKeyPatternsPanelViewModel {
                      .map(BibEntryType::getType)
                      .forEach(entryType -> {
                          String pattern;
-                         if (initialKeyPattern.isDefaultValue(entryType)) {
+                         if (initialNamePattern.isDefaultValue(entryType)) {
                              pattern = "";
                          } else {
-                             pattern = initialKeyPattern.getPatterns().get(entryType).stringRepresentation();
+                             pattern = initialNamePattern.getPatterns().get(entryType).stringRepresentation();
                          }
                          patternListProperty.add(new PatternsItemModel(entryType, pattern));
                      });
     }
 
     public void setItemToDefaultPattern(PatternsItemModel item) {
-        item.setPattern(keyPatternPreferences.getDefaultPattern());
+        item.setPattern(Pattern.AUTHOR_YEAR.stringRepresentation());
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());
+        defaultItemProperty.getValue().setPattern(ENTRY_TYPE_DEFAULT_NAME);
     }
 
     public ListProperty<PatternsItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<PatternsItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<PatternsItemModel> defaultNamePatternProperty() {
         return defaultItemProperty;
     }
 
