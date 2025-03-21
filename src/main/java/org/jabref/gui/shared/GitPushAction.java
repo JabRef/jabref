@@ -45,7 +45,7 @@ public class GitPushAction extends SimpleCommand {
 
         GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
                 dialogService,
-                preferences.getGitPreferences());
+                preferences);
         if (gitClientHandler.isGitRepository()) {
             try {
                 gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);

@@ -240,7 +240,7 @@ public class SaveDatabaseAction {
                 libraryTab.resetChangedProperties();
                 new GitClientHandler(targetPath.getParent(),
                         dialogService,
-                        preferences.getGitPreferences())
+                        preferences)
                         .postSaveDatabaseAction();
             }
             dialogService.notify(Localization.lang("Library saved"));

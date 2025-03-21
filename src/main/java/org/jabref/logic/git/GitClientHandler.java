@@ -1,12 +1,23 @@
 package org.jabref.logic.git;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoPushMode;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
@@ -16,18 +27,18 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 public class GitClientHandler extends GitHandler {
     private final DialogService dialogService;
-    private final GitPreferences gitPreferences;
+    private final CliPreferences preferences;
 
     public GitClientHandler(Path repositoryPath,
                             DialogService dialogService,
-                            GitPreferences gitPreferences) {
+                            CliPreferences preferences) {
         super(repositoryPath, false);
         this.dialogService = dialogService;
-        this.gitPreferences = gitPreferences;
+        this.preferences = preferences;
 
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                gitPreferences.getGitHubUsername(),
-                gitPreferences.getGitHubPasskey()
+                preferences.getGitPreferences().getGitHubUsername(),
+                preferences.getGitPreferences().getGitHubPasskey()
         );
     }
 
@@ -39,8 +50,16 @@ public class GitClientHandler extends GitHandler {
      */
     public void postSaveDatabaseAction() {
         if (this.isGitRepository() &&
-                gitPreferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
-                gitPreferences.getAutoPushEnabled()) {
+                preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
+                preferences.getGitPreferences().getAutoPushEnabled()) {
+            // Save BibDatabaseContext of bib files in current HEAD
+            List<Optional<BibDatabaseContext>> baseBibContextList;
+            try {
+                baseBibContextList = this.getChangedBibDatabaseContextList(this.getChangedFilesFromHeadToIndex());
+            } catch (IOException | GitAPIException e) {
+                LOGGER.error("Failed to save changes from HEAD to index");
+            }
+
             try {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
@@ -49,6 +68,12 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
+                List<Optional<BibDatabaseContext>> remoteBibContextList;
+                try {
+                    remoteBibContextList = this.getChangedBibDatabaseContextList(this.getChangedFilesFromHeadToIndex());
+                } catch (IOException | GitAPIException e) {
+                    LOGGER.error("Failed to save changes from HEAD to index");
+                }
             } catch (IOException | GitAPIException e) {
                 // In the case that rebase fails, try revert to previous commit
                 // and execute regular pull
@@ -73,17 +98,15 @@ public class GitClientHandler extends GitHandler {
                 } catch (IOException ex) {
                     LOGGER.error("Failed to pull");
                     dialogService.notify(Localization.lang("Failed to update repository"));
-                    // TODO: Detect if a merge conflict occurs at this point and resolve
+                    // TODO: Detect if a merge conflict occurs at this point and resolve using baseBibContextList and remoteBibContextList
                     return;
                 }
             }
-            dialogService.notify(Localization.lang("Successfully pulled"));
 
             try {
                 this.pushCommitsToRemoteRepository();
-                dialogService.notify(Localization.lang("Succesfully pushed"));
             } catch (IOException e) {
-                dialogService.notify(Localization.lang("Failed to push"));
+                LOGGER.error("Failed to push");
             }
         }
     }
@@ -103,6 +126,7 @@ public class GitClientHandler extends GitHandler {
         }
     }
 
+    @Override
     public void pushCommitsToRemoteRepository() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
@@ -114,6 +138,53 @@ public class GitClientHandler extends GitHandler {
                 dialogService.notify(Localization.lang("Failed to push to remote repository"));
                 LOGGER.error("Git push failed", e);
             }
+        }
+    }
+
+    private Set<String> getChanged() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+
+        return git.status().call().getChanged();
+    }
+
+    /**
+     * Save BibDatabaseContext for all bib files from HEAD to index
+     *
+     * @param pathList List of Paths to retrieve BibDatabaseContext objects from
+     * @return List of Optional BibDatabaseContext objects from
+     */
+    private List<Optional<BibDatabaseContext>> getChangedBibDatabaseContextList(List<Path> pathList) throws IOException, GitAPIException {
+        this.stageAllChangesToCurrentBranch();
+        return pathList
+                .stream()
+                .map(this::loadBibDatabaseContext)
+                .toList();
+    }
+
+    private List<Path> getChangedFilesFromHeadToIndex() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        return git.status()
+                  .call()
+                  .getChanged()
+                  .stream()
+                  .map(Path::of)
+                  .toList();
+    }
+
+    private Optional<BibDatabaseContext> loadBibDatabaseContext(Path bibFilePath) {
+        if (!FileUtil.isBibFile(bibFilePath)) {
+            return Optional.empty();
+        }
+
+        ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
+
+        try (BufferedReader reader = Files.newBufferedReader(bibFilePath, StandardCharsets.UTF_8)) {
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(reader);
+
+            return Optional.of(result.getDatabaseContext());
+        } catch (IOException e) {
+            LOGGER.error("Failed to load database context");
+            return Optional.empty();
         }
     }
 
@@ -135,5 +206,6 @@ public class GitClientHandler extends GitHandler {
            .setCredentialsProvider(credentialsProvider)
            .setRebase(true)
            .call();
+        dialogService.notify(Localization.lang("Successfully updated local repository"));
     }
 }
