@@ -14,9 +14,9 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
-import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
@@ -37,9 +37,9 @@ public class LinkedFileNamePatternsPanel extends TableView<LinkedFileNamePattern
     public LinkedFileNamePatternsPanel() {
         super();
         this.patterns = FXCollections.observableArrayList(
-                LinkedFileNamePattern.getAllPatterns().stream()
-                                     .map(LinkedFileNamePattern::stringRepresentation)
-                                     .toList()
+                Pattern.getAllPatterns().stream()
+                       .map(Pattern::stringRepresentation)
+                       .toList()
         );
 
         ViewLoader.view(this)

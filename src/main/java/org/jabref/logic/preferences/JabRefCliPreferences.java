@@ -40,7 +40,7 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -72,7 +72,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
-import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 import org.jabref.logic.linkedfile.LinkedFileNamePatternPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -1356,7 +1355,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // public for use in PreferenceMigrations
     public void storeGlobalLinkedFileNamePattern(GlobalLinkedFileNamePatterns pattern) {
         if ((pattern.getDefaultValue() == null)
-                || pattern.getDefaultValue().equals(LinkedFileNamePattern.NULL_LINKED_FILE_NAME_PATTERN)) {
+                || pattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
             put(DEFAULT_LINKED_FILE_NAME_PATTERN, "");
         } else {
             put(DEFAULT_LINKED_FILE_NAME_PATTERN, pattern.getDefaultValue().stringRepresentation());
@@ -1423,7 +1422,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
         if ((pattern.getDefaultValue() == null)
-                || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+                || pattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
             put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
             put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());

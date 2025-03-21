@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.model.entry.types.EntryType;
 
 /**
@@ -14,12 +15,12 @@ import org.jabref.model.entry.types.EntryType;
  */
 public abstract class AbstractLinkedFileNamePatterns {
 
-    protected LinkedFileNamePattern defaultPattern = LinkedFileNamePattern.NULL_LINKED_FILE_NAME_PATTERN;
+    protected Pattern defaultPattern = Pattern.NULL_PATTERN;
 
-    protected Map<EntryType, LinkedFileNamePattern> data = new HashMap<>();
+    protected Map<EntryType, Pattern> data = new HashMap<>();
 
     public void addLinkedFileNamePattern(EntryType type, String pattern) {
-        data.put(type, new LinkedFileNamePattern(pattern));
+        data.put(type, new Pattern(pattern));
     }
 
     @Override
@@ -57,13 +58,13 @@ public abstract class AbstractLinkedFileNamePatterns {
      * @param entryType a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
      */
-    public LinkedFileNamePattern getValue(EntryType entryType) {
-        LinkedFileNamePattern result = data.get(entryType);
+    public Pattern getValue(EntryType entryType) {
+        Pattern result = data.get(entryType);
         //  Test to see if we found anything
         if (result == null) {
             // check default value
             result = getDefaultValue();
-            if (result == null || LinkedFileNamePattern.NULL_LINKED_FILE_NAME_PATTERN.equals(result)) {
+            if (result == null || Pattern.NULL_PATTERN.equals(result)) {
                 // we are the "last" to ask
                 // we don't have anything left
                 return getLastLevelLinkedFileNamePattern(entryType);
@@ -84,7 +85,7 @@ public abstract class AbstractLinkedFileNamePatterns {
      *
      * @return null if not available.
      */
-    public LinkedFileNamePattern getDefaultValue() {
+    public Pattern getDefaultValue() {
         return this.defaultPattern;
     }
 
@@ -95,16 +96,16 @@ public abstract class AbstractLinkedFileNamePatterns {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern = new LinkedFileNamePattern(bibtexKeyPattern);
+        this.defaultPattern = new Pattern(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {
         return data.keySet();
     }
 
-    public Map<EntryType, LinkedFileNamePattern> getPatterns() {
+    public Map<EntryType, Pattern> getPatterns() {
         return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public abstract LinkedFileNamePattern getLastLevelLinkedFileNamePattern(EntryType key);
+    public abstract Pattern getLastLevelLinkedFileNamePattern(EntryType key);
 }

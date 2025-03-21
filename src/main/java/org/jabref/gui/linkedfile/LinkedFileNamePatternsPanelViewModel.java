@@ -9,9 +9,9 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
-import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
@@ -40,7 +40,7 @@ public class LinkedFileNamePatternsPanelViewModel {
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialNamePattern) {
         String defaultPattern;
-        if ((initialNamePattern.getDefaultValue() == null) || initialNamePattern.getDefaultValue().equals(LinkedFileNamePattern.NULL_LINKED_FILE_NAME_PATTERN)) {
+        if ((initialNamePattern.getDefaultValue() == null) || initialNamePattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
             defaultPattern = "";
         } else {
             defaultPattern = initialNamePattern.getDefaultValue().stringRepresentation();
@@ -64,7 +64,7 @@ public class LinkedFileNamePatternsPanelViewModel {
     }
 
     public void setItemToDefaultPattern(LinkedFileNamePatternsItemModel item) {
-        item.setPattern(LinkedFileNamePattern.AUTHOR_YEAR.stringRepresentation());
+        item.setPattern(Pattern.AUTHOR_YEAR.stringRepresentation());
     }
 
     public void resetAll() {

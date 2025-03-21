@@ -17,8 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Window;
 
+import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.linkedfile.LinkedFileNamePattern;
 
 public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<LinkedFileNamePatternsItemModel, String> {
     private final LinkedFileNamePatternSuggestionTextField searchField;
@@ -160,25 +160,25 @@ public class LinkedFileNamePatternsSuggestionCell extends TextFieldTableCell<Lin
         private Menu createPatternsSubMenu() {
             Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
-            Map<LinkedFileNamePattern.Category, List<LinkedFileNamePattern>> categorizedPatterns =
-                    LinkedFileNamePattern.getAllPatterns().stream()
-                                      .collect(Collectors.groupingBy(LinkedFileNamePattern::getCategory));
+            Map<Pattern.Category, List<Pattern>> categorizedPatterns =
+                    Pattern.getAllPatterns().stream()
+                                      .collect(Collectors.groupingBy(Pattern::getCategory));
 
-            Map<LinkedFileNamePattern.Category, String> categoryNames = new LinkedHashMap<>();
-            categoryNames.put(LinkedFileNamePattern.Category.AUTHOR_RELATED, Localization.lang("Author related"));
-            categoryNames.put(LinkedFileNamePattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
-            categoryNames.put(LinkedFileNamePattern.Category.TITLE_RELATED, Localization.lang("Title related"));
-            categoryNames.put(LinkedFileNamePattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
-            categoryNames.put(LinkedFileNamePattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
+            Map<Pattern.Category, String> categoryNames = new LinkedHashMap<>();
+            categoryNames.put(Pattern.Category.AUTHOR_RELATED, Localization.lang("Author related"));
+            categoryNames.put(Pattern.Category.EDITOR_RELATED, Localization.lang("Editor related"));
+            categoryNames.put(Pattern.Category.TITLE_RELATED, Localization.lang("Title related"));
+            categoryNames.put(Pattern.Category.OTHER_FIELDS, Localization.lang("Other fields"));
+            categoryNames.put(Pattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields"));
 
-            for (Map.Entry<LinkedFileNamePattern.Category, String> entry : categoryNames.entrySet()) {
-                LinkedFileNamePattern.Category category = entry.getKey();
+            for (Map.Entry<Pattern.Category, String> entry : categoryNames.entrySet()) {
+                Pattern.Category category = entry.getKey();
                 String categoryName = entry.getValue();
 
                 Menu categoryMenu = new Menu(categoryName);
-                List<LinkedFileNamePattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+                List<Pattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
 
-                for (LinkedFileNamePattern pattern : patterns) {
+                for (Pattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
                     menuItem.setOnAction(event -> {
                         setText(pattern.stringRepresentation());
