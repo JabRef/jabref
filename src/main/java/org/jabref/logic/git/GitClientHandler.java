@@ -49,8 +49,7 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
-                dialogService.notify(Localization.lang("Successfully pulled"));
-            } catch (IOException e) {
+            } catch (IOException | GitAPIException e) {
                 // In the case that rebase fails, try revert to previous commit
                 // and execute regular pull
                 Optional<Ref> headRef = Optional.empty();
@@ -65,7 +64,7 @@ public class GitClientHandler extends GitHandler {
 
                 try {
                     this.revertToCommit(headRef.get());
-                } catch (IOException ex) {
+                } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to revert to commit");
                 }
 
@@ -78,6 +77,7 @@ public class GitClientHandler extends GitHandler {
                     return;
                 }
             }
+            dialogService.notify(Localization.lang("Successfully pulled"));
 
             try {
                 this.pushCommitsToRemoteRepository();
@@ -88,33 +88,52 @@ public class GitClientHandler extends GitHandler {
         }
     }
 
-    private Optional<Ref> getHeadRef() throws IOException, GitAPIException {
-        return this.getRefForBranch(this.getCurrentlyCheckedOutBranch());
-    }
-
-    private void revertToCommit(Ref commit) throws IOException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.reset()
-                   .setMode(ResetCommand.ResetType.SOFT)
-                   .setRef(commit.toString())
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.error("Failed to rever to commit");
-            }
-        }
-    }
-
-    private void pullAndRebaseOnCurrentBranch() throws IOException {
+    @Override
+    public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
                    .setCredentialsProvider(credentialsProvider)
-                   .setRebase(true)
                    .call();
+                dialogService.notify(Localization.lang("Successfully updated local repository"));
             } catch (GitAPIException e) {
-                LOGGER.error("Failed to pull and rebase");
+                dialogService.notify(Localization.lang("Failed to pull from remote repository"));
+                LOGGER.error("Git pull failed");
             }
         }
+    }
+
+    public void pushCommitsToRemoteRepository() throws IOException {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            try {
+                git.push()
+                   .setCredentialsProvider(credentialsProvider)
+                   .call();
+                dialogService.notify(Localization.lang("Successfully updated remote repository"));
+            } catch (GitAPIException e) {
+                dialogService.notify(Localization.lang("Failed to push to remote repository"));
+                LOGGER.error("Git push failed", e);
+            }
+        }
+    }
+
+    private Optional<Ref> getHeadRef() throws IOException, GitAPIException {
+        return this.getRefForBranch(this.getCurrentlyCheckedOutBranch());
+    }
+
+    private void revertToCommit(Ref commit) throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.reset()
+           .setMode(ResetCommand.ResetType.SOFT)
+           .setRef(commit.toString())
+           .call();
+    }
+
+    private void pullAndRebaseOnCurrentBranch() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.pull()
+           .setCredentialsProvider(credentialsProvider)
+           .setRebase(true)
+           .call();
     }
 }

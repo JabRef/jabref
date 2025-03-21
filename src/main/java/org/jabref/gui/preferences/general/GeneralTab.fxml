@@ -103,20 +103,6 @@
         </padding>
     </HBox>
 
-    <HBox spacing="10">
-        <Label text="GitHub Username:"/>
-        <TextField fx:id="gitHubUsernameField"/>
-    </HBox>
-
-    <HBox spacing="10">
-        <Label text="GitHub Passkey:"/>
-        <TextField fx:id="gitHubPasskeyField"/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="4.0">
-        <CheckBox fx:id="autoPushCheckbox" text="Auto Push"/>
-        <ComboBox fx:id="autoPushModeComboBox"/>
-    </HBox>
-
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="createBackup" text="%Create backup"/>
         <TextField fx:id="backupDirectory" HBox.hgrow="ALWAYS"/>
@@ -133,5 +119,20 @@
         <VBox.margin>
             <Insets top="-4.0"/>
         </VBox.margin>
+    </HBox>
+
+    <Label styleClass="sectionHeader" text="%Git"/>
+    <HBox spacing="10">
+        <Label text="Git Username:"/>
+        <TextField fx:id="gitHubUsernameField" promptText="Enter your username here"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Git Personal Access Token:"/>
+        <TextField fx:id="gitHubPasskeyField" promptText="Enter your PAT here"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="4.0">
+        <CheckBox fx:id="autoPushCheckbox" text="Auto Push"/>
+        <ComboBox fx:id="autoPushModeComboBox"/>
     </HBox>
 </fx:root>
