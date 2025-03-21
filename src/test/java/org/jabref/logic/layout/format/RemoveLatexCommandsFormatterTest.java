@@ -1,3 +1,4 @@
+
 package org.jabref.logic.layout.format;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,5 +58,10 @@ class RemoveLatexCommandsFormatterTest {
     @Test
     void exampleUrlCorrectlyCleaned() {
         assertEquals("http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
+    }
+
+    @Test
+    void ampersandEncodedCorrectly() {
+        assertEquals("This &amp; that", formatter.format("This & that"));
     }
 }
