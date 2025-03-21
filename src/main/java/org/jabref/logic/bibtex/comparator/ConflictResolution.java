@@ -36,18 +36,12 @@ public class ConflictResolution {
                         preferences
                 );
 
-                // Create ShowDiffConfig with appropriate parameters
                 ShowDiffConfig diffConfig = new ShowDiffConfig(
                         DiffView.UNIFIED,
                         DiffHighlighter.BasicDiffMethod.WORDS
                 );
 
-                // Simply pass the diffConfig to configureDiff
-                // The ThreeWayMergeView will handle showing the differences
                 mergeDialog.configureDiff(diffConfig);
-
-                // The dialog already has access to both entries, so it should be able to
-                // detect and display the differences without needing to specify fields
 
                 mergeDialog.showAndWait().ifPresent(result -> {
                     local.getDatabase().insertEntry(result.mergedEntry());
