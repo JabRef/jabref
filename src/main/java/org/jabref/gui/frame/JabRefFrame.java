@@ -207,7 +207,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                undoManager,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
 
         MainMenu mainMenu = new MainMenu(
                 this,

@@ -20,6 +20,7 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -36,6 +37,7 @@ public class CleanupAction extends SimpleCommand {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private final List<JabRefException> failures;
 
     private boolean isCanceled;
@@ -46,13 +48,15 @@ public class CleanupAction extends SimpleCommand {
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         JournalAbbreviationRepository abbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
+        this.abbreviationRepository = abbreviationRepository;
         this.failures = new ArrayList<>();
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -112,7 +116,9 @@ public class CleanupAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                abbreviationRepository
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);

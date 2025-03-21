@@ -16,6 +16,7 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.FieldChange;
@@ -29,16 +30,18 @@ public class CleanupSingleAction extends SimpleCommand {
     private final StateManager stateManager;
     private final BibEntry entry;
     private final UndoManager undoManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupSingleAction(BibEntry entry, CliPreferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
+    public CleanupSingleAction(BibEntry entry, CliPreferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager, JournalAbbreviationRepository abbreviationRepository) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.abbreviationRepository = abbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -84,7 +87,9 @@ public class CleanupSingleAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                abbreviationRepository
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);

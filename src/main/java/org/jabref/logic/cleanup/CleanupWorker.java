@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,12 +17,16 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    private final boolean useFJounalField;
     private final List<JabRefException> failures;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.abbreviationRepository = abbreviationRepository;
+        this.useFJounalField = useFJournalField;
         this.failures = new ArrayList<>();
     }
 
@@ -87,6 +92,8 @@ public class CleanupWorker {
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
                     new ISSNCleanup();
+            case ABBREVIATE_JOURNAL_DEFAULT ->
+                    new AbbreviateJournalDefaultCleanup(abbreviationRepository, useFJounalField);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

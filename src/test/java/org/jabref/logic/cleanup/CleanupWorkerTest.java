@@ -18,6 +18,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -69,7 +70,7 @@ class CleanupWorkerTest {
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
+        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class), false, mock(JournalAbbreviationRepository.class));
     }
 
     @Test
