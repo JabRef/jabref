@@ -25,8 +25,8 @@ public class PdfGrobidImporter extends PdfImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        return grobidService.processPDF(filePath, importFormatPreferences);
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException {
+        return grobidService.processPDF(fullPath, importFormatPreferences);
     }
 
     @Override

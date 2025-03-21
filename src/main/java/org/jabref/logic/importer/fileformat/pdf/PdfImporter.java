@@ -31,7 +31,14 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  * {@link PdfImporter#importDatabase(Path)} or {@link PdfMergeMetadataImporter}.
  */
 public abstract class PdfImporter extends Importer {
-    public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
+    /**
+     * Abstract method that inheritors should define.
+     * <p>
+     * It contains two arguments: `fullPath`, which you can use to read file again for other properties
+     * (like XMP metadata); and `document`, which is a parsed PDF file. Many importers parse PDF files,
+     * so it was decided to parse it only once and provide the parsed data structure as an argument.
+     */
+    public abstract List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException;
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
