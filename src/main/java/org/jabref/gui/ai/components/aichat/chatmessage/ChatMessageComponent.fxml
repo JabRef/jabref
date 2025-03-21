@@ -35,6 +35,15 @@
                     <Tooltip text="%Delete message from chat history" />
                 </tooltip>
             </Button>
+            <Button onAction="#onRegenerateClick" styleClass="icon-button,narrow" textAlignment="CENTER">
+                <graphic>
+                    <JabRefIconView glyph="REFRESH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Regenerate AI response" />
+                </tooltip>
+            </Button>
         </VBox>
     </HBox>
 </fx:root>
+
