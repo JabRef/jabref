@@ -1,6 +1,8 @@
 package org.jabref.gui.importer.fetcher;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -33,36 +35,26 @@ public class WebSearchPaneView extends VBox {
     private final WebSearchPaneViewModel viewModel;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private final StateManager stateManager;
 
     public WebSearchPaneView(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
         initialize();
     }
 
     private void initialize() {
-        ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
-        new ViewModelListCellFactory<SearchBasedFetcher>()
-                .withText(SearchBasedFetcher::getName)
-                .install(fetchers);
-        fetchers.itemsProperty().bind(viewModel.fetchersProperty());
-        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
-        fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
-        HBox.setHgrow(fetchers, Priority.ALWAYS);
-
         StackPane helpButtonContainer = createHelpButtonContainer();
-        HBox fetcherContainer = new HBox(fetchers, helpButtonContainer);
-        TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
-        getChildren().addAll(fetcherContainer, query, createSearchButton());
+        HBox fetcherContainer = new HBox(createFetcherComboBox(), helpButtonContainer);
 
-        viewModel.queryProperty().bind(query.textProperty());
-
-        addQueryValidationHints(query);
-
-        enableEnterToTriggerSearch(query);
-
-        ClipBoardManager.addX11Support(query);
+        getChildren().addAll(
+                fetcherContainer,
+                createQueryField(),
+                createSearchButton()
+        );
+        this.disableProperty().bind(searchDisabledProperty());
     }
 
     /**
@@ -87,6 +79,33 @@ public class WebSearchPaneView extends VBox {
                         query.pseudoClassStateChanged(QUERY_INVALID, false);
                     }
                 });
+    }
+
+    /**
+     * Create combo box for selecting fetcher
+     */
+    private ComboBox<SearchBasedFetcher> createFetcherComboBox() {
+        ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
+        new ViewModelListCellFactory<SearchBasedFetcher>()
+                .withText(SearchBasedFetcher::getName)
+                .install(fetchers);
+        fetchers.itemsProperty().bind(viewModel.fetchersProperty());
+        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
+        fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
+        HBox.setHgrow(fetchers, Priority.ALWAYS);
+        return fetchers;
+    }
+
+    /**
+     * Create text field for search query
+     */
+    private TextField createQueryField() {
+        TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
+        viewModel.queryProperty().bind(query.textProperty());
+        addQueryValidationHints(query);
+        enableEnterToTriggerSearch(query);
+        ClipBoardManager.addX11Support(query);
+        return query;
     }
 
     /**
@@ -117,5 +136,15 @@ public class WebSearchPaneView extends VBox {
             }
         });
         return helpButtonContainer;
+    }
+
+    /**
+     * Creates an observable boolean value that is true if no database is open
+     */
+    private ObservableBooleanValue searchDisabledProperty() {
+        return Bindings.createBooleanBinding(
+                () -> stateManager.getOpenDatabases().isEmpty(),
+                stateManager.getOpenDatabases()
+        );
     }
 }

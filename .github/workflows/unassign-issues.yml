@@ -1,0 +1,64 @@
+name: Unassign stale issue assignments
+
+on:
+  schedule:
+    - cron: 4 12 * * *
+  workflow_dispatch:
+
+jobs:
+  unassign_issues:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    outputs:
+      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues }}
+    steps:
+      - name: Unassign stale assignments
+        id: unassign
+        uses: takanome-dev/assign-issue-action@edge
+        with:
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          days_until_unassign: 14
+          unassigned_comment: |
+            ### 📋 Assignment Update
+
+            Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
+
+            <details open>
+            <summary>Next steps</summary>
+
+            **If you still want to work on this:**
+            - Ask a maintainer to assign you again
+            - If you're making progress, a maintainer can add the pin label to prevent future automatic unassignment
+            </details>
+  move_unassigned_issues:
+    needs: unassign_issues
+    if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        issue_number: ${{ fromJson(needs.unassign_issues.outputs.unassigned_issues) }}
+    steps:
+      - name: Move issue to "Free to take" in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ matrix.issue_number }}
+          skip-if-not-in-project: true
+      - name: Move issue to "Free to take" in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ matrix.issue_number }}
+          skip-if-not-in-project: true

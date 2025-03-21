@@ -229,20 +229,14 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Key by which the work may be cited.");
             }
         } else if (field instanceof SpecialField specialField) {
-            switch (specialField) {
-                case PRINTED:
-                    return Localization.lang("User-specific printed flag, in case the entry has been printed.");
-                case PRIORITY:
-                    return Localization.lang("User-specific priority.");
-                case QUALITY:
-                    return Localization.lang("User-specific quality flag, in case its quality is assured.");
-                case RANKING:
-                    return Localization.lang("User-specific ranking.");
-                case READ_STATUS:
-                    return Localization.lang("User-specific read status.");
-                case RELEVANCE:
-                    return Localization.lang("User-specific relevance flag, in case the entry is relevant.");
-            }
+            return switch (specialField) {
+                case PRINTED -> Localization.lang("User-specific printed flag, in case the entry has been printed.");
+                case PRIORITY -> Localization.lang("User-specific priority.");
+                case QUALITY -> Localization.lang("User-specific quality flag, in case its quality is assured.");
+                case RANKING -> Localization.lang("User-specific ranking.");
+                case READ_STATUS -> Localization.lang("User-specific read status.");
+                case RELEVANCE -> Localization.lang("User-specific relevance flag, in case the entry is relevant.");
+            };
         }
         return "";
     }
