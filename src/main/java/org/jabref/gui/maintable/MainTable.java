@@ -606,7 +606,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (fileDirectories.isEmpty()) {
             dialogService.showWarningDialogAndWait(
-                    Localization.lang("File directory is not set or does not exist"),
+                    Localization.lang("File directory is not set or does not exist."),
                     Localization.lang("Please configure a file directory"));
 
             LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
