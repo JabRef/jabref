@@ -37,9 +37,7 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                     inCommand = false;
                     continue;
                 }
-                if (currentChar == '&' && i + 1 < field.length() && field.charAt(i + 1) == '#') {
-                    cleanedField.append(currentChar);
-                } else if (currentChar == '&') {
+                if (currentChar == '&') {
                     cleanedField.append("&amp;");
                 } else {
                     cleanedField.append(currentChar);
