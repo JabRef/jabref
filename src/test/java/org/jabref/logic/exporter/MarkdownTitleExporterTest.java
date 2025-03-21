@@ -204,3 +204,4 @@ class MarkdownTitleExporterTest {
         assertEquals(expected, Files.readAllLines(file));
     }
 }
+
