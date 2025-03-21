@@ -1,10 +1,11 @@
 package org.jabref.logic.bibtex.comparator;
+
 import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
-import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.DiffView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -38,7 +39,7 @@ public class ConflictResolution {
                 // Create ShowDiffConfig with appropriate parameters
                 ShowDiffConfig diffConfig = new ShowDiffConfig(
                         DiffView.UNIFIED,
-                        DiffMethod.WORDS;
+                        DiffHighlighter.BasicDiffMethod.WORDS
                 );
 
                 // Simply pass the diffConfig to configureDiff
