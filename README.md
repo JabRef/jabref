@@ -1,4 +1,4 @@
-# JabRef Bibliography Management
+# JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/main/badge.svg)](https://apidia.net/java/JabRef/main)
 
 JabRef is an open-source, cross-platform citation and reference management tool.
 
@@ -66,34 +66,8 @@ An explanation of donation possibilities and usage of donations is available at 
 
 ## Contributing
 
-[![dev-docs](https://img.shields.io/badge/dev-docs-blue)](https://devdocs.jabref.org/)
-[![Help Contribute to Open Source](https://www.codetriage.com/jabref/jabref/badges/users.svg)](https://www.codetriage.com/jabref/jabref)
-[![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
-[![Deployment Status](https://github.com/JabRef/jabref/workflows/Deployment/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ADeployment)
-[![Test Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
-[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=main)
-
-Want to be part of a free and open-source project that tens of thousands of scientists use every day?
-Check out the ways you can contribute, below:
-
-- Not a programmer? Help translating JabRef at [Crowdin](https://crowdin.com/project/jabref) or learn how to help at [contribute.jabref.org](https://contribute.jabref.org)
-- Quick overview on the architecture needed? Look at our [high-level documentation](https://devdocs.jabref.org/getting-into-the-code/high-level-documentation)
-- For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
-- You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
-- To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
-
-Please follow our [step-by-step guide on how to set-up your workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
-
-We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit.
-For developing, it is sufficient to locally only run the associated test for the classes you changed.
-GitHub will report any other failure.
-
-We view pull requests as a collaborative process.
-Submit a pull request early to get feedback from the team on work in progress.
-We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
-Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
-Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
+Want to be part of a free and open-source project that tens of thousands of researchers use every day?
+Please have a look at our [guidelines for contributing](CONTRIBUTING.md).
 
 ## Research and Education
 
@@ -103,7 +77,7 @@ The current list of papers where JabRef helped to enhance science is maintained 
 The JabRef team also fosters to use JabRef in Software Engineering training.
 We offer guidelines for this at <https://devdocs.jabref.org/teaching.html>.
 
-When citing JabRef, please use following citation:
+When citing JabRef, please use the following citation:
 
 ```bibtex
 @Article{jabref,
@@ -126,3 +100,15 @@ DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.p
 
 JabRef development is powered by YourKit Java Profiler  
 [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
+
+## ProductMap File Analysis Result
+
+This section contains an analysis of ProductMap files. Each file has a link to its source.
+
+| Github File | ProductMap File URL |
+|-------------|---------------------|
+| [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
+
+### ProductMap - Contact Us
+
+For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).

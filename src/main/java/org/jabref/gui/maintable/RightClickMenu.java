@@ -1,6 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -24,6 +23,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
+import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -36,6 +36,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -44,6 +45,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -104,7 +106,8 @@ public class RightClickMenu {
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager))
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor))
         );
 
         EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
@@ -120,31 +123,35 @@ public class RightClickMenu {
                                          StateManager stateManager,
                                          GuiPreferences preferences,
                                          LibraryTab libraryTab,
-                                         ImportHandler importHandler
-                                         ) {
+                                         ImportHandler importHandler) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
 
         ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
 
         BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
 
-        Optional<Path> sourcePath = libraryTab.getBibDatabaseContext().getDatabasePath();
-        String sourceDatabaseName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), sourcePath.get()).get();
+        Optional<String> sourceDatabaseName = libraryTab
+                .getBibDatabaseContext().getDatabasePath().stream()
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), path).stream())
+                .findFirst();
 
         if (!openDatabases.isEmpty()) {
             openDatabases.forEach(bibDatabaseContext -> {
-                Optional<Path> destinationPath = Optional.empty();
+                Optional<String> destinationPath = Optional.empty();
                 String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    destinationPath = bibDatabaseContext.getDatabasePath();
-                    String uniquePathName = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), destinationPath.get()).get();
-                    if (uniquePathName.equals(sourceDatabaseName)) {
+                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
+                    if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
                         return;
                     }
-                    destinationDatabaseName = uniquePathName;
+                    if (uniqueFilePathFragment.isPresent()) {
+                        destinationDatabaseName = uniqueFilePathFragment.get();
+                    }
                 } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
                     destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                } else {
+                    destinationDatabaseName = destinationPath.orElse(Localization.lang("untitled"));
                 }
 
                 copyToMenu.getItems().addAll(

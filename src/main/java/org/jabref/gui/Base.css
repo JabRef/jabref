@@ -364,6 +364,8 @@ TextFlow > .hyperlink:visited,
     -fx-opacity: 95%;
     -fx-text-fill: -jr-tooltip-fg;
     -fx-font-size: 1em;
+    -fx-show-delay: 300ms;
+    -fx-hide-delay: 300ms;
 }
 
 .tooltip > TextFlow > Text {
@@ -664,7 +666,14 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 0 0 0;
 }
 
+.tab-pane.hide-tab-bar > .tab-header-area {
+    -fx-pref-height: 0;
+    visibility: collapse;
+}
 
+.numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
+}
 
 .table-view,
 .tree-table-view {
@@ -1721,6 +1730,67 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
 }
 
+.welcome-label {
+    -fx-font-size: 2.75em;
+    -fx-text-fill: -jr-theme-text;
+    -fx-font-family: "Arial";
+}
+
+.welcome-description-label {
+    -fx-font-size: 1.75em;
+    -fx-font-family: "Arial";
+}
+
+.welcome-header-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+}
+
+.welcome-no-recent-label {
+    -fx-font-size: 1.25em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
+.welcome-hyperlink {
+    -fx-font-size: 1.25em;
+    -fx-text-fill: -jr-theme;
+}
+
+.welcome-hyperlink:visited {
+    -fx-text-fill: -jr-theme;
+}
+
+.welcome-footer-container {
+    -fx-padding: 15px;
+    -fx-alignment: center;
+    -fx-spacing: 15px;
+}
+
+.welcome-footer-label {
+    -fx-font-size: 2.25em;
+    -fx-text-fill: -jr-theme-text;
+    -fx-font-family: "Arial";
+}
+
+.welcome-footer-link {
+    -fx-font-size: 1.2em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
+.welcome-footer-link:hover {
+    -fx-underline: true;
+    -fx-text-fill: derive(-jr-theme, -20%);
+}
+
+.welcome-footer-version {
+    -fx-font-size: 1.2em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
 /* AboutDialog */
 #aboutDialog .about-heading {
     -fx-font-size: 30;
@@ -2113,7 +2183,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #groupFilterBar {
-    -fx-background-color: -jr-sidepane-header-background;
+    -fx-background-color: -jr-search-background;
     -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
@@ -2421,4 +2491,8 @@ journalInfo .grid-cell-b {
 
 #styleSelectDialog .currentStyleNameLabel {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
+}
+
+.refresh {
+    -fx-background-color: transparent;
 }

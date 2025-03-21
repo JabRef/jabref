@@ -245,10 +245,9 @@ public class BstFunctions {
             Object o1 = stack.pop();
             Object o2 = stack.pop();
 
-            if (!(o1 instanceof BstVMVisitor.Identifier identifier)) {
+            if (!(o1 instanceof BstVMVisitor.Identifier(String name))) {
                 throw new BstVMException("Invalid parameters (line %d)".formatted(ctx.start.getLine()));
             }
-            String name = identifier.name();
 
             if (o2 instanceof String value) {
                 if ((bstEntry != null) && bstEntry.localStrings.containsKey(name)) {
@@ -385,7 +384,7 @@ public class BstFunctions {
         }
         Object o1 = stack.pop();
 
-        if (!((o1 instanceof String s) && (((String) o1).length() == 1))) {
+        if (!((o1 instanceof String s) && (s.length() == 1))) {
             throw new BstVMException("Can only perform chr.to.int$ on string with length 1 (line %d)".formatted(ctx.start.getLine()));
         }
 
@@ -525,8 +524,8 @@ public class BstFunctions {
     private void callIdentifierOrTree(Object f, BstVMVisitor visitor, ParserRuleContext ctx) {
         if (f instanceof ParseTree tree) {
             visitor.visit(tree);
-        } else if (f instanceof BstVMVisitor.Identifier identifier) {
-            visitor.resolveIdentifier(identifier.name(), ctx);
+        } else if (f instanceof BstVMVisitor.Identifier(String name)) {
+            visitor.resolveIdentifier(name, ctx);
         } else {
             stack.push(f);
         }

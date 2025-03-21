@@ -1,4 +1,4 @@
-name: On labeled issue
+name: On issue labeled
 
 on:
   issues:
@@ -14,23 +14,23 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
           target-labels: "📍 Assigned"
-          target-column: "Free to take"
+          target-column: "Assigned"
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - name: Move Issue to "Free to take" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      - name: Move Issue to "Assigned" Column in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
           target-labels: "📍 Assigned"
-          target-column: "Free to take"
+          target-column: "Assigned"
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
@@ -59,7 +59,7 @@ jobs:
 
           Happy coding! 🚀
     - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      uses: m7kvqbe1/github-action-move-issues@main
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -69,7 +69,7 @@ jobs:
         default-column: "Free to take"
         skip-if-not-in-project: true
     - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@feat/skip-if-not-in-project-flag
+      uses: m7kvqbe1/github-action-move-issues@main
       with:
         github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
         project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -110,15 +110,3 @@ jobs:
         run: |
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
           gh project item-add 9 --owner JabRef --url $ISSUE_URL
-  ui:
-    if: "${{ github.event.label.name == 'ui' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
-    steps:
-      - name: ui
-        env:
-          GH_DEBUG: api
-          GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
-        run: |
-          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
-          echo $ISSUE_URL
-          gh project item-add 8 --owner JabRef --url $ISSUE_URL
