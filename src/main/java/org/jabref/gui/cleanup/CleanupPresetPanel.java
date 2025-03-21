@@ -111,7 +111,7 @@ public class CleanupPresetPanel extends VBox {
                 UNABBREVIATE,
                 NO_CHANGES
         ));
-        journalCleanupSelector.getSelectionModel().select(ABBREVIATE_DEFAULT);
+        journalCleanupSelector.getSelectionModel().select(NO_CHANGES);
         updateDisplay(cleanupPreferences);
     }
 
