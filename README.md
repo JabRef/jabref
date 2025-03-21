@@ -1,4 +1,4 @@
-# JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/badge.svg)](https://apidia.net/java/JabRef)
+# JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/main/badge.svg)](https://apidia.net/java/JabRef/main)
 
 JabRef is an open-source, cross-platform citation and reference management tool.
 
@@ -77,7 +77,7 @@ The current list of papers where JabRef helped to enhance science is maintained 
 The JabRef team also fosters to use JabRef in Software Engineering training.
 We offer guidelines for this at <https://devdocs.jabref.org/teaching.html>.
 
-When citing JabRef, please use following citation:
+When citing JabRef, please use the following citation:
 
 ```bibtex
 @Article{jabref,
