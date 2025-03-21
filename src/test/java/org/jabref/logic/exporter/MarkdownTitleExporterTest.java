@@ -66,7 +66,7 @@ class MarkdownTitleExporterTest {
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "* Test Title. Journal of this &amp; that 2020");
+                "* Test Title. Journal of this that 2020");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -185,7 +185,7 @@ class MarkdownTitleExporterTest {
         htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "* This is JabRef. Journal of this &amp; that 2020");
+                "* This is JabRef. Journal of this that 2020");
 
         assertEquals(expected, Files.readAllLines(file));
     }
