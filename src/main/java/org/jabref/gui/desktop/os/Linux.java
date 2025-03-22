@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
- * See https://tinylog.org/v2/configuration.
+ * https://tinylog.org/v2/configuration
  */
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux extends NativeDesktop {
