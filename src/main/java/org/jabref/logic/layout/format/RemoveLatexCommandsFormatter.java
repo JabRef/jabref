@@ -36,8 +36,7 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                 if (inCommand && Character.isWhitespace(currentChar)) {
                     inCommand = false;
                     continue;
-                }
-                else if (currentChar == '&') {
+                } else if (currentChar == '&') {
                     cleanedField.append("&amp;");
                 } else if (currentChar != '{' && currentChar != '}') {
                     cleanedField.append(currentChar);
