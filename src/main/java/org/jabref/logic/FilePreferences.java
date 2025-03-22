@@ -32,6 +32,7 @@ public class FilePreferences {
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
+    private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -45,7 +46,8 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean shouldKeepDownloadUrl) {
+                           boolean shouldKeepDownloadUrl,
+                           Path lastUsedDirectory) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -59,6 +61,7 @@ public class FilePreferences {
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
+        this.lastUsedDirectory.setValue(lastUsedDirectory);
     }
 
     public String getUserAndHost() {
@@ -215,5 +218,17 @@ public class FilePreferences {
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
+    }
+
+    public Path getLastUsedDirectory() {
+        return lastUsedDirectory.get();
+    }
+
+    public ObjectProperty<Path> lastUsedDirectoryProperty() {
+        return lastUsedDirectory;
+    }
+
+    public void setLastUsedDirectory(Path lastUsedDirectory) {
+        this.lastUsedDirectory.set(lastUsedDirectory);
     }
 }
