@@ -42,6 +42,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             dialogService.notify("Successfully pull");
         } catch (IOException e) {
             LOGGER.error("Failed to pull.", e);
+            dialogService.showErrorDialogAndWait("Git Pull Failed", "Failed to pull changes: " + e.getMessage());
         }
     }
 }

@@ -58,13 +58,15 @@ public class GitPullAction extends SimpleCommand {
                if (pullSuccessful) {
                     dialogService.notify("Successfully Pulled changes from remote repository");
                 } else {
-                    dialogService.showInformationDialogAndWait("Git Pull", "No changes to pull");
+                    dialogService.notify("No changes to pull");
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);
+                dialogService.showErrorDialogAndWait("Git Pull Failed", "Failed to pull changes: " + e.getMessage());
             }
         } else {
             LOGGER.info("Not a git repository at path: {}", path.get());
+             dialogService.notify("This is not a Git repository");
         }
     }
 }

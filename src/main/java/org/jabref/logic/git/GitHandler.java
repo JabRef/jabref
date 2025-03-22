@@ -212,6 +212,7 @@ public class GitHandler {
                    .call().isSuccessful();
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to pull");
+                return false;
             }
         }
         return pullSuccessful;
