@@ -45,10 +45,10 @@ import static org.jabref.model.entry.field.StandardField.URL;
  * <p>
  * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
- * See https://tinylog.org/v2/configuration.
+ * https://tinylog.org/v2/configuration/
  * <p>
- * See http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
- * http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT
+ * See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+ * https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
  *
  * For non-GUI things, see {@link org.jabref.logic.os.OS}.
  */
