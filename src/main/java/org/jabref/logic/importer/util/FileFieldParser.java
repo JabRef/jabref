@@ -19,6 +19,8 @@ public class FileFieldParser {
     private StringBuilder charactersOfCurrentElement;
 
     private boolean windowsPath;
+    private static final String HTTP_PREFIX = "http://";
+    private static final String HTTPS_PREFIX = "https://";
 
     public FileFieldParser(String value) {
         if (value == null) {
@@ -50,28 +52,18 @@ public class FileFieldParser {
 
     public List<LinkedFile> parse() {
         List<LinkedFile> files = new ArrayList<>();
-
+    
         if ((value == null) || value.trim().isEmpty()) {
             return files;
         }
-
-        if (LinkedFile.isOnlineLink(value.trim())) {
-            // needs to be modifiable
-            try {
-                return List.of(new LinkedFile(URLUtil.create(value), ""));
-            } catch (MalformedURLException e) {
-                LOGGER.error("invalid url", e);
-                return files;
-            }
-        }
-
-        // data of each LinkedFile as split string
+    
+        // Data of each LinkedFile as split string
         List<String> linkedFileData = new ArrayList<>();
-
+    
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
-
+    
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
@@ -101,7 +93,7 @@ public class FileFieldParser {
                     // We are at the second : (position 3 in the example) and "just" add it to the current element
                     charactersOfCurrentElement.append(c);
                     windowsPath = true;
-                    // special case for zotero absolute path on windows that do not have a colon in front
+                    // special case for Zotero absolute path on Windows that do not have a colon in front
                     // e.g. A:\zotero\paper.pdf
                 } else if (charactersOfCurrentElement.length() == 1 && value.charAt(i + 1) == '\\') {
                     charactersOfCurrentElement.append(c);
@@ -113,8 +105,9 @@ public class FileFieldParser {
                 }
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 linkedFileData.add(charactersOfCurrentElement.toString());
-                files.add(convert(linkedFileData));
-
+                LinkedFile field = convert(linkedFileData);
+                files.add(field);
+    
                 // next iteration
                 resetDataStructuresForNextElement();
             } else {
@@ -126,8 +119,10 @@ public class FileFieldParser {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
-            files.add(convert(linkedFileData));
+            LinkedFile field = convert(linkedFileData);
+            files.add(field);
         }
+    
         return files;
     }
 
@@ -152,18 +147,13 @@ public class FileFieldParser {
         while (entry.size() < 3) {
             entry.add("");
         }
-    
+
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
-            String url = entry.get(1);
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "http://" + url;
-            }
             try {
-                field = new LinkedFile(entry.getFirst(), URLUtil.create(url), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), URLUtil.create(entry.get(1)), entry.get(2));
             } catch (MalformedURLException e) {
-                // if the URL is still malformed, store it as a string
-                field = new LinkedFile(entry.getFirst(), url, entry.get(2));
+                field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }
         } else {
             String pathStr = entry.get(1);
@@ -174,7 +164,7 @@ public class FileFieldParser {
             } else {
                 try {
                     // there is no Path.isValidPath(String) method
-                     field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
+                    field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
                     // If the path is invalid, store it as a string
                     LOGGER.debug("Invalid path object, continuing with string", e);
@@ -182,11 +172,11 @@ public class FileFieldParser {
                 }
             }
         }
-    
+
         if (entry.size() > 3) {
             field.setSourceURL(entry.get(3));
         }
-    
+
         // link is the only mandatory field
         if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
             field = new LinkedFile("", Path.of(field.getFileType()), "");

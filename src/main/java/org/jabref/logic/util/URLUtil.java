@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
  */
 public class URLUtil {
+    private static final String PROTOCOL_SEPARATOR = "://";
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
 
@@ -98,10 +99,10 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        if (!url.contains("://")) {
+        if (!url.contains(PROTOCOL_SEPARATOR)) {
             url = "http://" + url;
         }
-
+    
         URI uri = createUri(url);
         return uri.toURL();
     }
