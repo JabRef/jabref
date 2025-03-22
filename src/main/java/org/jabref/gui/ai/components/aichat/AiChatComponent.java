@@ -10,7 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -62,6 +64,10 @@ public class AiChatComponent extends VBox {
     @FXML private Button notificationsButton;
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
+    @FXML private Hyperlink exQuestion1;
+    @FXML private Hyperlink exQuestion2;
+    @FXML private Hyperlink exQuestion3;
+    @FXML private HBox exQuestionBox;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -94,6 +100,7 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
+        sendExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -109,6 +116,29 @@ public class AiChatComponent extends VBox {
                 .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
         noticeText.setText(newNotice);
+    }
+
+    private void sendExampleQuestions() {
+        addExampleQuestionAction(exQuestion1);
+        addExampleQuestionAction(exQuestion2);
+        addExampleQuestionAction(exQuestion3);
+    }
+
+    private void addExampleQuestionAction(Hyperlink hyperlink) {
+        if (chatPrompt.getHistory().contains(hyperlink.getText())) {
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+            return;
+        }
+        hyperlink.setOnAction(event -> {
+            onSendMessage(hyperlink.getText());
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+        });
     }
 
     private void initializeChatPrompt() {
