@@ -378,6 +378,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_SUMMARIZATION_CHUNK_TEMPLATE = "aiSummarizationChunkTemplate";
     private static final String AI_SUMMARIZATION_COMBINE_TEMPLATE = "aiSummarizationCombineTemplate";
 
+    private static final String LAST_USED_DIRECTORY = "lastUsedDirectory";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -1554,7 +1556,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(KEEP_DOWNLOAD_URL));
+                getBoolean(KEEP_DOWNLOAD_URL),
+                getPath(LAST_USED_DIRECTORY, getDefaultPath()));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -1569,6 +1572,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
         EasyBind.listen(filePreferences.moveToTrashProperty(), (obs, oldValue, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
         EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (obs, oldValue, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
+        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (obs, oldValue, newValue) -> put(LAST_USED_DIRECTORY, newValue.toString()));
 
         return filePreferences;
     }
