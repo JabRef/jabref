@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationMvGenerator;
 
 /**
  * This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
@@ -57,6 +58,31 @@ public class AbbreviationsFileViewModel {
             throw new FileNotFoundException();
         }
     }
+    /**
+     * Reads journal abbreviations from the specified MV file and populates the abbreviations list.
+     * <p>
+     * If a valid file path is provided, this method loads abbreviations using
+     * {@link JournalAbbreviationMvGenerator#loadAbbreviationsFromMv(Path)} and converts them
+     * into {@link AbbreviationViewModel} objects before adding them to the  abbreviations list.
+     * </p>
+     *
+     * @throws IOException if the MV file cannot be found or read.
+     * @throws FileNotFoundException if no MV file path is specified.
+     */
+
+    public void readAbbreviationsFromMv() throws IOException {
+        if (path.isPresent()) {
+            // Load abbreviations from the MV file using MV processor.
+            Collection<Abbreviation> abbreviationList = JournalAbbreviationMvGenerator.loadAbbreviationsFromMv(path.get());
+
+            // Convert each Abbreviation into an AbbreviationViewModel and add it to the  abbreviations list.
+            for (Abbreviation abbreviation : abbreviationList) {
+                abbreviations.add(new AbbreviationViewModel(abbreviation));
+            }
+        } else {
+            throw new FileNotFoundException("MV file not specified");
+        }
+    }
 
     /**
      * This method will write all abbreviations of this abbreviation file to the file on the file system.
@@ -64,7 +90,7 @@ public class AbbreviationsFileViewModel {
      * {@link AbbreviationWriter#writeOrCreate}.
      */
     public void writeOrCreate() throws IOException {
-        if (!isBuiltInList.get()) {
+        if (!isBuiltInList.get() && !isMvFile()) {
             List<Abbreviation> actualAbbreviations =
                     abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
                                  .map(AbbreviationViewModel::getAbbreviationObject)
@@ -106,5 +132,9 @@ public class AbbreviationsFileViewModel {
         } else {
             return false;
         }
+    }
+
+    public boolean isMvFile() {
+        return path.isPresent() && path.get().toString().endsWith(".mv");
     }
 }
