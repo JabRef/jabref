@@ -26,6 +26,7 @@ public class ChatMessageComponent extends HBox {
 
     private final ObjectProperty<ChatMessage> chatMessage = new SimpleObjectProperty<>();
     private final ObjectProperty<Consumer<ChatMessageComponent>> onDelete = new SimpleObjectProperty<>();
+    private final ObjectProperty<Consumer<ChatMessageComponent>> onRegenerate = new SimpleObjectProperty<>();
 
     @FXML private HBox wrapperHBox;
     @FXML private VBox vBox;
@@ -63,6 +64,10 @@ public class ChatMessageComponent extends HBox {
         this.onDelete.set(onDeleteCallback);
     }
 
+    public void setOnRegenerate(Consumer<ChatMessageComponent> callback) {
+        this.onRegenerate.set(callback);
+    }
+
     private void loadChatMessage() {
         switch (chatMessage.get()) {
             case UserMessage userMessage -> {
@@ -87,7 +92,7 @@ public class ChatMessageComponent extends HBox {
             }
 
             default ->
-                LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
+                    LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
         }
     }
 
@@ -103,7 +108,15 @@ public class ChatMessageComponent extends HBox {
         }
     }
 
+    @FXML
+    private void onRegenerateClick() {
+        if (onRegenerate.get() != null) {
+            onRegenerate.get().accept(this);
+        }
+    }
+
     private void setColor(String fillColor, String borderColor) {
         vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
     }
 }
+
