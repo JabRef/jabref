@@ -141,8 +141,7 @@ public class DoiResolution implements FulltextFetcher {
 
     /**
      * Scan for {@code <meta name="citation_pdf_url">}.
-     *
-     * @see https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
+     * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
      */
     private Optional<URL> citationMetaTag(Document html) {
         Elements citationPdfUrlElement = html.head().select("meta[name='citation_pdf_url']");
