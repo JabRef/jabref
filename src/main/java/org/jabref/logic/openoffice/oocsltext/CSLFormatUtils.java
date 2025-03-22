@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -25,11 +26,10 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
-
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+
+    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = OpenOfficePreferences.CSL_BIBLIOGRAPHY_TITLE;
+    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = OpenOfficePreferences.CSL_HEADER_FORMAT;
 
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
