@@ -58,7 +58,7 @@ public class GitPullAction extends SimpleCommand {
                if (pullSuccessful) {
                     dialogService.notify("Successfully Pulled changes from remote repository");
                 } else {
-                    dialogService.showInformationDialogAndWait("Git Pull", "File is already up to date");
+                    dialogService.showInformationDialogAndWait("Git Pull", "No changes to pull");
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);
