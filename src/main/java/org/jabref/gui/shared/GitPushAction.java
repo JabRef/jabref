@@ -48,8 +48,13 @@ public class GitPushAction extends SimpleCommand {
                 preferences.getGitPreferences());
         if (gitClientHandler.isGitRepository()) {
             try {
-                gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-                gitClientHandler.pushCommitsToRemoteRepository();
+                boolean commitCreated = gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+                if (commitCreated) {
+                    gitClientHandler.pushCommitsToRemoteRepository();
+                    dialogService.notify("Successfully Pushed changes to remote repository");
+                } else {
+                    dialogService.showInformationDialogAndWait("Git Push", "No changes to push");
+                }
             } catch (IOException | GitAPIException e) {
                 dialogService.showErrorDialogAndWait(e);
             }
