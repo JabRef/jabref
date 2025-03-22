@@ -54,7 +54,12 @@ public class GitPullAction extends SimpleCommand {
                 preferences.getGitPreferences());
         if (gitClientHandler.isGitRepository()) {
             try {
-                gitClientHandler.pullOnCurrentBranch();
+               boolean pullSuccessful = gitClientHandler.pullOnCurrentBranch();
+               if (pullSuccessful) {
+                    dialogService.notify("Successfully Pulled changes from remote repository");
+                } else {
+                    dialogService.showInformationDialogAndWait("Git Pull", "File is already up to date");
+                }
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);
             }
