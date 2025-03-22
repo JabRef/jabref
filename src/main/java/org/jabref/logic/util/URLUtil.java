@@ -83,9 +83,9 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            create(url);
-            return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+            URI uri = new URI(url);
+            return uri.isAbsolute();
+        } catch (URISyntaxException e) {
             return false;
         }
     }
@@ -98,7 +98,12 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
+        if (!url.contains("://")) {
+            url = "http://" + url;
+        }
+
+        URI uri = createUri(url);
+        return uri.toURL();
     }
 
     /**
