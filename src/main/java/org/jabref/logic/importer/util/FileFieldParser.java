@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,14 +152,18 @@ public class FileFieldParser {
         while (entry.size() < 3) {
             entry.add("");
         }
-
+    
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
+            String url = entry.get(1);
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "http://" + url;
+            }
             try {
-                field = new LinkedFile(entry.getFirst(), URLUtil.create(entry.get(1)), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), URLUtil.create(url), entry.get(2));
             } catch (MalformedURLException e) {
-                // in case the URL is malformed, store it nevertheless
-                field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
+                // if the URL is still malformed, store it as a string
+                field = new LinkedFile(entry.getFirst(), url, entry.get(2));
             }
         } else {
             String pathStr = entry.get(1);
@@ -171,19 +174,19 @@ public class FileFieldParser {
             } else {
                 try {
                     // there is no Path.isValidPath(String) method
-                    field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
+                     field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
-                    // Ignored
+                    // If the path is invalid, store it as a string
                     LOGGER.debug("Invalid path object, continuing with string", e);
                     field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }
             }
         }
-
+    
         if (entry.size() > 3) {
             field.setSourceURL(entry.get(3));
         }
-
+    
         // link is the only mandatory field
         if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
             field = new LinkedFile("", Path.of(field.getFileType()), "");

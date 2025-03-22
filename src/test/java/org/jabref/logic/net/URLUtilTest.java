@@ -1,6 +1,7 @@
 package org.jabref.logic.net;
 
 import java.net.URI;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
@@ -87,4 +88,30 @@ class URLUtilTest {
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
     }
+    @Test
+    void createShouldHandleRelativeURLs() throws Exception {
+        URL relativeUrl = URLUtil.create("www.example.com");
+        assertEquals("http://www.example.com", relativeUrl.toString());
+
+        URL noWwwUrl = URLUtil.create("example.com");
+        assertEquals("http://example.com", noWwwUrl.toString());
+    }
+
+    @Test
+    void createShouldHandleAbsoluteURLs() throws Exception {
+        URL absoluteHttpUrl = URLUtil.create("http://www.example.com");
+        assertEquals("http://www.example.com", absoluteHttpUrl.toString());
+
+        URL absoluteHttpsUrl = URLUtil.create("https://www.example.com");
+        assertEquals("https://www.example.com", absoluteHttpsUrl.toString());
+    }
+
+    @Test
+    void createShouldHandleOtherProtocols() throws Exception {
+        URL ftpUrl = URLUtil.create("ftp://example.com");
+        assertEquals("ftp://example.com", ftpUrl.toString());
+
+        URL fileUrl = URLUtil.create("file:///path/to/file");
+        assertEquals("file:/path/to/file", fileUrl.toString());
+}
 }
