@@ -203,16 +203,18 @@ public class GitHandler {
         }
     }
 
-    public void pullOnCurrentBranch() throws IOException {
+    public boolean pullOnCurrentBranch() throws IOException {
+        boolean pullSuccessful = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
-                git.pull()
+               pullSuccessful = git.pull()
                    .setCredentialsProvider(credentialsProvider)
-                   .call();
+                   .call().isSuccessful();
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to pull");
             }
         }
+        return pullSuccessful;
     }
 
     public String getCurrentlyCheckedOutBranch() throws IOException {
