@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * XMPUtilShared provides support for reading (@link XMPUtilReader) and writing (@link XMPUtilWriter) BibTex data as XMP metadata
+ * XMPUtilShared provides support for reading {@link XMPUtilReader} and writing {@link XMPUtilWriter} BibTeX data as XMP metadata
  * in PDF-documents.
  */
 public class XmpUtilShared {
