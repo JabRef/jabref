@@ -60,6 +60,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private CustomTextField searchBox;
     @FXML private CheckBox useFJournal;
 
+    @FXML private Button changeDirectoryButton;
+    @FXML private CustomTextField directoryPathField;
+
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
@@ -87,6 +90,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+        directoryPathField.textProperty().bind(viewModel.directoryPathProperty());
     }
 
     private void setUpTable() {
@@ -188,6 +192,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         journalAbbreviationsTable.edit(
                 journalAbbreviationsTable.getSelectionModel().getSelectedIndex(),
                 journalTableNameColumn);
+    }
+
+    @FXML
+    private void handleChangeDirectory() {
+        viewModel.handleChangeDirectory();
     }
 
     private void selectNewAbbreviation() {

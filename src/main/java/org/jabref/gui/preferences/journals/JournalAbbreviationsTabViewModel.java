@@ -4,17 +4,21 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -57,6 +61,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
+    private final StringProperty directoryPath = new SimpleStringProperty();
+
     public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
                                             DialogService dialogService,
                                             TaskExecutor taskExecutor,
@@ -69,7 +75,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
-            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get();
+            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get() && !currentFile.get().isMvFile();
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
@@ -112,6 +118,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
+
+        directoryPath.set(abbreviationsPreferences.getJournalAbbreviationDir());
     }
 
     /**
@@ -119,7 +127,15 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      */
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
-        externalFiles.forEach(name -> openFile(Path.of(name)));
+        externalFiles.forEach(name -> {
+            Path filePath = Path.of(name);
+
+            if (name.endsWith(".mv")) {
+                openMvFile(filePath);
+            } else { // .csv file
+                openFile(filePath);
+            }
+        });
     }
 
     /**
@@ -188,6 +204,23 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         journalFiles.add(abbreviationsFile);
     }
 
+    private void openMvFile(Path filePath) {
+        AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
+        if (journalFiles.contains(abbreviationsFile)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
+                    Localization.lang("Journal file %s already added", filePath.toString()));
+            return;
+        }
+        if (abbreviationsFile.exists()) {
+            try {
+                abbreviationsFile.readAbbreviationsFromMv();
+            } catch (IOException e) {
+                LOGGER.debug("Could not read abbreviations file", e);
+            }
+        }
+        journalFiles.add(abbreviationsFile);
+    }
+
     public void openFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSV)
@@ -215,6 +248,36 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * Method to add a new abbreviation to the abbreviations list property. It also sets the currentAbbreviation
      * property to the new abbreviation.
      */
+    public void handleChangeDirectory() {
+        DirectoryDialogConfiguration config = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Path.of(directoryPath.get()))
+                .build();
+
+        Optional<Path> newDirectory = dialogService.showDirectorySelectionDialog(config);
+        newDirectory.ifPresent(path -> {
+            directoryPath.set(path.toString());
+            abbreviationsPreferences.setJournalAbbreviationDir(path.toString());
+            updateJournalFiles();
+            storeSettings();
+        });
+    }
+
+    private void updateJournalFiles() {
+        List<String> externalLists = abbreviationsPreferences.getExternalJournalLists();
+
+        // Remove files that are no longer in the external lists
+        journalFiles.removeIf(file -> !externalLists.contains(file.getAbsolutePath().map(Path::toString).orElse("")));
+        // Add new files
+        for (String filePath : externalLists) {
+            if (journalFiles.stream().noneMatch(file -> file.getAbsolutePath().map(Path::toString).orElse("").equals(filePath))) {
+                Path path = Path.of(filePath);
+                if (filePath.endsWith(".mv")) {
+                    openMvFile(path);
+                }
+            }
+        }
+    }
+
     public void addAbbreviation(Abbreviation abbreviationObject) {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
@@ -335,6 +398,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
+                    abbreviationsPreferences.setJournalAbbreviationDir(directoryPath.get());
 
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
@@ -386,5 +450,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty useFJournalProperty() {
         return useFJournal;
+    }
+
+    public StringProperty directoryPathProperty() {
+        return directoryPath;
     }
 }

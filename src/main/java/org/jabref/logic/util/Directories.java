@@ -62,4 +62,11 @@ public class Directories {
                                              "ssl",
                                              OS.APP_DIR_APP_AUTHOR));
     }
+
+    public static Path getJournalAbbreviationsDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "journal-abbreviations",
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
 }
