@@ -356,6 +356,57 @@ jobs:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4
 
+  checklist-checked:
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    name: PR checklist OK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Check for PR checklist
+        id: check_changelog_modification
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A5000 '### Mandatory checks')
+          echo "Found body: $BODY"
+
+          # Ensure the section exists
+          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
+              echo "❌ '### Mandatory checks' section is missing!"
+              exit 1
+          fi
+
+          BOXES=$(printf '%s\n' "$BODY" | grep "^- \[")
+          echo "Found boxes: $BOXES"
+
+          # Ensure at least one checkbox exists
+          if [ -z "$BOXES" ]; then
+              echo "❌ No checkboxes found in '### Mandatory checks'!"
+              exit 1
+          fi
+
+          while IFS= read -r line; do
+              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
+                  echo "❌ Found improperly formatted checkbox: '$line'"
+                  exit 1
+              fi
+          done <<< "$BOXES"
+
+          LINE_COUNT=$(echo "$BOXES" | wc -l)
+
+          if [ "$LINE_COUNT" -ne 7 ]; then
+            echo "❌ $LINE_COUNT instead of 7 lines"
+            exit 1
+          fi
+
+          echo "✅ All checkboxes are in the correct format."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
