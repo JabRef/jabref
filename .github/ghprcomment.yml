@@ -116,7 +116,7 @@
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
 - jobName: 'CHANGELOG.md needs to be modified'
   message: >
-    You ticked that you modified `CHANGELOG.md`, but there was no change there.
+    You ticked that you modified `CHANGELOG.md`, but a new entry is still missing there.
 
 
     If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
