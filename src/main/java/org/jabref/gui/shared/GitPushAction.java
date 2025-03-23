@@ -48,18 +48,32 @@ public class GitPushAction extends SimpleCommand {
                 preferences.getGitPreferences());
         if (gitClientHandler.isGitRepository()) {
             try {
-                boolean commitCreated = gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-                if (commitCreated) {
-                    gitClientHandler.pushCommitsToRemoteRepository();
-                    dialogService.notify("Successfully Pushed changes to remote repository");
+               boolean commitCreated = gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+               if (commitCreated) {
+                    boolean successPush = gitClientHandler.pushCommitsToRemoteRepository();
+                    if (successPush) {
+                        dialogService.notify("Successfully Pushed changes to remote repository");
+                    } else {
+                        dialogService.showErrorDialogAndWait("Git Push Failed", 
+                            "Failed to push changes to remote repository.\n\n" +
+                            "MOST LIKELY CAUSE: Missing Git credentials.\n" +
+                            "Please set your credentials by either:\n" +
+                            "1. Setting GIT_EMAIL and GIT_PW environment variables, or\n" +
+                            "2. Configuring them in JabRef Preferences\n\n" +
+                            "Other possible causes:\n" +
+                            "- Network connectivity issues\n" +
+                            "- Remote repository rejecting the push");
+                    }
                 } else {
                     dialogService.showInformationDialogAndWait("Git Push", "No changes to push");
                 }
             } catch (IOException | GitAPIException e) {
-                dialogService.showErrorDialogAndWait(e);
+                LOGGER.error("Failed to Push", e);
+                dialogService.showErrorDialogAndWait("Git Push Failed", "Failed to push changes: " + e.getMessage());
             }
         } else {
             LOGGER.info("Not a git repository at path: {}", path);
+            dialogService.showInformationDialogAndWait("Git Push", "This is not a Git repository");
         }
     }
 }

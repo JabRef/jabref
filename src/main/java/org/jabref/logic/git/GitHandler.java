@@ -191,14 +191,16 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository() throws IOException {
+    public boolean pushCommitsToRemoteRepository() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.push()
                    .setCredentialsProvider(credentialsProvider)
                    .call();
+                return true;
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
+                LOGGER.error("Failed to push: {}", e.getMessage(), e);
+                return false;
             }
         }
     }
@@ -321,4 +323,3 @@ public class GitHandler {
         }
     }
 }
-
