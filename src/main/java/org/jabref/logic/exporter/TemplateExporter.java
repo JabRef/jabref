@@ -227,8 +227,6 @@ public class TemplateExporter extends Exporter {
                 Path modifiedFilePath = parentDirectory.resolve(modifiedFileName);
 
                 // Export logic for each individual file
-                LOGGER.info("Exporting " + modifiedFileName + " into " + parentDirectory);
-                System.out.println("FileName" + getLayoutFileNameWithExtension());
 
                 try (AtomicFileWriter ps = new AtomicFileWriter(modifiedFilePath, encodingToUse)) {
                     List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);
