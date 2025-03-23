@@ -57,8 +57,18 @@ public class FileFieldParser {
         if ((value == null) || value.trim().isEmpty()) {
             return files;
         }
-    
-        // Data of each LinkedFile as split string
+
+        if (LinkedFile.isOnlineLink(value.trim())) {
+            // needs to be modifiable
+            try {
+                return List.of(new LinkedFile(URLUtil.create(value), ""));
+            } catch (MalformedURLException e) {
+                LOGGER.error("invalid url", e);
+                return files;
+            }
+        }
+
+        // data of each LinkedFile as split string
         List<String> linkedFileData = new ArrayList<>();
     
         resetDataStructuresForNextElement();
@@ -106,22 +116,19 @@ public class FileFieldParser {
                 }
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 linkedFileData.add(charactersOfCurrentElement.toString());
-                LinkedFile field = convert(linkedFileData);
-                files.add(field);
-    
-                // next iteration
+                files.add(convert(linkedFileData));
                 resetDataStructuresForNextElement();
             } else {
                 charactersOfCurrentElement.append(c);
             }
             escaped = false;
         }
+    
         if (charactersOfCurrentElement.length() > 0) {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
-            LinkedFile field = convert(linkedFileData);
-            files.add(field);
+            files.add(convert(linkedFileData));
         }
     
         return files;
