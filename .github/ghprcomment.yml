@@ -120,5 +120,5 @@
 
 
     If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
-    If you did not, please replace the cross by a slash to indicate that no `CHANGELOG.md` entry is necessary.
+    If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
