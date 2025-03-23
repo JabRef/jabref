@@ -125,6 +125,8 @@ public class CleanupAction extends SimpleCommand {
         }
 
         failures.addAll(cleaner.getFailures());
+
+        return !changes.isEmpty();
     }
 
     private void showResults() {
