@@ -496,8 +496,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Check PR body for changelog note
+        id: changelog_check
+        run: |
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+          if echo "$BODY" | grep -q '\[x\] Change in CHANGELOG.md described'; then
+            echo "found=yes" >> $GITHUB_OUTPUT
+          else
+            echo "found=no" >> $GITHUB_OUTPUT
+          fi
       - name: Check for CHANGELOG.md modifications
         id: check_changelog_modification
+        if: steps.changelog_check.outputs.found == 'yes'
         run: |
           git fetch origin ${{ github.base_ref }}
           if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^CHANGELOG\.md$'; then
