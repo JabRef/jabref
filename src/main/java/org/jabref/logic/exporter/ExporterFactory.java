@@ -62,6 +62,7 @@ public class ExporterFactory {
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
         exporters.add(new CffExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
+        exporters.add(new TemplateExporter("MARKDOWN", "md", "markdown", null, StandardFileType.MARKDOWN, layoutPreferences, saveOrder));
 
         // Now add custom export formats
         exporters.addAll(customFormats);
