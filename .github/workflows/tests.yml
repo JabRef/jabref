@@ -395,6 +395,14 @@ jobs:
                   exit 1
               fi
           done <<< "$BOXES"
+
+          LINE_COUNT=$(echo "$BOXES" | wc -l)
+
+          if [ "$LINE_COUNT" -ne 7 ]; then
+            echo "❌ $LINE_COUNT instead of 7 lines"
+            exit 1
+          fi
+
           echo "✅ All checkboxes are in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
