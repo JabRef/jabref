@@ -53,7 +53,7 @@ public class FileFieldParser {
 
     public List<LinkedFile> parse() {
         List<LinkedFile> files = new ArrayList<>();
-    
+
         if ((value == null) || value.trim().isEmpty()) {
             return files;
         }
@@ -70,7 +70,7 @@ public class FileFieldParser {
 
         // data of each LinkedFile as split string
         List<String> linkedFileData = new ArrayList<>();
-    
+
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
@@ -104,7 +104,7 @@ public class FileFieldParser {
                     // We are at the second : (position 3 in the example) and "just" add it to the current element
                     charactersOfCurrentElement.append(c);
                     windowsPath = true;
-                    // special case for Zotero absolute path on Windows that do not have a colon in front
+                    // special case for zotero absolute path on windows that do not have a colon in front
                     // e.g. A:\zotero\paper.pdf
                 } else if (charactersOfCurrentElement.length() == 1 && value.charAt(i + 1) == '\\') {
                     charactersOfCurrentElement.append(c);
@@ -117,6 +117,8 @@ public class FileFieldParser {
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 linkedFileData.add(charactersOfCurrentElement.toString());
                 files.add(convert(linkedFileData));
+
+                // next iteration
                 resetDataStructuresForNextElement();
             } else {
                 charactersOfCurrentElement.append(c);
@@ -161,6 +163,7 @@ public class FileFieldParser {
             try {
                 field = new LinkedFile(entry.getFirst(), URLUtil.create(entry.get(1)), entry.get(2));
             } catch (MalformedURLException e) {
+                // in case the URL is malformed, store it nevertheless
                 field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }
         } else {
