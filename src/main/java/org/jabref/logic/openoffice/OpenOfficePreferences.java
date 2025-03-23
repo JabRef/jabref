@@ -27,7 +27,7 @@ public class OpenOfficePreferences {
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public static final String CSL_BIBLIOGRAPHY_TITLE = "References";
-    public static final String CSL_HEADER_FORMAT = "Heading 1";
+    public static final String CSL_HEADER_FORMAT = "Heading 2";
 
     private final StringProperty executablePath;
     private final BooleanProperty useAllDatabases;
