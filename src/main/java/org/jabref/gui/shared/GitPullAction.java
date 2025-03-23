@@ -9,6 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitClientHandler;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -56,26 +57,27 @@ public class GitPullAction extends SimpleCommand {
             try {
                boolean pullSuccessful = gitClientHandler.pullOnCurrentBranch();
                if (pullSuccessful) {
-                    dialogService.notify("Successfully Pulled changes from remote repository");
+                    dialogService.notify(Localization.lang("Successfully Pulled changes from remote repository"));
                 } else {
-                     dialogService.showErrorDialogAndWait("Git Pull Failed",
-                        "Failed to pull changes from remote repository.\n\n" +
-                        "MOST LIKELY CAUSE: Missing Git credentials.\n" +
-                        "Please set your credentials by either:\n" +
-                        "1. Setting GIT_EMAIL and GIT_PW environment variables, or\n" +
-                        "2. Configuring them in JabRef Preferences\n\n" +
-                        "Other possible causes:\n" +
-                        "- Network connectivity issues\n" +
-                        "- Merge conflicts\n" +
-                        "- Remote repository inaccessible");
+                     dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Failed"),
+                        Localization.lang("Failed to pull changes from remote repository.") + "\n\n" +
+                        Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
+                        Localization.lang("Please set your credentials by either:") + "\n" +
+                        "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
+                        "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
+                        Localization.lang("Other possible causes:") + "\n" +
+                        "- " + Localization.lang("Network connectivity issues") + "\n" +
+                        "- " + Localization.lang("Merge conflicts") + "\n" +
+                        "- " + Localization.lang("Remote repository inaccessible"));
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);
-                dialogService.showErrorDialogAndWait("Git Pull Failed", "Failed to pull changes: " + e.getMessage());
+                dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Failed"),
+                    Localization.lang("Failed to pull changes: {0}", e.getMessage()));
             }
         } else {
             LOGGER.info("Not a git repository at path: {}", path.get());
-             dialogService.notify("This is not a Git repository");
+             dialogService.notify(Localization.lang("This is not a Git repository"));
         }
     }
 }
