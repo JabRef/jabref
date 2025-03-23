@@ -505,6 +505,8 @@ jobs:
           else
             echo "found=no" >> $GITHUB_OUTPUT
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check for CHANGELOG.md modifications
         id: check_changelog_modification
         if: steps.changelog_check.outputs.found == 'yes'
