@@ -148,8 +148,10 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             sb.append(linkedFile.getLink()).append("\n");
         }
 
-        String fileLabel = linkedFiles.size() == 1 ? "file" : "files...";
-        return Localization.lang("Open " + fileLabel) + "\n" + sb.toString();
+        if (sb.length() == 1) {
+            return Localization.lang("Open file %0", sb.toString());
+        }
+        return Localization.lang("Open files...") + "\n" + sb.toString();
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
