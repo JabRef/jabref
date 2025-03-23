@@ -1,29 +1,33 @@
 package org.jabref.logic.git;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
     private final DialogService dialogService;
@@ -53,13 +57,7 @@ public class GitClientHandler extends GitHandler {
                 preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
                 preferences.getGitPreferences().getAutoPushEnabled()) {
             // Save BibDatabaseContext of bib files in current HEAD
-            List<Optional<BibDatabaseContext>> baseBibContextList;
-            try {
-                baseBibContextList = this.getChangedBibDatabaseContextList(this.getChangedFilesFromHeadToIndex());
-            } catch (IOException | GitAPIException e) {
-                LOGGER.error("Failed to save changes from HEAD to index");
-            }
-
+            RevCommit localCommit = getLatestCommit();
             try {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
@@ -69,12 +67,7 @@ public class GitClientHandler extends GitHandler {
             try {
                 this.pullAndRebaseOnCurrentBranch();
                 // Save BibDatabaseContext of bib files in updated HEAD
-                List<Optional<BibDatabaseContext>> remoteBibContextList;
-                try {
-                    remoteBibContextList = this.getChangedBibDatabaseContextList(this.getChangedFilesFromHeadToIndex());
-                } catch (IOException | GitAPIException e) {
-                    LOGGER.error("Failed to save changes from HEAD to index");
-                }
+                RevCommit remoteCommit = getLatestCommit();
             } catch (IOException | GitAPIException e) {
                 // In the case that rebase fails, try revert to previous commit
                 // and execute regular pull
@@ -151,44 +144,61 @@ public class GitClientHandler extends GitHandler {
            .call();
     }
 
-    /**
-     * Save BibDatabaseContext for all bib files from HEAD to index
-     *
-     * @param pathList List of Paths to retrieve BibDatabaseContext objects from
-     * @return List of Optional BibDatabaseContext objects from
-     */
-    private List<Optional<BibDatabaseContext>> getChangedBibDatabaseContextList(List<Path> pathList) throws IOException, GitAPIException {
-        this.stageAllChangesToCurrentBranch();
-        return pathList
-                .stream()
-                .map(this::loadBibDatabaseContext)
-                .toList();
-    }
+    private RevCommit getLatestCommit() {
+        try {
+            Repository repository = new FileRepositoryBuilder()
+                    .findGitDir(new File(this.repositoryPath.toString() + "/.git"))
+                    .setMustExist(true)
+                    .build();
+            RevWalk revWalk = new RevWalk(repository);
 
-    private List<Path> getChangedFilesFromHeadToIndex() throws IOException, GitAPIException {
-        Git git = Git.open(this.repositoryPathAsFile);
-        return git.status()
-                  .call()
-                  .getChanged()
-                  .stream()
-                  .map(Path::of)
-                  .toList();
-    }
-
-    private Optional<BibDatabaseContext> loadBibDatabaseContext(Path bibFilePath) {
-        if (!FileUtil.isBibFile(bibFilePath)) {
-            return Optional.empty();
-        }
-
-        ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
-
-        try (BufferedReader reader = Files.newBufferedReader(bibFilePath, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(reader);
-
-            return Optional.of(result.getDatabaseContext());
+            ObjectId head = repository.resolve("HEAD");
+            return revWalk.parseCommit(head);
         } catch (IOException e) {
-            LOGGER.error("Failed to load database context");
-            return Optional.empty();
+            LOGGER.error("Failed to get latest commit");
+        }
+        return null;
+    }
+
+    private String getFileContents(RevCommit commit, String path) throws IOException {
+        try {
+            Repository repository = new FileRepositoryBuilder()
+                    .setGitDir(this.repositoryPathAsFile)
+                    .build();
+
+            TreeWalk treeWalk = TreeWalk.forPath(repository, path, commit.getTree());
+            if (treeWalk != null) {
+                ObjectId objectId = treeWalk.getObjectId(0);
+                try (ObjectReader reader = repository.newObjectReader()) {
+                    return new String(reader.open(objectId).getBytes(), StandardCharsets.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to get file contents");
+        }
+        return null;
+    }
+
+    private RevCommit findMergeBase(RevCommit commit1, RevCommit commit2) throws IOException {
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(this.repositoryPathAsFile)
+                .build();
+
+        try (RevWalk revWalk = new RevWalk(repository)) {
+            revWalk.markStart(commit1);
+            revWalk.markStart(commit2);
+
+            for (RevCommit commit : revWalk) {
+                return commit;
+            }
+        }
+        return null;
+    }
+
+    private BibDatabaseContext parseBibString(String bibtexContent) throws IOException {
+        try (StringReader reader = new StringReader(bibtexContent)) {
+            ParserResult result = new BibtexParser(this.preferences.getImportFormatPreferences()).parse(reader);
+            return result.getDatabaseContext();
         }
     }
 
