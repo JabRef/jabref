@@ -158,9 +158,9 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("BrayBuildingCommunity");
         entry.setField(StandardField.TITLE, "Building \\mkbibquote{Community}");
-
+        String expected = "BrayBuildingCommunity - Building Community";
         String result = FileUtil.createFileNameFromPattern(null, entry, pattern);
-        assertEquals("BrayBuildingCommunity - Building Community", result);
+        assertEquals(expected, result);
     }
 
     @Test

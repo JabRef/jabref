@@ -87,7 +87,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef would not open if an invalid external journal abbreviation path was encountered. [#12776](https://github.com/JabRef/jabref/issues/12776)
 - We fixed a bug where LaTeX commands were not removed from filenames generated using the `[bibtexkey] - [fulltitle]` pattern. [#12188](https://github.com/JabRef/jabref/issues/12188)
 
-
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
