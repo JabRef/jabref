@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -67,6 +68,7 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
+                // Save BibDatabaseContext of bib files in updated HEAD
                 List<Optional<BibDatabaseContext>> remoteBibContextList;
                 try {
                     remoteBibContextList = this.getChangedBibDatabaseContextList(this.getChangedFilesFromHeadToIndex());
@@ -93,11 +95,13 @@ public class GitClientHandler extends GitHandler {
                 }
 
                 try {
-                    this.pullOnCurrentBranch();
-                } catch (IOException ex) {
+                    this.pull();
+                } catch (CheckoutConflictException ex) {
+                    // TODO: Resolve
+                    LOGGER.info("HERE");
+                } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to pull");
                     dialogService.notify(Localization.lang("Failed to update repository"));
-                    // TODO: Detect if a merge conflict occurs at this point and resolve using baseBibContextList and remoteBibContextList
                     return;
                 }
             }
@@ -138,6 +142,13 @@ public class GitClientHandler extends GitHandler {
                 LOGGER.error("Git push failed", e);
             }
         }
+    }
+
+    private void pull() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.pull()
+           .setCredentialsProvider(this.credentialsProvider)
+           .call();
     }
 
     /**
