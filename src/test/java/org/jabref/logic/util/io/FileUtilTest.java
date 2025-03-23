@@ -153,6 +153,17 @@ class FileUtilTest {
     }
 
     @Test
+    void getLinkedFileNameRemovesLatexCommands() {
+        String pattern = "[citationkey] - [fulltitle]";
+        BibEntry entry = new BibEntry();
+        entry.setCitationKey("BrayBuildingCommunity");
+        entry.setField(StandardField.TITLE, "Building \\mkbibquote{Community}");
+
+        String result = FileUtil.createFileNameFromPattern(null, entry, pattern);
+        assertEquals("BrayBuildingCommunity - Building Community", result);
+    }
+
+    @Test
     void getFileExtensionSimpleFile() {
         assertEquals("pdf", FileUtil.getFileExtension(Path.of("test.pdf")).get());
     }

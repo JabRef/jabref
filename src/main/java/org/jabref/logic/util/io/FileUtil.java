@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -329,9 +330,12 @@ public class FileUtil {
         if (targetName.isEmpty()) {
             targetName = entry.getCitationKey().orElse("default");
         }
-
+        // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
+        // See: https://github.com/JabRef/jabref/issues/12188
+        targetName = new RemoveLatexCommandsFormatter().format(targetName);
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
+
         return targetName;
     }
 
