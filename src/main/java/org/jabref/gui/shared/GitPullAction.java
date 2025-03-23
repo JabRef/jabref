@@ -58,7 +58,16 @@ public class GitPullAction extends SimpleCommand {
                if (pullSuccessful) {
                     dialogService.notify("Successfully Pulled changes from remote repository");
                 } else {
-                    dialogService.notify("No changes to pull");
+                     dialogService.showErrorDialogAndWait("Git Pull Failed",
+                        "Failed to pull changes from remote repository.\n\n" +
+                        "MOST LIKELY CAUSE: Missing Git credentials.\n" +
+                        "Please set your credentials by either:\n" +
+                        "1. Setting GIT_EMAIL and GIT_PW environment variables, or\n" +
+                        "2. Configuring them in JabRef Preferences\n\n" +
+                        "Other possible causes:\n" +
+                        "- Network connectivity issues\n" +
+                        "- Merge conflicts\n" +
+                        "- Remote repository inaccessible");
                 }
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);

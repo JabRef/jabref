@@ -213,7 +213,7 @@ public class GitHandler {
                    .setCredentialsProvider(credentialsProvider)
                    .call().isSuccessful();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to pull");
+                LOGGER.error("Failed to pull", e);
                 return false;
             }
         }
