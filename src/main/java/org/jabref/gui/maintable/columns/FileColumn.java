@@ -2,6 +2,7 @@ package org.jabref.gui.maintable.columns;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -142,16 +143,16 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringJoiner joiner = new StringJoiner("\n");
 
         for (LinkedFile linkedFile : linkedFiles) {
-            sb.append("\n").append(linkedFile.getLink());
+            joiner.add(linkedFile.getLink());
         }
 
         if (linkedFiles.size() == 1) {
-            return Localization.lang("Open file %0", sb.toString());
+            return Localization.lang("Open file %0", joiner.toString());
         }
-        return Localization.lang("Open files...") + sb.toString();
+        return Localization.lang("Open files...") + "\n\n" + joiner.toString();
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
