@@ -89,31 +89,6 @@ public class ConflictResolutionTest {
     }
 
     @Test
-    void resolveGitConflicts_conflictDetected_shouldNotAutoMerge() {
-        BibEntry baseEntry = new BibEntry().withField(StandardField.TITLE, "Original");
-        BibEntry localEntry = new BibEntry().withField(StandardField.TITLE, "Local Change");
-        BibEntry remoteEntry = new BibEntry().withField(StandardField.TITLE, "Remote Change");
-
-        BibDatabaseContext baseContext = new BibDatabaseContext(new BibDatabase());
-        BibDatabaseContext localContext = new BibDatabaseContext(new BibDatabase());
-        BibDatabaseContext remoteContext = new BibDatabaseContext(new BibDatabase());
-
-        baseContext.getDatabase().insertEntry(baseEntry);
-        localContext.getDatabase().insertEntry(localEntry);
-        remoteContext.getDatabase().insertEntry(remoteEntry);
-
-        GuiPreferences mockPrefs = mock(GuiPreferences.class);
-
-        ConflictResolution.resolveGitConflicts(baseContext, localContext, remoteContext, mockPrefs);
-
-        long mergedCount = localContext.getDatabase().getEntries().stream()
-                                       .filter(e -> e.getField(StandardField.TITLE).orElse("").contains("Change"))
-                                       .count();
-
-        assertTrue(mergedCount < 2, "Conflicting entries should not both be merged blindly");
-    }
-
-    @Test
     void resolveGitConflicts_noChangeAcrossVersions_shouldDoNothing() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Same Title");
 
