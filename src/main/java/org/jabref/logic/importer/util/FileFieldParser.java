@@ -8,19 +8,20 @@ import java.util.List;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileFieldParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
+    private static final String HTTP_PREFIX = "http://";
+    private static final String HTTPS_PREFIX = "https://";
 
     private final String value;
 
     private StringBuilder charactersOfCurrentElement;
 
     private boolean windowsPath;
-    private static final String HTTP_PREFIX = "http://";
-    private static final String HTTPS_PREFIX = "https://";
 
     public FileFieldParser(String value) {
         if (value == null) {

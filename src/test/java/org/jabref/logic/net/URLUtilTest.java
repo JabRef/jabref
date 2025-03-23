@@ -4,12 +4,10 @@ import java.net.URI;
 import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class URLUtilTest {
 
@@ -88,6 +86,7 @@ class URLUtilTest {
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
     }
+
     @Test
     void createShouldHandleRelativeURLs() throws Exception {
         URL relativeUrl = URLUtil.create("www.example.com");
