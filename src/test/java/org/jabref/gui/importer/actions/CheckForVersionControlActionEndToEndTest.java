@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,6 +53,12 @@ class CheckForVersionControlActionEndToEndTest {
         cliPreferences = mock(CliPreferences.class);
         databaseContext = mock(BibDatabaseContext.class);
 
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getGitHubUsername()).thenReturn("testuser");
+        when(gitPreferences.getGitHubPasskey()).thenReturn("testpasskey");
+
+        when(cliPreferences.getGitPreferences()).thenReturn(gitPreferences);
+
         when(parserResult.getDatabaseContext()).thenReturn(databaseContext);
     }
 
@@ -91,3 +98,4 @@ class CheckForVersionControlActionEndToEndTest {
         assertDoesNotThrow(() -> action.performAction(parserResult, dialogService, cliPreferences));
     }
 }
+
