@@ -11,6 +11,7 @@ import org.jabref.logic.importer.fileformat.ACMPortalParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
@@ -23,6 +24,7 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
+@DisabledOnCIServer("ACM replied with 403 Forbidden on 2025-03-17")
 class ACMPortalFetcherTest {
     ACMPortalFetcher fetcher;
 
