@@ -155,6 +155,7 @@ public class ThreeWayMergeView extends VBox {
             fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferences, fieldIndex);
         }
 
+
         fieldRows.add(fieldIndex, fieldRow);
 
         mergeGridPane.add(fieldRow.getFieldNameCell(), 0, fieldIndex);
@@ -200,4 +201,11 @@ public class ThreeWayMergeView extends VBox {
     public void saveConfiguration() {
         toolbar.saveToolbarConfiguration();
     }
+
+    public void autoSelectBetterFields() {
+        for (FieldRowView row : fieldRows) {
+            row.autoSelectBetterValue();
+        }
+    }
+
 }

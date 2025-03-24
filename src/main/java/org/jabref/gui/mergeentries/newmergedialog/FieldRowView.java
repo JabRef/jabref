@@ -212,4 +212,38 @@ public class FieldRowView {
     public String toString() {
         return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
+
+    public void autoSelectBetterValue() {
+        String fieldName = fieldNameCell.getText();
+        if (fieldName == null) {
+            return;
+        }
+        fieldName = fieldName.toLowerCase().trim();
+
+        String leftVal = leftValueCell.textProperty().getValue();
+        if (leftVal == null) {
+            return;
+        }
+        leftVal = leftVal.trim();
+
+        // 1) If it's a "year" field and out of valid range
+        if (fieldName.contains("year")) {
+            try {
+                int year = Integer.parseInt(leftVal);
+                if (year < 1800 || year > 2100) {
+                    selectRightValue();
+                }
+            } catch (NumberFormatException e) {
+                selectRightValue();
+            }
+        }
+
+        // 2) If it's a "type" field and the left is "misc"
+        else if (fieldName.contains("type")) {
+            if ("misc".equalsIgnoreCase(leftVal)) {
+                selectRightValue();
+            }
+        }
+    }
+
 }
