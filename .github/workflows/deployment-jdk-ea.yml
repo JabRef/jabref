@@ -5,7 +5,7 @@ name: Deployment (JDK early access builds)
 
 on:
   schedule:
-    - cron: "0 18 * * 1"
+    - cron: "0 18 * * *"
   pull_request:
     paths:
       - .github/workflows/deployment-jdk-ea.yml
@@ -38,7 +38,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
         jdk: [23]
-        javafx: [24]
+        javafx: [25]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -193,8 +193,6 @@ jobs:
           distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')

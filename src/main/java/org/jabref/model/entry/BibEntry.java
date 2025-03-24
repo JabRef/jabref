@@ -547,15 +547,12 @@ public class BibEntry implements Cloneable {
 
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
-                if (StandardField.YEAR == field) {
-                    return parsedDate.get().getYear().map(Object::toString);
-                }
-                if (StandardField.MONTH == field) {
-                    return parsedDate.get().getMonth().map(Month::getJabRefFormat);
-                }
-                if (StandardField.DAY == field) {
-                    return parsedDate.get().getDay().map(Object::toString);
-                }
+                return switch (field) {
+                    case StandardField.YEAR -> parsedDate.get().getYear().map(Object::toString);
+                    case StandardField.MONTH -> parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                    case StandardField.DAY -> parsedDate.get().getDay().map(Object::toString);
+                    default -> throw new IllegalStateException("Unexpected value");
+                };
             } else {
                 // Date field not in valid format
                 LOGGER.debug("Could not parse date {}", date.get());
@@ -1158,6 +1155,10 @@ public class BibEntry implements Cloneable {
 
     public Optional<Month> getMonth() {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
+    }
+
+    public Optional<Season> getYearDivision() {
+        return getFieldOrAlias(StandardField.YEARDIVISION).flatMap(Season::parse);
     }
 
     public OptionalBinding<String> getFieldBinding(Field field) {

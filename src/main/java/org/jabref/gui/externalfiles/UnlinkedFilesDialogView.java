@@ -60,6 +60,8 @@ import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
+    private static final String REFRESH_CLASS = "refresh";
+
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
     @FXML private ComboBox<DateRange> fileDateCombo;
@@ -269,6 +271,15 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void startImport() {
         viewModel.startImport();
+
+        // Already imported files should not be re-added at a second click on "Import". Therefore, all imported files are unchecked.
+        unlinkedFilesList.getCheckModel().clearChecks();
+
+        // JavaFX does not re-render everything necessary after the file import, and hence it ends up with some misalignment (see https://github.com/JabRef/jabref/issues/12713). Thus, we remove and add the CSS property to force it to re-render.
+        Platform.runLater(() -> {
+            accordion.getStyleClass().remove(REFRESH_CLASS);
+            accordion.getStyleClass().add(REFRESH_CLASS);
+        });
     }
 
     @FXML

@@ -32,7 +32,7 @@ public enum OODataModel {
         }
         if (pageInfo != null) {
             final int last = nCitations - 1;
-            Optional<OOText> optionalPageInfo = Optional.ofNullable(OOText.fromString(pageInfo));
+            Optional<OOText> optionalPageInfo = Optional.of(OOText.fromString(pageInfo));
             pageInfos.set(last, PageInfo.normalizePageInfo(optionalPageInfo));
         }
         return pageInfos;

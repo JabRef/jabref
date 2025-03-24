@@ -77,6 +77,12 @@ public abstract class Importer implements Comparable<Importer> {
      * <p>
      * If importing in a specified format and an empty library is returned, JabRef reports that no entries were found.
      * <p>
+     * If your format is binary-based (PDF, ZIP-based, or others), then you should not solely override this method.
+     * For binary formats do this:
+     * 1. Throw {@link UnsupportedOperationException} in this method.
+     * 2. Override the method {@link Importer#importDatabase(Path)}.
+     * Example of this workaround is in: {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}.
+     * <p>
      * This method should never return null.
      *
      * @param input the input to read from
@@ -218,10 +224,9 @@ public abstract class Importer implements Comparable<Importer> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Importer)) {
+        if (!(obj instanceof Importer other)) {
             return false;
         }
-        Importer other = (Importer) obj;
         return Objects.equals(this.getName(), other.getName());
     }
 

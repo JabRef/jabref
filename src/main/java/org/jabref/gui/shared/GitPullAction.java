@@ -51,7 +51,7 @@ public class GitPullAction extends SimpleCommand {
 
         GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
                 dialogService,
-                preferences.getGitPreferences());
+                preferences);
         if (gitClientHandler.isGitRepository()) {
             try {
                 gitClientHandler.pullOnCurrentBranch();

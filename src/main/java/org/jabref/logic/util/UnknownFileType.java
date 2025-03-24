@@ -30,10 +30,9 @@ public class UnknownFileType implements FileType {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FileType)) {
+        if (!(o instanceof FileType other)) {
             return false;
         }
-        FileType other = (FileType) o;
         Collections.sort(extensions);
         Collections.sort(other.getExtensions());
         return extensions.equals(other.getExtensions());

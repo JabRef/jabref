@@ -130,6 +130,13 @@ public class GitHandler {
         }
     }
 
+    public void stageAllChangesToCurrentBranch() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.add()
+           .addFilepattern(".")
+           .call();
+    }
+
     /**
      * Creates a commit on the currently checked out branch
      *
