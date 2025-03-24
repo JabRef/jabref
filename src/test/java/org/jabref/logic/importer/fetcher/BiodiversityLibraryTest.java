@@ -35,7 +35,6 @@ class BiodiversityLibraryTest {
 
     @BeforeEach
     void setUp() {
-
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(BiodiversityLibrary.FETCHER_NAME)).thenReturn(Optional.of(apiKey));

@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-//Seems to be blocked from scrapers from cloudflare
 class ScienceDirectTest {
 
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);

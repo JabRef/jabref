@@ -35,6 +35,8 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     private static ImporterPreferences importerPreferences;
 
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+
     private static final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
             .withField(StandardField.DATE, "14-22 May 2016")
@@ -53,7 +55,6 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
             .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
 
     private IEEE fetcher;
-    private static final String apiKey = new BuildInfo().ieeeAPIKey;
 
     @BeforeAll
     static void ensureIeeeIsAvailable() throws Exception {
@@ -62,7 +63,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
         importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(apiKey));
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(API_KEY));
         IEEE ieee = new IEEE(importFormatPreferences, importerPreferences);
 
         assumeFalse(List.of().equals(ieee.performSearch("article_number:8801912")));
@@ -70,7 +71,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(apiKey));
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(API_KEY));
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
     }
 
