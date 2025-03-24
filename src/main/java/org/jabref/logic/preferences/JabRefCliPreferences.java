@@ -121,8 +121,6 @@ import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.commons.compress.harmony.archive.internal.nls.Messages.getString;
-
 /**
  * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
  * class.
@@ -1832,11 +1830,11 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
-        String storedMode = getString("gitAutoPushMode", AutoPushMode.ON_SAVE.name());
+        String storedMode = get("gitAutoPushMode", AutoPushMode.ON_SAVE.name());
         AutoPushMode autoPushMode = AutoPushMode.fromString(storedMode);
 
-        String gitHubUsername = getString("gitHubUsername", "");
-        String gitHubPasskey = getString("gitHubPasskey", "");
+        String gitHubUsername = get("gitHubUsername", "");
+        String gitHubPasskey = get("gitHubPasskey", "");
 
         gitPreferences = new GitPreferences(autoPushEnabled, autoPushMode, gitHubUsername, gitHubPasskey);
 
