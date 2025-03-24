@@ -261,7 +261,7 @@
         <PublicationType UI="D016454">Review</PublicationType>
         <PublicationType UI="D017065">Practice Guideline</PublicationType>
         <Abstract>
-            <AbstractText>just a dummy.</AbstractText>
+            <AbstractText Label="UNLABELLED">just a dummy.</AbstractText>
             <CopyrightInformation>Copyright from somwhere</CopyrightInformation>
         </Abstract>
         <Sections>

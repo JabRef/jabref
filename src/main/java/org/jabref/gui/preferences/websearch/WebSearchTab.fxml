@@ -18,9 +18,8 @@
 
     <Label styleClass="sectionHeader" text="%General"/>
     <CheckBox fx:id="enableWebSearch" text="%Enable web search"/>
-    <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
-    <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+    <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download referenced files (PDFs, ...)"/>
     <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
     <HBox alignment="BASELINE_LEFT" spacing="10">
         <Label text="%Default plain citation parser"/>

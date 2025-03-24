@@ -29,7 +29,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         }
         this.gitClientHandler = new GitClientHandler(path.get(),
                 dialogService,
-                preferences.getGitPreferences());
+                preferences);
         return gitClientHandler.isGitRepository();
     }
 

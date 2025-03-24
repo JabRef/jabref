@@ -56,6 +56,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.dd.plist.BinaryPropertyListParser;
+import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
 import org.slf4j.Logger;
@@ -92,6 +93,7 @@ public class BibtexParser implements Parser {
     private static final Integer LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -354,21 +356,18 @@ public class BibtexParser implements Parser {
         // We remove all line breaks in the metadata
         // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
-        if (MetaData.META_FLAG.equals(comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())))) {
-            if (comment.startsWith(MetaData.META_FLAG)) {
-                String rest = comment.substring(MetaData.META_FLAG.length());
+        if (comment.startsWith(MetaData.META_FLAG)) {
+            String rest = comment.substring(MetaData.META_FLAG.length());
 
-                int pos = rest.indexOf(':');
+            int pos = rest.indexOf(':');
 
-                if (pos > 0) {
-                    meta.put(rest.substring(0, pos), rest.substring(pos + 1));
+            if (pos > 0) {
+                meta.put(rest.substring(0, pos), rest.substring(pos + 1));
 
-                    // meta comments are always re-written by JabRef and not stored in the file
-                    dumpTextReadSoFarToString();
-                }
+                // meta comments are always re-written by JabRef and not stored in the file
+                dumpTextReadSoFarToString();
             }
-        } else if (MetaData.ENTRYTYPE_FLAG
-                          .equals(comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length())))) {
+        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
@@ -751,6 +750,14 @@ public class BibtexParser implements Parser {
 
                             LinkedFile file = new LinkedFile("", path, "");
                             entry.addFile(file);
+                        } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
+                            if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
+                                var relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
+                                Path path = Path.of(relativePath.getContent());
+
+                                LinkedFile file = new LinkedFile("", path, "");
+                                entry.addFile(file);
+                            }
                         } else {
                             LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                         }
@@ -775,7 +782,7 @@ public class BibtexParser implements Parser {
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
-                value.append(text.toString());
+                value.append(text);
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
@@ -858,7 +865,7 @@ public class BibtexParser implements Parser {
                 for (int i = 0; i < key.length(); i++) {
                     currentChar = key.charAt(i);
 
-                    /// Skip spaces:
+                    // Skip spaces:
                     if (!matchedAlpha && (currentChar == ' ')) {
                         continue;
                     }

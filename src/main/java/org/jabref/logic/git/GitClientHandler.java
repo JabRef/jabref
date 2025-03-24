@@ -1,33 +1,48 @@
 package org.jabref.logic.git;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoPushMode;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
     private final DialogService dialogService;
-    private final GitPreferences gitPreferences;
+    private final CliPreferences preferences;
 
     public GitClientHandler(Path repositoryPath,
                             DialogService dialogService,
-                            GitPreferences gitPreferences) {
+                            CliPreferences preferences) {
         super(repositoryPath, false);
         this.dialogService = dialogService;
-        this.gitPreferences = gitPreferences;
+        this.preferences = preferences;
 
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                gitPreferences.getGitHubUsername(),
-                gitPreferences.getGitHubPasskey()
+                preferences.getGitPreferences().getGitHubUsername(),
+                preferences.getGitPreferences().getGitHubPasskey()
         );
     }
 
@@ -39,8 +54,10 @@ public class GitClientHandler extends GitHandler {
      */
     public void postSaveDatabaseAction() {
         if (this.isGitRepository() &&
-                gitPreferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
-                gitPreferences.getAutoPushEnabled()) {
+                preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
+                preferences.getGitPreferences().getAutoPushEnabled()) {
+            // Save BibDatabaseContext of bib files in current HEAD
+            RevCommit localCommit = getLatestCommit();
             try {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
@@ -49,7 +66,9 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
-            } catch (IOException e) {
+                // Save BibDatabaseContext of bib files in updated HEAD
+                RevCommit remoteCommit = getLatestCommit();
+            } catch (IOException | GitAPIException e) {
                 // In the case that rebase fails, try revert to previous commit
                 // and execute regular pull
                 Optional<Ref> headRef = Optional.empty();
@@ -64,27 +83,122 @@ public class GitClientHandler extends GitHandler {
 
                 try {
                     this.revertToCommit(headRef.get());
-                } catch (IOException ex) {
+                } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to revert to commit");
                 }
 
                 try {
-                    this.pullOnCurrentBranch();
-                } catch (IOException ex) {
+                    this.pull();
+                } catch (CheckoutConflictException ex) {
+                    // TODO: Resolve
+                    LOGGER.info("HERE");
+                } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to pull");
                     dialogService.notify(Localization.lang("Failed to update repository"));
-                    // TODO: Detect if a merge conflict occurs at this point and resolve
                     return;
                 }
             }
-            dialogService.notify(Localization.lang("Successfully pulled"));
 
             try {
                 this.pushCommitsToRemoteRepository();
-                dialogService.notify(Localization.lang("Succesfully pushed"));
             } catch (IOException e) {
-                dialogService.notify(Localization.lang("Failed to push"));
+                LOGGER.error("Failed to push");
             }
+        }
+    }
+
+    @Override
+    public void pullOnCurrentBranch() throws IOException {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            try {
+                git.pull()
+                   .setCredentialsProvider(credentialsProvider)
+                   .call();
+                dialogService.notify(Localization.lang("Successfully updated local repository"));
+            } catch (GitAPIException e) {
+                dialogService.notify(Localization.lang("Failed to pull from remote repository"));
+                LOGGER.error("Git pull failed");
+            }
+        }
+    }
+
+    @Override
+    public void pushCommitsToRemoteRepository() throws IOException {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            try {
+                git.push()
+                   .setCredentialsProvider(credentialsProvider)
+                   .call();
+                dialogService.notify(Localization.lang("Successfully updated remote repository"));
+            } catch (GitAPIException e) {
+                dialogService.notify(Localization.lang("Failed to push to remote repository"));
+                LOGGER.error("Git push failed", e);
+            }
+        }
+    }
+
+    private void pull() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.pull()
+           .setCredentialsProvider(this.credentialsProvider)
+           .call();
+    }
+
+    private RevCommit getLatestCommit() {
+        try {
+            Repository repository = new FileRepositoryBuilder()
+                    .findGitDir(new File(this.repositoryPath.toString() + "/.git"))
+                    .setMustExist(true)
+                    .build();
+            RevWalk revWalk = new RevWalk(repository);
+
+            ObjectId head = repository.resolve("HEAD");
+            return revWalk.parseCommit(head);
+        } catch (IOException e) {
+            LOGGER.error("Failed to get latest commit");
+        }
+        return null;
+    }
+
+    private String getFileContents(RevCommit commit, String path) throws IOException {
+        try {
+            Repository repository = new FileRepositoryBuilder()
+                    .setGitDir(this.repositoryPathAsFile)
+                    .build();
+
+            TreeWalk treeWalk = TreeWalk.forPath(repository, path, commit.getTree());
+            if (treeWalk != null) {
+                ObjectId objectId = treeWalk.getObjectId(0);
+                try (ObjectReader reader = repository.newObjectReader()) {
+                    return new String(reader.open(objectId).getBytes(), StandardCharsets.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to get file contents");
+        }
+        return null;
+    }
+
+    private RevCommit findMergeBase(RevCommit commit1, RevCommit commit2) throws IOException {
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(this.repositoryPathAsFile)
+                .build();
+
+        try (RevWalk revWalk = new RevWalk(repository)) {
+            revWalk.markStart(commit1);
+            revWalk.markStart(commit2);
+
+            for (RevCommit commit : revWalk) {
+                return commit;
+            }
+        }
+        return null;
+    }
+
+    private BibDatabaseContext parseBibString(String bibtexContent) throws IOException {
+        try (StringReader reader = new StringReader(bibtexContent)) {
+            ParserResult result = new BibtexParser(this.preferences.getImportFormatPreferences()).parse(reader);
+            return result.getDatabaseContext();
         }
     }
 
@@ -92,29 +206,20 @@ public class GitClientHandler extends GitHandler {
         return this.getRefForBranch(this.getCurrentlyCheckedOutBranch());
     }
 
-    private void revertToCommit(Ref commit) throws IOException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.reset()
-                   .setMode(ResetCommand.ResetType.SOFT)
-                   .setRef(commit.toString())
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.error("Failed to revert to commit", e);
-            }
-        }
+    private void revertToCommit(Ref commit) throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.reset()
+           .setMode(ResetCommand.ResetType.SOFT)
+           .setRef(commit.toString())
+           .call();
     }
 
-    private void pullAndRebaseOnCurrentBranch() throws IOException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.pull()
-                   .setCredentialsProvider(credentialsProvider)
-                   .setRebase(true)
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.error("Failed to pull and rebase", e);
-            }
-        }
+    private void pullAndRebaseOnCurrentBranch() throws IOException, GitAPIException {
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.pull()
+           .setCredentialsProvider(credentialsProvider)
+           .setRebase(true)
+           .call();
+        dialogService.notify(Localization.lang("Successfully updated local repository"));
     }
 }
