@@ -25,7 +25,6 @@ public enum KeyBinding {
     EDITOR_KILL_WORD("Remove characters until next word", Localization.lang("Remove characters until next word"), "", KeyBindingCategory.EDITOR),
     EDITOR_KILL_WORD_BACKWARD("Characters until previous word", Localization.lang("Remove the current word backwards"), "", KeyBindingCategory.EDITOR),
 
-//    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl+alt+A", KeyBindingCategory.TOOLS),
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "ctrl+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "ctrl+ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
