@@ -24,11 +24,11 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupPresetPanel extends VBox {
 
-    private static final String ABBREVIATE_DEFAULT = "Abbreviate (default)";
-    private static final String ABBREVIATE_DOTLESS = "Abbreviate (dotless)";
-    private static final String ABBREVIATE_SHORTEST = "Abbreviate (shortest unique)";
-    private static final String UNABBREVIATE = "Unabbreviate";
-    private static final String NO_CHANGES = "No changes";
+    private static final String ABBREVIATE_DEFAULT_STRING = "Abbreviate (default)";
+    private static final String ABBREVIATE_DOTLESSS_STRING = "Abbreviate (dotless)";
+    private static final String ABBREVIATE_SHORTEST_STRING = "Abbreviate (shortest unique)";
+    private static final String UNABBREVIATE_STRING = "Unabbreviate";
+    private static final String NO_CHANGES_STRING = "No changes";
 
     private final BibDatabaseContext databaseContext;
     @FXML private Label cleanupRenamePDFLabel;
@@ -105,13 +105,13 @@ public class CleanupPresetPanel extends VBox {
                     }
                 });
         journalCleanupSelector.setItems(FXCollections.observableArrayList(
-                ABBREVIATE_DEFAULT,
-                ABBREVIATE_DOTLESS,
-                ABBREVIATE_SHORTEST,
-                UNABBREVIATE,
-                NO_CHANGES
+                ABBREVIATE_DEFAULT_STRING,
+                ABBREVIATE_DOTLESSS_STRING,
+                ABBREVIATE_SHORTEST_STRING,
+                UNABBREVIATE_STRING,
+                NO_CHANGES_STRING
         ));
-        journalCleanupSelector.getSelectionModel().select(NO_CHANGES);
+        journalCleanupSelector.getSelectionModel().select(NO_CHANGES_STRING);
         updateDisplay(cleanupPreferences);
     }
 
@@ -133,7 +133,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
-        journalCleanupSelector.getSelectionModel().select(preset.getSelectedJournalCleanupOption().name());
+        journalCleanupSelector.getSelectionModel().select(preset.getSelectedJournalCleanupOption());
 
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
@@ -186,13 +186,13 @@ public class CleanupPresetPanel extends VBox {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
         String selectedJournalOption = journalCleanupSelector.getSelectionModel().getSelectedItem();
-        if (ABBREVIATE_DEFAULT.equals(selectedJournalOption)) {
+        if (ABBREVIATE_DEFAULT_STRING.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
-        } else if (ABBREVIATE_DOTLESS.equals(selectedJournalOption)) {
+        } else if (ABBREVIATE_DOTLESSS_STRING.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
-        } else if (ABBREVIATE_SHORTEST.equals(selectedJournalOption)) {
+        } else if (ABBREVIATE_SHORTEST_STRING.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
-        } else if (UNABBREVIATE.equals(selectedJournalOption)) {
+        } else if (UNABBREVIATE_STRING.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.UNABBREVIATE);
         }
 

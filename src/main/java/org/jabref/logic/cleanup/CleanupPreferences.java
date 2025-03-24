@@ -72,17 +72,17 @@ public class CleanupPreferences {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
-    public CleanupStep getSelectedJournalCleanupOption() {
+    public String getSelectedJournalCleanupOption() {
         if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
-            return CleanupStep.ABBREVIATE_DEFAULT;
+            return "Abbreviate (default)";
         } else if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
-            return CleanupStep.ABBREVIATE_DOTLESS;
+            return "Abbreviate (dotless)";
         } else if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
-            return CleanupStep.ABBREVIATE_SHORTEST_UNIQUE;
+            return "Abbreviate (shortest unique)";
         } else if (isActive(CleanupStep.UNABBREVIATE)) {
-            return CleanupStep.UNABBREVIATE;
+            return "Unabbreviate";
         } else {
-            return CleanupStep.NO_CHANGES; // No journal cleanup option selected
+            return "No changes"; // No journal cleanup option selected
         }
     }
 
