@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -52,6 +53,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
             .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
 
     private IEEE fetcher;
+    private static final String apiKey = new BuildInfo().ieeeAPIKey;
 
     @BeforeAll
     static void ensureIeeeIsAvailable() throws Exception {
@@ -60,7 +62,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
         importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(apiKey));
         IEEE ieee = new IEEE(importFormatPreferences, importerPreferences);
 
         assumeFalse(List.of().equals(ieee.performSearch("article_number:8801912")));
@@ -68,6 +70,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @BeforeEach
     void setUp() {
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(apiKey));
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
     }
 

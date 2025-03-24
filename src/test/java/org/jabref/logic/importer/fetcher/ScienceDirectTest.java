@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -20,15 +21,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+//Seems to be blocked from scrapers from cloudflare
 class ScienceDirectTest {
 
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private ScienceDirect finder;
     private BibEntry entry;
-
     @BeforeEach
     void setUp() {
+        String apiKey = new BuildInfo().scienceDirectApiKey;
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
         finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }

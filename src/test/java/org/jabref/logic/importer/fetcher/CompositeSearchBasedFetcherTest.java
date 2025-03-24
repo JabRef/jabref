@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DisabledOnCIServer;
@@ -31,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,12 +78,16 @@ class CompositeSearchBasedFetcherTest {
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+        List fetcherNames = fetchers.stream().map(fetcher-> fetcher.getName()).collect(Collectors.toUnmodifiableList());
+        ObservableList<String> observableList = FXCollections.observableArrayList(fetcherNames);
+        when(importerPreferences.getCatalogs()).thenReturn(observableList);
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
+        compositeResult.forEach(cleanup::doPostCleanup);
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
                 List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
@@ -101,7 +111,15 @@ class CompositeSearchBasedFetcherTest {
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        BuildInfo buildInfo = new BuildInfo();
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(eq(AstrophysicsDataSystem.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.astrophysicsDataSystemAPIKey));
+        when(importerPreferences.getApiKey(eq(SemanticScholarFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.semanticScholarApiKey));
+        when(importerPreferences.getApiKey(eq(BiodiversityLibrary.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.biodiversityHeritageApiKey));
+        when(importerPreferences.getApiKey(eq(ScienceDirect.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.scienceDirectApiKey));
+        when(importerPreferences.getApiKey(eq(SpringerFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
+        when(importerPreferences.getApiKey(eq(IEEE.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.ieeeAPIKey));
+
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(

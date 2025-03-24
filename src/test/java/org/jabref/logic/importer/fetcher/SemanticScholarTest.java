@@ -9,9 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class SemanticScholarTest implements PagedSearchFetcherTest {
@@ -44,9 +47,11 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             .withField(StandardField.VENUE, "International Conference on Software Engineering");
 
     private SemanticScholar fetcher;
+    private final String apiKey = new BuildInfo().semanticScholarApiKey;
 
     @BeforeEach
     void setUp() {
+        when(importerPreferences.getApiKey(SemanticScholarFetcher.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
         fetcher = new SemanticScholar(importerPreferences);
     }
 
