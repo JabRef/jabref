@@ -713,12 +713,18 @@ public class GroupTreeView extends BorderPane {
         @Override
         public void execute() {
             switch (command) {
-                case GROUP_REMOVE ->
+                case GROUP_REMOVE -> {
                         viewModel.removeGroupNoSubgroups(group);
-                case GROUP_REMOVE_KEEP_SUBGROUPS ->
+                        groupTree.refresh();
+                }
+                case GROUP_REMOVE_KEEP_SUBGROUPS -> {
                         viewModel.removeGroupKeepSubgroups(group);
-                case GROUP_REMOVE_WITH_SUBGROUPS ->
+                        groupTree.refresh();
+                }
+                case GROUP_REMOVE_WITH_SUBGROUPS -> {
                         viewModel.removeGroupAndSubgroups(group);
+                        groupTree.refresh();
+                }
                 case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
                     viewModel.editGroup(group);
                     groupTree.refresh();
