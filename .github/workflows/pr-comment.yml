@@ -51,12 +51,12 @@ jobs:
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: jbang
+      - name: ghprcomment@main
         if: ${{ steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' }}
-        uses: jbangdev/jbang-action@v0.124.0
+        uses: jbangdev/jbang-action@v0.125.1
         with:
           script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
           trust: https://github.com/koppor/ghprcomment/
         env:
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
