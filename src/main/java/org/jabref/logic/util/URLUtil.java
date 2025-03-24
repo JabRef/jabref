@@ -84,9 +84,9 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            create(url);
+            createUri(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
