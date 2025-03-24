@@ -1,73 +1,8 @@
+# PR text
+
 - jobName: 'PR checklist OK'
   messsage:
     Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description, or have removed them.
-- jobName: 'Source branch is other than "main"'
-  message: >
-    You committed your code on `main` brach. This is bad practise.
-
-
-    Please start with a proper branch name.
-    See [https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process](CONTRIBUTING.md) for details.
-- jobName: windows installer and portable version
-  message: >
-    Your code does not compile.
-    Please ensure your changes compile successfully before pushing changes.
-
-
-    To verify compilation locally, run `./gradlew build` or try running JabRef.
-- jobName: 'Conflicts with target branch'
-  message: >
-    Your pull request conflicts with the target branch.
-
-
-    Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code.
-    For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
-- jobName: Checkstyle
-  message: >
-    Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
-
-
-    In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
-    You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
-- jobName: OpenRewrite
-  message: >
-    Your code currently does not meet JabRef's code guidelines.
-    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
-    The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
-- jobName: Modernizer
-  message: >
-    Your code currently does not meet JabRef's code guidelines.
-    We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
-    Please fix the detected errors, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-- jobName: Markdown
-  message: >
-    You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
-    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
-    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
-- jobName: CHANGELOG.md
-  message: |
-    While the PR was in progress, a new version of JabRef has been released.
-    You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
-- jobName: no-force-push
-  always: true
-  message: >
-    Do not force-push!
-    Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
-    Commits are lost and comments on commits lose their context, thus making it harder to review changes.
-    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
 - jobName: 'Determine issue number'
   message: |
     Your pull request needs to link an issue.
@@ -100,12 +35,18 @@
     - ✅ `Fixes https://github.com/JabRef/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
     - ✅ `Fixes https://github.com/Koppor/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
     - ❌ `Fixes [#xyz](https://github.com/JabRef/jabref/issues/xyz)` links pull-request to issue. Merging the PR will **NOT** close the issue.
-- jobName: 'Submodules not modified'
+
+
+# Compilation, tests, and code style
+
+- jobName: windows installer and portable version
   message: >
-    Your pull request modified git submodules.
+    Your code does not compile.
+    Please ensure your changes compile successfully before pushing changes.
 
 
-    Please follow our [FAQ on submodules](https://devdocs.jabref.org/code-howtos/faq.html#submodules) to fix.
+    To verify compilation locally, run `./gradlew build` or try running JabRef.
+
 - jobName: 'Unit tests'
   message: >
     JUnit tests are failing.
@@ -115,6 +56,37 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: Checkstyle
+  message: >
+    Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+
+
+    In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
+    You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
+- jobName: OpenRewrite
+  message: >
+    Your code currently does not meet JabRef's code guidelines.
+    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    The issues found can be **automatically fixed**.
+    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
+
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+- jobName: Modernizer
+  message: >
+    Your code currently does not meet JabRef's code guidelines.
+    We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    Please fix the detected errors, commit, and push.
+
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
+
+
+# CHANGELOG.md and *.md
+
 - jobName: 'CHANGELOG.md needs to be modified'
   message: >
     You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
@@ -123,3 +95,49 @@
     If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
+- jobName: CHANGELOG.md
+  message: >
+    While the PR was in progress, a new version of JabRef has been released.
+
+
+    You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: Markdown
+  message: >
+    You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
+    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
+    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
+
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+
+
+# Submodules and branches
+
+- jobName: 'Submodules not modified'
+  message: >
+    Your pull request modified git submodules.
+
+
+    Please follow our [FAQ on submodules](https://devdocs.jabref.org/code-howtos/faq.html#submodules) to fix.
+- jobName: no-force-push
+  always: true
+  message: >
+    Do not force-push!
+    Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
+    Commits are lost and comments on commits lose their context, thus making it harder to review changes.
+    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+- jobName: 'Conflicts with target branch'
+  message: >
+    Your pull request conflicts with the target branch.
+
+
+    Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code.
+    For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
+- jobName: 'Source branch is other than "main"'
+  message: >
+    You committed your code on the `main` brach of your fork. This is a bad practice.
+    The right way is to branch out from `main`, work on your patch/feature in that new branch, and then get that branch merged via the pull request (see [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)).
+
+    For this pull request, this is OK.
+    For subsequent pull requests, please start with a different branch with a proper branch name.
+    See [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for more details.
