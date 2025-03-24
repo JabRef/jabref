@@ -84,9 +84,9 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         try {
-            URI uri = new URI(url);
-            return uri.isAbsolute();
-        } catch (URISyntaxException e) {
+            create(url);
+            return true;
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return false;
         }
     }
