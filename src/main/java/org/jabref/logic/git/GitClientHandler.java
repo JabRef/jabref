@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.AutoPushMode;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
@@ -38,9 +37,7 @@ public class GitClientHandler extends GitHandler {
      * an error, the repository is reverted to the commit and a regular pull is executed.
      */
     public void postSaveDatabaseAction() {
-        if (this.isGitRepository() &&
-                gitPreferences.getAutoPushMode() == AutoPushMode.ON_SAVE &&
-                gitPreferences.getAutoPushEnabled()) {
+        if (this.isGitRepository() && gitPreferences.getAutoPushEnabled()) {
             try {
                 this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
