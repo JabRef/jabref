@@ -238,9 +238,7 @@ public class GitHandler {
      */
     public enum GitStatus {
         MODIFIED,
-        STAGED,
-        COMMITTED,
-        UNTRACKED
+        COMMITTED
     }
 
     /**
@@ -271,16 +269,6 @@ public class GitHandler {
 
             try (Git git = Git.open(repositoryPathAsFile)) {
                 Status status = git.status().call();
-
-                // Check for untracked files
-                if (status.getUntracked().contains(relativePath)) {
-                    return Optional.of(GitStatus.UNTRACKED);
-                }
-
-                // Check for staged files
-                if (status.getAdded().contains(relativePath) || status.getChanged().contains(relativePath)) {
-                    return Optional.of(GitStatus.STAGED);
-                }
 
                 // Check for modified files
                 if (status.getModified().contains(relativePath)) {

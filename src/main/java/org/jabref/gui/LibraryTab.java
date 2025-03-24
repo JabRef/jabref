@@ -430,9 +430,7 @@ public class LibraryTab extends Tab {
                 status.ifPresent(gitStatus -> {
                     String statusText = switch (gitStatus) {
                         case MODIFIED -> "[" + Localization.lang("Modified") + "]";
-                        case STAGED -> "[" + Localization.lang("Staged") + "]";
                         case COMMITTED -> "[" + Localization.lang("Committed") + "]";
-                        case UNTRACKED -> "[" + Localization.lang("Untracked") + "]";
                     };
                     tabTitle.append(statusText).append(" ");
                     toolTipText.append(statusText).append(" ");
