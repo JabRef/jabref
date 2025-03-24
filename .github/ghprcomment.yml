@@ -1,3 +1,6 @@
+- jobName: 'PR checklist OK'
+  messsage:
+    Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description, or have removed them.
 - jobName: 'Source branch is other than "main"'
   message: >
     You committed your code on `main` brach. This is bad practise.
@@ -59,6 +62,7 @@
     While the PR was in progress, a new version of JabRef has been released.
     You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
 - jobName: no-force-push
+  always: true
   message: >
     Do not force-push!
     Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
@@ -111,3 +115,11 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: 'CHANGELOG.md needs to be modified'
+  message: >
+    You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
+
+
+    If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
+    If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
+    More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
