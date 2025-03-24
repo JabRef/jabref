@@ -74,7 +74,7 @@ public class FileFieldParser {
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
-
+    
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
