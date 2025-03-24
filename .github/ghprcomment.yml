@@ -135,9 +135,9 @@
     For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 - jobName: 'Source branch is other than "main"'
   message: >
-    You committed your code on `main` brach. This is bad practise.
-
+    You committed your code on the `main` brach of your fork. This is a bad practice.
+    The right way is to branch out from `main`, work on your patch/feature in that new branch, and then get that branch merged via the pull request (see [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)).
 
     For this pull request, this is OK.
-    For the next pull request, please start with a proper branch name.
+    For subsequent pull requests, please start with a different branch with a proper branch name.
     See [https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process](CONTRIBUTING.md) for details.
