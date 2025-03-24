@@ -9,8 +9,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitClientHandler;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class GitPushAction extends SimpleCommand {
                     if (successPush) {
                         dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
                     } else {
-                        dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"), 
+                        dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
                             Localization.lang("Failed to push changes to remote repository.") + "\n\n" +
                             Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
                             Localization.lang("Please set your credentials by either:") + "\n" +
@@ -69,7 +70,7 @@ public class GitPushAction extends SimpleCommand {
                 }
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Failed to Push", e);
-                dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"), 
+                dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
                     Localization.lang("Failed to push changes: {0}", e.getMessage()));
             }
         } else {

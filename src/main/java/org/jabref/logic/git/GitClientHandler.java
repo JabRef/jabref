@@ -124,16 +124,16 @@ public class GitClientHandler extends GitHandler {
     }
 
     @Override
-    public void pushCommitsToRemoteRepository() throws IOException {
+    public boolean pushCommitsToRemoteRepository() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.push()
                    .setCredentialsProvider(credentialsProvider)
                    .call();
-                dialogService.notify(Localization.lang("Successfully updated remote repository"));
+                return true;
             } catch (GitAPIException e) {
-                dialogService.notify(Localization.lang("Failed to push to remote repository"));
-                LOGGER.error("Git push failed", e);
+                LOGGER.error("Failed to push: {}", e.getMessage(), e);
+                return false;
             }
         }
     }
