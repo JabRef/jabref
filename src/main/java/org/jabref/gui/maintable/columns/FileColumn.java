@@ -2,7 +2,6 @@ package org.jabref.gui.maintable.columns;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
