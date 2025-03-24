@@ -143,16 +143,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             return null;
         }
 
-        StringJoiner joiner = new StringJoiner("\n");
-
-        for (LinkedFile linkedFile : linkedFiles) {
-            joiner.add(linkedFile.getLink());
-        }
+        String filePaths = linkedFiles.stream()
+                                      .map(LinkedFile::getLink)
+                                      .collect(Collectors.joining("\n"));
 
         if (linkedFiles.size() == 1) {
-            return Localization.lang("Open file %0", joiner.toString());
+            return Localization.lang("Open file %0", filePaths);
         }
-        return Localization.lang("Open files...") + "\n\n" + joiner.toString();
+        return filePaths;
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
