@@ -72,6 +72,20 @@ public class CleanupPreferences {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
+    public CleanupStep getSelectedJournalCleanupOption() {
+        if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
+            return CleanupStep.ABBREVIATE_DEFAULT;
+        } else if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
+            return CleanupStep.ABBREVIATE_DOTLESS;
+        } else if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
+            return CleanupStep.ABBREVIATE_SHORTEST_UNIQUE;
+        } else if (isActive(CleanupStep.UNABBREVIATE)) {
+            return CleanupStep.UNABBREVIATE;
+        } else {
+            return CleanupStep.NO_CHANGES; // No journal cleanup option selected
+        }
+    }
+
     public enum CleanupStep {
         /**
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
@@ -107,6 +121,7 @@ public class CleanupPreferences {
         ABBREVIATE_DEFAULT,
         ABBREVIATE_DOTLESS,
         ABBREVIATE_SHORTEST_UNIQUE,
-        UNABBREVIATE
+        UNABBREVIATE,
+        NO_CHANGES
     }
 }
