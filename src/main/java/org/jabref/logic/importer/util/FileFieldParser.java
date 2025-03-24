@@ -74,7 +74,7 @@ public class FileFieldParser {
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
-    
+
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
@@ -125,14 +125,12 @@ public class FileFieldParser {
             }
             escaped = false;
         }
-    
         if (charactersOfCurrentElement.length() > 0) {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
             files.add(convert(linkedFileData));
         }
-    
         return files;
     }
 
