@@ -106,38 +106,7 @@ public class GitClientHandler extends GitHandler {
             }
         }
     }
-
-    @Override
-    public boolean pullOnCurrentBranch() throws IOException {
-        boolean pullSuccessful = false;
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                pullSuccessful = git.pull()
-                                    .setCredentialsProvider(credentialsProvider)
-                                    .call().isSuccessful();
-            } catch (GitAPIException e) {
-                LOGGER.error("Failed to pull", e);
-                return false;
-            }
-        }
-        return pullSuccessful;
-    }
-
-    @Override
-    public boolean pushCommitsToRemoteRepository() throws IOException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.push()
-                   .setCredentialsProvider(credentialsProvider)
-                   .call();
-                return true;
-            } catch (GitAPIException e) {
-                LOGGER.error("Failed to push: {}", e.getMessage(), e);
-                return false;
-            }
-        }
-    }
-
+    
     private void pull() throws IOException, GitAPIException {
         Git git = Git.open(this.repositoryPathAsFile);
         git.pull()
