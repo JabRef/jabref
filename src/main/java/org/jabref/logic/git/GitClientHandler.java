@@ -108,18 +108,19 @@ public class GitClientHandler extends GitHandler {
     }
 
     @Override
-    public void pullOnCurrentBranch() throws IOException {
+    public boolean pullOnCurrentBranch() throws IOException {
+        boolean pullSuccessful = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
-                git.pull()
-                   .setCredentialsProvider(credentialsProvider)
-                   .call();
-                dialogService.notify(Localization.lang("Successfully updated local repository"));
+                pullSuccessful = git.pull()
+                                    .setCredentialsProvider(credentialsProvider)
+                                    .call().isSuccessful();
             } catch (GitAPIException e) {
-                dialogService.notify(Localization.lang("Failed to pull from remote repository"));
-                LOGGER.error("Git pull failed");
+                LOGGER.error("Failed to pull", e);
+                return false;
             }
         }
+        return pullSuccessful;
     }
 
     @Override
