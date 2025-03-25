@@ -411,7 +411,7 @@ jobs:
           echo "Found boxes: $BOXES"
 
           while IFS= read -r line; do
-              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
+              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| |)\] "; then
                   echo "❌ Found improperly formatted checkbox: '$line'"
                   exit 1
               fi
