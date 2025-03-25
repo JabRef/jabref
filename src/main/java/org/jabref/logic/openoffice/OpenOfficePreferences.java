@@ -13,8 +13,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.openoffice.style.OOStyle;
 
-import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
-
 public class OpenOfficePreferences {
 
     public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\LibreOffice\\program";
@@ -35,7 +33,7 @@ public class OpenOfficePreferences {
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
-    private final ObjectProperty<Format> cslBibliographyHeaderFormat;
+    private final StringProperty cslBibliographyHeaderFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -54,7 +52,7 @@ public class OpenOfficePreferences {
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
-        this.cslBibliographyHeaderFormat = new SimpleObjectProperty<>(Format.HEADING_2);
+        this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
     }
 
     public void clearConnectionSettings() {
@@ -165,7 +163,7 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle;
     }
 
-    public ObjectProperty<Format> cslBibliographyHeaderFormat() {
+    public StringProperty cslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat;
     }
 }

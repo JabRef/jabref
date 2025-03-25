@@ -1,9 +1,9 @@
 package org.jabref.gui.openoffice;
 
-import javafx.beans.property.ObjectProperty;
+import java.util.Arrays;
+
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -14,10 +14,12 @@ import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
 
 public class ModifyCSLBibliographyTitleDialogViewModel {
 
-    private final StringProperty cslBibliographyTitle = new SimpleStringProperty("");
-    private final ObjectProperty<Format> cslBibliographyHeaderSelectedFormat = new SimpleObjectProperty<>();
-    private final ReadOnlyListProperty<Format> formatListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Format.values()));
+    private final StringProperty cslBibliographyTitle = new SimpleStringProperty();
+    private final StringProperty cslBibliographyHeaderSelectedFormat = new SimpleStringProperty();
+    private final ReadOnlyListProperty<String> formatListProperty =
+             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
+                    Arrays.stream(Format.values()).map(Format::getFormat).toList()
+            ));
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
         this.cslBibliographyTitle.set(preferences.cslBibliographyTitle().get());
@@ -31,11 +33,11 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
         return cslBibliographyTitle;
     }
 
-    public ObjectProperty<Format> cslBibliographyHeaderSelectedFormat() {
+    public StringProperty cslBibliographyHeaderSelectedFormat() {
         return this.cslBibliographyHeaderSelectedFormat;
     }
 
-    public ReadOnlyListProperty<Format> formatListProperty() {
+    public ReadOnlyListProperty<String> formatListProperty() {
         return this.formatListProperty;
     }
 }

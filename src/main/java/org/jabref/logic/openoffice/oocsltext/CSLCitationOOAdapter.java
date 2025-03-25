@@ -178,7 +178,7 @@ public class CSLCitationOOAdapter {
             throws WrappedTargetException, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
-        OOText title = OOFormat.paragraph(OOText.fromString(preferences.cslBibliographyTitle().get()), preferences.cslBibliographyHeaderFormat().get().getFormat());
+        OOText title = OOFormat.paragraph(OOText.fromString(preferences.cslBibliographyTitle().get()), preferences.cslBibliographyHeaderFormat().get());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);

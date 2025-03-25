@@ -12,12 +12,10 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
-
 public class ModifyCSLBibliographyTitleDialog extends BaseDialog<Void> {
 
     @FXML private TextField titleField;
-    @FXML private ComboBox<Format> formats;
+    @FXML private ComboBox<String> formats;
 
     private final OpenOfficePreferences openOfficePreferences;
 
@@ -39,8 +37,8 @@ public class ModifyCSLBibliographyTitleDialog extends BaseDialog<Void> {
 
         titleField.textProperty().bindBidirectional(viewModel.cslBibliographyTitle());
 
-        new ViewModelListCellFactory<Format>()
-                .withText(Format::getFormat)
+        new ViewModelListCellFactory<String>()
+                .withText(format -> format)
                 .install(formats);
         formats.itemsProperty().bind(viewModel.formatListProperty());
         formats.valueProperty().bindBidirectional(viewModel.cslBibliographyHeaderSelectedFormat());
