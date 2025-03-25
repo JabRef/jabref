@@ -207,8 +207,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void modifyBibliographyTitle() {
-        ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialog = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences());
-        dialogService.showCustomDialog(modifyBibliographyTitleDialog);
+        ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialogView = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences());
+        dialogService.showCustomDialog(modifyBibliographyTitleDialogView);
     }
 
     @FXML
