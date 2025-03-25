@@ -12,8 +12,7 @@
   message: >
     JUnit tests are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    Locate "Tests / Unit tests (pull_request)" and click on it.
-    This brings you to the test output.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -23,8 +22,7 @@
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    Locate "Tests / Checkstyle (pull_request)" and click on it.
-    This brings you to the test output.
+    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
@@ -38,19 +36,17 @@
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    Locate "Tests / OpenRewrite (pull_request)" and click on it.
-    This brings you to the test output.
+    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
 
     
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    Locate "Tests / Modernizer (pull_request)" and click on it.
-    This brings you to the test output.
+    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
 
 
     Please fix the detected errors, commit, and push.
