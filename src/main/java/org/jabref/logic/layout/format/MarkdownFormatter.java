@@ -1,20 +1,15 @@
 package org.jabref.logic.layout.format;
 
-import java.io.File;
 import java.util.Objects;
 
-import org.jabref.gui.fieldeditors.MarkdownEditor;
 import org.jabref.logic.layout.LayoutFormatter;
 
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import org.jabref.model.database.BibDatabaseContext;
 
 public class MarkdownFormatter implements LayoutFormatter {
 
