@@ -204,26 +204,46 @@ public class GitClientHandler extends GitHandler {
                 "- " + Localization.lang("Remote repository rejecting the " + operationType + "operation"));
     }
 
-    public void pullAndDisplayErrorMsg() throws IOException {
-        boolean pullSuccessful = this.pullOnCurrentBranch();
-        if (pullSuccessful) {
-            dialogService.notify(Localization.lang("Successfully Pulled changes from remote repository"));
-        } else {
-            this.showGitCredentialErrorDialog("pull");
+    public void pullAndDisplayErrorMsg() {
+        if (!isGitRepository()) {
+           handleNonGitRepoOperation();
+            return;
         }
-    }
+            try {
+               pullOnCurrentBranch();
+            } catch (IOException e) {
+                LOGGER.error("Failed to Pull", e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Failed"),
+                        Localization.lang("Failed to pull changes: {0}", e.getMessage()));
+            }
+        }
 
-    public void commitThenPushAndDisplayErrorMsg() throws IOException, GitAPIException {
-        boolean commitCreated = this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-        if (commitCreated) {
-            boolean successPush = this.pushCommitsToRemoteRepository();
+    public void commitThenPushAndDisplayErrorMsg() {
+        if (!isGitRepository()) {
+            handleNonGitRepoOperation();
+            return;
+        }
+        try {
+            boolean commitCreated = this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+            if (!commitCreated) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Git Push"), Localization.lang("No changes to push"));
+                return;
+            }
+            boolean successPush = pushCommitsToRemoteRepository();
             if (successPush) {
                 dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
             } else {
                 this.showGitCredentialErrorDialog("push");
             }
-        } else {
-            dialogService.showInformationDialogAndWait(Localization.lang("Git Push"), Localization.lang("No changes to push"));
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Failed to Push", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
+                    Localization.lang("Failed to push changes: {0}", e.getMessage()));
         }
+    }
+
+    public void handleNonGitRepoOperation() {
+        LOGGER.info("Not a git repository at path: {}", repositoryPath);
+        dialogService.notify(Localization.lang("This is not a Git repository"));
     }
 }
