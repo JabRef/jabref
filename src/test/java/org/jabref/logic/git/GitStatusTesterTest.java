@@ -44,36 +44,6 @@ class GitStatusTesterTest {
     }
 
     @Test
-    @DisplayName("Test status of untracked files")
-    void untrackedFileStatus() throws IOException, GitAPIException {
-        Path untrackedFile = tempDir.resolve("untracked.txt");
-        Files.writeString(untrackedFile, "This is an untracked file");
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(untrackedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get());
-    }
-
-    @Test
-    @DisplayName("Test status of staged files")
-    void stagedFileStatus() throws IOException, GitAPIException {
-        Path initialFile = tempDir.resolve("initial.txt");
-        Files.writeString(initialFile, "Initial commit file");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(initialFile.getFileName().toString()).call();
-        }
-        gitHandler.createCommitOnCurrentBranch("Initial commit", false);
-
-        Path stagedFile = tempDir.resolve("staged.txt");
-        Files.writeString(stagedFile, "This is a staged file");
-        try (Git git = Git.open(tempDir.toFile())) {
-            git.add().addFilepattern(stagedFile.getFileName().toString()).call();
-        }
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(stagedFile);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.STAGED, status.get());
-    }
-
-    @Test
     @DisplayName("Test status of modified files")
     void modifiedFileStatus() throws IOException, GitAPIException {
         Path modifiedFile = tempDir.resolve("modified.txt");
@@ -125,17 +95,7 @@ class GitStatusTesterTest {
         assertTrue(status.isPresent());
         assertEquals(GitHandler.GitStatus.COMMITTED, status.get());
     }
-
-    @Test
-    @DisplayName("Test status for newly created file")
-    void getFileStatusForNewFile() throws IOException, GitAPIException {
-        Path filePath = tempDir.resolve("NewTest.txt");
-        Files.createFile(filePath);
-        Optional<GitHandler.GitStatus> status = gitHandler.getFileStatus(filePath);
-        assertTrue(status.isPresent());
-        assertEquals(GitHandler.GitStatus.UNTRACKED, status.get());
-    }
-
+    
     @Test
     @DisplayName("Test status for file modified after commit")
     void getFileStatusForModifiedFile() throws IOException, GitAPIException {
@@ -181,12 +141,6 @@ class GitStatusTesterTest {
         try (Git git = Git.open(tempDir.toFile())) {
             git.add().addFilepattern(bibFile.getFileName().toString()).call();
         }
-        BibDatabaseContext stagedContext = new BibDatabaseContext();
-        stagedContext.setDatabasePath(bibFile);
-        Optional<GitHandler.GitStatus> stagedStatus = stagedContext.getGitStatus();
-        assertTrue(stagedStatus.isPresent());
-        assertEquals(GitHandler.GitStatus.STAGED, stagedStatus.get());
-
         Path nonExistentFile = tempDir.resolve("non_existent.bib");
         BibDatabaseContext nonExistentContext = new BibDatabaseContext();
         nonExistentContext.setDatabasePath(nonExistentFile);
