@@ -33,8 +33,8 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
         return cslBibliographyTitle;
     }
 
-    public StringProperty cslBibliographySelectedHeaderFormat() {
-        return this.cslBibliographySelectedHeaderFormat;
+    public StringProperty getCslBibliographySelectedHeaderFormat() {
+        return this.cslBibliographySelectedHeaderFormat.get();
     }
 
     public ReadOnlyListProperty<String> formatListProperty() {
