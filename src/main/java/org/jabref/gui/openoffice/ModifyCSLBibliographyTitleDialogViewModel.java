@@ -22,7 +22,7 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
         this.cslBibliographyTitle.set(preferences.getCslBibliographyTitle());
-        this.cslBibliographySelectedHeaderFormat.set(preferences.getCslBibliographyHeaderFormat());
+        this.cslBibliographySelectedHeaderFormat.set(preferences.getCslBibliographySelectedHeaderFormat());
 
         cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitleProperty());
         cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormatProperty());
