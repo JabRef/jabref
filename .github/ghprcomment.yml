@@ -2,7 +2,7 @@
 
 - jobName: 'PR checklist OK'
   message: >
-    Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description, or have removed them.
+    Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description and mark them as one of `[x] done`, `[ ] not done (yet)`, `[/] not applicable`.
 - jobName: 'Determine issue number'
   message: |
     Your pull request needs to link an issue.
