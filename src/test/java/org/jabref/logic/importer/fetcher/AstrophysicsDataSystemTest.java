@@ -67,11 +67,11 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        String apiKey = new BuildInfo().astrophysicsDataSystemAPIKey;
+        Optional<String> apiKey = Optional.of(new BuildInfo().astrophysicsDataSystemAPIKey);
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(AstrophysicsDataSystem.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
+        when(importerPreferences.getApiKey(AstrophysicsDataSystem.FETCHER_NAME)).thenReturn(apiKey);
 
         fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
 

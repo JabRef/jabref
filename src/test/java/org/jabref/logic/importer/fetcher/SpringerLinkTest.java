@@ -30,8 +30,8 @@ class SpringerLinkTest {
 
     @BeforeEach
     void setUp() {
-        String apiKey = new BuildInfo().springerNatureAPIKey;
-        when(importerPreferences.getApiKey(SpringerLink.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
+        Optional<String> apiKey = Optional.of(new BuildInfo().springerNatureAPIKey);
+        when(importerPreferences.getApiKey(SpringerLink.FETCHER_NAME)).thenReturn(apiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         finder = new SpringerLink(importerPreferences);
         entry = new BibEntry();

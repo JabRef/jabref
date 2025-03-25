@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -78,7 +79,7 @@ class CompositeSearchBasedFetcherTest {
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
-        List fetcherNames = fetchers.stream().map(fetcher-> fetcher.getName()).collect(Collectors.toUnmodifiableList());
+        List fetcherNames = fetchers.stream().map(WebFetcher::getName).collect(Collectors.toUnmodifiableList());
         ObservableList<String> observableList = FXCollections.observableArrayList(fetcherNames);
         when(importerPreferences.getCatalogs()).thenReturn(observableList);
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);

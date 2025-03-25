@@ -28,9 +28,9 @@ class ScienceDirectTest {
     private BibEntry entry;
     @BeforeEach
     void setUp() {
-        String apiKey = new BuildInfo().scienceDirectApiKey;
+        Optional<String> apiKey = Optional.of(new BuildInfo().scienceDirectApiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
+        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(apiKey);
         finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }

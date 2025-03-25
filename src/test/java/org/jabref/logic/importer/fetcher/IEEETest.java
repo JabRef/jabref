@@ -35,7 +35,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     private static ImporterPreferences importerPreferences;
 
-    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().ieeeAPIKey);
 
     private static final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
@@ -63,7 +63,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
         importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(API_KEY));
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(API_KEY);
         IEEE ieee = new IEEE(importFormatPreferences, importerPreferences);
 
         assumeFalse(List.of().equals(ieee.performSearch("article_number:8801912")));
@@ -71,7 +71,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(Optional.ofNullable(API_KEY));
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(API_KEY);
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
     }
 

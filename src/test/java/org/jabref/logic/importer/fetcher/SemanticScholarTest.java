@@ -47,11 +47,11 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             .withField(StandardField.VENUE, "International Conference on Software Engineering");
 
     private SemanticScholar fetcher;
-    private final String apiKey = new BuildInfo().semanticScholarApiKey;
+    private final Optional<String> apiKey = Optional.of(new BuildInfo().semanticScholarApiKey);
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKey(SemanticScholarFetcher.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
+        when(importerPreferences.getApiKey(SemanticScholarFetcher.FETCHER_NAME)).thenReturn(apiKey);
         fetcher = new SemanticScholar(importerPreferences);
     }
 
