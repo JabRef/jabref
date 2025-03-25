@@ -1,7 +1,7 @@
 # PR text
 
 - jobName: 'PR checklist OK'
-  messsage:
+  messsage: >
     Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description, or have removed them.
 - jobName: 'Determine issue number'
   message: |
