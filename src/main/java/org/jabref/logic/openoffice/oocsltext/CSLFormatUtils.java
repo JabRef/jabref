@@ -47,17 +47,26 @@ public class CSLFormatUtils {
         }
     }
 
-    public static String BIBLIOGRAPHY_TITLE;
-    public static String BIBLIOGRAPHY_HEADER_FORMAT;
+    public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
-
-    public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+    
+    private static String bibliographyTitle;
+    private static String bibliographyHeaderFormat;
+    
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
+    public static String getBibliographyTitle() {
+        return bibliographyTitle;
+    }
+
+    public static String getBibliographyHeaderFormat() {
+        return bibliographyHeaderFormat;
+    }
+
     public static void setBibliographyProperties(OpenOfficePreferences openOfficePreferences) {
-        BIBLIOGRAPHY_TITLE = openOfficePreferences.getCslBibliographyTitle();
-        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.getCslBibliographyHeaderFormat();
+        bibliographyTitle = openOfficePreferences.getCslBibliographyTitle();
+        bibliographyHeaderFormat = openOfficePreferences.getCslBibliographyHeaderFormat();
     }
 
     /**
@@ -150,9 +159,9 @@ public class CSLFormatUtils {
         String inTextCitation = generateAlphanumericCitation(List.of(entry), bibDatabaseContext);
 
         String authorName = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
-                                        .map(AuthorList::parse)
-                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
-                                        .orElse("");
+                                 .map(AuthorList::parse)
+                                 .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
+                                 .orElse("");
 
         return authorName + " " + inTextCitation;
     }
