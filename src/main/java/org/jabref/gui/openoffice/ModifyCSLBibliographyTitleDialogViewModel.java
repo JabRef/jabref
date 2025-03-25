@@ -29,8 +29,8 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
         cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
     }
 
-    public StringProperty cslBibliographyTitle() {
-        return cslBibliographyTitle;
+    public StringProperty getCslBibliographyTitle() {
+        return cslBibliographyTitle.get();
     }
 
     public StringProperty getCslBibliographySelectedHeaderFormat() {
