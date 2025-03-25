@@ -9,8 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-
-import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 
 public class ModifyCSLBibliographyTitleDialogViewModel {
 
@@ -18,7 +17,7 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
     private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();
     private final ReadOnlyListProperty<String> formatListProperty =
              new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
-                    Arrays.stream(Format.values()).map(Format::getFormat).toList()
+                    Arrays.stream(CSLFormatUtils.Format.values()).map(CSLFormatUtils.Format::getFormat).toList()
             ));
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
