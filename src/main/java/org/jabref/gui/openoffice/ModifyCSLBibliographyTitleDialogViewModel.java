@@ -15,7 +15,7 @@ import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
 public class ModifyCSLBibliographyTitleDialogViewModel {
 
     private final StringProperty cslBibliographyTitle = new SimpleStringProperty();
-    private final StringProperty cslBibliographyHeaderSelectedFormat = new SimpleStringProperty();
+    private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();
     private final ReadOnlyListProperty<String> formatListProperty =
              new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
                     Arrays.stream(Format.values()).map(Format::getFormat).toList()
@@ -23,18 +23,18 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
         this.cslBibliographyTitle.set(preferences.cslBibliographyTitle().get());
-        this.cslBibliographyHeaderSelectedFormat.set(preferences.cslBibliographyHeaderFormat().get());
+        this.cslBibliographySelectedHeaderFormat.set(preferences.cslBibliographyHeaderFormat().get());
 
         cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
-        cslBibliographyHeaderSelectedFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
+        cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
     }
 
     public StringProperty cslBibliographyTitle() {
         return cslBibliographyTitle;
     }
 
-    public StringProperty cslBibliographyHeaderSelectedFormat() {
-        return this.cslBibliographyHeaderSelectedFormat;
+    public StringProperty cslBibliographySelectedHeaderFormat() {
+        return this.cslBibliographySelectedHeaderFormat;
     }
 
     public ReadOnlyListProperty<String> formatListProperty() {

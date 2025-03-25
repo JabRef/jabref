@@ -41,6 +41,6 @@ public class ModifyCSLBibliographyTitleDialog extends BaseDialog<Void> {
                 .withText(format -> format)
                 .install(formats);
         formats.itemsProperty().bind(viewModel.formatListProperty());
-        formats.valueProperty().bindBidirectional(viewModel.cslBibliographyHeaderSelectedFormat());
+        formats.valueProperty().bindBidirectional(viewModel.cslBibliographySelectedHeaderFormat());
     }
 }
