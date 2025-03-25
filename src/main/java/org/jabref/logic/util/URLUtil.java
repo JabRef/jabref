@@ -86,7 +86,7 @@ public class URLUtil {
         try {
             createUri(url);
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (MalformedURLException | IllegalArgumentException e){
             return false;
         }
     }
