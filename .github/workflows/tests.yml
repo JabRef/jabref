@@ -458,6 +458,8 @@ jobs:
             echo "Result:"
             git diff --submodule=log origin/${{ github.base_ref }} HEAD
             echo "--end--"
+            echo "Grep result"
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -E "^Submodule .* contains modified content$"
             echo "❌ Submodule modifications detected"
             exit 1
           fi
