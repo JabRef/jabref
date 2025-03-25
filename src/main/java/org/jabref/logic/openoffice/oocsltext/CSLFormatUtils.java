@@ -57,7 +57,7 @@ public class CSLFormatUtils {
 
     public CSLFormatUtils(OpenOfficePreferences openOfficePreferences) {
         BIBLIOGRAPHY_TITLE = openOfficePreferences.getCslBibliographyTitle();
-        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.getCslBibliographySelectedHeaderFormat();
+        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.getCslBibliographyHeaderFormat();
     }
 
     /**

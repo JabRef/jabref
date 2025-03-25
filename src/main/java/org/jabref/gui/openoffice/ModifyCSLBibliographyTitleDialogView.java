@@ -12,14 +12,14 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ModifyCSLBibliographyTitleDialog extends BaseDialog<Void> {
+public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
 
     @FXML private TextField titleField;
     @FXML private ComboBox<String> formats;
 
     private final OpenOfficePreferences openOfficePreferences;
 
-    public ModifyCSLBibliographyTitleDialog(OpenOfficePreferences openOfficePreferences) {
+    public ModifyCSLBibliographyTitleDialogView(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = openOfficePreferences;
 
         this.setTitle(Localization.lang("Modify bibliography title"));

@@ -171,7 +171,7 @@ public class OpenOfficePreferences {
         return cslBibliographyHeaderFormat;
     }
 
-    public String getCslBibliographySelectedHeaderFormat() {
+    public String getCslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat.get();
     }
 }

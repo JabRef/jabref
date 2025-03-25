@@ -20,12 +20,12 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
                     Arrays.stream(CSLFormatUtils.Format.values()).map(CSLFormatUtils.Format::getFormat).toList()
             ));
 
-    public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
-        this.cslBibliographyTitle.set(preferences.getCslBibliographyTitle());
-        this.cslBibliographySelectedHeaderFormat.set(preferences.getCslBibliographySelectedHeaderFormat());
+    public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences openOfficePreferences) {
+        this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
+        this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());
 
-        cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitleProperty());
-        cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormatProperty());
+        cslBibliographyTitle.bindBidirectional(openOfficePreferences.cslBibliographyTitleProperty());
+        cslBibliographySelectedHeaderFormat.bindBidirectional(openOfficePreferences.cslBibliographyHeaderFormatProperty());
     }
 
     public StringProperty cslBibliographyTitleProperty() {
