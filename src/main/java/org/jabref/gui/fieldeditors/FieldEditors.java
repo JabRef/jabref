@@ -25,6 +25,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -111,7 +112,7 @@ public class FieldEditors {
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
-            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
+            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences,databaseContext, undoManager, undoAction, redoAction);
         } else {
             // There was no specific editor found
 
