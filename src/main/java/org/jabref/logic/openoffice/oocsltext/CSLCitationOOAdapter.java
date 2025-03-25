@@ -48,7 +48,6 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
-    private OpenOfficePreferences preferences;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -57,7 +56,6 @@ public class CSLCitationOOAdapter {
         if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle;
         }
-        this.preferences = openOfficePreferences;
 
         markManager.readAndUpdateExistingMarks();
     }
