@@ -1,6 +1,8 @@
 package org.jabref.gui.openoffice;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
@@ -9,6 +11,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -29,6 +32,12 @@ public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        
+        Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setOnAction(event -> {
+            CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
+            this.close();
+        });
     }
 
     @FXML

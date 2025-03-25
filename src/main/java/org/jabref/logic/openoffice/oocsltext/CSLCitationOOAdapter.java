@@ -56,6 +56,8 @@ public class CSLCitationOOAdapter {
         if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle;
         }
+        
+        CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
 
         markManager.readAndUpdateExistingMarks();
     }

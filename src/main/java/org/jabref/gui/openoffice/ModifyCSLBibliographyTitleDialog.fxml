@@ -15,5 +15,5 @@
             <ComboBox fx:id="formats" prefWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
         </GridPane>
     </content>
-    <ButtonType fx:constant="CLOSE"/>
+    <ButtonType fx:constant="OK"/>
 </DialogPane>
