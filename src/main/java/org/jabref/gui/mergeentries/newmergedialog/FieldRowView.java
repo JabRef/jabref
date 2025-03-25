@@ -221,17 +221,27 @@ public class FieldRowView {
         fieldName = fieldName.toLowerCase().trim();
 
         String leftVal = leftValueCell.textProperty().getValue();
+        String rightVal = rightValueCell.textProperty().getValue();
         if (leftVal == null) {
             return;
         }
         leftVal = leftVal.trim();
+        rightVal = rightVal.trim();
 
         // 1) If it's a "year" field and out of valid range
         if (fieldName.contains("year")) {
             try {
-                int year = Integer.parseInt(leftVal);
-                if (year < 1800 || year > 2100) {
+                int leftYear = Integer.parseInt(leftVal);
+                int rightYear = Integer.parseInt(rightVal);
+                if (leftYear < 1800 || leftYear > 2100) {
                     selectRightValue();
+                }
+                else if(leftYear-rightYear >10 ||leftYear-rightYear <-10){
+                    if(leftYear>rightYear){
+                        selectLeftValue();
+                    }else{
+                        selectRightValue();
+                    }
                 }
             } catch (NumberFormatException e) {
                 selectRightValue();
