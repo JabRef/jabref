@@ -1146,6 +1146,9 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
         EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
+        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
+        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
+
         return openOfficePreferences;
     }
 
