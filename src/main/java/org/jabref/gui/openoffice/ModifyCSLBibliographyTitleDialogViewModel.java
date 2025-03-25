@@ -19,8 +19,10 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
              new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
                     Arrays.stream(CSLFormatUtils.Format.values()).map(CSLFormatUtils.Format::getFormat).toList()
             ));
+    private final OpenOfficePreferences openOfficePreferences;
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
         this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());
 
@@ -37,6 +39,10 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
     }
 
     public ReadOnlyListProperty<String> formatListProperty() {
-        return this.formatListProperty;
+        return formatListProperty;
+    }
+
+    public void updateSettings() {
+        CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
     }
 }

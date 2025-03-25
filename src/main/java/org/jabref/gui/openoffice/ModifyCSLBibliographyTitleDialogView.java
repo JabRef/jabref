@@ -11,7 +11,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -20,10 +19,10 @@ public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
     @FXML private TextField titleField;
     @FXML private ComboBox<String> formats;
 
-    private final OpenOfficePreferences openOfficePreferences;
+    private final ModifyCSLBibliographyTitleDialogViewModel viewModel;
 
     public ModifyCSLBibliographyTitleDialogView(OpenOfficePreferences openOfficePreferences) {
-        this.openOfficePreferences = openOfficePreferences;
+        this.viewModel = new ModifyCSLBibliographyTitleDialogViewModel(openOfficePreferences);
 
         this.setTitle(Localization.lang("Modify bibliography title"));
         this.initModality(Modality.NONE);
@@ -32,18 +31,16 @@ public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        
+
         Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         okButton.setOnAction(event -> {
-            CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
+            viewModel.updateSettings();
             this.close();
         });
     }
 
     @FXML
     public void initialize() {
-        ModifyCSLBibliographyTitleDialogViewModel viewModel = new ModifyCSLBibliographyTitleDialogViewModel(openOfficePreferences);
-
         titleField.textProperty().bindBidirectional(viewModel.cslBibliographyTitleProperty());
 
         new ViewModelListCellFactory<String>()
