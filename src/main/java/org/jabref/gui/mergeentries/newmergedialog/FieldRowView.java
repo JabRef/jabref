@@ -216,44 +216,42 @@ public class FieldRowView {
     public void autoSelectBetterValue() {
         String fieldName = fieldNameCell.getText();
         if (fieldName == null) {
-            return;
+            return; // Early return if fieldName is null
         }
-        fieldName = fieldName.toLowerCase().trim();
+        fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
 
         String leftVal = leftValueCell.textProperty().getValue();
         String rightVal = rightValueCell.textProperty().getValue();
-        if (leftVal == null) {
-            return;
+        if (leftVal == null || rightVal == null) {
+            return; // Early return if leftVal or rightVal is null
         }
         leftVal = leftVal.trim();
         rightVal = rightVal.trim();
 
-        // 1) If it's a "year" field and out of valid range
+        // Logic for auto selection based on field name
         if (fieldName.contains("year")) {
             try {
                 int leftYear = Integer.parseInt(leftVal);
                 int rightYear = Integer.parseInt(rightVal);
                 if (leftYear < 1800 || leftYear > 2100) {
-                    selectRightValue();
-                }
-                else if(leftYear-rightYear >10 ||leftYear-rightYear <-10){
-                    if(leftYear>rightYear){
+                    selectRightValue(); // Select right value if left year is out of range
+                } else if (Math.abs(leftYear - rightYear) > 10) {
+                    // Select value based on a difference condition
+                    if (leftYear > rightYear) {
                         selectLeftValue();
-                    }else{
+                    } else {
                         selectRightValue();
                     }
                 }
             } catch (NumberFormatException e) {
-                selectRightValue();
+                selectRightValue(); // Handle parsing exceptions
             }
-        }
-
-        // 2) If it's a "type" field and the left is "misc"
-        else if (fieldName.contains("type")) {
+        } else if (fieldName.contains("type")) {
             if ("misc".equalsIgnoreCase(leftVal)) {
-                selectRightValue();
+                selectRightValue(); // Select right value if left value is "misc"
             }
         }
     }
+
 
 }
