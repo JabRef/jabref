@@ -106,7 +106,7 @@ public class GitClientHandler extends GitHandler {
             }
         }
     }
-    
+
     private void pull() throws IOException, GitAPIException {
         Git git = Git.open(this.repositoryPathAsFile);
         git.pull()
@@ -191,5 +191,39 @@ public class GitClientHandler extends GitHandler {
            .setRebase(true)
            .call();
         dialogService.notify(Localization.lang("Successfully updated local repository"));
+    }
+
+    public void showGitCredentialErrorDialog(String operationType) {
+        dialogService.showErrorDialogAndWait(Localization.lang(operationType + "Failed") +
+                Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
+                Localization.lang("Please set your credentials by either:") + "\n" +
+                "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
+                "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
+                Localization.lang("Other possible causes:") + "\n" +
+                "- " + Localization.lang("Network connectivity issues") + "\n" +
+                "- " + Localization.lang("Remote repository rejecting the " + operationType + "operation"));
+    }
+
+    public void pullAndDisplayErrorMsg() throws IOException {
+        boolean pullSuccessful = this.pullOnCurrentBranch();
+        if (pullSuccessful) {
+            dialogService.notify(Localization.lang("Successfully Pulled changes from remote repository"));
+        } else {
+            this.showGitCredentialErrorDialog("pull");
+        }
+    }
+
+    public void commitThenPushAndDisplayErrorMsg() throws IOException, GitAPIException {
+        boolean commitCreated = this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+        if (commitCreated) {
+            boolean successPush = this.pushCommitsToRemoteRepository();
+            if (successPush) {
+                dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
+            } else {
+                this.showGitCredentialErrorDialog("push");
+            }
+        } else {
+            dialogService.showInformationDialogAndWait(Localization.lang("Git Push"), Localization.lang("No changes to push"));
+        }
     }
 }

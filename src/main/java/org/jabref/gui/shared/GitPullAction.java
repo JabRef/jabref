@@ -55,21 +55,7 @@ public class GitPullAction extends SimpleCommand {
                 preferences);
         if (gitClientHandler.isGitRepository()) {
             try {
-               boolean pullSuccessful = gitClientHandler.pullOnCurrentBranch();
-               if (pullSuccessful) {
-                    dialogService.notify(Localization.lang("Successfully Pulled changes from remote repository"));
-                } else {
-                     dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Failed"),
-                        Localization.lang("Failed to pull changes from remote repository.") + "\n\n" +
-                        Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
-                        Localization.lang("Please set your credentials by either:") + "\n" +
-                        "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
-                        "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
-                        Localization.lang("Other possible causes:") + "\n" +
-                        "- " + Localization.lang("Network connectivity issues") + "\n" +
-                        "- " + Localization.lang("Merge conflicts") + "\n" +
-                        "- " + Localization.lang("Remote repository inaccessible"));
-                }
+                gitClientHandler.pullAndDisplayErrorMsg();
             } catch (IOException e) {
                 LOGGER.error("Failed to Pull", e);
                 dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Failed"),

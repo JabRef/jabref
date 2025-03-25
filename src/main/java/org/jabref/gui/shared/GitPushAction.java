@@ -49,25 +49,7 @@ public class GitPushAction extends SimpleCommand {
                 preferences);
         if (gitClientHandler.isGitRepository()) {
             try {
-               boolean commitCreated = gitClientHandler.createCommitOnCurrentBranch("Automatic update via JabRef", false);
-               if (commitCreated) {
-                    boolean successPush = gitClientHandler.pushCommitsToRemoteRepository();
-                    if (successPush) {
-                        dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
-                    } else {
-                        dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),
-                            Localization.lang("Failed to push changes to remote repository.") + "\n\n" +
-                            Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
-                            Localization.lang("Please set your credentials by either:") + "\n" +
-                            "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
-                            "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
-                            Localization.lang("Other possible causes:") + "\n" +
-                            "- " + Localization.lang("Network connectivity issues") + "\n" +
-                            "- " + Localization.lang("Remote repository rejecting the push"));
-                    }
-                } else {
-                    dialogService.showInformationDialogAndWait(Localization.lang("Git Push"), Localization.lang("No changes to push"));
-                }
+           gitClientHandler.commitThenPushAndDisplayErrorMsg();
             } catch (IOException | GitAPIException e) {
                 LOGGER.error("Failed to Push", e);
                 dialogService.showErrorDialogAndWait(Localization.lang("Git Push Failed"),

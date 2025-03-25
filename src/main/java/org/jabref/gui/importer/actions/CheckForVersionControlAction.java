@@ -38,21 +38,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         parserResult.getDatabaseContext().setVersioned(true);
 
         try {
-            boolean pullSuccessful = this.gitClientHandler.pullOnCurrentBranch();
-            if (pullSuccessful) {
-                dialogService.notify("Successfully Pulled changes from remote repository");
-            } else {
-                dialogService.showErrorDialogAndWait("Git Pull Failed", 
-                        "Failed to pull changes from remote repository.\n\n" +
-                        "MOST LIKELY CAUSE: Missing Git credentials.\n" +
-                        "Please set your credentials by either:\n" +
-                        "1. Setting GIT_EMAIL and GIT_PW environment variables, or\n" +
-                        "2. Configuring them in JabRef Preferences\n\n" +
-                        "Other possible causes:\n" +
-                        "- Network connectivity issues\n" +
-                        "- Merge conflicts\n" +
-                        "- Remote repository inaccessible");
-            }
+           gitClientHandler.pullAndDisplayErrorMsg();
         } catch (IOException e) {
             LOGGER.error("Failed to Pull", e);
             dialogService.showErrorDialogAndWait("Git Pull Failed", "Failed to pull changes: " + e.getMessage());
