@@ -159,7 +159,7 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);
     }
 
-    public StringProperty cslBibliographyTitle() {
+    public StringProperty cslBibliographyTitleProperty() {
         return cslBibliographyTitle;
     }
 
@@ -167,7 +167,7 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle.get();
     }
 
-    public StringProperty cslBibliographyHeaderFormat() {
+    public StringProperty cslBibliographyHeaderFormatProperty() {
         return cslBibliographyHeaderFormat;
     }
 

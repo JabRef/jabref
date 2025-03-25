@@ -21,18 +21,18 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
             ));
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
-        this.cslBibliographyTitle.set(preferences.cslBibliographyTitle().get());
-        this.cslBibliographySelectedHeaderFormat.set(preferences.cslBibliographyHeaderFormat().get());
+        this.cslBibliographyTitle.set(preferences.getCslBibliographyTitle());
+        this.cslBibliographySelectedHeaderFormat.set(preferences.getCslBibliographyHeaderFormat());
 
-        cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
-        cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
+        cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitleProperty());
+        cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormatProperty());
     }
 
-    public StringProperty cslBibliographyTitle() {
+    public StringProperty cslBibliographyTitleProperty() {
         return cslBibliographyTitle;
     }
 
-    public StringProperty cslBibliographySelectedHeaderFormat() {
+    public StringProperty cslBibliographySelectedHeaderFormatProperty() {
         return cslBibliographySelectedHeaderFormat;
     }
 
