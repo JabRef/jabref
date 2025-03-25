@@ -28,12 +28,12 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
         cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
     }
 
-    public StringProperty getCslBibliographyTitle() {
-        return cslBibliographyTitle.get();
+    public StringProperty cslBibliographyTitle() {
+        return cslBibliographyTitle;
     }
 
-    public StringProperty getCslBibliographySelectedHeaderFormat() {
-        return this.cslBibliographySelectedHeaderFormat.get();
+    public StringProperty cslBibliographySelectedHeaderFormat() {
+        return cslBibliographySelectedHeaderFormat;
     }
 
     public ReadOnlyListProperty<String> formatListProperty() {

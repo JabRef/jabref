@@ -56,8 +56,8 @@ public class CSLFormatUtils {
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     public CSLFormatUtils(OpenOfficePreferences openOfficePreferences) {
-        BIBLIOGRAPHY_TITLE = openOfficePreferences.cslBibliographyTitle().get();
-        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.cslBibliographyHeaderFormat().get();
+        BIBLIOGRAPHY_TITLE = openOfficePreferences.getCslBibliographyTitle();
+        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.getCslBibliographySelectedHeaderFormat();
     }
 
     /**
