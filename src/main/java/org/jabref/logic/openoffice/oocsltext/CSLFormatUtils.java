@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -46,13 +47,18 @@ public class CSLFormatUtils {
         }
     }
 
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT = "Heading 2";
+    public static String DEFAULT_BIBLIOGRAPHY_TITLE;
+    public static String DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT;
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
 
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
+
+    public CSLFormatUtils(OpenOfficePreferences openOfficePreferences) {
+        DEFAULT_BIBLIOGRAPHY_TITLE = openOfficePreferences.cslBibliographyTitle().get();
+        DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.cslBibliographyHeaderFormat().get();
+    }
 
     /**
      * Transforms provided HTML into a format that can be fully parsed and inserted into an OO document.
