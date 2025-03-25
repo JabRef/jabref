@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -26,8 +25,29 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = OpenOfficePreferences.CSL_BIBLIOGRAPHY_TITLE;
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = OpenOfficePreferences.CSL_HEADER_FORMAT;
+    public enum Format {
+        TITLE("Title"),
+        BODY_TEXT("Body Text"),
+        SUBTITLE("Subtitle"),
+        HEADING_1("Heading 1"),
+        HEADING_2("Heading 2"),
+        HEADING_3("Heading 3"),
+        HEADING_4("Heading 4"),
+        HEADING("Heading");
+
+        private final String format;
+
+        Format(String format) {
+            this.format = format;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+    }
+
+    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
+    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT = "Heading 2";
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
 

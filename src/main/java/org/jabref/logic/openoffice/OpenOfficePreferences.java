@@ -11,8 +11,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.openoffice.oocsltext.Format;
 import org.jabref.logic.openoffice.style.OOStyle;
+
+import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
 
 public class OpenOfficePreferences {
 
@@ -26,9 +27,6 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
-    public static final String CSL_BIBLIOGRAPHY_TITLE = "References";
-    public static final String CSL_HEADER_FORMAT = "Heading 2";
-
     private final StringProperty executablePath;
     private final BooleanProperty useAllDatabases;
     private final BooleanProperty syncWhenCiting;
@@ -37,7 +35,7 @@ public class OpenOfficePreferences {
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
-    private final ObjectProperty<Format> cslHeaderFormat;
+    private final ObjectProperty<Format> cslBibliographyHeaderFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -47,7 +45,7 @@ public class OpenOfficePreferences {
                                  OOStyle currentStyle,
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
-                                 String cslHeaderFormat) {
+                                 String cslBibliographyHeaderFormat) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -56,7 +54,7 @@ public class OpenOfficePreferences {
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
-        this.cslHeaderFormat = new SimpleObjectProperty<>(Format.HEADING_2);
+        this.cslBibliographyHeaderFormat = new SimpleObjectProperty<>(Format.HEADING_2);
     }
 
     public void clearConnectionSettings() {
@@ -167,7 +165,7 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle;
     }
 
-    public ObjectProperty<Format> cslHeaderFormat() {
-        return cslHeaderFormat;
+    public ObjectProperty<Format> cslBibliographyHeaderFormat() {
+        return cslBibliographyHeaderFormat;
     }
 }

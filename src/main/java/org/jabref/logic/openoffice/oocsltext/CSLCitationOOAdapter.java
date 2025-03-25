@@ -48,6 +48,7 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
+    private OpenOfficePreferences preferences;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -56,6 +57,7 @@ public class CSLCitationOOAdapter {
         if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle;
         }
+        this.preferences = openOfficePreferences;
 
         markManager.readAndUpdateExistingMarks();
     }
@@ -176,7 +178,7 @@ public class CSLCitationOOAdapter {
             throws WrappedTargetException, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
-        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+        OOText title = OOFormat.paragraph(OOText.fromString(preferences.cslBibliographyTitle().get()), preferences.cslBibliographyHeaderFormat().get().getFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);

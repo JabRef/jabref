@@ -9,29 +9,30 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.Format;
+
+import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.Format;
 
 public class ModifyCSLBibliographyTitleDialogViewModel {
 
-    private final StringProperty clsBibliographyTitle = new SimpleStringProperty("");
-    private final ObjectProperty<Format> cslSelectedFormat = new SimpleObjectProperty<>();
+    private final StringProperty cslBibliographyTitle = new SimpleStringProperty("");
+    private final ObjectProperty<Format> cslBibliographyHeaderSelectedFormat = new SimpleObjectProperty<>();
     private final ReadOnlyListProperty<Format> formatListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Format.values()));
 
     public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
-        this.clsBibliographyTitle.set(preferences.cslBibliographyTitle().get());
-        this.cslSelectedFormat.set(preferences.cslHeaderFormat().get());
+        this.cslBibliographyTitle.set(preferences.cslBibliographyTitle().get());
+        this.cslBibliographyHeaderSelectedFormat.set(preferences.cslBibliographyHeaderFormat().get());
 
-        clsBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
-        cslSelectedFormat.bindBidirectional(preferences.cslHeaderFormat());
+        cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
+        cslBibliographyHeaderSelectedFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
     }
 
     public StringProperty cslBibliographyTitle() {
-        return clsBibliographyTitle;
+        return cslBibliographyTitle;
     }
 
-    public ObjectProperty<Format> cslSelectedFormat() {
-        return this.cslSelectedFormat;
+    public ObjectProperty<Format> cslBibliographyHeaderSelectedFormat() {
+        return this.cslBibliographyHeaderSelectedFormat;
     }
 
     public ReadOnlyListProperty<Format> formatListProperty() {
