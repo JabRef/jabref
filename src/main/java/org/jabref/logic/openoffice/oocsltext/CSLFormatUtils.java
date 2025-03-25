@@ -47,8 +47,8 @@ public class CSLFormatUtils {
         }
     }
 
-    public static String DEFAULT_BIBLIOGRAPHY_TITLE;
-    public static String DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT;
+    public static String BIBLIOGRAPHY_TITLE;
+    public static String BIBLIOGRAPHY_HEADER_FORMAT;
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
 
@@ -56,8 +56,8 @@ public class CSLFormatUtils {
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     public CSLFormatUtils(OpenOfficePreferences openOfficePreferences) {
-        DEFAULT_BIBLIOGRAPHY_TITLE = openOfficePreferences.cslBibliographyTitle().get();
-        DEFAULT_BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.cslBibliographyHeaderFormat().get();
+        BIBLIOGRAPHY_TITLE = openOfficePreferences.cslBibliographyTitle().get();
+        BIBLIOGRAPHY_HEADER_FORMAT = openOfficePreferences.cslBibliographyHeaderFormat().get();
     }
 
     /**
