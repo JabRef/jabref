@@ -83,10 +83,13 @@ public class URLUtil {
      * @return true if <c>url</c> contains a valid URL
      */
     public static boolean isURL(String url) {
+        if (!url.matches("^[a-zA-Z]+://.*")) {
+            return false;
+        }
         try {
             createUri(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
