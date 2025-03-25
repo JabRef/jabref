@@ -46,8 +46,7 @@ jobs:
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Checkout
-        # required for gh tool
-        if: ${{ github.event_name != 'workflow_dispatch' && steps.read-pr_number.outputs.pr_number != '' }}
+        # required for gh tool and .github/ghprcomment.yml
         uses: actions/checkout@v4
         with:
           show-progress: 'false'
