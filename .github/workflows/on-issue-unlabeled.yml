@@ -6,7 +6,7 @@ on:
        - unlabeled
 
 jobs:
-  ensure_column:
+  handle_Assigned_and_FirstTimeCodeContribution:
     name: "📍 Assigned or FirstTimeCodeContribution"
     if: ${{ (github.event.label.name == '📍 Assigned' || github.event.label.name == 'FirstTimeCodeContribution') && github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
@@ -33,13 +33,6 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-  remove_assignees:
-    if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: read
-    steps:
       - uses: actions/checkout@v4
       - name: Remove all assignees
         run: |
