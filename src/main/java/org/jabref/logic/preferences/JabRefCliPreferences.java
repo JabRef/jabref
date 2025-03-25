@@ -277,7 +277,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
     public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
 
-    public static final String CSL_BIBLIOGRAPHY_TITLE = "bibliographyTitle";
+    public static final String CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
 
     // Prefs node for CitationKeyPatterns
