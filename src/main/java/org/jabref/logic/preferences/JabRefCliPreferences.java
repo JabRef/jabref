@@ -276,9 +276,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
     public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
-
-    public static final String CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
-    public static final String CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
+    public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
+    public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -568,8 +567,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
         defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
-        defaults.put(CSL_BIBLIOGRAPHY_TITLE, "References");
-        defaults.put(CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
+        defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
+        defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -1134,8 +1133,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_BIBLIOGRAPHY_STYLE_FILE),
                 currentStyle,
                 getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
-                get(CSL_BIBLIOGRAPHY_TITLE),
-                get(CSL_BIBLIOGRAPHY_HEADER_FORMAT));
+                get(OO_CSL_BIBLIOGRAPHY_TITLE),
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT));
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
