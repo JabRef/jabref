@@ -4,6 +4,8 @@ import java.net.URI;
 import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import org.junit.jupiter.api.Test;
 
@@ -107,12 +109,11 @@ class URLUtilTest {
         assertEquals("https://www.example.com", absoluteHttpsUrl.toString());
     }
 
-    @Test
-    void createShouldHandleOtherProtocols() throws Exception {
-        URL ftpUrl = URLUtil.create("ftp://example.com");
-        assertEquals("ftp://example.com", ftpUrl.toString());
-
-        URL fileUrl = URLUtil.create("file:///path/to/file");
-        assertEquals("file:/path/to/file", fileUrl.toString());
-}
-}
+    @ParameterizedTest
+    @CsvSource({
+        "ftp://example.com, ftp://example.com",
+        "file:///path/to/file, file:/path/to/file"
+    })
+    void createShouldHandleOtherProtocols(String inputUrl, String expectedUrl) throws Exception {
+        URL actualUrl = URLUtil.create(inputUrl);
+        assertEquals(expectedUrl, actualUrl.toString());

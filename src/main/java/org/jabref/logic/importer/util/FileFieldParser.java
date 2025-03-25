@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 public class FileFieldParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
-    private static final String HTTP_PREFIX = "http://";
-    private static final String HTTPS_PREFIX = "https://";
 
     private final String value;
 
@@ -58,7 +56,7 @@ public class FileFieldParser {
             return files;
         }
 
-        if (LinkedFile.isOnlineLink(value.trim())) {
+        if (URLUtil.isURL(value.trim())) {
             // needs to be modifiable
             try {
                 return List.of(new LinkedFile(URLUtil.create(value), ""));

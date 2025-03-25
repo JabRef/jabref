@@ -96,6 +96,10 @@ public class URLUtil {
 
     /**
      * Creates a {@link URL} object from the given string URL.
+     * <p>
+     * If the URL does not contain a protocol (e.g., "example.com"), 
+     * "https://" is added by default to ensure a valid URL format. 
+     * This helps avoid errors when handling URLs without protocols.
      *
      * @param url the URL string to be converted into a {@link URL}.
      * @return the {@link URL} object created from the string URL.
@@ -103,9 +107,9 @@ public class URLUtil {
      */
     public static URL create(String url) throws MalformedURLException {
         if (!url.contains(PROTOCOL_SEPARATOR)) {
-            url = "http://" + url;
+            url = "https://" + url;
         }
-    
+
         URI uri = createUri(url);
         return uri.toURL();
     }
