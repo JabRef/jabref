@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
@@ -49,10 +48,12 @@ public class GitClientHandler extends GitHandler {
         this.notificationService = notificationService;
         this.preferences = preferences;
 
-        this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                preferences.getGitPreferences().getGitHubUsername(),
-                preferences.getGitPreferences().getGitHubPasskey()
-        );
+        if (preferences != null && preferences.getGitPreferences() != null) {
+            this.credentialsProvider = new UsernamePasswordCredentialsProvider(
+                    preferences.getGitPreferences().getGitHubUsername(),
+                    preferences.getGitPreferences().getGitHubPasskey()
+            );
+        }
     }
 
     /**
