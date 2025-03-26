@@ -1,5 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import java.time.Year;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -25,7 +27,6 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Year;
 
 /**
  * A controller class to control left, right and merged field values
@@ -235,7 +236,7 @@ public class FieldRowView {
             try {
                 int leftYear = Integer.parseInt(leftVal);
                 int rightYear = Integer.parseInt(rightVal);
-                if (leftYear < 1800 || leftYear > (Year.now().getValue() + 100) ) {
+                if (leftYear < 1800 || leftYear > (Year.now().getValue() + 100)) {
                     selectRightValue(); // Select right value if left year is out of range, note that work created before Year 1800 will still be correctly processed
                 } else if (Math.abs(leftYear - rightYear) > 10) {
                     // Select value based on a difference condition
