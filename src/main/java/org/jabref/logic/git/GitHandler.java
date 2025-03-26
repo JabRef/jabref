@@ -319,7 +319,7 @@ public class GitHandler {
         }
     }
 
-    public boolean pullAndRebaseOnCurrentBranch() throws IOException, GitAPIException {
+    public boolean pullAndRebaseOnCurrentBranch() throws IOException{
         boolean pullAndRebaseSuccessful = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {

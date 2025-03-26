@@ -30,6 +30,16 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
+    private final static String GENERAL_ERROR_MESSAGE = Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
+            Localization.lang("Please set your credentials by either:") + "\n" +
+            "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
+            "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
+            Localization.lang("Other possible causes:") + "\n" +
+            "- " + Localization.lang("Network connectivity issues") + "\n" +
+            "- " + Localization.lang("Remote repository rejecting the operation");
+    private static final String GIT_PUSH = "Git push";
+    private static final String GIT_COMMIT = "Git commit";
+    private static final String GIT_PULL = "Git pull";
     private final DialogService dialogService;
     private final CliPreferences preferences;
 
@@ -53,24 +63,21 @@ public class GitClientHandler extends GitHandler {
      * an error, the repository is reverted to the commit and a regular pull is executed.
      */
     public void postSaveDatabaseAction() {
-        if (this.isGitRepository() &&
+        if (isGitRepository() &&
                 preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
                 preferences.getGitPreferences().getAutoPushEnabled()) {
             // Save BibDatabaseContext of bib files in current HEAD
             RevCommit localCommit = getLatestCommit();
             try {
-                this.createCommitOnCurrentBranch("Automatic update via JabRef", false);
+                createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
                 return;
             }
 
             try {
                 this.pullAndRebaseOnCurrentBranch();
-                // Save BibDatabaseContext of bib files in updated HEAD
                 RevCommit remoteCommit = getLatestCommit();
             } catch (IOException | GitAPIException e) {
-                // In the case that rebase fails, try revert to previous commit
-                // and execute regular pull
                 Optional<Ref> headRef = Optional.empty();
                 try {
                     headRef = this.getHeadRef();
@@ -80,13 +87,11 @@ public class GitClientHandler extends GitHandler {
                 if (headRef.isEmpty()) {
                     return;
                 }
-
                 try {
                     this.revertToCommit(headRef.get());
                 } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to revert to commit");
                 }
-
                 try {
                     this.pull();
                 } catch (CheckoutConflictException ex) {
@@ -184,24 +189,8 @@ public class GitClientHandler extends GitHandler {
            .call();
     }
 
-    private void pullAndRebaseOnCurrentBranch() throws IOException, GitAPIException {
-        Git git = Git.open(this.repositoryPathAsFile);
-        git.pull()
-           .setCredentialsProvider(credentialsProvider)
-           .setRebase(true)
-           .call();
-        dialogService.notify(Localization.lang("Successfully updated local repository"));
-    }
-
     public void showGeneralErrorDialog(String operationType) {
-        dialogService.showErrorDialogAndWait(Localization.lang(operationType + "Failed") +
-                Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
-                Localization.lang("Please set your credentials by either:") + "\n" +
-                "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
-                "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
-                Localization.lang("Other possible causes:") + "\n" +
-                "- " + Localization.lang("Network connectivity issues") + "\n" +
-                "- " + Localization.lang("Remote repository rejecting the " + operationType + "operation"));
+        dialogService.showErrorDialogAndWait(Localization.lang(operationType + "Failed"), GENERAL_ERROR_MESSAGE);
     }
 
     public void checkGitRepoAndPullAndDisplayMsg() throws IOException {
@@ -212,7 +201,7 @@ public class GitClientHandler extends GitHandler {
         if (pullOnCurrentBranch()) {
             dialogService.notify(Localization.lang("Successfully pulled from remote repository"));
         } else {
-           showGeneralErrorDialog(Localization.lang("Git pull"));
+           showGeneralErrorDialog(GIT_PULL);
         }
     }
 
@@ -223,14 +212,14 @@ public class GitClientHandler extends GitHandler {
         }
             boolean commitCreated = this.createCommitOnCurrentBranch(Localization.lang("Automatic update via JabRef"), false);
             if (!commitCreated) {
-               showGeneralErrorDialog(Localization.lang("Git commit"));
+               showGeneralErrorDialog(GIT_COMMIT);
                 return;
             }
             boolean successPush = pushCommitsToRemoteRepository();
             if (successPush) {
                 dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
             } else {
-               showGeneralErrorDialog(Localization.lang("Git push"));
+               showGeneralErrorDialog(GIT_PUSH);
             }
         }
 
