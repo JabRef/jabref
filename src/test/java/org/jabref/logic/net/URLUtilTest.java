@@ -4,10 +4,10 @@ import java.net.URI;
 import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -94,7 +94,7 @@ class URLUtilTest {
     @Test
     void createShouldHandleRelativeURLs() throws Exception {
         URL relativeUrl = URLUtil.create("www.example.com");
-        assertEquals("http://www.example.com", relativeUrl.toString());
+        assertEquals("https://www.example.com", relativeUrl.toString());
 
         URL noWwwUrl = URLUtil.create("example.com");
         assertEquals("http://example.com", noWwwUrl.toString());
