@@ -423,7 +423,7 @@ class BibDatabaseTest {
         database.addString(tripleB);
         database.insertEntry(entry);
 
-        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Collections.singletonList(entry));
+        List<BibtexString> usedStrings = database.getUsedStrings(Collections.singletonList(entry));
         assertEquals(strings, usedStrings);
     }
 
