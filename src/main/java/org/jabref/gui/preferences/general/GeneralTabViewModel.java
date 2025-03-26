@@ -36,7 +36,6 @@ import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -65,10 +64,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
-
-    private final ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AutoPushMode.values()));
-    private final ObjectProperty<AutoPushMode> autoPushModeProperty = new SimpleObjectProperty<>();
 
     private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
 
@@ -204,7 +199,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
 
         autoPushEnabledProperty().setValue(gitPreferences.getAutoPushEnabled());
-        autoPushModeProperty().setValue(gitPreferences.getAutoPushMode());
         gitHubUsernameProperty().setValue(gitPreferences.getGitHubUsername());
         gitHubPasskeyProperty().setValue(gitPreferences.getGitHubPasskey());
 
@@ -251,7 +245,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
         gitPreferences.setAutoPushEnabled(autoPushEnabledProperty().get());
-        gitPreferences.setAutoPushMode(autoPushModeProperty().get());
         gitPreferences.setGitHubUsername(gitHubUsernameProperty().get());
         gitPreferences.setGitHubPasskey(gitHubPasskeyProperty().get());
 
@@ -461,14 +454,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty autoPushEnabledProperty() {
         return gitPreferences.getAutoPushEnabledProperty();
-    }
-
-    public ReadOnlyListProperty<AutoPushMode> autoPushModeListProperty() {
-        return this.autoPushModeListProperty;
-    }
-
-    public ObjectProperty<AutoPushMode> autoPushModeProperty() {
-        return this.autoPushModeProperty;
     }
 
     public StringProperty gitHubUsernameProperty() {
