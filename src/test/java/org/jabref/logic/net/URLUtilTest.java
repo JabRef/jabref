@@ -117,3 +117,5 @@ class URLUtilTest {
     void createShouldHandleOtherProtocols(String inputUrl, String expectedUrl) throws Exception {
         URL actualUrl = URLUtil.create(inputUrl);
         assertEquals(expectedUrl, actualUrl.toString());
+    }
+}
