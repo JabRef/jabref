@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - Added "$" to the citation key generator preferences default list of characters to remove [#12536](https://github.com/JabRef/jabref/issues/12536)
 - We changed the message displayed in the Integrity Check Progress dialog to "Waiting for the check to finish...". [#12694](https://github.com/JabRef/jabref/issues/12694)
+- We moved journal abbreviation from the Quality menu to the cleanup entries dialog [#11791](https://github.com/JabRef/jabref/issues/11791)
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
