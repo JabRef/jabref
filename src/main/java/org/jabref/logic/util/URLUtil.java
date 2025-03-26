@@ -106,7 +106,10 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        if (!url.contains(PROTOCOL_SEPARATOR)) {
+        if (url.startsWith("ftp://")) {
+            URI uri = createUri(url);
+            return uri.toURL();
+        }else if (!url.contains(PROTOCOL_SEPARATOR)) {
             url = "https://" + url;
         }
 

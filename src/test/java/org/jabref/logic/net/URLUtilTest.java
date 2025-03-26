@@ -97,7 +97,7 @@ class URLUtilTest {
         assertEquals("https://www.example.com", relativeUrl.toString());
 
         URL noWwwUrl = URLUtil.create("example.com");
-        assertEquals("http://example.com", noWwwUrl.toString());
+        assertEquals("https://example.com", noWwwUrl.toString());
     }
 
     @Test
