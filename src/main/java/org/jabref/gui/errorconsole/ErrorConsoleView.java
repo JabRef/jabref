@@ -1,6 +1,5 @@
 package org.jabref.gui.errorconsole;
 
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -72,7 +71,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
         messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (change -> {
+        viewModel.allMessagesDataProperty().addListener((change -> {
             int size = viewModel.allMessagesDataProperty().size();
             if (size > 0) {
                 messagesListView.scrollTo(size - 1);
