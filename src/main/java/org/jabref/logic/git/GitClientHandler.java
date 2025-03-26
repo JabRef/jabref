@@ -30,16 +30,14 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
-    private final static String GENERAL_ERROR_MESSAGE = Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
-            Localization.lang("Please set your credentials by either:") + "\n" +
-            "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
-            "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
-            Localization.lang("Other possible causes:") + "\n" +
-            "- " + Localization.lang("Network connectivity issues") + "\n" +
-            "- " + Localization.lang("Remote repository rejecting the operation");
-    private static final String GIT_PUSH = "Git push";
-    private static final String GIT_COMMIT = "Git commit";
-    private static final String GIT_PULL = "Git pull";
+   private final static String GENERAL_ERROR_MESSAGE = Localization.lang("This Git operation failed") + "\n\n" +
+        Localization.lang("MOST LIKELY CAUSE: Missing Git credentials.") + "\n" +
+        Localization.lang("Please set your credentials by either:") + "\n" +
+        "1. " + Localization.lang("Setting GIT_EMAIL and GIT_PW environment variables") + ", " + Localization.lang("or") + "\n" +
+        "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
+        Localization.lang("Other possible causes:") + "\n" +
+        "- " + Localization.lang("Network connectivity issues") + "\n" +
+        "- " + Localization.lang("Remote repository rejecting the operation");
     private final DialogService dialogService;
     private final CliPreferences preferences;
 
@@ -189,8 +187,8 @@ public class GitClientHandler extends GitHandler {
            .call();
     }
 
-    public void showGeneralErrorDialog(String operationType) {
-        dialogService.showErrorDialogAndWait(Localization.lang(operationType + "Failed"), GENERAL_ERROR_MESSAGE);
+    public void showGeneralErrorDialog() {
+        dialogService.showErrorDialogAndWait(GENERAL_ERROR_MESSAGE);
     }
 
     public void checkGitRepoAndPullAndDisplayMsg() throws IOException {
@@ -201,7 +199,7 @@ public class GitClientHandler extends GitHandler {
         if (pullOnCurrentBranch()) {
             dialogService.notify(Localization.lang("Successfully pulled from remote repository"));
         } else {
-           showGeneralErrorDialog(GIT_PULL);
+           showGeneralErrorDialog();
         }
     }
 
@@ -212,14 +210,14 @@ public class GitClientHandler extends GitHandler {
         }
             boolean commitCreated = this.createCommitOnCurrentBranch(Localization.lang("Automatic update via JabRef"), false);
             if (!commitCreated) {
-               showGeneralErrorDialog(GIT_COMMIT);
+               showGeneralErrorDialog();
                 return;
             }
             boolean successPush = pushCommitsToRemoteRepository();
             if (successPush) {
                 dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
             } else {
-               showGeneralErrorDialog(GIT_PUSH);
+               showGeneralErrorDialog();
             }
         }
 
