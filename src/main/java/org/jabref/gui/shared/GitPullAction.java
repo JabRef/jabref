@@ -1,5 +1,6 @@
 package org.jabref.gui.shared;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitClientHandler;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -51,6 +53,12 @@ public class GitPullAction extends SimpleCommand {
         GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
                 dialogService,
                 preferences);
-        gitClientHandler.pullAndDisplayErrorMsg();
+        try {
+            gitClientHandler.checkGitRepoAndPullAndDisplayMsg();
+        } catch (IOException e) {
+        LOGGER.error("Error while pulling and displaying message", e);
+        dialogService.showErrorDialogAndWait(Localization.lang("Git Pull Error"),
+                Localization.lang("Fail to pull changes: {0}", e.getMessage()));
+        }
     }
 }

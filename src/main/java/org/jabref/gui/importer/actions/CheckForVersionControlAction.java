@@ -38,7 +38,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
         parserResult.getDatabaseContext().setVersioned(true);
 
         try {
-           gitClientHandler.pullAndDisplayErrorMsg();
+            gitClientHandler.checkGitRepoAndPullAndDisplayMsg();
         } catch (IOException e) {
             LOGGER.error("Failed to Pull", e);
             dialogService.showErrorDialogAndWait("Git Pull Failed", "Failed to pull changes: " + e.getMessage());
