@@ -37,7 +37,8 @@ public class GitClientHandler extends GitHandler {
         "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
         Localization.lang("Other possible causes:") + "\n" +
         "- " + Localization.lang("Network connectivity issues") + "\n" +
-        "- " + Localization.lang("Remote repository rejecting the operation");
+        "- " + Localization.lang("Remote repository rejecting the operation") +
+        "- " + Localization.lang("No changes are made");
     private final NotificationService notificationService;
     private final CliPreferences preferences;
 
@@ -106,8 +107,10 @@ public class GitClientHandler extends GitHandler {
 
             try {
                 this.pushCommitsToRemoteRepository();
+                notificationService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
             } catch (IOException e) {
                 LOGGER.error("Failed to push");
+                showGeneralErrorDialog();
             }
         }
     }
@@ -228,3 +231,4 @@ public class GitClientHandler extends GitHandler {
         notificationService.notify(Localization.lang("This is not a Git repository"));
     }
 }
+
