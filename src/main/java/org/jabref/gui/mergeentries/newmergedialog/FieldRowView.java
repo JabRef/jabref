@@ -40,10 +40,10 @@ public class FieldRowView {
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
-    final int YEAR_LOWER = 1800;
-    final int YEAR_DIF = 10;
-    final int YEAR_UPPER_DIF = 100;
-    final String MISC = "misc";
+    private static final int YEAR_LOWER = 1800;
+    private static final int YEAR_DIF = 10;
+    private static final int YEAR_UPPER_DIF = 100;
+    private static final String MISC = "misc";
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
@@ -226,7 +226,7 @@ public class FieldRowView {
     public void autoSelectBetterValue() {
         String fieldName = fieldNameCell.getText();
         if (fieldName == null) {
-            return; // Early return if fieldName is null
+            return; // Early return if fieldName is null or invalid
         }
         fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
 
