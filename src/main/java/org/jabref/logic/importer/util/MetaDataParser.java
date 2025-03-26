@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
-import org.jabref.logic.citationkeypattern.Pattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -45,7 +45,7 @@ public class MetaDataParser {
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
-    private static final java.util.regex.Pattern SINGLE_BACKSLASH = java.util.regex.Pattern.compile("[^\\\\]\\\\[^\\\\]");
+    private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
 
     static {
         DEFAULT_SAVE_ACTIONS = List.of(
@@ -102,7 +102,7 @@ public class MetaDataParser {
      * @return the given metaData instance (which is modified, too)
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
-        Pattern defaultCiteKeyPattern = Pattern.NULL_PATTERN;
+        Pattern defaultCiteKeyPattern = org.jabref.logic.citationkeypattern.Pattern.NULL_PATTERN;
         Map<EntryType, Pattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
@@ -156,7 +156,7 @@ public class MetaDataParser {
             }
         }
 
-        if (!defaultCiteKeyPattern.equals(Pattern.NULL_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
+        if (!defaultCiteKeyPattern.equals(org.jabref.logic.citationkeypattern.Pattern.NULL_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
             metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 
