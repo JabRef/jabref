@@ -40,6 +40,10 @@ public class FieldRowView {
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
+    final int YEAR_LOWER = 1800;
+    final int YEAR_DIF = 10;
+    final int YEAR_UPPER_DIF = 100;
+    final String MISC = "misc";
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
@@ -220,11 +224,6 @@ public class FieldRowView {
      * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
      */
     public void autoSelectBetterValue() {
-        final int YEAR_LOWER = 1800;
-        final int YEAR_DIF = 10;
-        final int YEAR_UPPER_DIF = 100;
-        final String MISC = "misc";
-
         String fieldName = fieldNameCell.getText();
         if (fieldName == null) {
             return; // Early return if fieldName is null
