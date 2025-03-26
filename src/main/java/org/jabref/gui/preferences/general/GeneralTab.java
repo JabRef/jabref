@@ -136,6 +136,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
+        gitHubUsernameField.setPromptText(Localization.lang("GitHub Username"));
+        gitHubPasskeyField.setPromptText(Localization.lang("GitHub Passkey"));
+        autoPushCheckbox.setText(Localization.lang("Automatically push changes"));
+
         gitHubUsernameField.textProperty().bindBidirectional(viewModel.gitHubUsernameProperty());
         gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
 
