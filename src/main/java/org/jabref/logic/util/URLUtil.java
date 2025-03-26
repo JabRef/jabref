@@ -109,10 +109,11 @@ public class URLUtil {
         if (url.startsWith("ftp://")) {
             URI uri = createUri(url);
             return uri.toURL();
-        }else if (!url.contains(PROTOCOL_SEPARATOR)) {
+        }
+        if (!url.contains(PROTOCOL_SEPARATOR)) {
             url = "https://" + url;
         }
-
+        
         URI uri = createUri(url);
         return uri.toURL();
     }
