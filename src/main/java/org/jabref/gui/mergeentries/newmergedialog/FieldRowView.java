@@ -215,6 +215,10 @@ public class FieldRowView {
         return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 
+    /**
+     * Method for selecting the 'Better' year value.
+     * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
+     */
     public void autoSelectBetterValue() {
         String fieldName = fieldNameCell.getText();
         if (fieldName == null) {
