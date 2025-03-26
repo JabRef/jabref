@@ -65,21 +65,17 @@ class CheckForVersionControlActionEndToEndTest {
     }
 
     @Test
-    void isActionNecessary_WhenDatabasePathExistsButNotAGitRepo_ShouldReturnFalse() {
+    void isActionNecessary_WhenDatabasePathExistsButNotAGitRepo_ShouldReturnFalse() throws IOException {
         Path nonGitDir = tempDir.resolve("non-git-dir");
-        try {
-            Files.createDirectories(nonGitDir);
-            Path nonGitFile = nonGitDir.resolve("test.bib");
-            Files.writeString(nonGitFile, "@article{test, author={Test Author}, title={Test Title}}");
+        Files.createDirectories(nonGitDir);
+        Path nonGitFile = nonGitDir.resolve("test.bib");
+        Files.writeString(nonGitFile, "@article{test, author={Test Author}, title={Test Title}}");
 
-            when(databaseContext.getDatabasePath()).thenReturn(Optional.of(nonGitFile));
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(nonGitFile));
 
-            boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
+        boolean result = action.isActionNecessary(parserResult, dialogService, cliPreferences);
 
-            assertFalse(result);
-        } catch (IOException e) {
-            throw new AssertionError("Failed to set up test directory", e);
-        }
+        assertFalse(result);
     }
 
     @Test
