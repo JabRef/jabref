@@ -13,6 +13,8 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -28,6 +30,8 @@ public class FieldFactory {
      */
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
+
+    private static final Pattern UNKNOWNFIELD_PATTERN = Pattern.compile("UnknownField\\{name='(?<fieldName>[^']+)'");
 
     public static String serializeOrFields(Field... fields) {
         return serializeOrFields(new OrFields(fields));
@@ -119,6 +123,13 @@ public class FieldFactory {
             String username = fieldName.substring("comment-".length());
             return new UserSpecificCommentField(username);
         }
+
+        // Support for UnknownField{name='rights'} and similar constructs
+        Matcher matcher = UNKNOWNFIELD_PATTERN.matcher(fieldName);
+        if (matcher.find()) {
+            fieldName = matcher.group("fieldName");
+        }
+
         return OptionalUtil.<Field>orElse(
               OptionalUtil.<Field>orElse(
                OptionalUtil.<Field>orElse(
