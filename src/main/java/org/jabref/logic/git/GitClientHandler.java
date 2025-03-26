@@ -17,12 +17,12 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -66,7 +66,6 @@ public class GitClientHandler extends GitHandler {
         if (isGitRepository() &&
                 preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
                 preferences.getGitPreferences().getAutoPushEnabled()) {
-            // Save BibDatabaseContext of bib files in current HEAD
             RevCommit localCommit = getLatestCommit();
             try {
                 createCommitOnCurrentBranch("Automatic update via JabRef", false);
@@ -75,40 +74,49 @@ public class GitClientHandler extends GitHandler {
             }
 
             try {
-                this.pullAndRebaseOnCurrentBranch();
-                RevCommit remoteCommit = getLatestCommit();
-            } catch (IOException e) {
-                Optional<Ref> headRef = Optional.empty();
-                try {
-                    headRef = this.getHeadRef();
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Cannot find HEAD on current branch");
-                }
-                if (headRef.isEmpty()) {
+                pull();
+                if (this.getRepository().getRepositoryState() == RepositoryState.MERGING) {
+                    resetRepository();
+                    revertToCommit(localCommit.getName());
+                    notificationService.notify("Failed to pull from remote repository");
                     return;
                 }
-                try {
-                    this.revertToCommit(headRef.get());
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Failed to revert to commit");
-                }
-                try {
-                    this.pull();
-                } catch (CheckoutConflictException ex) {
-                    // TODO: Resolve
-                    LOGGER.info("HERE");
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Failed to pull");
-                    notificationService.notify(Localization.lang("Failed to update repository"));
-                    return;
-                }
+            } catch (IOException | GitAPIException e) {
+                revertToCommit(localCommit.getName());
+                notificationService.notify("Failed to pull from remote repository");
+                return;
             }
 
             try {
-                this.pushCommitsToRemoteRepository();
+                pushCommitsToRemoteRepository();
             } catch (IOException e) {
                 LOGGER.error("Failed to push");
             }
+        }
+    }
+
+    public void revertToCommit(String ref) {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            git.reset()
+               .setMode(ResetCommand.ResetType.SOFT)
+               .setRef(ref)
+               .call();
+            notificationService.notify("Reverted to previous commit");
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Failed to revert to commit");
+            notificationService.notify("Failed to revert to commit");
+        }
+    }
+
+    private void resetRepository() {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            git.reset()
+               .setMode(ResetCommand.ResetType.HARD)
+               .call();
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Failed to reset repository");
         }
     }
 
