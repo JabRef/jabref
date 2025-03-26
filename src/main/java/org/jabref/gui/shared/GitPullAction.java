@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.service.DialogNotificationService;
 import org.jabref.logic.git.GitClientHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +52,7 @@ public class GitPullAction extends SimpleCommand {
         }
 
         GitClientHandler gitClientHandler = new GitClientHandler(path.get().getParent(),
-                dialogService,
+                new DialogNotificationService(dialogService),
                 preferences);
         try {
             gitClientHandler.checkGitRepoAndPullAndDisplayMsg();

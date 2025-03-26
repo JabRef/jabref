@@ -25,6 +25,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.service.DialogNotificationService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -239,7 +240,7 @@ public class SaveDatabaseAction {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
                 new GitClientHandler(targetPath.getParent(),
-                        dialogService,
+                        new DialogNotificationService(dialogService),
                         preferences)
                         .postSaveDatabaseAction();
             }

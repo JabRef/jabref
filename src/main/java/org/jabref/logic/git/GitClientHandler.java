@@ -13,6 +13,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.service.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
@@ -38,14 +39,14 @@ public class GitClientHandler extends GitHandler {
         Localization.lang("Other possible causes:") + "\n" +
         "- " + Localization.lang("Network connectivity issues") + "\n" +
         "- " + Localization.lang("Remote repository rejecting the operation");
-    private final DialogService dialogService;
+    private final NotificationService notificationService;
     private final CliPreferences preferences;
 
     public GitClientHandler(Path repositoryPath,
-                            DialogService dialogService,
+                            NotificationService notificationService,
                             CliPreferences preferences) {
         super(repositoryPath, false);
-        this.dialogService = dialogService;
+        this.notificationService = notificationService;
         this.preferences = preferences;
 
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(
@@ -97,7 +98,7 @@ public class GitClientHandler extends GitHandler {
                     LOGGER.info("HERE");
                 } catch (IOException | GitAPIException ex) {
                     LOGGER.error("Failed to pull");
-                    dialogService.notify(Localization.lang("Failed to update repository"));
+                    notificationService.notify(Localization.lang("Failed to update repository"));
                     return;
                 }
             }
@@ -188,7 +189,7 @@ public class GitClientHandler extends GitHandler {
     }
 
     public void showGeneralErrorDialog() {
-        dialogService.showErrorDialogAndWait(GENERAL_ERROR_MESSAGE);
+        notificationService.showErrorDialog(GENERAL_ERROR_MESSAGE);
     }
 
     public void checkGitRepoAndPullAndDisplayMsg() throws IOException {
@@ -197,7 +198,7 @@ public class GitClientHandler extends GitHandler {
             handleNonGitRepoOperation();
         }
         if (pullOnCurrentBranch()) {
-            dialogService.notify(Localization.lang("Successfully pulled from remote repository"));
+            notificationService.notify(Localization.lang("Successfully pulled from remote repository"));
         } else {
            showGeneralErrorDialog();
         }
@@ -215,7 +216,7 @@ public class GitClientHandler extends GitHandler {
             }
             boolean successPush = pushCommitsToRemoteRepository();
             if (successPush) {
-                dialogService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
+                notificationService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
             } else {
                showGeneralErrorDialog();
             }
@@ -223,6 +224,6 @@ public class GitClientHandler extends GitHandler {
 
     public void handleNonGitRepoOperation() {
         LOGGER.info("Not a git repository at path: {}", repositoryPath);
-        dialogService.notify(Localization.lang("This is not a Git repository"));
+        notificationService.notify(Localization.lang("This is not a Git repository"));
     }
 }

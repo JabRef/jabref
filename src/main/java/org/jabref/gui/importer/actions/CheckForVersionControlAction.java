@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.service.DialogNotificationService;
 import org.jabref.logic.git.GitClientHandler;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
@@ -28,7 +29,7 @@ public class CheckForVersionControlAction implements GUIPostOpenAction {
             return false;
         }
         this.gitClientHandler = new GitClientHandler(path.get(),
-                dialogService,
+                new DialogNotificationService(dialogService),
                 preferences);
         return gitClientHandler.isGitRepository();
     }
