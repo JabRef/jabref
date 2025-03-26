@@ -73,7 +73,9 @@ public class CleanupPreferences {
     }
 
     public String getSelectedJournalCleanupOption() {
-        if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
+        if (isActive(CleanupStep.NO_CHANGES)) {
+            return "No changes";
+        } else if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
             return "Abbreviate (default)";
         } else if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
             return "Abbreviate (dotless)";
@@ -82,7 +84,7 @@ public class CleanupPreferences {
         } else if (isActive(CleanupStep.UNABBREVIATE)) {
             return "Unabbreviate";
         } else {
-            return "No changes"; // No journal cleanup option selected
+            return "No changes";
         }
     }
 
