@@ -231,7 +231,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * No Equivalent in BibTeX. Will create an Unknown "Coverage" Field
+     * No equivalent in BibTeX. Will create an unknown "Coverage" field.
      */
     private void extractCoverage() {
         String coverage = dcSchema.getCoverage();
