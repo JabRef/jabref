@@ -14,7 +14,9 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -333,5 +335,18 @@ public class GitHandler {
             }
         }
         return pullAndRebaseSuccessful;
+    }
+
+    public Repository getRepository() {
+        try {
+            return new FileRepositoryBuilder()
+                    .setGitDir(new File(this.repositoryPath.toString() + "/.git"))  // Set the .git directory
+                    .readEnvironment()   // Read system environment variables
+                    .findGitDir()        // Auto-detect the .git directory if not set
+                    .build();
+        } catch (IOException e) {
+            LOGGER.error("Could not get repository");
+        }
+        return null;
     }
 }

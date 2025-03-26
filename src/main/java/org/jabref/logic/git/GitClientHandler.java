@@ -2,23 +2,31 @@ package org.jabref.logic.git;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.service.NotificationService;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitClientHandler extends GitHandler {
    private final static String GENERAL_ERROR_MESSAGE = Localization.lang("This Git operation failed") + "\n\n" +
@@ -56,7 +64,9 @@ public class GitClientHandler extends GitHandler {
      */
     public void postSaveDatabaseAction() {
         if (isGitRepository() &&
+                preferences.getGitPreferences().getAutoPushEnabled() &&
                 preferences.getGitPreferences().getAutoPushEnabled()) {
+            RevCommit localCommit = getLatestCommit();
             try {
                 createCommitOnCurrentBranch("Automatic update via JabRef", false);
             } catch (GitAPIException | IOException e) {
@@ -64,38 +74,50 @@ public class GitClientHandler extends GitHandler {
             }
 
             try {
-                this.pullAndRebaseOnCurrentBranch();
-            } catch (IOException e) {
-                Optional<Ref> headRef = Optional.empty();
-                try {
-                    headRef = this.getHeadRef();
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Cannot find HEAD on current branch");
-                }
-                if (headRef.isEmpty()) {
+                pull();
+                if (this.getRepository().getRepositoryState() == RepositoryState.MERGING) {
+                    resetRepository();
+                    revertToCommit(localCommit.getName());
+                    notificationService.notify("Failed to pull from remote repository");
                     return;
                 }
-                try {
-                    this.revertToCommit(headRef.get());
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Failed to revert to commit");
-                }
-                try {
-                    this.pull();
-                } catch (IOException | GitAPIException ex) {
-                    LOGGER.error("Failed to pull");
-                    notificationService.notify(Localization.lang("Failed to update repository"));
-                    return;
-                }
+            } catch (IOException | GitAPIException e) {
+                revertToCommit(localCommit.getName());
+                notificationService.notify("Failed to pull from remote repository");
+                return;
             }
 
             try {
-                this.pushCommitsToRemoteRepository();
-                notificationService.notify(Localization.lang("Successfully Pushed changes to remote repository"));
+                pushCommitsToRemoteRepository();
             } catch (IOException e) {
                 LOGGER.error("Failed to push");
                 showGeneralErrorDialog();
             }
+        }
+    }
+
+    public void revertToCommit(String ref) {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            git.reset()
+               .setMode(ResetCommand.ResetType.SOFT)
+               .setRef(ref)
+               .call();
+            notificationService.notify("Reverted to previous commit");
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Failed to revert to commit");
+            notificationService.notify("Failed to revert to commit");
+        }
+    }
+
+    private void resetRepository() {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            git.reset()
+               .setMode(ResetCommand.ResetType.HARD)
+               .call();
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Failed to reset repository");
         }
     }
 
@@ -120,6 +142,48 @@ public class GitClientHandler extends GitHandler {
             LOGGER.error("Failed to get latest commit");
         }
         return null;
+    }
+
+    private String getFileContents(RevCommit commit, String path) throws IOException {
+        try {
+            Repository repository = new FileRepositoryBuilder()
+                    .setGitDir(this.repositoryPathAsFile)
+                    .build();
+
+            TreeWalk treeWalk = TreeWalk.forPath(repository, path, commit.getTree());
+            if (treeWalk != null) {
+                ObjectId objectId = treeWalk.getObjectId(0);
+                try (ObjectReader reader = repository.newObjectReader()) {
+                    return new String(reader.open(objectId).getBytes(), StandardCharsets.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to get file contents");
+        }
+        return null;
+    }
+
+    private RevCommit findMergeBase(RevCommit commit1, RevCommit commit2) throws IOException {
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(this.repositoryPathAsFile)
+                .build();
+
+        try (RevWalk revWalk = new RevWalk(repository)) {
+            revWalk.markStart(commit1);
+            revWalk.markStart(commit2);
+
+            for (RevCommit commit : revWalk) {
+                return commit;
+            }
+        }
+        return null;
+    }
+
+    private BibDatabaseContext parseBibString(String bibtexContent) throws IOException {
+        try (StringReader reader = new StringReader(bibtexContent)) {
+            ParserResult result = new BibtexParser(this.preferences.getImportFormatPreferences()).parse(reader);
+            return result.getDatabaseContext();
+        }
     }
 
     private Optional<Ref> getHeadRef() throws IOException, GitAPIException {
@@ -173,4 +237,3 @@ public class GitClientHandler extends GitHandler {
         notificationService.notify(Localization.lang("This is not a Git repository"));
     }
 }
-
