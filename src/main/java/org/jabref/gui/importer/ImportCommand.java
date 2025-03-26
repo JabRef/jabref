@@ -102,6 +102,10 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
 
+        if (selectedExtensionFilter == FileFilterConverter.ANY_FILE || selectedExtensionFilter.getDescription().equals("Available import formats")) {
+            selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(file);
+        }
+
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(
                 () -> doImport(Collections.singletonList(file), format.orElse(null)));

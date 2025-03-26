@@ -16,6 +16,7 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
 
@@ -34,6 +35,14 @@ public class FileFilterConverter {
 
     public static FileChooser.ExtensionFilter toExtensionFilter(String description, FileType fileType) {
         return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());
+    }
+
+    public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {
+        FileChooser.ExtensionFilter extensionFilter = FileFilterConverter.ANY_FILE;
+        if (FileUtil.isBibFile(file)) {
+            extensionFilter = toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB);
+        }
+        return extensionFilter;
     }
 
     public static Optional<Importer> getImporter(FileChooser.ExtensionFilter extensionFilter, Collection<Importer> importers) {
