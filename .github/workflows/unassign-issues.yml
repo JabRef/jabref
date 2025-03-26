@@ -28,9 +28,10 @@ jobs:
             <details open>
             <summary>Next steps</summary>
 
+            \
             **If you still want to work on this:**
-            - Ask a maintainer to assign you again
-            - If you're making progress, a maintainer can add the pin label to prevent future automatic unassignment
+            - Submit a pull request showing your current state. You will be automatically assigned again.
+            - Ask a maintainer to assign you again.
             </details>
   move_unassigned_issues:
     needs: unassign_issues
