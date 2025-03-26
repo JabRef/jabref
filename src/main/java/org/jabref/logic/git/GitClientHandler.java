@@ -77,7 +77,7 @@ public class GitClientHandler extends GitHandler {
             try {
                 this.pullAndRebaseOnCurrentBranch();
                 RevCommit remoteCommit = getLatestCommit();
-            } catch (IOException | GitAPIException e) {
+            } catch (IOException e) {
                 Optional<Ref> headRef = Optional.empty();
                 try {
                     headRef = this.getHeadRef();

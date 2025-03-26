@@ -319,14 +319,14 @@ public class GitHandler {
         }
     }
 
-    public boolean pullAndRebaseOnCurrentBranch() throws IOException{
+    public boolean pullAndRebaseOnCurrentBranch() throws IOException {
         boolean pullAndRebaseSuccessful = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 pullAndRebaseSuccessful = git.pull()
-                                .setCredentialsProvider(credentialsProvider)
-                                .setRebase(true)
-                                .call().isSuccessful();
+                                             .setCredentialsProvider(credentialsProvider)
+                                             .setRebase(true)
+                                             .call().isSuccessful();
             } catch (GitAPIException e) {
                 LOGGER.error("Failed to pull", e);
                 return false;
