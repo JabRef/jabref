@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.AutoPushMode;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.service.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,7 +36,8 @@ public class GitClientHandler extends GitHandler {
         "2. " + Localization.lang("Configuring them in JabRef Preferences") + "\n\n" +
         Localization.lang("Other possible causes:") + "\n" +
         "- " + Localization.lang("Network connectivity issues") + "\n" +
-        "- " + Localization.lang("Remote repository rejecting the operation");
+        "- " + Localization.lang("Remote repository rejecting the operation") +
+        "- " + Localization.lang("No changes are made");
     private final NotificationService notificationService;
     private final CliPreferences preferences;
 
@@ -64,7 +64,7 @@ public class GitClientHandler extends GitHandler {
      */
     public void postSaveDatabaseAction() {
         if (isGitRepository() &&
-                preferences.getGitPreferences().getAutoPushMode() == AutoPushMode.ON_SAVE &&
+                preferences.getGitPreferences().getAutoPushEnabled() &&
                 preferences.getGitPreferences().getAutoPushEnabled()) {
             RevCommit localCommit = getLatestCommit();
             try {
@@ -91,6 +91,7 @@ public class GitClientHandler extends GitHandler {
                 pushCommitsToRemoteRepository();
             } catch (IOException e) {
                 LOGGER.error("Failed to push");
+                showGeneralErrorDialog();
             }
         }
     }
