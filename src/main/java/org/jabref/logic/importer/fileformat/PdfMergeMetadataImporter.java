@@ -99,6 +99,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         for (PdfImporter metadataImporter : metadataImporters) {
             try {
                 List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document);
+                LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
             } catch (Exception e) {
                 LOGGER.error("Got an exception while importing PDF file", e);
