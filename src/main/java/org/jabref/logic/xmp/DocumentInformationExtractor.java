@@ -60,9 +60,9 @@ public class DocumentInformationExtractor {
         for (Map.Entry<COSName, COSBase> o : dict.entrySet()) {
             String key = o.getKey().getName();
             if (key.startsWith("bibtex/")) {
-                String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
                 Field field = FieldFactory.parseField(key);
+                String value = dict.getString(key);
                 if (InternalField.TYPE_HEADER == field) {
                     bibEntry.setType(EntryTypeFactory.parse(value));
                 } else {
