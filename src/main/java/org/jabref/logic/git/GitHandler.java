@@ -45,7 +45,7 @@ public class GitHandler {
      * Initialize the handler for the given repository
      *
      * @param repositoryPath The root of the initialized git repository
-     * @param createRepo If true, initializes a repository if the file path does not contain a repository
+     * @param createRepo     If true, initializes a repository if the file path does not contain a repository
      */
     public GitHandler(Path repositoryPath, boolean createRepo) {
         if (Files.isRegularFile(repositoryPath)) {
@@ -216,9 +216,9 @@ public class GitHandler {
         boolean pullSuccessful = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
-               pullSuccessful = git.pull()
-                   .setCredentialsProvider(credentialsProvider)
-                   .call().isSuccessful();
+                pullSuccessful = git.pull()
+                                    .setCredentialsProvider(credentialsProvider)
+                                    .call().isSuccessful();
             } catch (GitAPIException e) {
                 LOGGER.error("Failed to pull", e);
                 return false;
@@ -286,6 +286,7 @@ public class GitHandler {
             return Optional.empty();
         }
     }
+
     /**
      * Gets the relative path of a file to the repository root
      *
@@ -316,5 +317,21 @@ public class GitHandler {
             LOGGER.debug("IO error when getting relative path", e);
             return "";
         }
+    }
+
+    public boolean pullAndRebaseOnCurrentBranch() throws IOException, GitAPIException {
+        boolean pullAndRebaseSuccessful = false;
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            try {
+                pullAndRebaseSuccessful = git.pull()
+                                .setCredentialsProvider(credentialsProvider)
+                                .setRebase(true)
+                                .call().isSuccessful();
+            } catch (GitAPIException e) {
+                LOGGER.error("Failed to pull", e);
+                return false;
+            }
+        }
+        return pullAndRebaseSuccessful;
     }
 }
