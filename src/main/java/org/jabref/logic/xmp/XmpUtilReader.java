@@ -1,11 +1,11 @@
 package org.jabref.logic.xmp;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.SequencedCollection;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -63,33 +63,26 @@ public class XmpUtilReader {
     }
 
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
-        List<BibEntry> result = new ArrayList<>();
+        SequencedCollection<BibEntry> result = new LinkedHashSet<>();
+
+        // We add PDDocumentInformation in call cases
+        PDDocumentInformation documentInformation = document.getDocumentInformation();
+        new DocumentInformationExtractor(documentInformation).extractBibtexEntry().ifPresent(result::add);
 
         List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
-
         if (!xmpMetaList.isEmpty()) {
             // Only support Dublin Core since JabRef 4.2
             for (XMPMetadata xmpMeta : xmpMetaList) {
                 DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                 if (dcSchema != null) {
                     DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
-                    Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-                    entry.ifPresent(result::add);
+                    dcExtractor.extractBibtexEntry().ifPresent(result::add);
                 }
             }
         }
 
-        if (result.isEmpty()) {
-            // If we did not find any XMP metadata, search for non XMP metadata
-            PDDocumentInformation documentInformation = document.getDocumentInformation();
-            DocumentInformationExtractor diExtractor = new DocumentInformationExtractor(documentInformation);
-            Optional<BibEntry> entry = diExtractor.extractBibtexEntry();
-            entry.ifPresent(result::add);
-        }
-
         result.forEach(entry -> entry.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF")));
-
-        return result;
+        return result.stream().toList();
     }
 
     /**
@@ -108,34 +101,12 @@ public class XmpUtilReader {
             return List.of();
         }
 
-        List<XMPMetadata> metaList = new ArrayList<>();
-
-        String xmp = metaRaw.getCOSObject().toTextString();
-
-        int startDescriptionSection = xmp.indexOf(START_TAG);
-        int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
-
-        if ((startDescriptionSection < 0) || (startDescriptionSection > endDescriptionSection) || (endDescriptionSection == (END_TAG.length() - 1))) {
-            return metaList;
+        try (InputStream is = metaRaw.exportXMPMetadata()) {
+            return List.of(XmpUtilShared.parseXmpMetadata(is));
+        } catch (IOException e) {
+            LOGGER.debug("Problem parsing XMP metadata.", e);
+            return List.of();
         }
-
-        // XML header for the xmpDomParser
-        String start = xmp.substring(0, startDescriptionSection);
-        // descriptionArray - mid part of the textual metadata
-        String[] descriptionsArray = xmp.substring(startDescriptionSection, endDescriptionSection).split(END_TAG);
-        // XML footer for the xmpDomParser
-        String end = xmp.substring(endDescriptionSection);
-
-        for (String s : descriptionsArray) {
-            // END_TAG is appended, because of the split operation above
-            String xmpMetaString = start + s + END_TAG + end;
-            try {
-                metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
-            } catch (IOException ex) {
-                LOGGER.debug("Problem parsing XMP schema. Continuing with other schemas.", ex);
-            }
-        }
-        return metaList;
     }
 
     /**
