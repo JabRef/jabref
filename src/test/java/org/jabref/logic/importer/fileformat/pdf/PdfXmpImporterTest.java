@@ -51,6 +51,22 @@ class PdfXmpImporterTest {
     }
 
     @Test
+    void pdf2024SPLCBecker() throws URISyntaxException {
+        Path file = Path.of(PdfXmpImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+
+        // TODO: Adapt this
+        BibEntry expected = new BibEntry()
+                .withField(StandardField.ABSTRACT, "how to annotate a pdf")
+                .withField(StandardField.AUTHOR, "Chris")
+                .withField(StandardField.KEYWORDS, "pdf, annotation")
+                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF")
+                .withField(StandardField.TITLE, "The best Pdf ever");
+
+        assertEquals(List.of(expected), bibEntries);
+    }
+
+    @Test
     void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
