@@ -89,11 +89,7 @@ public class GitBibEntryDiff {
                 return false;
             }
 
-            if (Objects.equals(baseValue, localValue) || Objects.equals(baseValue, remoteValue)) {
-                return false;
-            }
-
-            return true;
+            return !(Objects.equals(baseValue, localValue) || Objects.equals(baseValue, remoteValue));
         }
 
         public String getResolvedValue() {

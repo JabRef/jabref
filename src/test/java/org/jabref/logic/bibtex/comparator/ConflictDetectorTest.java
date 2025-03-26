@@ -34,7 +34,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testDetectGitConflictsNoConflicts() {
+    void detectGitConflictsNoConflicts() {
         when(diff.getEntryDifferences()).thenReturn(Collections.emptyList());
         when(diff.getMetaDataDifferences()).thenReturn(Optional.empty());
 
@@ -45,7 +45,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testDetectGitConflictsWithEntryConflicts() {
+    void detectGitConflictsWithEntryConflicts() {
         when(entryDiff.hasConflicts()).thenReturn(true);
         when(diff.getEntryDifferences()).thenReturn(List.of(entryDiff));
         when(diff.getMetaDataDifferences()).thenReturn(Optional.empty());
@@ -57,7 +57,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testDetectGitConflictsWithMetaDataConflicts() {
+    void detectGitConflictsWithMetaDataConflicts() {
         when(diff.getEntryDifferences()).thenReturn(Collections.emptyList());
         when(diff.getMetaDataDifferences()).thenReturn(Optional.of(mock(MetaDataDiff.class)));
 
@@ -68,7 +68,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testHasGitConflictsTrue() {
+    void hasGitConflictsTrue() {
         when(diff.getEntryDifferences()).thenReturn(List.of(entryDiff));
         when(entryDiff.hasConflicts()).thenReturn(true);
 
@@ -79,7 +79,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testHasGitConflictsFalse() {
+    void hasGitConflictsFalse() {
         when(diff.getEntryDifferences()).thenReturn(Collections.emptyList());
         when(diff.getMetaDataDifferences()).thenReturn(Optional.empty());
 
@@ -90,7 +90,7 @@ class ConflictDetectorTest {
     }
 
     @Test
-    void testGetGitEntryConflicts() {
+    void getGitEntryConflicts() {
         when(diff.getEntryDifferences()).thenReturn(List.of(entryDiff));
 
         try (var mockedStatic = mockStatic(GitBibDatabaseDiff.class)) {

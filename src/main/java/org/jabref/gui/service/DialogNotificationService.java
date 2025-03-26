@@ -11,28 +11,23 @@ import org.jabref.logic.service.NotificationService;
 public class DialogNotificationService implements NotificationService {
 
     private final DialogService dialogService;
-    
+
     /**
      * Creates a new DialogNotificationService
-     * 
-     * @param dialogService The dialog service to delegate notifications to
+     *
+     * @param dialogService The dialog service to delegate notifications t
      */
     public DialogNotificationService(DialogService dialogService) {
         this.dialogService = dialogService;
     }
-    
+
     @Override
     public void notify(String message) {
         dialogService.notify(message);
     }
-    
+
     @Override
     public void showErrorDialog(String message) {
         dialogService.showErrorDialogAndWait(message);
-    }
-    
-    @Override
-    public void showErrorDialog(String title, String message) {
-        dialogService.showErrorDialogAndWait(title, message);
     }
 }

@@ -12,19 +12,11 @@ public interface NotificationService {
      * @param message The message to display
      */
     void notify(String message);
-    
+
     /**
      * Display an error dialog with the specified message
      *
      * @param message The error message to display
      */
     void showErrorDialog(String message);
-    
-    /**
-     * Display an error dialog with title and message
-     *
-     * @param title The dialog title
-     * @param message The error message to display
-     */
-    void showErrorDialog(String title, String message);
 }
