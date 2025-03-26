@@ -296,6 +296,10 @@ public class ArgumentProcessor {
             uiCommands.add(new UiCommand.OpenDatabases(loaded));
         }
 
+        if (cli.isBlank() && loaded.isEmpty()) {
+            uiCommands.add(new UiCommand.BlankWorkspace());
+        }
+
         if (cli.isCheckConsistency()) {
             checkConsistency(cliPreferences, entryTypesManager);
         }
