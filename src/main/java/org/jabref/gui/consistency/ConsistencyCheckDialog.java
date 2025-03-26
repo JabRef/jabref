@@ -123,7 +123,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                     this.setOnMouseClicked(event -> {
                         if (!isEmpty()) {
-                            TableColumn<?, ?> clickedColumn = getTableColumn();
+                            TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
 
                             ConsistencyMessage selectedMessage = getTableRow().getItem();
                             Optional<StandardField> field = StandardField.fromName(clickedColumn.getText());
