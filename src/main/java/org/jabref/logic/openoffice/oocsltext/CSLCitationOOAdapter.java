@@ -57,6 +57,8 @@ public class CSLCitationOOAdapter {
             this.currentStyle = citationStyle;
         }
 
+        CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
+
         markManager.readAndUpdateExistingMarks();
     }
 
@@ -176,7 +178,7 @@ public class CSLCitationOOAdapter {
             throws WrappedTargetException, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
-        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.BIBLIOGRAPHY_TITLE), CSLFormatUtils.BIBLIOGRAPHY_HEADER_FORMAT);
+        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.getBibliographyTitle()), CSLFormatUtils.getBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);

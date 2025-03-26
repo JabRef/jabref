@@ -19,24 +19,30 @@ public class ModifyCSLBibliographyTitleDialogViewModel {
              new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
                     Arrays.stream(CSLFormatUtils.Format.values()).map(CSLFormatUtils.Format::getFormat).toList()
             ));
+    private final OpenOfficePreferences openOfficePreferences;
 
-    public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences preferences) {
-        this.cslBibliographyTitle.set(preferences.cslBibliographyTitle().get());
-        this.cslBibliographySelectedHeaderFormat.set(preferences.cslBibliographyHeaderFormat().get());
+    public ModifyCSLBibliographyTitleDialogViewModel(OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
+        this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
+        this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());
 
-        cslBibliographyTitle.bindBidirectional(preferences.cslBibliographyTitle());
-        cslBibliographySelectedHeaderFormat.bindBidirectional(preferences.cslBibliographyHeaderFormat());
+        cslBibliographyTitle.bindBidirectional(openOfficePreferences.cslBibliographyTitleProperty());
+        cslBibliographySelectedHeaderFormat.bindBidirectional(openOfficePreferences.cslBibliographyHeaderFormatProperty());
     }
 
-    public StringProperty cslBibliographyTitle() {
+    public StringProperty cslBibliographyTitleProperty() {
         return cslBibliographyTitle;
     }
 
-    public StringProperty cslBibliographySelectedHeaderFormat() {
+    public StringProperty cslBibliographySelectedHeaderFormatProperty() {
         return cslBibliographySelectedHeaderFormat;
     }
 
     public ReadOnlyListProperty<String> formatListProperty() {
-        return this.formatListProperty;
+        return formatListProperty;
+    }
+
+    public void updateSettings() {
+        CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
     }
 }
