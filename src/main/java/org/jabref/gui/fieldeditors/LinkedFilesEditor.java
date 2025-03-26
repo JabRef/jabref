@@ -380,15 +380,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         @Override
         public void execute() {
-            System.out.println("Executing MultiContextAction: " + command);
+            /*
+            Must remove print statements before pull request.
+            - use of standard IO causing failing tests in MainArchitectureTest.java
+             */
+            System.out.println("Executing MultiContextAction: " + command); /* MUST REMOVE BEFORE PULL REQUEST */
             List<LinkedFileViewModel> selectedFilesCopy = new ArrayList<>(selectedFiles);
             for (LinkedFileViewModel linkedFile : selectedFilesCopy) {
-                System.out.println("Processing file: " + linkedFile.getFile().getLink());
+                System.out.println("Processing file: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
                 new ContextAction(command, linkedFile, preferences).execute();
-                System.out.println("Finished processing: " + linkedFile.getFile().getLink());
+                System.out.println("Finished processing: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
             }
 
-            System.out.println("MultiContextAction completed");
+            System.out.println("MultiContextAction completed"); /* MUST REMOVE BEFORE PULL REQUEST */
         }
 
 
