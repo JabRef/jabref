@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +87,14 @@ class PdfMergeMetadataImporterTest {
         expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
         assertEquals(Collections.singletonList(expected), result);
+    }
+
+    @Test
+    void pdfMetadataExtractedFrom2024SPLCBecker() throws Exception {
+        Path file = Path.of(PdfMergeMetadataImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        // TODO: Check real data
+        assertNotEquals(List.of(), result);
     }
 
     @Test
