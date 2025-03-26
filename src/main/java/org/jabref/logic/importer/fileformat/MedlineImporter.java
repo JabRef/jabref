@@ -438,9 +438,6 @@ public class MedlineImporter extends Importer implements Parser {
                             if (isCharacterXMLEvent(reader) && version > latestVersion) {
                                 latestVersion = version;
                                 fields.put(StandardField.PMID, reader.getText());
-                                if (!fields.containsKey(StandardField.URL)) {
-                                    fields.put(StandardField.URL, String.format("https://pubmed.ncbi.nlm.nih.gov/%s/", reader.getText()));
-                                }
                             }
                         }
                     }
@@ -835,17 +832,24 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void addArticleIdList(Map<Field, String> fields, List<ArticleId> articleIdList) {
-        for (ArticleId id : articleIdList) {
-            if (!id.idType().isBlank()) {
+        articleIdList.forEach(id -> {
+            if (!id.idType().isBlank() && !"url".equals(id.idType())) {
                 if ("pubmed".equals(id.idType())) {
                     fields.computeIfAbsent(StandardField.PMID, k -> id.content());
-                    if (!fields.containsKey(StandardField.URL)) {
-                        fields.put(StandardField.URL, String.format("https://pubmed.ncbi.nlm.nih.gov/%s/", id.content()));
-                    }
                 } else {
                     fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), k -> id.content());
                 }
             }
+        });
+
+        articleIdList.stream()
+                .filter(id -> "url".equals(id.idType()))
+                .findFirst()
+                .ifPresent(id -> fields.put(StandardField.URL, id.content()));
+
+        if (!fields.containsKey(StandardField.URL) && fields.containsKey(StandardField.PMID)) {
+            String pmid = fields.get(StandardField.PMID);
+            fields.put(StandardField.URL, String.format("https://pubmed.ncbi.nlm.nih.gov/%s/", pmid));
         }
     }
 
