@@ -56,35 +56,39 @@ public class XmpUtilReader {
      * @throws IOException Throws an IOException if the file cannot be read, so the user than remove a lock or cancel
      *                     the operation.
      */
-    public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences)
-            throws IOException {
+    public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
+        try (PDDocument document = loadWithAutomaticDecryption(path)) {
+            return readXmp(path, document, xmpPreferences);
+        }
+    }
 
+    public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
         List<BibEntry> result = new ArrayList<>();
 
-        try (PDDocument document = loadWithAutomaticDecryption(path)) {
-            List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
+        List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
 
-            if (!xmpMetaList.isEmpty()) {
-                // Only support Dublin Core since JabRef 4.2
-                for (XMPMetadata xmpMeta : xmpMetaList) {
-                    DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
-                    if (dcSchema != null) {
-                        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
-                        Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-                        entry.ifPresent(result::add);
-                    }
+        if (!xmpMetaList.isEmpty()) {
+            // Only support Dublin Core since JabRef 4.2
+            for (XMPMetadata xmpMeta : xmpMetaList) {
+                DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
+                if (dcSchema != null) {
+                    DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
+                    Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
+                    entry.ifPresent(result::add);
                 }
-            }
-            if (result.isEmpty()) {
-                // If we did not find any XMP metadata, search for non XMP metadata
-                PDDocumentInformation documentInformation = document.getDocumentInformation();
-                DocumentInformationExtractor diExtractor = new DocumentInformationExtractor(documentInformation);
-                Optional<BibEntry> entry = diExtractor.extractBibtexEntry();
-                entry.ifPresent(result::add);
             }
         }
 
+        if (result.isEmpty()) {
+            // If we did not find any XMP metadata, search for non XMP metadata
+            PDDocumentInformation documentInformation = document.getDocumentInformation();
+            DocumentInformationExtractor diExtractor = new DocumentInformationExtractor(documentInformation);
+            Optional<BibEntry> entry = diExtractor.extractBibtexEntry();
+            entry.ifPresent(result::add);
+        }
+
         result.forEach(entry -> entry.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF")));
+
         return result;
     }
 
