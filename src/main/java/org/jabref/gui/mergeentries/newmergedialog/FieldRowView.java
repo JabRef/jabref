@@ -220,6 +220,11 @@ public class FieldRowView {
      * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
      */
     public void autoSelectBetterValue() {
+        final int YEAR_LOWER = 1800;
+        final int YEAR_DIF = 10;
+        final int YEAR_UPPER_DIF = 100;
+        final String MISC = "misc";
+
         String fieldName = fieldNameCell.getText();
         if (fieldName == null) {
             return; // Early return if fieldName is null
@@ -239,9 +244,9 @@ public class FieldRowView {
             try {
                 int leftYear = Integer.parseInt(leftVal);
                 int rightYear = Integer.parseInt(rightVal);
-                if (leftYear < 1800 || leftYear > (Year.now().getValue() + 100)) {
+                if (leftYear < YEAR_LOWER || leftYear > (Year.now().getValue() + YEAR_UPPER_DIF)) {
                     selectRightValue(); // Select right value if left year is out of range, note that work created before Year 1800 will still be correctly processed
-                } else if (Math.abs(leftYear - rightYear) > 10) {
+                } else if (Math.abs(leftYear - rightYear) > YEAR_DIF) {
                     // Select value based on a difference condition
                     if (leftYear > rightYear) {
                         selectLeftValue();
@@ -253,7 +258,7 @@ public class FieldRowView {
                 selectRightValue(); // Handle parsing exceptions
             }
         } else if (fieldName.contains("type")) {
-            if ("misc".equalsIgnoreCase(leftVal)) {
+            if (MISC.equalsIgnoreCase(leftVal)) {
                 selectRightValue(); // Select right value if left value is "misc"
             }
         }
