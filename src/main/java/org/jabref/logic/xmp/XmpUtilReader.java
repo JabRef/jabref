@@ -104,11 +104,11 @@ public class XmpUtilReader {
     private List<XMPMetadata> getXmpMetadata(PDDocument document) {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
-        List<XMPMetadata> metaList = new ArrayList<>();
-
         if (metaRaw == null) {
-            return metaList;
+            return List.of();
         }
+
+        List<XMPMetadata> metaList = new ArrayList<>();
 
         String xmp = metaRaw.getCOSObject().toTextString();
 
