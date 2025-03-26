@@ -60,7 +60,7 @@ class XmpUtilReaderTest {
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
 
-        assertEquals(expected, Collections.singletonList(entry.get()));
+        assertEquals(expected, List.of(entry.get()));
     }
 
     /**
