@@ -61,8 +61,9 @@ public class DocumentInformationExtractor {
             String key = o.getKey().getName();
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
-                key = key.substring("bibtex/".length());
-                Field field = FieldFactory.parseField(key);
+
+                String fieldName = key.substring("bibtex/".length());
+                Field field = FieldFactory.parseField(fieldName);
                 if (InternalField.TYPE_HEADER == field) {
                     bibEntry.setType(EntryTypeFactory.parse(value));
                 } else {
