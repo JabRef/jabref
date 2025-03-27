@@ -15,6 +15,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -94,8 +94,27 @@ class PdfMergeMetadataImporterTest {
     void pdfMetadataExtractedFrom2024SPLCBecker() throws Exception {
         Path file = Path.of(PdfMergeMetadataImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        // TODO: Check real data
-        assertNotEquals(List.of(), result);
+
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("Becker_2024")
+                .withField(StandardField.AUTHOR, "Becker, Martin and Rabiser, Rick and Botterweck, Goetz")
+                .withField(StandardField.TITLE, "Not Quite There Yet: Remaining Challenges in Systems and Software Product Line Engineering as Perceived by Industry Practitioners")
+                .withField(StandardField.BOOKTITLE, "28th ACM International Systems and Software Product Line Conference")
+                .withField(StandardField.SERIES, "SPLC ’24")
+                .withField(StandardField.PUBLISHER, "ACM")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.MONTH, "#sep#")
+                .withField(StandardField.PAGES, "179--190")
+                .withField(StandardField.DOI, "10.1145/3646548.3672587")
+                .withField(StandardField.KEYWORDS, "case studies about companies adopting product line engineering")
+                .withField(FieldFactory.parseField("collection"), "SPLC ’24")
+                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF")
+
+                // TODO: Abstract not correct yet --> parsing logic needs to be improved
+                // Abstract is CC-BY, thus no issue to include it here.
+                .withField(StandardField.ABSTRACT, "Research on system and software product line engineering (SPLE) and the community around it have been inspired by industrial applications. However, despite decades of research, industry is still struggling with adopting product line approaches and more generally with managing system variability. We argue that it is essential to better understand why this is the case. Particularly, we need to understand the current challenges industry is facing wrt. adopting SPLE practices, how far existing research helps industry practitioners to cope with their challenges, and where additional research would be required. We conducted a hybrid workshop at the 2023 Systems and Software Product Line Conference (SPLC) with over 30 participants from industry and academia. 9 companies from diverse domains and in different phases of SPLE adoption presented their context and perceived challenges. We grouped, discussed, and rated the relevance of the articulated challenges. We then formed clusters of relevant research topics to discuss existing literature as well as research opportunities. In this paper, we report the industry cases, the identified challenges and clusters of research topics, provide pointers to existing work, and discuss research opportunities. With this, we want to enable industry practitioners to become aware of typical challenges and find their way into the existing body of knowledge and to relevant fields of research. CCS CONCEPTS • Software and its engineering → Software product lines.");
+
+        assertEquals(List.of(expected), result);
     }
 
     @Test
