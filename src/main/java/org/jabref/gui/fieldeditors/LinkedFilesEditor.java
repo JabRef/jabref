@@ -123,7 +123,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
-                .withContextMenu(this::getContextMenuForSelection)
+                //.withContextMenu(this::getContextMenuForSelection) // The context menu to use is instead determined when the user right-clicks
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -314,6 +314,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
+        if (event.getButton() == MouseButton.SECONDARY) {
+            // Right click -> get and display context menu
+            ContextMenu contextMenu = getContextMenuForSelection(linkedFile);
+            contextMenu.show(listView, event.getScreenX(), event.getScreenY());
+        }
+
         if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
             // Double click -> open
             linkedFile.open();
