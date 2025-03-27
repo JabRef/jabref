@@ -21,6 +21,9 @@ import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Readings on XMP are available at docs/code-howtos/xmp-parsing.md
+ */
 public class XmpUtilReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);
