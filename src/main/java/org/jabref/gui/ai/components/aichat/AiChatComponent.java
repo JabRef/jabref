@@ -101,6 +101,7 @@ public class AiChatComponent extends VBox {
         initializeNotice();
         initializeNotifications();
         sendExampleQuestions();
+        initializeExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -116,6 +117,12 @@ public class AiChatComponent extends VBox {
                 .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
         noticeText.setText(newNotice);
+    }
+
+    private void initializeExampleQuestions() {
+        exQuestion1.setText(Localization.lang("What is the goal of the paper?"));
+        exQuestion2.setText(Localization.lang("Which methods were used in the research?"));
+        exQuestion3.setText(Localization.lang("What are the key findings?"));
     }
 
     private void sendExampleQuestions() {
