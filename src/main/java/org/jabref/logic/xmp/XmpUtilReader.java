@@ -90,7 +90,7 @@ public class XmpUtilReader {
             }
         }
 
-        result.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF"));
+        result.addFile(new LinkedFile("", path, "PDF"));
 
         return List.of(result);
     }
