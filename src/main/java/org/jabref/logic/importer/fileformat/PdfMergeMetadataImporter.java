@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.cleanup.RelativePathsCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -187,11 +188,19 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return entry;
     }
 
+    /**
+     * Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
+     */
     public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
         Objects.requireNonNull(context);
         Objects.requireNonNull(filePreferences);
 
-        return importDatabase(filePath);
+        ParserResult parserResult = importDatabase(filePath);
+
+        RelativePathsCleanup relativePathsCleanup = new RelativePathsCleanup(context, filePreferences);
+        parserResult.getDatabase().getEntries().forEach(entry -> relativePathsCleanup.cleanup(entry));
+
+        return parserResult;
     }
 
     @Override

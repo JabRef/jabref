@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -106,7 +107,7 @@ class PdfMergeMetadataImporterTest {
         // Initialize file and working directory
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
-        preferences.setWorkingDirectory(directory);
+        when(preferences.getMainFileDirectory()).thenReturn(Optional.of(directory));
 
         List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
 
