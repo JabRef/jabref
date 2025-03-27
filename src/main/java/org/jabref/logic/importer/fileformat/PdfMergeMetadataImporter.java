@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
@@ -25,14 +24,12 @@ import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
-import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -159,31 +156,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
-        BibEntry entry = new BibEntry();
+        final BibEntry entry = new BibEntry();
+        candidates.forEach(entry::mergeWith);
 
-        // Functional style is used here instead of imperative like in `extractCandidatesFromPdf` or `fetchIdsOfCandidates`,
-        // because they have checked exceptions.
-
-        candidates.forEach(candidate -> {
-            if (BibEntry.DEFAULT_TYPE.equals(entry.getType())) {
-                entry.setType(candidate.getType());
-            }
-
-            Set<Field> presentFields = entry.getFields();
-
-            candidate
-                    .getFieldMap()
-                    .entrySet()
-                    .stream()
-                    // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
-                    // Nevertheless, retain online links.
-                    .filter(fieldEntry ->
-                            !(StandardField.FILE == fieldEntry.getKey()
-                                    && FileFieldParser.parse(fieldEntry.getValue()).stream().noneMatch(LinkedFile::isOnlineLink)))
-                    // Only overwrite non-present fields
-                    .filter(fieldEntry -> !presentFields.contains(fieldEntry.getKey()))
-                    .forEach(fieldEntry -> entry.setField(fieldEntry.getKey(), fieldEntry.getValue()));
-        });
+        // Retain online links only
+        List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
+        entry.clearField(StandardField.FILE);
+        entry.addFiles(onlineLinks);
 
         return entry;
     }
