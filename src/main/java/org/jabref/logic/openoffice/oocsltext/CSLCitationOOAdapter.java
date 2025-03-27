@@ -53,11 +53,10 @@ public class CSLCitationOOAdapter {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
+
         if (initialStyle instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
         }
-
-        CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
 
         markManager.readAndUpdateExistingMarks();
     }
