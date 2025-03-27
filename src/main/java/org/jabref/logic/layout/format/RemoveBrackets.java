@@ -5,9 +5,10 @@ import org.jabref.logic.layout.LayoutFormatter;
 /**
  * Remove brackets formatter.
  *
- * <example>
+ * <h4>Example</h4>
+ * <pre>{@code
  *     "{Stefan Kolb}" -> "Stefan Kolb"
- * </example>
+ * }</pre>
  */
 public class RemoveBrackets implements LayoutFormatter {
     @Override
