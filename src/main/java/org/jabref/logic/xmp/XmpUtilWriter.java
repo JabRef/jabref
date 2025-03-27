@@ -80,22 +80,6 @@ public class XmpUtilWriter {
     }
 
     /**
-     * Writes the information of the bib entry to the dublin core schema using
-     * a custom extractor.
-     *
-     * @param dcSchema Dublin core schema, which is filled with the bib entry.
-     * @param entry    The entry, which is added to the dublin core metadata.
-     * @param database An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
-     */
-    private void writeToDCSchema(DublinCoreSchema dcSchema,
-                                 BibEntry entry,
-                                 BibDatabase database) {
-        BibEntry resolvedEntry = getDefaultOrDatabaseEntry(entry, database);
-        writeToDCSchema(dcSchema, resolvedEntry);
-    }
-
-    /**
      * Writes the information of the bib entry to the dublin core schema using a custom extractor.
      *
      * @param dcSchema Dublin core schema, which is filled with the bib entry.
@@ -151,7 +135,7 @@ public class XmpUtilWriter {
 
         for (BibEntry entry : resolvedEntries) {
             DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
-            writeToDCSchema(dcSchema, entry, null);
+            writeToDCSchema(dcSchema, entry);
         }
 
         // Save to stream and then input that stream to the PDF
