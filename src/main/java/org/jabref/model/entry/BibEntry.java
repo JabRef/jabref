@@ -1250,6 +1250,10 @@ public class BibEntry implements Cloneable {
                 otherFieldValue.ifPresent(s -> this.setField(otherField, s));
             }
         }
+
+        if (this.getType().equals(DEFAULT_TYPE)) {
+            this.setType(other.getType());
+        }
     }
 
     public boolean isEmpty() {
