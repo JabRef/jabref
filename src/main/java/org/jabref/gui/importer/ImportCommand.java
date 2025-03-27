@@ -102,7 +102,7 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
 
-        if (selectedExtensionFilter == FileFilterConverter.ANY_FILE || selectedExtensionFilter.getDescription().equals("Available import formats")) {
+        if (selectedExtensionFilter == FileFilterConverter.ANY_FILE || "Available import formats".equals(selectedExtensionFilter.getDescription())) {
             selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(file);
         }
 
