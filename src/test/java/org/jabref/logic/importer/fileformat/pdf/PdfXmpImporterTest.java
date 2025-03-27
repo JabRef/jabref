@@ -55,7 +55,6 @@ class PdfXmpImporterTest {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
-        // TODO: Adapt this
         BibEntry expected = new BibEntry()
                 .withField(StandardField.TITLE, "Not Quite There Yet: Remaining Challenges in Systems and Software Product Line Engineering as Perceived by Industry Practitioners")
                 .withField(StandardField.ABSTRACT, "-  Software and its engineering  ->  Software product lines.")
