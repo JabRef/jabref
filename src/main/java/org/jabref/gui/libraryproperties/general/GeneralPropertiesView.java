@@ -57,6 +57,13 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                librarySpecificFileDirectory.requestFocus();
+            }
+        });
     }
 
     @FXML

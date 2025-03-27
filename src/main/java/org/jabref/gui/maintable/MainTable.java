@@ -213,7 +213,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
         importPdfsButton.getStyleClass().add("text-button-blue");
         importPdfsButton.setOnAction(event -> {
-           importPdfsButton();
+            importPdfs();
         });
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
@@ -601,14 +601,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return exampleEntry;
     }
 
-    private void importPdfsButton() {
+    private void importPdfs() {
         List<Path> fileDirectories = database.getFileDirectories(filePreferences);
 
         if (fileDirectories.isEmpty()) {
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("File directory is not set or does not exist."),
-                    Localization.lang("Please configure a file directory"));
-
+            dialogService.notify(
+                    Localization.lang("File directory is not set or does not exist.")
+                    );
             LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
             libraryPropertiesAction.execute();
         } else {
