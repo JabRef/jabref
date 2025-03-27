@@ -38,11 +38,10 @@ public class FileFilterConverter {
     }
 
     public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {
-        FileChooser.ExtensionFilter extensionFilter = FileFilterConverter.ANY_FILE;
-        if (FileUtil.isBibFile(file)) {
-            extensionFilter = toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB);
+        if (!FileUtil.isBibFile(file)) {
+            return FileFilterConverter.ANY_FILE;
         }
-        return extensionFilter;
+        return toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB);
     }
 
     public static Optional<Importer> getImporter(FileChooser.ExtensionFilter extensionFilter, Collection<Importer> importers) {
