@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public class XmpUtilShared {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
+    static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
 
     private DomXmpParser DOM_XMP_PARSER;
 

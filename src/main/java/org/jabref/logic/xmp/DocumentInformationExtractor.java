@@ -21,8 +21,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
  */
 public class DocumentInformationExtractor {
 
-    private static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
-
     private static final Map<COSName, Field> FIELD_MAPPING = Map.ofEntries(
             Map.entry(COSName.TITLE, StandardField.TITLE),
             Map.entry(COSName.SUBJECT, StandardField.ABSTRACT),
@@ -62,10 +60,10 @@ public class DocumentInformationExtractor {
             if (FIELD_MAPPING.containsKey(o.getKey())) {
                 Field field = FIELD_MAPPING.get(o.getKey());
                 bibEntry.setField(field, dict.getString(key));
-            } else if (key.startsWith(BIBTEX_DI_FIELD_NAME_PREFIX)) {
+            } else if (key.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX)) {
                 String value = dict.getString(key);
 
-                String fieldName = key.substring(BIBTEX_DI_FIELD_NAME_PREFIX.length());
+                String fieldName = key.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());
                 Field field = FieldFactory.parseField(fieldName);
                 if (InternalField.TYPE_HEADER == field) {
                     bibEntry.setType(EntryTypeFactory.parse(value));

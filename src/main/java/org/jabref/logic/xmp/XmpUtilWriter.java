@@ -207,7 +207,7 @@ public class XmpUtilWriter {
      * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
-     * @param entry    The Bibtex entry that is written into the PDF properties. *
+     * @param entry    The BibEntry that is written into the PDF properties.
      * @param database An optional database which the given bibtex entries belong to, which will be used to
      *                 resolve strings. If the database is null the strings will not be resolved.
      */
@@ -234,7 +234,7 @@ public class XmpUtilWriter {
                     case StandardField.FILE -> {
                     }
                     case null, default ->
-                            di.setCustomMetadataValue("bibtex/" + field, null);
+                            di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), null);
                 }
                 continue;
             }
@@ -255,7 +255,7 @@ public class XmpUtilWriter {
                 case StandardField.FILE -> {
                 }
                 case null, default ->
-                        resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue("bibtex/" + field, val));
+                        resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), val));
                 // We hit the case of an PDF-unsupported field --> write it directly
             }
         }

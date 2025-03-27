@@ -146,12 +146,12 @@ public class DublinCoreExtractor {
      * The relation attribute of DublinCore is abused to store these custom fields. The prefix <code>bibtex</code> is used.
      */
     private void extractBibTexFields() {
-        Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
+        Predicate<String> isBibTeXElement = s -> s.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX);
         Consumer<String> splitBibTeXElement = s -> {
             // the default pattern is bibtex/key/value, but some fields contains url etc.
             // so the value property contains additional slashes, which makes the usage of
             // String#split complicated.
-            String temp = s.substring("bibtex/".length());
+            String temp = s.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());
             int i = temp.indexOf('/');
             if (i != -1) {
                 Field key = FieldFactory.parseField(temp.substring(0, i));
@@ -405,7 +405,7 @@ public class DublinCoreExtractor {
         // We write the plain content of the field, because this is a custom DC field content with the semantics that
         // BibTeX data is stored. Thus, we do not need to get rid of BibTeX, but can keep it.
         String value = bibEntry.getField(field).get();
-        dcSchema.addRelation("bibtex/" + field.getName() + '/' + value);
+        dcSchema.addRelation(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName() + '/' + value);
     }
 
     /**
