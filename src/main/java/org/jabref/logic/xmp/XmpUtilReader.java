@@ -50,15 +50,9 @@ public class XmpUtilReader {
     }
 
     /**
-     * Try to read the given BibTexEntry from the XMP-stream of the given
-     * inputstream containing a PDF-file.
-     * <p>
-     * Only supports Dublin Core as a metadata format.
-     *
      * @param path The path to read from.
-     * @return list of BibEntries retrieved from the stream. May be empty, but never null
-     * @throws IOException Throws an IOException if the file cannot be read, so the user than remove a lock or cancel
-     *                     the operation.
+     *
+     * @return list of a single BibEntry retrieved by merging the data from the stream
      */
     public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
@@ -68,6 +62,16 @@ public class XmpUtilReader {
 
     /**
      * Merges all XMP data together in one entry.
+     *
+     * Try to read the given BibTexEntry from the given PDF file.
+     * <p>
+     * Looks at the DocumentInformation and the XMP metadata.
+     * Regarding the XMP metadata, only Dublin Core is supported.
+     *
+     * @param path the path to the PDF file
+     * @param document the PDF document to read from (should have been created from <code>path</code>
+     *
+     * @return list of a single BibEntry retrieved by merging the data of the given document
      */
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
         final BibEntry result = new BibEntry();
