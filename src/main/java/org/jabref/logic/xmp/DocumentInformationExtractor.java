@@ -3,6 +3,7 @@ package org.jabref.logic.xmp;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -19,41 +20,34 @@ public class DocumentInformationExtractor {
 
     private static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
 
+    private static final Map<COSName, Field> FIELD_MAPPING = Map.ofEntries(
+            Map.entry(COSName.TITLE, StandardField.TITLE),
+            Map.entry(COSName.SUBJECT, StandardField.ABSTRACT),
+            Map.entry(COSName.KEYWORDS, StandardField.KEYWORDS),
+            Map.entry(COSName.DATE, StandardField.DATE),
+            Map.entry(COSName.COLLECTION, StandardField.BOOKTITLE),
+            Map.entry(COSName.PAGES, StandardField.PAGES),
+            Map.entry(COSName.PAGE, StandardField.PAGES),
+            Map.entry(COSName.URL, StandardField.URL),
+            Map.entry(COSName.VOLUME, StandardField.VOLUME),
+            Map.entry(COSName.VERSION, StandardField.VERSION),
+            Map.entry(COSName.ISSUER, StandardField.EDITOR)
+    );
+
     private final PDDocumentInformation documentInformation;
 
     private final BibEntry bibEntry;
 
     public DocumentInformationExtractor(PDDocumentInformation documentInformation) {
         this.documentInformation = documentInformation;
-
         this.bibEntry = new BibEntry();
     }
 
     private void extractAuthor() {
         String s = documentInformation.getAuthor();
         if (s != null) {
+            s = AuthorListParser.normalizeSimply(s).orElse(s);
             bibEntry.setField(StandardField.AUTHOR, s);
-        }
-    }
-
-    private void extractTitle() {
-        String s = documentInformation.getTitle();
-        if (s != null) {
-            bibEntry.setField(StandardField.TITLE, s);
-        }
-    }
-
-    private void extractKeywords() {
-        String s = documentInformation.getKeywords();
-        if (s != null) {
-            bibEntry.setField(StandardField.KEYWORDS, s);
-        }
-    }
-
-    private void extractSubject() {
-        String s = documentInformation.getSubject();
-        if (s != null) {
-            bibEntry.setField(StandardField.ABSTRACT, s);
         }
     }
 
@@ -61,7 +55,11 @@ public class DocumentInformationExtractor {
         COSDictionary dict = documentInformation.getCOSObject();
         for (Map.Entry<COSName, COSBase> o : dict.entrySet()) {
             String key = o.getKey().getName();
-            if (key.startsWith(BIBTEX_DI_FIELD_NAME_PREFIX)) {
+
+            if (FIELD_MAPPING.containsKey(o.getKey())) {
+                Field field = FIELD_MAPPING.get(o.getKey());
+                bibEntry.setField(field, dict.getString(key));
+            } else if (key.startsWith(BIBTEX_DI_FIELD_NAME_PREFIX)) {
                 String value = dict.getString(key);
 
                 String fieldName = key.substring(BIBTEX_DI_FIELD_NAME_PREFIX.length());
@@ -88,12 +86,7 @@ public class DocumentInformationExtractor {
      * @return The bibtex entry found in the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
-        bibEntry.setType(BibEntry.DEFAULT_TYPE);
-
         this.extractAuthor();
-        this.extractTitle();
-        this.extractKeywords();
-        this.extractSubject();
         this.extractOtherFields();
 
         if (bibEntry.getFields().isEmpty()) {
