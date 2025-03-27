@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -14,11 +13,12 @@ import org.jabref.logic.util.Directories;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class contains some default implementations (if OS is neither linux, windows or osx) file directories and file/application open handling methods <br>
- * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * This class contains some default implementations (if OS is neither linux, windows or osx) file directories and file/application open handling methods.
+ * <p>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
  * https://tinylog.org/v2/configuration/
- **/
+ */
 @AllowedToUseAwt("Requires AWT to open a file")
 public class DefaultDesktop extends NativeDesktop {
 

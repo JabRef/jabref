@@ -363,7 +363,7 @@ public class BibEntry implements Cloneable {
     /**
      * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
      * <p>
-     * It is <emph>not</emph> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+     * It is <em>not</em> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
      */
     public String getId() {
         return id;
@@ -388,7 +388,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets the citation key. Note: This is <emph>not</emph> the internal Id of this entry.
+     * Sets the citation key. Note: This is <em>not</em> the internal Id of this entry.
      * The internal Id is always present, whereas the citation key might not be present.
      *
      * @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
