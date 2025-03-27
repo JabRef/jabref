@@ -31,6 +31,8 @@ public class XmpUtilReader {
     private static final String START_TAG = "<rdf:Description";
     private static final String END_TAG = "</rdf:Description>";
 
+    private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();
+
     public XmpUtilReader() {
         // See: https://pdfbox.apache.org/2.0/getting-started.html
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); // To get higher rendering speed on java 8 oder 9 for images
@@ -132,8 +134,11 @@ public class XmpUtilReader {
         for (String s : descriptionsArray) {
             // END_TAG is appended, because of the split operation above
             String xmpMetaString = start + s + END_TAG + end;
+
+            LOGGER.debug("Parsing RDF Description {}", xmpMetaString);
+
             try {
-                metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+                metaList.add(XMP_UTIL_SHARED.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
             } catch (IOException ex) {
                 LOGGER.debug("Problem parsing XMP schema. Continuing with other schemas.", ex);
             }

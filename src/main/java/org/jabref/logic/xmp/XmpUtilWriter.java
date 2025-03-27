@@ -46,6 +46,8 @@ public class XmpUtilWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
+    private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();
+
     private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
     private final XmpPreferences xmpPreferences;
 
@@ -121,7 +123,7 @@ public class XmpUtilWriter {
             meta = XMPMetadata.createXMPMetadata();
         } else {
             try {
-                meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+                meta = XMP_UTIL_SHARED.parseXmpMetadata(metaRaw.createInputStream());
                 // In case, that the pdf file has no namespace definition for xmp,
                 // but metadata in a different format, the parser throws an exception
                 // Creating an empty xmp metadata element solves this problem

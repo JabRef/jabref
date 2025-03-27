@@ -9,6 +9,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
+import org.apache.xmpbox.xml.XmpParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +21,21 @@ public class XmpUtilShared {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
 
-    private XmpUtilShared() {
+    private DomXmpParser DOM_XMP_PARSER;
+
+    public XmpUtilShared() {
+        try {
+            DOM_XMP_PARSER = new DomXmpParser();
+        } catch (XmpParsingException e) {
+            LOGGER.error("Could not initialize DomXmpParser", e);
+            DOM_XMP_PARSER = null;
+        }
     }
 
-    protected static XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
+    public XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
         XMPMetadata meta;
         try {
-            DomXmpParser parser = new DomXmpParser();
-            meta = parser.parse(is);
+            meta = DOM_XMP_PARSER.parse(is);
             return meta;
         } catch (Exception e) {
             // bad style to catch Exception but as this is called in a loop we do not want to break here when any schema encounters an error
