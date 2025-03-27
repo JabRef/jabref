@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is used for <em>both</em> conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
+ *
+ * Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
  */
 public class DublinCoreExtractor {
 
