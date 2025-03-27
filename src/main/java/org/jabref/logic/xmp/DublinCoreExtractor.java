@@ -118,6 +118,13 @@ public class DublinCoreExtractor {
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
         if (!StringUtil.isNullOrEmpty(identifier)) {
+            if (identifier.startsWith("doi:")) {
+                identifier = identifier.substring(4);
+            }
+            if (identifier.contains(":")) {
+                LOGGER.info("Found identifier other than DOI {}", identifier);
+                // TODO: If other prefix, write to other field
+            }
             bibEntry.setField(StandardField.DOI, identifier);
         }
     }
