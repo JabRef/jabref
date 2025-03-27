@@ -87,7 +87,7 @@ class PdfMergeMetadataImporterTest {
         // From merge
         expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 
     @Test
