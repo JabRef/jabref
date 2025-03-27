@@ -4,8 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.SequencedCollection;
 
+import org.jabref.logic.bibtex.comparator.BibEntryCompare;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.schema.DublinCoreSchemaCustom;
@@ -22,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Readings on XMP are available at docs/code-howtos/xmp-parsing.md
+ *
+ * See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
  */
 public class XmpUtilReader {
 
@@ -70,17 +76,9 @@ public class XmpUtilReader {
      *
      * @param path the path to the PDF file
      * @param document the PDF document to read from (should have been created from <code>path</code>
-     *
-     * @return list of a single BibEntry retrieved by merging the data of the given document
      */
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
-        final BibEntry result = new BibEntry();
-
-        // PDDocumentInformation is the "priority"
-        PDDocumentInformation documentInformation = document.getDocumentInformation();
-        new DocumentInformationExtractor(documentInformation).extractBibtexEntry().ifPresent(entry -> {
-                result.mergeWith(entry);
-        });
+        final SequencedCollection<BibEntry> result = new LinkedHashSet<>();
 
         List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
         if (!xmpMetaList.isEmpty()) {
@@ -89,14 +87,33 @@ public class XmpUtilReader {
                 DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                 if (dcSchema != null) {
                     DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
-                    dcExtractor.extractBibtexEntry().ifPresent(entry -> result.mergeWith(entry));
+                    dcExtractor.extractBibtexEntry().ifPresent(result::add);
                 }
             }
         }
 
-        result.addFile(new LinkedFile("", path, "PDF"));
+        PDDocumentInformation documentInformation = document.getDocumentInformation();
+        Optional<BibEntry> documentInformationEntry = new DocumentInformationExtractor(documentInformation).extractBibtexEntry();
+        documentInformationEntry.ifPresent(entry -> {
+            if (result.isEmpty()) {
+                result.add(entry);
+                return;
+            }
+            BibEntry first = result.getFirst();
+            switch (BibEntryCompare.compareEntries(first, entry)) {
+                case SUBSET -> {
+                    result.removeFirst();
+                    result.addFirst(entry);
+                }
+                case DIFFERENT -> result.addFirst(entry);
+                case DISJUNCT_OR_EQUAL_FIELDS, DISJUNCT -> first.mergeWith(entry);
+                // in all other cases (EQUAL, SUPERSET), the documentInformation is ignored
+            }
+        });
 
-        return List.of(result);
+        result.forEach(entry -> entry.addFile(new LinkedFile("", path, "PDF")));
+
+        return result.stream().toList();
     }
 
     /**

@@ -251,12 +251,13 @@ public class XmpUtilWriter {
                         di.setKeywords(value);
                 case StandardField.ABSTRACT ->
                         di.setSubject(value);
-                // do not write file field
                 case StandardField.FILE -> {
+                    // do not write file field
                 }
-                case null, default ->
+                case null,
+                     default ->
+                        // We hit the case of an PDF-unsupported field --> write it directly
                         resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), val));
-                // We hit the case of an PDF-unsupported field --> write it directly
             }
         }
         di.setCustomMetadataValue("bibtex/entrytype", resolvedEntry.getType().getDisplayName());
