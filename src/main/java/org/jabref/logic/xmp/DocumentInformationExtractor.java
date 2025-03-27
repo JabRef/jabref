@@ -17,6 +17,8 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 public class DocumentInformationExtractor {
 
+    private static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
+
     private final PDDocumentInformation documentInformation;
 
     private final BibEntry bibEntry;
@@ -59,10 +61,10 @@ public class DocumentInformationExtractor {
         COSDictionary dict = documentInformation.getCOSObject();
         for (Map.Entry<COSName, COSBase> o : dict.entrySet()) {
             String key = o.getKey().getName();
-            if (key.startsWith("bibtex/")) {
+            if (key.startsWith(BIBTEX_DI_FIELD_NAME_PREFIX)) {
                 String value = dict.getString(key);
 
-                String fieldName = key.substring("bibtex/".length());
+                String fieldName = key.substring(BIBTEX_DI_FIELD_NAME_PREFIX.length());
                 Field field = FieldFactory.parseField(fieldName);
                 if (InternalField.TYPE_HEADER == field) {
                     bibEntry.setType(EntryTypeFactory.parse(value));
