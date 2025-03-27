@@ -116,6 +116,8 @@ public class FieldFactory {
     /**
      * Type T is an entry type and is used to direct the mapping to the Java field class.
      * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
+     *
+     * Supports also parsing of "UnknownField{name='rights'}" as field name (written by JabRef 5.x)
      */
     public static <T extends EntryType> Field parseField(T type, String fieldName) {
         // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
