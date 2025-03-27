@@ -25,25 +25,10 @@
     </Loadable>
 
     <HBox spacing="10" alignment="CENTER" fx:id="exQuestionBox">
-        <Label
-                text="%Try with examples"
-                BorderPane.alignment="CENTER"
-        />
-        <Hyperlink fx:id="exQuestion1"
-                   text="What is the goal of the paper?"
-                   BorderPane.alignment="CENTER"
-                   styleClass="exampleQuestionStyle"
-                  />
-        <Hyperlink fx:id="exQuestion2"
-                   text="Which methods were used in the research?"
-                   BorderPane.alignment="CENTER"
-                   styleClass="exampleQuestionStyle"
-                   />
-        <Hyperlink fx:id="exQuestion3"
-                   text="What are the key findings?"
-                   BorderPane.alignment="CENTER"
-                   styleClass="exampleQuestionStyle"
-                  />
+        <Label text="%Try with examples" BorderPane.alignment="CENTER"/>
+        <Hyperlink fx:id="exQuestion1" text="What is the goal of the paper?" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
+        <Hyperlink fx:id="exQuestion2" text="Which methods were used in the research?" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
+        <Hyperlink fx:id="exQuestion3" text="What are the key findings?" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
     </HBox>
 
     <HBox spacing="10">
