@@ -3,15 +3,18 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RelativePathsCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
@@ -46,12 +49,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
-    private final ImportFormatPreferences importFormatPreferences;
     private final List<PdfImporter> metadataImporters;
 
-    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    private final DoiFetcher doiFetcher;
+    private final ArXivFetcher arXivFetcher;
+    private final IsbnFetcher isbnFetcher;
 
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         // TODO: Evaluate priorities of these {@link PdfBibExtractor}s.
         this.metadataImporters = new ArrayList<>(List.of(
                 new PdfVerbatimBibtexImporter(importFormatPreferences),
@@ -63,6 +67,12 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(2, new PdfGrobidImporter(importFormatPreferences));
         }
+        doiFetcher = new DoiFetcher(importFormatPreferences);
+        arXivFetcher = new ArXivFetcher(importFormatPreferences);
+
+        isbnFetcher = new IsbnFetcher(importFormatPreferences);
+        // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
     }
 
     /**
@@ -110,49 +120,44 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates) {
         List<BibEntry> fetchedCandidates = new ArrayList<>();
 
+        // Collects Ids already looked for - to avoid multiple calls for one id
+        final Set<String> fetchedIds = new HashSet<>();
+
         for (BibEntry candidate : candidates) {
-            Optional<String> doi = candidate.getField(StandardField.DOI);
-            if (doi.isPresent()) {
-                try {
-                    new DoiFetcher(importFormatPreferences)
-                            .performSearchById(doi.get())
-                            .ifPresent(fetchedCandidates::add);
-                } catch (FetcherException e) {
-                    LOGGER.error("Fetching failed for DOI \"{}\".", doi, e);
-                }
-            }
+            fetchData(candidate, StandardField.DOI, doiFetcher, fetchedIds, fetchedCandidates);
 
-            Optional<String> eprint = candidate.getField(StandardField.EPRINT);
-            if (eprint.isPresent()) {
-                // This code assumes that `eprint` field refers to an arXiv preprint, which is not correct.
-                // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
-                try {
-                    new ArXivFetcher(importFormatPreferences)
-                            .performSearchById(eprint.get())
-                            .ifPresent(fetchedCandidates::add);
-                } catch (FetcherException e) {
-                    LOGGER.error("Fetching failed for arXiv ID \"{}\".", eprint.get(), e);
-                }
-            }
+            // This code assumes that `eprint` field refers to an arXiv preprint, which is not correct.
+            // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
+            fetchData(candidate, StandardField.EPRINT, arXivFetcher, fetchedIds, fetchedCandidates);
 
-            Optional<String> isbn = candidate.getField(StandardField.ISBN);
-            if (isbn.isPresent()) {
-                try {
-                    new IsbnFetcher(importFormatPreferences)
-                            // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                            // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
-                            .performSearchById(isbn.get())
-                            .ifPresent(fetchedCandidates::add);
-                } catch (FetcherException e) {
-                    LOGGER.error("Fetching failed for ISBN \"{}\".", isbn.get(), e);
-                }
-            }
+            fetchData(candidate, StandardField.ISBN, isbnFetcher, fetchedIds, fetchedCandidates);
 
             // TODO: Handle URLs too.
             // However, it may have problems if URL refers to the same identifier in DOI, ISBN, or arXiv.
         }
 
         return fetchedCandidates;
+    }
+
+    /**
+     * @param candidate         The BibEntry to look for the field
+     * @param field             The field to look for
+     * @param fetcher           The fetcher to use
+     * @param fetchedIds        The already fetched ids (will be updated)
+     * @param fetchedCandidates New candidate (will be updated)
+     */
+    private void fetchData(BibEntry candidate, StandardField field, IdBasedFetcher fetcher, Set<String> fetchedIds, List<BibEntry> fetchedCandidates) {
+        candidate.getField(field)
+                 .filter(id -> !fetchedIds.contains(id))
+                 .ifPresent(id -> {
+                     fetchedIds.add(id);
+                     try {
+                         fetcher.performSearchById(id)
+                                .ifPresent(fetchedCandidates::add);
+                     } catch (FetcherException e) {
+                         LOGGER.error("Fetching failed for id \"{}\".", id, e);
+                     }
+                 });
     }
 
     private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
