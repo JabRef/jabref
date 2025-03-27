@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -53,7 +52,7 @@ public class XmpUtilReader {
     /**
      * Try to read the given BibTexEntry from the XMP-stream of the given
      * inputstream containing a PDF-file.
-     *
+     * <p>
      * Only supports Dublin Core as a metadata format.
      *
      * @param path The path to read from.
@@ -67,42 +66,44 @@ public class XmpUtilReader {
         }
     }
 
+    /**
+     * Merges all XMP data together in one entry.
+     */
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
-        List<BibEntry> result = new ArrayList<>();
+        final BibEntry result = new BibEntry();
+
+        // PDDocumentInformation is the "priority"
+        PDDocumentInformation documentInformation = document.getDocumentInformation();
+        new DocumentInformationExtractor(documentInformation).extractBibtexEntry().ifPresent(entry -> {
+                result.mergeWith(entry);
+        });
 
         List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
-
         if (!xmpMetaList.isEmpty()) {
             // Only support Dublin Core since JabRef 4.2
             for (XMPMetadata xmpMeta : xmpMetaList) {
                 DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                 if (dcSchema != null) {
                     DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
-                    Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-                    entry.ifPresent(result::add);
+                    dcExtractor.extractBibtexEntry().ifPresent(entry -> result.mergeWith(entry));
                 }
             }
         }
 
-        if (result.isEmpty()) {
-            // If we did not find any XMP metadata, search for non XMP metadata
-            PDDocumentInformation documentInformation = document.getDocumentInformation();
-            DocumentInformationExtractor diExtractor = new DocumentInformationExtractor(documentInformation);
-            Optional<BibEntry> entry = diExtractor.extractBibtexEntry();
-            entry.ifPresent(result::add);
-        }
+        result.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF"));
 
-        result.forEach(entry -> entry.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF")));
-
-        return result;
+        return List.of(result);
     }
 
     /**
+     * <p>
      * This method is a hack to generate multiple XMPMetadata objects, because the
      * implementation of the pdfbox does not support methods for reading multiple
      * DublinCoreSchemas from a single metadata entry.
-     * <p/>
-     *
+     * </p>
+     * <p>
+     * Moreover, DomXmpParser does not handle unknown namespaces
+     * </p>
      *
      * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
      */
@@ -117,10 +118,15 @@ public class XmpUtilReader {
 
         String xmp = metaRaw.getCOSObject().toTextString();
 
+        // Simple-string based solution to check for XML elements
+        //   <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">...
+        // The heuristics works as most PDf tools use this syntax (i.e., XML prefix names for RDF)
+
         int startDescriptionSection = xmp.indexOf(START_TAG);
         int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
 
         if ((startDescriptionSection < 0) || (startDescriptionSection > endDescriptionSection) || (endDescriptionSection == (END_TAG.length() - 1))) {
+            LOGGER.debug("Cannot find start or end tag in metadata. Returning empty list.");
             return metaList;
         }
 

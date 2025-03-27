@@ -57,11 +57,10 @@ class PdfXmpImporterTest {
 
         // TODO: Adapt this
         BibEntry expected = new BibEntry()
-                .withField(StandardField.ABSTRACT, "how to annotate a pdf")
-                .withField(StandardField.AUTHOR, "Chris")
-                .withField(StandardField.KEYWORDS, "pdf, annotation")
-                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF")
-                .withField(StandardField.TITLE, "The best Pdf ever");
+                .withField(StandardField.TITLE, "Not Quite There Yet: Remaining Challenges in Systems and Software Product Line Engineering as Perceived by Industry Practitioners")
+                .withField(StandardField.ABSTRACT, "-  Software and its engineering  ->  Software product lines.")
+                .withField(StandardField.DOI, "10.1145/3646548.3672587")
+                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF");
 
         assertEquals(List.of(expected), bibEntries);
     }
