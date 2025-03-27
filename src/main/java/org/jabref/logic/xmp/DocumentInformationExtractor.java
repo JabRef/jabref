@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -65,10 +66,14 @@ public class DocumentInformationExtractor {
 
                 String fieldName = key.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());
                 Field field = FieldFactory.parseField(fieldName);
-                if (InternalField.TYPE_HEADER == field) {
-                    bibEntry.setType(EntryTypeFactory.parse(value));
-                } else {
-                    bibEntry.setField(field, value);
+                switch (field) {
+                    case InternalField.TYPE_HEADER -> bibEntry.setType(EntryTypeFactory.parse(value));
+                    case StandardField.MONTH -> {
+                        value = Month.parse(value).map(Month::getJabRefFormat).orElse(value);
+                        bibEntry.setField(StandardField.MONTH, value);
+                    }
+                    default ->
+                        bibEntry.setField(field, value);
                 }
             }
         }
