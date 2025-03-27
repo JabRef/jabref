@@ -91,6 +91,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
+    private ContextMenu activeContextMenu = null;
+
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
                              SuggestionProvider<?> suggestionProvider,
@@ -313,16 +315,26 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         viewModel.addFromURL();
     }
 
-    private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY) {
-            // Right click -> get and display context menu
-            ContextMenu contextMenu = getContextMenuForSelection(linkedFile);
-            contextMenu.show(listView, event.getScreenX(), event.getScreenY());
-        }
 
+    private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
             // Double click -> open
             linkedFile.open();
+        }
+        else if (activeContextMenu != null && event.getButton() == MouseButton.PRIMARY) {
+            // removal of active context menu
+            activeContextMenu.hide();
+            activeContextMenu = null;
+        }
+        else if (event.getButton() == MouseButton.SECONDARY) {
+            if (activeContextMenu != null) {
+                activeContextMenu.hide();
+                activeContextMenu = null;
+            }
+            // Right click -> get and display context menu
+            ContextMenu contextMenu = getContextMenuForSelection(linkedFile);
+            contextMenu.show(listView, event.getScreenX(), event.getScreenY());
+            activeContextMenu = contextMenu;
         }
     }
 
