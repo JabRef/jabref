@@ -536,7 +536,7 @@ class JStyleGetCitationMarker {
      * @return A normalized citation marker for deciding which
      *         citations need uniqueLetters.
      *
-     * For details of what "normalized" means: {@see getAuthorYearParenthesisMarker2}
+     * For details of what "normalized" means: See {@link JStyleGetCitationMarker#getAuthorYearParenthesisMarker2}
      *
      * Note: now includes some markup.
      */

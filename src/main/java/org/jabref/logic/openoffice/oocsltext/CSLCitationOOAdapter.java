@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -49,12 +49,12 @@ public class CSLCitationOOAdapter {
     private CitationStyle currentStyle;
     private boolean styleChanged;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OOStyle initialStyle) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
-        if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle citationStyle) {
-            this.currentStyle = citationStyle;
+        if (initialStyle instanceof CitationStyle citationStyle) {
+            this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
         }
 
         CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
