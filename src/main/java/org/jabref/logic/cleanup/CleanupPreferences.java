@@ -75,17 +75,20 @@ public class CleanupPreferences {
     public String getSelectedJournalCleanupOption() {
         if (isActive(CleanupStep.NO_CHANGES)) {
             return "No changes";
-        } if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
+        }
+        if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
             return "Abbreviate (default)";
-        } if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
+        }
+        if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
             return "Abbreviate (dotless)";
-        } if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
+        }
+        if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
             return "Abbreviate (shortest unique)";
-        } if (isActive(CleanupStep.UNABBREVIATE)) {
+        }
+        if (isActive(CleanupStep.UNABBREVIATE)) {
             return "Unabbreviate";
         }
         return "No changes";
-
     }
 
     public enum CleanupStep {

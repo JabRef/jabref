@@ -93,6 +93,5 @@ public class AbbreviateJournalCleanup implements CleanupJob {
                 return text.getName();
             }
         }
-
     }
 }
