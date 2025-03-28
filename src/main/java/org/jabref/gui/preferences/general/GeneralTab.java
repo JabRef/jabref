@@ -53,6 +53,9 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox alwaysReformatBib;
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
+    @FXML private TextField gitHubUsernameField;
+    @FXML private TextField gitHubPasskeyField;
+    @FXML private CheckBox autoPushCheckbox;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
     @FXML private CheckBox remoteServer;
@@ -132,6 +135,12 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+
+        gitHubUsernameField.textProperty().bindBidirectional(viewModel.gitHubUsernameProperty());
+        gitHubPasskeyField.textProperty().bindBidirectional(viewModel.gitHubPasskeyProperty());
+
+        autoPushCheckbox.selectedProperty().bindBidirectional(viewModel.autoPushEnabledProperty());
+
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);
