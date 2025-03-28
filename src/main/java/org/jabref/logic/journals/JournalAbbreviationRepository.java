@@ -39,15 +39,15 @@ public class JournalAbbreviationRepository {
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
             mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
-                String abbrevationString = abbreviation.getAbbreviation();
+                String abbreviationString = abbreviation.getAbbreviation();
                 String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
                 Abbreviation newAbbreviation = new Abbreviation(
                         name,
-                        abbrevationString,
+                        abbreviationString,
                         shortestUniqueAbbreviation
                 );
                 fullToAbbreviationObject.put(name, newAbbreviation);
-                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
+                abbreviationToAbbreviationObject.put(abbreviationString, newAbbreviation);
                 dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
                 shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
