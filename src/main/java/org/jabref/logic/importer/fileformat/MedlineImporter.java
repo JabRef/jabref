@@ -850,7 +850,7 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (!fields.containsKey(StandardField.URL) && fields.containsKey(StandardField.PMID)) {
             String pmid = fields.get(StandardField.PMID);
-            fields.put(StandardField.URL, String.format("https://pubmed.ncbi.nlm.nih.gov/%s/", pmid));
+            fields.put(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/%s/".formatted(pmid));
         }
     }
 
