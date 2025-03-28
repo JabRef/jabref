@@ -832,6 +832,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void addArticleIdList(Map<Field, String> fields, List<ArticleId> articleIdList) {
+        // "url" IDs are handled separately to ensure explicit URLs are preserved.
         articleIdList.forEach(id -> {
             if (!id.idType().isBlank() && !"url".equals(id.idType())) {
                 if ("pubmed".equals(id.idType())) {

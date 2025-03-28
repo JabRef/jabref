@@ -644,6 +644,7 @@
                     <ArticleIdList>
                         <ArticleId IdType="pmc">PMC4509611</ArticleId>
                         <ArticleId IdType="pubmed">26195126</ArticleId>
+                        <ArticleId IdType="url">https://pubmed.ncbi.nlm.nih.gov/29872490/</ArticleId>
                     </ArticleIdList>
                 </Reference>
             </ReferenceList>
