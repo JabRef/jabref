@@ -111,7 +111,6 @@ jobs:
         run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   conflicts_with_target:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
