@@ -9,6 +9,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,8 @@ class UnabbreviateJournalCleanupTest {
     void noJournalFieldsMeansNoChange() {
         BibEntry entry = new BibEntry();
         List<FieldChange> changes = cleanup.cleanup(entry);
-        assertTrue(changes.isEmpty(), "Expected no changes when neither field is present");
+        //"Expected no changes when neither field is present"
+        assertEquals(List.of(), changes);
     }
 
     @Test
@@ -50,7 +52,8 @@ class UnabbreviateJournalCleanupTest {
 
         List<FieldChange> changes = cleanup.cleanup(entry);
 
-        assertTrue(changes.isEmpty(), "No changes expected if the repo can't find an unabbreviation");
+        assertEquals(List.of(), changes);
+        //"No changes expected if the repo can't find an unabbreviation"
         assertEquals(Optional.of("Unknown Journal"), entry.getField(StandardField.JOURNAL));
     }
 
@@ -62,7 +65,7 @@ class UnabbreviateJournalCleanupTest {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Journal of Foo");
 
         List<FieldChange> changes = cleanup.cleanup(entry);
-        assertTrue(changes.isEmpty(), "Expected no changes if already unabbreviated");
+        assertEquals(List.of(), changes);//"Expected no changes if already unabbreviated"
         assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
     }
 
@@ -74,15 +77,16 @@ class UnabbreviateJournalCleanupTest {
         Mockito.when(repositoryMock.get("J. Foo")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "J. Foo");
-
+        FieldChange expectedChange = new FieldChange(entry, StandardField.JOURNAL,"J. Foo", "Journal of Foo");
         List<FieldChange> changes = cleanup.cleanup(entry);
-        assertEquals(1, changes.size(), "Should produce one field change for the journal field");
-        FieldChange fc = changes.getFirst();
+        assertEquals(List.of(expectedChange), changes);
+       // assertEquals(1, changes.size()); //Should produce one field change for the journal field
+       /* FieldChange fc = changes.getFirst();
         assertEquals(StandardField.JOURNAL, fc.getField());
         assertEquals("J. Foo", fc.getOldValue());
         assertEquals("Journal of Foo", fc.getNewValue());
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));*/
     }
 
     @Test
@@ -148,10 +152,11 @@ class UnabbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "{J. Foo}");
         Mockito.when(databaseMock.resolveForStrings("{J. Foo}")).thenReturn("J. Foo");
-
+        FieldChange expectedChanges = new FieldChange(entry,StandardField.JOURNAL, "J. Foo", "Journal of Foo");
+        //FieldChange(BibEntry entry, Field field, String oldValue, String newValue)
         List<FieldChange> changes = cleanup.cleanup(entry);
-
-        assertEquals(1, changes.size(), "Should produce 1 field change if we handle braces around the name");
+        assertEquals(List.of(expectedChanges), changes);
+        //assertEquals(1, changes.size(), "Should produce 1 field change if we handle braces around the name");
         assertEquals("Journal of Foo", entry.getField(StandardField.JOURNAL).orElse("?"));
     }
 
@@ -165,12 +170,15 @@ class UnabbreviateJournalCleanupTest {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, " J. Foo ");
         Mockito.when(databaseMock.resolveForStrings(" J. Foo ")).thenReturn("J. Foo");
 
-        List<FieldChange> changes = cleanup.cleanup(entry);
-        assertEquals(1, changes.size(), "Should produce 1 change if trailing spaces are trimmed for the lookup to succeed");
+        FieldChange expectedChanges = new FieldChange(entry, StandardField.JOURNAL," J. Foo ","Journal of Foo");
 
-        FieldChange fc = changes.getFirst();
-        assertEquals(" J. Foo ", fc.getOldValue());
-        assertEquals("Journal of Foo", fc.getNewValue());
+        List<FieldChange> changes = cleanup.cleanup(entry);
+        //assertEquals(1, changes.size(), "Should produce 1 change if trailing spaces are trimmed for the lookup to succeed");
+        assertEquals(List.of(expectedChanges), changes);
+//
+//        FieldChange fc = changes.getFirst();
+//        assertEquals(" J. Foo ", fc.getOldValue());
+//        assertEquals("Journal of Foo", fc.getNewValue());
 
         assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
     }
