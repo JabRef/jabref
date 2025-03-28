@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
@@ -77,15 +78,20 @@ public class AbbreviateJournalCleanup implements CleanupJob {
     }
 
     private String getAbbreviatedName(Abbreviation text) {
-        return switch (abbreviationType) {
-            case DEFAULT ->
-                    text.getAbbreviation();
-            case DOTLESS ->
-                    text.getDotlessAbbreviation();
-            case SHORTEST_UNIQUE ->
-                    text.getShortestUniqueAbbreviation();
-            default ->
-                    throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
-        };
+        switch (abbreviationType) {
+            case DEFAULT -> {
+                return text.getAbbreviation();
+            }
+            case DOTLESS -> {
+                return text.getDotlessAbbreviation();
+            }
+            case SHORTEST_UNIQUE -> {
+                return text.getShortestUniqueAbbreviation();
+            }
+            default -> {
+                Logger.getLogger(AbbreviateJournalCleanup.class.getName()).warning("Unexpected abbreviationtype: " + abbreviationType);
+                return text.getName();
+            }
+        }
     }
 }
