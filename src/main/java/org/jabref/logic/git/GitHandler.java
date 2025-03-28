@@ -3,7 +3,9 @@ package org.jabref.logic.git;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -36,9 +38,25 @@ public class GitHandler {
      * @param repositoryPath The root of the initialized git repository
      */
     public GitHandler(Path repositoryPath) {
-        this.repositoryPath = repositoryPath;
+        this(repositoryPath, true);
+    }
+
+    /**
+     * Initialize the handler for the given repository
+     *
+     * @param repositoryPath The root of the initialized git repository
+     * @param createRepo If true, initializes a repository if the file path does not contain a repository
+     */
+    public GitHandler(Path repositoryPath, boolean createRepo) {
+        if (Files.isRegularFile(repositoryPath)) {
+            repositoryPath = repositoryPath.getParent();
+        }
+
+        // Normalize the path to ensure consistent path handling
+        this.repositoryPath = repositoryPath.toAbsolutePath().normalize();
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        if (!isGitRepository()) {
+
+        if (createRepo && !isGitRepository()) {
             try {
                 Git.init()
                    .setDirectory(repositoryPathAsFile)
@@ -202,4 +220,102 @@ public class GitHandler {
             return git.getRepository().getBranch();
         }
     }
+
+    /**
+     * Represents the Git status of a file within a repository
+     */
+    public enum GitStatus {
+        MODIFIED,
+        STAGED,
+        COMMITTED,
+        UNTRACKED
+    }
+
+    /**
+     * Gets the Git status of a file
+     *
+     * @param filePath The path to the file to check
+     * @return Optional containing the Git status of the file, or empty if status cannot be determined
+     */
+    public Optional<GitStatus> getFileStatus(Path filePath) {
+        try {
+
+            // Check if file exists
+            Path absoluteFilePath = filePath.toAbsolutePath().normalize();
+            if (!Files.exists(absoluteFilePath)) {
+                return Optional.empty();
+            }
+
+            if (!isGitRepository()) {
+                // if the file is not in a git repository return empty
+                return Optional.empty();
+            }
+
+            // Get relative path in repository
+            String relativePath = getRelativePath(filePath);
+            if (relativePath.isEmpty()) {
+                return Optional.empty();
+            }
+
+            try (Git git = Git.open(repositoryPathAsFile)) {
+                Status status = git.status().call();
+
+                // Check for untracked files
+                if (status.getUntracked().contains(relativePath)) {
+                    return Optional.of(GitStatus.UNTRACKED);
+                }
+
+                // Check for staged files
+                if (status.getAdded().contains(relativePath) || status.getChanged().contains(relativePath)) {
+                    return Optional.of(GitStatus.STAGED);
+                }
+
+                // Check for modified files
+                if (status.getModified().contains(relativePath)) {
+                    return Optional.of(GitStatus.MODIFIED);
+                }
+
+                // If file is in the repository but not modified, staged, or untracked, it must be committed
+                return Optional.of(GitStatus.COMMITTED);
+            } catch (AccessDeniedException | NoSuchFileException | GitAPIException e) {
+                LOGGER.error("Access or file not found error when getting file status: {}", e.getMessage(), e);
+                return Optional.empty();
+            }
+        } catch (IOException e) {
+            LOGGER.error("IO error when getting file status: {}", e.getMessage(), e);
+            return Optional.empty();
+        }
+    }
+    /**
+     * Gets the relative path of a file to the repository root
+     *
+     * @param filePath The absolute path to the file
+     * @return The relative path to the repository, or empty string if the file is not in the repository
+     */
+
+    public String getRelativePath(Path filePath) {
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path cannot be null");
+        }
+
+        try {
+            Path absoluteFilePath = filePath.toRealPath();
+            Path absoluteRepoPath = repositoryPath.toRealPath();
+
+            if (absoluteFilePath.startsWith(absoluteRepoPath)) {
+                return absoluteRepoPath.relativize(absoluteFilePath).toString();
+            }
+            return "";
+        } catch (AccessDeniedException e) {
+            LOGGER.debug("Access denied when getting relative path", e);
+            return "";
+        } catch (NoSuchFileException e) {
+            LOGGER.debug("File not found when getting relative path", e);
+            return "";
+        } catch (IOException e) {
+            LOGGER.debug("IO error when getting relative path", e);
+            return "";
+        }
+    }
 }
+
