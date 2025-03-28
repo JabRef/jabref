@@ -1,10 +1,13 @@
 package org.jabref.logic.net;
 
 import java.net.URI;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -86,5 +89,33 @@ class URLUtilTest {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
+    }
+
+    @Test
+    void createShouldHandleRelativeURLs() throws Exception {
+        URL relativeUrl = URLUtil.create("www.example.com");
+        assertEquals("https://www.example.com", relativeUrl.toString());
+
+        URL noWwwUrl = URLUtil.create("example.com");
+        assertEquals("https://example.com", noWwwUrl.toString());
+    }
+
+    @Test
+    void createShouldHandleAbsoluteURLs() throws Exception {
+        URL absoluteHttpUrl = URLUtil.create("http://www.example.com");
+        assertEquals("http://www.example.com", absoluteHttpUrl.toString());
+
+        URL absoluteHttpsUrl = URLUtil.create("https://www.example.com");
+        assertEquals("https://www.example.com", absoluteHttpsUrl.toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ftp://example.com, ftp://example.com",
+        "file:///path/to/file, file:/path/to/file"
+    })
+    void createShouldHandleOtherProtocols(String inputUrl, String expectedUrl) throws Exception {
+        URL actualUrl = URLUtil.create(inputUrl);
+        assertEquals(expectedUrl, actualUrl.toString());
     }
 }

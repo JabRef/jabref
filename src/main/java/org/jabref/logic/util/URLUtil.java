@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
  */
 public class URLUtil {
+    private static final String PROTOCOL_SEPARATOR = "://";
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
 
@@ -83,25 +84,37 @@ public class URLUtil {
      * @return true if <c>url</c> contains a valid URL
      */
     public static boolean isURL(String url) {
+        if (!url.matches("^[a-zA-Z]+://.*")) {
+            return false;
+        }
         try {
-            create(url);
+            createUri(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
 
     /**
      * Creates a {@link URL} object from the given string URL.
+     * <p>
+     * If the URL does not contain a protocol (e.g., "example.com"), 
+     * "https://" is added by default to ensure a valid URL format. 
+     * This helps avoid errors when handling URLs without protocols.
      *
      * @param url the URL string to be converted into a {@link URL}.
      * @return the {@link URL} object created from the string URL.
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
-    }
+        if (!url.contains(PROTOCOL_SEPARATOR)) {
+            url = "https://" + url;
+        }
 
+        URI uri = createUri(url);
+        return uri.toURL();
+    }
+    
     /**
      * Creates a {@link URI} object from the given string URL.
      * This method attempts to convert the given URL string into a {@link URI} object.
