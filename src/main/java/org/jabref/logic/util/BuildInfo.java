@@ -20,14 +20,13 @@ public final class BuildInfo {
     public final Version version;
     public final String maintainers;
     public final String year;
-    public final String springerNatureAPIKey;
+
     public final String astrophysicsDataSystemAPIKey;
+    public final String biodiversityHeritageApiKey;
     public final String ieeeAPIKey;
     public final String scienceDirectApiKey;
-    public final String minRequiredJavaVersion;
-    public final boolean allowJava9;
-    public final String biodiversityHeritageApiKey;
     public final String semanticScholarApiKey;
+    public final String springerNatureAPIKey;
 
     public BuildInfo() {
         this("/build.properties");
@@ -43,20 +42,19 @@ public final class BuildInfo {
                 }
             }
         } catch (IOException ignored) {
-            // nothing to do -> default already set
+            // nothing to do -> default will be set
         }
 
         version = Version.parse(properties.getProperty("version"));
         year = properties.getProperty("year", "");
         maintainers = properties.getProperty("maintainers", "");
-        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
+
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
+        biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
-        minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
-        allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
-        biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
+        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {
