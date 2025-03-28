@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -29,14 +30,14 @@ import static org.mockito.Mockito.when;
 class BiodiversityLibraryTest {
     private final String RESPONSE_FORMAT = "&format=json";
 
-    private String apiKey;
+    private final String apiKey = new BuildInfo().biodiversityHeritageApiKey;
     private BiodiversityLibrary fetcher;
 
     @BeforeEach
     void setUp() {
-        apiKey = new BuildInfo().biodiversityHeritageApiKey;
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(BiodiversityLibrary.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
         fetcher = new BiodiversityLibrary(importerPreferences);
     }
 
