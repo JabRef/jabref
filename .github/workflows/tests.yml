@@ -356,6 +356,33 @@ jobs:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4
 
+  mandatory-checks-section-exists:
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    name: Mandatory Checks present
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+          
+      - name: Check for existence of Mandatory Checks section
+        id: check_mandatory_section
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+          
+          if echo "$BODY" | grep -q "### Mandatory checks"; then
+            echo "✅ '### Mandatory checks' section found."
+          else
+            echo "❌ '### Mandatory checks' section is missing!"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   checklist-checked:
     if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
     name: PR checklist OK
@@ -452,10 +479,14 @@ jobs:
           # enable diffing of submodules
           sed -i "s/ all/ untracked/" .gitmodules
 
-          if ! git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -vzq "Submodule src"; then
+          if git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -Eq "^Submodule .* contains modified content$"; then
             echo "Debug:"
-            echo git diff --submodule=log origin/${{ github.base_ref }} HEAD
+            echo "Command: git diff --submodule=log origin/${{ github.base_ref }} HEAD"
+            echo "Result:"
             git diff --submodule=log origin/${{ github.base_ref }} HEAD
+            echo "--end--"
+            echo "Grep result"
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -E "^Submodule .* contains modified content$"
             echo "❌ Submodule modifications detected"
             exit 1
           fi

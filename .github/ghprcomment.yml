@@ -1,42 +1,3 @@
-# PR text
-
-- jobName: 'PR checklist OK'
-  messsage:
-    Note that your PR will not be accepted/reviewed until you have gone through the mandatory checks in the description, or have removed them.
-- jobName: 'Determine issue number'
-  message: |
-    Your pull request needs to link an issue.
-
-    To ease organizational workflows, please link this pull-request to the issue with syntax as described in <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>:
-
-    > <h2 id="linking-a-pull-request-to-an-issue-using-a-keyword">Linking a pull request to an issue using a keyword</h2>
-    > <p>You can link a pull request to an issue by using a supported keyword
-    > in the pull request's description or in a commit message. The pull
-    > request <strong>must be</strong> on the default branch.</p>
-    > <ul>
-    > <li>close</li>
-    > <li>closes</li>
-    > <li>closed</li>
-    > <li>fix</li>
-    > <li>fixes</li>
-    > <li>fixed</li>
-    > <li>resolve</li>
-    > <li>resolves</li>
-    > <li>resolved</li>
-    > </ul>
-    > <p>If you use a keyword to reference a pull request comment in another
-    > pull request, the pull requests will be linked. Merging the referencing
-    > pull request also closes the referenced pull request.</p>
-    > <p>The syntax for closing keywords depends on whether the issue is in the same repository as the pull request.</p>
-
-    ### Examples
-
-    - ✅ `Fixes #xyz` links pull-request to issue. Merging the PR will close the issue.
-    - ✅ `Fixes https://github.com/JabRef/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
-    - ✅ `Fixes https://github.com/Koppor/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
-    - ❌ `Fixes [#xyz](https://github.com/JabRef/jabref/issues/xyz)` links pull-request to issue. Merging the PR will **NOT** close the issue.
-
-
 # Compilation, tests, and code style
 
 - jobName: windows installer and portable version
@@ -50,8 +11,8 @@
 - jobName: 'Unit tests'
   message: >
     JUnit tests are failing.
-    In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details".
-    This brings you to the test output.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -60,30 +21,35 @@
   message: >
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
     You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
+
+
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
 - jobName: OpenRewrite
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
+
+    
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
+
+
     Please fix the detected errors, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-
 
 # CHANGELOG.md and *.md
 
@@ -141,3 +107,48 @@
     For this pull request, this is OK.
     For subsequent pull requests, please start with a different branch with a proper branch name.
     See [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for more details.
+
+
+# PR text
+
+- jobName: 'Mandatory Checks present'
+  always: true
+  message: >
+    You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
+- jobName: 'PR checklist OK'
+  always: true
+  message: >
+    Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
+- jobName: 'Determine issue number'
+  always: true
+  message: |
+    Your pull request needs to link an issue.
+
+    To ease organizational workflows, please link this pull-request to the issue with syntax as described in <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>:
+
+    > <h2 id="linking-a-pull-request-to-an-issue-using-a-keyword">Linking a pull request to an issue using a keyword</h2>
+    > <p>You can link a pull request to an issue by using a supported keyword
+    > in the pull request's description or in a commit message. The pull
+    > request <strong>must be</strong> on the default branch.</p>
+    > <ul>
+    > <li>close</li>
+    > <li>closes</li>
+    > <li>closed</li>
+    > <li>fix</li>
+    > <li>fixes</li>
+    > <li>fixed</li>
+    > <li>resolve</li>
+    > <li>resolves</li>
+    > <li>resolved</li>
+    > </ul>
+    > <p>If you use a keyword to reference a pull request comment in another
+    > pull request, the pull requests will be linked. Merging the referencing
+    > pull request also closes the referenced pull request.</p>
+    > <p>The syntax for closing keywords depends on whether the issue is in the same repository as the pull request.</p>
+
+    ### Examples
+
+    - ✅ `Fixes #xyz` links pull-request to issue. Merging the PR will close the issue.
+    - ✅ `Fixes https://github.com/JabRef/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
+    - ✅ `Fixes https://github.com/Koppor/jabref/issues/xyz` links pull-request to issue. Merging the PR will close the issue.
+    - ❌ `Fixes [#xyz](https://github.com/JabRef/jabref/issues/xyz)` links pull-request to issue. Merging the PR will **NOT** close the issue.
