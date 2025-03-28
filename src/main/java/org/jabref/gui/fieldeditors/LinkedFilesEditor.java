@@ -42,6 +42,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
+import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
@@ -92,6 +93,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
     private ContextMenu activeContextMenu = null;
+    private ContextMenuFactory contextMenuFactory;
 
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
@@ -140,15 +142,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         setUpKeyBindings();
     }
 
-    private ContextMenu getContextMenuForSelection(LinkedFileViewModel linkedFile) {
-        ObservableList<LinkedFileViewModel> selectedFiles = listView.getSelectionModel().getSelectedItems();
-
-        if (selectedFiles.size() > 1) {
-            return createMultiSelectionContextMenu(selectedFiles);
-        }
-
-        return createContextMenuForFile(linkedFile);
-    }
+//    private ContextMenu getContextMenuForSelection(LinkedFileViewModel linkedFile) {
+//        ObservableList<LinkedFileViewModel> selectedFiles = listView.getSelectionModel().getSelectedItems();
+//
+//        if (selectedFiles.size() > 1) {
+//            return createMultiSelectionContextMenu(selectedFiles);
+//        }
+//
+//        return createContextMenuForFile(linkedFile);
+//    }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
@@ -332,7 +334,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 activeContextMenu = null;
             }
             // Right click -> get and display context menu
-            ContextMenu contextMenu = getContextMenuForSelection(linkedFile);
+            contextMenuFactory = new ContextMenuFactory(
+                    dialogService,
+                    preferences,
+                    databaseContext,
+                    bibEntry,
+                    viewModel);
+
+            ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());
+//            ContextMenu contextMenu = getContextMenuForSelection(linkedFile);
             contextMenu.show(listView, event.getScreenX(), event.getScreenY());
             activeContextMenu = contextMenu;
         }
@@ -343,129 +353,129 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return 3;
     }
 
-    private ContextMenu createMultiSelectionContextMenu(ObservableList<LinkedFileViewModel> selectedFiles) {
-        ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
-
-        menu.getItems().addAll(
-                factory.createMenuItem(StandardActions.REMOVE_LINKS, new MultiContextAction(StandardActions.REMOVE_LINKS, selectedFiles, preferences))
-        );
-
-        return menu;
-    }
-
-
-    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
-        ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
-
-        menu.getItems().addAll(
-                factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferences)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.OPEN_FILE, new ContextAction(StandardActions.OPEN_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferences)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
-                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferences))
-        );
-
-        return menu;
-    }
-
-    private class MultiContextAction extends SimpleCommand {
-
-        private final StandardActions command;
-        private final ObservableList<LinkedFileViewModel> selectedFiles;
-        private final CliPreferences preferences;
-
-        public MultiContextAction(StandardActions command, ObservableList<LinkedFileViewModel> selectedFiles, CliPreferences preferences) {
-            this.command = command;
-            this.selectedFiles = selectedFiles;
-            this.preferences = preferences;
-
-            this.executable.bind(Bindings.createBooleanBinding(
-                    () -> !selectedFiles.isEmpty(),
-                    selectedFiles
-            ));
-        }
-
-        @Override
-        public void execute() {
-            /*
-            Must remove print statements before pull request.
-            - use of standard IO causing failing tests in MainArchitectureTest.java
-             */
-            System.out.println("Executing MultiContextAction: " + command); /* MUST REMOVE BEFORE PULL REQUEST */
-            List<LinkedFileViewModel> selectedFilesCopy = new ArrayList<>(selectedFiles);
-            for (LinkedFileViewModel linkedFile : selectedFilesCopy) {
-                System.out.println("Processing file: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
-                new ContextAction(command, linkedFile, preferences).execute();
-                System.out.println("Finished processing: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
-            }
-
-            System.out.println("MultiContextAction completed"); /* MUST REMOVE BEFORE PULL REQUEST */
-        }
+//    private ContextMenu createMultiSelectionContextMenu(ObservableList<LinkedFileViewModel> selectedFiles) {
+//        ContextMenu menu = new ContextMenu();
+//        ActionFactory factory = new ActionFactory();
+//
+//        menu.getItems().addAll(
+//                factory.createMenuItem(StandardActions.REMOVE_LINKS, new MultiContextAction(StandardActions.REMOVE_LINKS, selectedFiles, preferences))
+//        );
+//
+//        return menu;
+//    }
 
 
-    }
+//    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
+//        ContextMenu menu = new ContextMenu();
+//        ActionFactory factory = new ActionFactory();
+//
+//        menu.getItems().addAll(
+//                factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferences)),
+//                new SeparatorMenuItem(),
+//                factory.createMenuItem(StandardActions.OPEN_FILE, new ContextAction(StandardActions.OPEN_FILE, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferences)),
+//                new SeparatorMenuItem(),
+//                factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
+//                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferences)),
+//                factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferences))
+//        );
+//
+//        return menu;
+//    }
 
-    private class ContextAction extends SimpleCommand {
-
-        private final StandardActions command;
-        private final LinkedFileViewModel linkedFile;
-
-        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
-            this.command = command;
-            this.linkedFile = linkedFile;
-
-            this.executable.bind(
-                    switch (command) {
-                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case MOVE_FILE_TO_FOLDER, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> linkedFile.getFile().isOnlineLink(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
-                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        default -> BindingsHelper.constantOf(true);
-                    });
-        }
-
-        @Override
-        public void execute() {
-            switch (command) {
-                case EDIT_FILE_LINK -> linkedFile.edit();
-                case OPEN_FILE -> linkedFile.open();
-                case OPEN_FOLDER -> linkedFile.openFolder();
-                case DOWNLOAD_FILE -> linkedFile.download(true);
-                case REDOWNLOAD_FILE -> linkedFile.redownload();
-                case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
-                case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
-                case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
-                case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
-                case DELETE_FILE -> viewModel.deleteFile(linkedFile);
-                case REMOVE_LINK, REMOVE_LINKS -> viewModel.removeFileLink(linkedFile);
-            }
-        }
-    }
+//    private class MultiContextAction extends SimpleCommand {
+//
+//        private final StandardActions command;
+//        private final ObservableList<LinkedFileViewModel> selectedFiles;
+//        private final CliPreferences preferences;
+//
+//        public MultiContextAction(StandardActions command, ObservableList<LinkedFileViewModel> selectedFiles, CliPreferences preferences) {
+//            this.command = command;
+//            this.selectedFiles = selectedFiles;
+//            this.preferences = preferences;
+//
+//            this.executable.bind(Bindings.createBooleanBinding(
+//                    () -> !selectedFiles.isEmpty(),
+//                    selectedFiles
+//            ));
+//        }
+//
+//        @Override
+//        public void execute() {
+//            /*
+//            Must remove print statements before pull request.
+//            - use of standard IO causing failing tests in MainArchitectureTest.java
+//             */
+//            System.out.println("Executing MultiContextAction: " + command); /* MUST REMOVE BEFORE PULL REQUEST */
+//            List<LinkedFileViewModel> selectedFilesCopy = new ArrayList<>(selectedFiles);
+//            for (LinkedFileViewModel linkedFile : selectedFilesCopy) {
+//                System.out.println("Processing file: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
+//                new ContextAction(command, linkedFile, preferences).execute();
+//                System.out.println("Finished processing: " + linkedFile.getFile().getLink()); /* MUST REMOVE BEFORE PULL REQUEST */
+//            }
+//
+//            System.out.println("MultiContextAction completed"); /* MUST REMOVE BEFORE PULL REQUEST */
+//        }
+//
+//
+//    }
+//
+//    private class ContextAction extends SimpleCommand {
+//
+//        private final StandardActions command;
+//        private final LinkedFileViewModel linkedFile;
+//
+//        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
+//            this.command = command;
+//            this.linkedFile = linkedFile;
+//
+//            this.executable.bind(
+//                    switch (command) {
+//                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
+//                                () -> !linkedFile.getFile().isOnlineLink()
+//                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+//                                        && !linkedFile.isGeneratedNameSameAsOriginal(),
+//                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+//                        case MOVE_FILE_TO_FOLDER, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
+//                                () -> !linkedFile.getFile().isOnlineLink()
+//                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+//                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
+//                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+//                        case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
+//                                () -> linkedFile.getFile().isOnlineLink(),
+//                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+//                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
+//                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
+//                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+//                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
+//                                () -> !linkedFile.getFile().isOnlineLink()
+//                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
+//                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+//                        default -> BindingsHelper.constantOf(true);
+//                    });
+//        }
+//
+//        @Override
+//        public void execute() {
+//            switch (command) {
+//                case EDIT_FILE_LINK -> linkedFile.edit();
+//                case OPEN_FILE -> linkedFile.open();
+//                case OPEN_FOLDER -> linkedFile.openFolder();
+//                case DOWNLOAD_FILE -> linkedFile.download(true);
+//                case REDOWNLOAD_FILE -> linkedFile.redownload();
+//                case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
+//                case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
+//                case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
+//                case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
+//                case DELETE_FILE -> viewModel.deleteFile(linkedFile);
+//                case REMOVE_LINK, REMOVE_LINKS -> viewModel.removeFileLink(linkedFile);
+//            }
+//        }
+//    }
 }
