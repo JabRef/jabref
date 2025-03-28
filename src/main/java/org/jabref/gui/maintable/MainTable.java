@@ -215,6 +215,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         importPdfsButton.setOnAction(event -> importPdfs());
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
+        noContentLabel.getStyleClass().add("welcome-header-label");
 
         HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -583,17 +584,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private BibEntry addExampleEntry() {
-        BibEntry exampleEntry = new BibEntry(StandardEntryType.Article);
-        exampleEntry.withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker");
-        exampleEntry.withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
-        exampleEntry.withField(StandardField.JOURNAL, "TUGboat");
-        exampleEntry.withField(StandardField.VOLUME, "44");
-        exampleEntry.withField(StandardField.NUMBER, "3");
-        exampleEntry.withField(StandardField.PAGES, "441--447");
-        exampleEntry.withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
-        exampleEntry.withField(StandardField.ISSN, "0896-3207");
-        exampleEntry.withField(StandardField.ISSUE, "138");
-        exampleEntry.withField(StandardField.YEAR, "2023");
+        BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker").withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
+                .withField(StandardField.JOURNAL, "TUGboat")
+                .withField(StandardField.VOLUME, "44")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.PAGES, "441--447")
+                .withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref")
+                .withField(StandardField.ISSN, "0896-3207")
+                .withField(StandardField.ISSUE, "138")
+                .withField(StandardField.YEAR, "2023");
 
         database.getDatabase().insertEntry(exampleEntry);
         return exampleEntry;
@@ -610,9 +610,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             libraryPropertiesAction.execute();
             return;
         }
-            FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
-            findUnlinkedFilesAction.execute();
+
+        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
+        findUnlinkedFilesAction.execute();
     }
 }
-
-
