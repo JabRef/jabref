@@ -208,7 +208,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
-                    Localization.lang("Journal file %s already added", filePath.toString()));
+                    Localization.lang("Journal file %s is already added", filePath.toString()));
             return;
         }
         if (abbreviationsFile.exists()) {
