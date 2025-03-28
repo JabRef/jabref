@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -22,6 +23,12 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupPresetPanel extends VBox {
+
+    private static final String ABBREVIATE_DEFAULT_STRING = "Abbreviate (default)";
+    private static final String ABBREVIATE_DOTLESSS_STRING = "Abbreviate (dotless)";
+    private static final String ABBREVIATE_SHORTEST_STRING = "Abbreviate (shortest unique)";
+    private static final String UNABBREVIATE_STRING = "Unabbreviate";
+    private static final String NO_CHANGES_STRING = "No changes";
 
     private final BibDatabaseContext databaseContext;
     @FXML private Label cleanupRenamePDFLabel;
@@ -39,6 +46,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBibtex;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private ComboBox<String> journalCleanupSelector;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -96,6 +104,14 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
                     }
                 });
+        journalCleanupSelector.setItems(FXCollections.observableArrayList(
+                ABBREVIATE_DEFAULT_STRING,
+                ABBREVIATE_DOTLESSS_STRING,
+                ABBREVIATE_SHORTEST_STRING,
+                UNABBREVIATE_STRING,
+                NO_CHANGES_STRING
+        ));
+        journalCleanupSelector.getSelectionModel().select(NO_CHANGES_STRING);
         updateDisplay(cleanupPreferences);
     }
 
@@ -117,6 +133,8 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
+        journalCleanupSelector.getSelectionModel().select(preset.getSelectedJournalCleanupOption());
+
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
@@ -166,6 +184,16 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpTimestampToModificationDate.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
+        }
+        String selectedJournalOption = journalCleanupSelector.getSelectionModel().getSelectedItem();
+        if (ABBREVIATE_DEFAULT_STRING.equals(selectedJournalOption)) {
+            activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+        } else if (ABBREVIATE_DOTLESSS_STRING.equals(selectedJournalOption)) {
+            activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
+        } else if (ABBREVIATE_SHORTEST_STRING.equals(selectedJournalOption)) {
+            activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
+        } else if (UNABBREVIATE_STRING.equals(selectedJournalOption)) {
+            activeJobs.add(CleanupPreferences.CleanupStep.UNABBREVIATE);
         }
 
         activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);
