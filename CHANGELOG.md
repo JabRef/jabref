@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
+- We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
 - We added automatic PubMed URL insertion when importing from PubMed if no URL is present. #12832
 
 ### Changed
@@ -90,6 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed a bug where LaTeX commands were not removed from filenames generated using the `[bibtexkey] - [fulltitle]` pattern. [#12188](https://github.com/JabRef/jabref/issues/12188)
 - We fixed an issue where JabRef interface would not properly refresh after a group removal. [#11487](https://github.com/JabRef/jabref/issues/11487)
 - We fixed an issue where valid DOI could not be imported if it had special characters like `<` or `>`. [#12434](https://github.com/JabRef/jabref/issues/12434)
+- We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 
 ### Removed
 
