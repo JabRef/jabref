@@ -225,6 +225,9 @@ public class ImportHandler {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(entries);
+        entries.forEach(entry -> {
+            entry.setFiles(entry.getFiles());
+        });
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
