@@ -48,6 +48,11 @@ import org.slf4j.LoggerFactory;
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
+    // Example Questions
+    private static final String EXAMPLE_QUESTION_1 = Localization.lang("What is the goal of the paper?");
+    private static final String EXAMPLE_QUESTION_2 = Localization.lang("Which methods were used in the research?");
+    private static final String EXAMPLE_QUESTION_3 = Localization.lang("What are the key findings?");
+
     private final AiService aiService;
     private final ObservableList<BibEntry> entries;
     private final BibDatabaseContext bibDatabaseContext;
@@ -58,6 +63,8 @@ public class AiChatComponent extends VBox {
     private final AiChatLogic aiChatLogic;
 
     private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
+
+
 
     @FXML private Loadable uiLoadableChatHistory;
     @FXML private ChatHistoryComponent uiChatHistory;
@@ -120,9 +127,9 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeExampleQuestions() {
-        exQuestion1.setText(Localization.lang("What is the goal of the paper?"));
-        exQuestion2.setText(Localization.lang("Which methods were used in the research?"));
-        exQuestion3.setText(Localization.lang("What are the key findings?"));
+        exQuestion1.setText(EXAMPLE_QUESTION_1);
+        exQuestion2.setText(EXAMPLE_QUESTION_2);
+        exQuestion3.setText(EXAMPLE_QUESTION_3);
     }
 
     private void sendExampleQuestions() {
