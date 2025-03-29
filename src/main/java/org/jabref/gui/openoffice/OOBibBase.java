@@ -26,6 +26,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -94,6 +95,7 @@ public class OOBibBase {
             OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, initialStyle);
             cslUpdateBibliography = new CSLUpdateBibliography();
+            CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
         }
     }
 

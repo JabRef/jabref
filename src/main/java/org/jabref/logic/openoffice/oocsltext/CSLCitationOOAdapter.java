@@ -53,6 +53,7 @@ public class CSLCitationOOAdapter {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
+
         if (initialStyle instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
         }
@@ -176,7 +177,7 @@ public class CSLCitationOOAdapter {
             throws WrappedTargetException, CreationException {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
-        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.getBibliographyTitle()), CSLFormatUtils.getBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);

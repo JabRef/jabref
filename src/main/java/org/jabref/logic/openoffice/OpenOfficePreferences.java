@@ -32,6 +32,8 @@ public class OpenOfficePreferences {
     private final StringProperty currentJStyle;
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
+    private final StringProperty cslBibliographyTitle;
+    private final StringProperty cslBibliographyHeaderFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -39,7 +41,9 @@ public class OpenOfficePreferences {
                                  List<String> externalStyles,
                                  String currentJStyle,
                                  OOStyle currentStyle,
-                                 boolean alwaysAddCitedOnPages) {
+                                 boolean alwaysAddCitedOnPages,
+                                 String cslBibliographyTitle,
+                                 String cslBibliographyHeaderFormat) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -47,6 +51,8 @@ public class OpenOfficePreferences {
         this.currentJStyle = new SimpleStringProperty(currentJStyle);
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
+        this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
+        this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
     }
 
     public void clearConnectionSettings() {
@@ -151,5 +157,21 @@ public class OpenOfficePreferences {
 
     public void setAlwaysAddCitedOnPages(boolean alwaysAddCitedOnPages) {
         this.alwaysAddCitedOnPages.set(alwaysAddCitedOnPages);
+    }
+
+    public StringProperty cslBibliographyTitleProperty() {
+        return cslBibliographyTitle;
+    }
+
+    public String getCslBibliographyTitle() {
+        return cslBibliographyTitle.get();
+    }
+
+    public StringProperty cslBibliographyHeaderFormatProperty() {
+        return cslBibliographyHeaderFormat;
+    }
+
+    public String getCslBibliographyHeaderFormat() {
+        return cslBibliographyHeaderFormat.get();
     }
 }
