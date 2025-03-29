@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -26,7 +25,6 @@ import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -76,8 +74,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
      * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
      */
     @Override
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException {
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(fullPath, document);
         if (extractedCandidates.isEmpty()) {
             return List.of();
         }
@@ -87,10 +85,22 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         Stream<BibEntry> allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());
         BibEntry entry = mergeCandidates(allCandidates);
 
-        // We use the absolute path here as we do not know the context where this import will be used.
-        // The caller is responsible for making the path relative if necessary.
-        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return List.of(entry);
+    }
+
+    /**
+     * Enhanced {@link PdfImporter#importDatabase(Path)} method that relativizes paths of PDF files (if turned on in the preferences).
+     */
+    public ParserResult importDatabase(Path filePath, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        ParserResult parserResult = importDatabase(filePath);
+
+        if (filePreferences.shouldStoreFilesRelativeToBibFile() && bibDatabaseContext.getDatabasePath().isPresent()) {
+            Path storePath = bibDatabaseContext.getDatabasePath().get().getParent().relativize(filePath);
+            parserResult.getDatabase().getEntries().forEach(entry ->
+                    entry.addFile(new LinkedFile("", storePath, StandardField.PDF.getName())));
+        }
+
+        return parserResult;
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
@@ -184,13 +194,6 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         });
 
         return entry;
-    }
-
-    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
-        Objects.requireNonNull(context);
-        Objects.requireNonNull(filePreferences);
-
-        return importDatabase(filePath);
     }
 
     @Override

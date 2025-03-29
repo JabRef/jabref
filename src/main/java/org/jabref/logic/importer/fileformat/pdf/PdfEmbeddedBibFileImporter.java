@@ -38,7 +38,7 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
      * Extraction of embedded files in pdfs adapted from:
      * <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
      */
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
         if (nameDictionary != null) {

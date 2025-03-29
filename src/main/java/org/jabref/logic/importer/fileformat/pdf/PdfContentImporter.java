@@ -185,7 +185,7 @@ public class PdfContentImporter extends PdfImporter {
         return removeNonLettersAtEnd(title);
     }
 
-    public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
+    public List<BibEntry> importDatabase(Path fullPath, PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
