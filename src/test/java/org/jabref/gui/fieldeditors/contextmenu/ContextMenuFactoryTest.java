@@ -33,10 +33,18 @@ public class ContextMenuFactoryTest {
     private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
     private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
 
+    private static boolean toolkitInitialized = false;
+
     @BeforeAll
     public static void initToolkit() {
-        // Initialize JavaFX platform once
-        Platform.startup(() -> {});
+        if (!toolkitInitialized) {
+            try {
+                Platform.startup(() -> {});
+            } catch (IllegalStateException e) {
+                // Toolkit already initialized by another thread/test
+            }
+            toolkitInitialized = true;
+        }
     }
 
     @BeforeEach
