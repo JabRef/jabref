@@ -1,9 +1,9 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -13,6 +13,8 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
+import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextMenuFactory {
 

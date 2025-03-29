@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
 import javafx.beans.binding.Bindings;
+
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -9,6 +10,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextAction extends SimpleCommand {

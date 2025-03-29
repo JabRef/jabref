@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import jakarta.ws.rs.core.Link;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -37,8 +36,8 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
-import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.MultiContextCommandFactory;
+import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
 import org.jabref.gui.fieldeditors.contextmenu.MultiContextAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
@@ -47,13 +46,11 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -124,7 +121,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
-                //.withContextMenu(this::getContextMenuForSelection) // The context menu to use is instead determined when the user right-clicks
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -304,7 +300,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         viewModel.addFromURL();
     }
 
-
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
             linkedFile.open(); // Double-click: open file
@@ -317,7 +312,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 activeContextMenu = null;
             }
 
-            // Updated lambdas to include viewModel
             SingleContextCommandFactory contextCommandFactory = (action, file) ->
                     new ContextAction(action, file, databaseContext, bibEntry, preferences, viewModel);
 
@@ -340,10 +334,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         }
     }
 
-
     @Override
     public double getWeight() {
         return 3;
     }
-
 }

@@ -1,13 +1,12 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
@@ -15,14 +14,24 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ContextMenuFactoryTest {
+
+    private static boolean toolkitInitialized = false;
 
     private DialogService dialogService;
     private GuiPreferences guiPreferences;
@@ -33,13 +42,11 @@ public class ContextMenuFactoryTest {
     private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
     private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
 
-    private static boolean toolkitInitialized = false;
-
     @BeforeAll
     public static void initToolkit() {
         if (!toolkitInitialized) {
             try {
-                Platform.startup(() -> {});
+                Platform.startup(() -> { });
             } catch (IllegalStateException e) {
                 // Toolkit already initialized by another thread/test
             }
