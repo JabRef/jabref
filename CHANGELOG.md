@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- In the Open/LibreOffice integration, we added the provision to modify the bibliography title and its format for CSL styles, in the "Select style" dialog. [#12663](https://github.com/JabRef/jabref/issues/12663)
 - We added a new Welcome tab which shows a welcome screen if no database is open. [#12272](https://github.com/JabRef/jabref/issues/12272)
 - We added <kbd>F5</kbd> as a shortcut key for fetching data and <kbd>Alt+F</kbd> as a shortcut for looking up data using DOI. [#11802](https://github.com/JabRef/jabref/issues/11802)
 - We added a feature to rename the subgroup, with the keybinding (<kbd>F2</kbd>) for quick access. [#11896](https://github.com/JabRef/jabref/issues/11896)
@@ -90,6 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed a bug where LaTeX commands were not removed from filenames generated using the `[bibtexkey] - [fulltitle]` pattern. [#12188](https://github.com/JabRef/jabref/issues/12188)
 - We fixed an issue where JabRef interface would not properly refresh after a group removal. [#11487](https://github.com/JabRef/jabref/issues/11487)
 - We fixed an issue where valid DOI could not be imported if it had special characters like `<` or `>`. [#12434](https://github.com/JabRef/jabref/issues/12434)
+- We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 
 ### Removed
 
