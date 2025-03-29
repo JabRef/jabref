@@ -4,11 +4,7 @@ collection: publications
 \begin{entrytype}category: \entrytype \end{entrytype}
 \begin{citationkey}permalink: \citationkey \end{citationkey}
 \begin{note}excerpt: \note \end{note}
-\begin{year}date: \year-\month-\day \end{year}
-venue:
-slidesurl:
-\begin{url}paperurl: \url \end{url}
-citation:
+\begin{year}date: \year-01-\day \end{year}
 ---
 
 
