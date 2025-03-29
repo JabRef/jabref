@@ -597,30 +597,20 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                try {
-                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
-                    // MUST always be paired with an unlockControllers() call
-                    doc.lockControllers();
 
-                    if (citationType == CitationType.AUTHORYEAR_PAR) {
-                        // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-                    } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                        // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-                    } else if (citationType == CitationType.INVISIBLE_CIT) {
-                        // "Insert empty citation"
-                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
-                    }
-
-                    // Release controller lock
-                    doc.unlockControllers();
-
-                    // If "Automatically sync bibliography when inserting citations" is enabled
-                    syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
-                } finally {
-                    doc.lockControllers();
+                if (citationType == CitationType.AUTHORYEAR_PAR) {
+                    // "Cite" button
+                    cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                    // "Cite in-text" button
+                    cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.INVISIBLE_CIT) {
+                    // "Insert empty citation"
+                    cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
                 }
+
+                // If "Automatically sync bibliography when inserting citations" is enabled
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
 
@@ -945,16 +935,11 @@ public class OOBibBase {
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
-                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
-                    // MUST always be paired with an unlockControllers() call
-                    doc.lockControllers();
-
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
                     throw new RuntimeException(e);
                 } finally {
-                    doc.unlockControllers();
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
