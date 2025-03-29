@@ -22,11 +22,12 @@ public class MinifyNameListFormatter extends Formatter {
     /**
      * Replaces three or more authors with and others.
      *
-     * <example>
+     * <h4>Example</h4>
+     * <pre>{@code
      *     Stefan Kolb -> Stefan Kolb
      *     Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
      *     Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
-     * </example>
+     * }</pre>
      */
     @Override
     public String format(String value) {

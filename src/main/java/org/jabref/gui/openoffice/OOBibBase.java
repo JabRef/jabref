@@ -26,6 +26,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -73,6 +74,7 @@ public class OOBibBase {
     private final OOBibBaseConnect connection;
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
+    private CSLUpdateBibliography cslUpdateBibliography;
 
     private OpenOfficePreferences openOfficePreferences;
 
@@ -90,7 +92,10 @@ public class OOBibBase {
         if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences);
+            OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, initialStyle);
+            cslUpdateBibliography = new CSLUpdateBibliography();
+            CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
         }
     }
 
@@ -888,8 +893,6 @@ public class OOBibBase {
             }
         } else if (style instanceof CitationStyle citationStyle) {
             try {
-
-                CSLUpdateBibliography cslUpdateBibliography = new CSLUpdateBibliography();
 
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
                 if (testDialog(errorTitle, odoc.asVoidResult())) {
