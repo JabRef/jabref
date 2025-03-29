@@ -97,7 +97,7 @@ public class ContextMenuFactoryTest {
     }
 
     @Test
-    public void testCreateContextMenuForSingleFile() {
+    public void createContextMenuForSingleFile() {
         LinkedFileViewModel file = mockFileWithLink("file1.pdf");
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
 
@@ -107,7 +107,7 @@ public class ContextMenuFactoryTest {
     }
 
     @Test
-    public void testCreateContextMenuForMultipleFiles() {
+    public void createContextMenuForMultipleFiles() {
         LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
         LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
@@ -118,7 +118,7 @@ public class ContextMenuFactoryTest {
     }
 
     @Test
-    public void testCreateContextMenuForEmptySelection() {
+    public void createContextMenuForEmptySelection() {
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
         ContextMenu menu = factory.createForSelection(files);
 
@@ -127,7 +127,7 @@ public class ContextMenuFactoryTest {
     }
 
     @Test
-    public void testRemoveLinkActionCallsViewModelForSingleFile() {
+    public void removeLinkActionCallsViewModelForSingleFile() {
         LinkedFileViewModel file = mockFileWithLink("file1.pdf");
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
         ContextMenu menu = factory.createForSelection(files);
@@ -144,7 +144,7 @@ public class ContextMenuFactoryTest {
     }
 
     @Test
-    public void testRemoveLinksActionCallsViewModelForAllSelectedFiles() {
+    public void removeLinksActionCallsViewModelForAllSelectedFiles() {
         LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
         LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
 
