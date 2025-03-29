@@ -194,8 +194,8 @@ public class XmpUtilWriter {
 
     /**
      * This method generates an xmp metadata string in dublin core format without the
-     * metadata section <?xpacket begin=...>.
-     * <br/>
+     * metadata section {@code <?xpacket begin=...>}.
+     *
      *
      * @param entries A list of entries, which are added to the dublin core metadata.
      * @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
