@@ -427,6 +427,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES),
                 getBoolean(INCLUDE_CROSS_REFERENCES)
         );
+
+        EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
+        EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (obs, oldValue, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
+
         return copyToPreferences;
     }
 
