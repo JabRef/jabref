@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -43,13 +42,13 @@ import static org.jabref.model.entry.field.StandardField.URL;
 /**
  * This class contains bundles OS specific implementations for file directories and file/application open handling methods.
  * In case the default does not work, subclasses provide the correct behavior.
- * * <p>
- * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * <p>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
  * https://tinylog.org/v2/configuration/
  * <p>
- * See http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
- * http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT
+ * See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+ * https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
  *
  * For non-GUI things, see {@link org.jabref.logic.os.OS}.
  */

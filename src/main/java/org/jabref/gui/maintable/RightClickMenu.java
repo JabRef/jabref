@@ -23,6 +23,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
+import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -33,6 +34,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -41,6 +43,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -96,7 +99,13 @@ public class RightClickMenu {
                 extractFileReferencesOffline,
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences))
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
+
+                new SeparatorMenuItem(),
+
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor))
         );
 
         EasyBind.subscribe(preferences.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
