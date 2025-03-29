@@ -52,7 +52,7 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("RIS", "ris", "ris", "ris", StandardFileType.RIS, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
         exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
-        exporters.add(new TemplateExporter("Hayagriva YAML", "hayagrivayaml", "hayagrivayaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));
+        exporters.add(new TemplateExporter("Hayagriva YAML", "hayagrivayaml", "hayagrivayaml", null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.KEEP_BLANKS));
         exporters.add(new OpenOfficeDocumentCreator());
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
@@ -62,7 +62,7 @@ public class ExporterFactory {
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
         exporters.add(new CffExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
-        exporters.add(new TemplateExporter("MARKDOWN", "md", "markdown", null, StandardFileType.MARKDOWN, layoutPreferences, saveOrder));
+        exporters.add(new AcademicPagesExporter("academicpages.github", "academicpages.github.io", "academicpages", StandardFileType.MARKDOWN, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS, null));
 
         // Now add custom export formats
         exporters.addAll(customFormats);
