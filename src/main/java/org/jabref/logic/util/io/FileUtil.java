@@ -497,6 +497,28 @@ public class FileUtil {
     }
 
     /**
+     * Test if the file is a mv file by simply checking the extension to be ".mv"
+     *
+     * @param file The file to check
+     * @return True if file extension is ".mv", false otherwise
+     */
+    public static boolean isMvFile(Path file) {
+        Optional<String> extension = FileUtil.getFileExtension(file);
+        return extension.isPresent() && StandardFileType.MV.getExtensions().contains(extension.get());
+    }
+
+    /**
+     * Test if the file is a csv file by simply checking the extension to be ".csv"
+     *
+     * @param file The file to check
+     * @return True if file extension is ".csv", false otherwise
+     */
+    public static boolean isCsvFile(Path file) {
+        Optional<String> extension = FileUtil.getFileExtension(file);
+        return extension.isPresent() && StandardFileType.CSV.getExtensions().contains(extension.get());
+    }
+
+    /**
      * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
      */
     public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {

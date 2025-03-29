@@ -28,6 +28,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
-            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get() && !currentFile.get().isMvFile();
+            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get() && !FileUtil.isMvFile(currentFile.get().getAbsolutePath().get());
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
@@ -271,7 +272,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         for (String filePath : externalLists) {
             if (journalFiles.stream().noneMatch(file -> file.getAbsolutePath().map(Path::toString).orElse("").equals(filePath))) {
                 Path path = Path.of(filePath);
-                if (filePath.endsWith(".mv")) {
+                if (FileUtil.isMvFile(path)) {
                     openMvFile(path);
                 }
             }

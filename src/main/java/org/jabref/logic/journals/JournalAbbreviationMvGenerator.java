@@ -24,6 +24,15 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationMvGenerator.class);
+    private static final String TIMESTAMPS_FILE = "timestamps.mv";
+    private static final Set<String> IGNORED_NAMES = Set.of(
+            "journal_abbreviations_entrez.csv",
+            "journal_abbreviations_medicus.csv",
+            "journal_abbreviations_webofscience-dotless.csv",
+            "journal_abbreviations_ieee_strings.csv"
+    );
+    private static final String FILE_TIMESTAMPS_MAP = "fileTimestamps";
+    private static final String ABBREVIATION_MAP = "FullToAbbreviation";
 
     /**
      * Scans the given directory for CSV files and converts each
@@ -32,27 +41,19 @@ public class JournalAbbreviationMvGenerator {
      * @param abbreviationsDirectory the directory containing journal abbreviation CSV files.
      */
     public static void convertAllCsvToMv(Path abbreviationsDirectory) {
-        // A set of filenames to ignore
-        Set<String> ignoredNames = Set.of(
-                "journal_abbreviations_entrez.csv",
-                "journal_abbreviations_medicus.csv",
-                "journal_abbreviations_webofscience-dotless.csv",
-                "journal_abbreviations_ieee_strings.csv"
-        );
-
         // Open or create a persistent MVStore file for storing CSV file timestamps.
-        Path timestampFile = abbreviationsDirectory.resolve("timestamps.mv");
+        Path timestampFile = abbreviationsDirectory.resolve(TIMESTAMPS_FILE);
         try (MVStore store = new MVStore.Builder()
                 .fileName(timestampFile.toString())
                 .compressHigh()
                 .open()) {
-            MVMap<String, Long> timestampMap = store.openMap("fileTimestamps");
+            MVMap<String, Long> timestampMap = store.openMap(FILE_TIMESTAMPS_MAP);
 
             // Iterate through all CSV files in the directory.
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(abbreviationsDirectory, "*.csv")) {
                 stream.forEach(Unchecked.consumer(csvFile -> {
                     String fileName = csvFile.getFileName().toString();
-                    if (ignoredNames.contains(fileName)) {
+                    if (IGNORED_NAMES.contains(fileName)) {
                         LOGGER.info("{} ignored", fileName);
                     } else {
                         long currentTimestamp = Files.getLastModifiedTime(csvFile).toMillis();
@@ -83,8 +84,9 @@ public class JournalAbbreviationMvGenerator {
      * Converts a CSV file into an MV file.
      * Reads the CSV file and stores its abbreviations into an MVMap inside the MV file.
      *
-     * @param csvFile the source CSV file.
-     * @param mvFile  the target MV file.
+     * @param csvFile the source CSV file
+     * @param mvFile the target MV file
+     * @throws IOException if there is an error reading the CSV file or writing the MV file
      */
 
     public static void convertCsvToMv(Path csvFile, Path mvFile) throws IOException {
@@ -93,7 +95,7 @@ public class JournalAbbreviationMvGenerator {
                 .fileName(mvFile.toString())
                 .compressHigh()
                 .open()) {
-            MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
+            MVMap<String, Abbreviation> fullToAbbreviation = store.openMap(ABBREVIATION_MAP);
 
             // Clear the existing map to remove outdated entries
             fullToAbbreviation.clear();
@@ -127,7 +129,7 @@ public class JournalAbbreviationMvGenerator {
                 .fileName(path.toString())
                 .readOnly()
                 .open()) {
-            MVMap<String, Abbreviation> abbreviationMap = store.openMap("FullToAbbreviation");
+            MVMap<String, Abbreviation> abbreviationMap = store.openMap(ABBREVIATION_MAP);
 
             abbreviationMap.forEach((key, value) -> {
                     Abbreviation fixedAbbreviation = new Abbreviation(

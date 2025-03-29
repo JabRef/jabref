@@ -8,9 +8,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javafx.beans.property.SimpleStringProperty;
-
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +67,9 @@ public class JournalAbbreviationLoader {
             for (String filename : lists) {
                 try {
                     Path filePath = Path.of(filename);
-                    if (filename.endsWith(".mv")) {
+                    if (FileUtil.isMvFile(filePath)) {
                         repository.addCustomAbbreviations(loadAbbreviationsFromMv(filePath));
-                    } else if (filename.endsWith(".csv")) {
+                    } else if (FileUtil.isCsvFile(filePath)) {
                         repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(filePath));
                     }
                 } catch (IOException e) {
@@ -82,6 +81,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, new SimpleStringProperty(Directories.getJournalAbbreviationsDirectory().toString())));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, Directories.getJournalAbbreviationsDirectory().toString()));
     }
 }

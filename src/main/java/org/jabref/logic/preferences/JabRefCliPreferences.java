@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
@@ -584,7 +583,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
         defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^");
+        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
         defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -605,6 +604,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
+        defaults.put(JOURNAL_ABBREVIATION_DIRECTORY, Directories.getJournalAbbreviationsDirectory().toString());
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
@@ -680,9 +680,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
-
-        // Journal abbreviations directory
-        defaults.put(JOURNAL_ABBREVIATION_DIRECTORY, Directories.getJournalAbbreviationsDirectory().toString());
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1023,7 +1020,7 @@ public class JabRefCliPreferences implements CliPreferences {
         journalAbbreviationPreferences = new JournalAbbreviationPreferences(
                 getStringList(EXTERNAL_JOURNAL_LISTS),
                 getBoolean(USE_AMS_FJOURNAL),
-               new SimpleStringProperty(get(JOURNAL_ABBREVIATION_DIRECTORY)));
+               get(JOURNAL_ABBREVIATION_DIRECTORY));
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));

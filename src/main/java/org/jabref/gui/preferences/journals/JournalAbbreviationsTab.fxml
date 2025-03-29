@@ -50,7 +50,7 @@
     </HBox>
 
     <HBox spacing="10.0" alignment="CENTER_LEFT">
-        <Button fx:id="changeDirectoryButton" onAction="#handleChangeDirectory" text="Change Directory"/>
+        <Button fx:id="changeDirectoryButton" onAction="#handleChangeDirectory" text="%Change directory"/>
         <CustomTextField fx:id="directoryPathField" editable="false" minWidth="250"/>
     </HBox>
 

@@ -19,6 +19,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationMvGenerator;
+import org.jabref.logic.util.io.FileUtil;
 
 /**
  * This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
@@ -90,7 +91,7 @@ public class AbbreviationsFileViewModel {
      * {@link AbbreviationWriter#writeOrCreate}.
      */
     public void writeOrCreate() throws IOException {
-        if (!isBuiltInList.get() && !isMvFile()) {
+        if (!isBuiltInList.get() && !FileUtil.isMvFile(path.get())) {
             List<Abbreviation> actualAbbreviations =
                     abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
                                  .map(AbbreviationViewModel::getAbbreviationObject)
@@ -132,9 +133,5 @@ public class AbbreviationsFileViewModel {
         } else {
             return false;
         }
-    }
-
-    public boolean isMvFile() {
-        return path.isPresent() && path.get().toString().endsWith(".mv");
     }
 }
