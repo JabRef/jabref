@@ -598,6 +598,10 @@ public class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
 
+                // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
+                // MUST always be paired with an unlockControllers() call
+                doc.lockControllers();
+
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
                     cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -608,6 +612,9 @@ public class OOBibBase {
                     // "Insert empty citation"
                     cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
                 }
+
+                // Release controller lock
+                doc.unlockControllers();
 
                 // If "Automatically sync bibliography when inserting citations" is enabled
                 syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
@@ -935,7 +942,11 @@ public class OOBibBase {
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
+                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
+                    // MUST always be paired with an unlockControllers() call
+                    doc.lockControllers();
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                    doc.unlockControllers();
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
                     throw new RuntimeException(e);
