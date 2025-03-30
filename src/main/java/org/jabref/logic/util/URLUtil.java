@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
  */
 public class URLUtil {
     private static final String PROTOCOL_SEPARATOR = "://";
+    private static final Pattern SCHEME_PREFIX = Pattern.compile("^[a-zA-Z]+://.*");
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
 
@@ -77,13 +78,16 @@ public class URLUtil {
     /**
      * Checks whether the given String is a URL.
      * <p>
-     * Currently only checks for a protocol String.
+     * A valid URL must have a scheme (e.g., "http", "https",
+     * "ftp") and an authority (e.g., "example.com").
+     * See <a href="https://en.wikipedia.org/wiki/URL#Syntax">
+     * URL Syntax</a> for details.
      *
      * @param url the String to check for a URL
      * @return true if <c>url</c> contains a valid URL
      */
     public static boolean isURL(String url) {
-        if (!url.matches("^[a-zA-Z]+://.*")) {
+        if (!SCHEME_PREFIX.matcher(url).matches()) {
             return false;
         }
         try {

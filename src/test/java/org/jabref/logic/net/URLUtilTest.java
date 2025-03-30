@@ -91,22 +91,19 @@ class URLUtilTest {
         assertEquals("http://example.com/test%7Cfile", uri.toString());
     }
 
-    @Test
-    void createShouldHandleRelativeURLs() throws Exception {
-        URL relativeUrl = URLUtil.create("www.example.com");
-        assertEquals("https://www.example.com", relativeUrl.toString());
+    @ParameterizedTest
+    @CsvSource({
+    // Relative URLs (should default to HTTPS)
+    "www.example.com, https://www.example.com",
+    "example.com, https://example.com",
 
-        URL noWwwUrl = URLUtil.create("example.com");
-        assertEquals("https://example.com", noWwwUrl.toString());
-    }
-
-    @Test
-    void createShouldHandleAbsoluteURLs() throws Exception {
-        URL absoluteHttpUrl = URLUtil.create("http://www.example.com");
-        assertEquals("http://www.example.com", absoluteHttpUrl.toString());
-
-        URL absoluteHttpsUrl = URLUtil.create("https://www.example.com");
-        assertEquals("https://www.example.com", absoluteHttpsUrl.toString());
+    // Absolute URLs (should remain unchanged)
+    "http://www.example.com, http://www.example.com",
+    "https://www.example.com, https://www.example.com"
+    })
+    void createShouldHandleURLs(String input, String expected) throws Exception {
+    URL url = URLUtil.create(input);
+    assertEquals(expected, url.toString());
     }
 
     @ParameterizedTest
