@@ -202,12 +202,12 @@ public class ThreeWayMergeView extends VBox {
     }
 
     /**
-     * Directs to the method autoSelectBetterValue() in FieldRowView.java
+     * Directs to the method autoSelectBetterValue() in FieldRowViewModel.java
      * Select 'Better' values for each field row in the Entry
      */
     public void autoSelectBetterFields() {
         for (FieldRowView row : fieldRows) {
-            row.autoSelectBetterValue();
+            row.autoSelectBetterValue_1();
         }
     }
 }
