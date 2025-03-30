@@ -310,7 +310,7 @@ public class FieldRowViewModel {
 
         // Logic for auto selection based on field name
         // Default is right value
-        if (field_1.contains("year")) {
+        if ("year".equals(field_1)) {
             try {
                 int leftYear = Integer.parseInt(leftVal);
                 int rightYear = Integer.parseInt(rightVal);
@@ -327,7 +327,7 @@ public class FieldRowViewModel {
             } catch (NumberFormatException e) {
                 selectRightValue();
             }
-        } else if (field_1.contains("type")) {
+        } else if ("type".equals(field_1)) {
             if (MISC.equalsIgnoreCase(leftVal)) {
                 selectRightValue(); // Select right value if left value is "misc"
             }
