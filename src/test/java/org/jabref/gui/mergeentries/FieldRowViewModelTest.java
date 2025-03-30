@@ -254,11 +254,9 @@ public class FieldRowViewModelTest {
     @Test
     void autoSelectBetterYearWhenMergingExistingYearWithinBounds() {
         var yearField = create4thViewModelForField(StandardField.YEAR);
-        var oldRightGroups = yearField.getRightFieldValue();
         yearField.autoSelectBetterValue();
 
         var yearField2 = create5thViewModelForField(StandardField.YEAR);
-        var oldLeftGroups = yearField2.getLeftFieldValue();
         yearField2.autoSelectBetterValue();
 
         var yearField3 = create6thViewModelForField(StandardField.YEAR);
