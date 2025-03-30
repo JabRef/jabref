@@ -23,13 +23,6 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupPresetPanel extends VBox {
-
-    private static final String ABBREVIATE_DEFAULT_STRING = "Abbreviate (default)";
-    private static final String ABBREVIATE_DOTLESSS_STRING = "Abbreviate (dotless)";
-    private static final String ABBREVIATE_SHORTEST_STRING = "Abbreviate (shortest unique)";
-    private static final String UNABBREVIATE_STRING = "Unabbreviate";
-    private static final String NO_CHANGES_STRING = "No changes";
-
     private final BibDatabaseContext databaseContext;
     @FXML private Label cleanupRenamePDFLabel;
     @FXML private CheckBox cleanUpDOI;
@@ -105,13 +98,13 @@ public class CleanupPresetPanel extends VBox {
                     }
                 });
         journalCleanupSelector.setItems(FXCollections.observableArrayList(
-                ABBREVIATE_DEFAULT_STRING,
-                ABBREVIATE_DOTLESSS_STRING,
-                ABBREVIATE_SHORTEST_STRING,
-                UNABBREVIATE_STRING,
-                NO_CHANGES_STRING
+                CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_DEFAULT,
+                CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_DOTLESS,
+                CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE,
+                CleanupPreferences.JOURNAL_CLEANUP_UNABBREVIATE,
+                CleanupPreferences.JOURNAL_CLEANUP_NO_CHANGES
         ));
-        journalCleanupSelector.getSelectionModel().select(NO_CHANGES_STRING);
+        journalCleanupSelector.getSelectionModel().select(CleanupPreferences.JOURNAL_CLEANUP_NO_CHANGES);
         updateDisplay(cleanupPreferences);
     }
 
@@ -186,13 +179,13 @@ public class CleanupPresetPanel extends VBox {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
         String selectedJournalOption = journalCleanupSelector.getSelectionModel().getSelectedItem();
-        if (ABBREVIATE_DEFAULT_STRING.equals(selectedJournalOption)) {
+        if (CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_DEFAULT.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
-        } else if (ABBREVIATE_DOTLESSS_STRING.equals(selectedJournalOption)) {
+        } else if (CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_DOTLESS.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
-        } else if (ABBREVIATE_SHORTEST_STRING.equals(selectedJournalOption)) {
+        } else if (CleanupPreferences.JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
-        } else if (UNABBREVIATE_STRING.equals(selectedJournalOption)) {
+        } else if (CleanupPreferences.JOURNAL_CLEANUP_UNABBREVIATE.equals(selectedJournalOption)) {
             activeJobs.add(CleanupPreferences.CleanupStep.UNABBREVIATE);
         }
 

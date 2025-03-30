@@ -11,6 +11,12 @@ import javafx.collections.ObservableSet;
 
 public class CleanupPreferences {
 
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_DEFAULT = "Abbreviate (default)";
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_DOTLESS = "Abbreviate (dotless)";
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE = "Abbreviate (shortest unique)";
+    public static final String JOURNAL_CLEANUP_UNABBREVIATE = "Unabbreviate";
+    public static final String JOURNAL_CLEANUP_NO_CHANGES = "No changes";
+
     private final ObservableSet<CleanupStep> activeJobs;
     private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
 
@@ -74,21 +80,21 @@ public class CleanupPreferences {
 
     public String getSelectedJournalCleanupOption() {
         if (isActive(CleanupStep.NO_CHANGES)) {
-            return "No changes";
+            return JOURNAL_CLEANUP_NO_CHANGES;
         }
         if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
-            return "Abbreviate (default)";
+            return JOURNAL_CLEANUP_ABBREVIATE_DEFAULT;
         }
         if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
-            return "Abbreviate (dotless)";
+            return JOURNAL_CLEANUP_ABBREVIATE_DOTLESS;
         }
         if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
-            return "Abbreviate (shortest unique)";
+            return JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE;
         }
         if (isActive(CleanupStep.UNABBREVIATE)) {
-            return "Unabbreviate";
+            return JOURNAL_CLEANUP_UNABBREVIATE;
         }
-        return "No changes";
+        return JOURNAL_CLEANUP_NO_CHANGES;
     }
 
     public enum CleanupStep {
