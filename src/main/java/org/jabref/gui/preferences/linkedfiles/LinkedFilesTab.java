@@ -66,6 +66,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());
 
+        //added:
         copyLinkedFiles.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesProperty());
         copyLinkedFiles.selectedProperty().set(true);
 

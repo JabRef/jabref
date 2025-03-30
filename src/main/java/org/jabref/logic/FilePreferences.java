@@ -31,6 +31,7 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
 
     public FilePreferences(String userAndHost,
@@ -45,6 +46,7 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
+                           boolean copyLinkedFiles,
                            boolean shouldKeepDownloadUrl) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
@@ -58,6 +60,7 @@ public class FilePreferences {
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
+        this.copyLinkedFiles.setValue(copyLinkedFiles);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
     }
 
@@ -216,4 +219,17 @@ public class FilePreferences {
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
     }
+
+    public boolean copyLinkedFiles() {
+        return copyLinkedFiles.get();
+    }
+
+    public BooleanProperty copyLinkedFilesProperty() {
+        return copyLinkedFiles;
+    }
+
+    public void copyLinkedFiles(boolean copyLinkedFiles) {
+        this.copyLinkedFiles.set(copyLinkedFiles);
+    }
+
 }
