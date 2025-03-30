@@ -124,6 +124,7 @@ public class FieldRowViewModelTest {
     void selectLeftValueShouldBeCorrect() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectLeftValue();
+
         assertEquals(FieldRowViewModel.Selection.LEFT, monthFieldViewModel.getSelection());
         assertEquals(Optional.of(""), Optional.ofNullable(monthFieldViewModel.getMergedFieldValue()));
 

@@ -219,47 +219,7 @@ public class FieldRowView {
         return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 
-    /**
-     * Method for selecting the 'Better' year value.
-     * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
-     */
-    public void autoSelectBetterValue() {
-        String fieldName = fieldNameCell.getText();
-        if (fieldName == null) {
-            return; // Early return if fieldName is null or invalid
-        }
-        fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
-
-        String leftVal = leftValueCell.textProperty().getValue();
-        String rightVal = rightValueCell.textProperty().getValue();
-        if (leftVal == null || rightVal == null) {
-            return; // Early return if leftVal or rightVal is null
-        }
-        leftVal = leftVal.trim();
-        rightVal = rightVal.trim();
-
-        // Logic for auto selection based on field name
-        if (fieldName.contains("year")) {
-            try {
-                int leftYear = Integer.parseInt(leftVal);
-                int rightYear = Integer.parseInt(rightVal);
-                if (leftYear < YEAR_LOWER || leftYear > (Year.now().getValue() + YEAR_UPPER_DIF)) {
-                    selectRightValue(); // Select right value if left year is out of range, note that work created before Year 1800 will still be correctly processed
-                } else if (Math.abs(leftYear - rightYear) > YEAR_DIF) {
-                    // Select value based on a difference condition
-                    if (leftYear > rightYear) {
-                        selectLeftValue();
-                    } else {
-                        selectRightValue();
-                    }
-                }
-            } catch (NumberFormatException e) {
-                selectRightValue(); // Handle parsing exceptions
-            }
-        } else if (fieldName.contains("type")) {
-            if (MISC.equalsIgnoreCase(leftVal)) {
-                selectRightValue(); // Select right value if left value is "misc"
-            }
-        }
+    public void autoSelectBetterValue_1(){
+        viewModel.autoSelectBetterValue();
     }
 }
