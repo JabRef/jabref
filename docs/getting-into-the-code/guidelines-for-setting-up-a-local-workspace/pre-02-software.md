@@ -16,8 +16,7 @@ It is strongly recommended that you have git installed.
 
 ## Installed IDE
 
-We highly encourdage [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref), because all other IDEs work less good.
-Especially using VS.Code has issues.
+We highly encourage [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref),  as it provides the most reliable experience for this project. Other IDEs may have compatibility issues, particularly VS Code, which has known limitations when working with this codebase.
 
 IntelliJ's Community Edition works well.
 Most contributors use the Ultimate Edition, because they are students getting that edition for free.
