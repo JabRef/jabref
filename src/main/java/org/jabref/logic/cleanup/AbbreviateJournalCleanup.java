@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
@@ -88,10 +87,8 @@ public class AbbreviateJournalCleanup implements CleanupJob {
             case SHORTEST_UNIQUE -> {
                 return text.getShortestUniqueAbbreviation();
             }
-            default -> {
-                Logger.getLogger(AbbreviateJournalCleanup.class.getName()).warning("Unexpected abbreviationtype: " + abbreviationType);
-                return text.getName();
-            }
         }
+        // Should never happen
+        return text.getName();
     }
 }
