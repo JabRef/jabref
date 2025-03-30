@@ -122,7 +122,7 @@ class AbbreviateJournalCleanupTest {
     }
 
     @Test
-    void testResolveForStringsIsCalled() {
+    void resolveForStringsIsCalled() {
         Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
         Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
 
