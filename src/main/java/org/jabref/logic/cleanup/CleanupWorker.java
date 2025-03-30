@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;

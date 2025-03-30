@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
