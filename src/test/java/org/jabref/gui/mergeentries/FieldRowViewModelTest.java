@@ -1,8 +1,7 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.Optional;
-
 import java.time.Year;
+import java.util.Optional;
 
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
@@ -17,7 +16,6 @@ import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDirFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
