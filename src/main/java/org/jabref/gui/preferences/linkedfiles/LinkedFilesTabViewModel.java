@@ -41,6 +41,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFilesProperty = new SimpleBooleanProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -116,6 +117,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -191,6 +193,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty copyLinkedFilesProperty() {
+        return this.copyLinkedFilesProperty;
     }
 }
 
