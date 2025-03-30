@@ -51,7 +51,7 @@
           <VBox.margin>
             <Insets left="20.0" />
           </VBox.margin>
-          <Label text="Choose how to handle journal names:" />
+          <Label text="%Manage journal abbreviations" />
           <ComboBox fx:id="journalCleanupSelector" />
       </VBox>
             <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
