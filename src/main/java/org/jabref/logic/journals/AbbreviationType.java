@@ -1,4 +1,4 @@
-package org.jabref.gui.journals;
+package org.jabref.logic.journals;
 
 /**
  * Defines the different abbreviation types that JabRef can operate with.

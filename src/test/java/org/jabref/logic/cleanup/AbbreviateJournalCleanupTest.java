@@ -3,7 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.journals.AbbreviationType;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;

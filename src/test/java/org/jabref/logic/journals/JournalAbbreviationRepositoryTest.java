@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.UnabbreviateJournalCleanup;
 import org.jabref.model.database.BibDatabase;
