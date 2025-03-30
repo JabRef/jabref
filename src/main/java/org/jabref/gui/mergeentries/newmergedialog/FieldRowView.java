@@ -1,7 +1,5 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import java.time.Year;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -219,7 +217,7 @@ public class FieldRowView {
         return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 
-    public void autoSelectBetterValue_1(){
+    public void autoSelectBetterValue_1() {
         viewModel.autoSelectBetterValue();
     }
 }
