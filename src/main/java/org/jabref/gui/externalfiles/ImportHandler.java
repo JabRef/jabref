@@ -157,9 +157,9 @@ public class ImportHandler {
                                         LOGGER.warn("Entry's files: {}", entry.getFiles());
                                     }
                                     entry.clearField(StandardField.FILE);
+                                    entry.setCitationKey(bibDatabaseContext, preferences);
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
-                                    generateKeys(Collections.singletonList(entry));
                                     DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
@@ -225,9 +225,6 @@ public class ImportHandler {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(entries);
-        entries.forEach(entry -> {
-            entry.setFiles(entry.getFiles());
-        });
     }
 
     public void importCleanedEntries(List<BibEntry> entries) {
