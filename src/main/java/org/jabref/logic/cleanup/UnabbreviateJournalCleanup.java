@@ -44,9 +44,9 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
             return restoreUnabbreviatedJournalTitleFromFJournal(entry, fieldName, changes);
         }
 
+        String origText = entry.getField(fieldName).get();
         // No access to FJournal
         String text = entry.getFieldLatexFree(fieldName).get();
-        String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);
         }
