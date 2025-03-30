@@ -101,9 +101,9 @@ public class URLUtil {
     /**
      * Creates a {@link URL} object from the given string URL.
      * <p>
-     * If the URL does not contain a protocol (e.g., "example.com"), 
-     * "https://" is added by default to ensure a valid URL format. 
-     * This helps avoid errors when handling URLs without protocols.
+     * If the given URL string does not contain a protocol (e.g., "example.com"),
+     * "https://" is automatically added to ensure a valid URL format.
+     * This prevents errors when handling URLs without explicit protocols.
      *
      * @param url the URL string to be converted into a {@link URL}.
      * @return the {@link URL} object created from the string URL.
