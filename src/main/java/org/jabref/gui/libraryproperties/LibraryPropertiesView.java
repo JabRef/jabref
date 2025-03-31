@@ -63,7 +63,9 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
     }
 
     private void savePreferencesAndCloseDialog() {
-        viewModel.storeAllSettings();
-        close();
+        if (viewModel.validateAllSettings()) {
+            viewModel.storeAllSettings();
+            close();
+        }
     }
 }
