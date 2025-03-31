@@ -118,7 +118,7 @@ public class JournalAbbreviationMvGenerator {
             store.commit();
             LOGGER.info("Saved MV file: {}", mvFile.getFileName());
         } catch (IOException e) {
-            LOGGER.error("Failed to convert CSV file: {}. Reason: {}", csvFile, e.getMessage(), e);
+            LOGGER.error("Failed to convert CSV file: {}", csvFile, e);
         }
     }
 
@@ -141,7 +141,7 @@ public class JournalAbbreviationMvGenerator {
                 });
             store.commit();
         } catch (MVStoreException e) {
-            LOGGER.error("MVStoreException: {} , Error message: {}", path, e.getMessage(), e);
+            LOGGER.error("MVStoreException: {}", path, e);
         } catch (Exception e) {
             LOGGER.error("Unexpected error while reading MV file: {}", path, e);
         }
